@@ -19,7 +19,10 @@ class PosService
 {
     public function getPosIndexData()
     {
-        $products = Product::with('unit')->get();
+        $products = Product::with(['unit'])
+            ->withSum('productWarehouses', 'quantity') // Eager load stock sum
+            ->get();
+        
         $customers = Customer::all();
         $walkInCustomerId = $customers->where('name', 'Walk In Customer')->first()->id ?? null;
         $categories = Categories::all();
@@ -35,6 +38,10 @@ class PosService
         if (!$products || !is_array($products)) {
             throw new \Exception('Invalid product data');
         }
+
+        // Fetch all products in one query
+        $productIds = array_column($products, 'id');
+        $dbProducts = Product::whereIn('id', $productIds)->get()->keyBy('id');
 
         $subTotal = 0;
         $totalBeforeDiscounts = 0;
@@ -60,7 +67,7 @@ class PosService
         $userId = Auth::id();
         $userTimezone = Auth::user()->timezone ?? config('app.timezone');
 
-        $transactionDate = \Carbon\Carbon::parse($data['transaction_date'], $userTimezone)->setTimezone('UTC')->format('Y-m-d');
+        // $transactionDate = \Carbon\Carbon::parse($data['transaction_date'], $userTimezone)->setTimezone('UTC')->format('Y-m-d');
         $transactionDate = $data['transaction_date'];
 
         $lastPosInvoice = Sales::where('invoice', 'like', 'POS-%')
@@ -85,7 +92,7 @@ class PosService
             'invoice' => $invoice,
             'customer_id' => $data['customer_id'],
             'user_id' => Auth::id(),
-            'warehouse_id' => $mainWarehouse ? $mainWarehouse->id : null, // Added
+            'warehouse_id' => $mainWarehouse ? $mainWarehouse->id : null,
             'order_date' => $data['transaction_date'],
             'due_date' => $data['transaction_date'],
             'tax_rate' => $taxRate,
@@ -107,8 +114,16 @@ class PosService
             'notes' => 'Payment for POS sale ' . $invoice,
         ]);
 
+        // Eager load warehouse stock for bulk update
+        if ($mainWarehouse) {
+            $stockRecords = ProductWarehouse::whereIn('product_id', $productIds)
+                ->where('warehouse_id', $mainWarehouse->id)
+                ->get()
+                ->keyBy('product_id');
+        }
+
         foreach ($products as $product) {
-            $productModel = Product::find($product['id']);
+            $productModel = $dbProducts[$product['id']] ?? null;
             if (!$productModel) {
                 continue;
             }
@@ -117,7 +132,7 @@ class PosService
             SalesItem::create([
                 'sales_id' => $sale->id,
                 'product_id' => $product['id'],
-                'name' => $productModel->name, // Added product name
+                'name' => $productModel->name,
                 'quantity' => $product['quantity'],
                 'customer_price' => $product['price'],
                 'discount' => 0,
@@ -127,13 +142,8 @@ class PosService
 
             // Deduct stock from Main Warehouse
             if ($mainWarehouse) {
-                $stockRecord = ProductWarehouse::where('product_id', $productModel->id)
-                    ->where('warehouse_id', $mainWarehouse->id)
-                    ->where('tenant_id', $productModel->tenant_id)
-                    ->first();
-
-                if ($stockRecord) {
-                    $stockRecord->decrement('quantity', $product['quantity']);
+                if (isset($stockRecords[$product['id']])) {
+                    $stockRecords[$product['id']]->decrement('quantity', $product['quantity']);
                 } else {
                     // Create negative stock if allowed
                     ProductWarehouse::create([

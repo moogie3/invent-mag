@@ -895,7 +895,8 @@ class ProductControllerTest extends TestCase
                 5.0,
                 'increase',
                 'Test adjustment',
-                $this->user->id
+                $this->user->id,
+                null
             )
             ->andReturn($adjustedProduct);
 

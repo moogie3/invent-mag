@@ -44,9 +44,11 @@ class POItem extends Model
     public static function getExpiringSoonItems()
     {
         $thirtyDaysFromNow = now()->addDays(30);
-        return self::with('product')->whereNotNull('expiry_date')
+        return self::with(['product', 'purchaseOrder.warehouse'])
+            ->whereNotNull('expiry_date')
             ->where('expiry_date', '>', now())
             ->where('expiry_date', '<=', $thirtyDaysFromNow)
+            ->where('remaining_quantity', '>', 0)
             ->get();
     }
 

@@ -6,13 +6,7 @@ import { initBulkSelection, clearProductSelection } from './bulkActions/selectio
 import { initializeEntriesSelector, initKeyboardShortcuts, initExport } from './events.js';
 import { bulkUpdateStock } from './bulkActions/stock.js'; // Import bulkUpdateStock
 import { bulkDeleteProducts } from './bulkActions/delete.js'; // Import bulkDeleteProducts
-
-function getStockClassAndText(stockQty, threshold = 10) {
-    if (stockQty <= threshold) {
-        return ['bg-red text-white', 'Low Stock'];
-    }
-    return ['bg-green text-white', 'In Stock'];
-}
+import { getStockClassAndText } from './utils/ui.js';
 
 export function initProductPage() {
     document.addEventListener("DOMContentLoaded", function () {
@@ -83,6 +77,34 @@ export function initProductPage() {
         }
 
         // Stock Adjustment Modal Logic
+        function updateCurrentStockForWarehouse(productId, warehouseId) {
+            const adjustCurrentStockInput = document.getElementById('adjustCurrentStock');
+            if (!adjustCurrentStockInput) return;
+            
+            fetch(`/admin/product/modal-view/${productId}`)
+                .then(response => response.json())
+                .then(product => {
+                    let quantity = 0;
+                    if (warehouseId) {
+                        const warehouse = product.warehouses.find(w => w.id == warehouseId);
+                        quantity = warehouse ? (warehouse.pivot ? warehouse.pivot.quantity : 0) : 0;
+                    } else {
+                        quantity = product.total_stock || product.stock_quantity || 0;
+                    }
+                    adjustCurrentStockInput.value = quantity;
+                    if (typeof updateAdjustmentPreview === 'function') {
+                        updateAdjustmentPreview();
+                    }
+                })
+                .catch(error => {
+                    // // console.error('Error fetching warehouse stock:', error);
+                    adjustCurrentStockInput.value = 0;
+                    if (typeof updateAdjustmentPreview === 'function') {
+                        updateAdjustmentPreview();
+                    }
+                });
+        }
+
         window.openAdjustStockModal = function(productId, productName, currentStock) {
             document.getElementById('adjustProductId').value = productId;
             document.getElementById('adjustProductName').textContent = productName;
@@ -91,6 +113,38 @@ export function initProductPage() {
             document.getElementById('adjustmentAmount').value = 1; // Default amount
             document.getElementById('adjustmentReason').value = ''; // Clear reason
             document.getElementById('adjustmentAmountLabel').textContent = 'Adjustment Amount'; // Reset label
+            
+            // Get selected warehouse from global filter
+            const globalWarehouseSelect = document.querySelector('select[name="warehouse_id"]');
+            const globalWarehouseId = globalWarehouseSelect ? globalWarehouseSelect.value : '';
+            
+            // Get modal's warehouse dropdown
+            const adjustmentWarehouseSelect = document.getElementById('adjustmentWarehouse');
+            
+            if (adjustmentWarehouseSelect) {
+                if (globalWarehouseId) {
+                    // Pre-select the filtered warehouse and disable dropdown
+                    adjustmentWarehouseSelect.value = globalWarehouseId;
+                    adjustmentWarehouseSelect.disabled = true;
+                } else {
+                    // Enable dropdown for selection
+                    adjustmentWarehouseSelect.disabled = false;
+                    // If there's a first option (likely Main Warehouse), select it
+                    if (adjustmentWarehouseSelect.options.length > 0 && !adjustmentWarehouseSelect.value) {
+                        adjustmentWarehouseSelect.selectedIndex = 0;
+                    }
+                }
+                
+                // Add event listener for warehouse change within the modal
+                // Use onchange to replace any previous listener and avoid multiple triggers
+                adjustmentWarehouseSelect.onchange = function() {
+                    const pid = document.getElementById('adjustProductId').value;
+                    updateCurrentStockForWarehouse(pid, this.value);
+                };
+
+                // Trigger initial stock update for the selected warehouse
+                updateCurrentStockForWarehouse(productId, adjustmentWarehouseSelect.value);
+            }
             
             // Initialize adjustment preview
             updateAdjustmentPreview();
@@ -129,38 +183,48 @@ export function initProductPage() {
                 change = newStock - currentStock;
             }
 
-            adjustmentPreviewBadge.textContent = `New Stock: ${newStock} (${change >= 0 ? '+' : ''}${change})`;
-            adjustmentPreviewBadge.classList.remove('bg-secondary-lt', 'bg-success-lt', 'bg-danger-lt');
-            if (change === 0) {
-                adjustmentPreviewBadge.classList.add('bg-secondary-lt');
-            } else if (change > 0) {
-                adjustmentPreviewBadge.classList.add('bg-success-lt');
-            } else {
-                adjustmentPreviewBadge.classList.add('bg-danger-lt');
+            if (adjustmentPreviewBadge) {
+                adjustmentPreviewBadge.textContent = `New Stock: ${newStock} (${change >= 0 ? '+' : ''}${change})`;
+                adjustmentPreviewBadge.classList.remove('bg-secondary-lt', 'bg-success-lt', 'bg-danger-lt');
+                if (change === 0) {
+                    adjustmentPreviewBadge.classList.add('bg-secondary-lt');
+                } else if (change > 0) {
+                    adjustmentPreviewBadge.classList.add('bg-success-lt');
+                } else {
+                    adjustmentPreviewBadge.classList.add('bg-danger-lt');
+                }
             }
         }
 
         const adjustmentAmountContainer = document.getElementById('adjustmentAmountContainer');
         const correctionAmountContainer = document.getElementById('correctionAmountContainer');
 
-        adjustmentTypeSelect.addEventListener('change', function() {
-            const type = this.value;
-            if (type === 'correction') {
-                adjustmentAmountContainer.style.display = 'none';
-                correctionAmountContainer.style.display = 'block';
-            } else {
-                adjustmentAmountContainer.style.display = 'block';
-                correctionAmountContainer.style.display = 'none';
-            }
-            updateAdjustmentPreview();
-        });
+        if (adjustmentTypeSelect) {
+            adjustmentTypeSelect.addEventListener('change', function() {
+                const type = this.value;
+                if (type === 'correction') {
+                    if (adjustmentAmountContainer) adjustmentAmountContainer.style.display = 'none';
+                    if (correctionAmountContainer) correctionAmountContainer.style.display = 'block';
+                } else {
+                    if (adjustmentAmountContainer) adjustmentAmountContainer.style.display = 'block';
+                    if (correctionAmountContainer) correctionAmountContainer.style.display = 'none';
+                }
+                updateAdjustmentPreview();
+            });
+        }
 
-        adjustmentAmountInput.addEventListener('input', updateAdjustmentPreview);
+        if (adjustmentAmountInput) adjustmentAmountInput.addEventListener('input', updateAdjustmentPreview);
+        if (correctionAmountInput) correctionAmountInput.addEventListener('input', updateAdjustmentPreview);
 
         document.getElementById('confirmAdjustStockBtn').addEventListener('click', function() {
             const productId = document.getElementById('adjustProductId').value;
             const adjustmentType = document.getElementById('adjustmentType').value;
             const reason = document.getElementById('adjustmentReason').value;
+            
+            // Read warehouse from modal's dropdown
+            const adjustmentWarehouseSelect = document.getElementById('adjustmentWarehouse');
+            const warehouseId = adjustmentWarehouseSelect ? adjustmentWarehouseSelect.value : null;
+
             let adjustmentAmount = 0;
 
             if (adjustmentType === 'correction') {
@@ -182,6 +246,7 @@ export function initProductPage() {
                 },
                 body: JSON.stringify({
                     product_id: productId,
+                    warehouse_id: warehouseId,
                     adjustment_type: adjustmentType,
                     adjustment_amount: parseFloat(adjustmentAmount),
                     reason: reason
@@ -196,22 +261,31 @@ export function initProductPage() {
                     if (row) {
                         const stockQuantityElement = row.querySelector(".sort-quantity .fw-bold");
                         if (stockQuantityElement) {
-                            stockQuantityElement.textContent = product.stock_quantity;
-                        }
-
-                        let badgeElement = row.querySelector(".sort-quantity .badge");
-                        if (!badgeElement) {
-                            const badgeContainer = row.querySelector(".sort-quantity");
-                            if (badgeContainer) {
-                                badgeElement = document.createElement("span");
-                                badgeContainer.appendChild(badgeElement);
+                            // Determine which stock quantity to show based on global filter
+                            const globalWarehouseSelect = document.querySelector('select[name="warehouse_id"]');
+                            const globalWarehouseId = globalWarehouseSelect ? globalWarehouseSelect.value : '';
+                            
+                            let displayStock = product.total_stock;
+                            if (globalWarehouseId && product.warehouse_id == globalWarehouseId) {
+                                displayStock = product.warehouse_stock;
                             }
-                        }
+                            
+                            stockQuantityElement.textContent = displayStock;
 
-                        if (badgeElement) {
-                            const [badgeClass, badgeText] = getStockClassAndText(product.stock_quantity, product.low_stock_threshold);
-                            badgeElement.className = `badge ${badgeClass}`;
-                            badgeElement.textContent = badgeText;
+                            let badgeElement = row.querySelector(".sort-quantity .badge");
+                            if (!badgeElement) {
+                                const badgeContainer = row.querySelector(".sort-quantity");
+                                if (badgeContainer) {
+                                    badgeElement = document.createElement("span");
+                                    badgeContainer.appendChild(badgeElement);
+                                }
+                            }
+
+                            if (badgeElement) {
+                                const [badgeClass, badgeText] = getStockClassAndText(displayStock, product.low_stock_threshold);
+                                badgeElement.className = `badge ${badgeClass}`;
+                                badgeElement.textContent = badgeText;
+                            }
                         }
 
                         const thresholdElement = row.querySelector(".sort-quantity small.text-muted");

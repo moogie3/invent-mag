@@ -1,6 +1,6 @@
 export function extractProductDataFromRow(row) {
     try {
-        const img = row.querySelector(".sort-image img");
+        const imgElement = row.querySelector(".sort-image img");
         const nameElement = row.querySelector(".sort-name");
         const codeElement = row.querySelector(".sort-code");
         const quantityElement = row.querySelector(".sort-quantity");
@@ -26,6 +26,18 @@ export function extractProductDataFromRow(row) {
             }
         }
 
+        let imageSrc = null;
+        let isPlaceholder = false;
+
+        if (imgElement && imgElement.src) {
+            imageSrc = imgElement.src;
+            if (imageSrc.includes("default_placeholder.png") || imageSrc.includes("undefined") || imageSrc.includes("null")) {
+                isPlaceholder = true;
+            }
+        } else {
+            isPlaceholder = true;
+        }
+
         return {
             id: parseInt(row.dataset.id),
             name: nameElement.textContent.trim(),
@@ -38,7 +50,8 @@ export function extractProductDataFromRow(row) {
                 sellingPriceElement?.textContent || "0"
             ),
             supplier: { name: supplierElement?.textContent?.trim() || "N/A" },
-            image: img?.src || "/img/default_placeholder.png",
+            image: imageSrc,
+            is_placeholder: isPlaceholder,
             low_stock_threshold: lowStockThreshold,
         };
     } catch (error) {

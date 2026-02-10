@@ -2,6 +2,8 @@ import { setText, setBadge, getExpiryBadge } from '../utils/ui.js';
 import { formatCurrency } from '../../../../utils/currencyFormatter.js';
 import { escapeHtml } from '../../../../utils/sanitize.js';
 
+let currentProductData = null;
+
 export function initProductModal() {
     const printBtn = document.getElementById("productModalPrint");
     if (printBtn) printBtn.addEventListener("click", handleProductModalPrint);
@@ -28,7 +30,19 @@ export function initProductModal() {
                 return response.json();
             })
             .then((data) => {
+                currentProductData = data;
                 renderProductDetails(data);
+                
+                // Add event listener for warehouse context change (template is now in DOM)
+                const warehouseContextSelect = document.getElementById('viewProductWarehouseContext');
+                if (warehouseContextSelect) {
+                    warehouseContextSelect.onchange = function() {
+                        if (currentProductData) {
+                            updateStockDisplay(currentProductData, this.value);
+                        }
+                    };
+                }
+
                 // Also fetch and render the adjustment log
                 fetch(`/admin/product/${id}/adjustment-log`)
                     .then(response => response.json())
@@ -48,12 +62,51 @@ export function initProductModal() {
     };
 }
 
+function updateStockDisplay(data, warehouseId) {
+    let stockQty = 0;
+    let warehouseName = "All Warehouses";
+
+    if (warehouseId) {
+        const warehouse = data.warehouses.find(w => w.id == warehouseId);
+        stockQty = warehouse ? (warehouse.pivot ? warehouse.pivot.quantity : 0) : 0;
+        warehouseName = warehouse ? warehouse.name : "N/A";
+    } else {
+        stockQty = data.total_stock || data.stock_quantity || 0;
+    }
+
+    setText("productQuantity", stockQty);
+    
+    const threshold = data.low_stock_threshold || 10;
+    const stockElement = document.getElementById("stockStatus");
+    const isLowStock = stockQty <= threshold;
+    
+    if (stockElement) {
+        setBadge(
+            stockElement,
+            isLowStock ? "Low Stock" : "In Stock",
+            isLowStock ? "bg-danger-lt" : "bg-success-lt"
+        );
+    }
+
+    // Update Expiry Status Tab based on warehouse
+    renderExpiryItems(data, warehouseId);
+}
+
 function renderProductDetails(data) {
     const content = document.getElementById("viewProductModalContent");
     const template = document.getElementById(
         "productModalViewTemplate"
     ).innerHTML;
     content.innerHTML = template;
+
+    // Get selected warehouse from global filter to pre-set context
+    const globalWarehouseSelect = document.querySelector('select[name="warehouse_id"]');
+    const globalWarehouseId = globalWarehouseSelect ? globalWarehouseSelect.value : '';
+    
+    const warehouseContextSelect = document.getElementById('viewProductWarehouseContext');
+    if (warehouseContextSelect) {
+        warehouseContextSelect.value = globalWarehouseId;
+    }
 
     // Activate the first tab (Basic Info) by default
     const basicInfoTab = document.getElementById('basic-info-tab');
@@ -67,33 +120,21 @@ function renderProductDetails(data) {
     setText("productCode", `Code: ${data.code}`);
     setText("productCategory", data.category?.name || "N/A");
     setText("productUnit", data.unit?.symbol || "N/A");
-    setText("productQuantity", data.stock_quantity || data.total_stock || "0");
     setText("productSupplier", data.supplier?.name || "N/A");
     
     let warehouseText = "N/A";
-    // Check if warehouses relation exists and has items
     if (data.warehouses && Array.isArray(data.warehouses) && data.warehouses.length > 0) {
         warehouseText = data.warehouses.map(w => {
             const qty = w.pivot ? w.pivot.quantity : 0;
-            return `${w.name}: ${qty}`;
+            return `<strong>${escapeHtml(w.name)}:</strong> ${qty}`;
         }).join("<br>");
-    } else if (data.warehouse && data.warehouse.name) {
-        // Fallback for old structure
-        warehouseText = data.warehouse.name;
     }
     
-    // Allow HTML for warehouse list (multiline)
     const warehouseEl = document.getElementById("productWarehouse");
     if (warehouseEl) warehouseEl.innerHTML = warehouseText;
-    
-    const threshold = data.low_stock_threshold || 10;
-    const stockElement = document.getElementById("stockStatus");
-    const isLowStock = data.stock_quantity <= threshold;
-    setBadge(
-        stockElement,
-        isLowStock ? "Low Stock" : "In Stock",
-        isLowStock ? "bg-danger-lt" : "bg-success-lt"
-    );
+
+    // Initial stock display
+    updateStockDisplay(data, globalWarehouseId);
 
     const productImageContainer = document.getElementById(
         "productImageContainer"
@@ -109,7 +150,7 @@ function renderProductDetails(data) {
             data.image.toLowerCase() !== "null" &&
             data.image.toLowerCase() !== "undefined"
         ) {
-            productImageContainer.innerHTML = `<img id="productImage" src="${data.image}" alt="Product Image" class="img-fluid rounded shadow-sm" style="max-height: 220px; object-fit: contain;">`;
+            productImageContainer.innerHTML = `<img id="productImage" src="${data.image}" alt="Product Image" class="img-fluid rounded shadow-sm" style="max-height: 220px; object-fit: contain;" onerror="this.src='/img/default_placeholder.png'; this.onerror=null;">`;
         } else {
             productImageContainer.innerHTML = `
                 <div class="d-flex align-items-center justify-content-center"
@@ -120,7 +161,6 @@ function renderProductDetails(data) {
         }
     }
 
-    const thresholdElement = document.getElementById("productThreshold");
     const thresholdNote = document.getElementById("thresholdDefaultNote");
     setText("productThreshold", data.low_stock_threshold || "10");
     if (thresholdNote) {
@@ -135,10 +175,10 @@ function renderProductDetails(data) {
         data.formatted_selling_price || formatCurrency(data.selling_price)
     );
 
-    const margin = (
+    const margin = data.price > 0 ? (
         ((data.selling_price - data.price) / data.price) *
         100
-    ).toFixed(2);
+    ).toFixed(2) : "0.00";
     setText("productMargin", margin + "%");
 
     const descContainer = document.getElementById(
@@ -149,100 +189,101 @@ function renderProductDetails(data) {
     } else if (descContainer) {
         descContainer.style.display = "none";
     }
+}
 
-    // Handle Expiry Status Tab
+function renderExpiryItems(data, warehouseId = null) {
     const expiryStatusTab = document.getElementById('expiry-status-tab');
     const expiryStatusPane = document.getElementById('expiry-status-pane');
     const productExpiryStatusContent = document.getElementById('productExpiryStatusContent');
 
-    if (data.has_expiry) {
-        // Show the tab - product has expiry tracking enabled
-        if (expiryStatusTab && expiryStatusTab.parentElement) {
-            expiryStatusTab.parentElement.style.display = '';
-        }
-        if (expiryStatusPane) expiryStatusPane.style.display = '';
-        
-        if (data.po_items && data.po_items.length > 0) {
-            // Has purchase history - show expiry table
-            let expiryTableHtml = `
-                <div class="table-responsive">
-                    <table class="table table-vcenter card-table">
-                        <thead>
-                            <tr>
-                                <th>PO ID</th>
-                                <th>Quantity</th>
-                                <th>Expiry Date</th>
-                                <th>Status</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-            `;
-            data.po_items.forEach(item => {
-                const expiryDate = item.expiry_date ? new Date(item.expiry_date).toLocaleDateString("en-GB", { day: "2-digit", month: "long", year: "numeric" }) : 'N/A';
-                const today = new Date();
-                const itemExpiryDate = item.expiry_date ? new Date(item.expiry_date) : null;
-                let status = 'N/A';
-                let statusClass = '';
-
-                if (itemExpiryDate) {
-                    if (itemExpiryDate < today) {
-                        status = 'Expired';
-                        statusClass = 'badge bg-danger-lt';
-                    } else {
-                        const diffTime = Math.abs(itemExpiryDate - today);
-                        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-                        if (diffDays <= 7) {
-                            status = `Expiring in ${diffDays} days`;
-                            statusClass = 'badge bg-danger-lt';
-                        } else if (diffDays <= 30) {
-                            status = `Expiring in ${diffDays} days`;
-                            statusClass = 'badge bg-warning-lt';
-                        } else if (diffDays <= 90) {
-                            status = `Expiring in ${diffDays} days`;
-                            statusClass = 'badge bg-info-lt';
-                        } else {
-                            status = 'Long Shelf Life';
-                            statusClass = 'badge bg-success-lt';
-                        }
-                    }
-                }
-
-                expiryTableHtml += `
-                    <tr>
-                        <td><a href="/admin/po/edit/${item.po_id}">${item.po_id}</a></td>
-                        <td>${item.quantity}</td>
-                        <td>${escapeHtml(expiryDate)}</td>
-                        <td><span class="${statusClass}">${escapeHtml(status)}</span></td>
-                    </tr>
-                `;
-            });
-            expiryTableHtml += `
-                        </tbody>
-                    </table>
-                </div>
-            `;
-            if (productExpiryStatusContent) {
-                productExpiryStatusContent.innerHTML = expiryTableHtml;
-            }
-        } else {
-            // No purchase history yet - show message
-            if (productExpiryStatusContent) {
-                productExpiryStatusContent.innerHTML = `
-                    <div class="text-center text-muted py-5">
-                        <i class="ti ti-shopping-cart-off" style="font-size: 3rem; opacity: 0.3;"></i>
-                        <h4 class="mt-3">No Purchase Orders Yet</h4>
-                        <p>Expiry dates will be tracked when you create purchase orders for this product.</p>
-                    </div>
-                `;
-            }
-        }
-    } else {
-        // Product doesn't have expiry tracking - hide the tab completely
+    if (!data.has_expiry) {
         if (expiryStatusTab && expiryStatusTab.parentElement) {
             expiryStatusTab.parentElement.style.display = 'none';
         }
-        if (expiryStatusPane) {
-            expiryStatusPane.style.display = 'none';
+        if (expiryStatusPane) expiryStatusPane.style.display = 'none';
+        return;
+    }
+
+    if (expiryStatusTab && expiryStatusTab.parentElement) {
+        expiryStatusTab.parentElement.style.display = '';
+    }
+    if (expiryStatusPane) expiryStatusPane.style.display = '';
+
+    let items = data.po_items || [];
+    if (warehouseId) {
+        items = items.filter(item => item.po && item.po.warehouse_id == warehouseId);
+    }
+
+    if (items.length > 0) {
+        let expiryTableHtml = `
+            <div class="table-responsive">
+                <table class="table table-vcenter card-table">
+                    <thead>
+                        <tr>
+                            <th>PO ID</th>
+                            <th>Quantity</th>
+                            <th>Expiry Date</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+        `;
+        items.forEach(item => {
+            const expiryDate = item.expiry_date ? new Date(item.expiry_date).toLocaleDateString("en-GB", { day: "2-digit", month: "long", year: "numeric" }) : 'N/A';
+            const today = new Date();
+            const itemExpiryDate = item.expiry_date ? new Date(item.expiry_date) : null;
+            let status = 'N/A';
+            let statusClass = '';
+
+            if (itemExpiryDate) {
+                if (itemExpiryDate < today) {
+                    status = 'Expired';
+                    statusClass = 'badge bg-danger-lt';
+                } else {
+                    const diffTime = Math.abs(itemExpiryDate - today);
+                    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                    if (diffDays <= 7) {
+                        status = `Expiring in ${diffDays} days`;
+                        statusClass = 'badge bg-danger-lt';
+                    } else if (diffDays <= 30) {
+                        status = `Expiring in ${diffDays} days`;
+                        statusClass = 'badge bg-warning-lt';
+                    } else if (diffDays <= 90) {
+                        status = `Expiring in ${diffDays} days`;
+                        statusClass = 'badge bg-info-lt';
+                    } else {
+                        status = 'Long Shelf Life';
+                        statusClass = 'badge bg-success-lt';
+                    }
+                }
+            }
+
+            expiryTableHtml += `
+                <tr>
+                    <td><a href="/admin/po/edit/${item.po_id}">${item.po_id}</a></td>
+                    <td>${item.remaining_quantity || item.quantity}</td>
+                    <td>${escapeHtml(expiryDate)}</td>
+                    <td><span class="${statusClass}">${escapeHtml(status)}</span></td>
+                </tr>
+            `;
+        });
+        expiryTableHtml += `
+                    </tbody>
+                </table>
+            </div>
+        `;
+        if (productExpiryStatusContent) {
+            productExpiryStatusContent.innerHTML = expiryTableHtml;
+        }
+    } else {
+        if (productExpiryStatusContent) {
+            productExpiryStatusContent.innerHTML = `
+                <div class="text-center text-muted py-5">
+                    <i class="ti ti-shopping-cart-off" style="font-size: 3rem; opacity: 0.3;"></i>
+                    <h4 class="mt-3">${warehouseId ? 'No Stock in Selected Warehouse' : 'No Purchase Orders Yet'}</h4>
+                    <p>${warehouseId ? 'There are no active stock items with expiry dates in this warehouse.' : 'Expiry dates will be tracked when you create purchase orders for this product.'}</p>
+                </div>
+            `;
         }
     }
 }
@@ -370,7 +411,7 @@ function renderAdjustmentLog(logData) {
                 <td>${log.quantity_before}</td>
                 <td>${log.quantity_after}</td>
                 <td class="${changeClass}">${changeSign}${change}</td>
-                <td>${log.reason || 'N/A'}</td>
+                <td>${escapeHtml(log.reason || 'N/A')}</td>
                 <td>${log.adjusted_by ? log.adjusted_by.name : 'System'}</td>
             </tr>
         `;

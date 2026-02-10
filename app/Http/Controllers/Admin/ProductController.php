@@ -149,7 +149,7 @@ class ProductController extends Controller
             'supplier_id' => 'required|integer|exists:suppliers,id',
             'warehouse_id' => 'nullable|integer|exists:warehouses,id',
             'description' => 'nullable|string',
-            'image' => 'nullable|image|mimes:jpeg,jpg,png',
+            'image' => 'nullable|image|mimes:jpeg,jpg,png|max:2048',
             'has_expiry' => 'nullable|sometimes|boolean',
         ]);
 
@@ -289,18 +289,20 @@ class ProductController extends Controller
             'updates.*.id' => 'required|integer|exists:products,id',
             'updates.*.stock_quantity' => 'required|integer|min:0',
             'reason' => 'nullable|string|max:500',
+            'warehouse_id' => 'nullable|integer|exists:warehouses,id',
         ]);
 
         try {
             $result = $this->productService->bulkUpdateStock(
                 $request->updates,
                 $request->reason,
-                auth()->id()
+                auth()->id(),
+                $request->warehouse_id
             );
             $updatedProductsWithBadges = [];
             foreach ($result['changes'] as $change) {
-                // Assuming 'low_stock_threshold' is returned in the $change array from ProductService
-                $lowStockThreshold = $change['low_stock_threshold'] ?? 10; // Default to 10 if not provided
+                // Use the new total stock for badge calculation, not the warehouse-specific stock
+                $lowStockThreshold = $change['low_stock_threshold'] ?? 10;
                 [$badgeClass, $badgeText] = \App\Helpers\ProductHelper::getStockClassAndText($change['new_stock_quantity'], $lowStockThreshold);
                 $updatedProductsWithBadges[] = array_merge($change, [
                     'badge_class' => $badgeClass,
@@ -313,6 +315,7 @@ class ProductController extends Controller
                 'message' => "Successfully updated stock for {$result['updated_count']} product(s)",
                 'updated_count' => $result['updated_count'],
                 'changes' => $updatedProductsWithBadges,
+                'warehouse_id' => $request->warehouse_id, // Return the warehouse ID that was updated
             ]);
         } catch (\Exception $e) {
             return response()->json([
@@ -330,6 +333,7 @@ class ProductController extends Controller
             'adjustment_amount' => 'required|numeric|min:1', // Can be positive or negative, validation for negative will be handled by adjustment_type
             'adjustment_type' => 'required|in:increase,decrease,correction',
             'reason' => 'nullable|string|max:500',
+            'warehouse_id' => 'nullable|integer|exists:warehouses,id',
         ]);
 
         try {
@@ -339,13 +343,28 @@ class ProductController extends Controller
                 $request->adjustment_amount,
                 $request->adjustment_type,
                 $request->reason,
-                auth()->id() // Pass the authenticated user's ID
+                auth()->id(), // Pass the authenticated user's ID
+                $request->warehouse_id
             );
+
+            // Prepare the response with both total and warehouse-specific stock
+            $responseData = [
+                'id' => $adjustedProduct->id,
+                'total_stock' => $adjustedProduct->total_stock,
+                'stock_quantity' => $adjustedProduct->total_stock, // For backward compatibility
+                'low_stock_threshold' => $adjustedProduct->low_stock_threshold,
+            ];
+
+            if ($request->warehouse_id) {
+                $warehousePivot = $adjustedProduct->warehouses()->find($request->warehouse_id);
+                $responseData['warehouse_stock'] = $warehousePivot ? $warehousePivot->pivot->quantity : 0;
+                $responseData['warehouse_id'] = $request->warehouse_id;
+            }
 
             return response()->json([
                 'success' => true,
                 'message' => 'Stock adjusted successfully.',
-                'product' => $adjustedProduct,
+                'product' => $responseData,
             ]);
         } catch (\Exception $e) {
             return response()->json([

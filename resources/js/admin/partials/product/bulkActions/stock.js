@@ -1,5 +1,5 @@
 import { getSelectedProductIds, clearProductSelection } from "./selection.js";
-import { resetButton } from "../utils/ui.js";
+import { resetButton, getStockClassAndText } from "../utils/ui.js";
 import { fetchProductMetrics } from "../stats.js";
 import { originalProductData } from "../search/state.js";
 import { extractProductDataFromRow } from "../utils/helpers.js";
@@ -18,9 +18,39 @@ export function bulkUpdateStock() {
             typeof bootstrap !== "undefined" &&
             typeof bootstrap.Modal !== "undefined"
         ) {
+            // Pre-select warehouse from global filter
+            const globalWarehouseSelect = document.querySelector('select[name="warehouse_id"]');
+            const globalWarehouseId = globalWarehouseSelect ? globalWarehouseSelect.value : '';
+            const bulkUpdateWarehouseSelect = document.getElementById('bulkUpdateWarehouse');
+            
+            if (bulkUpdateWarehouseSelect) {
+                if (globalWarehouseId) {
+                    bulkUpdateWarehouseSelect.value = globalWarehouseId;
+                    bulkUpdateWarehouseSelect.disabled = true;
+                } else {
+                    bulkUpdateWarehouseSelect.disabled = false;
+                    if (bulkUpdateWarehouseSelect.options.length > 0 && !bulkUpdateWarehouseSelect.value) {
+                        bulkUpdateWarehouseSelect.selectedIndex = 0;
+                    }
+                }
+            }
+
             const modal = new bootstrap.Modal(modalElement);
             modal.show();
             loadBulkUpdateProductsFromTable(selected);
+            initializeBulkUpdateHandlers();
+
+            // Initial refresh of stock values for the selected warehouse
+            if (bulkUpdateWarehouseSelect) {
+                // Determine which warehouse ID to use (global filter or current selection)
+                const targetWarehouseId = globalWarehouseId || bulkUpdateWarehouseSelect.value;
+                if (targetWarehouseId) {
+                    // Short delay to ensure template rows are rendered and then refresh
+                    setTimeout(() => {
+                        refreshBulkUpdateStockForWarehouse(targetWarehouseId);
+                    }, 150);
+                }
+            }
         } else {
             InventMagApp.showToast(
                 "Error",
@@ -33,131 +63,72 @@ export function bulkUpdateStock() {
     }
 }
 
-function loadBulkUpdateProductsFromTable(ids) {
-    const content = document.getElementById("bulkUpdateStockContent");
+function loadBulkUpdateProductsFromTable(selectedIds) {
+    const container = document.getElementById("bulkUpdateStockContent");
+    const template = document.getElementById("stockUpdateRowTemplate");
     const countElement = document.getElementById("updateStockCount");
 
-    const validIds = ids
-        .map((id) => parseInt(id))
-        .filter((id) => !isNaN(id) && id > 0);
+    if (!container || !template) return;
 
-    if (!validIds.length) {
-        content.innerHTML =
-            '<div class="alert alert-danger">No valid products selected.</div>';
-        return;
-    }
+    container.innerHTML = "";
+    countElement.textContent = selectedIds.length;
 
-    countElement.textContent = validIds.length;
+    selectedIds.forEach((id) => {
+        const row = document.querySelector(`tr[data-id="${id}"]`);
+        if (!row) return;
 
-    const products = validIds
-        .map((id) => {
-            const idStr = id.toString();
+        const data = extractProductDataFromRow(row);
+        const clone = template.cloneNode(true);
+        clone.style.display = "block";
+        clone.id = "";
+        clone.dataset.productId = id;
 
-            if (originalProductData.has(idStr)) {
-                return originalProductData.get(idStr);
-            }
-
-            const row = document.querySelector(`tr[data-id="${id}"]`);
-            if (row) {
-                return extractProductDataFromRow(row);
-            }
-
-            return null;
-        })
-        .filter(Boolean);
-
-    if (!products.length) {
-        content.innerHTML =
-            '<div class="alert alert-danger">Could not find product data for selected items.</div>';
-        return;
-    }
-
-    renderBulkUpdateProducts(products);
-    initializeBulkUpdateHandlers();
-}
-
-function renderBulkUpdateProducts(products) {
-    const content = document.getElementById("bulkUpdateStockContent");
-    const template = document.getElementById("stockUpdateRowTemplate");
-
-    if (!template) return;
-
-    content.innerHTML = "";
-
-    products.forEach((product) => {
-        const row = template.cloneNode(true);
-        row.style.display = "block";
-        row.dataset.productId = product.id.toString();
-        row.classList.add("stock-update-row");
-
-        const elements = {
-            img: row.querySelector(".product-image"),
-            name: row.querySelector(".product-name"),
-            code: row.querySelector(".product-code"),
-            currentStock: row.querySelector(".current-stock"),
-            newStockInput: row.querySelector(".new-stock-input"),
-        };
-
-        if (elements.img) {
-            if (
-                product.image &&
-                product.image.trim() !== "" &&
-                product.image.toLowerCase() !== "null" &&
-                product.image.toLowerCase() !== "undefined"
-            ) {
-                elements.img.src = product.image;
-                elements.img.onerror = () => {
-                    elements.img.outerHTML = `<div class="d-flex align-items-center justify-content-center" style="width: 80px; height: 80px; border: 1px solid #ccc; border-radius: 5px;"><i class="ti ti-photo fs-1 text-muted"></i></div>`;
+        clone.querySelector(".product-name").textContent = data.name;
+        clone.querySelector(".product-code").textContent = data.code;
+        clone.querySelector(".current-stock").textContent = data.stock_quantity;
+        
+        const img = clone.querySelector(".product-image");
+        const iconPlaceholder = clone.querySelector(".product-icon-placeholder");
+        
+        if (data.is_placeholder) {
+            if (iconPlaceholder) iconPlaceholder.classList.remove("d-none");
+            if (img) img.classList.add("d-none");
+        } else {
+            if (img) {
+                img.src = data.image;
+                img.classList.remove("d-none");
+                img.onerror = () => {
+                    img.classList.add("d-none");
+                    if (iconPlaceholder) iconPlaceholder.classList.remove("d-none");
                 };
-            } else {
-                elements.img.outerHTML = `<div class="d-flex align-items-center justify-content-center" style="width: 80px; height: 80px; border: 1px solid #ccc; border-radius: 5px;"><i class="ti ti-photo fs-1 text-muted"></i></div>`;
             }
-        }
-        if (elements.name) elements.name.textContent = product.name;
-        if (elements.code) elements.code.textContent = `Code: ${product.code}`;
-        if (elements.currentStock)
-            elements.currentStock.textContent = product.stock_quantity;
-        if (elements.newStockInput) {
-            elements.newStockInput.value = product.stock_quantity;
-            elements.newStockInput.dataset.originalStock =
-                product.stock_quantity.toString();
+            if (iconPlaceholder) iconPlaceholder.classList.add("d-none");
         }
 
-        content.appendChild(row);
-    });
+        const input = clone.querySelector(".new-stock-input");
+        input.value = data.stock_quantity;
+        input.dataset.originalStock = data.stock_quantity;
 
-    initializeStockRowHandlers();
-}
+        // Add event listeners for this row
+        const decreaseBtn = clone.querySelector(".decrease-btn");
+        const increaseBtn = clone.querySelector(".increase-btn");
 
-function initializeStockRowHandlers() {
-    document.querySelectorAll(".stock-update-row").forEach((row) => {
-        const decrease = row.querySelector(".decrease-btn");
-        const increase = row.querySelector(".increase-btn");
-        const input = row.querySelector(".new-stock-input");
+        decreaseBtn.addEventListener("click", () => {
+            input.value = Math.max(0, parseInt(input.value) - 1);
+            updateStockChangeDisplay(clone);
+        });
 
-        if (decrease) {
-            decrease.addEventListener("click", () => {
-                const current = parseInt(input.value) || 0;
-                if (current > 0) {
-                    input.value = current - 1;
-                    updateStockChangeDisplay(row);
-                }
-            });
-        }
+        increaseBtn.addEventListener("click", () => {
+            input.value = parseInt(input.value) + 1;
+            updateStockChangeDisplay(clone);
+        });
 
-        if (increase) {
-            increase.addEventListener("click", () => {
-                const current = parseInt(input.value) || 0;
-                input.value = current + 1;
-                updateStockChangeDisplay(row);
-            });
-        }
+        input.addEventListener("input", () => {
+            if (parseInt(input.value) < 0) input.value = 0;
+            updateStockChangeDisplay(clone);
+        });
 
-        if (input) {
-            input.addEventListener("input", () =>
-                updateStockChangeDisplay(row)
-            );
-        }
+        container.appendChild(clone);
     });
 }
 
@@ -166,35 +137,122 @@ function updateStockChangeDisplay(row) {
     const badge = row.querySelector(".stock-change-badge");
     if (!input || !badge) return;
 
-    const original = parseInt(input.dataset.originalStock) || 0;
-    const current = parseInt(input.value) || 0;
-    const change = current - original;
+    const current = parseInt(input.dataset.originalStock) || 0;
+    const next = parseInt(input.value) || 0;
+    const diff = next - current;
 
-    if (change === 0) {
+    if (diff === 0) {
         badge.textContent = "No change";
         badge.className = "badge stock-change-badge bg-secondary-lt";
-    } else if (change > 0) {
-        badge.textContent = `+${change}`;
+    } else if (diff > 0) {
+        badge.textContent = `+${diff}`;
         badge.className = "badge stock-change-badge bg-success-lt";
     } else {
-        badge.textContent = change.toString();
+        badge.textContent = diff;
         badge.className = "badge stock-change-badge bg-danger-lt";
     }
+}
+
+function refreshBulkUpdateStockForWarehouse(warehouseId) {
+    const rows = document.querySelectorAll("#bulkUpdateStockContent .stock-update-row");
+    rows.forEach(row => {
+        const productId = row.dataset.productId;
+        const currentStockDisplay = row.querySelector(".current-stock");
+        const newStockInput = row.querySelector(".new-stock-input");
+        const changeBadge = row.querySelector(".stock-change-badge");
+        
+        if (!currentStockDisplay || !newStockInput) return;
+
+        fetch(`/admin/product/modal-view/${productId}`)
+            .then(response => response.json())
+            .then(product => {
+                let quantity = 0;
+                if (warehouseId) {
+                    const warehouse = product.warehouses.find(w => w.id == warehouseId);
+                    quantity = warehouse ? (warehouse.pivot ? warehouse.pivot.quantity : 0) : 0;
+                } else {
+                    quantity = product.total_stock || product.stock_quantity || 0;
+                }
+                currentStockDisplay.textContent = quantity;
+                newStockInput.dataset.originalStock = quantity.toString();
+                // Reset input to current stock to reflect the warehouse context
+                newStockInput.value = quantity;
+                if (changeBadge) {
+                    changeBadge.textContent = "No change";
+                    changeBadge.className = "badge stock-change-badge bg-secondary-lt";
+                }
+            })
+            .catch(() => {
+                currentStockDisplay.textContent = "0";
+                newStockInput.dataset.originalStock = "0";
+                newStockInput.value = 0;
+                if (changeBadge) {
+                    changeBadge.textContent = "No change";
+                    changeBadge.className = "badge stock-change-badge bg-secondary-lt";
+                }
+            });
+    });
 }
 
 function initializeBulkUpdateHandlers() {
     const confirmBtn = document.getElementById("confirmBulkUpdateBtn");
     if (confirmBtn) {
+        // Use a more robust way to handle the click and avoid multiple bindings
         const newBtn = confirmBtn.cloneNode(true);
         confirmBtn.parentNode.replaceChild(newBtn, confirmBtn);
         newBtn.addEventListener("click", () => {
             handleBulkStockUpdate();
         });
     }
+
+    const bulkUpdateWarehouseSelect = document.getElementById('bulkUpdateWarehouse');
+    if (bulkUpdateWarehouseSelect) {
+        // Use onchange to ensure only one listener is active
+        bulkUpdateWarehouseSelect.onchange = (e) => {
+            refreshBulkUpdateStockForWarehouse(e.target.value);
+        };
+    }
+
+    // Default currentBulkAction
+    window.currentBulkAction = 'add';
+
+    // Expose bulk action helper functions to window
+    window.setBulkAction = function(action, text) {
+        const btn = document.getElementById('bulkActionText');
+        if (btn) btn.textContent = text;
+        window.currentBulkAction = action;
+    };
+
+    window.applyBulkStockAction = function() {
+        const bulkStockValueInput = document.getElementById('bulkStockValue');
+        const val = parseInt(bulkStockValueInput ? bulkStockValueInput.value : 0);
+        
+        if (isNaN(val)) {
+            InventMagApp.showToast("Warning", "Please enter a valid value.", "warning");
+            return;
+        }
+
+        const action = window.currentBulkAction || 'add';
+        const rows = document.querySelectorAll("#bulkUpdateStockContent .stock-update-row");
+        
+        rows.forEach(row => {
+            const input = row.querySelector(".new-stock-input");
+            const original = parseInt(input.dataset.originalStock) || 0;
+            
+            if (action === 'add') {
+                input.value = original + val;
+            } else if (action === 'subtract') {
+                input.value = Math.max(0, original - val);
+            } else if (action === 'set') {
+                input.value = val;
+            }
+            updateStockChangeDisplay(row);
+        });
+    };
 }
 
 function handleBulkStockUpdate() {
-    const rows = document.querySelectorAll(".stock-update-row");
+    const rows = document.querySelectorAll("#bulkUpdateStockContent .stock-update-row");
     const updates = [];
 
     rows.forEach((row) => {
@@ -227,9 +285,11 @@ function handleBulkStockUpdate() {
         return;
     }
 
-    const bulkAdjustmentReason = document.getElementById(
-        "bulkAdjustmentReason"
-    ).value;
+    const bulkAdjustmentReasonInput = document.getElementById("bulkAdjustmentReason");
+    const bulkAdjustmentReason = bulkAdjustmentReasonInput ? bulkAdjustmentReasonInput.value : "";
+
+    const bulkUpdateWarehouseSelect = document.getElementById('bulkUpdateWarehouse');
+    const warehouseId = bulkUpdateWarehouseSelect ? bulkUpdateWarehouseSelect.value : null;
 
     const confirmBtn = document.getElementById("confirmBulkUpdateBtn");
     const original = confirmBtn.innerHTML;
@@ -239,7 +299,6 @@ function handleBulkStockUpdate() {
 
     const csrf = document.querySelector('meta[name="csrf-token"]');
     if (!csrf) {
-        // // console.error("CSRF token not found.");
         InventMagApp.showToast("Error", "Security token not found.", "error");
         resetButton(confirmBtn, original);
         return;
@@ -261,136 +320,69 @@ function handleBulkStockUpdate() {
         body: JSON.stringify({
             updates: payloadUpdates,
             reason: bulkAdjustmentReason || null,
+            warehouse_id: warehouseId
         }),
     })
         .then((response) => {
             if (!response.ok) {
-                return response
-                    .json()
-                    .then((errorData) => {
-                        throw new Error(
-                            errorData.message ||
-                                `Server error: ${response.status} ${response.statusText}`
-                        );
-                    })
-                    .catch(() => {
-                        throw new Error(
-                            `Server error: ${response.status} ${response.statusText}`
-                        );
-                    });
+                return response.json().then((errorData) => {
+                    throw new Error(errorData.message || `Server error: ${response.status}`);
+                }).catch(() => {
+                    throw new Error(`Server error: ${response.status}`);
+                });
             }
             return response.json();
         })
         .then((data) => {
             if (data.success) {
-                setTimeout(() => {
-                    const modal = bootstrap.Modal.getInstance(
-                        document.getElementById("bulkUpdateStockModal")
+                const modal = bootstrap.Modal.getInstance(document.getElementById("bulkUpdateStockModal"));
+                if (modal) {
+                    modal.hide();
+                    
+                    // Show toast
+                    InventMagApp.showToast(
+                        "Success",
+                        `Stock updated successfully for ${data.updated_count || updates.length} products!`,
+                        "success"
                     );
-                    if (modal) {
-                        modal.hide();
-                        // Ensure all modal backdrops are removed
-                        modal._element.addEventListener(
-                            "hidden.bs.modal",
-                            function handler() {
-                                modal._element.removeEventListener(
-                                    "hidden.bs.modal",
-                                    handler
-                                );
-                                const backdrops =
-                                    document.querySelectorAll(
-                                        ".modal-backdrop"
-                                    );
-                                backdrops.forEach((backdrop) =>
-                                    backdrop.remove()
-                                );
-                                // Show toast
-                                InventMagApp.showToast(
-                                    "Success",
-                                    `Stock updated successfully for ${
-                                        data.updated_count || updates.length
-                                    } products!`,
-                                    "success"
-                                );
-                                // Then reload after a short delay
-                                // Update the main table rows dynamically
-                                if (
-                                    data.changes &&
-                                    Array.isArray(data.changes)
-                                ) {
-                                    data.changes.forEach((change) => {
-                                        const row = document.querySelector(
-                                            `tr[data-id="${change.product_id}"]`
-                                        );
-                                        if (row) {
-                                            const stockQuantityElement =
-                                                row.querySelector(
-                                                    ".sort-quantity .fw-bold"
-                                                );
-                                            if (stockQuantityElement) {
-                                                stockQuantityElement.textContent =
-                                                    change.new_stock_quantity;
-                                            }
-                                            const badgeElement =
-                                                row.querySelector(
-                                                    ".sort-quantity .badge"
-                                                );
-                                            if (
-                                                badgeElement &&
-                                                change.badge_class &&
-                                                change.badge_text
-                                            ) {
-                                                badgeElement.className =
-                                                    change.badge_class;
-                                                badgeElement.textContent =
-                                                    change.badge_text;
-                                            } else if (badgeElement) {
-                                                // If no badge is returned, remove existing badge or hide it
-                                                badgeElement.remove();
-                                            }
-                                            // Also update the threshold if it's displayed
-                                            const thresholdElement =
-                                                row.querySelector(
-                                                    ".sort-quantity small.text-muted"
-                                                );
-                                            if (
-                                                thresholdElement &&
-                                                change.low_stock_threshold !==
-                                                    undefined
-                                            ) {
-                                                thresholdElement.textContent = `Threshold: ${change.low_stock_threshold}`;
-                                            }
-                                        }
-                                    });
+
+                    // Update the main table rows dynamically
+                    if (data.changes && Array.isArray(data.changes)) {
+                        data.changes.forEach((change) => {
+                            const row = document.querySelector(`tr[data-id="${change.product_id}"]`);
+                            if (row) {
+                                const stockQuantityElement = row.querySelector(".sort-quantity .fw-bold");
+                                if (stockQuantityElement) {
+                                    // Determine which stock quantity to show based on global filter
+                                    const globalWarehouseSelect = document.querySelector('select[name="warehouse_id"]');
+                                    const globalWarehouseId = globalWarehouseSelect ? globalWarehouseSelect.value : '';
+                                    
+                                    let displayStock = change.new_stock_quantity; // Default to total stock
+                                    if (globalWarehouseId && data.warehouse_id == globalWarehouseId) {
+                                        displayStock = change.new_warehouse_stock;
+                                    }
+                                    
+                                    stockQuantityElement.textContent = displayStock;
+
+                                    const badgeElement = row.querySelector(".sort-quantity .badge");
+                                    if (badgeElement) {
+                                        // Recalculate badge for the displayed stock context
+                                        const [badgeClass, badgeText] = getStockClassAndText(displayStock, change.low_stock_threshold);
+                                        badgeElement.className = `badge ${badgeClass}`;
+                                        badgeElement.textContent = badgeText;
+                                    }
                                 }
-                                // Clear selection after successful update
-                                clearProductSelection();
                             }
-                        );
-                    } else {
-                        // Fallback if modal instance not found
-                        InventMagApp.showToast(
-                            "Success",
-                            `Stock updated successfully for ${
-                                data.updated_count || updates.length
-                            } products!`,
-                            "success"
-                        );
-                        // Clear selection after successful update
-                        clearProductSelection();
+                        });
                     }
-                }, 300);
+                    clearProductSelection();
+                }
             } else {
                 InventMagApp.showToast("Error", data.message || "Update failed.", "error");
             }
         })
         .catch((error) => {
-            // // console.error("Fetch or processing error:", error);
-            InventMagApp.showToast(
-                "Error",
-                `An error occurred while updating stock: ${error.message}`,
-                "error"
-            );
+            InventMagApp.showToast("Error", `An error occurred: ${error.message}`, "error");
         })
         .finally(() => {
             resetButton(confirmBtn, original);

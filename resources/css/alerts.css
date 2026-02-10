@@ -148,8 +148,10 @@
 #alertTabContent {
     background: #fff;
     border-radius: 0 0 8px 8px;
-    height: 320px;
+    height: auto;
     min-height: 320px;
+    max-height: 320px;
+    overflow-y: auto;
 }
 
 /* Empty state styling */
@@ -160,8 +162,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    height: 100%;
-    min-height: 280px;
+    height: 280px;
 }
 
 /* Dark theme support */

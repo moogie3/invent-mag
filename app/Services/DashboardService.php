@@ -43,7 +43,17 @@ class DashboardService
         $recentTransactions = $this->getRecentTransactions($dates, $reportType);
         $topCategories = $this->getTopCategories($dates);
         $monthlyData = $this->getMonthlyData($dates, $categoryId);
-        $lowStockProducts = Product::getLowStockProducts();
+        // $lowStockProducts = Product::getLowStockProducts(); // Old logic
+        
+        // Fetch low stock items per warehouse
+        $lowStockProducts = \App\Models\ProductWarehouse::with(['product', 'warehouse'])
+            ->whereHas('product')
+            ->get()
+            ->filter(function ($pw) {
+                $threshold = $pw->product->low_stock_threshold ?? 10;
+                return $pw->quantity <= $threshold;
+            });
+
         $expiringSoonItems = \App\Models\POItem::getExpiringSoonItems();
 
         $monthFormat = DB::connection()->getDriverName() === 'sqlite' ? "strftime('%b', order_date)" : "DATE_FORMAT(order_date, '%b')";
@@ -341,78 +351,72 @@ class DashboardService
 
     private function getAccountsReceivableAging()
     {
-        $now = Carbon::now();
-        $aging = [
-            'current' => 0,
-            '1-30' => 0,
-            '31-60' => 0,
-            '61-90' => 0,
-            '90+' => 0,
-            'total_overdue' => 0,
-        ];
+        $tenantId = app('currentTenant')->id;
+        $driver = DB::connection()->getDriverName();
+        
+        // Calculate days overdue: NOW - due_date
+        // SQLite: julianday('now') - julianday(due_date)
+        // MySQL: DATEDIFF(NOW(), due_date)
+        
+        $diffSql = $driver === 'sqlite' 
+            ? "julianday('now') - julianday(due_date)" 
+            : "DATEDIFF(NOW(), due_date)";
 
-        $unpaidSales = Sales::whereIn('status', ['Unpaid', 'Partial'])
+        $results = DB::table('sales')
+            ->selectRaw("
+                SUM(CASE WHEN $diffSql < 0 THEN total ELSE 0 END) as current_amount,
+                SUM(CASE WHEN $diffSql >= 0 AND $diffSql <= 30 THEN total ELSE 0 END) as overdue_1_30,
+                SUM(CASE WHEN $diffSql > 30 AND $diffSql <= 60 THEN total ELSE 0 END) as overdue_31_60,
+                SUM(CASE WHEN $diffSql > 60 AND $diffSql <= 90 THEN total ELSE 0 END) as overdue_61_90,
+                SUM(CASE WHEN $diffSql > 90 THEN total ELSE 0 END) as overdue_90_plus,
+                SUM(CASE WHEN $diffSql >= 0 THEN total ELSE 0 END) as total_overdue
+            ")
+            ->where('tenant_id', $tenantId)
+            ->whereIn('status', ['Unpaid', 'Partial'])
             ->whereNotNull('due_date')
-            ->get();
+            ->first();
 
-        foreach ($unpaidSales as $sale) {
-            $daysOverdue = $now->diffInDays($sale->due_date, false); // false for absolute difference
-
-            if ($daysOverdue >= 0) { // Due date is today or in the future
-                $aging['current'] += $sale->total;
-            } elseif ($daysOverdue >= -30) { // 1-30 days overdue
-                $aging['1-30'] += $sale->total;
-                $aging['total_overdue'] += $sale->total;
-            } elseif ($daysOverdue >= -60) { // 31-60 days overdue
-                $aging['31-60'] += $sale->total;
-                $aging['total_overdue'] += $sale->total;
-            } elseif ($daysOverdue >= -90) { // 61-90 days overdue
-                $aging['61-90'] += $sale->total;
-                $aging['total_overdue'] += $sale->total;
-            } else { // 90+ days overdue
-                $aging['90+'] += $sale->total;
-                $aging['total_overdue'] += $sale->total;
-            }
-        }
-        return $aging;
+        return [
+            'current' => (float) ($results->current_amount ?? 0),
+            '1-30' => (float) ($results->overdue_1_30 ?? 0),
+            '31-60' => (float) ($results->overdue_31_60 ?? 0),
+            '61-90' => (float) ($results->overdue_61_90 ?? 0),
+            '90+' => (float) ($results->overdue_90_plus ?? 0),
+            'total_overdue' => (float) ($results->total_overdue ?? 0),
+        ];
     }
 
     private function getAccountsPayableAging()
     {
-        $now = Carbon::now();
-        $aging = [
-            'current' => 0,
-            '1-30' => 0,
-            '31-60' => 0,
-            '61-90' => 0,
-            '90+' => 0,
-            'total_overdue' => 0,
-        ];
+        $tenantId = app('currentTenant')->id;
+        $driver = DB::connection()->getDriverName();
+        
+        $diffSql = $driver === 'sqlite' 
+            ? "julianday('now') - julianday(due_date)" 
+            : "DATEDIFF(NOW(), due_date)";
 
-        $unpaidPurchases = Purchase::whereIn('status', ['Unpaid', 'Partial'])
+        $results = DB::table('po')
+            ->selectRaw("
+                SUM(CASE WHEN $diffSql < 0 THEN total ELSE 0 END) as current_amount,
+                SUM(CASE WHEN $diffSql >= 0 AND $diffSql <= 30 THEN total ELSE 0 END) as overdue_1_30,
+                SUM(CASE WHEN $diffSql > 30 AND $diffSql <= 60 THEN total ELSE 0 END) as overdue_31_60,
+                SUM(CASE WHEN $diffSql > 60 AND $diffSql <= 90 THEN total ELSE 0 END) as overdue_61_90,
+                SUM(CASE WHEN $diffSql > 90 THEN total ELSE 0 END) as overdue_90_plus,
+                SUM(CASE WHEN $diffSql >= 0 THEN total ELSE 0 END) as total_overdue
+            ")
+            ->where('tenant_id', $tenantId)
+            ->whereIn('status', ['Unpaid', 'Partial'])
             ->whereNotNull('due_date')
-            ->get();
+            ->first();
 
-        foreach ($unpaidPurchases as $purchase) {
-            $daysOverdue = $now->diffInDays($purchase->due_date, false);
-
-            if ($daysOverdue >= 0) { // Due date is today or in the future
-                $aging['current'] += $purchase->total;
-            } elseif ($daysOverdue >= -30) { // 1-30 days overdue
-                $aging['1-30'] += $purchase->total;
-                $aging['total_overdue'] += $purchase->total;
-            } elseif ($daysOverdue >= -60) { // 31-60 days overdue
-                $aging['31-60'] += $purchase->total;
-                $aging['total_overdue'] += $purchase->total;
-            } elseif ($daysOverdue >= -90) { // 61-90 days overdue
-                $aging['61-90'] += $purchase->total;
-                $aging['total_overdue'] += $purchase->total;
-            } else { // 90+ days overdue
-                $aging['90+'] += $purchase->total;
-                $aging['total_overdue'] += $purchase->total;
-            }
-        }
-        return $aging;
+        return [
+            'current' => (float) ($results->current_amount ?? 0),
+            '1-30' => (float) ($results->overdue_1_30 ?? 0),
+            '31-60' => (float) ($results->overdue_31_60 ?? 0),
+            '61-90' => (float) ($results->overdue_61_90 ?? 0),
+            '90+' => (float) ($results->overdue_90_plus ?? 0),
+            'total_overdue' => (float) ($results->total_overdue ?? 0),
+        ];
     }
 
     private function prepareFinancialItems($totalLiability, $unpaidLiability, $totalRevenue)
@@ -783,16 +787,31 @@ class DashboardService
 
     private function getAverageDueDays()
     {
-        $avgDays = Sales::where('status', 'Paid')
-            ->whereNotNull('due_date')
-            ->get()
-            ->avg(function ($sale) {
-                $latestPaymentDate = $sale->payments()->latest('payment_date')->value('payment_date');
-                if ($latestPaymentDate && $sale->due_date) {
-                    return Carbon::parse($latestPaymentDate)->diffInDays($sale->due_date);
-                }
-                return 0;
-            });
+        $tenantId = app('currentTenant')->id;
+        $driver = DB::connection()->getDriverName();
+
+        // Subquery to find the latest payment date for each sales record
+        $latestPayments = DB::table('payments')
+            ->select('paymentable_id', DB::raw('MAX(payment_date) as last_payment_date'))
+            ->where('paymentable_type', Sales::class)
+            ->where('tenant_id', $tenantId)
+            ->groupBy('paymentable_id');
+
+        // Main query to calculate average difference
+        // DATEDIFF(last_payment_date, due_date)
+        
+        $dateDiffSql = $driver === 'sqlite' 
+            ? "julianday(p.last_payment_date) - julianday(sales.due_date)" 
+            : "DATEDIFF(p.last_payment_date, sales.due_date)";
+
+        $avgDays = DB::table('sales')
+            ->joinSub($latestPayments, 'p', function ($join) {
+                $join->on('sales.id', '=', 'p.paymentable_id');
+            })
+            ->where('sales.status', 'Paid')
+            ->where('sales.tenant_id', $tenantId)
+            ->whereNotNull('sales.due_date')
+            ->avg(DB::raw($dateDiffSql));
 
         return round($avgDays) ?? 0;
     }

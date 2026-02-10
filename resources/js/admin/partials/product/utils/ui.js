@@ -23,6 +23,13 @@ export function getExpiryBadge(expiryDateStr) {
     return "";
 }
 
+export function getStockClassAndText(stockQty, threshold = 10) {
+    if (stockQty <= threshold) {
+        return ['bg-red text-white', 'Low Stock'];
+    }
+    return ['bg-green text-white', 'In Stock'];
+}
+
 export function resetButton(button, originalText) {
     if (button) {
         button.innerHTML = originalText;

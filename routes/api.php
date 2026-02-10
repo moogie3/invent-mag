@@ -22,7 +22,7 @@ Route::middleware(['throttle:auth'])->group(function () {
         ->middleware('throttle:3,60'); // Only 3 registrations per hour per IP
 });
 
-Route::post('/lookup-tenant', [TenantLookupController::class, 'lookup']);
+Route::post('/lookup-tenant', [TenantLookupController::class, 'lookup'])->middleware('throttle:10,1');
 
 // Protected routes - Token management only
 Route::middleware(['auth:sanctum', 'throttle:api'])->prefix('v1')->group(function () {

@@ -137,34 +137,43 @@ class ReportController extends Controller
 
         // Fetch revenue accounts and their balances
         $revenueAccounts = Account::where('type', 'revenue')
-            ->with(['transactions' => function ($query) use ($startDate, $endDate) {
-                $query->whereHas('journalEntry', function ($q) use ($startDate, $endDate) {
-                    $q->whereBetween('date', [$startDate, $endDate]);
-                });
-            }])->get();
+            ->with(['transactions' => function ($query) use ($startDate, $endDate) { // Fallback for complex logic, but restricted fields
+                 $query->select('account_id', 'type', 'amount')
+                       ->whereHas('journalEntry', function ($q) use ($startDate, $endDate) {
+                            $q->whereBetween('date', [$startDate, $endDate]);
+                       });
+            }])
+            ->get();
 
-        $totalRevenue = $revenueAccounts->sum(function ($account) {
-            return $account->transactions->sum(function ($transaction) {
+        // Optimized sum using PHP on minimal data
+        $totalRevenue = 0;
+        foreach ($revenueAccounts as $account) {
+            $balance = $account->transactions->sum(function ($transaction) {
                 return $transaction->type === 'credit' ? $transaction->amount : -$transaction->amount;
             });
-        });
+            $account->calculated_balance = $balance; // Store for view
+            $totalRevenue += $balance;
+        }
 
         // Fetch expense accounts and their balances
         $expenseAccounts = Account::where('type', 'expense')
             ->with(['transactions' => function ($query) use ($startDate, $endDate) {
-                $query->whereHas('journalEntry', function ($q) use ($startDate, $endDate) {
-                    $q->whereBetween('date', [$startDate, $endDate]);
-                });
-            }])->get();
+                 $query->select('account_id', 'type', 'amount')
+                       ->whereHas('journalEntry', function ($q) use ($startDate, $endDate) {
+                            $q->whereBetween('date', [$startDate, $endDate]);
+                       });
+            }])
+            ->get();
 
-        $totalExpenses = $expenseAccounts->sum(function ($account) {
-            return $account->transactions->sum(function ($transaction) {
+        $totalExpenses = 0;
+        foreach ($expenseAccounts as $account) {
+            $balance = $account->transactions->sum(function ($transaction) {
                 return $transaction->type === 'debit' ? $transaction->amount : -$transaction->amount;
             });
-        });
+            $account->calculated_balance = $balance;
+            $totalExpenses += $balance;
+        }
 
-        // Simplified for now: Gross Profit calculation might involve specific COGS accounts,
-        // but for a general income statement, we sum all revenues and expenses.
         // Net Income = Total Revenue - Total Expenses
         $netIncome = $totalRevenue - $totalExpenses;
 
@@ -298,10 +307,12 @@ class ReportController extends Controller
         $endDate = $request->input('end_date', Carbon::now()->endOfDay()->toDateString());
 
         // Get all accounts and calculate their balances up to the end_date
+        // Optimizing by selecting only necessary columns for calculation
         $accounts = Account::with(['transactions' => function ($query) use ($endDate) {
-            $query->whereHas('journalEntry', function ($q) use ($endDate) {
-                $q->where('date', '<=', $endDate);
-            });
+            $query->select('account_id', 'type', 'amount')
+                  ->whereHas('journalEntry', function ($q) use ($endDate) {
+                        $q->where('date', '<=', $endDate);
+                  });
         }])->get();
 
         $assets = collect();
@@ -314,6 +325,7 @@ class ReportController extends Controller
         foreach ($accounts as $account) {
             $balance = 0;
             // Calculate balance based on account type (debit vs credit normal balances)
+            // Since we loaded lightweight transaction objects, this sum is faster
             $debits = $account->transactions->sum(fn($t) => $t->type === 'debit' ? $t->amount : 0);
             $credits = $account->transactions->sum(fn($t) => $t->type === 'credit' ? $t->amount : 0);
 
@@ -350,11 +362,6 @@ class ReportController extends Controller
                 }
             }
         }
-
-        // This is a simplified approach. In a real system, the net income/loss from
-        // the Income Statement period would be explicitly rolled into Retained Earnings (Equity)
-        // at the end of an accounting period. For a point-in-time balance sheet, we directly sum
-        // revenues and expenses' impact into equity here.
 
         // Ensure assets, liabilities, and equity are sorted by account code or name for readability
         $assets = $assets->sortBy('code');

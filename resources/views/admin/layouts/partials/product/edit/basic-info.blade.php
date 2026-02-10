@@ -1,7 +1,7 @@
 <div class="row g-3">
     <div class="col-md-2">
         <label class="form-label">{{ __('messages.code') }}</label>
-        <input type="text" class="form-control" value="{{ $products->code }}" disabled>
+        <input type="text" name="code" class="form-control" value="{{ $products->code }}" readonly>
     </div>
 
     <div class="col-md-3">

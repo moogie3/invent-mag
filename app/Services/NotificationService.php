@@ -48,6 +48,7 @@ class NotificationService
     {
         return Purchase::with('payments')->where('due_date', '<=', Carbon::now()->addDays(7))
             ->orderBy('due_date', 'asc')
+            ->limit(20)
             ->get()
             ->map(function ($po) use ($today) {
                 $paymentDate = $po->payments->max('payment_date');
@@ -79,6 +80,7 @@ class NotificationService
     {
         return Sales::with('payments')->where('due_date', '<=', Carbon::now()->addDays(7))
             ->orderBy('due_date', 'asc')
+            ->limit(20)
             ->get()
             ->map(function ($sale) use ($today) {
                 $paymentDate = $sale->payments->max('payment_date');
@@ -137,6 +139,7 @@ class NotificationService
             ->where('expiry_date', '>', Carbon::now())
             ->where('expiry_date', '<=', $thirtyDaysFromNow)
             ->with('product') // Eager load the product relationship
+            ->limit(20)
             ->get()
             ->map(function ($poItem) {
                 $product = $poItem->product;

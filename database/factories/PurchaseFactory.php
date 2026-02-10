@@ -4,6 +4,7 @@ namespace Database\Factories;
 
 use App\Models\Supplier;
 use App\Models\Warehouse;
+use App\Models\POItem;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -36,9 +37,9 @@ class PurchaseFactory extends Factory
         ];
     }
 
-    public function hasItems(int $count = 1): static
+    public function hasItems(int $count = 1, array $attributes = []): static
     {
-        return $this->has(POItemFactory::new()->count($count), 'items');
+        return $this->has(POItem::factory()->count($count)->state($attributes), 'items');
     }
 
     public function forSupplier(Supplier $supplier)

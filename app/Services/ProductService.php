@@ -257,27 +257,29 @@ class ProductService
         return null;
     }
 
-    public function bulkUpdateStock(array $updates, ?string $reason, ?int $adjustedBy)
+    public function bulkUpdateStock(array $updates, ?string $reason, ?int $adjustedBy, ?int $warehouseId = null)
     {
-        // Bulk update now targets the Main Warehouse by default or needs a strategy.
-        // For simplicity in this refactor, we assume updates apply to the Main Warehouse
-        // or we require warehouse_id in the updates array.
-        
-        $mainWarehouse = Warehouse::where('is_main', true)->first();
-        if (!$mainWarehouse) {
-             throw new \Exception('Main warehouse not found for bulk update.');
+        // If warehouseId is provided, use it. Otherwise default to Main Warehouse.
+        if ($warehouseId) {
+            $targetWarehouse = Warehouse::find($warehouseId);
+        } else {
+            $targetWarehouse = Warehouse::where('is_main', true)->first();
+        }
+
+        if (!$targetWarehouse) {
+             throw new \Exception('Target warehouse not found for bulk update.');
         }
 
         $updatedCount = 0;
         $stockChanges = [];
 
-        DB::transaction(function () use ($updates, $reason, $adjustedBy, $mainWarehouse, &$updatedCount, &$stockChanges) {
+        DB::transaction(function () use ($updates, $reason, $adjustedBy, $targetWarehouse, &$updatedCount, &$stockChanges) {
             foreach ($updates as $update) {
                 $product = Product::findOrFail($update['id']);
                 
-                // Get stock for the main warehouse
+                // Get stock for the target warehouse
                 $stockRecord = ProductWarehouse::firstOrCreate(
-                    ['product_id' => $product->id, 'warehouse_id' => $mainWarehouse->id, 'tenant_id' => $product->tenant_id],
+                    ['product_id' => $product->id, 'warehouse_id' => $targetWarehouse->id, 'tenant_id' => $product->tenant_id],
                     ['quantity' => 0]
                 );
 
@@ -302,12 +304,12 @@ class ProductService
 
                     \App\Models\StockAdjustment::create([
                         'product_id' => $product->id,
-                        'warehouse_id' => $mainWarehouse->id, // Track warehouse
+                        'warehouse_id' => $targetWarehouse->id, // Track warehouse
                         'adjustment_type' => $adjustmentType,
                         'quantity_before' => $originalStock,
                         'quantity_after' => $newStock,
                         'adjustment_amount' => $adjustmentAmount,
-                        'reason' => $reason ?? 'Bulk stock update (Main Warehouse)',
+                        'reason' => $reason ?? "Bulk stock update ({$targetWarehouse->name})",
                         'adjusted_by' => $adjustedBy,
                         'tenant_id' => $product->tenant_id,
                     ]);
@@ -316,7 +318,8 @@ class ProductService
                         'product_id' => $product->id,
                         'product_code' => $product->code,
                         'original_stock' => $originalStock,
-                        'new_stock_quantity' => $newStock,
+                        'new_warehouse_stock' => $newStock,
+                        'new_stock_quantity' => $product->total_stock, // Return the NEW total stock
                         'change' => $newStock - $originalStock,
                         'low_stock_threshold' => $product->low_stock_threshold,
                     ];

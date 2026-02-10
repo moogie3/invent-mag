@@ -257,12 +257,28 @@
 <div id="productModalViewTemplate" style="display: none;">
     <div class="card shadow">
         <!-- Header Section -->
-        <div class="card-header py-3">
-            <div class="d-flex align-items-center justify-content-between">
-                <div>
+        <div class="card-header py-3 bg-light">
+            <div class="row align-items-center w-100">
+                <div class="col">
                     <h2 class="mb-0 fw-bold" id="productName"></h2>
                     <div class="text-muted" id="productCode"></div>
-                    <span class="badge fs-5" id="stockStatus"></span>
+                </div>
+                <div class="col-auto">
+                    <div class="d-flex align-items-center gap-3">
+                        <div style="min-width: 200px;">
+                            <label class="form-label small mb-1">{{ __('messages.warehouse_context') }}</label>
+                            <select class="form-select form-select-sm" id="viewProductWarehouseContext">
+                                <option value="">{{ __('messages.all_warehouses') }}</option>
+                                @foreach($warehouses as $warehouse)
+                                    <option value="{{ $warehouse->id }}">{{ $warehouse->name }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div>
+                            <label class="form-label small mb-1 d-block">&nbsp;</label>
+                            <span class="badge fs-5" id="stockStatus"></span>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -446,11 +462,19 @@
                 </div>
 
                 <!-- Bulk Actions Section -->
-                <div class="border-bottom p-3">
-                    <div class="row align-items-center">
-                        <div class="col-md-6">
-                            <h6 class="mb-2">{{ __('messages.product_bulk_update_stock_quick_actions') }}</h6>
-                            <div class="input-group input-group-sm">
+                <div class="border-bottom p-3 bg-light-lt">
+                    <div class="row g-3 align-items-end">
+                        <div class="col-md-4">
+                            <label class="form-label fw-bold">{{ __('messages.warehouse') }}</label>
+                            <select class="form-select" id="bulkUpdateWarehouse">
+                                @foreach($warehouses as $warehouse)
+                                    <option value="{{ $warehouse->id }}">{{ $warehouse->name }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div class="col-md-8">
+                            <label class="form-label fw-bold">{{ __('messages.product_bulk_update_stock_quick_actions') }}</label>
+                            <div class="input-group">
                                 <input type="number" id="bulkStockValue" class="form-control"
                                     placeholder="{{ __('messages.product_bulk_update_stock_enter_value') }}"
                                     min="0">
@@ -461,25 +485,19 @@
                                 </button>
                                 <ul class="dropdown-menu">
                                     <li><a class="dropdown-item" href="#"
-                                            onclick="setBulkAction('add', '{{ __('messages.product_bulk_update_stock_add_to_all') }}')">{{ __('product_bulk_update_stock_add_to_all') }}</a>
+                                            onclick="setBulkAction('add', '{{ __('messages.product_bulk_update_stock_add_to_all') }}')">{{ __('messages.product_bulk_update_stock_add_to_all') }}</a>
                                     </li>
                                     <li><a class="dropdown-item" href="#"
-                                            onclick="setBulkAction('subtract', '{{ __('messages.product_bulk_update_stock_subtract_from_all') }}')">{{ __('product_bulk_update_stock_subtract_from_all') }}</a>
+                                            onclick="setBulkAction('subtract', '{{ __('messages.product_bulk_update_stock_subtract_from_all') }}')">{{ __('messages.product_bulk_update_stock_subtract_from_all') }}</a>
                                     </li>
                                     <li><a class="dropdown-item" href="#"
-                                            onclick="setBulkAction('set', '{{ __('messages.product_bulk_update_stock_set_all_to') }}')">{{ __('product_bulk_update_stock_set_all_to') }}</a>
+                                            onclick="setBulkAction('set', '{{ __('messages.product_bulk_update_stock_set_all_to') }}')">{{ __('messages.product_bulk_update_stock_set_all_to') }}</a>
                                     </li>
                                 </ul>
                                 <button class="btn btn-info" type="button" onclick="applyBulkStockAction()">
                                     {{ __('messages.product_bulk_update_stock_apply_button') }}
                                 </button>
                             </div>
-                        </div>
-                        <div class="col-md-6 text-end">
-                            <small class="text-muted">
-                                <i class="ti ti-clock me-1"></i>
-                                {{ __('messages.product_bulk_update_stock_save_info') }}
-                            </small>
                         </div>
                     </div>
                 </div>
@@ -545,6 +563,17 @@
                     </div>
                 </div>
 
+                <div class="mb-3">
+                    <label class="form-label">{{ __('messages.warehouse') }} <span class="text-danger">*</span></label>
+                    <select class="form-select" id="adjustmentWarehouse" required>
+                        <option value="">{{ __('messages.select_warehouse') }}</option>
+                        @foreach($warehouses as $warehouse)
+                            <option value="{{ $warehouse->id }}">{{ $warehouse->name }}</option>
+                        @endforeach
+                    </select>
+                    <small class="text-muted">{{ __('messages.product_adjust_stock_warehouse_info') }}</small>
+                </div>
+
                 <div class="row g-3 mb-3">
                     <div class="col-md-6">
                         <label class="form-label">{{ __('messages.product_current_stock') }}</label>
@@ -594,9 +623,13 @@
         <div class="card-body p-3">
             <div class="row align-items-center">
                 <div class="col-md-2">
-                    <div class="product-image-container">
-                        <img class="product-image rounded" src="" alt="Product"
-                            style="width: 60px; height: 60px; object-fit: cover;">
+                    <div class="product-image-container text-center">
+                        <img class="product-image rounded d-none" src="" alt="Product"
+                            style="width: 60px; height: 60px; object-fit: cover; margin: 0 auto; border: 1px solid #eee;">
+                        <div class="product-icon-placeholder rounded d-none align-items-center justify-content-center"
+                            style="width: 60px; height: 60px; border: 1px solid #ccc; margin: 0 auto; display: flex;">
+                            <i class="ti ti-photo fs-2 text-muted"></i>
+                        </div>
                     </div>
                 </div>
                 <div class="col-md-3">

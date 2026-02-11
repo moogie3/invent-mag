@@ -121,6 +121,15 @@ class PermissionSeeder extends Seeder
             'view-warehouse',
             'create-warehouse',
             'edit-warehouse',
+
+            // Manual Journal Entries
+            'view-manual-journal',
+            'create-manual-journal',
+            'edit-manual-journal',
+            'delete-manual-journal',
+            'post-manual-journal',
+            'void-manual-journal',
+            'reverse-manual-journal',
         ];
 
         // Create all permissions
@@ -164,6 +173,8 @@ class PermissionSeeder extends Seeder
             'view-reports', 'view-financial-reports', 'edit-transactions',
             'view-accounting', 'view-chart-of-accounts', 'edit-chart-of-accounts', 'delete-chart-of-accounts',
             'view-journal', 'view-general-ledger', 'view-trial-balance',
+            'view-manual-journal', 'create-manual-journal', 'edit-manual-journal', 'delete-manual-journal',
+            'post-manual-journal', 'void-manual-journal', 'reverse-manual-journal',
             'access-pos', 'delete-pos-transactions',
             'view-supplier', 'create-supplier', 'edit-supplier', 'delete-supplier',
             'view-customer', 'create-customer', 'edit-customer', 'delete-customer',

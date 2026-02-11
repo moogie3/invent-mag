@@ -87,6 +87,12 @@ return [
                     'icon' => 'ti ti-notebook',
                 ],
                 [
+                    'title' => 'messages.manual_journal_entries',
+                    'route' => 'admin.accounting.journal-entries.index',
+                    'permission' => 'view-manual-journal',
+                    'icon' => 'ti ti-notebook',
+                ],
+                [
                     'title' => 'messages.coa',
                     'route' => 'admin.accounting.chart',
                     'permission' => 'view-accounting',

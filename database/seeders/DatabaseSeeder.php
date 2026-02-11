@@ -35,7 +35,16 @@ class DatabaseSeeder extends Seeder
         ];
 
         foreach ($tenants as $tenantData) {
-            $tenant = Tenant::create($tenantData);
+            // Check if tenant already exists
+            $existingTenant = Tenant::where('domain', $tenantData['domain'])->first();
+            if ($existingTenant) {
+                $this->command->info("Tenant {$tenantData['name']} already exists, skipping creation");
+                $tenant = $existingTenant;
+            } else {
+                $tenant = Tenant::create($tenantData);
+                $this->command->info("Created tenant: {$tenant->name}");
+            }
+            
             $tenant->makeCurrent();
 
             // 4. Run all other tenant-specific seeders
@@ -60,6 +69,7 @@ class DatabaseSeeder extends Seeder
                 SalesPipelineSeeder::class,
                 PipelineStageSeeder::class,
                 SalesOpportunitySeeder::class,
+                ManualJournalEntrySeeder::class,
             ]);
         }
 

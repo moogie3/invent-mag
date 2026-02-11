@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use App\Helpers\CurrencyHelper;
 use App\Services\NotificationService;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\View;

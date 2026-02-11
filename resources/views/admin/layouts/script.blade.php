@@ -121,6 +121,11 @@
     @vite('resources/js/admin/accounting.js')
 @endif
 
+{{-- SCRIPT FOR JOURNAL ENTRIES --}}
+@if (request()->is('admin/accounting/journal-entries*', 'admin/accounting/journal-entries/create', 'admin/accounting/journal-entries/*/edit'))
+    @vite('resources/js/admin/journal-entry.js')
+@endif
+
 {{-- SCRIPT FOR ADJUSTMENT LOG --}}
 @if (request()->is('admin/reports/adjustment-log'))
     @vite('resources/js/admin/adjustment-log.js')

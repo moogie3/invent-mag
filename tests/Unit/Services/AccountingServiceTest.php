@@ -6,6 +6,7 @@ use App\Models\Account;
 use App\Models\JournalEntry;
 use App\Models\Sales;
 use App\Services\AccountingService;
+use App\Services\AccountingAuditService;
 use Exception;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Carbon;
@@ -24,9 +25,11 @@ class AccountingServiceTest extends TestCase
     {
         parent::setUp();
         $this->setupTenant();
-        $this->accountingService = new AccountingService();
         // Seed the accounts
         $this->seed(AccountSeeder::class);
+        
+        $auditService = new AccountingAuditService();
+        $this->accountingService = new AccountingService($auditService);
     }
 
     #[Test]

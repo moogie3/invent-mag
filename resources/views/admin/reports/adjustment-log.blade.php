@@ -48,16 +48,16 @@
                     </div>
                     <div class="table-responsive">
                         <table class="table card-table table-vcenter text-nowrap datatable">
-                            <thead>
+                            <thead style="font-size: large">
                                 <tr>
-                                    <th>{{ __('messages.date') }}</th>
-                                    <th>{{ __('messages.product') }}</th>
-                                    <th>{{ __('messages.type') }}</th>
-                                    <th>{{ __('messages.quantity_before') }}</th>
-                                    <th>{{ __('messages.quantity_after') }}</th>
-                                    <th>{{ __('messages.change') }}</th>
-                                    <th>{{ __('messages.reason_for_adjustment') }}</th>
-                                    <th>{{ __('messages.adjusted_by') }}</th>
+                                    <th class="fs-4 py-3">{{ __('messages.date') }}</th>
+                                    <th class="fs-4 py-3">{{ __('messages.product') }}</th>
+                                    <th class="fs-4 py-3">{{ __('messages.type') }}</th>
+                                    <th class="fs-4 py-3">{{ __('messages.quantity_before') }}</th>
+                                    <th class="fs-4 py-3">{{ __('messages.quantity_after') }}</th>
+                                    <th class="fs-4 py-3">{{ __('messages.change') }}</th>
+                                    <th class="fs-4 py-3">{{ __('messages.reason_for_adjustment') }}</th>
+                                    <th class="fs-4 py-3">{{ __('messages.adjusted_by') }}</th>
                                 </tr>
                             </thead>
                             <tbody class="table-tbody">

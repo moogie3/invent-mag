@@ -151,7 +151,7 @@ endpoints:
       image:
         custom: []
         name: image
-        description: 'Must be an image.'
+        description: 'Must be an image. Must not be greater than 2048 kilobytes.'
         required: false
         example: null
         type: file

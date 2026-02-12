@@ -45,13 +45,13 @@
             <div class="card">
                 <div class="table-responsive">
                     <table class="table table-vcenter card-table">
-                        <thead>
+                        <thead style="font-size: large">
                             <tr>
-                                <th>{{ __('messages.name') }}</th>
-                                <th>{{ __('messages.code') }}</th>
-                                <th>{{ __('messages.type') }}</th>
-                                <th>{{ __('messages.active') }}</th>
-                                <th class="w-1">{{ __('messages.actions') }}</th>
+                                <th class="fs-4 py-3">{{ __('messages.name') }}</th>
+                                <th class="fs-4 py-3">{{ __('messages.code') }}</th>
+                                <th class="fs-4 py-3">{{ __('messages.type') }}</th>
+                                <th class="fs-4 py-3">{{ __('messages.active') }}</th>
+                                <th class="fs-4 py-3 w-1">{{ __('messages.actions') }}</th>
                             </tr>
                         </thead>
                         <tbody>

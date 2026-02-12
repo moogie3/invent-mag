@@ -257,7 +257,7 @@ paths:
                 image:
                   type: string
                   format: binary
-                  description: 'Must be an image.'
+                  description: 'Must be an image. Must not be greater than 2048 kilobytes.'
                   nullable: true
                 has_expiry:
                   type: boolean

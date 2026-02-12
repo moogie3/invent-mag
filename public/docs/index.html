@@ -30,9 +30,9 @@
         var useCsrf = Boolean();
         var csrfUrl = "/sanctum/csrf-cookie";
     </script>
-    <script src="../docs/js/tryitout-5.6.0.js"></script>
+    <script src="../docs/js/tryitout-5.7.0.js"></script>
 
-    <script src="../docs/js/theme-default-5.6.0.js"></script>
+    <script src="../docs/js/theme-default-5.7.0.js"></script>
 
 </head>
 
@@ -120,7 +120,7 @@
     </ul>
 
     <ul class="toc-footer" id="last-updated">
-        <li>Last updated: January 28, 2026</li>
+        <li>Last updated: February 12, 2026</li>
     </ul>
 </div>
 
@@ -559,8 +559,8 @@ fetch(url, {
             </summary>
             <pre><code class="language-http">cache-control: no-cache, private
 content-type: application/json
-x-ratelimit-limit: 60
-x-ratelimit-remaining: 57
+x-ratelimit-limit: 10
+x-ratelimit-remaining: 8
 access-control-allow-origin: http://localhost:4321
 access-control-allow-credentials: true
  </code></pre></details>         <pre>
@@ -844,7 +844,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
     --form "warehouse_id=17"\
     --form "description=Dolores dolorum amet iste laborum eius est dolor."\
     --form "has_expiry=1"\
-    --form "image=@C:\Users\123\AppData\Local\Temp\phpDC18.tmp" </code></pre></div>
+    --form "image=@C:\Users\123\AppData\Local\Temp\php2DAA.tmp" </code></pre></div>
 
 
 <div class="javascript-example">
@@ -1123,7 +1123,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
                value=""
                data-component="body">
     <br>
-<p>Must be an image. Example: <code>C:\Users\123\AppData\Local\Temp\phpDC18.tmp</code></p>
+<p>Must be an image. Must not be greater than 2048 kilobytes. Example: <code>C:\Users\123\AppData\Local\Temp\php2DAA.tmp</code></p>
         </div>
                 <div style=" padding-left: 28px;  clear: unset;">
             <b style="line-height: 2;"><code>has_expiry</code></b>&nbsp;&nbsp;

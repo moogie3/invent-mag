@@ -10,7 +10,7 @@
     ],
     "info": {
         "name": "INVENT-MAG API Documentation",
-        "_postman_id": "d7f6aad7-a4d8-4ca0-bef3-cd3740ad3800",
+        "_postman_id": "99aa37e7-be8b-4086-abc2-34f5c402b148",
         "description": "",
         "schema": "https:\/\/schema.getpostman.com\/json\/collection\/v2.1.0\/collection.json"
     },
@@ -175,11 +175,11 @@
                                 },
                                 {
                                     "key": "x-ratelimit-limit",
-                                    "value": "60"
+                                    "value": "10"
                                 },
                                 {
                                     "key": "x-ratelimit-remaining",
-                                    "value": "57"
+                                    "value": "8"
                                 },
                                 {
                                     "key": "access-control-allow-origin",

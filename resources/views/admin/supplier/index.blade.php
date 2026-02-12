@@ -177,40 +177,34 @@
                                                     <td class="sort-paymentterms">{{ $supplier->payment_terms }}</td>
                                                     <td class="sort-email">{{ $supplier->email }}</td>
                                                     <td class="no-print" style="text-align:center">
-                                                        <div class="dropdown">
-                                                            <button class="btn dropdown-toggle align-text-top"
-                                                                data-bs-toggle="dropdown" data-bs-boundary="viewport">
-                                                                {{ __('messages.table_action') }}
+                                                        <div class="btn-list flex-nowrap justify-content-center">
+                                                            <button type="button" class="btn btn-icon btn-ghost-secondary srm-supplier-btn"
+                                                                data-id="{{ $supplier->id }}" data-bs-toggle="modal"
+                                                                data-bs-target="#srmSupplierModal"
+                                                                title="{{ __('messages.supplier_action_view_srm') }}">
+                                                                <i class="ti ti-user-search"></i>
                                                             </button>
-                                                            <div class="dropdown-menu">
-                                                                <a href="#" class="dropdown-item srm-supplier-btn"
-                                                                    data-id="{{ $supplier->id }}" data-bs-toggle="modal"
-                                                                    data-bs-target="#srmSupplierModal">
-                                                                    <i class="ti ti-user-search me-2"></i>
-                                                                    {{ __('messages.supplier_action_view_srm') }}
-                                                                </a>
-                                                                <a href="#" class="dropdown-item"
-                                                                    data-bs-toggle="modal"
-                                                                    data-bs-target="#editSupplierModal"
-                                                                    data-id="{{ $supplier->id }}"
-                                                                    data-code="{{ $supplier->code }}"
-                                                                    data-name="{{ $supplier->name }}"
-                                                                    data-address="{{ $supplier->address }}"
-                                                                    data-phone_number="{{ $supplier->phone_number }}"
-                                                                    data-location="{{ $supplier->location }}"
-                                                                    data-payment_terms="{{ $supplier->payment_terms }}"
-                                                                    data-image="{{ $supplier->image }}"
-                                                                    data-email="{{ $supplier->email }}">
-                                                                    <i class="ti ti-edit me-2"></i>
-                                                                    {{ __('messages.edit') }}
-                                                                </a>
-                                                                <button type="button" class="dropdown-item text-danger"
-                                                                    data-bs-toggle="modal" data-bs-target="#deleteModal"
-                                                                    onclick="setDeleteFormAction('{{ route('admin.supplier.destroy', $supplier->id) }}')">
-                                                                    <i class="ti ti-trash me-2"></i>
-                                                                    {{ __('messages.delete') }}
-                                                                </button>
-                                                            </div>
+                                                            <button type="button" class="btn btn-icon btn-ghost-primary"
+                                                                data-bs-toggle="modal"
+                                                                data-bs-target="#editSupplierModal"
+                                                                data-id="{{ $supplier->id }}"
+                                                                data-code="{{ $supplier->code }}"
+                                                                data-name="{{ $supplier->name }}"
+                                                                data-address="{{ $supplier->address }}"
+                                                                data-phone_number="{{ $supplier->phone_number }}"
+                                                                data-location="{{ $supplier->location }}"
+                                                                data-payment_terms="{{ $supplier->payment_terms }}"
+                                                                data-image="{{ $supplier->image }}"
+                                                                data-email="{{ $supplier->email }}"
+                                                                title="{{ __('messages.edit') }}">
+                                                                <i class="ti ti-edit"></i>
+                                                            </button>
+                                                            <button type="button" class="btn btn-icon btn-ghost-danger"
+                                                                data-bs-toggle="modal" data-bs-target="#deleteModal"
+                                                                onclick="setDeleteFormAction('{{ route('admin.supplier.destroy', $supplier->id) }}')"
+                                                                title="{{ __('messages.delete') }}">
+                                                                <i class="ti ti-trash"></i>
+                                                            </button>
                                                         </div>
                                                     </td>
                                                 </tr>

@@ -138,40 +138,33 @@
                                                     <td class="sort-paymentterms">{{ $customer->payment_terms }}</td>
                                                     <td class="sort-email">{{ $customer->email }}</td>
                                                     <td class="no-print" style="text-align:center">
-                                                        <div class="dropdown">
-                                                            <button class="btn dropdown-toggle align-text-top"
-                                                                data-bs-toggle="dropdown" data-bs-boundary="viewport">
-                                                                {{ __('messages.table_action') }}
+                                                        <div class="btn-list flex-nowrap justify-content-center">
+                                                            <button type="button" class="btn btn-icon btn-ghost-secondary crm-btn"
+                                                                data-bs-toggle="modal"
+                                                                data-bs-target="#crmCustomerModal"
+                                                                data-id="{{ $customer->id }}"
+                                                                title="{{ __('messages.customer_action_view_crm') }}">
+                                                                <i class="ti ti-eye"></i>
                                                             </button>
-                                                            <div class="dropdown-menu">
-                                                                <a href="#" class="dropdown-item crm-btn"
-                                                                    data-bs-toggle="modal"
-                                                                    data-bs-target="#crmCustomerModal"
-                                                                    data-id="{{ $customer->id }}">
-                                                                    <i class="ti ti-eye me-2"></i>
-                                                                    {{ __('messages.customer_action_view_crm') }}
-                                                                </a>
-                                                                <a href="#" class="dropdown-item"
-                                                                    data-bs-toggle="modal"
-                                                                    data-bs-target="#editCustomerModal"
-                                                                    data-id="{{ $customer->id }}"
-                                                                    data-name="{{ $customer->name }}"
-                                                                    data-address="{{ $customer->address }}"
-                                                                    data-phone_number="{{ $customer->phone_number }}"
-                                                                    data-payment_terms="{{ $customer->payment_terms }}"
-                                                                    data-email="{{ $customer->email }}"
-                                                                    data-image="{{ $customer->image }}">
-                                                                    <i class="ti ti-edit me-2"></i>
-                                                                    {{ __('messages.edit') }}
-                                                                </a>
-
-                                                                <button type="button" class="dropdown-item text-danger"
-                                                                    data-bs-toggle="modal" data-bs-target="#deleteModal"
-                                                                    onclick="setDeleteFormAction('{{ route('admin.customer.destroy', $customer->id) }}')">
-                                                                    <i class="ti ti-trash me-2"></i>
-                                                                    {{ __('messages.delete') }}
-                                                                </button>
-                                                            </div>
+                                                            <button type="button" class="btn btn-icon btn-ghost-primary"
+                                                                data-bs-toggle="modal"
+                                                                data-bs-target="#editCustomerModal"
+                                                                data-id="{{ $customer->id }}"
+                                                                data-name="{{ $customer->name }}"
+                                                                data-address="{{ $customer->address }}"
+                                                                data-phone_number="{{ $customer->phone_number }}"
+                                                                data-payment_terms="{{ $customer->payment_terms }}"
+                                                                data-email="{{ $customer->email }}"
+                                                                data-image="{{ $customer->image }}"
+                                                                title="{{ __('messages.edit') }}">
+                                                                <i class="ti ti-edit"></i>
+                                                            </button>
+                                                            <button type="button" class="btn btn-icon btn-ghost-danger"
+                                                                data-bs-toggle="modal" data-bs-target="#deleteModal"
+                                                                onclick="setDeleteFormAction('{{ route('admin.customer.destroy', $customer->id) }}')"
+                                                                title="{{ __('messages.delete') }}">
+                                                                <i class="ti ti-trash"></i>
+                                                            </button>
                                                         </div>
                                                     </td>
                                                 </tr>

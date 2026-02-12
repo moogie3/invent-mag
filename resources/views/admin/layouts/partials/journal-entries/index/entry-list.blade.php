@@ -4,27 +4,24 @@
             <i class="ti ti-notebook-off" style="font-size: 5rem; color: #ccc;"></i>
         </div>
         <p class="empty-title">{{ __('messages.no_journal_entries_found') }}</p>
-        <p class="empty-subtitle text-muted">
-            {{ __('messages.no_journal_entries_message') }}
-        </p>
+        <p class="empty-subtitle text-muted">{{ __('messages.no_journal_entries_message') }}</p>
         <div class="empty-action">
             <a href="{{ route('admin.accounting.journal-entries.create') }}" class="btn btn-primary">
-                <i class="ti ti-plus"></i>
-                {{ __('messages.create_first_entry') }}
+                <i class="ti ti-plus me-2"></i>{{ __('messages.create_first_entry') }}
             </a>
         </div>
     </div>
 @else
     <div class="table-responsive">
         <table class="table table-vcenter card-table">
-            <thead>
+            <thead style="font-size: large">
                 <tr>
-                    <th>{{ __('messages.date') }}</th>
-                    <th>{{ __('messages.description') }}</th>
-                    <th class="text-end">{{ __('messages.debit') }}</th>
-                    <th class="text-end">{{ __('messages.credit') }}</th>
-                    <th>{{ __('messages.status') }}</th>
-                    <th class="w-1">{{ __('messages.actions') }}</th>
+                    <th class="fs-4 py-3">{{ __('messages.date') }}</th>
+                    <th class="fs-4 py-3">{{ __('messages.description') }}</th>
+                    <th class="fs-4 py-3 text-end">{{ __('messages.debit') }}</th>
+                    <th class="fs-4 py-3 text-end">{{ __('messages.credit') }}</th>
+                    <th class="fs-4 py-3">{{ __('messages.status') }}</th>
+                    <th class="fs-4 py-3 w-1">{{ __('messages.actions') }}</th>
                 </tr>
             </thead>
             <tbody>
@@ -53,18 +50,25 @@
                             @endif
                         </td>
                         <td>
-                            <div class="btn-list flex-nowrap">
-                                <a href="{{ route('admin.accounting.journal-entries.show', $entry) }}" class="btn btn-sm btn-outline-primary">
-                                    {{ __('messages.view') }}
+                            <div class="btn-list flex-nowrap justify-content-end">
+                                <a href="{{ route('admin.accounting.journal-entries.show', $entry) }}" 
+                                    class="btn btn-icon btn-ghost-secondary"
+                                    title="{{ __('messages.view') }}">
+                                    <i class="ti ti-eye"></i>
                                 </a>
                                 @if($entry->status == 'draft')
-                                    <a href="{{ route('admin.accounting.journal-entries.edit', $entry) }}" class="btn btn-sm btn-outline-secondary">
-                                        {{ __('messages.edit') }}
+                                    <a href="{{ route('admin.accounting.journal-entries.edit', $entry) }}" 
+                                        class="btn btn-icon btn-ghost-primary"
+                                        title="{{ __('messages.edit') }}">
+                                        <i class="ti ti-edit"></i>
                                     </a>
                                 @endif
                                 @if($entry->status == 'posted')
-                                    <button type="button" class="btn btn-sm btn-outline-warning" onclick="confirmAction('{{ route('admin.accounting.journal-entries.reverse', $entry) }}', '{{ __('messages.reverse_entry') }}', '{{ __('messages.reverse_confirmation') }}')">
-                                        {{ __('messages.reverse') }}
+                                    <button type="button" 
+                                        class="btn btn-icon btn-ghost-warning"
+                                        title="{{ __('messages.reverse') }}"
+                                        onclick="confirmAction('{{ route('admin.accounting.journal-entries.reverse', $entry) }}', '{{ __('messages.reverse_entry') }}', '{{ __('messages.reverse_confirmation') }}')">
+                                        <i class="ti ti-arrow-back-up"></i>
                                     </button>
                                 @endif
                             </div>
@@ -74,7 +78,6 @@
             </tbody>
         </table>
     </div>
-
     <div class="mt-3">
         {{ $entries->appends(request()->query())->links() }}
     </div>

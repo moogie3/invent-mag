@@ -51,12 +51,12 @@
                 </div>
                 <div class="table-responsive">
                     <table class="table table-vcenter card-table">
-                        <thead>
+                        <thead style="font-size: large">
                             <tr>
-                                <th>{{ __('messages.code') }}</th>
-                                <th>{{ __('messages.account') }}</th>
-                                <th class="text-end">{{ __('messages.debit') }}</th>
-                                <th class="text-end">{{ __('messages.credit') }}</th>
+                                <th class="fs-4 py-3">{{ __('messages.code') }}</th>
+                                <th class="fs-4 py-3">{{ __('messages.account') }}</th>
+                                <th class="fs-4 py-3 text-end">{{ __('messages.debit') }}</th>
+                                <th class="fs-4 py-3 text-end">{{ __('messages.credit') }}</th>
                             </tr>
                         </thead>
                         <tbody>

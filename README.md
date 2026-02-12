@@ -4,21 +4,21 @@
 **Author:** moogie3  
 **License:** MIT  
 **Development Time:** 1.5 years (371+ commits)  
-**Status:** Production-Ready  
+**Status:** Production-Ready
 
 ---
 
 ## 📊 Project Statistics
 
-| Metric | Value |
-|--------|-------|
-| **🏗️ Architecture** | Multi-tenant SaaS |
-| **🧪 Test Coverage** | 60+ test files (Feature & Unit) |
-| **💻 Codebase** | 371+ commits, 1.5 years development |
-| **🔐 Security** | RBAC with 50+ permissions, audit logging |
-| **🐳 DevOps** | Docker + GitHub Actions CI/CD |
-| **📡 API** | RESTful API with Sanctum authentication |
-| **🌍 Multi-tenancy** | Database-level tenant isolation |
+| Metric               | Value                                    |
+| -------------------- | ---------------------------------------- |
+| **🏗️ Architecture**  | Multi-tenant SaaS                        |
+| **🧪 Test Coverage** | 60+ test files (Feature & Unit)          |
+| **💻 Codebase**      | 371+ commits, 1.5 years development      |
+| **🔐 Security**      | RBAC with 50+ permissions, audit logging |
+| **🐳 DevOps**        | Docker + GitHub Actions CI/CD            |
+| **📡 API**           | RESTful API with Sanctum authentication  |
+| **🌍 Multi-tenancy** | Database-level tenant isolation          |
 
 ---
 
@@ -37,8 +37,8 @@ Unlike basic inventory systems, Invent-MAG provides **sophisticated business int
 Experience Invent-MAG firsthand:
 
 - **URL:** `https://invent-mag.com`
-- **Admin Login:** `admin@example.com` / `password`
-- **Manager Login:** `manager@example.com` / `password`
+- **Super User Login:** `superuser@example.com` / `password`
+- **POS Login:** `pos@example.com` / `password`
 - **Staff Login:** `staff@example.com` / `password`
 
 ---
@@ -48,6 +48,7 @@ Experience Invent-MAG firsthand:
 ### **📦 Inventory & Product Management**
 
 #### Core Features
+
 - **Product Catalog:** Full CRUD with images, categories, descriptions
 - **Multi-Warehouse Support:** Track stock across unlimited warehouses
 - **Real-time Stock Control:** Live inventory levels per warehouse
@@ -56,6 +57,7 @@ Experience Invent-MAG firsthand:
 - **Unit Management:** Multiple units of measure per product
 
 #### Advanced Inventory Features
+
 - **Product Expiry Tracking:** Monitor and alert on expiring products
 - **Barcode Search:** Quick product lookup via barcode scanning
 - **Stock Adjustment Audit Trail:** Before/after quantities, user tracking
@@ -67,6 +69,7 @@ Experience Invent-MAG firsthand:
 ### **💰 Sales & Customer Management (CRM)**
 
 #### Sales Operations
+
 - **Sales Order Management:** Full lifecycle from quote to payment
 - **Point of Sale (POS):** Dedicated interface with receipt printing
 - **Multiple Payment Methods:** Cash, card, transfer per transaction
@@ -74,6 +77,7 @@ Experience Invent-MAG firsthand:
 - **Invoice Generation:** PDF invoice creation
 
 #### Customer Intelligence
+
 - **Customer Database:** Full profiles with interaction history
 - **Purchase History:** Complete customer transaction records
 - **Customer Lifetime Value (LTV):** Automated calculation
@@ -81,6 +85,7 @@ Experience Invent-MAG firsthand:
 - **Per-Customer Pricing:** Historical price tracking
 
 #### Advanced CRM Features
+
 - **Sales Pipeline:** Kanban-style opportunity management
 - **Pipeline Stages:** Customizable stages with drag-and-drop
 - **Opportunity Tracking:** Value, probability, expected close dates
@@ -88,10 +93,11 @@ Experience Invent-MAG firsthand:
 - **Interaction Tracking:** Log calls, emails, meetings, notes
 
 #### Sales Analytics
+
 - **Sales Forecasting:** ⭐ **Holt-Winters algorithm + Linear Regression**
-  - Predicts future sales based on historical data
-  - Seasonal trend analysis
-  - Accuracy metrics
+    - Predicts future sales based on historical data
+    - Seasonal trend analysis
+    - Accuracy metrics
 - **Sales Metrics:** Real-time dashboard KPIs
 - **Collection Rate:** Automated performance tracking
 
@@ -100,12 +106,14 @@ Experience Invent-MAG firsthand:
 ### **🛒 Purchase & Supplier Management (SRM)**
 
 #### Purchase Operations
+
 - **Purchase Order Management:** Full CRUD with stock reconciliation
 - **Multi-warehouse Receiving:** Receive to specific warehouses
 - **Purchase Returns:** Complete returns to suppliers
 - **Expiry Date Tracking:** Monitor product expiration dates
 
 #### Supplier Intelligence
+
 - **Supplier Database:** Profiles with interaction history
 - **Purchase History:** Complete supplier transaction records
 - **Supplier Analytics:** Performance tracking
@@ -116,12 +124,14 @@ Experience Invent-MAG firsthand:
 ### **📊 Financial & Accounting Suite**
 
 #### Chart of Accounts
+
 - **Hierarchical COA:** 35+ pre-configured accounts
 - **Account Types:** Assets, Liabilities, Equity, Revenue, Expenses
 - **Contra Accounts:** Support for accumulated depreciation, allowances
 - **Manual Entry Control:** Per-account permissions
 
 #### Journal Entry System ⭐ **NEW**
+
 - **Manual Journal Entries:** Full CRUD with multi-line support
 - **Status Workflow:** Draft → Posted → Void
 - **Balance Validation:** Automatic debit/credit balancing
@@ -130,11 +140,13 @@ Experience Invent-MAG firsthand:
 - **Audit Trail:** Complete change history for compliance
 
 #### Core Accounting
+
 - **General Journal:** All financial transactions
 - **General Ledger:** Account-level transaction history
 - **Trial Balance:** Automated balancing validation
 
 #### Financial Reporting
+
 - **Income Statement:** P&L with customizable periods
 - **Balance Sheet:** Financial position snapshot
 - **AR Aging Report:** Outstanding receivables (Current, 1-30, 31-60, 61-90, 90+ days)
@@ -142,6 +154,7 @@ Experience Invent-MAG firsthand:
 - **Cash Position:** Current cash across accounts
 
 #### Advanced Accounting Features
+
 - **Double-Entry Bookkeeping:** Automatic journal entry creation
 - **Multi-Currency Support:** Transaction recording in multiple currencies
 - **Opening Balances:** Setup wizard for new fiscal years
@@ -153,6 +166,7 @@ Experience Invent-MAG firsthand:
 ### **⚙️ Administration & System**
 
 #### Dashboard & Analytics
+
 - **Interactive Dashboard:** Real-time KPIs and metrics
 - **Sales Charts:** Visual sales trends
 - **Financial Health:** Cash position, AR/AP summaries
@@ -160,12 +174,14 @@ Experience Invent-MAG firsthand:
 - **Sales Forecast:** Visual forecast with confidence intervals
 
 #### User Management
+
 - **Role-Based Access Control:** Admin, Manager, Staff roles
 - **Granular Permissions:** 50+ specific permissions
 - **User Profiles:** Avatar support, password management
 - **Email Verification:** Required for account activation
 
 #### System Configuration
+
 - **Currency Settings:** Multi-currency configuration
 - **Tax Configuration:** Dynamic tax rate management
 - **Theme Settings:** Dark/light mode with persistence
@@ -174,12 +190,13 @@ Experience Invent-MAG firsthand:
 - **Unit Management:** Units of measure
 
 #### Security & Compliance
+
 - **Comprehensive Audit Logging:**
-  - Password changes
-  - Failed login attempts
-  - Successful logins
-  - Permission denials
-  - Suspicious activity
+    - Password changes
+    - Failed login attempts
+    - Successful logins
+    - Permission denials
+    - Suspicious activity
 - **Rate Limiting:** Custom throttling (5 login attempts, 3 reg/hour)
 - **Input Sanitization:** XSS protection
 - **Custom Error Pages:** 403, 404, 419, 429, 500, 503
@@ -189,12 +206,14 @@ Experience Invent-MAG firsthand:
 ### **🔌 API & Integrations**
 
 #### RESTful API
+
 - **Versioned API:** v1 with Sanctum authentication
 - **Auto-Generated Documentation:** Scribe-generated at `/docs`
 - **Postman Collection:** Ready to use
 - **OpenAPI 3.0 Spec:** Standard specification
 
 #### API Endpoints Include:
+
 ```
 Authentication:
 - POST /api/login
@@ -225,18 +244,21 @@ Data:
 ### **🛠️ Developer Features**
 
 #### Testing
+
 - **60+ Test Files:** Feature and unit tests
 - **PHPUnit 10+:** Modern PHP testing
 - **Parallel Testing:** `php artisan test --parallel`
 - **Multi-tenancy Tests:** Tenant isolation testing
 
 #### Code Quality
+
 - **Laravel Pint:** Code formatting
 - **Service Layer Pattern:** Clean architecture
 - **Repository Pattern:** Data access abstraction
 - **Type Hints:** Full PHP 8+ type declarations
 
 #### Developer Tools
+
 - **ER Diagram Generator:** `php artisan generate:erd`
 - **Laravel Pail:** Real-time log monitoring
 - **API Documentation:** Auto-generated with Scribe
@@ -246,24 +268,25 @@ Data:
 
 ## 🔐 Security Architecture
 
-| Layer | Implementation |
-|-------|----------------|
-| **Authentication** | Laravel Fortify + Email Verification |
-| **API Security** | Laravel Sanctum (Token-based) |
-| **Authorization** | Spatie Permission (50+ permissions) |
-| **Tenant Isolation** | Spatie Multitenancy (Database-level) |
-| **Password Security** | Bcrypt hashing |
-| **CSRF Protection** | Built-in token validation |
-| **XSS Prevention** | Blade auto-escaping + sanitize.js |
-| **SQL Injection** | Query Builder/Eloquent ORM |
-| **Rate Limiting** | Custom throttling per endpoint |
-| **Audit Trail** | SecurityLogger + AccountingAuditLog |
+| Layer                 | Implementation                       |
+| --------------------- | ------------------------------------ |
+| **Authentication**    | Laravel Fortify + Email Verification |
+| **API Security**      | Laravel Sanctum (Token-based)        |
+| **Authorization**     | Spatie Permission (50+ permissions)  |
+| **Tenant Isolation**  | Spatie Multitenancy (Database-level) |
+| **Password Security** | Bcrypt hashing                       |
+| **CSRF Protection**   | Built-in token validation            |
+| **XSS Prevention**    | Blade auto-escaping + sanitize.js    |
+| **SQL Injection**     | Query Builder/Eloquent ORM           |
+| **Rate Limiting**     | Custom throttling per endpoint       |
+| **Audit Trail**       | SecurityLogger + AccountingAuditLog  |
 
 ---
 
 ## 🚀 Technology Stack
 
 ### Backend
+
 - **Framework:** Laravel 11 (PHP 8.2+)
 - **Authentication:** Laravel Fortify + Sanctum
 - **Permissions:** Spatie Laravel Permission
@@ -272,6 +295,7 @@ Data:
 - **Testing:** PHPUnit 10+ + Paratest
 
 ### Frontend
+
 - **Template Engine:** Blade
 - **CSS Framework:** Tailwind CSS
 - **JavaScript:** Alpine.js
@@ -279,6 +303,7 @@ Data:
 - **UI Kit:** Tabler
 
 ### Database & Storage
+
 - **Primary:** MySQL (recommended)
 - **Alternative:** SQLite
 - **Cache:** File/Database (Redis ready)
@@ -286,6 +311,7 @@ Data:
 - **Backups:** Spatie Laravel Backup
 
 ### DevOps
+
 - **Containerization:** Docker + Docker Compose
 - **CI/CD:** GitHub Actions
 - **Code Quality:** Laravel Pint
@@ -298,6 +324,7 @@ Data:
 **60+ Test Files Covering:**
 
 ### Feature Tests
+
 - Authentication & Authorization
 - Product Management (CRUD, bulk operations)
 - Sales & Purchase Orders
@@ -310,12 +337,14 @@ Data:
 - Multi-tenancy
 
 ### Unit Tests
+
 - Service Layer (Dashboard, Sales, POS, Accounting, etc.)
 - Helper Classes (Currency, Sales, Product)
 - DTOs and Form Requests
 - Middleware
 
 ### Running Tests
+
 ```bash
 # All tests
 php artisan test
@@ -332,6 +361,7 @@ npm run test:js
 ## 🐳 Docker Support
 
 ### Quick Start with Docker
+
 ```bash
 # Clone and start
 git clone https://github.com/moogie3/invent-mag.git
@@ -346,6 +376,7 @@ http://localhost
 ```
 
 ### Docker Includes:
+
 - PHP 8.2-FPM
 - Nginx web server
 - MySQL database
@@ -403,11 +434,13 @@ docker-compose exec app php artisan migrate --seed
 ## 📚 Documentation
 
 ### API Documentation
+
 - **URL:** `/docs` (after installation)
 - **Features:** Try It Out, code examples, OpenAPI spec
 - **Formats:** HTML, Postman Collection, OpenAPI 3.0
 
 ### Code Documentation
+
 - **ER Diagram:** `php artisan generate:erd`
 - **API Spec:** Auto-generated via Scribe
 - **Test Docs:** PHPUnit coverage reports
@@ -417,6 +450,7 @@ docker-compose exec app php artisan migrate --seed
 ## 🗺️ Roadmap
 
 ### Recently Added (v1.2)
+
 - ✅ Manual Journal Entry System
 - ✅ Journal Entry Approval Workflow
 - ✅ Comprehensive Audit Trail
@@ -425,6 +459,7 @@ docker-compose exec app php artisan migrate --seed
 - ✅ Opening Balance Support
 
 ### Planned Features
+
 - 🔄 Bank Reconciliation
 - 🔄 Cash Flow Statement
 - 🔄 Advanced Multi-Currency
@@ -457,5 +492,3 @@ Invent-MAG is licensed under the **MIT License**. See the `LICENSE` file for det
 - Icons by [Tabler Icons](https://tabler-icons.io)
 
 ---
-
-**⭐ Star this repository if you find it helpful!**

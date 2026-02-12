@@ -118,7 +118,7 @@
 
 <!-- Low Stock Products Modal -->
 <div class="modal modal-blur fade" id="lowStockModal" tabindex="-1" role="dialog" aria-hidden="true">
-    <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+    <div class="modal-dialog modal-xl modal-dialog-centered" role="document">
         <div class="modal-content">
             <div class="modal-header bg-danger text-white">
                 <h4 class="modal-title"><i
@@ -131,35 +131,38 @@
                     <table class="table card-table table-vcenter">
                         <thead>
                             <tr>
-                                <th>{{ __('messages.name') }}</th>
-                                <th class="text-center">{{ __('messages.product_current_stock') }}</th>
-                                <th class="text-center">{{ __('messages.threshold') }}</th>
-                                <th class="text-end">{{ __('messages.action') }}</th>
+                                <th class="fs-4 fw-bold">{{ __('messages.name') }}</th>
+                                <th class="text-center fs-4 fw-bold">{{ __('messages.product_current_stock') }}</th>
+                                <th class="text-center fs-4 fw-bold">{{ __('messages.threshold') }}</th>
+                                <th class="text-end fs-4 fw-bold">{{ __('messages.action') }}</th>
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach ($lowStockProducts as $product)
+                            @foreach ($lowStockProducts as $pw)
                                 <tr>
-                                    <td>{{ $product->name }}</td>
+                                    <td>{{ $pw->product->name }}</td>
                                     @php
                                         [
                                             $stockBadgeClass,
                                             $stockBadgeText,
-                                        ] = \App\Helpers\ProductHelper::getStockClassAndText($product->stock_quantity, $product->low_stock_threshold);
+                                        ] = \App\Helpers\ProductHelper::getStockClassAndText($pw->quantity ?? 0, $pw->product->low_stock_threshold ?? 10);
                                     @endphp
                                     <td class="text-center">
                                         <span class="{{ $stockBadgeClass }}">
-                                            {{ $product->stock_quantity }}
+                                            {{ $pw->quantity }}
                                             @if ($stockBadgeText)
                                                 <small>({{ $stockBadgeText }})</small>
                                             @endif
                                         </span>
+                                        @if($pw->warehouse)
+                                            <small class="text-muted d-block">{{ $pw->warehouse->name }}</small>
+                                        @endif
                                     </td>
-                                    <td class="text-center">{{ $product->low_stock_threshold ?? 10 }}</td>
+                                    <td class="text-center">{{ $pw->product->low_stock_threshold ?? 10 }}</td>
                                     <td class="text-end">
-                                        <a href="{{ route('admin.product.edit', $product->id) }}"
-                                            class="btn btn-sm btn-primary">
-                                            <i class="ti ti-edit me-1"></i> {{ __('messages.edit') }}
+                                        <a href="{{ route('admin.product.edit', $pw->product->id) }}"
+                                            class="btn btn-icon btn-ghost-primary" title="{{ __('messages.edit') }}">
+                                            <i class="ti ti-edit"></i>
                                         </a>
                                     </td>
                                 </tr>
@@ -181,7 +184,7 @@
 
 <!-- Expiring Soon Products Modal -->
 <div class="modal modal-blur fade" id="expiringSoonModal" tabindex="-1" role="dialog" aria-hidden="true">
-    <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+    <div class="modal-dialog modal-xl modal-dialog-centered" role="document">
         <div class="modal-content">
             <div class="modal-header bg-warning text-white">
                 <h4 class="modal-title"><i
@@ -195,11 +198,12 @@
                     <table class="table card-table table-vcenter">
                         <thead>
                             <tr>
-                                <th>{{ __('messages.table_product_name') }}</th>
-                                <th class="text-center">{{ __('messages.po_id') }}</th>
-                                <th class="text-center">{{ __('messages.quantity') }}</th>
-                                <th class="text-center">{{ __('messages.table_expiry_date') }}</th>
-                                <th class="text-end">{{ __('messages.action') }}</th>
+                                <th class="fs-4 fw-bold">{{ __('messages.table_product_name') }}</th>
+                                <th class="text-center fs-4 fw-bold">{{ __('messages.po_id') }}</th>
+                                <th class="text-center fs-4 fw-bold">{{ __('messages.quantity') }}</th>
+                                <th class="text-center fs-4 fw-bold">{{ __('messages.table_expiry_date') }}</th>
+                                <th class="text-center fs-4 fw-bold">{{ __('messages.status') }}</th>
+                                <th class="text-end fs-4 fw-bold">{{ __('messages.action') }}</th>
                             </tr>
                         </thead>
                         <tbody id="expiringSoonProductsTableBody">

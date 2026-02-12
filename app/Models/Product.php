@@ -122,26 +122,36 @@ class Product extends Model
 
 
     /**
-     * Get all products with low stock
+     * Get all products with low stock (per warehouse)
      *
      * @return \Illuminate\Database\Eloquent\Collection
      */
     public static function getLowStockProducts()
     {
-        // Filter in PHP to be database agnostic (SQLite/MySQL compatible)
-        return self::with('productWarehouses')->get()->filter(function ($product) {
-            return $product->total_stock <= $product->getLowStockThreshold();
-        })->values(); // Reset keys
+        return \App\Models\ProductWarehouse::with(['product', 'warehouse'])
+            ->whereHas('product')
+            ->get()
+            ->filter(function ($pw) {
+                $threshold = $pw->product->low_stock_threshold ?? 10;
+                return $pw->quantity <= $threshold;
+            });
     }
 
     /**
-     * Count how many products have low stock
+     * Count how many products have low stock (per warehouse)
      *
      * @return int
      */
     public static function lowStockCount(): int
     {
-        return self::getLowStockProducts()->count();
+        return \App\Models\ProductWarehouse::with(['product'])
+            ->whereHas('product')
+            ->get()
+            ->filter(function ($pw) {
+                $threshold = $pw->product->low_stock_threshold ?? 10;
+                return $pw->quantity <= $threshold;
+            })
+            ->count();
     }
 
     /**

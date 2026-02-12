@@ -271,11 +271,11 @@
 
                                     @if (isset($notifications) &&
                                             $notifications->filter(function ($n) {
-                                                    return $n['type'] == 'product' && $n['status'] == 'Expiring Soon';
+                                                    return $n['type'] == 'product' && isset($n['days_remaining']) && $n['days_remaining'] <= 30;
                                                 })->count() > 0)
                                         @php
                                             $expiringNotifications = $notifications->filter(function ($n) {
-                                                return $n['type'] == 'product' && $n['status'] == 'Expiring Soon';
+                                                return $n['type'] == 'product' && isset($n['days_remaining']) && $n['days_remaining'] <= 30;
                                             });
                                             $expiringCount = $expiringNotifications->count();
                                         @endphp

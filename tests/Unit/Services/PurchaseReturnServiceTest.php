@@ -35,6 +35,12 @@ class PurchaseReturnServiceTest extends TestCase
         $this->product = Product::factory()->withStock(100)->create();
         $this->purchase = Purchase::factory()->create();
         
+        // Sync product warehouse to match purchase warehouse for consistent testing
+        $productWarehouse = $this->product->productWarehouses()->first();
+        if ($productWarehouse) {
+            $productWarehouse->update(['warehouse_id' => $this->purchase->warehouse_id]);
+        }
+        
         // Mock AccountingService
         $this->accountingServiceMock = Mockery::mock(AccountingService::class);
         $this->purchaseReturnService = new PurchaseReturnService($this->accountingServiceMock);

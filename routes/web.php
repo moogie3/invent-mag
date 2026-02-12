@@ -494,6 +494,18 @@ Route::middleware('web')->prefix('admin')->group(function () {
                 ->name('admin.reports.adjustment-log')
                 ->middleware('can:view-reports');
 
+            Route::post('/stock-transfer', [ReportController::class, 'stockTransfer'])
+                ->name('admin.reports.stock-transfer')
+                ->middleware('can:adjust-stock');
+
+            Route::get('/stock-transfer', [ReportController::class, 'stockTransferPage'])
+                ->name('admin.reports.stock-transfer.page')
+                ->middleware('can:adjust-stock');
+
+            Route::get('/stock-transfer/products/{warehouseId}', [ReportController::class, 'getProductsForTransfer'])
+                ->name('admin.reports.stock-transfer.products')
+                ->middleware('can:adjust-stock');
+
             Route::get('/recent-transactions', [ReportController::class, 'recentTransactions'])
                 ->name('admin.reports.recent-transactions')
                 ->middleware('can:view-reports');

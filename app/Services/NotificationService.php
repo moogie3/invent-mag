@@ -34,7 +34,14 @@ class NotificationService
             ->where('status', '!=', 'Paid')
             ->count();
 
-        $lowStockCount = Product::lowStockCount();
+        $lowStockCount = \App\Models\ProductWarehouse::with(['product'])
+            ->whereHas('product')
+            ->get()
+            ->filter(function ($pw) {
+                $threshold = $pw->product->low_stock_threshold ?? 10;
+                return $pw->quantity <= $threshold;
+            })
+            ->count();
 
         return [
             'poCount' => $poCount,
@@ -110,59 +117,68 @@ class NotificationService
 
     protected function getLowStockNotifications(): Collection
     {
-        return Product::getLowStockProducts()->map(function ($product) {
-            return [
-                'id' => 'product::' . $product->id,
-                'title' => "Low Stock Alert: {$product->name}",
-                'description' => "Only {$product->stock_quantity} remaining",
-                'due_date' => Carbon::now(),
-                'status' => 'Low Stock',
-                'urgency' => 'high',
-                'days_remaining' => 0,
-                'route' => route('admin.product.edit', ['id' => $product->id]),
-                'threshold' => $product->getLowStockThreshold(),
-                'type' => 'product',
-                'label' => 'Product #' . $product->code,
-                'status_badge' => 'text-red',
-                'status_text' => 'Low Stock',
-                'status_icon' => 'ti ti-alert-triangle',
-                'show_notification' => true,
-            ];
-        });
+        // Match DashboardService approach - check per warehouse
+        return \App\Models\ProductWarehouse::with(['product', 'warehouse'])
+            ->whereHas('product')
+            ->get()
+            ->filter(function ($pw) {
+                $threshold = $pw->product->low_stock_threshold ?? 10;
+                return $pw->quantity <= $threshold;
+            })
+            ->map(function ($pw) {
+                $product = $pw->product;
+                $warehouse = $pw->warehouse;
+                    return [
+                        'id' => 'product::' . $product->id . '::' . $pw->warehouse_id,
+                        'title' => "Low Stock Alert: {$product->name}",
+                        'description' => "Only {$pw->quantity} remaining in {$warehouse->name}",
+                    'due_date' => Carbon::now(),
+                    'status' => 'Low Stock',
+                    'urgency' => 'high',
+                    'days_remaining' => 0,
+                    'route' => route('admin.product.edit', ['id' => $product->id]),
+                    'threshold' => $product->low_stock_threshold ?? 10,
+                    'type' => 'product',
+                    'label' => 'Product #' . $product->code,
+                    'status_badge' => 'text-red',
+                    'status_text' => 'Low Stock',
+                    'status_icon' => 'ti ti-alert-triangle',
+                    'show_notification' => true,
+                    'warehouse_name' => $warehouse->name,
+                    'quantity' => $pw->quantity,
+                ];
+            });
     }
 
     protected function getExpiringProductNotifications(): Collection
     {
-        $thirtyDaysFromNow = Carbon::now()->addDays(30);
-
-        return \App\Models\POItem::whereNotNull('expiry_date')
-            ->where('expiry_date', '>', Carbon::now())
-            ->where('expiry_date', '<=', $thirtyDaysFromNow)
-            ->with('product') // Eager load the product relationship
-            ->limit(20)
-            ->get()
+        return \App\Models\POItem::getExpiringSoonItems()
             ->map(function ($poItem) {
                 $product = $poItem->product;
+                $warehouse = $poItem->purchaseOrder->warehouse ?? null;
                 $daysRemaining = (int) Carbon::now()->diffInDays($poItem->expiry_date, false);
                 [$badgeClass, $badgeText] = \App\Helpers\ProductHelper::getExpiryClassAndText($poItem->expiry_date);
 
                 return [
                     'id' => 'poitem::' . $poItem->id,
                     'title' => "Expiring Product: {$product->name}",
-                    'description' => "Expires on {$poItem->expiry_date->format('M d, Y')}",
+                    'description' => $warehouse
+                        ? "Expires on {$poItem->expiry_date->format('M d, Y')} in {$warehouse->name}"
+                        : "Expires on {$poItem->expiry_date->format('M d, Y')}",
                     'po_id' => $poItem->po_id,
-                    'quantity' => $poItem->quantity,
+                    'quantity' => $poItem->remaining_quantity,
                     'due_date' => $poItem->expiry_date,
-                    'status' => $badgeText, // Use the text from the helper
+                    'status' => $badgeText,
                     'urgency' => $this->getUrgencyLevel($daysRemaining),
                     'days_remaining' => $daysRemaining,
-                    'route' => route('admin.product.edit', ['id' => $product->id]), // Link to product edit page
+                    'route' => route('admin.product.edit', ['id' => $product->id]),
                     'type' => 'product',
-                    'label' => 'Product # ' . $product->code,
-                    'status_badge' => str_replace('badge ', '', $badgeClass), // Use the class from the helper
+                    'label' => 'Product #' . $product->code,
+                    'status_badge' => str_replace('badge ', '', $badgeClass),
                     'status_text' => $badgeText,
                     'status_icon' => 'ti ti-calendar-time',
                     'show_notification' => true,
+                    'warehouse_name' => $warehouse->name ?? null,
                 ];
             });
     }

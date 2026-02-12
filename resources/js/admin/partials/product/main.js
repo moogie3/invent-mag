@@ -26,7 +26,7 @@ export function initProductPage() {
                 if (tableBody) {
                     tableBody.innerHTML = `
                         <tr>
-                            <td colspan="5" class="text-center py-4">
+                            <td colspan="6" class="text-center py-4">
                                 <div class="spinner-border spinner-border-sm text-primary" role="status">
                                     <span class="visually-hidden">Loading...</span>
                                 </div>
@@ -51,7 +51,7 @@ export function initProductPage() {
                         if (tableBody) {
                             tableBody.innerHTML = `
                                 <tr>
-                                    <td colspan="5" class="text-center text-danger py-4">
+                                    <td colspan="6" class="text-center text-danger py-4">
                                         Error loading products. Please try again.
                                     </td>
                                 </tr>

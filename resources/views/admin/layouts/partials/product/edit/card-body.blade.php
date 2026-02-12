@@ -11,7 +11,7 @@
 
     <hr class="my-4">
 
-    @include('admin.layouts.partials.product.edit.warehouse-selection')
+    @include('admin.layouts.partials.product.edit.warehouse-stock')
 
     <hr class="my-4">
 

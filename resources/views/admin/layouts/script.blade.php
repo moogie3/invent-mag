@@ -131,6 +131,11 @@
     @vite('resources/js/admin/adjustment-log.js')
 @endif
 
+{{-- SCRIPT FOR STOCK TRANSFER --}}
+@if (request()->is('admin/reports/stock-transfer*'))
+    @vite('resources/js/admin/reports/stock-transfer.js')
+@endif
+
 {{-- SCRIPT FOR TAX settings --}}
 @if (request()->is('admin/settings/tax'))
     @vite('resources/js/admin/tax.js')

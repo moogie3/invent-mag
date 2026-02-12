@@ -143,6 +143,12 @@ return [
                     'icon' => 'ti ti-clipboard-list',
                 ],
                 [
+                    'title' => 'messages.stock_transfer',
+                    'route' => 'admin.reports.stock-transfer.page',
+                    'permission' => 'adjust-stock',
+                    'icon' => 'ti ti-forklift',
+                ],
+                [
                     'title' => 'messages.recent_transactions',
                     'route' => 'admin.reports.recent-transactions',
                     'permission' => 'view-reports',

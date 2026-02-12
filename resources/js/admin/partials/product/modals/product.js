@@ -348,11 +348,16 @@ export function loadExpiringSoonProductsModal(expiringSoonProducts) {
 
             const row = `
                 <tr>
-                    <td>${item.product ? item.product.name : 'N/A'}</td>
+                    <td class="fw-medium">${item.product ? item.product.name : 'N/A'}</td>
                     <td class="text-center"><a href="/admin/po/edit/${item.po_id}">${item.po_id}</a></td>
-                    <td class="text-center">${item.quantity}</td>
+                    <td class="text-center fw-medium">${item.quantity}</td>
                     <td class="text-center">${expiryDate}</td>
                     <td class="text-center"><span class="${statusClass}">${status}</span></td>
+                    <td class="text-end">
+                        <a href="/admin/product/edit/${item.product_id}" class="btn btn-icon btn-ghost-primary" title="Edit">
+                            <i class="ti ti-edit"></i>
+                        </a>
+                    </td>
                 </tr>
             `;
             tableBody.insertAdjacentHTML('beforeend', row);
@@ -360,7 +365,7 @@ export function loadExpiringSoonProductsModal(expiringSoonProducts) {
     } else {
         tableBody.innerHTML = `
             <tr>
-                <td colspan="5" class="text-center text-muted py-4">No products expiring soon.</td>
+                <td colspan="6" class="text-center text-muted py-4">No products expiring soon.</td>
             </tr>
         `;
     }

@@ -27,16 +27,124 @@ class ReportController extends Controller
         $this->transactionService = $transactionService;
     }
 
-    /**
+     /**
      * Display the adjustment log.
      */
     public function adjustmentLog(Request $request)
     {
-        $adjustments = StockAdjustment::with(['product:id,name', 'adjustedBy:id,name'])
-            ->orderBy('created_at', 'desc')
-            ->paginate(20);
+        $query = StockAdjustment::with(['product:id,name', 'adjustedBy:id,name', 'warehouse:id,name']);
 
-        return view('admin.reports.adjustment-log', compact('adjustments'));
+        if ($request->warehouse_id && $request->warehouse_id !== 'all') {
+            $query->where('warehouse_id', $request->warehouse_id);
+        }
+
+        if ($request->type && $request->type !== 'all') {
+            $query->where('adjustment_type', $request->type);
+        }
+
+        $adjustments = $query->orderBy('created_at', 'desc')->paginate(20);
+
+        $warehouses = \App\Models\Warehouse::all();
+        $types = ['adjustment', 'increase', 'decrease', 'correction', 'transfer'];
+
+        return view('admin.reports.adjustment-log', compact('adjustments', 'warehouses', 'types'));
+    }
+
+    /**
+     * Handle stock transfer between warehouses.
+     */
+    public function stockTransfer(Request $request)
+    {
+        $request->validate([
+            'from_warehouse_id' => 'required|exists:warehouses,id',
+            'to_warehouse_id' => 'required|exists:warehouses,id|different:from_warehouse_id',
+            'product_id' => 'required|exists:products,id',
+            'quantity' => 'required|integer|min:1',
+            'reason' => 'nullable|string|max:1000',
+        ]);
+
+        $fromWarehouse = \App\Models\Warehouse::findOrFail($request->from_warehouse_id);
+        $toWarehouse = \App\Models\Warehouse::findOrFail($request->to_warehouse_id);
+        $product = \App\Models\Product::findOrFail($request->product_id);
+
+        $fromStockRecord = \App\Models\ProductWarehouse::where('product_id', $product->id)
+            ->where('warehouse_id', $fromWarehouse->id)
+            ->first();
+
+        $availableQty = $fromStockRecord ? $fromStockRecord->quantity : 0;
+
+        if ($availableQty < $request->quantity) {
+            return redirect()->back()
+                ->with('error', "Insufficient stock. Available: {$availableQty}, Requested: {$request->quantity}");
+        }
+
+        DB::transaction(function () use ($request, $fromWarehouse, $toWarehouse, $product, $fromStockRecord, $availableQty) {
+            $fromQty = $availableQty;
+            $toQty = \App\Models\ProductWarehouse::firstOrCreate(
+                ['product_id' => $product->id, 'warehouse_id' => $toWarehouse->id, 'tenant_id' => $product->tenant_id],
+                ['quantity' => 0]
+            )->quantity;
+
+            $fromStockRecord->update(['quantity' => $fromQty - $request['quantity']]);
+            $toWarehouse->productWarehouses()->updateOrCreate(
+                ['product_id' => $product->id],
+                ['quantity' => $toQty + $request['quantity']]
+            );
+
+            \App\Models\StockAdjustment::create([
+                'product_id' => $product->id,
+                'warehouse_id' => $fromWarehouse->id,
+                'adjustment_type' => 'transfer',
+                'quantity_before' => $fromQty,
+                'quantity_after' => $fromQty - $request['quantity'],
+                'adjustment_amount' => $request['quantity'],
+                'reason' => $request['reason'] ?? "Transfer to {$toWarehouse->name}",
+                'adjusted_by' => auth()->id(),
+                'tenant_id' => $product->tenant_id,
+            ]);
+
+            \App\Models\StockAdjustment::create([
+                'product_id' => $product->id,
+                'warehouse_id' => $toWarehouse->id,
+                'adjustment_type' => 'transfer',
+                'quantity_before' => $toQty,
+                'quantity_after' => $toQty + $request['quantity'],
+                'adjustment_amount' => $request['quantity'],
+                'reason' => $request['reason'] ?? "Transfer from {$fromWarehouse->name}",
+                'adjusted_by' => auth()->id(),
+                'tenant_id' => $product->tenant_id,
+            ]);
+        });
+
+        return redirect()->route('admin.reports.adjustment-log')
+            ->with('success', "Successfully transferred {$request['quantity']} units of {$product->name} from {$fromWarehouse->name} to {$toWarehouse->name}");
+    }
+
+    /**
+     * Display stock transfer page.
+     */
+    public function stockTransferPage()
+    {
+        $warehouses = \App\Models\Warehouse::all();
+        return view('admin.reports.stock-transfer.page', compact('warehouses'));
+    }
+
+    /**
+     * Get products by warehouse for transfer.
+     */
+    public function getProductsForTransfer($warehouseId)
+    {
+        $warehouse = \App\Models\Warehouse::findOrFail($warehouseId);
+        $products = $warehouse->productWarehouses()->with('product:id,name,code')->get();
+
+        return response()->json($products->map(function ($pw) {
+            return [
+                'id' => $pw->product->id,
+                'name' => $pw->product->name,
+                'code' => $pw->product->code,
+                'quantity' => $pw->quantity,
+            ];
+        }));
     }
 
     /**

@@ -167,7 +167,7 @@ class SalesReturnServiceTest extends TestCase
         
         $this->product->refresh();
         // Initial stock (100) + first return (1) - old return (1) + new return (3) = 100 + 1 - 1 + 3 = 103
-        $this->assertEquals(100 - 1 + 3, $this->product->stock_quantity); 
+        $this->assertEquals(100 + 1 - 1 + 3, $this->product->stock_quantity); 
         $this->sale->refresh();
         $this->assertEquals('Partial', $this->sale->status); // Still partial as 3/5 returned
     }

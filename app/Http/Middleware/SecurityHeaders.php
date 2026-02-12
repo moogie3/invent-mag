@@ -19,14 +19,15 @@ class SecurityHeaders
         $response->headers->set('Permissions-Policy', 'geolocation=(), microphone=(), camera=()');
 
         // Content Security Policy
-        $localSources = app()->environment('local') ? ' http://localhost:5173 ws://localhost:5173' : '';
+        $localSources = app()->environment('local') ? ' http://localhost:5173 ws://localhost:5173 http://localhost:4000 ws://localhost:4000' : '';
+        $localImages = app()->environment('local') ? ' http://localhost:5173 http://localhost:4000' : '';
         
         $response->headers->set('Content-Security-Policy', 
             "default-src 'self'; " .
             "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://code.jquery.com https://cdnjs.cloudflare.com{$localSources}; " .
             "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.jsdelivr.net https://rsms.me{$localSources}; " .
             "font-src 'self' https://fonts.gstatic.com https://cdn.jsdelivr.net https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest data: https://rsms.me; " .
-            "img-src 'self' data: https:; " .
+            "img-src 'self' data: https:{$localImages}; " .
             "connect-src 'self' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com{$localSources};"
         );
 

@@ -102,8 +102,12 @@ class PurchaseReturnService
                 // Decrement stock for the returned product
                 $product = Product::find($itemData['product_id']);
                 if ($product) {
-                    // Decrement stock from the first available warehouse
-                    $stockRecord = ProductWarehouse::where('product_id', $product->id)->first();
+                    $warehouseId = $purchase->warehouse_id ?? Product::getMainWarehouseId();
+                    
+                    $stockRecord = ProductWarehouse::where('product_id', $product->id)
+                        ->where('warehouse_id', $warehouseId)
+                        ->first();
+                    
                     if ($stockRecord) {
                         $stockRecord->decrement('quantity', $returnedQuantity);
                     }
@@ -165,8 +169,13 @@ class PurchaseReturnService
             foreach ($purchaseReturn->items as $oldItem) {
                 $product = Product::find($oldItem->product_id);
                 if ($product) {
-                    // Increment stock back to the first available warehouse
-                    $stockRecord = ProductWarehouse::where('product_id', $product->id)->first();
+                    $purchase = $purchaseReturn->purchase;
+                    $warehouseId = $purchase->warehouse_id ?? Product::getMainWarehouseId();
+                    
+                    $stockRecord = ProductWarehouse::where('product_id', $product->id)
+                        ->where('warehouse_id', $warehouseId)
+                        ->first();
+                    
                     if ($stockRecord) {
                         $stockRecord->increment('quantity', $oldItem->quantity);
                     }
@@ -218,11 +227,14 @@ class PurchaseReturnService
                 // Decrement stock for the returned product
                 $product = Product::find($itemData['product_id']);
                 if ($product) {
-                    // Decrement stock from the first available warehouse
-                    $stockRecord = ProductWarehouse::where('product_id', $product->id)->first();
-                    if ($stockRecord) {
-                        $stockRecord->decrement('quantity', $returnedQuantity);
-                    }
+                    $purchase = $purchaseReturn->purchase;
+                    $warehouseId = $purchase->warehouse_id ?? Product::getMainWarehouseId();
+                    
+                    $stockRecord = ProductWarehouse::firstOrCreate(
+                        ['product_id' => $product->id, 'warehouse_id' => $warehouseId, 'tenant_id' => $product->tenant_id],
+                        ['quantity' => 0]
+                    );
+                    $stockRecord->decrement('quantity', $returnedQuantity);
                 }
             }
             $purchase = $purchaseReturn->purchase;

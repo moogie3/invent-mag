@@ -40,6 +40,7 @@ class PermissionSeeder extends Seeder
             'view-reports',
             'view-financial-reports',
             'edit-transactions',
+            'adjust-stock',
             
             // Accounting
             'view-accounting',
@@ -170,7 +171,7 @@ class PermissionSeeder extends Seeder
             'view-purchase-orders', 'create-purchase-orders', 'edit-purchase-orders', 'delete-purchase-orders',
             'view-sales', 'create-sales', 'edit-sales', 'delete-sales',
             'view-warehouses', 'create-warehouses', 'edit-warehouses', 'delete-warehouses',
-            'view-reports', 'view-financial-reports', 'edit-transactions',
+            'view-reports', 'view-financial-reports', 'edit-transactions', 'adjust-stock',
             'view-accounting', 'view-chart-of-accounts', 'edit-chart-of-accounts', 'delete-chart-of-accounts',
             'view-journal', 'view-general-ledger', 'view-trial-balance',
             'view-manual-journal', 'create-manual-journal', 'edit-manual-journal', 'delete-manual-journal',

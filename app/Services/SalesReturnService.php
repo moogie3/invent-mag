@@ -90,11 +90,14 @@ class SalesReturnService
 
                     $product = Product::find($itemData['product_id']);
                     if ($product) {
-                        // Increment stock in the first available warehouse
-                        $stockRecord = ProductWarehouse::where('product_id', $product->id)->first();
-                        if ($stockRecord) {
-                            $stockRecord->increment('quantity', $itemData['returned_quantity']);
-                        }
+                        $sale = Sales::find($data['sales_id']);
+                        $warehouseId = $sale->warehouse_id ?? Product::getMainWarehouseId();
+                        
+                        $stockRecord = ProductWarehouse::firstOrCreate(
+                            ['product_id' => $product->id, 'warehouse_id' => $warehouseId, 'tenant_id' => $product->tenant_id],
+                            ['quantity' => 0]
+                        );
+                        $stockRecord->increment('quantity', $itemData['returned_quantity']);
                     }
                 }
             }
@@ -139,11 +142,16 @@ class SalesReturnService
                 throw new \Exception('Invalid items data');
             }
 
+            $sale = $salesReturn->sale;
+            
             foreach ($salesReturn->items as $oldItem) {
                 $product = Product::find($oldItem->product_id);
                 if ($product) {
-                    // Decrement stock from the first available warehouse
-                    $stockRecord = ProductWarehouse::where('product_id', $product->id)->first();
+                    $warehouseId = $sale->warehouse_id ?? Product::getMainWarehouseId();
+                    
+                    $stockRecord = ProductWarehouse::where('product_id', $product->id)
+                        ->where('warehouse_id', $warehouseId)
+                        ->first();
                     if ($stockRecord) {
                         $stockRecord->decrement('quantity', $oldItem->quantity);
                     }
@@ -182,15 +190,16 @@ class SalesReturnService
 
                 $product = Product::find($itemData['product_id']);
                 if ($product) {
-                    // Increment stock in the first available warehouse
-                    $stockRecord = ProductWarehouse::where('product_id', $product->id)->first();
-                    if ($stockRecord) {
-                        $stockRecord->increment('quantity', $returnedQuantity);
-                    }
+                    $warehouseId = $sale->warehouse_id ?? Product::getMainWarehouseId();
+                    
+                    $stockRecord = ProductWarehouse::firstOrCreate(
+                        ['product_id' => $product->id, 'warehouse_id' => $warehouseId, 'tenant_id' => $product->tenant_id],
+                        ['quantity' => 0]
+                    );
+                    $stockRecord->increment('quantity', $returnedQuantity);
                 }
             }
 
-            $sale = $salesReturn->sale;
             $totalOriginalQuantitySold = $sale->salesItems()->sum('quantity');
             $totalQuantityReturnedSoFar = $sale->salesReturns->flatMap(function ($sr) {
                 return $sr->items;

@@ -1,5 +1,5 @@
 <div class="page-body">
-    <div class="container-xl">
+    <div class="{{ $containerClass ?? "container-xl" }}">
         <div class="row row-deck row-cards">
             <div class="col-md-12">
                 <div class="card card-primary">

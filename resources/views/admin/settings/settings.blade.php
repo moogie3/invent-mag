@@ -6,7 +6,7 @@
     <div class="page-wrapper">
         <div class="page-wrapper">
             <div class="page-body">
-                <div class="container-xl">
+                <div class="{{ $containerClass ?? "container-xl" }}">
                     <div class="card">
                         <div class="card-body">
                             <h2><i class="ti ti-settings me-2"></i>{{ __('messages.system_settings') }}</h2>
@@ -266,6 +266,13 @@
                                                                 {{ auth()->user()->system_settings['lazy_load_images'] ?? true ? 'checked' : '' }}>
                                                             <label
                                                                 class="form-check-label">{{ __('messages.lazy_load_images') }}</label>
+                                                        </div>
+                                                        <div class="form-check form-switch mb-2">
+                                                            <input class="form-check-input" type="checkbox"
+                                                                name="fluid_layout"
+                                                                {{ auth()->user()->system_settings['fluid_layout'] ?? false ? 'checked' : '' }}>
+                                                            <label
+                                                                class="form-check-label">{{ __('messages.enable_fluid_layout') }}</label>
                                                         </div>
                                                     </div>
                                                     <div class="col-md-6">

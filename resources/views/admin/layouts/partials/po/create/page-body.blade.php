@@ -1,5 +1,5 @@
 <div class="page-body">
-    <div class="container-xl">
+    <div class="{{ $containerClass ?? "container-xl" }}">
         <form enctype="multipart/form-data" method="POST" action="{{ route('admin.po.store') }}" id="invoiceForm">
             @csrf
             @include('admin.layouts.partials.po.create.order-information')

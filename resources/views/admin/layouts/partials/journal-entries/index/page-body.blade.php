@@ -1,5 +1,5 @@
 <div class="page-body mt-4">
-    <div class="container-xl">
+    <div class="{{ $containerClass ?? "container-xl" }}">
         <div class="card">
             <div class="card-header">
                 <ul class="nav nav-tabs card-header-tabs" data-bs-toggle="tabs">

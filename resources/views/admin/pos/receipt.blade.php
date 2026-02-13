@@ -5,7 +5,7 @@
 @section('content')
     <div class="page-wrapper">
         <div class="page-header no-print">
-            <div class="container-xl">
+            <div class="{{ $containerClass ?? "container-xl" }}">
                 <div class="row align-items-center">
                     <div class="col">
                         <div class="page-pretitle">{{ __('messages.overview') }}</div>
@@ -24,7 +24,7 @@
         </div>
 
         <div class="page-body">
-            <div class="container-xl">
+            <div class="{{ $containerClass ?? "container-xl" }}">
                 <div class="row row-deck row-cards">
                     <div class="col-md-10 mx-auto">
                         <div class="card card-primary receipt-card receipt-preview">

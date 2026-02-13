@@ -51,6 +51,19 @@ class AppServiceProvider extends ServiceProvider
         });
 
         if (! app()->environment('testing')) {
+            View::composer(['admin.*'], function ($view) {
+                // ... (Existing notification logic) ...
+
+                // Add container class logic
+                if (auth()->check()) {
+                    $fluidLayout = auth()->user()->system_settings['fluid_layout'] ?? false;
+                    $view->with('containerClass', $fluidLayout ? 'container-fluid' : 'container-xl');
+                } else {
+                     // Default for guests (e.g., login page) - usually narrow, but let's stick to standard
+                    $view->with('containerClass', 'container-xl');
+                }
+            });
+            
             View::composer(['admin.layouts.*', 'admin.*'], function ($view) {
                 if (app()->has('currentTenant')) { // Check if a tenant is active
                     $notificationService = app(NotificationService::class);

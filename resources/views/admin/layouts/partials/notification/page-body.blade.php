@@ -1,5 +1,5 @@
 <div class="page-body">
-    <div class="container-xl">
+    <div class="{{ $containerClass ?? "container-xl" }}">
         <div class="card">
             <div class="card-body">
                 <h2><i class="ti ti-bell me-2"></i>{{ __('messages.notification') }}</h2>

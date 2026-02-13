@@ -5,7 +5,7 @@
 @section('content')
     <div class="page-wrapper">
         <div class="page-body">
-            <div class="container-xl">
+            <div class="{{ $containerClass ?? "container-xl" }}">
                 <div class="card">
                     <div class="card-body">
                         <h2><i class="ti ti-users me-2"></i>{{ __('messages.user_management_title') }}</h2>

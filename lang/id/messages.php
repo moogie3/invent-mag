@@ -15,6 +15,7 @@ return [
     'enable_sidebar_lock' => 'Aktifkan Kunci Sidebar',
     'navbar_options' => 'Opsi Navbar',
     'enable_sticky_navbar' => 'Aktifkan Navbar Lengket',
+    'enable_fluid_layout' => 'Aktifkan Tata Letak Cair (Lebar Penuh)',
     'theme_configuration' => 'Konfigurasi Tema',
     'control_the_visual_appearance_and_theme_settings' => 'Kontrol tampilan visual dan pengaturan tema',
     'theme_mode' => 'Mode Tema',

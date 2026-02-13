@@ -44,6 +44,7 @@ class SettingsController extends Controller
             'show_tooltips',
             'compact_mode',
             'sticky_navbar',
+            'fluid_layout',
         ];
 
         $settingsToSave = $validatedData;
@@ -115,6 +116,7 @@ class SettingsController extends Controller
             'show_tooltips' => true,
             'compact_mode' => false,
             'sticky_navbar' => false,
+            'fluid_layout' => false,
         ];
 
         $settings = array_merge($defaults, $settings);

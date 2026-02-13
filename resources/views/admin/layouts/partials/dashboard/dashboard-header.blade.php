@@ -1,5 +1,5 @@
 <div class="page-header d-print-none" style="position: relative; z-index: 10;">
-    <div class="container-xl">
+    <div class="{{ $containerClass ?? 'container-xl' }}">
         <div class="row align-items-center">
             <div class="col">
                 <h2 class="page-title d-flex align-items-center">

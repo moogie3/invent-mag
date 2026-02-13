@@ -352,6 +352,7 @@ function resetToDefaults() {
         // Performance Settings
         form.querySelector('input[name="enable_animations"]').checked = true;
         form.querySelector('input[name="lazy_load_images"]').checked = true;
+        form.querySelector('input[name="fluid_layout"]').checked = false;
         form.querySelector('select[name="data_refresh_rate"]').value = '30';
 
         // Language & Localization

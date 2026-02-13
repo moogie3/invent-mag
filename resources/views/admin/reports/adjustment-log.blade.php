@@ -5,7 +5,8 @@
 @section('content')
     <div class="page-wrapper">
         <div class="page-header d-print-none">
-            <div class="container-xl">
+            <div class="{{ ($containerClass ?? 'container-xl') === 'container-xl' ? 'container-fluid' : $containerClass }}" 
+                 style="{{ ($containerClass ?? 'container-xl') === 'container-xl' ? 'max-width: 90%;' : '' }}">
                 <div class="row align-items-center">
                     <div class="col">
                         <div class="page-pretitle">
@@ -27,7 +28,8 @@
             </div>
         </div>
         <div class="page-body">
-            <div class="container-xl">
+            <div class="{{ ($containerClass ?? 'container-xl') === 'container-xl' ? 'container-fluid' : $containerClass }}" 
+                 style="{{ ($containerClass ?? 'container-xl') === 'container-xl' ? 'max-width: 90%;' : '' }}">
                 <div class="card">
                     <div class="card-header">
                         <h3 class="card-title">{{ __('messages.adjustment_log') }}</h3>
@@ -129,7 +131,7 @@
                                             <span
                                                 class="{{ $changeClass }}">{{ $changeSign }}{{ $change }}</span>
                                         </td>
-                                        <td>{{ $log->reason ?: 'N/A' }}</td>
+                                        <td class="text-wrap" style="min-width: 250px;">{{ $log->reason ?: 'N/A' }}</td>
                                         <td>{{ $log->adjustedBy ? $log->adjustedBy->name : __('messages.system') }}</td>
                                     </tr>
                                 @empty

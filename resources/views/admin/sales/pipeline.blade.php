@@ -5,7 +5,7 @@
 @section('content')
     <div class="page-wrapper">
         <div class="page-header">
-            <div class="container-xl">
+            <div class="{{ $containerClass ?? "container-xl" }}">
                 <div class="row align-items-center">
                     <div class="col">
                         <div class="page-pretitle">
@@ -20,7 +20,7 @@
         </div>
 
         <div class="page-body">
-            <div class="container-xl">
+            <div class="{{ $containerClass ?? "container-xl" }}">
                 <div class="card">
                     <div class="row g-0">
                         <div class="col-12 d-flex flex-column">

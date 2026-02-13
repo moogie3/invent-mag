@@ -9,7 +9,7 @@
 
         <!-- Page Body -->
         <div class="page-body">
-            <div class="container-xl">
+            <div class="{{ $containerClass ?? 'container-xl' }}">
                 <div class="row row-deck row-cards">
                     <!-- Key Metrics Cards -->
                     @include('admin.layouts.partials.dashboard.key-metrics')

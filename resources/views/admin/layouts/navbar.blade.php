@@ -1,5 +1,5 @@
 <header class="navbar navbar-expand-md d-print-none nav-container">
-    <div class="container-xl d-flex align-items-center justify-content-between position-relative">
+    <div class="{{ $containerClass ?? 'container-xl' }} d-flex align-items-center justify-content-between position-relative">
         <div class="d-flex flex-grow-1 nav-left align-items-center">
             <!-- Sidebar toggle will be in the sidebar itself -->
         </div>

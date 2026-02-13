@@ -3,7 +3,7 @@
 @section('title', __('messages.general_journal'))
 
 @section('content')
-    <div class="container-xl">
+    <div class="{{ $containerClass ?? "container-xl" }}">
         <div class="page-header d-print-none mt-4">
             <div class="row g-2 align-items-center">
                 <div class="col">

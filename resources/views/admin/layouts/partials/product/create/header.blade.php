@@ -1,5 +1,5 @@
 <div class="page-header">
-    <div class="container-xl">
+    <div class="{{ $containerClass ?? "container-xl" }}">
         <div class="row align-items-center">
             <div class="col">
                 <div class="page-pretitle">{{ __('messages.product_management') }}</div>

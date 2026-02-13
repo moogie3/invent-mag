@@ -4,7 +4,7 @@
     <div class="page-wrapper">
         <!-- Page Header -->
         <div class="page-header d-print-none" style="position: relative; z-index: 20;">
-            <div class="container-xl">
+            <div class="{{ $containerClass ?? "container-xl" }}">
                 <div class="row g-2 align-items-center">
                     <div class="col">
                         <div class="page-pretitle">
@@ -126,7 +126,7 @@
 
         <!-- Page Body -->
         <div class="page-body">
-            <div class="container-xl">
+            <div class="{{ $containerClass ?? "container-xl" }}">
                 <!-- Summary Cards -->
                 <div class="row g-3 mb-4">
                     <div class="col-sm-6 col-lg-3">

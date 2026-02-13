@@ -6,7 +6,7 @@
     <div class="page-wrapper">
         <!-- Header -->
         <div class="page-header d-print-none">
-            <div class="container-xl">
+            <div class="{{ $containerClass ?? "container-xl" }}">
                 <div class="row align-items-center">
                     <div class="col">
                         <div class="page-pretitle">
@@ -30,7 +30,7 @@
 
         <!-- Page Body -->
         <div class="page-body">
-            <div class="container-xl">
+            <div class="{{ $containerClass ?? "container-xl" }}">
                 <div class="row row-cards">
                     <div class="col-12">
                         <div class="card">

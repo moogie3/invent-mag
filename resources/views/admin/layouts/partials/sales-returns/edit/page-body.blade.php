@@ -1,5 +1,5 @@
 <div class="page-body">
-    <div class="container-xl">
+    <div class="{{ $containerClass ?? "container-xl" }}">
         <div class="card shadow-sm">
             <div class="card-header border-0">
                 <h3 class="card-title">

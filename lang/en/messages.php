@@ -15,6 +15,7 @@ return [
     'enable_sidebar_lock' => 'Enable Sidebar Lock',
     'navbar_options' => 'Navbar Options',
     'enable_sticky_navbar' => 'Enable Sticky Navbar',
+    'enable_fluid_layout' => 'Enable Fluid Layout (Full Width)',
     'theme_configuration' => 'Theme Configuration',
     'control_the_visual_appearance_and_theme_settings' => 'Control the visual appearance and theme settings',
     'theme_mode' => 'Theme Mode',

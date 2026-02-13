@@ -34,7 +34,7 @@
     <div class="page">
         <div class="page-wrapper">
             <div class="page-body">
-                <div class="container-fluid">
+                <div class="{{ $containerClass ?? "container-xl" }}">
                     @yield('content')
                 </div>
             </div>

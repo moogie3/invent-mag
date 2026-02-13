@@ -1,5 +1,5 @@
 <div class="page-body">
-    <div class="container-xl">
+    <div class="{{ $containerClass ?? "container-xl" }}">
         <div class="card card-lg">
             <div class="card-body">
                 {{-- Content from srmodals-view.blade.php starts here --}}

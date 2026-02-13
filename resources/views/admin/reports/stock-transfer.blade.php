@@ -33,7 +33,7 @@
             <div class="{{ $containerClass ?? "container-xl" }}">
                 <div class="row row-cards">
                     <div class="col-12">
-                        <div class="card">
+                        <div class="card border-0 shadow-sm rounded-3">
                             <div class="card-body">
                                 <form action="{{ route('admin.reports.stock-transfer') }}" method="POST" id="stockTransferForm" data-same-warehouse-error="{{ __('messages.stock_transfer_same_warehouse_error') }}">
                                     @csrf

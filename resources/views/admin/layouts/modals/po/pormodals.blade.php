@@ -2,7 +2,7 @@
 <div class="modal modal-blur fade" id="bulkDeletePurchaseReturnModal" tabindex="-1" aria-labelledby="bulkDeletePurchaseReturnModalLabel"
     aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
+        <div class="modal-content border-0 shadow-lg rounded-3">
             <div class="modal-header bg-danger text-white">
                 <h5 class="modal-title" id="bulkDeletePurchaseReturnModalLabel">
                     <i class="ti ti-trash me-2"></i>
@@ -70,7 +70,7 @@
 <div class="modal modal-blur fade" id="bulkMarkCompletedPurchaseReturnModal" tabindex="-1" aria-labelledby="bulkMarkCompletedPurchaseReturnModalLabel"
     aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
+        <div class="modal-content border-0 shadow-lg rounded-3">
             <div class="modal-header bg-success text-white">
                 <h5 class="modal-title" id="bulkMarkCompletedPurchaseReturnModalLabel">
                     <i class="ti ti-check me-2"></i>
@@ -112,7 +112,7 @@
 <div class="modal modal-blur fade" id="bulkMarkCanceledPurchaseReturnModal" tabindex="-1" aria-labelledby="bulkMarkCanceledPurchaseReturnModalLabel"
     aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
+        <div class="modal-content border-0 shadow-lg rounded-3">
             <div class="modal-header bg-warning text-white">
                 <h5 class="modal-title" id="bulkMarkCanceledPurchaseReturnModalLabel">
                     <i class="ti ti-x me-2"></i>
@@ -153,7 +153,7 @@
 <!-- Purchase Return Detail Modal -->
 <div class="modal modal-blur fade" id="purchaseReturnDetailModal" tabindex="-1" aria-labelledby="purchaseReturnDetailModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-xl modal-dialog-centered">
-        <div class="modal-content">
+        <div class="modal-content border-0 shadow-lg rounded-3">
             <div id="purchaseReturnDetailModalContent">
                 <!-- Content will be loaded dynamically here -->
                 <div class="modal-header">
@@ -190,7 +190,7 @@
 <!-- Single Delete Purchase Return Modal -->
 <div class="modal modal-blur fade" id="deleteModal" tabindex="-1" role="dialog" aria-hidden="true">
     <div class="modal-dialog modal-sm modal-dialog-centered" role="document">
-        <div class="modal-content">
+        <div class="modal-content border-0 shadow-lg rounded-3">
             <div class="modal-header">
                 <h5 class="modal-title">{{ __('messages.pr_modal_delete_title') }}</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
@@ -228,7 +228,7 @@
 <div class="modal fade" id="prStatusWarningModal" tabindex="-1" aria-labelledby="prStatusWarningModalLabel"
     aria-hidden="true">
     <div class="modal-dialog modal-sm modal-dialog-centered">
-        <div class="modal-content">
+        <div class="modal-content border-0 shadow-lg rounded-3">
             <button type="button" class="btn-close m-2" data-bs-dismiss="modal" aria-label="Close"></button>
             <div class="modal-body text-center py-4">
                 <i class="ti ti-alert-triangle icon text-warning icon-lg mb-4"></i>

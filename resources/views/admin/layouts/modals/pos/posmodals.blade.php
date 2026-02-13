@@ -1,6 +1,6 @@
 <div class="modal modal-blur fade" id="paymentModal" tabindex="-1" role="dialog" aria-hidden="true">
     <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
-        <div class="modal-content">
+        <div class="modal-content border-0 shadow-lg rounded-3">
             <div class="modal-header bg-primary text-white">
                 <h5 class="modal-title"><i class="ti ti-receipt me-2"></i>{{ __('messages.pos_order_summary_title') }}
                 </h5>
@@ -122,7 +122,7 @@
 <div class="modal fade" id="quickCreateCustomerModal" tabindex="-1" aria-labelledby="quickCreateCustomerModalLabel"
     aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
+        <div class="modal-content border-0 shadow-lg rounded-3">
             <div class="modal-header bg-primary text-white">
                 <h5 class="modal-title" id="quickCreateCustomerModalLabel"><i
                         class="ti ti-user-plus me-2"></i>{{ __('messages.pos_create_new_customer') }}</h5>
@@ -169,7 +169,7 @@
 <div class="modal fade" id="quickCreateProductModal" tabindex="-1" aria-labelledby="quickCreateProductModalLabel"
     aria-hidden="true">
     <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
-        <div class="modal-content">
+        <div class="modal-content border-0 shadow-lg rounded-3">
             <div class="modal-header bg-primary text-white">
                 <h5 class="modal-title" id="quickCreateProductModalLabel"><i
                         class="ti ti-box-seam me-2"></i>{{ __('messages.pos_create_new_product') }}</h5>

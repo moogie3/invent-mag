@@ -24,7 +24,7 @@
         </div>
         <div class="page-body mt-4">
             <div class="col-12">
-                <div class="card">
+                <div class="card border-0 shadow-sm rounded-3">
                     <div class="card-header">
                         <h3 class="card-title">{{ __('messages.all_accounts') }}</h3>
                     </div>

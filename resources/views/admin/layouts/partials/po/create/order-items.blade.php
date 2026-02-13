@@ -1,5 +1,5 @@
-<div class="card shadow-sm mb-4">
-    <div class="card-header">
+<div class="card border-0 shadow-sm rounded-3 mb-4">
+    <div class="card-header bg-white border-bottom">
         <h3 class="card-title"><i class="ti ti-box"></i> {{ __('messages.po_order_items_title') }}</h3>
     </div>
     <div class="card-body p-0">

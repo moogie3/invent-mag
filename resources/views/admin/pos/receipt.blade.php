@@ -27,7 +27,7 @@
             <div class="{{ $containerClass ?? "container-xl" }}">
                 <div class="row row-deck row-cards">
                     <div class="col-md-10 mx-auto">
-                        <div class="card card-primary receipt-card receipt-preview">
+                        <div class="card border-0 shadow-sm rounded-3 receipt-card receipt-preview">
                             <div class="card-body">
                                 <div class="receipt-container">
 

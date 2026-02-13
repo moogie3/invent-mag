@@ -1,7 +1,7 @@
 <div class="modal modal-blur fade" id="crmCustomerModal" tabindex="-1" aria-labelledby="crmCustomerModalLabel"
     aria-hidden="true">
     <div class="modal-dialog modal-xl modal-dialog-centered">
-        <div class="modal-content">
+        <div class="modal-content border-0 shadow-lg rounded-3">
             <div class="modal-header bg-primary text-white">
                 <h5 class="modal-title" id="crmCustomerModalLabel"><i
                         class="ti ti-users me-2"></i>{{ __('messages.customer_crm_title') }} <span

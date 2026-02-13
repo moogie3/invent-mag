@@ -3,7 +3,7 @@
 @section('title', __('messages.email_verified_success_title'))
 
 @section('content')
-    <div class="card card-md">
+    <div class="card card-md border-0 shadow-sm rounded-3">
         <div class="card-body">
             <h2 class="h2 text-center mb-4">{{ __('messages.email_verified_success_title') }}</h2>
 

@@ -1,7 +1,7 @@
 <!-- Confirm Modal -->
 <div class="modal fade" id="confirmModal" tabindex="-1" aria-labelledby="confirmModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
+        <div class="modal-content border-0 shadow-lg rounded-3">
             <div class="modal-header">
                 <h5 class="modal-title" id="confirmModalLabel">
                     <i class="ti ti-receipt-tax me-2"></i>{{ __('messages.tax_modal_confirm_tax_settings_title') }}

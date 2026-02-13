@@ -30,7 +30,7 @@
         <div class="page-body">
             <div class="{{ ($containerClass ?? 'container-xl') === 'container-xl' ? 'container-fluid' : $containerClass }}" 
                  style="{{ ($containerClass ?? 'container-xl') === 'container-xl' ? 'max-width: 90%;' : '' }}">
-                <div class="card">
+                <div class="card border-0 shadow-sm rounded-3">
                     <div class="card-header">
                         <h3 class="card-title">{{ __('messages.adjustment_log') }}</h3>
                         <div class="ms-auto d-flex gap-2">

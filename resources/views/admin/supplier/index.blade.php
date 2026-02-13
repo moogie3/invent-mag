@@ -12,10 +12,10 @@
                         <h2 class="page-title"><i class="ti ti-truck me-2"></i>{{ __('messages.supplier_title') }}</h2>
                     </div>
                     <div class="col-auto ms-auto">
-                        <div class="btn-group d-none d-sm-inline-block me-2">
+                        <div class="dropdown d-inline-block me-2">
                             <button type="button" class="btn btn-secondary dropdown-toggle" data-bs-toggle="dropdown"
                                 aria-expanded="false">
-                                <i class="ti ti-printer fs-4 me-2"></i> {{ __('messages.export') }}
+                                <i class="ti ti-download fs-4 me-2"></i> {{ __('messages.export') }}
                             </button>
                             <ul class="dropdown-menu">
                                 <li><a class="dropdown-item" href="#" onclick="exportSuppliers('csv')">Export as
@@ -37,13 +37,13 @@
             <div class="{{ $containerClass ?? "container-xl" }}">
                 <div class="row row-deck row-cards">
                     <div class="col-md-12">
-                        <div class="card card-primary">
+                        <div class="card border-0 shadow-sm rounded-3">
                             <div class="card-body border-bottom py-3">
                                 <div class="d-flex justify-content-between">
                                     <div class="col-md-8">
                                         <div class="row g-3">
                                             <div class="col-md-4">
-                                                <div class="card border-0 bg-light">
+                                                <div class="card border-0 shadow-sm rounded-3 bg-light">
                                                     <div class="card-body py-3">
                                                         <div class="mb-2">
                                                             <label class="form-label text-muted mb-2 d-block">
@@ -76,7 +76,7 @@
                                                 </div>
                                             </div>
                                             <div class="col-md-3">
-                                                <div class="card border-0 bg-blue-lt">
+                                                <div class="card border-0 shadow-sm rounded-3 bg-blue-lt">
                                                     <div class="card-body py-3">
                                                         <div class="mb-2">
                                                             <label class="form-label text-muted mb-2 d-block">

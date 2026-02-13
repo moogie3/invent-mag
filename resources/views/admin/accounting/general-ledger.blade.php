@@ -24,7 +24,7 @@
         </div>
 
         <div class="page-body mt-4">
-            <div class="card mb-4">
+            <div class="card border-0 shadow-sm rounded-3 mb-4">
                 <div class="card-body">
                     <form method="GET" action="{{ route('admin.accounting.ledger') }}" class="row g-3">
                         <div class="col-md-4">
@@ -56,7 +56,7 @@
             </div>
 
             @if ($selectedAccount)
-                <div class="card">
+                <div class="card border-0 shadow-sm rounded-3">
                     <div class="card-header">
                         <h3 class="card-title">{{ __('messages.ledger_for') }} {{ __($selectedAccount->name) }}</h3>
                         <div class="ms-auto">

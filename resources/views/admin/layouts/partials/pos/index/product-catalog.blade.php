@@ -1,5 +1,5 @@
 <div class="col-md-6">
-    <div class="card card-product-catalog mb-4">
+    <div class="card border-0 shadow-sm rounded-3 card-product-catalog mb-4">
         <div class="card-header d-flex justify-content-between align-items-center">
             <h4 class="card-title mb-0">
                 <i class="ti ti-box me-2"></i>{{ __('messages.product_catalog') }}
@@ -38,7 +38,7 @@
                 @else
                     @foreach ($products as $product)
                         <div class="col-md-4 mb-2">
-                            <div class="card product-card border hover-shadow" style="cursor: pointer;"
+                            <div class="card product-card border-0 shadow-sm rounded-3 hover-shadow" style="cursor: pointer;"
                                 data-product-id="{{ $product->id }}" data-product-name="{{ $product->name }}"
                                 data-product-price="{{ $product->selling_price }}"
                                 data-product-unit="{{ $product->unit->symbol }}"

@@ -1,4 +1,4 @@
-<div class="card shadow-sm border-1 mb-4">
+<div class="card border-0 shadow-sm rounded-3 mb-4">
     <div class="card-status-top bg-{{ $color }}"></div>
     <div class="card-header d-flex justify-content-between align-items-center">
         <h3 class="card-title mb-0">

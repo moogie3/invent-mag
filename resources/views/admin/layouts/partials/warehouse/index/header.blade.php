@@ -7,10 +7,10 @@
                 </h2>
             </div>
             <div class="col-auto ms-auto">
-                <div class="btn-group d-none d-sm-inline-block me-2">
+                <div class="dropdown d-inline-block me-2">
                     <button type="button" class="btn btn-secondary dropdown-toggle" data-bs-toggle="dropdown"
                         aria-expanded="false">
-                        <i class="ti ti-printer fs-4 me-2"></i> {{ __('messages.export') }}
+                        <i class="ti ti-download fs-4 me-2"></i> {{ __('messages.export') }}
                     </button>
                     <ul class="dropdown-menu">
                         <li><a class="dropdown-item" href="#" onclick="event.preventDefault(); exportWarehouses('csv')">Export as CSV</a>

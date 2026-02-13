@@ -1,4 +1,4 @@
-<div class="card mb-4 border-0">
+<div class="card border-0 shadow-sm rounded-3 mb-4">
     <div class="card-body">
         <div class="d-flex justify-content-between align-items-center">
             <div class="d-flex align-items-center">

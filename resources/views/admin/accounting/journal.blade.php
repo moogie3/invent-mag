@@ -24,7 +24,7 @@
         </div>
 
         <div class="page-body mt-4">
-            <div class="card">
+            <div class="card border-0 shadow-sm rounded-3">
                 <div class="card-body">
                     <form action="{{ route('admin.accounting.journal') }}" method="GET" class="mb-4">
                         <div class="row g-3 align-items-end">

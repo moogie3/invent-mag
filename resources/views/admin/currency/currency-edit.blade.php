@@ -6,9 +6,9 @@
     <div class="page-wrapper">
         <div class="page-wrapper">
             <div class="page-body">
-                <div class="{{ $containerClass ?? "container-xl" }}">
-                    <div class="card">
-                        <div class="card-body">
+            <div class="{{ $containerClass ?? "container-xl" }}">
+                <div class="card border-0 shadow-sm rounded-3">
+                    <div class="card-body">
                             <h2><i class="ti ti-coin me-2"></i>{{ __('messages.currency_settings_title') }}</h2>
                         </div>
                         <hr class="my-0">

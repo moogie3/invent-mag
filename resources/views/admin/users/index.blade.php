@@ -6,7 +6,7 @@
     <div class="page-wrapper">
         <div class="page-body">
             <div class="{{ $containerClass ?? "container-xl" }}">
-                <div class="card">
+                <div class="card border-0 shadow-sm rounded-3">
                     <div class="card-body">
                         <h2><i class="ti ti-users me-2"></i>{{ __('messages.user_management_title') }}</h2>
                     </div>
@@ -18,7 +18,7 @@
                         <div class="col-12 col-md-9 d-flex flex-column">
                             <div class="row row-deck row-cards">
                                 <div class="col-md-12">
-                                    <div class="card card-primary">
+                                    <div class="card border-0 shadow-none">
                                         <div class="card-body border-bottom py-3">
                                             <div class="d-flex justify-content-between align-items-center mb-3">
                                                 <h2 class="mb-0">
@@ -39,7 +39,7 @@
                                             {{-- User Statistics --}}
                                             <div class="row">
                                                 <div class="col-lg-4">
-                                                    <div class="card card-sm border-0 shadow-sm">
+                                                    <div class="card card-sm border-0 shadow-sm rounded-3">
                                                         <div class="card-body">
                                                             <div class="row align-items-center">
                                                                 <div class="col-auto">
@@ -68,7 +68,7 @@
                                                     </div>
                                                 </div>
                                                 <div class="col-lg-4">
-                                                    <div class="card card-sm border-0 shadow-sm">
+                                                    <div class="card card-sm border-0 shadow-sm rounded-3">
                                                         <div class="card-body">
                                                             <div class="row align-items-center">
                                                                 <div class="col-auto">
@@ -97,7 +97,7 @@
                                                     </div>
                                                 </div>
                                                 <div class="col-lg-4">
-                                                    <div class="card card-sm border-0 shadow-sm">
+                                                    <div class="card card-sm border-0 shadow-sm rounded-3">
                                                         <div class="card-body">
                                                             <div class="row align-items-center">
                                                                 <div class="col-auto">

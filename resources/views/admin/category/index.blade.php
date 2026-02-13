@@ -6,9 +6,9 @@
     <div class="page-wrapper">
         <div class="page-wrapper">
             <div class="page-body">
-                <div class="{{ $containerClass ?? "container-xl" }}">
-                    <div class="card">
-                        <div class="card-body">
+            <div class="{{ $containerClass ?? "container-xl" }}">
+                <div class="card border-0 shadow-sm rounded-3">
+                    <div class="card-body">
                             <h2><i class="ti ti-tag me-2"></i>{{ __('messages.category_settings_title') }}</h2>
                         </div>
                         <hr class="my-0">
@@ -18,9 +18,9 @@
                             </div>
                             <div class="col-12 col-md-9 d-flex flex-column">
                                 <div class="row row-deck row-cards">
-                                    <div class="col-md-12">
-                                        <div class="card card-primary">
-                                            <div class="card-body border-bottom py-3">
+                                <div class="col-md-12">
+                                    <div class="card border-0 shadow-none rounded-3">
+                                        <div class="card-body border-bottom py-3">
                                                 <div class="d-flex justify-content-between align-items-center">
                                                     <div class="d-flex align-items-center">
                                                         <i class="ti ti-tag fs-1 me-3 text-primary"></i>

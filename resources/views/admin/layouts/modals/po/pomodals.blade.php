@@ -1,6 +1,6 @@
 <div class="modal modal-blur fade" id="deleteModal" tabindex="-1" role="dialog" aria-hidden="true">
     <div class="modal-dialog modal-sm modal-dialog-centered" role="document">
-        <div class="modal-content">
+        <div class="modal-content border-0 shadow-lg rounded-3">
             <div class="modal-header">
                 <h5 class="modal-title">{{ __('messages.po_modal_delete_title') }}</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
@@ -37,7 +37,7 @@
 <div class="modal modal-blur fade" id="bulkDeleteModal" tabindex="-1" aria-labelledby="bulkDeleteModalLabel"
     aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
+        <div class="modal-content border-0 shadow-lg rounded-3">
             <div class="modal-header bg-danger text-white">
                 <h5 class="modal-title" id="bulkDeleteModalLabel">
                     <i class="ti ti-trash me-2"></i>
@@ -108,7 +108,7 @@
 <div class="modal fade" id="bulkMarkAsPaidModal" tabindex="-1" aria-labelledby="bulkMarkAsPaidModalLabel"
     aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
+        <div class="modal-content border-0 shadow-lg rounded-3">
             <div class="modal-header bg-success text-white">
                 <h5 class="modal-title" id="bulkMarkAsPaidModalLabel">
                     <i class="ti ti-check me-2"></i>
@@ -170,7 +170,7 @@
 
 <div class="modal modal-blur fade" id="viewPoModal" tabindex="-1" role="dialog" aria-hidden="true">
     <div class="modal-dialog modal-xl modal-dialog-centered" role="document">
-        <div class="modal-content">
+        <div class="modal-content border-0 shadow-lg rounded-3">
             <div class="modal-header bg-primary text-white">
                 <h4 class="modal-title"><i
                         class="ti ti-file-invoice me-2"></i>{{ __('messages.po_modal_details_title') }}</h4>
@@ -208,7 +208,7 @@
     <div class="modal fade" id="paidInvoiceModal" tabindex="-1" aria-labelledby="paidInvoiceModalLabel"
         aria-hidden="true">
         <div class="modal-dialog modal-sm modal-dialog-centered">
-            <div class="modal-content">
+            <div class="modal-content border-0 shadow-lg rounded-3">
                 <button type="button" class="btn-close m-2" data-bs-dismiss="modal" aria-label="Close"></button>
                 <div class="modal-body text-center py-4">
                     <i class="ti ti-alert-triangle icon text-warning icon-lg mb-4"></i>
@@ -253,7 +253,7 @@
 <!-- Expiring Soon Purchase Orders Modal -->
 <div class="modal modal-blur fade" id="expiringPurchaseModal" tabindex="-1" role="dialog" aria-hidden="true">
     <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
-        <div class="modal-content">
+        <div class="modal-content border-0 shadow-lg rounded-3">
             <div class="modal-header bg-warning text-white">
                 <h4 class="modal-title"><i
                         class="ti ti-calendar-time me-2"></i>{{ __('messages.po_modal_expiring_title') }}</h4>

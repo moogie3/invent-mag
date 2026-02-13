@@ -2,7 +2,7 @@
 <div class="modal modal-blur fade" id="bulkDeleteSalesReturnModal" tabindex="-1" aria-labelledby="bulkDeleteSalesReturnModalLabel"
     aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
+        <div class="modal-content border-0 shadow-lg rounded-3">
             <div class="modal-header bg-danger text-white">
                 <h5 class="modal-title" id="bulkDeleteSalesReturnModalLabel">
                     <i class="ti ti-trash me-2"></i>
@@ -70,7 +70,7 @@
 <div class="modal modal-blur fade" id="bulkMarkCompletedSalesReturnModal" tabindex="-1" aria-labelledby="bulkMarkCompletedSalesReturnModalLabel"
     aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
+        <div class="modal-content border-0 shadow-lg rounded-3">
             <div class="modal-header bg-success text-white">
                 <h5 class="modal-title" id="bulkMarkCompletedSalesReturnModalLabel">
                     <i class="ti ti-check me-2"></i>
@@ -112,7 +112,7 @@
 <div class="modal modal-blur fade" id="bulkMarkCanceledSalesReturnModal" tabindex="-1" aria-labelledby="bulkMarkCanceledSalesReturnModalLabel"
     aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
+        <div class="modal-content border-0 shadow-lg rounded-3">
             <div class="modal-header bg-warning text-white">
                 <h5 class="modal-title" id="bulkMarkCanceledSalesReturnModalLabel">
                     <i class="ti ti-x me-2"></i>
@@ -153,7 +153,7 @@
 <!-- Single Delete Sales Return Modal -->
 <div class="modal modal-blur fade" id="deleteModal" tabindex="-1" role="dialog" aria-hidden="true">
     <div class="modal-dialog modal-sm modal-dialog-centered" role="document">
-        <div class="modal-content">
+        <div class="modal-content border-0 shadow-lg rounded-3">
             <div class="modal-header">
                 <h5 class="modal-title">{{ __('messages.sr_modal_delete_title') }}</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
@@ -191,7 +191,7 @@
 <div class="modal fade" id="srStatusWarningModal" tabindex="-1" aria-labelledby="srStatusWarningModalLabel"
     aria-hidden="true">
     <div class="modal-dialog modal-sm modal-dialog-centered">
-        <div class="modal-content">
+        <div class="modal-content border-0 shadow-lg rounded-3">
             <button type="button" class="btn-close m-2" data-bs-dismiss="modal" aria-label="Close"></button>
             <div class="modal-body text-center py-4">
                 <i class="ti ti-alert-triangle icon text-warning icon-lg mb-4"></i>
@@ -214,7 +214,7 @@
 <!-- Sales Return Detail Modal -->
 <div class="modal modal-blur fade" id="salesReturnDetailModal" tabindex="-1" aria-labelledby="salesReturnDetailModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-xl modal-dialog-centered">
-        <div class="modal-content">
+        <div class="modal-content border-0 shadow-lg rounded-3">
             <div id="salesReturnDetailModalContent">
                 <!-- Content will be loaded dynamically here -->
                 <div class="modal-header">

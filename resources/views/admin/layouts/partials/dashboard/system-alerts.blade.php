@@ -1,4 +1,4 @@
-<div class="card shadow-sm border-1">
+<div class="card border-0 shadow-sm rounded-3">
     <div class="card-header d-flex justify-content-between align-items-center py-3">
         <h3 class="card-title mb-0">
             <i class="ti ti-bell-ringing fs-3 me-2"></i> {{ __('messages.system_alerts') }}

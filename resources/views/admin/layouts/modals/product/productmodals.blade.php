@@ -1,6 +1,6 @@
 <div class="modal modal-blur fade" id="deleteModal" tabindex="-1" role="dialog" aria-hidden="true">
     <div class="modal-dialog modal-sm modal-dialog-centered" role="document">
-        <div class="modal-content">
+        <div class="modal-content border-0 shadow-lg rounded-3">
             <div class="modal-header">
                 <h5 class="modal-title">{{ __('messages.product_modal_delete_title') }}</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
@@ -37,7 +37,7 @@
 <div class="modal modal-blur fade" id="bulkDeleteModal" tabindex="-1" aria-labelledby="bulkDeleteModalLabel"
     aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
+        <div class="modal-content border-0 shadow-lg rounded-3">
             <div class="modal-header bg-danger text-white">
                 <h5 class="modal-title" id="bulkDeleteModalLabel">
                     <i class="ti ti-trash me-2"></i>
@@ -119,7 +119,7 @@
 <!-- Low Stock Products Modal -->
 <div class="modal modal-blur fade" id="lowStockModal" tabindex="-1" role="dialog" aria-hidden="true">
     <div class="modal-dialog modal-xl modal-dialog-centered" role="document">
-        <div class="modal-content">
+        <div class="modal-content border-0 shadow-lg rounded-3">
             <div class="modal-header bg-danger text-white">
                 <h4 class="modal-title"><i
                         class="ti ti-alert-triangle me-2"></i>{{ __('messages.product_low_stock_modal_title') }}</h4>
@@ -185,7 +185,7 @@
 <!-- Expiring Soon Products Modal -->
 <div class="modal modal-blur fade" id="expiringSoonModal" tabindex="-1" role="dialog" aria-hidden="true">
     <div class="modal-dialog modal-xl modal-dialog-centered" role="document">
-        <div class="modal-content">
+        <div class="modal-content border-0 shadow-lg rounded-3">
             <div class="modal-header bg-warning text-white">
                 <h4 class="modal-title"><i
                         class="ti ti-calendar-time me-2"></i>{{ __('messages.product_expiring_soon_modal_title') }}
@@ -226,7 +226,7 @@
 <!-- View Product Details Modal -->
 <div class="modal modal-blur fade" id="viewProductModal" tabindex="-1" role="dialog" aria-hidden="true">
     <div class="modal-dialog modal-xl modal-dialog-centered" role="document">
-        <div class="modal-content">
+        <div class="modal-content border-0 shadow-lg rounded-3">
             <div class="modal-header bg-primary text-white">
                 <h4 class="modal-title"><i
                         class="ti ti-box me-2"></i>{{ __('messages.product_modal_details_title') }}</h4>
@@ -259,7 +259,7 @@
 
 <!-- Product Details View Modal Content -->
 <div id="productModalViewTemplate" style="display: none;">
-    <div class="card shadow">
+    <div class="card border-0 shadow-sm rounded-3">
         <!-- Header Section -->
         <div class="card-header py-3 bg-light">
             <div class="row align-items-center w-100">
@@ -449,7 +449,7 @@
 <div class="modal modal-blur fade" id="bulkUpdateStockModal" tabindex="-1"
     aria-labelledby="bulkUpdateStockModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-xl modal-dialog-centered">
-        <div class="modal-content">
+        <div class="modal-content border-0 shadow-lg rounded-3">
             <div class="modal-header bg-info text-white">
                 <h5 class="modal-title" id="bulkUpdateStockModalLabel">
                     <i class="ti ti-packages me-2"></i>
@@ -548,7 +548,7 @@
 <div class="modal modal-blur fade" id="adjustStockModal" tabindex="-1" aria-labelledby="adjustStockModalLabel"
     aria-hidden="true">
     <div class="modal-dialog modal-md modal-dialog-centered">
-        <div class="modal-content">
+        <div class="modal-content border-0 shadow-lg rounded-3">
             <div class="modal-header bg-info text-white">
                 <h5 class="modal-title" id="adjustStockModalLabel">
                     <i class="ti ti-arrows-diff me-2"></i>

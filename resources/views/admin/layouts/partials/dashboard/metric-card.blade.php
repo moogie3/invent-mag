@@ -1,5 +1,5 @@
 <div class="col-md-6 col-lg-3">
-    <div class="card h-100 border-1 rounded-2">
+    <div class="card h-100 border-0 shadow-sm rounded-3">
         <div class="card-body d-flex flex-column gap-2">
             <div class="d-flex align-items-center gap-3">
                 <div class="rounded-circle d-flex align-items-center justify-content-center bg-secondary-lt"

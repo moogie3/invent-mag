@@ -1,7 +1,7 @@
 <div class="modal modal-blur fade" id="srmSupplierModal" tabindex="-1" aria-labelledby="srmSupplierModalLabel"
     aria-hidden="true">
     <div class="modal-dialog modal-xl modal-dialog-centered">
-        <div class="modal-content">
+        <div class="modal-content border-0 shadow-lg rounded-3">
             <div class="modal-header bg-primary text-white">
                 <h5 class="modal-title" id="srmSupplierModalLabel"><i
                         class="ti ti-users me-2"></i>{{ __('messages.supplier_srm_title') }} <span

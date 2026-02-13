@@ -2,7 +2,7 @@
     @csrf
     @method('PUT')
 
-    <div class="card">
+    <div class="card border-0 shadow-sm rounded-3">
         @include('admin.layouts.partials.product.edit.card-header')
         @include('admin.layouts.partials.product.edit.card-body')
         @include('admin.layouts.partials.product.edit.card-footer')

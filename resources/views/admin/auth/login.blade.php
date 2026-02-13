@@ -3,7 +3,7 @@
 @section('title', 'Login')
 
 @section('content')
-    <div class="card card-md">
+    <div class="card card-md border-0 shadow-sm rounded-3">
         <div class="card-body">
             <h2 class="h2 text-center mb-5">Login to your account</h2>
             <form action="{{ route('admin.login') }}" method="POST" autocomplete="off" novalidate>

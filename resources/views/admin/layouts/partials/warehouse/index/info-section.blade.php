@@ -3,7 +3,7 @@
         <div class="col-md-8">
             <div class="row g-3">
                 <div class="col-md-6">
-                    <div class="card border-0 bg-light">
+                    <div class="card border-0 shadow-sm rounded-3 bg-light">
                         <div class="card-body py-3">
                             <div class="mb-2">
                                 <label class="form-label text-muted mb-2 d-block">
@@ -35,7 +35,7 @@
                     </div>
                 </div>
                 <div class="col-md-6">
-                    <div class="card border-0 bg-light">
+                    <div class="card border-0 shadow-sm rounded-3 bg-light">
                         <div class="card-body py-3">
                             <div class="mb-2">
                                 <label class="form-label text-muted mb-2 d-block">

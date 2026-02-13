@@ -1,7 +1,7 @@
 <!-- Mark as Paid Modal -->
 <div class="modal fade" id="markAsPaidModal" tabindex="-1" aria-labelledby="markAsPaidModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
+        <div class="modal-content border-0 shadow-lg rounded-3">
             <div class="modal-header bg-success text-white">
                 <h5 class="modal-title" id="markAsPaidModalLabel">
                     <i class="ti ti-check me-2"></i>
@@ -85,7 +85,7 @@
 <div class="modal fade" id="bulkMarkAsPaidModal" tabindex="-1" aria-labelledby="bulkMarkAsPaidModalLabel"
     aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
+        <div class="modal-content border-0 shadow-lg rounded-3">
             <div class="modal-header bg-success text-white">
                 <h5 class="modal-title" id="bulkMarkAsPaidModalLabel">
                     <i class="ti ti-check me-2"></i>

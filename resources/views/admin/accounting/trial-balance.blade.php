@@ -24,7 +24,7 @@
         </div>
 
         <div class="page-body mt-4">
-            <div class="card">
+            <div class="card border-0 shadow-sm rounded-3">
                 <div class="card-body">
                     <form id="filter-form" method="GET" action="{{ route('admin.accounting.trial_balance') }}" class="row g-3">
                         <div class="col-md-3">

@@ -1,6 +1,6 @@
 <div class="page-body">
     <div class="{{ $containerClass ?? "container-xl" }}">
-        <div class="card shadow-sm">
+        <div class="card border-0 shadow-sm rounded-3">
             <div class="card-header border-0">
                 <h3 class="card-title">
                     <i class="ti ti-file-invoice me-2"></i>
@@ -53,7 +53,7 @@
                     </div>
 
                     {{-- Products to Return Section --}}
-                    <div class="card mt-4 border">
+                    <div class="card mt-4 border-0 shadow-sm rounded-3">
                         <div class="card-header bg-light">
                             <h3 class="card-title">
                                 <i class="ti ti-package me-2"></i>

@@ -1,9 +1,9 @@
 <div class="page-body">
     <div class="{{ $containerClass ?? "container-xl" }}">
-        <div class="card card-lg">
+        <div class="card card-lg border-0 shadow-sm rounded-3">
             <div class="card-body">
                 {{-- Content from srmodals-view.blade.php starts here --}}
-                <div class="card shadow-sm mb-4">
+                <div class="card border-0 shadow-sm rounded-3 mb-4">
                     <div class="card-header">
                         <div class="d-flex align-items-start justify-content-between flex-wrap gap-2">
                             <div class="d-flex align-items-center">
@@ -27,7 +27,7 @@
 
                 <div class="row g-4 mb-4">
                     <div class="col-md-6">
-                        <div class="card bg-light border-0 h-100">
+                        <div class="card bg-light border-0 h-100 rounded-3 shadow-sm">
                             <div class="card-body p-3">
                                 <h4 class="card-title mb-3"><i
                                         class="ti ti-user me-2 text-primary"></i>{{ __('messages.customer') }}</h4>
@@ -45,7 +45,7 @@
                         </div>
                     </div>
                     <div class="col-md-6">
-                        <div class="card bg-light border-0 h-100">
+                        <div class="card bg-light border-0 h-100 rounded-3 shadow-sm">
                             <div class="card-body p-3">
                                 <h4 class="card-title mb-3"><i
                                         class="ti ti-info-circle me-2 text-primary"></i>{{ __('messages.sr_return_information_title') }}
@@ -75,7 +75,7 @@
                     </div>
                 </div>
 
-                <div class="card border mb-4">
+                <div class="card border-0 shadow-sm rounded-3 mb-4">
                     <div class="card-header bg-light py-2">
                         <h4 class="card-title mb-0"><i
                                 class="ti ti-list me-2 text-primary"></i>{{ __('messages.sr_returned_items_title') }}</h4>

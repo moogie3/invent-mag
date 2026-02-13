@@ -1,5 +1,5 @@
-<div class="card shadow-sm mb-4">
-    <div class="card-header">
+<div class="card border-0 shadow-sm rounded-3 mb-4">
+    <div class="card-header bg-white border-bottom">
         <h4 class="mb-0"><i class="ti ti-percentage"></i> {{ __('messages.order_discount') }}</h4>
     </div>
     <div class="card-body">

@@ -7,7 +7,7 @@
         <div class="page-wrapper">
             <div class="page-body">
                 <div class="{{ $containerClass ?? "container-xl" }}">
-                    <div class="card">
+                    <div class="card border-0 shadow-sm rounded-3">
                         <div class="card-body">
                             <h2><i class="ti ti-user-cog me-2"></i>{{ __('messages.account_settings') }}</h2>
                         </div>

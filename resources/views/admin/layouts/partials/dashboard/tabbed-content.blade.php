@@ -1,4 +1,4 @@
-<div class="card">
+<div class="card border-0 shadow-sm rounded-3">
     <div class="card-header">
         <ul class="nav nav-tabs card-header-tabs" data-bs-toggle="tabs">
             <li class="nav-item">

@@ -1,6 +1,6 @@
 <div class="modal modal-blur fade" id="deleteModal" tabindex="-1" role="dialog" aria-hidden="true">
     <div class="modal-dialog modal-sm modal-dialog-centered" role="document">
-        <div class="modal-content">
+        <div class="modal-content border-0 shadow-lg rounded-3">
             <div class="modal-header">
                 <h5 class="modal-title">{{ __('messages.sales_modal_delete_sales_order_title') }}</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
@@ -36,7 +36,7 @@
 <div class="modal modal-blur fade" id="bulkDeleteModal" tabindex="-1" aria-labelledby="bulkDeleteModalLabel"
     aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
+        <div class="modal-content border-0 shadow-lg rounded-3">
             <div class="modal-header bg-danger text-white">
                 <h5 class="modal-title" id="bulkDeleteModalLabel">
                     <i class="ti ti-trash me-2"></i>
@@ -107,7 +107,7 @@
 <div class="modal fade" id="bulkMarkAsPaidModal" tabindex="-1" aria-labelledby="bulkMarkAsPaidModalLabel"
     aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
+        <div class="modal-content border-0 shadow-lg rounded-3">
             <div class="modal-header bg-success text-white">
                 <h5 class="modal-title" id="bulkMarkAsPaidModalLabel">
                     <i class="ti ti-check me-2"></i>
@@ -169,7 +169,7 @@
 
 <div class="modal modal-blur fade" id="viewSalesModal" tabindex="-1" role="dialog" aria-hidden="true">
     <div class="modal-dialog modal-xl modal-dialog-centered" role="document">
-        <div class="modal-content">
+        <div class="modal-content border-0 shadow-lg rounded-3">
             <div class="modal-header bg-info text-white">
                 <h4 class="modal-title"><i
                         class="ti ti-file-invoice me-2"></i>{{ __('messages.sales_modal_sales_order_details_title') }}
@@ -210,7 +210,7 @@
     <div class="modal fade" id="paidInvoiceModal" tabindex="-1" aria-labelledby="paidInvoiceModalLabel"
         aria-hidden="true">
         <div class="modal-dialog modal-sm modal-dialog-centered">
-            <div class="modal-content">
+            <div class="modal-content border-0 shadow-lg rounded-3">
                 <button type="button" class="btn-close m-2" data-bs-dismiss="modal" aria-label="Close"></button>
                 <div class="modal-body text-center py-4">
                     <i class="ti ti-alert-triangle icon text-warning icon-lg mb-4"></i>
@@ -256,7 +256,7 @@
 <!-- Expiring Soon Sales Invoices Modal -->
 <div class="modal modal-blur fade" id="expiringSalesModal" tabindex="-1" role="dialog" aria-hidden="true">
     <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
-        <div class="modal-content">
+        <div class="modal-content border-0 shadow-lg rounded-3">
             <div class="modal-header bg-warning text-white">
                 <h4 class="modal-title"><i
                         class="ti ti-calendar-time me-2"></i>{{ __('messages.sales_modal_expiring_sales_invoices_title') }}

@@ -130,7 +130,7 @@
                 <!-- Summary Cards -->
                 <div class="row g-3 mb-4">
                     <div class="col-sm-6 col-lg-3">
-                        <div class="card">
+                        <div class="card border-0 shadow-sm rounded-3">
                             <div class="card-body">
                                 <div class="d-flex align-items-center">
                                     <div class="subheader">{{ __('messages.total_transactions') }}</div>
@@ -151,7 +151,7 @@
                         </div>
                     </div>
                     <div class="col-sm-6 col-lg-3">
-                        <div class="card">
+                        <div class="card border-0 shadow-sm rounded-3">
                             <div class="card-body">
                                 <div class="d-flex align-items-center">
                                     <div class="subheader">{{ __('messages.total_amount') }}</div>
@@ -171,7 +171,7 @@
                         </div>
                     </div>
                     <div class="col-sm-6 col-lg-3">
-                        <div class="card">
+                        <div class="card border-0 shadow-sm rounded-3">
                             <div class="card-body">
                                 <div class="d-flex align-items-center">
                                     <div class="subheader">{{ __('messages.paid_transactions') }}</div>
@@ -190,7 +190,7 @@
                         </div>
                     </div>
                     <div class="col-sm-6 col-lg-3">
-                        <div class="card">
+                        <div class="card border-0 shadow-sm rounded-3">
                             <div class="card-body">
                                 <div class="d-flex align-items-center">
                                     <div class="subheader">{{ __('messages.outstanding') }}</div>
@@ -211,7 +211,7 @@
                 </div>
 
                 <!-- Transactions Table -->
-                <div class="card">
+                <div class="card border-0 shadow-sm rounded-3">
                     <div id="bulkActionsBar" class="bulk-actions-bar border-bottom sticky-top" style="display: none;">
                         <div class="px-4 py-3">
                             <div class="row align-items-center">

@@ -1,7 +1,7 @@
 <div class="modal modal-blur fade" id="convertOpportunityModal" tabindex="-1"
     aria-labelledby="convertOpportunityModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
+        <div class="modal-content border-0 shadow-lg rounded-3">
             <div class="modal-header">
                 <h5 class="modal-title" id="convertOpportunityModalLabel">
                     {{ __('messages.sales_pipeline_modal_convert_to_sales_order_title') }}</h5>
@@ -26,7 +26,7 @@
 <!-- Confirmation Modal -->
 <div class="modal modal-blur fade" id="confirmationModal" tabindex="-1" role="dialog" aria-hidden="true">
     <div class="modal-dialog modal-sm modal-dialog-centered" role="document">
-        <div class="modal-content">
+        <div class="modal-content border-0 shadow-lg rounded-3">
             <div class="modal-header">
                 <h5 class="modal-title" id="confirmationModalTitle">
                     {{ __('messages.sales_pipeline_modal_confirmation_title') }}

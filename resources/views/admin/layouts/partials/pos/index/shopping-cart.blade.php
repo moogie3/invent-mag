@@ -1,5 +1,5 @@
 <div class="col-md-6">
-    <div class="card mb-4">
+    <div class="card border-0 shadow-sm rounded-3 mb-4">
         <div class="card-header d-flex justify-content-between align-items-center">
             <h4 class="card-title mb-0">
                 <i class="ti ti-shopping-cart me-2"></i>{{ __('messages.shopping_cart') }}

@@ -21,10 +21,10 @@
                     </div>
                 </div>
                 <div class="col-auto ms-auto d-print-none">
-                    <div class="btn-group d-none d-sm-inline-block me-2">
+                    <div class="dropdown d-inline-block me-2">
                         <button type="button" class="btn btn-secondary dropdown-toggle" data-bs-toggle="dropdown"
                             aria-expanded="false">
-                            <i class="ti ti-printer fs-4 me-2"></i> {{ __('messages.export') }}
+                            <i class="ti ti-download fs-4 me-2"></i> {{ __('messages.export') }}
                         </button>
                         <ul class="dropdown-menu">
                             <li><a class="dropdown-item" href="#" onclick="exportAccounts('csv')">Export as CSV</a>
@@ -42,7 +42,7 @@
         </div>
 
         <div class="page-body mt-4">
-            <div class="card">
+            <div class="card border-0 shadow-sm rounded-3">
                 <div class="table-responsive">
                     <table class="table table-vcenter card-table">
                         <thead style="font-size: large">

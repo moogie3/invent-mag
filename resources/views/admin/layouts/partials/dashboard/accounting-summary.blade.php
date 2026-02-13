@@ -1,5 +1,5 @@
 <div class="col-12">
-    <div class="card">
+    <div class="card border-0 shadow-sm rounded-3">
         <div class="card-header">
             <h3 class="card-title"><i class="ti ti-calculator me-2"></i>{{ __('messages.accounting_summary') }}</h3>
         </div>
@@ -8,7 +8,7 @@
                 @if(isset($financialItems))
                     @foreach($financialItems as $item)
                         <div class="col-md-4">
-                            <div class="card card-sm">
+                            <div class="card card-sm border-light shadow-none rounded-3">
                                 <div class="card-body">
                                     <div class="row align-items-center">
                                         <div class="col-auto">

@@ -26,10 +26,11 @@ class SalesOpportunitySeeder extends Seeder
         $stages = $pipeline ? PipelineStage::where('sales_pipeline_id', $pipeline->id)->where('tenant_id', $tenantId)->get() : collect();
 
         if (!$pipeline || $customers->isEmpty() || $products->isEmpty() || $stages->isEmpty()) {
-            $this->command->info('Skipping SalesOpportunitySeeder for tenant ' . app('currentTenant')->name . ': Default pipeline, customers, products, or stages not found.');
+            $this->command->warn('Skipping SalesOpportunitySeeder for tenant ' . app('currentTenant')->name . ': Default pipeline, customers, products, or stages not found.');
             return;
         }
 
+        $count = 0;
         for ($i = 0; $i < 5; $i++) {
             $status = ($i == 0) ? 'won' : 'open';
             $opportunity = SalesOpportunity::create([
@@ -52,6 +53,9 @@ class SalesOpportunitySeeder extends Seeder
                     'tenant_id' => $tenantId,
                 ]);
             }
+            $count++;
         }
+        
+        $this->command->info("Seeded {$count} Sales Opportunities for tenant: " . app('currentTenant')->name);
     }
 }

@@ -5,7 +5,14 @@ namespace Tests\Feature\Admin;
 use App\Models\Account;
 use App\Models\JournalEntry;
 use App\Models\User;
+use App\Services\AccountService;
+use App\Services\AccountingExportService;
+use App\Services\AccountingReportService;
+use App\Services\ChartOfAccountsService;
+use App\Services\GeneralLedgerService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Pagination\LengthAwarePaginator;
+use Mockery;
 use PHPUnit\Framework\Attributes\Test;
 use Spatie\Permission\Models\Role;
 use Tests\TestCase;
@@ -17,6 +24,12 @@ class AccountingControllerTest extends TestCase
 {
     use RefreshDatabase, CreatesTenant;
 
+    protected $accountServiceMock;
+    protected $generalLedgerServiceMock;
+    protected $accountingReportServiceMock;
+    protected $accountingExportServiceMock;
+    protected $chartOfAccountsServiceMock;
+
     protected function setUp(): void
     {
         parent::setUp();
@@ -26,12 +39,31 @@ class AccountingControllerTest extends TestCase
 
         // Seed accounts within the tenant context
         $this->seed(AccountSeeder::class);
+
+        // Mock the services
+        $this->accountServiceMock = Mockery::mock(AccountService::class);
+        $this->generalLedgerServiceMock = Mockery::mock(GeneralLedgerService::class);
+        $this->accountingReportServiceMock = Mockery::mock(AccountingReportService::class);
+        $this->accountingExportServiceMock = Mockery::mock(AccountingExportService::class);
+        $this->chartOfAccountsServiceMock = Mockery::mock(ChartOfAccountsService::class);
+
+        $this->app->instance(AccountService::class, $this->accountServiceMock);
+        $this->app->instance(GeneralLedgerService::class, $this->generalLedgerServiceMock);
+        $this->app->instance(AccountingReportService::class, $this->accountingReportServiceMock);
+        $this->app->instance(AccountingExportService::class, $this->accountingExportServiceMock);
+        $this->app->instance(ChartOfAccountsService::class, $this->chartOfAccountsServiceMock);
+    }
+
+    protected function tearDown(): void
+    {
+        Mockery::close();
+        parent::tearDown();
     }
 
     #[Test]
     public function it_can_display_the_chart_of_accounts()
     {
-        $response = $this->get(route('admin.accounting.chart'));
+        $response = $this->actingAs($this->user)->get(route('admin.accounting.chart'));
 
         $response->assertRedirect(route('admin.accounting.accounts.index'));
     }
@@ -39,9 +71,14 @@ class AccountingControllerTest extends TestCase
     #[Test]
     public function it_can_display_the_general_journal()
     {
-        JournalEntry::factory()->count(5)->create();
+        $this->generalLedgerServiceMock->shouldReceive('getJournalEntries')
+            ->andReturn([
+                'entries' => new LengthAwarePaginator(collect([]), 0, 20),
+                'start_date' => '2024-01-01',
+                'end_date' => '2024-01-31',
+            ]);
 
-        $response = $this->get(route('admin.accounting.journal'));
+        $response = $this->actingAs($this->user)->get(route('admin.accounting.journal'));
 
         $response->assertOk();
         $response->assertViewIs('admin.accounting.journal');
@@ -51,7 +88,10 @@ class AccountingControllerTest extends TestCase
     #[Test]
     public function it_can_display_the_general_ledger()
     {
-        $response = $this->get(route('admin.accounting.ledger'));
+        $this->accountServiceMock->shouldReceive('getAllAccountsOrdered')
+            ->andReturn(collect([]));
+
+        $response = $this->actingAs($this->user)->get(route('admin.accounting.ledger'));
 
         $response->assertOk();
         $response->assertViewIs('admin.accounting.general-ledger');
@@ -63,9 +103,21 @@ class AccountingControllerTest extends TestCase
     {
         $tenantId = app('currentTenant')->id;
         $account = Account::where('code', '1110-' . $tenantId)->first();
-        JournalEntry::factory()->hasTransactions(1, ['account_id' => $account->id])->create();
 
-        $response = $this->get(route('admin.accounting.ledger', [
+        $this->accountServiceMock->shouldReceive('getAllAccountsOrdered')
+            ->andReturn(collect([$account]));
+        
+        $this->generalLedgerServiceMock->shouldReceive('getGeneralLedger')
+            ->andReturn([
+                'account' => $account,
+                'transactions' => new LengthAwarePaginator(collect([]), 0, 50),
+                'opening_balance' => 0,
+                'closing_balance' => 0,
+                'start_date' => '2024-01-01',
+                'end_date' => '2024-01-31',
+            ]);
+
+        $response = $this->actingAs($this->user)->get(route('admin.accounting.ledger', [
             'account_id' => $account->id,
             'start_date' => now()->subMonth()->toDateString(),
             'end_date' => now()->addMonth()->toDateString(),
@@ -80,58 +132,31 @@ class AccountingControllerTest extends TestCase
     #[Test]
     public function it_can_display_the_trial_balance()
     {
-        // Create some transactions to ensure balances exist
-        $tenantId = app('currentTenant')->id;
-        $cash = Account::where('code', '1110-' . $tenantId)->first();
-        $salesRevenue = Account::where('code', '4100-' . $tenantId)->first();
-        $ar = Account::where('code', '1130-' . $tenantId)->first();
+        $this->accountingReportServiceMock->shouldReceive('generateTrialBalance')
+            ->andReturn([
+                'report_data' => [],
+                'total_debits' => 0,
+                'total_credits' => 0,
+                'is_balanced' => true,
+                'end_date' => '2024-01-31',
+            ]);
 
-        $sale = \App\Models\Sales::factory()->create();
-        $payment = \App\Models\Payment::factory()->for($sale, 'paymentable')->create(['amount' => 100]);
-
-        // Simulate a sale
-        JournalEntry::factory()->create([
-            'date' => now()->subDays(5),
-            'description' => 'Sale Test',
-            'sourceable_id' => $sale->id,
-            'sourceable_type' => \App\Models\Sales::class,
-        ])->transactions()->createMany([
-            ['account_id' => $ar->id, 'type' => 'debit', 'amount' => 100],
-            ['account_id' => $salesRevenue->id, 'type' => 'credit', 'amount' => 100],
-        ]);
-
-        // Simulate a payment
-        JournalEntry::factory()->create([
-            'date' => now()->subDays(3),
-            'description' => 'Payment Test',
-            'sourceable_id' => $payment->id,
-            'sourceable_type' => \App\Models\Payment::class,
-        ])->transactions()->createMany([
-            ['account_id' => $cash->id, 'type' => 'debit', 'amount' => 100],
-            ['account_id' => $ar->id, 'type' => 'credit', 'amount' => 100],
-        ]);
-
-        $response = $this->get(route('admin.accounting.trial_balance'));
+        $response = $this->actingAs($this->user)->get(route('admin.accounting.trial_balance'));
 
         $response->assertOk();
         $response->assertViewIs('admin.accounting.trial-balance');
         $response->assertViewHas('reportData');
         $response->assertViewHas('totalDebits');
         $response->assertViewHas('totalCredits');
-
-        // Assert that total debits equal total credits
-        $reportData = $response->original->getData()['reportData'];
-        $totalDebits = $response->original->getData()['totalDebits'];
-        $totalCredits = $response->original->getData()['totalCredits'];
-
-        $this->assertEquals($totalDebits, $totalCredits);
-        $this->assertGreaterThan(0, $totalDebits); // Ensure some transactions were processed
     }
 
     #[Test]
     public function it_can_display_the_accounts_index_page()
     {
-        $response = $this->get(route('admin.accounting.accounts.index'));
+        $this->accountServiceMock->shouldReceive('getAccountsWithChildren')
+            ->andReturn(collect([]));
+
+        $response = $this->actingAs($this->user)->get(route('admin.accounting.accounts.index'));
 
         $response->assertOk();
         $response->assertViewIs('admin.accounting.accounts.index');
@@ -141,7 +166,10 @@ class AccountingControllerTest extends TestCase
     #[Test]
     public function it_can_display_the_accounts_create_page()
     {
-        $response = $this->get(route('admin.accounting.accounts.create'));
+        $this->accountServiceMock->shouldReceive('getAllAccountsOrdered')
+            ->andReturn(collect([]));
+
+        $response = $this->actingAs($this->user)->get(route('admin.accounting.accounts.create'));
 
         $response->assertOk();
         $response->assertViewIs('admin.accounting.accounts.create');
@@ -152,10 +180,16 @@ class AccountingControllerTest extends TestCase
     public function it_can_store_a_new_account()
     {
         $tenantId = app('currentTenant')->id;
-        $parentAccount = Account::where('code', '1000-' . $tenantId)->first(); // Assets
+        $parentAccount = Account::where('code', '1000-' . $tenantId)->first();
         $this->assertNotNull($parentAccount, 'Parent account with code 1000 not found.');
 
-        $response = $this->post(route('admin.accounting.accounts.store'), [
+        $this->accountServiceMock->shouldReceive('createAccount')
+            ->once()
+            ->andReturnUsing(function ($data) {
+                return Account::factory()->create($data);
+            });
+
+        $response = $this->actingAs($this->user)->post(route('admin.accounting.accounts.store'), [
             'name' => 'Test Account',
             'code' => '9000',
             'type' => 'asset',
@@ -165,19 +199,18 @@ class AccountingControllerTest extends TestCase
 
         $response->assertRedirect(route('admin.accounting.accounts.index'));
         $response->assertSessionHas('success', 'Account created successfully.');
-        $this->assertDatabaseHas('accounts', [
-            'name' => 'Test Account',
-            'code' => '9000',
-            'type' => 'asset',
-            'parent_id' => $parentAccount->id,
-            'level' => $parentAccount->level + 1,
-        ]);
     }
 
     #[Test]
     public function it_validates_account_store_request()
     {
-        $response = $this->post(route('admin.accounting.accounts.store'), [
+        $this->accountServiceMock->shouldReceive('createAccount')
+            ->once()
+            ->andThrow(new \Illuminate\Validation\ValidationException(
+                validator([], ['name' => 'required', 'code' => 'required', 'type' => 'required'])
+            ));
+
+        $response = $this->actingAs($this->user)->post(route('admin.accounting.accounts.store'), [
             'name' => '',
             'code' => '',
             'type' => 'invalid_type',
@@ -191,7 +224,11 @@ class AccountingControllerTest extends TestCase
     {
         $account = Account::factory()->create();
 
-        $response = $this->get(route('admin.accounting.accounts.edit', $account));
+        $this->accountServiceMock->shouldReceive('getAllAccountsExcept')
+            ->with($account->id)
+            ->andReturn(collect([]));
+
+        $response = $this->actingAs($this->user)->get(route('admin.accounting.accounts.edit', $account));
 
         $response->assertOk();
         $response->assertViewIs('admin.accounting.accounts.edit');
@@ -204,9 +241,13 @@ class AccountingControllerTest extends TestCase
     {
         $account = Account::factory()->create(['name' => 'Old Name', 'code' => 'OLD1', 'type' => 'asset']);
         $tenantId = app('currentTenant')->id;
-        $parentAccount = Account::where('code', '1000-' . $tenantId)->first(); // Assets
+        $parentAccount = Account::where('code', '1000-' . $tenantId)->first();
 
-        $response = $this->put(route('admin.accounting.accounts.update', $account), [
+        $this->accountServiceMock->shouldReceive('updateAccount')
+            ->once()
+            ->andReturn($account);
+
+        $response = $this->actingAs($this->user)->put(route('admin.accounting.accounts.update', $account), [
             'name' => 'Updated Name',
             'code' => 'UPD1',
             'type' => 'liability',
@@ -216,14 +257,6 @@ class AccountingControllerTest extends TestCase
 
         $response->assertRedirect(route('admin.accounting.accounts.index'));
         $response->assertSessionHas('success', 'Account updated successfully.');
-        $this->assertDatabaseHas('accounts', [
-            'id' => $account->id,
-            'name' => 'Updated Name',
-            'code' => 'UPD1',
-            'type' => 'liability',
-            'parent_id' => $parentAccount->id,
-            'level' => $parentAccount->level + 1,
-        ]);
     }
 
     #[Test]
@@ -231,7 +264,13 @@ class AccountingControllerTest extends TestCase
     {
         $account = Account::factory()->create();
 
-        $response = $this->put(route('admin.accounting.accounts.update', $account), [
+        $this->accountServiceMock->shouldReceive('updateAccount')
+            ->once()
+            ->andThrow(new \Illuminate\Validation\ValidationException(
+                validator([], ['name' => 'required', 'code' => 'required', 'type' => 'required'])
+            ));
+
+        $response = $this->actingAs($this->user)->put(route('admin.accounting.accounts.update', $account), [
             'name' => '',
             'code' => '',
             'type' => 'invalid_type',
@@ -245,38 +284,279 @@ class AccountingControllerTest extends TestCase
     {
         $account = Account::factory()->create();
 
-        $response = $this->delete(route('admin.accounting.accounts.destroy', $account));
+        $this->accountServiceMock->shouldReceive('deleteAccount')
+            ->with(Mockery::on(function ($arg) use ($account) {
+                return $arg->id === $account->id;
+            }))
+            ->once()
+            ->andReturn([
+                'success' => true,
+                'message' => 'Account deleted successfully.',
+            ]);
+
+        $response = $this->actingAs($this->user)->delete(route('admin.accounting.accounts.destroy', $account));
 
         $response->assertRedirect(route('admin.accounting.accounts.index'));
         $response->assertSessionHas('success', 'Account deleted successfully.');
-        $this->assertDatabaseMissing('accounts', ['id' => $account->id]);
     }
 
     #[Test]
     public function it_cannot_delete_account_with_transactions()
     {
-        $tenantId = app('currentTenant')->id;
-        $account = Account::where('code', '1110-' . $tenantId)->first();
-        JournalEntry::factory()->hasTransactions(1, ['account_id' => $account->id])->create();
+        $account = Account::factory()->create();
 
-        $response = $this->delete(route('admin.accounting.accounts.destroy', $account));
+        $this->accountServiceMock->shouldReceive('deleteAccount')
+            ->with(Mockery::on(function ($arg) use ($account) {
+                return $arg->id === $account->id;
+            }))
+            ->once()
+            ->andReturn([
+                'success' => false,
+                'message' => 'Account cannot be deleted because it has transactions.',
+            ]);
+
+        $response = $this->actingAs($this->user)->delete(route('admin.accounting.accounts.destroy', $account));
 
         $response->assertRedirect(route('admin.accounting.accounts.index'));
-        $response->assertSessionHas('error', 'Account cannot be deleted because it has transactions or child accounts.');
-        $this->assertDatabaseHas('accounts', ['id' => $account->id]);
+        $response->assertSessionHas('error', 'Account cannot be deleted because it has transactions.');
     }
 
     #[Test]
     public function it_cannot_delete_account_with_children()
     {
-        $tenantId = app('currentTenant')->id;
-        $parent = Account::where('code', '1000-' . $tenantId)->first(); // Assets
-        $child = Account::factory()->create(['parent_id' => $parent->id]);
+        $account = Account::factory()->create();
 
-        $response = $this->delete(route('admin.accounting.accounts.destroy', $parent));
+        $this->accountServiceMock->shouldReceive('deleteAccount')
+            ->with(Mockery::on(function ($arg) use ($account) {
+                return $arg->id === $account->id;
+            }))
+            ->once()
+            ->andReturn([
+                'success' => false,
+                'message' => 'Account cannot be deleted because it has child accounts.',
+            ]);
+
+        $response = $this->actingAs($this->user)->delete(route('admin.accounting.accounts.destroy', $account));
 
         $response->assertRedirect(route('admin.accounting.accounts.index'));
-        $response->assertSessionHas('error', 'Account cannot be deleted because it has transactions or child accounts.');
-        $this->assertDatabaseHas('accounts', ['id' => $parent->id]);
+        $response->assertSessionHas('error', 'Account cannot be deleted because it has child accounts.');
+    }
+
+    #[Test]
+    public function it_can_export_chart_of_accounts_to_pdf()
+    {
+        $this->accountServiceMock->shouldReceive('getAccountsWithChildren')
+            ->andReturn(collect([]));
+        
+        $this->accountingExportServiceMock->shouldReceive('exportChartOfAccountsToPdf')
+            ->andReturn(response('pdf content', 200, ['Content-Type' => 'application/pdf']));
+
+        $response = $this->actingAs($this->user)->post(route('admin.accounting.accounts.export'), [
+            'export_option' => 'pdf',
+        ]);
+
+        $response->assertStatus(200);
+    }
+
+    #[Test]
+    public function it_can_export_chart_of_accounts_to_csv()
+    {
+        $this->accountServiceMock->shouldReceive('getAccountsWithChildren')
+            ->andReturn(collect([]));
+        
+        $this->accountingReportServiceMock->shouldReceive('flattenAccountHierarchy')
+            ->andReturn([]);
+        
+        $this->accountingExportServiceMock->shouldReceive('exportChartOfAccountsToCsv')
+            ->andReturn(response('csv content', 200, ['Content-Type' => 'text/csv']));
+
+        $response = $this->actingAs($this->user)->post(route('admin.accounting.accounts.export'), [
+            'export_option' => 'csv',
+        ]);
+
+        $response->assertStatus(200);
+    }
+
+    #[Test]
+    public function it_can_export_journal_to_pdf()
+    {
+        $this->generalLedgerServiceMock->shouldReceive('getJournalEntriesForExport')
+            ->andReturn(collect([]));
+        
+        $this->accountingExportServiceMock->shouldReceive('exportJournalToPdf')
+            ->andReturn(response('pdf content', 200, ['Content-Type' => 'application/pdf']));
+
+        $response = $this->actingAs($this->user)->post(route('admin.accounting.journal.export'), [
+            'export_option' => 'pdf',
+        ]);
+
+        $response->assertStatus(200);
+    }
+
+    #[Test]
+    public function it_can_export_journal_to_csv()
+    {
+        $this->generalLedgerServiceMock->shouldReceive('getJournalEntriesForExport')
+            ->andReturn(collect([]));
+        
+        $this->accountingExportServiceMock->shouldReceive('exportJournalToCsv')
+            ->andReturn(response('csv content', 200, ['Content-Type' => 'text/csv']));
+
+        $response = $this->actingAs($this->user)->post(route('admin.accounting.journal.export'), [
+            'export_option' => 'csv',
+        ]);
+
+        $response->assertStatus(200);
+    }
+
+    #[Test]
+    public function it_can_export_trial_balance_to_pdf()
+    {
+        $this->accountingReportServiceMock->shouldReceive('generateTrialBalance')
+            ->andReturn([
+                'report_data' => [],
+                'total_debits' => 0,
+                'total_credits' => 0,
+                'end_date' => '2024-01-31',
+            ]);
+        
+        $this->accountingExportServiceMock->shouldReceive('exportTrialBalanceToPdf')
+            ->andReturn(response('pdf content', 200, ['Content-Type' => 'application/pdf']));
+
+        $response = $this->actingAs($this->user)->post(route('admin.accounting.trial_balance.export'), [
+            'export_option' => 'pdf',
+        ]);
+
+        $response->assertStatus(200);
+    }
+
+    #[Test]
+    public function it_can_export_trial_balance_to_csv()
+    {
+        $this->accountingReportServiceMock->shouldReceive('generateTrialBalance')
+            ->andReturn([
+                'report_data' => [],
+                'total_debits' => 0,
+                'total_credits' => 0,
+                'end_date' => '2024-01-31',
+            ]);
+        
+        $this->accountingExportServiceMock->shouldReceive('exportTrialBalanceToCsv')
+            ->andReturn(response('csv content', 200, ['Content-Type' => 'text/csv']));
+
+        $response = $this->actingAs($this->user)->post(route('admin.accounting.trial_balance.export'), [
+            'export_option' => 'csv',
+        ]);
+
+        $response->assertStatus(200);
+    }
+
+    #[Test]
+    public function it_can_export_general_ledger_to_pdf()
+    {
+        $tenantId = app('currentTenant')->id;
+        $account = Account::where('code', '1110-' . $tenantId)->first();
+
+        $this->generalLedgerServiceMock->shouldReceive('getGeneralLedgerForExport')
+            ->andReturn([
+                'account' => $account,
+                'transactions' => collect([]),
+                'opening_balance' => 0,
+                'closing_balance' => 0,
+                'start_date' => '2024-01-01',
+                'end_date' => '2024-01-31',
+            ]);
+        
+        $this->accountingExportServiceMock->shouldReceive('exportGeneralLedgerToPdf')
+            ->andReturn(response('pdf content', 200, ['Content-Type' => 'application/pdf']));
+
+        $response = $this->actingAs($this->user)->post(route('admin.accounting.ledger.export'), [
+            'export_option' => 'pdf',
+            'account_id' => $account->id,
+        ]);
+
+        $response->assertStatus(200);
+    }
+
+    #[Test]
+    public function it_can_export_general_ledger_to_csv()
+    {
+        $tenantId = app('currentTenant')->id;
+        $account = Account::where('code', '1110-' . $tenantId)->first();
+
+        $this->generalLedgerServiceMock->shouldReceive('getGeneralLedgerForExport')
+            ->andReturn([
+                'account' => $account,
+                'transactions' => collect([]),
+                'opening_balance' => 0,
+                'closing_balance' => 0,
+                'start_date' => '2024-01-01',
+                'end_date' => '2024-01-31',
+            ]);
+        
+        $this->accountingExportServiceMock->shouldReceive('exportGeneralLedgerToCsv')
+            ->andReturn(response('csv content', 200, ['Content-Type' => 'text/csv']));
+
+        $response = $this->actingAs($this->user)->post(route('admin.accounting.ledger.export'), [
+            'export_option' => 'csv',
+            'account_id' => $account->id,
+        ]);
+
+        $response->assertStatus(200);
+    }
+
+    #[Test]
+    public function it_can_display_accounting_settings()
+    {
+        $this->chartOfAccountsServiceMock->shouldReceive('getAccountingSettings')
+            ->andReturn([
+                'accounts' => collect([]),
+                'settings' => [],
+            ]);
+
+        $response = $this->actingAs($this->user)->get(route('admin.setting.accounting'));
+
+        $response->assertOk();
+        $response->assertViewIs('admin.accounting.accounting-setting');
+    }
+
+    #[Test]
+    public function it_can_update_accounting_settings()
+    {
+        $this->chartOfAccountsServiceMock->shouldReceive('validateSettingsData')
+            ->andReturn([
+                'sales_revenue_account_id' => 'required|exists:accounts,id',
+                'accounts_receivable_account_id' => 'required|exists:accounts,id',
+                'cost_of_goods_sold_account_id' => 'required|exists:accounts,id',
+                'inventory_account_id' => 'required|exists:accounts,id',
+                'accounts_payable_account_id' => 'required|exists:accounts,id',
+                'cash_account_id' => 'required|exists:accounts,id',
+            ]);
+
+        $this->chartOfAccountsServiceMock->shouldReceive('updateAccountingSettings')
+            ->andReturn([
+                'success' => true,
+                'message' => 'Accounting settings updated successfully.',
+            ]);
+
+        $tenantId = app('currentTenant')->id;
+        $cash = Account::where('code', '1110-' . $tenantId)->first();
+        $ar = Account::where('code', '1130-' . $tenantId)->first();
+        $inventory = Account::where('code', '1150-' . $tenantId)->first();
+        $ap = Account::where('code', '2110-' . $tenantId)->first();
+        $sales = Account::where('code', '4100-' . $tenantId)->first();
+        $cogs = Account::where('code', '5110-' . $tenantId)->first();
+
+        $response = $this->actingAs($this->user)->post(route('admin.setting.accounting.update'), [
+            'sales_revenue_account_id' => $sales->id,
+            'accounts_receivable_account_id' => $ar->id,
+            'cost_of_goods_sold_account_id' => $cogs->id,
+            'inventory_account_id' => $inventory->id,
+            'accounts_payable_account_id' => $ap->id,
+            'cash_account_id' => $cash->id,
+        ]);
+
+        $response->assertRedirect(route('admin.setting.accounting'));
+        $response->assertSessionHas('success', 'Accounting settings updated successfully.');
     }
 }

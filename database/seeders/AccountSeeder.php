@@ -16,6 +16,8 @@ class AccountSeeder extends Seeder
             $tenantId = app('currentTenant')->id;
         $tenantName = app('currentTenant')->name;
 
+        $this->command->info("Seeding Chart of Accounts for tenant: {$tenantName} (ID: {$tenantId})");
+        
         $accountsData = [
             // Group 1: Assets
             [
@@ -111,11 +113,28 @@ class AccountSeeder extends Seeder
             ],
         ];
 
-        $this->seedAccounts($accountsData, $tenantId);
+        $createdCount = $this->seedAccounts($accountsData, $tenantId);
+        
+        $this->command->info("Chart of Accounts seeded successfully!");
+        $this->command->info("Total accounts created/updated: {$createdCount}");
+        
+        // Show summary by type
+        $accountsByType = Account::where('tenant_id', $tenantId)
+            ->selectRaw('type, count(*) as count')
+            ->groupBy('type')
+            ->pluck('count', 'type');
+        
+        $this->command->newLine();
+        $this->command->info("Account Summary by Type:");
+        foreach ($accountsByType as $type => $count) {
+            $this->command->info("  - " . ucfirst($type) . ": {$count} accounts");
+        }
     }
 
-    private function seedAccounts(array $accounts, int $tenantId, ?int $parentId = null): void
+    private function seedAccounts(array $accounts, int $tenantId, ?int $parentId = null): int
     {
+        $count = 0;
+        
         foreach ($accounts as $accountData) {
             $children = $accountData['children'] ?? [];
             unset($accountData['children']);
@@ -127,10 +146,14 @@ class AccountSeeder extends Seeder
                 ],
                 $accountData + ['parent_id' => $parentId]
             );
+            
+            $count++;
 
             if (!empty($children)) {
-                $this->seedAccounts($children, $tenantId, $account->id);
+                $count += $this->seedAccounts($children, $tenantId, $account->id);
             }
         }
+        
+        return $count;
     }
 }

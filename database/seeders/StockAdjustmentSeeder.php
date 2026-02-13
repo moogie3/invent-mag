@@ -25,9 +25,13 @@ class StockAdjustmentSeeder extends Seeder
         $warehouses = Warehouse::where('tenant_id', $tenantId)->get();
 
         if ($products->isEmpty() || $users->isEmpty() || $warehouses->isEmpty()) {
-            $this->command->info('Skipping StockAdjustmentSeeder for tenant ' . app('currentTenant')->name . ': Missing dependency data.');
+            $this->command->warn('Skipping StockAdjustmentSeeder for tenant ' . app('currentTenant')->name . ': Missing dependency data.');
             return;
         }
+
+        $this->command->info("Seeding Initial Stock Adjustments for tenant: " . app('currentTenant')->name);
+        $totalProducts = $products->count();
+        $this->command->getOutput()->progressStart($totalProducts);
 
         foreach ($products as $product) {
             $warehouse = $warehouses->random();
@@ -51,6 +55,12 @@ class StockAdjustmentSeeder extends Seeder
             ]);
             
             $stockRecord->increment('quantity', 10);
+            
+            $this->command->getOutput()->progressAdvance();
         }
+        
+        $this->command->getOutput()->progressFinish();
+        $this->command->info("Stock Adjustment seeding completed!");
+        $this->command->info("Created initial stock increase records for {$totalProducts} products (+10 qty each).");
     }
 }

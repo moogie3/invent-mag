@@ -4,23 +4,32 @@ namespace App\Http\Controllers\Admin;
 
 use App\Helpers\CurrencyHelper;
 use App\Http\Controllers\Controller;
-use App\Models\Account;
-use App\Models\Purchase;
-use App\Models\Sales;
 use App\Models\StockAdjustment;
+use App\Services\AgingReportService;
+use App\Services\FinancialReportingService;
+use App\Services\ReportExporter;
 use App\Services\TransactionService;
 use Carbon\Carbon;
-use Dompdf\Dompdf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 
 class ReportController extends Controller
 {
     protected $transactionService;
+    protected $financialReportingService;
+    protected $agingReportService;
+    protected $reportExporter;
 
-    public function __construct(TransactionService $transactionService)
-    {
+    public function __construct(
+        TransactionService $transactionService,
+        FinancialReportingService $financialReportingService,
+        AgingReportService $agingReportService,
+        ReportExporter $reportExporter
+    ) {
         $this->transactionService = $transactionService;
+        $this->financialReportingService = $financialReportingService;
+        $this->agingReportService = $agingReportService;
+        $this->reportExporter = $reportExporter;
     }
 
     /**
@@ -141,53 +150,17 @@ class ReportController extends Controller
         $startDate = $request->input('start_date', Carbon::now()->startOfMonth()->toDateString());
         $endDate = $request->input('end_date', Carbon::now()->endOfMonth()->toDateString());
 
-        $revenueAccounts = Account::where('type', 'revenue')
-            ->with(['transactions' => function ($query) use ($startDate, $endDate) {
-                 $query->select('account_id', 'type', 'amount')
-                       ->whereHas('journalEntry', function ($q) use ($startDate, $endDate) {
-                            $q->whereBetween('date', [$startDate, $endDate]);
-                       });
-            }])
-            ->get();
+        $reportData = $this->financialReportingService->generateIncomeStatement($startDate, $endDate);
 
-        $totalRevenue = 0;
-        foreach ($revenueAccounts as $account) {
-            $balance = $account->transactions->sum(function ($transaction) {
-                return $transaction->type === 'credit' ? $transaction->amount : -$transaction->amount;
-            });
-            $account->calculated_balance = $balance;
-            $totalRevenue += $balance;
-        }
-
-        $expenseAccounts = Account::where('type', 'expense')
-            ->with(['transactions' => function ($query) use ($startDate, $endDate) {
-                 $query->select('account_id', 'type', 'amount')
-                       ->whereHas('journalEntry', function ($q) use ($startDate, $endDate) {
-                            $q->whereBetween('date', [$startDate, $endDate]);
-                       });
-            }])
-            ->get();
-
-        $totalExpenses = 0;
-        foreach ($expenseAccounts as $account) {
-            $balance = $account->transactions->sum(function ($transaction) {
-                return $transaction->type === 'debit' ? $transaction->amount : -$transaction->amount;
-            });
-            $account->calculated_balance = $balance;
-            $totalExpenses += $balance;
-        }
-
-        $netIncome = $totalRevenue - $totalExpenses;
-
-        return view('admin.reports.income-statement', compact(
-            'revenueAccounts',
-            'totalRevenue',
-            'expenseAccounts',
-            'totalExpenses',
-            'netIncome',
-            'startDate',
-            'endDate'
-        ));
+        return view('admin.reports.income-statement', [
+            'revenueAccounts' => $reportData['revenue_accounts'],
+            'totalRevenue' => $reportData['total_revenue'],
+            'expenseAccounts' => $reportData['expense_accounts'],
+            'totalExpenses' => $reportData['total_expenses'],
+            'netIncome' => $reportData['net_income'],
+            'startDate' => $reportData['start_date'],
+            'endDate' => $reportData['end_date'],
+        ]);
     }
 
     /**
@@ -205,86 +178,22 @@ class ReportController extends Controller
             $startDate = $request->input('start_date', Carbon::now()->startOfMonth()->toDateString());
             $endDate = $request->input('end_date', Carbon::now()->endOfMonth()->toDateString());
 
-            $revenueAccounts = Account::where('type', 'revenue')
-                ->with(['transactions' => function ($query) use ($startDate, $endDate) {
-                    $query->whereHas('journalEntry', function ($q) use ($startDate, $endDate) {
-                        $q->whereBetween('date', [$startDate, $endDate]);
-                    });
-                }])->get();
-
-            $totalRevenue = $revenueAccounts->sum(function ($account) {
-                return $account->transactions->sum(function ($transaction) {
-                    return $transaction->type === 'credit' ? $transaction->amount : -$transaction->amount;
-                });
-            });
-
-            $expenseAccounts = Account::where('type', 'expense')
-                ->with(['transactions' => function ($query) use ($startDate, $endDate) {
-                    $query->whereHas('journalEntry', function ($q) use ($startDate, $endDate) {
-                        $q->whereBetween('date', [$startDate, $endDate]);
-                    });
-                }])->get();
-
-            $totalExpenses = $expenseAccounts->sum(function ($account) {
-                return $account->transactions->sum(function ($transaction) {
-                    return $transaction->type === 'debit' ? $transaction->amount : -$transaction->amount;
-                });
-            });
-
-            $netIncome = $totalRevenue - $totalExpenses;
+            $reportData = $this->financialReportingService->generateIncomeStatement($startDate, $endDate);
 
             if ($request->export_option === 'pdf') {
-                $dompdf = new Dompdf();
-                $html = view('admin.reports.income-statement-export-pdf', compact('revenueAccounts', 'totalRevenue', 'expenseAccounts', 'totalExpenses', 'netIncome', 'startDate', 'endDate'))->render();
-                $dompdf->loadHtml($html);
-                $dompdf->setPaper('A4', 'portrait');
-                $dompdf->render();
-                return $dompdf->stream('income-statement.pdf');
+                return $this->reportExporter->exportToPdf(
+                    'admin.reports.income-statement-export-pdf',
+                    $reportData,
+                    'income-statement.pdf'
+                );
             }
 
             if ($request->export_option === 'csv') {
-                $headers = [
-                    'Content-type' => 'text/csv',
-                    'Content-Disposition' => 'attachment; filename=income-statement.csv',
-                    'Pragma' => 'no-cache',
-                    'Cache-Control' => 'must-revalidate, post-check=0, pre-check=0',
-                    'Expires' => '0',
-                ];
-
-                $callback = function () use ($revenueAccounts, $totalRevenue, $expenseAccounts, $totalExpenses, $netIncome, $startDate, $endDate) {
-                    $file = fopen('php://output', 'w');
-                    fputcsv($file, ['Income Statement']);
-                    fputcsv($file, ["Period: {$startDate} to {$endDate}"]);
-                    fputcsv($file, []);
-
-                    fputcsv($file, ['Revenue']);
-                    foreach ($revenueAccounts as $account) {
-                        $amount = $account->transactions->sum(function ($transaction) {
-                            return $transaction->type === 'credit' ? $transaction->amount : -$transaction->amount;
-                        });
-                        fputcsv($file, [$account->name, CurrencyHelper::format($amount)]);
-                    }
-                    fputcsv($file, ['Total Revenue', CurrencyHelper::format($totalRevenue)]);
-                    fputcsv($file, []);
-
-                    fputcsv($file, ['Expenses']);
-                    foreach ($expenseAccounts as $account) {
-                        $amount = $account->transactions->sum(function ($transaction) {
-                            return $transaction->type === 'debit' ? $transaction->amount : -$transaction->amount;
-                        });
-                        fputcsv($file, [$account->name, CurrencyHelper::format($amount)]);
-                    }
-                    fputcsv($file, ['Total Expenses', CurrencyHelper::format($totalExpenses)]);
-                    fputcsv($file, []);
-
-                    fputcsv($file, ['Net Income', CurrencyHelper::format($netIncome)]);
-
-                    fclose($file);
-                };
-
-                return response()->stream($callback, 200, $headers);
+                return $this->reportExporter->exportIncomeStatementToCsv($reportData, 'income-statement.csv');
             }
         } catch (\Exception $e) {
+            Log::error('Error exporting income statement: ' . $e->getMessage());
+            
             return response()->json([
                 'success' => false,
                 'message' => 'Error exporting income statement. Please try again.',
@@ -300,72 +209,18 @@ class ReportController extends Controller
     {
         $endDate = $request->input('end_date', Carbon::now()->endOfDay()->toDateString());
 
-        $accounts = Account::with(['transactions' => function ($query) use ($endDate) {
-            $query->select('account_id', 'type', 'amount')
-                  ->whereHas('journalEntry', function ($q) use ($endDate) {
-                        $q->where('date', '<=', $endDate);
-                  });
-        }])->get();
+        $reportData = $this->financialReportingService->generateBalanceSheet($endDate);
 
-        $assets = collect();
-        $liabilities = collect();
-        $equity = collect();
-        $totalAssets = 0;
-        $totalLiabilities = 0;
-        $totalEquity = 0;
-
-        foreach ($accounts as $account) {
-            $balance = 0;
-            $debits = $account->transactions->sum(fn($t) => $t->type === 'debit' ? $t->amount : 0);
-            $credits = $account->transactions->sum(fn($t) => $t->type === 'credit' ? $t->amount : 0);
-
-            if (in_array($account->type, ['asset', 'expense'])) {
-                $balance = $debits - $credits;
-            } else {
-                $balance = $credits - $debits;
-            }
-
-            if (abs($balance) > 0.001) {
-                $account->calculated_balance = $balance;
-                switch ($account->type) {
-                    case 'asset':
-                        $assets->push($account);
-                        $totalAssets += $balance;
-                        break;
-                    case 'liability':
-                        $liabilities->push($account);
-                        $totalLiabilities += $balance;
-                        break;
-                    case 'equity':
-                        $equity->push($account);
-                        $totalEquity += $balance;
-                        break;
-                    case 'revenue':
-                        $totalEquity += $balance;
-                        break;
-                    case 'expense':
-                        $totalEquity -= $balance;
-                        break;
-                }
-            }
-        }
-
-        $assets = $assets->sortBy('code');
-        $liabilities = $liabilities->sortBy('code');
-        $equity = $equity->sortBy('code');
-
-        $equation_balanced = abs($totalAssets - ($totalLiabilities + $totalEquity)) < 0.001;
-
-        return view('admin.reports.balance-sheet', compact(
-            'assets',
-            'liabilities',
-            'equity',
-            'totalAssets',
-            'totalLiabilities',
-            'totalEquity',
-            'endDate',
-            'equation_balanced'
-        ));
+        return view('admin.reports.balance-sheet', [
+            'assets' => $reportData['assets'],
+            'liabilities' => $reportData['liabilities'],
+            'equity' => $reportData['equity'],
+            'totalAssets' => $reportData['total_assets'],
+            'totalLiabilities' => $reportData['total_liabilities'],
+            'totalEquity' => $reportData['total_equity'],
+            'endDate' => $reportData['end_date'],
+            'equation_balanced' => $reportData['equation_balanced'],
+        ]);
     }
 
     /**
@@ -381,112 +236,22 @@ class ReportController extends Controller
         try {
             $endDate = $request->input('end_date', Carbon::now()->endOfDay()->toDateString());
 
-            $accounts = Account::with(['transactions' => function ($query) use ($endDate) {
-                $query->whereHas('journalEntry', function ($q) use ($endDate) {
-                    $q->where('date', '<=', $endDate);
-                });
-            }])->get();
-
-            $assets = collect();
-            $liabilities = collect();
-            $equity = collect();
-            $totalAssets = 0;
-            $totalLiabilities = 0;
-            $totalEquity = 0;
-
-            foreach ($accounts as $account) {
-                $balance = 0;
-                $debits = $account->transactions->sum(fn($t) => $t->type === 'debit' ? $t->amount : 0);
-                $credits = $account->transactions->sum(fn($t) => $t->type === 'credit' ? $t->amount : 0);
-
-                if (in_array($account->type, ['asset', 'expense'])) {
-                    $balance = $debits - $credits;
-                } else {
-                    $balance = $credits - $debits;
-                }
-
-                if (abs($balance) > 0.001) {
-                    $account->calculated_balance = $balance;
-                    switch ($account->type) {
-                        case 'asset':
-                            $assets->push($account);
-                            $totalAssets += $balance;
-                            break;
-                        case 'liability':
-                            $liabilities->push($account);
-                            $totalLiabilities += $balance;
-                            break;
-                        case 'equity':
-                            $equity->push($account);
-                            $totalEquity += $balance;
-                            break;
-                        case 'revenue':
-                            $totalEquity += $balance;
-                            break;
-                        case 'expense':
-                            $totalEquity -= $balance;
-                            break;
-                    }
-                }
-            }
-
-            $assets = $assets->sortBy('code');
-            $liabilities = $liabilities->sortBy('code');
-            $equity = $equity->sortBy('code');
+            $reportData = $this->financialReportingService->generateBalanceSheet($endDate);
 
             if ($request->export_option === 'pdf') {
-                $dompdf = new Dompdf();
-                $html = view('admin.reports.balance-sheet-export-pdf', compact('assets', 'liabilities', 'equity', 'totalAssets', 'totalLiabilities', 'totalEquity', 'endDate'))->render();
-                $dompdf->loadHtml($html);
-                $dompdf->setPaper('A4', 'portrait');
-                $dompdf->render();
-                return $dompdf->stream('balance-sheet.pdf');
+                return $this->reportExporter->exportToPdf(
+                    'admin.reports.balance-sheet-export-pdf',
+                    $reportData,
+                    'balance-sheet.pdf'
+                );
             }
 
             if ($request->export_option === 'csv') {
-                $headers = [
-                    'Content-type' => 'text/csv',
-                    'Content-Disposition' => 'attachment; filename=balance-sheet.csv',
-                    'Pragma' => 'no-cache',
-                    'Cache-Control' => 'must-revalidate, post-check=0, pre-check=0',
-                    'Expires' => '0',
-                ];
-
-                $callback = function () use ($assets, $liabilities, $equity, $totalAssets, $totalLiabilities, $totalEquity, $endDate) {
-                    $file = fopen('php://output', 'w');
-                    fputcsv($file, ['Balance Sheet']);
-                    fputcsv($file, ["As of: {$endDate}"]);
-                    fputcsv($file, []);
-
-                    fputcsv($file, ['Assets']);
-                    foreach ($assets as $account) {
-                        fputcsv($file, [$account->name, CurrencyHelper::format($account->calculated_balance)]);
-                    }
-                    fputcsv($file, ['Total Assets', CurrencyHelper::format($totalAssets)]);
-                    fputcsv($file, []);
-
-                    fputcsv($file, ['Liabilities']);
-                    foreach ($liabilities as $account) {
-                        fputcsv($file, [$account->name, CurrencyHelper::format($account->calculated_balance)]);
-                    }
-                    fputcsv($file, ['Total Liabilities', CurrencyHelper::format($totalLiabilities)]);
-                    fputcsv($file, []);
-
-                    fputcsv($file, ['Equity']);
-                    foreach ($equity as $account) {
-                        fputcsv($file, [$account->name, CurrencyHelper::format($account->calculated_balance)]);
-                    }
-                    fputcsv($file, ['Total Equity', CurrencyHelper::format($totalEquity)]);
-                    fputcsv($file, []);
-
-                    fputcsv($file, ['Total Liabilities & Equity', CurrencyHelper::format($totalLiabilities + $totalEquity)]);
-
-                    fclose($file);
-                };
-
-                return response()->stream($callback, 200, $headers);
+                return $this->reportExporter->exportBalanceSheetToCsv($reportData, 'balance-sheet.csv');
             }
         } catch (\Exception $e) {
+            Log::error('Error exporting balance sheet: ' . $e->getMessage());
+            
             return response()->json([
                 'success' => false,
                 'message' => 'Error exporting balance sheet. Please try again.',
@@ -495,26 +260,12 @@ class ReportController extends Controller
         }
     }
 
+    /**
+     * Display Aged Receivables report.
+     */
     public function agedReceivables(Request $request)
     {
-        $now = Carbon::now();
-        $unpaidSales = Sales::with('customer')
-            ->whereIn('status', ['Unpaid', 'Partial'])
-            ->whereNotNull('due_date')
-            ->get()
-            ->map(function ($sale) use ($now) {
-                $daysOverdue = $now->diffInDays($sale->due_date, false);
-                $sale->days_overdue = $daysOverdue < 0 ? round(abs($daysOverdue)) : 0;
-                return $sale;
-            });
-
-        $aging = [
-            'current' => $unpaidSales->where('days_overdue', 0),
-            '1-30' => $unpaidSales->where('days_overdue', '>', 0)->where('days_overdue', '<=', 30),
-            '31-60' => $unpaidSales->where('days_overdue', '>', 30)->where('days_overdue', '<=', 60),
-            '61-90' => $unpaidSales->where('days_overdue', '>', 60)->where('days_overdue', '<=', 90),
-            '90+' => $unpaidSales->where('days_overdue', '>', 90),
-        ];
+        $aging = $this->agingReportService->generateAgedReceivables();
 
         return view('admin.reports.aged-receivables', compact('aging'));
     }
@@ -529,87 +280,22 @@ class ReportController extends Controller
         ]);
 
         try {
-            $now = Carbon::now();
-            $unpaidSales = Sales::with('customer')
-                ->whereIn('status', ['Unpaid', 'Partial'])
-                ->whereNotNull('due_date')
-                ->get()
-                ->map(function ($sale) use ($now) {
-                    $daysOverdue = $now->diffInDays($sale->due_date, false);
-                    $sale->days_overdue = $daysOverdue < 0 ? abs($daysOverdue) : 0;
-                    return $sale;
-                });
-
-            $aging = [
-                'current' => $unpaidSales->where('days_overdue', 0),
-                '1-30' => $unpaidSales->where('days_overdue', '>', 0)->where('days_overdue', '<=', 30),
-                '31-60' => $unpaidSales->where('days_overdue', '>', 30)->where('days_overdue', '<=', 60),
-                '61-90' => $unpaidSales->where('days_overdue', '>', 60)->where('days_overdue', '<=', 90),
-                '90+' => $unpaidSales->where('days_overdue', '>', 90),
-            ];
+            $aging = $this->agingReportService->generateAgedReceivables();
 
             if ($request->export_option === 'pdf') {
-                $dompdf = new Dompdf();
-                $html = view('admin.reports.aged-receivables-export-pdf', compact('aging'))->render();
-                $dompdf->loadHtml($html);
-                $dompdf->setPaper('A4', 'portrait');
-                $dompdf->render();
-                return $dompdf->stream('aged-receivables.pdf');
+                return $this->reportExporter->exportToPdf(
+                    'admin.reports.aged-receivables-export-pdf',
+                    compact('aging'),
+                    'aged-receivables.pdf'
+                );
             }
 
             if ($request->export_option === 'csv') {
-                $headers = [
-                    'Content-type' => 'text/csv',
-                    'Content-Disposition' => 'attachment; filename=aged-receivables.csv',
-                    'Pragma' => 'no-cache',
-                    'Cache-Control' => 'must-revalidate, post-check=0, pre-check=0',
-                    'Expires' => '0',
-                ];
-
-                $callback = function () use ($aging) {
-                    $file = fopen('php://output', 'w');
-                    fputcsv($file, ['Aged Receivables Report']);
-                    fputcsv($file, ["Report Date: " . Carbon::now()->format('Y-m-d')]);
-                    fputcsv($file, []);
-
-                    $buckets = [
-                        'current' => 'Current',
-                        '1-30' => '1-30 Days Overdue',
-                        '31-60' => '31-60 Days Overdue',
-                        '61-90' => '61-90 Days Overdue',
-                        '90+' => 'Over 90 Days Overdue',
-                    ];
-
-                    foreach ($aging as $bucketKey => $invoices) {
-                        if ($invoices->count() > 0) {
-                            fputcsv($file, [$buckets[$bucketKey]]);
-                            fputcsv($file, [
-                                'Customer',
-                                'Invoice No',
-                                'Due Date',
-                                'Days Overdue',
-                                'Amount',
-                            ]);
-                            foreach ($invoices as $invoice) {
-                                fputcsv($file, [
-                                    $invoice->customer->name ?? 'Walk-in Customer',
-                                    $invoice->invoice,
-                                    Carbon::parse($invoice->due_date)->format('Y-m-d'),
-                                    $invoice->days_overdue,
-                                    CurrencyHelper::format($invoice->total),
-                                ]);
-                            }
-                            fputcsv($file, ['Total for ' . $buckets[$bucketKey], '', '', '', CurrencyHelper::format($invoices->sum('total'))]);
-                            fputcsv($file, []);
-                        }
-                    }
-
-                    fclose($file);
-                };
-
-                return response()->stream($callback, 200, $headers);
+                return $this->reportExporter->exportAgingToCsv($aging, 'aged-receivables.csv', 'receivables');
             }
         } catch (\Exception $e) {
+            Log::error('Error exporting aged receivables: ' . $e->getMessage());
+            
             return response()->json([
                 'success' => false,
                 'message' => 'Error exporting aged receivables report. Please try again.',
@@ -618,26 +304,12 @@ class ReportController extends Controller
         }
     }
 
+    /**
+     * Display Aged Payables report.
+     */
     public function agedPayables(Request $request)
     {
-        $now = Carbon::now();
-        $unpaidPurchases = Purchase::with('supplier')
-            ->whereIn('status', ['Unpaid', 'Partial'])
-            ->whereNotNull('due_date')
-            ->get()
-            ->map(function ($purchase) use ($now) {
-                $daysOverdue = $now->diffInDays($purchase->due_date, false);
-                $purchase->days_overdue = $daysOverdue < 0 ? round(abs($daysOverdue)) : 0;
-                return $purchase;
-            });
-
-        $aging = [
-            'current' => $unpaidPurchases->where('days_overdue', 0),
-            '1-30' => $unpaidPurchases->where('days_overdue', '>', 0)->where('days_overdue', '<=', 30),
-            '31-60' => $unpaidPurchases->where('days_overdue', '>', 30)->where('days_overdue', '<=', 60),
-            '61-90' => $unpaidPurchases->where('days_overdue', '>', 60)->where('days_overdue', '<=', 90),
-            '90+' => $unpaidPurchases->where('days_overdue', '>', 90),
-        ];
+        $aging = $this->agingReportService->generateAgedPayables();
 
         return view('admin.reports.aged-payables', compact('aging'));
     }
@@ -652,87 +324,22 @@ class ReportController extends Controller
         ]);
 
         try {
-            $now = Carbon::now();
-            $unpaidPurchases = Purchase::with('supplier')
-                ->whereIn('status', ['Unpaid', 'Partial'])
-                ->whereNotNull('due_date')
-                ->get()
-                ->map(function ($purchase) use ($now) {
-                    $daysOverdue = $now->diffInDays($purchase->due_date, false);
-                    $purchase->days_overdue = $daysOverdue < 0 ? abs($daysOverdue) : 0;
-                    return $purchase;
-                });
-
-            $aging = [
-                'current' => $unpaidPurchases->where('days_overdue', 0),
-                '1-30' => $unpaidPurchases->where('days_overdue', '>', 0)->where('days_overdue', '<=', 30),
-                '31-60' => $unpaidPurchases->where('days_overdue', '>', 30)->where('days_overdue', '<=', 60),
-                '61-90' => $unpaidPurchases->where('days_overdue', '>', 60)->where('days_overdue', '<=', 90),
-                '90+' => $unpaidPurchases->where('days_overdue', '>', 90),
-            ];
+            $aging = $this->agingReportService->generateAgedPayables();
 
             if ($request->export_option === 'pdf') {
-                $dompdf = new Dompdf();
-                $html = view('admin.reports.aged-payables-export-pdf', compact('aging'))->render();
-                $dompdf->loadHtml($html);
-                $dompdf->setPaper('A4', 'portrait');
-                $dompdf->render();
-                return $dompdf->stream('aged-payables.pdf');
+                return $this->reportExporter->exportToPdf(
+                    'admin.reports.aged-payables-export-pdf',
+                    compact('aging'),
+                    'aged-payables.pdf'
+                );
             }
 
             if ($request->export_option === 'csv') {
-                $headers = [
-                    'Content-type' => 'text/csv',
-                    'Content-Disposition' => 'attachment; filename=aged-payables.csv',
-                    'Pragma' => 'no-cache',
-                    'Cache-Control' => 'must-revalidate, post-check=0, pre-check=0',
-                    'Expires' => '0',
-                ];
-
-                $callback = function () use ($aging) {
-                    $file = fopen('php://output', 'w');
-                    fputcsv($file, ['Aged Payables Report']);
-                    fputcsv($file, ["Report Date: " . Carbon::now()->format('Y-m-d')]);
-                    fputcsv($file, []);
-
-                    $buckets = [
-                        'current' => 'Current',
-                        '1-30' => '1-30 Days Overdue',
-                        '31-60' => '31-60 Days Overdue',
-                        '61-90' => '61-90 Days Overdue',
-                        '90+' => 'Over 90 Days Overdue',
-                    ];
-
-                    foreach ($aging as $bucketKey => $invoices) {
-                        if ($invoices->count() > 0) {
-                            fputcsv($file, [$buckets[$bucketKey]]);
-                            fputcsv($file, [
-                                'Supplier',
-                                'Invoice No',
-                                'Due Date',
-                                'Days Overdue',
-                                'Amount',
-                            ]);
-                            foreach ($invoices as $invoice) {
-                                fputcsv($file, [
-                                    $invoice->supplier->name ?? 'Unknown Supplier',
-                                    $invoice->invoice,
-                                    Carbon::parse($invoice->due_date)->format('Y-m-d'),
-                                    $invoice->days_overdue,
-                                    CurrencyHelper::format($invoice->total),
-                                ]);
-                            }
-                            fputcsv($file, ['Total for ' . $buckets[$bucketKey], '', '', '', CurrencyHelper::format($invoices->sum('total'))]);
-                            fputcsv($file, []);
-                        }
-                    }
-
-                    fclose($file);
-                };
-
-                return response()->stream($callback, 200, $headers);
+                return $this->reportExporter->exportAgingToCsv($aging, 'aged-payables.csv', 'payables');
             }
         } catch (\Exception $e) {
+            Log::error('Error exporting aged payables: ' . $e->getMessage());
+            
             return response()->json([
                 'success' => false,
                 'message' => 'Error exporting aged payables report. Please try again.',
@@ -741,6 +348,9 @@ class ReportController extends Controller
         }
     }
 
+    /**
+     * Export Adjustment Log
+     */
     public function exportAdjustmentLog(Request $request)
     {
         $request->validate([
@@ -753,56 +363,19 @@ class ReportController extends Controller
                 ->get();
 
             if ($request->export_option === 'pdf') {
-                $dompdf = new Dompdf();
-                $html = view('admin.reports.adjustment-log-export-pdf', compact('adjustments'))->render();
-                $dompdf->loadHtml($html);
-                $dompdf->setPaper('A4', 'portrait');
-                $dompdf->render();
-                return $dompdf->stream('adjustment-log.pdf');
+                return $this->reportExporter->exportToPdf(
+                    'admin.reports.adjustment-log-export-pdf',
+                    compact('adjustments'),
+                    'adjustment-log.pdf'
+                );
             }
 
             if ($request->export_option === 'csv') {
-                $headers = [
-                    'Content-type' => 'text/csv',
-                    'Content-Disposition' => 'attachment; filename=adjustment-log.csv',
-                    'Pragma' => 'no-cache',
-                    'Cache-Control' => 'must-revalidate, post-check=0, pre-check=0',
-                    'Expires' => '0',
-                ];
-
-                $callback = function () use ($adjustments) {
-                    $file = fopen('php://output', 'w');
-                    fputcsv($file, [
-                        'Date',
-                        'Product',
-                        'Type',
-                        'Quantity Before',
-                        'Quantity After',
-                        'Change',
-                        'Reason',
-                        'Adjusted By',
-                    ]);
-
-                    foreach ($adjustments as $log) {
-                        $change = $log->quantity_after - $log->quantity_before;
-                        fputcsv($file, [
-                            $log->created_at->translatedFormat('d M Y, H:i'),
-                            $log->product ? $log->product->name : 'Product Not Found',
-                            $log->adjustment_type,
-                            $log->quantity_before,
-                            $log->quantity_after,
-                            $change,
-                            $log->reason ?: 'N/A',
-                            $log->adjustedBy ? $log->adjustedBy->name : 'System',
-                        ]);
-                    }
-
-                    fclose($file);
-                };
-
-                return response()->stream($callback, 200, $headers);
+                return $this->reportExporter->exportAdjustmentLogToCsv($adjustments, 'adjustment-log.csv');
             }
         } catch (\Exception $e) {
+            Log::error('Error exporting adjustment log: ' . $e->getMessage());
+            
             return response()->json([
                 'success' => false,
                 'message' => 'Error exporting adjustment log. Please try again.',
@@ -811,6 +384,9 @@ class ReportController extends Controller
         }
     }
 
+    /**
+     * Export Recent Transactions
+     */
     public function exportRecentTransactions(Request $request)
     {
         $request->validate([
@@ -831,51 +407,19 @@ class ReportController extends Controller
             $transactions = $this->transactionService->getTransactionsForExport($filters, $selectedIds);
 
             if ($request->export_option === 'pdf') {
-                $dompdf = new Dompdf();
-                $html = view('admin.reports.recent-transactions-export-pdf', compact('transactions'))->render();
-                $dompdf->loadHtml($html);
-                $dompdf->setPaper('A4', 'portrait');
-                $dompdf->render();
-                return $dompdf->stream('recent-transactions.pdf');
+                return $this->reportExporter->exportToPdf(
+                    'admin.reports.recent-transactions-export-pdf',
+                    compact('transactions'),
+                    'recent-transactions.pdf'
+                );
             }
 
             if ($request->export_option === 'csv') {
-                $headers = [
-                    'Content-type' => 'text/csv',
-                    'Content-Disposition' => 'attachment; filename=recent-transactions.csv',
-                    'Pragma' => 'no-cache',
-                    'Cache-Control' => 'must-revalidate, post-check=0, pre-check=0',
-                    'Expires' => '0',
-                ];
-
-                $callback = function () use ($transactions) {
-                    $file = fopen('php://output', 'w');
-                    fputcsv($file, [
-                        'Type',
-                        'Invoice',
-                        'Customer/Supplier',
-                        'Date',
-                        'Amount',
-                        'Status',
-                    ]);
-
-                    foreach ($transactions as $transaction) {
-                        fputcsv($file, [
-                            $transaction['type'],
-                            $transaction['invoice'],
-                            $transaction['customer_supplier'],
-                            Carbon::parse($transaction['date'])->format('Y-m-d H:i'),
-                            CurrencyHelper::format($transaction['amount']),
-                            $transaction['status'],
-                        ]);
-                    }
-
-                    fclose($file);
-                };
-
-                return response()->stream($callback, 200, $headers);
+                return $this->reportExporter->exportRecentTransactionsToCsv($transactions, 'recent-transactions.csv');
             }
         } catch (\Exception $e) {
+            Log::error('Error exporting recent transactions: ' . $e->getMessage());
+            
             return response()->json([
                 'success' => false,
                 'message' => 'Error exporting recent transactions. Please try again.',

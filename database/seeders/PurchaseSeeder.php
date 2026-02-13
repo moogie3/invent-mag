@@ -35,9 +35,12 @@ class PurchaseSeeder extends Seeder
         $warehouseIds = Warehouse::where('tenant_id', $tenantId)->pluck('id')->toArray();
 
         if ($suppliers->isEmpty() || $products->isEmpty() || empty($warehouseIds)) {
-            $this->command->info('Skipping PurchaseSeeder for tenant ' . app('currentTenant')->name . ': Missing dependency data.');
+            $this->command->warn('Skipping PurchaseSeeder for tenant ' . app('currentTenant')->name . ': Missing dependency data.');
             return;
         }
+
+        $this->command->info("Seeding Purchase Orders for tenant: " . app('currentTenant')->name);
+        $this->command->info("Available: {$suppliers->count()} suppliers, {$products->count()} products, " . count($warehouseIds) . " warehouses");
 
         for ($i = 0; $i < 100; $i++) {
             $supplier = $suppliers->random();
@@ -181,5 +184,8 @@ class PurchaseSeeder extends Seeder
                 $this->command->error("Failed to create journal entry for purchase {$purchase->invoice}: " . $e->getMessage());
             }
         }
+        
+        $this->command->info("Purchase Orders seeding completed successfully!");
+        $this->command->info("Created 100 purchase orders with items, payments, and journal entries.");
     }
 }

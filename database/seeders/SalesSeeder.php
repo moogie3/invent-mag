@@ -47,9 +47,12 @@ class SalesSeeder extends Seeder
         $warehouseIds = Warehouse::where('tenant_id', $tenantId)->pluck('id')->toArray(); // Fetch warehouse IDs
 
         if ($customers->isEmpty() || $users->isEmpty() || $products->isEmpty() || empty($warehouseIds)) {
-            $this->command->info('Skipping SalesSeeder for tenant ' . app('currentTenant')->name . ': Missing dependency data.');
+            $this->command->warn('Skipping SalesSeeder for tenant ' . app('currentTenant')->name . ': Missing dependency data.');
             return;
         }
+        
+        $this->command->info("Seeding Sales data for tenant: " . app('currentTenant')->name);
+        $this->command->info("Available: {$customers->count()} customers, {$users->count()} users, {$products->count()} products, " . count($warehouseIds) . " warehouses");
 
         for ($i = 0; $i < 100; $i++) { // Create 100 sample sales
             $customer = $customers->random();
@@ -241,5 +244,8 @@ class SalesSeeder extends Seeder
                 $this->command->error("Failed to create journal entry for sale {$sales->invoice}: " . $e->getMessage());
             }
         }
+        
+        $this->command->info("Sales seeding completed successfully!");
+        $this->command->info("Created 100 sales invoices with items, payments, and journal entries.");
     }
 }

@@ -22,8 +22,12 @@ class UserSeeder extends Seeder
         $tenantName = $tenant->name;
         $tenantNameSlug = strtolower(str_replace(' ', '-', $tenantName));
 
+        $email = 'admin-' . $tenantNameSlug . '@gmail.com';
+        
+        $this->command->info("Creating admin user for tenant: {$tenantName}");
+        
         $user = User::updateOrCreate(
-            ['email' => 'admin-' . $tenantNameSlug . '@gmail.com', 'tenant_id' => $tenantId],
+            ['email' => $email, 'tenant_id' => $tenantId],
             [
                 'name' => 'admin-' . $tenantNameSlug,
                 'password' => Hash::make('password'),
@@ -36,6 +40,7 @@ class UserSeeder extends Seeder
         $role = Role::where('name', 'superuser')->first();
         if ($role) {
             $user->assignRole($role);
+            $this->command->info("  - Assigned superuser role");
         }
 
         // Set default accounting settings
@@ -57,6 +62,10 @@ class UserSeeder extends Seeder
                 'cost_of_goods_sold_account_id' => $costOfGoodsSoldAccount->id,
             ];
             $user->save();
+            $this->command->info("  - Configured default accounting settings");
         }
+        
+        $this->command->info("Admin user created: {$email} (password: 'password')");
+        $this->command->info("User seeding completed for tenant: {$tenantName}");
     }
 }

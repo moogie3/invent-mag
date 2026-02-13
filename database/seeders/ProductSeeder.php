@@ -15,6 +15,7 @@ class ProductSeeder extends Seeder
     public function run(): void
     {
         $tenantId = app('currentTenant')->id;
+        $tenantName = app('currentTenant')->name;
 
         // Fetch existing IDs for the current tenant
         $categoryIds = Categories::where('tenant_id', $tenantId)->pluck('id')->toArray();
@@ -24,9 +25,12 @@ class ProductSeeder extends Seeder
 
         // Check if necessary data exists
         if (empty($categoryIds) || empty($unitIds) || empty($supplierIds) || empty($warehouseIds)) {
-            $this->command->info('Skipping ProductSeeder for tenant ' . app('currentTenant')->name . ': Categories, Units, Suppliers, or Warehouses not found. Please ensure their seeders run correctly for this tenant.');
+            $this->command->warn('Skipping ProductSeeder for tenant ' . $tenantName . ': Categories, Units, Suppliers, or Warehouses not found. Please ensure their seeders run correctly for this tenant.');
             return;
         }
+
+        $this->command->info("Seeding test products for tenant: {$tenantName}");
+        $this->command->info("Available: " . count($categoryIds) . " categories, " . count($unitIds) . " units, " . count($supplierIds) . " suppliers, " . count($warehouseIds) . " warehouses");
 
         $faker = \Faker\Factory::create();
 
@@ -50,11 +54,12 @@ class ProductSeeder extends Seeder
         ]);
         
         // Add stock to main warehouse
-        ProductWarehouse::create([
+        ProductWarehouse::updateOrCreate([
             'product_id' => $product1->id,
             'warehouse_id' => $faker->randomElement($warehouseIds),
-            'quantity' => 9,
             'tenant_id' => $tenantId,
+        ],[
+            'quantity' => 9,
         ]);
 
         $product2 = Product::updateOrCreate([
@@ -76,11 +81,12 @@ class ProductSeeder extends Seeder
             'has_expiry' => true,
         ]);
 
-        ProductWarehouse::create([
+        ProductWarehouse::updateOrCreate([
             'product_id' => $product2->id,
             'warehouse_id' => $faker->randomElement($warehouseIds),
-            'quantity' => 15,
             'tenant_id' => $tenantId,
+        ],[
+            'quantity' => 15,
         ]);
 
         $product3 = Product::updateOrCreate([
@@ -102,11 +108,12 @@ class ProductSeeder extends Seeder
             'has_expiry' => true,
         ]);
 
-        ProductWarehouse::create([
+        ProductWarehouse::updateOrCreate([
             'product_id' => $product3->id,
             'warehouse_id' => $faker->randomElement($warehouseIds),
-            'quantity' => 50,
             'tenant_id' => $tenantId,
+        ],[
+            'quantity' => 50,
         ]);
 
         $product4 = Product::updateOrCreate([
@@ -128,11 +135,12 @@ class ProductSeeder extends Seeder
             'has_expiry' => true,
         ]);
 
-        ProductWarehouse::create([
+        ProductWarehouse::updateOrCreate([
             'product_id' => $product4->id,
             'warehouse_id' => $faker->randomElement($warehouseIds),
-            'quantity' => 0,
             'tenant_id' => $tenantId,
+        ],[
+            'quantity' => 0,
         ]);
 
         $product5 = Product::updateOrCreate([
@@ -154,11 +162,20 @@ class ProductSeeder extends Seeder
             'has_expiry' => true,
         ]);
 
-        ProductWarehouse::create([
+        ProductWarehouse::updateOrCreate([
             'product_id' => $product5->id,
             'warehouse_id' => $faker->randomElement($warehouseIds),
-            'quantity' => 0,
             'tenant_id' => $tenantId,
+        ],[
+            'quantity' => 0,
         ]);
+        
+        $this->command->info("Products seeded successfully!");
+        $this->command->info("Created 5 test products with warehouse stock:");
+        $this->command->info("  - Near Low Stock Capacitor (qty: 9, threshold: 10)");
+        $this->command->info("  - Expired Diode (qty: 15, has expiry)");
+        $this->command->info("  - Near Expiry Crystal Oscillator (qty: 50)");
+        $this->command->info("  - Low Stock LED (qty: 0)");
+        $this->command->info("  - Expired Voltage Regulator (qty: 0)");
     }
 }

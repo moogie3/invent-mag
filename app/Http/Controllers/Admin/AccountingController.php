@@ -4,103 +4,78 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Account;
-use App\Models\JournalEntry;
-use App\Models\Transaction;
+use App\Services\AccountService;
+use App\Services\AccountingExportService;
+use App\Services\AccountingReportService;
+use App\Services\ChartOfAccountsService;
+use App\Services\GeneralLedgerService;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
-use Illuminate\Support\Carbon;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-use Dompdf\Dompdf;
-use App\Helpers\CurrencyHelper;
-use Illuminate\Validation\Rule;
 
 class AccountingController extends Controller
 {
+    protected $accountService;
+    protected $generalLedgerService;
+    protected $accountingReportService;
+    protected $accountingExportService;
+    protected $chartOfAccountsService;
+
+    public function __construct(
+        AccountService $accountService,
+        GeneralLedgerService $generalLedgerService,
+        AccountingReportService $accountingReportService,
+        AccountingExportService $accountingExportService,
+        ChartOfAccountsService $chartOfAccountsService
+    ) {
+        $this->accountService = $accountService;
+        $this->generalLedgerService = $generalLedgerService;
+        $this->accountingReportService = $accountingReportService;
+        $this->accountingExportService = $accountingExportService;
+        $this->chartOfAccountsService = $chartOfAccountsService;
+    }
+
+    /**
+     * Display accounting settings.
+     */
     public function accounting()
     {
-        $accounts = Account::all()->groupBy('type');
-        $user = Auth::user();
-        $settings = $user->accounting_settings ?? [];
-
-        return view('admin.accounting.accounting-setting', compact('accounts', 'settings'));
+        $settingsData = $this->chartOfAccountsService->getAccountingSettings();
+        
+        return view('admin.accounting.accounting-setting', [
+            'accounts' => $settingsData['accounts'],
+            'settings' => $settingsData['settings'],
+        ]);
     }
 
+    /**
+     * Update accounting settings.
+     */
     public function updateAccounting(Request $request)
     {
-        $validatedData = $request->validate([
-            'sales_revenue_account_id' => 'required|exists:accounts,id',
-            'accounts_receivable_account_id' => 'required|exists:accounts,id',
-            'cost_of_goods_sold_account_id' => 'required|exists:accounts,id',
-            'inventory_account_id' => 'required|exists:accounts,id',
-            'accounts_payable_account_id' => 'required|exists:accounts,id',
-            'cash_account_id' => 'required|exists:accounts,id',
-        ]);
+        $validatedData = $request->validate(
+            $this->chartOfAccountsService->validateSettingsData($request->all())
+        );
 
-        $user = Auth::user();
-        $user->accounting_settings = $validatedData;
-        $user->save();
+        $result = $this->chartOfAccountsService->updateAccountingSettings($validatedData);
 
-        return redirect()->route('admin.setting.accounting')->with('success', 'Accounting settings updated successfully.');
+        return redirect()->route('admin.setting.accounting')
+            ->with('success', $result['message']);
     }
 
+    /**
+     * Reset chart of accounts to default.
+     */
     public function resetToDefault(Request $request)
     {
-        set_time_limit(300); 
-        Log::debug('resetToDefault method called.');
+        $result = $this->chartOfAccountsService->resetToDefault();
 
-        try {
-            DB::beginTransaction();
-            Log::debug('Explicit transaction started. DB_CONNECTION: ' . config('database.default') . ', Transaction Level: ' . DB::transactionLevel());
-
-            try {
-                // Temporarily disable foreign key checks
-                if (DB::connection()->getDriverName() === 'sqlite') {
-                    DB::statement('PRAGMA foreign_keys = OFF;');
-                } else {
-                    DB::statement('SET FOREIGN_KEY_CHECKS=0;');
-                }
-            } catch (\Exception $e) {
-                Log::error('Failed to disable foreign key checks: ' . $e->getMessage());
-                throw $e;
-            }
-
-            try {
-                // Delete all related transactions and journal entries first
-                Transaction::query()->delete();
-                JournalEntry::query()->delete();
-                Account::query()->delete();
-                Log::debug('Accounting data truncated.');
-            } catch (\Exception $e) {
-                Log::error('Failed to delete/truncate accounting data: ' . $e->getMessage());
-                throw $e;
-            }
-
-            try {
-                // Re-enable foreign key checks
-                if (DB::connection()->getDriverName() === 'sqlite') {
-                    DB::statement('PRAGMA foreign_keys = ON;');
-                } else {
-                    DB::statement('SET FOREIGN_KEY_CHECKS=1;');
-                }
-            } catch (\Exception $e) {
-                Log::error('Failed to re-enable foreign key checks: ' . $e->getMessage());
-                throw $e;
-            }
-
-            // Call the seeder to restore defaults
-            \Illuminate\Support\Facades\Artisan::call('db:seed', ['--class' => 'AccountSeeder']);
-            Log::debug('AccountSeeder executed.');
-
-            DB::commit(); 
-            
-            return redirect()->route('admin.setting.accounting')->with('success', 'Chart of Accounts has been reset to default successfully.');
-
-        } catch (\Exception $e) {
-            DB::rollBack();
-            Log::error('Failed to reset COA: ' . $e->getMessage());
-            return redirect()->back()->with('error', 'An error occurred while resetting the Chart of Accounts: ' . $e->getMessage());
+        if ($result['success']) {
+            return redirect()->route('admin.setting.accounting')
+                ->with('success', $result['message']);
         }
+
+        return redirect()->back()->with('error', $result['message']);
     }
 
     /**
@@ -119,19 +94,13 @@ class AccountingController extends Controller
         $startDate = $request->input('start_date', Carbon::now()->startOfMonth()->toDateString());
         $endDate = $request->input('end_date', Carbon::now()->endOfMonth()->toDateString());
 
-        $query = JournalEntry::with('transactions.account')->latest('date')->latest('id');
+        $journalData = $this->generalLedgerService->getJournalEntries($startDate, $endDate);
 
-        if ($startDate) {
-            $query->where('date', '>=', $startDate);
-        }
-
-        if ($endDate) {
-            $query->where('date', '<=', $endDate);
-        }
-
-        $entries = $query->paginate(20)->withQueryString();
-
-        return view('admin.accounting.journal', compact('entries', 'startDate', 'endDate'));
+        return view('admin.accounting.journal', [
+            'entries' => $journalData['entries'],
+            'startDate' => $journalData['start_date'],
+            'endDate' => $journalData['end_date'],
+        ]);
     }
 
     /**
@@ -139,54 +108,35 @@ class AccountingController extends Controller
      */
     public function generalLedger(Request $request)
     {
-        $accounts = Account::orderBy('name')->get();
+        $accounts = $this->accountService->getAllAccountsOrdered();
         $selectedAccountId = $request->input('account_id');
         $startDate = $request->input('start_date', Carbon::now()->startOfMonth()->toDateString());
         $endDate = $request->input('end_date', Carbon::now()->endOfMonth()->toDateString());
 
-        $transactions = collect();
-        $openingBalance = 0;
-        $closingBalance = 0;
-        $selectedAccount = null;
+        $ledgerData = [
+            'transactions' => collect(),
+            'opening_balance' => 0,
+            'closing_balance' => 0,
+            'account' => null,
+        ];
 
         if ($selectedAccountId) {
-            $selectedAccount = Account::findOrFail($selectedAccountId);
-
-            // Calculate Opening Balance
-            $openingBalance = Transaction::where('account_id', $selectedAccountId)
-                ->whereHas('journalEntry', function ($query) use ($startDate) {
-                    $query->where('date', '<', $startDate);
-                })
-                ->get()
-                ->sum(function ($transaction) {
-                    return $transaction->type === 'debit' ? $transaction->amount : -$transaction->amount;
-                });
-
-            // Get Transactions for the period
-            $transactions = Transaction::with('journalEntry')
-                ->where('account_id', $selectedAccountId)
-                ->whereHas('journalEntry', function ($query) use ($startDate, $endDate) {
-                    $query->whereBetween('date', [$startDate, $endDate]);
-                })
-                ->latest('journal_entry_id')
-                ->paginate(50);
-
-            $periodChange = $transactions->sum(function ($transaction) {
-                return $transaction->type === 'debit' ? $transaction->amount : -$transaction->amount;
-            });
-
-            $closingBalance = $openingBalance + $periodChange;
+            $ledgerData = $this->generalLedgerService->getGeneralLedger(
+                $selectedAccountId,
+                $startDate,
+                $endDate
+            );
         }
 
-        return view('admin.accounting.general-ledger', compact(
-            'accounts',
-            'selectedAccount',
-            'transactions',
-            'openingBalance',
-            'closingBalance',
-            'startDate',
-            'endDate'
-        ));
+        return view('admin.accounting.general-ledger', [
+            'accounts' => $accounts,
+            'selectedAccount' => $ledgerData['account'],
+            'transactions' => $ledgerData['transactions'],
+            'openingBalance' => $ledgerData['opening_balance'],
+            'closingBalance' => $ledgerData['closing_balance'],
+            'startDate' => $startDate,
+            'endDate' => $endDate,
+        ]);
     }
 
     /**
@@ -196,149 +146,90 @@ class AccountingController extends Controller
     {
         $endDate = $request->input('end_date', Carbon::now()->toDateString());
 
-        $accounts = Account::with(['transactions' => function ($query) use ($endDate) {
-            $query->whereHas('journalEntry', function ($q) use ($endDate) {
-                $q->where('date', '<=', $endDate);
-            });
-        }])->orderBy('code')->get();
+        $reportData = $this->accountingReportService->generateTrialBalance($endDate);
 
-        $reportData = [];
-        $totalDebits = 0;
-        $totalCredits = 0;
-
-        foreach ($accounts as $account) {
-            $debits = $account->transactions->where('type', 'debit')->sum('amount');
-            $credits = $account->transactions->where('type', 'credit')->sum('amount');
-            $balance = $debits - $credits;
-
-            if ($balance == 0 && $account->transactions->isEmpty()) {
-                continue;
-            }
-
-            $debitBalance = 0;
-            $creditBalance = 0;
-
-            // Asset and Expense accounts normally have a debit balance
-            if (in_array($account->type, ['asset', 'expense'])) {
-                if ($balance > 0) {
-                    $debitBalance = $balance;
-                } else {
-                    $creditBalance = -$balance;
-                }
-            }
-            // Liability, Equity, and Revenue accounts normally have a credit balance
-            else {
-                if ($balance < 0) {
-                    $creditBalance = -$balance;
-                } else {
-                    $debitBalance = $balance;
-                }
-            }
-
-            $reportData[] = [
-                'code' => $account->code,
-                'name' => $account->name,
-                'debit' => $debitBalance,
-                'credit' => $creditBalance,
-            ];
-
-            $totalDebits += $debitBalance;
-            $totalCredits += $creditBalance;
-        }
-
-        return view('admin.accounting.trial-balance', compact(
-            'reportData',
-            'totalDebits',
-            'totalCredits',
-            'endDate'
-        ));
-    }
-
-    public function accountsIndex()
-    {
-        $accounts = Account::with('children')->whereNull('parent_id')->orderBy('code')->get();
-        return view('admin.accounting.accounts.index', compact('accounts'));
-    }
-
-    public function accountsCreate()
-    {
-        $accounts = Account::orderBy('name')->get();
-        return view('admin.accounting.accounts.create', compact('accounts'));
-    }
-
-    public function accountsStore(Request $request)
-    {
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'code' => [
-                'required',
-                'string',
-                'max:255',
-                Rule::unique('accounts', 'code')->where('tenant_id', auth()->user()->tenant_id)
-            ],
-            'type' => 'required|in:asset,liability,equity,revenue,expense',
-            'parent_id' => 'nullable|exists:accounts,id',
+        return view('admin.accounting.trial-balance', [
+            'reportData' => $reportData['report_data'],
+            'totalDebits' => $reportData['total_debits'],
+            'totalCredits' => $reportData['total_credits'],
+            'endDate' => $reportData['end_date'],
         ]);
-
-        $level = 0;
-        if ($request->parent_id) {
-            $parent = Account::find($request->parent_id);
-            $level = $parent->level + 1;
-        }
-
-        Account::create($request->all() + ['level' => $level]);
-
-        return redirect()->route('admin.accounting.accounts.index')->with('success', 'Account created successfully.');
-    }
-
-    public function accountsEdit(Account $account)
-    {
-        $accounts = Account::where('id', '!=', $account->id)->orderBy('name')->get();
-        return view('admin.accounting.accounts.edit', compact('account', 'accounts'));
-    }
-
-    public function accountsUpdate(Request $request, Account $account)
-    {
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'code' => [
-                'required',
-                'string',
-                'max:255',
-                Rule::unique('accounts', 'code')->where('tenant_id', auth()->user()->tenant_id)->ignore($account->id)
-            ],
-            'type' => 'required|in:asset,liability,equity,revenue,expense',
-            'parent_id' => 'nullable|exists:accounts,id',
-        ]);
-
-        $level = 0;
-        if ($request->parent_id) {
-            $parent = Account::find($request->parent_id);
-            $level = $parent->level + 1;
-        }
-
-        $account->update($request->all() + ['level' => $level]);
-
-        return redirect()->route('admin.accounting.accounts.index')->with('success', 'Account updated successfully.');
-    }
-
-    public function accountsDestroy(Account $account)
-    {
-        // Add logic to prevent deletion if account has transactions
-        if ($account->transactions()->exists() || $account->children()->exists()) {
-            return redirect()->route('admin.accounting.accounts.index')->with('error', 'Account cannot be deleted because it has transactions or child accounts.');
-        }
-
-        $account->delete();
-
-        return redirect()->route('admin.accounting.accounts.index')->with('success', 'Account deleted successfully.');
     }
 
     /**
-     * @group Accounting
-     * @summary Export All Accounts
-     * @bodyParam export_option string required The export format ('pdf' or 'csv'). Example: "csv"
-     * @response 200 "The exported file."
+     * Display accounts index.
+     */
+    public function accountsIndex()
+    {
+        $accounts = $this->accountService->getAccountsWithChildren();
+        return view('admin.accounting.accounts.index', compact('accounts'));
+    }
+
+    /**
+     * Display account create form.
+     */
+    public function accountsCreate()
+    {
+        $accounts = $this->accountService->getAllAccountsOrdered();
+        return view('admin.accounting.accounts.create', compact('accounts'));
+    }
+
+    /**
+     * Store a new account.
+     */
+    public function accountsStore(Request $request)
+    {
+        try {
+            $this->accountService->createAccount($request->all());
+            return redirect()->route('admin.accounting.accounts.index')
+                ->with('success', 'Account created successfully.');
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return redirect()->back()
+                ->withErrors($e->validator)
+                ->withInput();
+        }
+    }
+
+    /**
+     * Display account edit form.
+     */
+    public function accountsEdit(Account $account)
+    {
+        $accounts = $this->accountService->getAllAccountsExcept($account->id);
+        return view('admin.accounting.accounts.edit', compact('account', 'accounts'));
+    }
+
+    /**
+     * Update an account.
+     */
+    public function accountsUpdate(Request $request, Account $account)
+    {
+        try {
+            $this->accountService->updateAccount($account, $request->all());
+            return redirect()->route('admin.accounting.accounts.index')
+                ->with('success', 'Account updated successfully.');
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return redirect()->back()
+                ->withErrors($e->validator)
+                ->withInput();
+        }
+    }
+
+    /**
+     * Delete an account.
+     */
+    public function accountsDestroy(Account $account)
+    {
+        $result = $this->accountService->deleteAccount($account);
+
+        $messageType = $result['success'] ? 'success' : 'error';
+        
+        return redirect()->route('admin.accounting.accounts.index')
+            ->with($messageType, $result['message']);
+    }
+
+    /**
+     * Export Chart of Accounts.
      */
     public function exportAll(Request $request)
     {
@@ -347,58 +238,25 @@ class AccountingController extends Controller
         ]);
 
         try {
-            $accounts = Account::with('children')->whereNull('parent_id')->orderBy('code')->get();
+            $accounts = $this->accountService->getAccountsWithChildren();
 
             if ($request->export_option === 'pdf') {
-                $html = view('admin.accounting.accounts.export-pdf', compact('accounts'))->render();
-                $dompdf = new Dompdf();
-                $dompdf->loadHtml($html);
-                $dompdf->setPaper('A4', 'landscape');
-                $dompdf->render();
-                return $dompdf->stream('chart-of-accounts.pdf');
+                return $this->accountingExportService->exportChartOfAccountsToPdf(
+                    $accounts,
+                    'chart-of-accounts.pdf'
+                );
             }
 
             if ($request->export_option === 'csv') {
-                $headers = [
-                    'Content-type' => 'text/csv',
-                    'Content-Disposition' => 'attachment; filename=chart-of-accounts.csv',
-                    'Pragma' => 'no-cache',
-                    'Cache-Control' => 'must-revalidate, post-check=0, pre-check=0',
-                    'Expires' => '0',
-                ];
-
-                $callback = function () use ($accounts) {
-                    $file = fopen('php://output', 'w');
-                    fputcsv($file, [
-                        'Code',
-                        'Name',
-                        'Type',
-                        'Level',
-                    ]);
-
-                    $accountList = function ($accounts, $level = 0) use (&$file, &$accountList) {
-                        foreach ($accounts as $account) {
-                            fputcsv($file, [
-                                $account->code,
-                                str_repeat('-', $level) . ' ' . $account->name,
-                                $account->type,
-                                $account->level,
-                            ]);
-                    
-                            if ($account->children->isNotEmpty()) {
-                                $accountList($account->children, $level + 1);
-                            }
-                        }
-                    };
-
-                    $accountList($accounts);
-
-                    fclose($file);
-                };
-
-                return response()->stream($callback, 200, $headers);
+                $accountList = $this->accountingReportService->flattenAccountHierarchy($accounts);
+                return $this->accountingExportService->exportChartOfAccountsToCsv(
+                    $accountList,
+                    'chart-of-accounts.csv'
+                );
             }
         } catch (\Exception $e) {
+            Log::error('Error exporting accounts: ' . $e->getMessage());
+            
             return response()->json([
                 'success' => false,
                 'message' => 'Error exporting accounts. Please try again.',
@@ -407,186 +265,48 @@ class AccountingController extends Controller
         }
     }
 
-    
-
     /**
-
-     * @group Accounting
-
-     * @summary Export General Journal
-
-     * @bodyParam export_option string required The export format ('pdf' or 'csv'). Example: "csv"
-
-     * @bodyParam start_date string The start date for the export. Example: "2023-01-01"
-
-     * @bodyParam end_date string The end date for the export. Example: "2023-12-31"
-
-     * @response 200 "The exported file."
-
+     * Export General Journal.
      */
-
     public function exportJournal(Request $request)
-
     {
-
         $request->validate([
-
             'export_option' => 'required|string|in:pdf,csv',
-
             'start_date' => 'nullable|date',
-
             'end_date' => 'nullable|date',
-
         ]);
 
-
-
         try {
-
             $startDate = $request->input('start_date', Carbon::now()->startOfMonth()->toDateString());
-
             $endDate = $request->input('end_date', Carbon::now()->endOfMonth()->toDateString());
 
-
-
-            $query = JournalEntry::with('transactions.account')->latest('date')->latest('id');
-
-
-
-            if ($startDate) {
-
-                $query->where('date', '>=', $startDate);
-
-            }
-
-
-
-            if ($endDate) {
-
-                $query->where('date', '<=', $endDate);
-
-            }
-
-
-
-            $entries = $query->get();
-
-
+            $entries = $this->generalLedgerService->getJournalEntriesForExport($startDate, $endDate);
 
             if ($request->export_option === 'pdf') {
-
-                $html = view('admin.accounting.journal-export-pdf', compact('entries', 'startDate', 'endDate'))->render();
-
-                $dompdf = new Dompdf();
-
-                $dompdf->loadHtml($html);
-
-                $dompdf->setPaper('A4', 'landscape');
-
-                $dompdf->render();
-
-                return $dompdf->stream('journal.pdf');
-
+                return $this->accountingExportService->exportJournalToPdf(
+                    $entries,
+                    $startDate,
+                    $endDate,
+                    'journal.pdf'
+                );
             }
-
-
 
             if ($request->export_option === 'csv') {
-
-                $headers = [
-
-                    'Content-type' => 'text/csv',
-
-                    'Content-Disposition' => 'attachment; filename=journal.csv',
-
-                    'Pragma' => 'no-cache',
-
-                    'Cache-Control' => 'must-revalidate, post-check=0, pre-check=0',
-
-                    'Expires' => '0',
-
-                ];
-
-
-
-                $callback = function () use ($entries) {
-
-                    $file = fopen('php://output', 'w');
-
-                    fputcsv($file, [
-
-                        'Date',
-
-                        'Description',
-
-                        'Account',
-
-                        'Debit',
-
-                        'Credit',
-
-                    ]);
-
-
-
-                    foreach ($entries as $entry) {
-
-                        foreach ($entry->transactions as $index => $transaction) {
-
-                            $row = [
-
-                                $index === 0 ? $entry->date->format('Y-m-d') : '',
-
-                                $index === 0 ? $entry->description : '',
-
-                                $transaction->account->name,
-
-                                $transaction->type == 'debit' ? CurrencyHelper::format($transaction->amount) : '',
-
-                                $transaction->type == 'credit' ? CurrencyHelper::format($transaction->amount) : '',
-
-                            ];
-
-                            fputcsv($file, $row);
-
-                        }
-
-                    }
-
-
-
-                    fclose($file);
-
-                };
-
-
-
-                return response()->stream($callback, 200, $headers);
-
+                return $this->accountingExportService->exportJournalToCsv($entries, 'journal.csv');
             }
-
         } catch (\Exception $e) {
-
+            Log::error('Error exporting journal: ' . $e->getMessage());
+            
             return response()->json([
-
                 'success' => false,
-
                 'message' => 'Error exporting journal. Please try again.',
-
                 'error_details' => 'Internal server error',
-
             ], 500);
-
         }
-
     }
 
     /**
-     * @group Accounting
-     * @summary Export Trial Balance
-     * @bodyParam export_option string required The export format ('pdf' or 'csv'). Example: "csv"
-     * @bodyParam end_date string The end date for the export. Example: "2023-12-31"
-     * @response 200 "The exported file."
+     * Export Trial Balance.
      */
     public function exportTrialBalance(Request $request)
     {
@@ -597,107 +317,30 @@ class AccountingController extends Controller
 
         try {
             $endDate = $request->input('end_date', Carbon::now()->toDateString());
-
-            $accounts = Account::with(['transactions' => function ($query) use ($endDate) {
-                $query->whereHas('journalEntry', function ($q) use ($endDate) {
-                    $q->where('date', '<=', $endDate);
-                });
-            }])->orderBy('code')->get();
-
-            $reportData = [];
-            $totalDebits = 0;
-            $totalCredits = 0;
-
-            foreach ($accounts as $account) {
-                $debits = $account->transactions->where('type', 'debit')->sum('amount');
-                $credits = $account->transactions->where('type', 'credit')->sum('amount');
-                $balance = $debits - $credits;
-
-                if ($balance == 0 && $account->transactions->isEmpty()) {
-                    continue;
-                }
-
-                $debitBalance = 0;
-                $creditBalance = 0;
-
-                if (in_array($account->type, ['asset', 'expense'])) {
-                    if ($balance > 0) {
-                        $debitBalance = $balance;
-                    } else {
-                        $creditBalance = -$balance;
-                    }
-                } else {
-                    if ($balance < 0) {
-                        $creditBalance = -$balance;
-                    } else {
-                        $debitBalance = $balance;
-                    }
-                }
-
-                $reportData[] = [
-                    'code' => $account->code,
-                    'name' => $account->name,
-                    'debit' => $debitBalance,
-                    'credit' => $creditBalance,
-                ];
-
-                $totalDebits += $debitBalance;
-                $totalCredits += $creditBalance;
-            }
+            $reportData = $this->accountingReportService->generateTrialBalance($endDate);
 
             if ($request->export_option === 'pdf') {
-                $html = view('admin.accounting.trial-balance-export-pdf', compact('reportData', 'totalDebits', 'totalCredits', 'endDate'))->render();
-                $dompdf = new Dompdf();
-                $dompdf->loadHtml($html);
-                $dompdf->setPaper('A4', 'landscape');
-                $dompdf->render();
-                return $dompdf->stream('trial-balance.pdf');
+                return $this->accountingExportService->exportTrialBalanceToPdf(
+                    $reportData['report_data'],
+                    $reportData['total_debits'],
+                    $reportData['total_credits'],
+                    $endDate,
+                    'trial-balance.pdf'
+                );
             }
 
             if ($request->export_option === 'csv') {
-                $headers = [
-                    'Content-type' => 'text/csv',
-                    'Content-Disposition' => 'attachment; filename=trial-balance.csv',
-                    'Pragma' => 'no-cache',
-                    'Cache-Control' => 'must-revalidate, post-check=0, pre-check=0',
-                    'Expires' => '0',
-                ];
-
-                $callback = function () use ($reportData, $totalDebits, $totalCredits, $endDate) {
-                    $file = fopen('php://output', 'w');
-                    fputcsv($file, [
-                        'Trial Balance as of ' . $endDate,
-                    ]);
-                    fputcsv($file, []);
-                    fputcsv($file, [
-                        'Code',
-                        'Account',
-                        'Debit',
-                        'Credit',
-                    ]);
-
-                    foreach ($reportData as $item) {
-                        fputcsv($file, [
-                            $item['code'],
-                            $item['name'],
-                            $item['debit'] > 0 ? CurrencyHelper::format($item['debit']) : '-',
-                            $item['credit'] > 0 ? CurrencyHelper::format($item['credit']) : '-',
-                        ]);
-                    }
-
-                    fputcsv($file, [
-                        '',
-                        'Total',
-                        CurrencyHelper::format($totalDebits),
-                        CurrencyHelper::format($totalCredits),
-                    ]);
-
-                    fclose($file);
-                };
-
-                return response()->stream($callback, 200, $headers);
+                return $this->accountingExportService->exportTrialBalanceToCsv(
+                    $reportData['report_data'],
+                    $reportData['total_debits'],
+                    $reportData['total_credits'],
+                    $endDate,
+                    'trial-balance.csv'
+                );
             }
         } catch (\Exception $e) {
+            Log::error('Error exporting trial balance: ' . $e->getMessage());
+            
             return response()->json([
                 'success' => false,
                 'message' => 'Error exporting trial balance. Please try again.',
@@ -706,17 +349,8 @@ class AccountingController extends Controller
         }
     }
 
-
-
-
     /**
-     * @group Accounting
-     * @summary Export General Ledger
-     * @bodyParam export_option string required The export format ('pdf' or 'csv'). Example: "csv"
-     * @bodyParam account_id integer required The ID of the account to export. Example: 1
-     * @bodyParam start_date string The start date for the export. Example: "2023-01-01"
-     * @bodyParam end_date string The end date for the export. Example: "2023-12-31"
-     * @response 200 "The exported file."
+     * Export General Ledger.
      */
     public function exportGeneralLedger(Request $request)
     {
@@ -732,100 +366,38 @@ class AccountingController extends Controller
             $startDate = $request->input('start_date', Carbon::now()->startOfMonth()->toDateString());
             $endDate = $request->input('end_date', Carbon::now()->endOfMonth()->toDateString());
 
-            $account = Account::findOrFail($accountId);
-
-            $openingBalance = Transaction::where('account_id', $accountId)
-                ->whereHas('journalEntry', function ($query) use ($startDate) {
-                    $query->where('date', '<', $startDate);
-                })
-                ->get()
-                ->sum(function ($transaction) {
-                    return $transaction->type === 'debit' ? $transaction->amount : -$transaction->amount;
-                });
-
-            $transactions = Transaction::with('journalEntry')
-                ->where('account_id', $accountId)
-                ->whereHas('journalEntry', function ($query) use ($startDate, $endDate) {
-                    $query->whereBetween('date', [$startDate, $endDate]);
-                })
-                ->latest('journal_entry_id')
-                ->get();
-
-            $closingBalance = $openingBalance + $transactions->sum(function ($transaction) {
-                return $transaction->type === 'debit' ? $transaction->amount : -$transaction->amount;
-            });
+            $ledgerData = $this->generalLedgerService->getGeneralLedgerForExport(
+                $accountId,
+                $startDate,
+                $endDate
+            );
 
             if ($request->export_option === 'pdf') {
-                $html = view('admin.accounting.general-ledger-export-pdf', compact('account', 'transactions', 'openingBalance', 'closingBalance', 'startDate', 'endDate'))->render();
-                $dompdf = new Dompdf();
-                $dompdf->loadHtml($html);
-                $dompdf->setPaper('A4', 'landscape');
-                $dompdf->render();
-                return $dompdf->stream('general-ledger.pdf');
+                return $this->accountingExportService->exportGeneralLedgerToPdf(
+                    $ledgerData['account'],
+                    $ledgerData['transactions'],
+                    $ledgerData['opening_balance'],
+                    $ledgerData['closing_balance'],
+                    $startDate,
+                    $endDate,
+                    'general-ledger.pdf'
+                );
             }
 
             if ($request->export_option === 'csv') {
-                $headers = [
-                    'Content-type' => 'text/csv',
-                    'Content-Disposition' => 'attachment; filename=general-ledger.csv',
-                    'Pragma' => 'no-cache',
-                    'Cache-Control' => 'must-revalidate, post-check=0, pre-check=0',
-                    'Expires' => '0',
-                ];
-
-                $callback = function () use ($account, $transactions, $openingBalance, $closingBalance, $startDate, $endDate) {
-                    $file = fopen('php://output', 'w');
-                    fputcsv($file, [
-                        'Account:',
-                        $account->name,
-                    ]);
-                    fputcsv($file, [
-                        'Period:',
-                        $startDate . ' to ' . $endDate,
-                    ]);
-                    fputcsv($file, []); // Empty row
-                    fputcsv($file, [
-                        'Date',
-                        'Description',
-                        'Debit',
-                        'Credit',
-                        'Balance',
-                    ]);
-
-                    fputcsv($file, [
-                        '',
-                        'Opening Balance',
-                        '',
-                        '',
-                        CurrencyHelper::format($openingBalance),
-                    ]);
-
-                    $balance = $openingBalance;
-                    foreach ($transactions as $transaction) {
-                        $balance += $transaction->type === 'debit' ? $transaction->amount : -$transaction->amount;
-                        fputcsv($file, [
-                            $transaction->journalEntry->date->format('Y-m-d'),
-                            $transaction->journalEntry->description,
-                            $transaction->type == 'debit' ? CurrencyHelper::format($transaction->amount) : '',
-                            $transaction->type == 'credit' ? CurrencyHelper::format($transaction->amount) : '',
-                            CurrencyHelper::format($balance),
-                        ]);
-                    }
-
-                    fputcsv($file, [
-                        '',
-                        'Closing Balance',
-                        '',
-                        '',
-                        CurrencyHelper::format($closingBalance),
-                    ]);
-
-                    fclose($file);
-                };
-
-                return response()->stream($callback, 200, $headers);
+                return $this->accountingExportService->exportGeneralLedgerToCsv(
+                    $ledgerData['account'],
+                    $ledgerData['transactions'],
+                    $ledgerData['opening_balance'],
+                    $ledgerData['closing_balance'],
+                    $startDate,
+                    $endDate,
+                    'general-ledger.csv'
+                );
             }
         } catch (\Exception $e) {
+            Log::error('Error exporting general ledger: ' . $e->getMessage());
+            
             return response()->json([
                 'success' => false,
                 'message' => 'Error exporting general ledger. Please try again.',
@@ -833,6 +405,4 @@ class AccountingController extends Controller
             ], 500);
         }
     }
-
-
 }

@@ -48,5 +48,10 @@ class RolePermissionSeeder extends Seeder
             'view-products',
             'view-reports',
         ]);
+        
+        $this->command->info("Role permissions synced successfully!");
+        $this->command->info("  - Superuser: All permissions");
+        $this->command->info("  - Staff: 40+ permissions assigned");
+        $this->command->info("  - POS: 6 basic permissions assigned");
     }
 }

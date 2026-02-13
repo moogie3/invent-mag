@@ -133,15 +133,27 @@ class PermissionSeeder extends Seeder
             'reverse-manual-journal',
         ];
 
+        $this->command->info("Creating " . count($permissions) . " permissions...");
+        
         // Create all permissions
         foreach ($permissions as $permission) {
             Permission::firstOrCreate(['name' => $permission]);
         }
 
+        $this->command->info("Permissions created successfully!");
+        $this->command->info("Assigning permissions to roles...");
+        
         // Assign permissions to roles
         $this->assignToSuperuser();
+        $this->command->info("  - Superuser: All permissions assigned");
+        
         $this->assignToPos();
+        $this->command->info("  - POS: Limited permissions assigned");
+        
         $this->assignToStaff();
+        $this->command->info("  - Staff: Standard permissions assigned");
+        
+        $this->command->info("Permission seeding completed!");
     }
 
     private function assignToSuperuser()

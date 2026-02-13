@@ -42,12 +42,15 @@ class PurchaseReturnSeeder extends Seeder
         $purchases = Purchase::where('tenant_id', $tenantId)->has('items')->get(); // Only purchases with items
 
         if ($users->isEmpty() || $purchases->isEmpty()) {
-            $this->command->info('Skipping PurchaseReturnSeeder for tenant ' . app('currentTenant')->name . ': No users or purchases with items found. Please run UserSeeder and PurchaseSeeder first.');
+            $this->command->warn('Skipping PurchaseReturnSeeder for tenant ' . app('currentTenant')->name . ': No users or purchases with items found. Please run UserSeeder and PurchaseSeeder first.');
             return;
         }
 
+        $this->command->info("Seeding Purchase Returns for tenant: " . app('currentTenant')->name);
+
         $faker = \Faker\Factory::create();
 
+        $count = 0;
         for ($i = 0; $i < 15; $i++) {
             $purchase = $purchases->random();
             $user = $users->random();
@@ -132,6 +135,11 @@ class PurchaseReturnSeeder extends Seeder
             } catch (\Exception $e) {
                 $this->command->error("Failed to create journal entry for purchase return {$purchaseReturn->id}: " . $e->getMessage());
             }
+            
+            $count++;
         }
+        
+        $this->command->info("Purchase Return seeding completed!");
+        $this->command->info("Created {$count} purchase returns with items, stock updates, and journal entries.");
     }
 }

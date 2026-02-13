@@ -43,12 +43,15 @@ class SalesReturnSeeder extends Seeder
         $sales = Sales::where('tenant_id', $tenantId)->has('salesItems')->get(); // Only sales with items
 
         if ($users->isEmpty() || $sales->isEmpty()) {
-            $this->command->info('Skipping SalesReturnSeeder for tenant ' . app('currentTenant')->name . ': No users or sales with items found. Please run UserSeeder and SalesSeeder first.');
+            $this->command->warn('Skipping SalesReturnSeeder for tenant ' . app('currentTenant')->name . ': No users or sales with items found. Please run UserSeeder and SalesSeeder first.');
             return;
         }
 
+        $this->command->info("Seeding Sales Returns for tenant: " . app('currentTenant')->name);
+        
         $faker = \Faker\Factory::create();
 
+        $count = 0;
         for ($i = 0; $i < 15; $i++) {
             $sale = $sales->random();
             $user = $users->random();
@@ -135,6 +138,11 @@ class SalesReturnSeeder extends Seeder
             } catch (\Exception $e) {
                 $this->command->error("Failed to create journal entry for sales return {$salesReturn->id}: " . $e->getMessage());
             }
+            
+            $count++;
         }
+        
+        $this->command->info("Sales Return seeding completed!");
+        $this->command->info("Created {$count} sales returns with items, stock updates, and journal entries.");
     }
 }

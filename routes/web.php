@@ -5,7 +5,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Str;
-use App\Http\Controllers\Admin\{CategoryController, CustomerController, ProductController, PurchaseController, SalesPipelineController, SupplierController, UnitController, CurrencyController, SalesController, DashboardController, ProfileController, NotificationController, POSController, ReportController, WarehouseController, TaxController, UserController, CustomerCrmController, SupplierCrmController, SettingsController, PurchaseReturnController, SalesReturnController, JournalEntryController};
+use App\Http\Controllers\Admin\{CategoryController, CustomerController, ProductController, PurchaseController, SalesPipelineController, SupplierController, UnitController, CurrencyController, SalesController, DashboardController, ProfileController, NotificationController, POSController, ReportController, WarehouseController, TaxController, UserController, CustomerCrmController, SupplierCrmController, SettingsController, PurchaseReturnController, SalesReturnController, JournalEntryController, StockTransferController};
 use Laravel\Fortify\Http\Controllers\AuthenticatedSessionController;
 use Laravel\Fortify\Http\Controllers\NewPasswordController;
 use Laravel\Fortify\Http\Controllers\PasswordResetLinkController;
@@ -494,15 +494,16 @@ Route::middleware('web')->prefix('admin')->group(function () {
                 ->name('admin.reports.adjustment-log')
                 ->middleware('can:view-reports');
 
-            Route::post('/stock-transfer', [ReportController::class, 'stockTransfer'])
-                ->name('admin.reports.stock-transfer')
-                ->middleware('can:adjust-stock');
-
-            Route::get('/stock-transfer', [ReportController::class, 'stockTransferPage'])
+            // Stock Transfer Routes
+            Route::get('/stock-transfer', [StockTransferController::class, 'index'])
                 ->name('admin.reports.stock-transfer.page')
                 ->middleware('can:adjust-stock');
 
-            Route::get('/stock-transfer/products/{warehouseId}', [ReportController::class, 'getProductsForTransfer'])
+            Route::post('/stock-transfer', [StockTransferController::class, 'store'])
+                ->name('admin.reports.stock-transfer')
+                ->middleware('can:adjust-stock');
+
+            Route::get('/stock-transfer/products/{warehouseId}', [StockTransferController::class, 'getProducts'])
                 ->name('admin.reports.stock-transfer.products')
                 ->middleware('can:adjust-stock');
 

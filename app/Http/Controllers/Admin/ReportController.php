@@ -2,21 +2,17 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Helpers\CurrencyHelper;
 use App\Http\Controllers\Controller;
-use App\Models\StockAdjustment;
-use Illuminate\Http\Request;
-use App\Models\POItem;
-use App\Services\TransactionService;
-use Illuminate\Support\Facades\Log;
-use App\Models\Sales;
+use App\Models\Account;
 use App\Models\Purchase;
+use App\Models\Sales;
+use App\Models\StockAdjustment;
+use App\Services\TransactionService;
 use Carbon\Carbon;
-use App\DTOs\TransactionDTO;
-use App\Models\Transaction; // Assuming a generic Transaction model if not specifically Sales/Purchase
-use Illuminate\Support\Facades\DB;
-use App\Models\Account; // Required for Income Statement
-use App\Services\DashboardService;
 use Dompdf\Dompdf;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 class ReportController extends Controller
 {
@@ -27,7 +23,7 @@ class ReportController extends Controller
         $this->transactionService = $transactionService;
     }
 
-     /**
+    /**
      * Display the adjustment log.
      */
     public function adjustmentLog(Request $request)
@@ -48,103 +44,6 @@ class ReportController extends Controller
         $types = ['adjustment', 'increase', 'decrease', 'correction', 'transfer'];
 
         return view('admin.reports.adjustment-log', compact('adjustments', 'warehouses', 'types'));
-    }
-
-    /**
-     * Handle stock transfer between warehouses.
-     */
-    public function stockTransfer(Request $request)
-    {
-        $request->validate([
-            'from_warehouse_id' => 'required|exists:warehouses,id',
-            'to_warehouse_id' => 'required|exists:warehouses,id|different:from_warehouse_id',
-            'product_id' => 'required|exists:products,id',
-            'quantity' => 'required|integer|min:1',
-            'reason' => 'nullable|string|max:1000',
-        ]);
-
-        $fromWarehouse = \App\Models\Warehouse::findOrFail($request->from_warehouse_id);
-        $toWarehouse = \App\Models\Warehouse::findOrFail($request->to_warehouse_id);
-        $product = \App\Models\Product::findOrFail($request->product_id);
-
-        $fromStockRecord = \App\Models\ProductWarehouse::where('product_id', $product->id)
-            ->where('warehouse_id', $fromWarehouse->id)
-            ->first();
-
-        $availableQty = $fromStockRecord ? $fromStockRecord->quantity : 0;
-
-        if ($availableQty < $request->quantity) {
-            return redirect()->back()
-                ->with('error', "Insufficient stock. Available: {$availableQty}, Requested: {$request->quantity}");
-        }
-
-        DB::transaction(function () use ($request, $fromWarehouse, $toWarehouse, $product, $fromStockRecord, $availableQty) {
-            $fromQty = $availableQty;
-            $toQty = \App\Models\ProductWarehouse::firstOrCreate(
-                ['product_id' => $product->id, 'warehouse_id' => $toWarehouse->id, 'tenant_id' => $product->tenant_id],
-                ['quantity' => 0]
-            )->quantity;
-
-            $fromStockRecord->update(['quantity' => $fromQty - $request['quantity']]);
-            $toWarehouse->productWarehouses()->updateOrCreate(
-                ['product_id' => $product->id],
-                ['quantity' => $toQty + $request['quantity']]
-            );
-
-            \App\Models\StockAdjustment::create([
-                'product_id' => $product->id,
-                'warehouse_id' => $fromWarehouse->id,
-                'adjustment_type' => 'transfer',
-                'quantity_before' => $fromQty,
-                'quantity_after' => $fromQty - $request['quantity'],
-                'adjustment_amount' => $request['quantity'],
-                'reason' => $request['reason'] ?? "Transfer to {$toWarehouse->name}",
-                'adjusted_by' => auth()->id(),
-                'tenant_id' => $product->tenant_id,
-            ]);
-
-            \App\Models\StockAdjustment::create([
-                'product_id' => $product->id,
-                'warehouse_id' => $toWarehouse->id,
-                'adjustment_type' => 'transfer',
-                'quantity_before' => $toQty,
-                'quantity_after' => $toQty + $request['quantity'],
-                'adjustment_amount' => $request['quantity'],
-                'reason' => $request['reason'] ?? "Transfer from {$fromWarehouse->name}",
-                'adjusted_by' => auth()->id(),
-                'tenant_id' => $product->tenant_id,
-            ]);
-        });
-
-        return redirect()->route('admin.reports.adjustment-log')
-            ->with('success', "Successfully transferred {$request['quantity']} units of {$product->name} from {$fromWarehouse->name} to {$toWarehouse->name}");
-    }
-
-    /**
-     * Display stock transfer page.
-     */
-    public function stockTransferPage()
-    {
-        $warehouses = \App\Models\Warehouse::all();
-        return view('admin.reports.stock-transfer.page', compact('warehouses'));
-    }
-
-    /**
-     * Get products by warehouse for transfer.
-     */
-    public function getProductsForTransfer($warehouseId)
-    {
-        $warehouse = \App\Models\Warehouse::findOrFail($warehouseId);
-        $products = $warehouse->productWarehouses()->with('product:id,name,code')->get();
-
-        return response()->json($products->map(function ($pw) {
-            return [
-                'id' => $pw->product->id,
-                'name' => $pw->product->name,
-                'code' => $pw->product->code,
-                'quantity' => $pw->quantity,
-            ];
-        }));
     }
 
     /**
@@ -239,13 +138,11 @@ class ReportController extends Controller
      */
     public function incomeStatement(Request $request)
     {
-        // Placeholder for initial Income Statement implementation
         $startDate = $request->input('start_date', Carbon::now()->startOfMonth()->toDateString());
         $endDate = $request->input('end_date', Carbon::now()->endOfMonth()->toDateString());
 
-        // Fetch revenue accounts and their balances
         $revenueAccounts = Account::where('type', 'revenue')
-            ->with(['transactions' => function ($query) use ($startDate, $endDate) { // Fallback for complex logic, but restricted fields
+            ->with(['transactions' => function ($query) use ($startDate, $endDate) {
                  $query->select('account_id', 'type', 'amount')
                        ->whereHas('journalEntry', function ($q) use ($startDate, $endDate) {
                             $q->whereBetween('date', [$startDate, $endDate]);
@@ -253,17 +150,15 @@ class ReportController extends Controller
             }])
             ->get();
 
-        // Optimized sum using PHP on minimal data
         $totalRevenue = 0;
         foreach ($revenueAccounts as $account) {
             $balance = $account->transactions->sum(function ($transaction) {
                 return $transaction->type === 'credit' ? $transaction->amount : -$transaction->amount;
             });
-            $account->calculated_balance = $balance; // Store for view
+            $account->calculated_balance = $balance;
             $totalRevenue += $balance;
         }
 
-        // Fetch expense accounts and their balances
         $expenseAccounts = Account::where('type', 'expense')
             ->with(['transactions' => function ($query) use ($startDate, $endDate) {
                  $query->select('account_id', 'type', 'amount')
@@ -282,7 +177,6 @@ class ReportController extends Controller
             $totalExpenses += $balance;
         }
 
-        // Net Income = Total Revenue - Total Expenses
         $netIncome = $totalRevenue - $totalExpenses;
 
         return view('admin.reports.income-statement', compact(
@@ -297,12 +191,7 @@ class ReportController extends Controller
     }
 
     /**
-     * @group Reports
-     * @summary Export Income Statement
-     * @bodyParam export_option string required The export format ('pdf' or 'csv'). Example: "csv"
-     * @bodyParam start_date string The start date for the export. Example: "2023-01-01"
-     * @bodyParam end_date string The end date for the export. Example: "2023-12-31"
-     * @response 200 "The exported file."
+     * Export Income Statement
      */
     public function exportIncomeStatement(Request $request)
     {
@@ -316,7 +205,6 @@ class ReportController extends Controller
             $startDate = $request->input('start_date', Carbon::now()->startOfMonth()->toDateString());
             $endDate = $request->input('end_date', Carbon::now()->endOfMonth()->toDateString());
 
-            // Fetch revenue accounts and their balances
             $revenueAccounts = Account::where('type', 'revenue')
                 ->with(['transactions' => function ($query) use ($startDate, $endDate) {
                     $query->whereHas('journalEntry', function ($q) use ($startDate, $endDate) {
@@ -330,7 +218,6 @@ class ReportController extends Controller
                 });
             });
 
-            // Fetch expense accounts and their balances
             $expenseAccounts = Account::where('type', 'expense')
                 ->with(['transactions' => function ($query) use ($startDate, $endDate) {
                     $query->whereHas('journalEntry', function ($q) use ($startDate, $endDate) {
@@ -375,9 +262,9 @@ class ReportController extends Controller
                         $amount = $account->transactions->sum(function ($transaction) {
                             return $transaction->type === 'credit' ? $transaction->amount : -$transaction->amount;
                         });
-                        fputcsv($file, [$account->name, \App\Helpers\CurrencyHelper::format($amount)]);
+                        fputcsv($file, [$account->name, CurrencyHelper::format($amount)]);
                     }
-                    fputcsv($file, ['Total Revenue', \App\Helpers\CurrencyHelper::format($totalRevenue)]);
+                    fputcsv($file, ['Total Revenue', CurrencyHelper::format($totalRevenue)]);
                     fputcsv($file, []);
 
                     fputcsv($file, ['Expenses']);
@@ -385,12 +272,12 @@ class ReportController extends Controller
                         $amount = $account->transactions->sum(function ($transaction) {
                             return $transaction->type === 'debit' ? $transaction->amount : -$transaction->amount;
                         });
-                        fputcsv($file, [$account->name, \App\Helpers\CurrencyHelper::format($amount)]);
+                        fputcsv($file, [$account->name, CurrencyHelper::format($amount)]);
                     }
-                    fputcsv($file, ['Total Expenses', \App\Helpers\CurrencyHelper::format($totalExpenses)]);
+                    fputcsv($file, ['Total Expenses', CurrencyHelper::format($totalExpenses)]);
                     fputcsv($file, []);
 
-                    fputcsv($file, ['Net Income', \App\Helpers\CurrencyHelper::format($netIncome)]);
+                    fputcsv($file, ['Net Income', CurrencyHelper::format($netIncome)]);
 
                     fclose($file);
                 };
@@ -406,7 +293,6 @@ class ReportController extends Controller
         }
     }
 
-
     /**
      * Display the Balance Sheet report.
      */
@@ -414,8 +300,6 @@ class ReportController extends Controller
     {
         $endDate = $request->input('end_date', Carbon::now()->endOfDay()->toDateString());
 
-        // Get all accounts and calculate their balances up to the end_date
-        // Optimizing by selecting only necessary columns for calculation
         $accounts = Account::with(['transactions' => function ($query) use ($endDate) {
             $query->select('account_id', 'type', 'amount')
                   ->whereHas('journalEntry', function ($q) use ($endDate) {
@@ -432,19 +316,16 @@ class ReportController extends Controller
 
         foreach ($accounts as $account) {
             $balance = 0;
-            // Calculate balance based on account type (debit vs credit normal balances)
-            // Since we loaded lightweight transaction objects, this sum is faster
             $debits = $account->transactions->sum(fn($t) => $t->type === 'debit' ? $t->amount : 0);
             $credits = $account->transactions->sum(fn($t) => $t->type === 'credit' ? $t->amount : 0);
 
-            if (in_array($account->type, ['asset', 'expense'])) { // Assets and Expenses normally have debit balances
+            if (in_array($account->type, ['asset', 'expense'])) {
                 $balance = $debits - $credits;
-            } else { // Liabilities, Equity, and Revenue normally have credit balances
+            } else {
                 $balance = $credits - $debits;
             }
 
-            // Only include accounts with a non-zero balance for clarity
-            if (abs($balance) > 0.001) { // Using a small epsilon for floating point comparison
+            if (abs($balance) > 0.001) {
                 $account->calculated_balance = $balance;
                 switch ($account->type) {
                     case 'asset':
@@ -459,24 +340,20 @@ class ReportController extends Controller
                         $equity->push($account);
                         $totalEquity += $balance;
                         break;
-                    // For income statement accounts (revenue, expense), their net effect
-                    // rolls into equity for the balance sheet.
                     case 'revenue':
-                        $totalEquity += $balance; // Revenue increases equity
+                        $totalEquity += $balance;
                         break;
                     case 'expense':
-                        $totalEquity -= $balance; // Expenses decrease equity
+                        $totalEquity -= $balance;
                         break;
                 }
             }
         }
 
-        // Ensure assets, liabilities, and equity are sorted by account code or name for readability
         $assets = $assets->sortBy('code');
         $liabilities = $liabilities->sortBy('code');
         $equity = $equity->sortBy('code');
 
-        // Check accounting equation for debugging/validation
         $equation_balanced = abs($totalAssets - ($totalLiabilities + $totalEquity)) < 0.001;
 
         return view('admin.reports.balance-sheet', compact(
@@ -492,11 +369,7 @@ class ReportController extends Controller
     }
 
     /**
-     * @group Reports
-     * @summary Export Balance Sheet
-     * @bodyParam export_option string required The export format ('pdf' or 'csv'). Example: "csv"
-     * @bodyParam end_date string The end date for the export. Example: "2023-12-31"
-     * @response 200 "The exported file."
+     * Export Balance Sheet
      */
     public function exportBalanceSheet(Request $request)
     {
@@ -587,26 +460,26 @@ class ReportController extends Controller
 
                     fputcsv($file, ['Assets']);
                     foreach ($assets as $account) {
-                        fputcsv($file, [$account->name, \App\Helpers\CurrencyHelper::format($account->calculated_balance)]);
+                        fputcsv($file, [$account->name, CurrencyHelper::format($account->calculated_balance)]);
                     }
-                    fputcsv($file, ['Total Assets', \App\Helpers\CurrencyHelper::format($totalAssets)]);
+                    fputcsv($file, ['Total Assets', CurrencyHelper::format($totalAssets)]);
                     fputcsv($file, []);
 
                     fputcsv($file, ['Liabilities']);
                     foreach ($liabilities as $account) {
-                        fputcsv($file, [$account->name, \App\Helpers\CurrencyHelper::format($account->calculated_balance)]);
+                        fputcsv($file, [$account->name, CurrencyHelper::format($account->calculated_balance)]);
                     }
-                    fputcsv($file, ['Total Liabilities', \App\Helpers\CurrencyHelper::format($totalLiabilities)]);
+                    fputcsv($file, ['Total Liabilities', CurrencyHelper::format($totalLiabilities)]);
                     fputcsv($file, []);
 
                     fputcsv($file, ['Equity']);
                     foreach ($equity as $account) {
-                        fputcsv($file, [$account->name, \App\Helpers\CurrencyHelper::format($account->calculated_balance)]);
+                        fputcsv($file, [$account->name, CurrencyHelper::format($account->calculated_balance)]);
                     }
-                    fputcsv($file, ['Total Equity', \App\Helpers\CurrencyHelper::format($totalEquity)]);
+                    fputcsv($file, ['Total Equity', CurrencyHelper::format($totalEquity)]);
                     fputcsv($file, []);
 
-                    fputcsv($file, ['Total Liabilities & Equity', \App\Helpers\CurrencyHelper::format($totalLiabilities + $totalEquity)]);
+                    fputcsv($file, ['Total Liabilities & Equity', CurrencyHelper::format($totalLiabilities + $totalEquity)]);
 
                     fclose($file);
                 };
@@ -647,10 +520,7 @@ class ReportController extends Controller
     }
 
     /**
-     * @group Reports
-     * @summary Export Aged Receivables Report
-     * @bodyParam export_option string required The export format ('pdf' or 'csv'). Example: "csv"
-     * @response 200 "The exported file."
+     * Export Aged Receivables Report
      */
     public function exportAgedReceivables(Request $request)
     {
@@ -726,10 +596,10 @@ class ReportController extends Controller
                                     $invoice->invoice,
                                     Carbon::parse($invoice->due_date)->format('Y-m-d'),
                                     $invoice->days_overdue,
-                                    \App\Helpers\CurrencyHelper::format($invoice->total),
+                                    CurrencyHelper::format($invoice->total),
                                 ]);
                             }
-                            fputcsv($file, ['Total for ' . $buckets[$bucketKey], '', '', '', \App\Helpers\CurrencyHelper::format($invoices->sum('total'))]);
+                            fputcsv($file, ['Total for ' . $buckets[$bucketKey], '', '', '', CurrencyHelper::format($invoices->sum('total'))]);
                             fputcsv($file, []);
                         }
                     }
@@ -773,10 +643,7 @@ class ReportController extends Controller
     }
 
     /**
-     * @group Reports
-     * @summary Export Aged Payables Report
-     * @bodyParam export_option string required The export format ('pdf' or 'csv'). Example: "csv"
-     * @response 200 "The exported file."
+     * Export Aged Payables Report
      */
     public function exportAgedPayables(Request $request)
     {
@@ -852,10 +719,10 @@ class ReportController extends Controller
                                     $invoice->invoice,
                                     Carbon::parse($invoice->due_date)->format('Y-m-d'),
                                     $invoice->days_overdue,
-                                    \App\Helpers\CurrencyHelper::format($invoice->total),
+                                    CurrencyHelper::format($invoice->total),
                                 ]);
                             }
-                            fputcsv($file, ['Total for ' . $buckets[$bucketKey], '', '', '', \App\Helpers\CurrencyHelper::format($invoices->sum('total'))]);
+                            fputcsv($file, ['Total for ' . $buckets[$bucketKey], '', '', '', CurrencyHelper::format($invoices->sum('total'))]);
                             fputcsv($file, []);
                         }
                     }
@@ -960,7 +827,7 @@ class ReportController extends Controller
                 'end_date' => $request->get('end_date'),
                 'search' => $request->get('search'),
             ];
-        
+
             $transactions = $this->transactionService->getTransactionsForExport($filters, $selectedIds);
 
             if ($request->export_option === 'pdf') {
@@ -998,7 +865,7 @@ class ReportController extends Controller
                             $transaction['invoice'],
                             $transaction['customer_supplier'],
                             Carbon::parse($transaction['date'])->format('Y-m-d H:i'),
-                            \App\Helpers\CurrencyHelper::format($transaction['amount']),
+                            CurrencyHelper::format($transaction['amount']),
                             $transaction['status'],
                         ]);
                     }

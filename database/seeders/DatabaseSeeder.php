@@ -66,6 +66,7 @@ class DatabaseSeeder extends Seeder
                 SupplierInteractionSeeder::class,
                 TaxSeeder::class,
                 StockAdjustmentSeeder::class,
+                StockTransferSeeder::class,
                 SalesPipelineSeeder::class,
                 PipelineStageSeeder::class,
                 SalesOpportunitySeeder::class,

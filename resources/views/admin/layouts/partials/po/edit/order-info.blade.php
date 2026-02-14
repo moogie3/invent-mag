@@ -4,23 +4,23 @@
     </h5>
     <div class="row g-3">
         <div class="col-md-6">
-            <div class="mb-3">
+            <div class="mb-2">
                 <label class="form-label fw-bold">{{ __('messages.po_invoice') }}</label>
                 <input type="text" class="form-control" name="invoice" value="{{ $pos->invoice }}" required>
             </div>
-            <div class="mb-3">
+            <div class="mb-2">
                 <label class="form-label fw-bold">{{ __('messages.po_order_date') }}</label>
                 <div class="form-control-plaintext">{{ $pos->order_date->format('d F Y') }}</div>
                 <input type="hidden" name="order_date" value="{{ $pos->order_date }}">
             </div>
-            <div class="mb-3">
+            <div class="mb-2">
                 <label class="form-label fw-bold">{{ __('messages.po_due_date') }}</label>
                 <div class="form-control-plaintext">{{ $pos->due_date->format('d F Y') }}</div>
                 <input type="hidden" name="due_date" value="{{ $pos->due_date }}">
             </div>
         </div>
         <div class="col-md-6">
-            <div class="mb-3">
+            <div class="mb-2">
                 <label class="form-label fw-bold">{{ __('messages.warehouse') }}</label>
                 <select class="form-select" name="warehouse_id" id="warehouse_id">
                     @foreach ($warehouses as $warehouse)
@@ -31,7 +31,7 @@
                     @endforeach
                 </select>
             </div>
-            <div class="mb-3">
+            <div class="mb-2">
                 <label class="form-label fw-bold">{{ __('messages.po_payment_type') }}</label>
                 <select class="form-select" name="payment_type" id="payment_type"
                     {{ $pos->status == __('messages.paid') ? 'disabled' : '' }}>
@@ -43,7 +43,7 @@
                     </option>
                 </select>
             </div>
-            <div class="mb-3">
+            <div class="mb-2">
                 <label class="form-label fw-bold">{{ __('messages.payment_status') }}</label>
                 <select class="form-select" name="status" id="status">
                     <option value="Paid" {{ $pos->status == __('messages.paid') ? 'selected' : '' }}>
@@ -54,6 +54,14 @@
                     </option>
                 </select>
             </div>
+            @if ($pos->status === 'Paid' && isset($pos->payment_date))
+                <div class="d-flex justify-content-between mt-2">
+                    <div><strong>{{ __('messages.payment_date') }}</strong></div>
+                    <div>
+                        {{ $pos->payment_date->format('d F Y H:i') }}
+                    </div>
+                </div>
+            @endif
         </div>
     </div>
 </div>

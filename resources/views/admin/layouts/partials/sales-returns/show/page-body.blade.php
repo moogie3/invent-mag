@@ -1,6 +1,8 @@
 <div class="page-body">
     <div class="{{ $containerClass ?? "container-xl" }}">
-        <div class="card card-lg border-0 shadow-sm rounded-3">
+        <div class="row row-deck row-cards">
+            <div class="col-md-12">
+                <div class="card border-0 shadow-sm rounded-3">
             <div class="card-body">
                 {{-- Content from srmodals-view.blade.php starts here --}}
                 <div class="card border-0 shadow-sm rounded-3 mb-4">

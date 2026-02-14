@@ -1,4 +1,4 @@
-<div class="mb-5 border-bottom pb-4">
+<div class="mb-4 pb-4 border-top pt-4">
     <div class="row align-items-center mb-4">
         <div class="col">
             <h4 class="card-title mb-0">

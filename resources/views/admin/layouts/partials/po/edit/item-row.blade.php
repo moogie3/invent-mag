@@ -6,7 +6,7 @@
         $item->discount_type,
     );
 @endphp
-<tr>
+<tr class="product-row" data-product-id="{{ $item->product_id }}">
     <td class="text-center">{{ $index + 1 }}</td>
     <td>
         <div class="strong">{{ $item->product->name }}</div>

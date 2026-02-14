@@ -1,9 +1,11 @@
 <div class="card-header">
-    @php
-        $statusClass = \App\Helpers\PurchaseHelper::getStatusClass($pos->status, $pos->due_date);
-    @endphp
-    <div class="row align-items-center w-100">
+    <div class="row align-items-center">
         <div class="col">
+            @php
+                $statusClass = \App\Helpers\PurchaseHelper::getStatusClass($pos->status, $pos->due_date);
+            @endphp
+        </div>
+        <div class="d-flex align-items-start justify-content-between flex-wrap gap-2">
             <div class="d-flex align-items-center">
                 <div class="status-indicator {{ $statusClass }}"
                     style="width: 6px; height: 36px; border-radius: 3px; margin-right: 15px;">
@@ -15,11 +17,11 @@
                     </div>
                 </div>
             </div>
-        </div>
-        <div class="col-auto">
-            <span class="badge fs-6 {{ $statusClass }}">
-                {!! \App\Helpers\PurchaseHelper::getStatusText($pos->status, $pos->due_date) !!}
-            </span>
+            <div class="text-end">
+                <span class="badge fs-6 {{ $statusClass }}">
+                    {!! \App\Helpers\PurchaseHelper::getStatusText($pos->status, $pos->due_date) !!}
+                </span>
+            </div>
         </div>
     </div>
 </div>

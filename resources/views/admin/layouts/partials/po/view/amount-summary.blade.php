@@ -6,7 +6,7 @@
     </div>
     <div class="d-flex justify-content-between mb-2">
         <div>
-            <span>{{ __('messages.po_order_discount') }}</span>
+            {{ __('messages.po_order_discount') }}
             <small class="text-muted">
                 ({{ $pos->discount_total_type === 'percentage' ? $pos->discount_total . '%' : __('messages.po_fixed') }})
             </small>:
@@ -22,26 +22,24 @@
             {{ \App\Helpers\CurrencyHelper::format($finalTotal) }}
         </div>
     </div>
-
     @php
         // Calculate total completed returns
         $totalReturned = $pos->purchaseReturns->where('status', 'Completed')->sum('total_amount');
         $adjustedBalance = max(0, $pos->balance - $totalReturned);
     @endphp
-
     @if($totalReturned > 0)
     <div class="d-flex justify-content-between text-warning mb-2">
-        <span>{{ __('messages.returned') }}</span>
-        <span>- {{ \App\Helpers\CurrencyHelper::format($totalReturned) }}</span>
+        <div class="fs-4">{{ __('messages.returned') }}</div>
+        <div class="fs-4">- {{ \App\Helpers\CurrencyHelper::format($totalReturned) }}</div>
     </div>
     @endif
 
-    <div class="d-flex justify-content-between text-success mb-2">
-        <span>{{ __('messages.total_paid') }}</span>
-        <span>{{ \App\Helpers\CurrencyHelper::format($pos->total_paid) }}</span>
+    <div class="d-flex justify-content-between text-success mb-1">
+        <div class="fs-4">{{ __('messages.total_paid') }}</div>
+        <div class="fs-4">{{ \App\Helpers\CurrencyHelper::format($pos->total_paid) }}</div>
     </div>
-    <div class="d-flex justify-content-between text-danger fw-bold">
-        <span>{{ __('messages.balance') }}</span>
-        <span>{{ \App\Helpers\CurrencyHelper::format($adjustedBalance) }}</span>
+    <div class="d-flex justify-content-between text-danger">
+        <div class="fs-4">{{ __('messages.balance') }}</div>
+        <div class="fs-4">{{ \App\Helpers\CurrencyHelper::format($adjustedBalance) }}</div>
     </div>
 </div>

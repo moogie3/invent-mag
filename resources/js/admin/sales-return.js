@@ -93,6 +93,32 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     } else if (pathname.includes("/admin/sales-returns")) {
         initBulkSelection();
+        
+        // Initialize search functionality for Sales Returns index page
+        const searchInput = document.getElementById("searchInput");
+        if (searchInput) {
+            searchInput.addEventListener("keyup", function () {
+                const searchTerm = searchInput.value.toLowerCase().trim();
+                const tableRows = document.querySelectorAll("#invoiceTableBody tr");
+                
+                tableRows.forEach((row) => {
+                    // Skip empty state rows
+                    if (row.querySelector('.empty-state') || row.querySelector('.empty')) {
+                        return;
+                    }
+                    
+                    // Get all text content from the row including nested elements
+                    const rowText = row.innerText.toLowerCase();
+                    
+                    // Check if any text in the row includes the search term
+                    if (rowText.includes(searchTerm)) {
+                        row.style.display = "";
+                    } else {
+                        row.style.display = "none";
+                    }
+                });
+            });
+        }
     }
 
     const salesReturnDetailModal = document.getElementById(

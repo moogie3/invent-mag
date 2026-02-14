@@ -187,6 +187,30 @@
     </div>
 </div>
 
+<!-- Purchase Return Status Warning Modal -->
+<div class="modal fade" id="prStatusWarningModal" tabindex="-1" aria-labelledby="prStatusWarningModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog modal-sm modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg rounded-3">
+            <button type="button" class="btn-close m-2" data-bs-dismiss="modal" aria-label="Close"></button>
+            <div class="modal-body text-center py-4">
+                <i class="ti ti-alert-triangle icon text-warning icon-lg mb-4" style="font-size: 3rem;"></i>
+                <h3 class="mb-3">{{ __('messages.warning') }}</h3>
+                <div class="text-secondary">
+                    <div class="text-warning text-center" id="prStatusWarningMessage">
+                        {{-- Message will be set by JavaScript --}}
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <a href="#" class="btn btn-primary w-100" data-bs-dismiss="modal">
+                    {{ __('messages.close') }}
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
 <!-- Single Delete Purchase Return Modal -->
 <div class="modal modal-blur fade" id="deleteModal" tabindex="-1" role="dialog" aria-hidden="true">
     <div class="modal-dialog modal-sm modal-dialog-centered" role="document">

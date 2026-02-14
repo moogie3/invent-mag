@@ -1,74 +1,70 @@
 <div class="page-body">
     <div class="{{ $containerClass ?? "container-xl" }}">
-        <div class="row row-deck row-cards">
-            <div class="col-md-12">
-                <div class="card card-primary">
+        <div class="row row-cards">
+            <div class="col-12">
+                <div class="card shadow-sm border-0 rounded-3">
                     @include('admin.layouts.partials.por.index.store-info')
                     @include('admin.layouts.partials.por.index.bulk-actions')
-                    <div id="invoiceTableContainer" class="position-relative">
+                    <div id="invoiceTableContainer" class="position-relative card-body border-top py-0">
                         <div class="table-responsive">
-                            <table class="table card-table table-vcenter">
+                            <table class="table table-hover align-middle">
                                 <thead style="font-size: large">
                                     <tr>
-                                        <th class="sticky-top" style="z-index: 1020;">
+                                        <th class="sticky-top bg-white fs-4 py-3" style="z-index: 1020; width: 40px;">
                                             <input type="checkbox" id="selectAll" class="form-check-input">
                                         </th>
-                                        <th class="sticky-top" style="z-index: 1020;">
-                                            <button class="table-sort fs-4 py-3" data-sort="sort-no">
-                                                {{ __('messages.no') }}
-                                            </button>
+                                        <th class="sticky-top bg-white fs-4 py-3" style="z-index: 1020; width: 60px;">
+                                            {{ __('messages.table_no') }}
                                         </th>
-                                        <th class="sticky-top" style="z-index: 1020;">
-                                            <button class="table-sort fs-4 py-3">
-                                                {{ __('messages.table_invoice') }}
-                                            </button>
+                                        <th class="sticky-top bg-white fs-4 py-3" style="z-index: 1020;">
+                                            {{ __('messages.table_invoice') }}
                                         </th>
-                                        <th class="sticky-top" style="z-index: 1020;">
-                                            <button class="table-sort fs-4 py-3">
-                                                {{ __('messages.return_date') }}
-                                            </button>
+                                        <th class="sticky-top bg-white fs-4 py-3" style="z-index: 1020;">
+                                            {{ __('messages.return_date') }}
                                         </th>
-                                        <th class="sticky-top" style="z-index: 1020;">
-                                            <button class="table-sort fs-4 py-3">
-                                                {{ __('messages.table_total') }}
-                                            </button>
+                                        <th class="sticky-top bg-white fs-4 py-3" style="z-index: 1020;">
+                                            {{ __('messages.table_total') }}
                                         </th>
-                                        <th class="sticky-top" style="z-index: 1020;">
-                                            <button class="table-sort fs-4 py-3">
-                                                {{ __('messages.status') }}
-                                            </button>
+                                        <th class="sticky-top bg-white fs-4 py-3 text-center" style="z-index: 1020;">
+                                            {{ __('messages.status') }}
                                         </th>
-                                        <th class="sticky-top fs-4 py-3 no-print"
-                                            style="width: 100px; text-align: center; z-index: 1020;">
+                                        <th class="sticky-top bg-white fs-4 py-3 no-print" style="z-index: 1020; width: 120px;">
                                             {{ __('messages.table_action') }}
                                         </th>
                                     </tr>
                                 </thead>
-                                <tbody>
+                                <tbody id="invoiceTableBody">
                                     @forelse ($returns as $return)
                                         <tr>
-                                            <td>
+                                            <td class="text-center py-3">
                                                 <input type="checkbox" name="selected_invoices[]" value="{{ $return->id }}"
                                                     class="form-check-input row-checkbox">
                                             </td>
-                                            <td>
+                                            <td class="text-center py-3">
                                                 <span class="text-muted">{{ $loop->iteration }}</span>
                                             </td>
-                                            <td>
-                                                <a href="{{ route('admin.por.show', $return) }}">
+                                            <td class="py-3">
+                                                <a href="{{ route('admin.por.show', $return) }}" class="fw-bold text-primary">
                                                     {{ $return->purchase->invoice }}
                                                 </a>
                                             </td>
-                                            <td>{{ $return->return_date->format('d-m-Y') }}</td>
-                                            <td>{{ App\Helpers\CurrencyHelper::format($return->total_amount) }}</td>
-                                            <td>
-                                                <span
-                                                    class="badge bg-{{ $return->status == 'Completed' ? 'success' : 'warning' }}-lt">
+                                            <td class="py-3">{{ $return->return_date->format('d F Y') }}</td>
+                                            <td class="fw-bold py-3">{{ App\Helpers\CurrencyHelper::format($return->total_amount) }}</td>
+                                            <td class="text-center py-3">
+                                                @php
+                                                    $statusClass = match($return->status) {
+                                                        'Completed' => 'bg-success-lt text-success',
+                                                        'Pending' => 'bg-warning-lt text-warning',
+                                                        'Canceled' => 'bg-danger-lt text-danger',
+                                                        default => 'bg-secondary-lt text-secondary'
+                                                    };
+                                                @endphp
+                                                <span class="badge {{ $statusClass }}">
                                                     {{ $return->status }}
                                                 </span>
                                             </td>
-                                            <td>
-                                                <div class="btn-list flex-nowrap justify-content-end">
+                                            <td class="text-center py-3">
+                                                <div class="btn-list flex-nowrap justify-content-center">
                                                     <button type="button" class="btn btn-icon btn-ghost-secondary view-purchase-return-btn"
                                                         data-bs-toggle="modal" data-bs-target="#purchaseReturnDetailModal"
                                                         data-pr-id="{{ $return->id }}"
@@ -91,16 +87,25 @@
                                         </tr>
                                     @empty
                                         <tr>
-                                            <td colspan="7" class="text-center">
-                                                {{ __('messages.no_purchase_returns_found') }}
+                                            <td colspan="7" class="text-center py-5">
+                                                <div class="empty-state">
+                                                    <i class="ti ti-receipt-refund fs-1 text-muted mb-3 d-block"></i>
+                                                    <h4 class="text-muted">{{ __('messages.no_purchase_returns_found') }}</h4>
+                                                    <p class="text-muted small">{{ __('messages.create_your_first_return') }}</p>
+                                                </div>
                                             </td>
                                         </tr>
                                     @endforelse
                                 </tbody>
                             </table>
                         </div>
-                        <div class="card-footer d-flex align-items-center">
-                            {{ $returns->links() }}
+                        <div class="card-footer d-flex align-items-center border-top py-3">
+                            <p class="m-0 text-secondary">
+                                {{ __('messages.pagination_showing_entries', ['first' => $returns->firstItem(), 'last' => $returns->lastItem(), 'total' => $returns->total()]) }}
+                            </p>
+                            <div class="ms-auto">
+                                {{ $returns->appends(request()->query())->links('vendor.pagination.tabler') }}
+                            </div>
                         </div>
                     </div>
                 </div>

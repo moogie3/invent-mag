@@ -90,6 +90,33 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     } else if (pathname.includes("/admin/por")) {
         initBulkSelection();
+        
+        // Initialize search functionality for POR index page
+        const searchInput = document.getElementById("searchInput");
+        if (searchInput) {
+            searchInput.addEventListener("keyup", function () {
+                const searchTerm = searchInput.value.toLowerCase().trim();
+                const tableRows = document.querySelectorAll("#invoiceTableBody tr");
+                
+                tableRows.forEach((row) => {
+                    // Skip empty state rows
+                    if (row.querySelector('.empty-state') || row.querySelector('.empty')) {
+                        return;
+                    }
+                    
+                    // Get all text content from the row including nested elements
+                    const rowText = row.innerText.toLowerCase();
+                    const searchText = searchTerm;
+                    
+                    // Check if any text in the row includes the search term
+                    if (rowText.includes(searchText)) {
+                        row.style.display = "";
+                    } else {
+                        row.style.display = "none";
+                    }
+                });
+            });
+        }
     }
 
     const purchaseReturnDetailModal = document.getElementById(

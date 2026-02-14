@@ -1,64 +1,58 @@
-<div class="card border">
-    <div class="card-body p-3">
-        <h5 class="mb-3 card-title">{{ __('messages.amount_summary') }}</h5>
-        <div class="d-flex justify-content-between mb-2">
-            <div>{{ __('messages.subtotal') }}:</div>
-            <div id="subtotal">
-                {{ \App\Helpers\CurrencyHelper::format($summary['subtotal']) }}
-            </div>
+<div class="h-100 p-4 bg-primary-lt rounded-3">
+    <h5 class="mb-3 card-title text-primary">{{ __('messages.amount_summary_title') }}</h5>
+    <div class="d-flex justify-content-between mb-2">
+        <div>{{ __('messages.subtotal') }}</div>
+        <div id="subtotal">
+            {{ \App\Helpers\CurrencyHelper::format($summary['subtotal']) }}
         </div>
-        <div class="d-flex justify-content-between mb-2">
-            <div>
-                <span>{{ __('messages.order_discount') }}:</span>
-            </div>
-            <div class="d-flex align-items-center">
-                <div class="input-group me-2" style="width: 200px;">
-                    <input type="number" name="order_discount" value="{{ (float) ($sales->order_discount ?? 0) }}"
-                        class="form-control text-end" id="discountTotalValue" step="1" min="0"
-                        style="min-width: 80px;" />
-
-                    <select name="order_discount_type" class="form-select" id="discountTotalType"
-                        style="min-width: 70px;">
-                        <option value="percentage"
-                            {{ ($sales->order_discount_type ?? '') === 'percentage' ? 'selected' : '' }}>
-                            %</option>
-                        <option value="fixed" {{ ($sales->order_discount_type ?? '') === 'fixed' ? 'selected' : '' }}>
-                            {{ __('messages.fixed') }}</option>
-                    </select>
-                </div>
-                <div class="text-danger" id="orderDiscountTotal">
-                    {{ \App\Helpers\CurrencyHelper::format($summary['orderDiscount']) }}
-                </div>
-            </div>
-        </div>
-
-        <div class="d-flex justify-content-between mb-2">
-                <div>{{ __('messages.tax') }} ({{ $sales->tax_rate ?? 0 }}%):</div>
-                <div class="text-muted" id="totalTax">
-                    {{ \App\Helpers\CurrencyHelper::format($summary['taxAmount']) }}
-                </div>
-            </div>
-
-        <hr>
-        <div class="d-flex justify-content-between align-items-center">
-            <div class="fs-5"><strong>{{ __('messages.grand_total') }}:</strong></div>
-            <div class="fs-3 fw-bold text-primary" id="finalTotal">
-                {{ \App\Helpers\CurrencyHelper::format($summary['finalTotal']) }}
-            </div>
-        </div>
-        <div class="d-flex justify-content-between text-success mb-2">
-            <span>{{ __('messages.total_paid') }}</span>
-            <span id="total-paid-amount" data-total-paid="{{ $sales->total_paid }}">{{ \App\Helpers\CurrencyHelper::format($sales->total_paid) }}</span>
-        </div>
-        <div class="d-flex justify-content-between text-danger fw-bold">
-            <span>{{ __('messages.balance') }}</span>
-            <span id="balance-amount" data-balance="{{ $sales->balance }}">{{ \App\Helpers\CurrencyHelper::format($sales->balance) }}</span>
-        </div>
-
-        <!-- Hidden inputs for form submission -->
-        <input type="hidden" id="grandTotalInput" name="total" value="{{ $summary['finalTotal'] }}">
-        <input type="hidden" id="taxInput" name="tax_amount" value="{{ $summary['taxAmount'] }}">
-        <input type="hidden" id="totalDiscountInput" name="total_discount" value="{{ $summary['orderDiscount'] }}">
-        <input type="hidden" id="taxRateInput" name="tax_rate" value="{{ $sales->tax_rate ?? 0 }}">
     </div>
+    <div class="d-flex justify-content-between mb-2">
+        <div>
+            <span>{{ __('messages.order_discount') }}</span>
+        </div>
+        <div class="d-flex align-items-center">
+            <div class="input-group me-2" style="width: 200px;">
+                <input type="number" name="order_discount" value="{{ (float) ($sales->order_discount ?? 0) }}"
+                    class="form-control text-end" id="discountTotalValue" step="1" min="0"
+                    style="min-width: 80px;" />
+
+                <select name="order_discount_type" class="form-select" id="discountTotalType"
+                    style="min-width: 70px;">
+                    <option value="percentage"
+                        {{ ($sales->order_discount_type ?? '') === 'percentage' ? 'selected' : '' }}>
+                        {{ __('messages.percentage') }}</option>
+                    <option value="fixed" {{ ($sales->order_discount_type ?? '') === 'fixed' ? 'selected' : '' }}>
+                        {{ __('messages.fixed') }}</option>
+                </select>
+            </div>
+            <div class="text-danger" id="orderDiscountTotal">
+                {{ \App\Helpers\CurrencyHelper::format($summary['orderDiscount']) }}
+            </div>
+        </div>
+    </div>
+    <div class="d-flex justify-content-between mb-2">
+        <div>{{ __('messages.tax') }} ({{ $sales->tax_rate ?? 0 }}%)</div>
+        <div class="text-muted" id="totalTax">
+            {{ \App\Helpers\CurrencyHelper::format($summary['taxAmount']) }}
+        </div>
+    </div>
+    <hr class="border-primary">
+    <div class="d-flex justify-content-between align-items-center">
+        <div class="fs-4"><strong>{{ __('messages.grand_total') }}</strong></div>
+        <div class="fs-3 fw-bold text-primary" id="finalTotal">
+            {{ \App\Helpers\CurrencyHelper::format($summary['finalTotal']) }}
+        </div>
+    </div>
+    <div class="d-flex justify-content-between text-success mb-2">
+        <span>{{ __('messages.total_paid') }}</span>
+        <span id="total-paid-amount" data-total-paid="{{ $sales->total_paid }}">{{ \App\Helpers\CurrencyHelper::format($sales->total_paid) }}</span>
+    </div>
+    <div class="d-flex justify-content-between text-danger fw-bold">
+        <span>{{ __('messages.balance') }}</span>
+        <span id="balance-amount" data-balance="{{ $sales->balance }}">{{ \App\Helpers\CurrencyHelper::format($sales->balance) }}</span>
+    </div>
+    <input type="hidden" id="grandTotalInput" name="total" value="{{ $summary['finalTotal'] }}">
+    <input type="hidden" id="taxInput" name="tax_amount" value="{{ $summary['taxAmount'] }}">
+    <input type="hidden" id="totalDiscountInput" name="total_discount" value="{{ $summary['orderDiscount'] }}">
+    <input type="hidden" id="taxRateInput" name="tax_rate" value="{{ $sales->tax_rate ?? 0 }}">
 </div>

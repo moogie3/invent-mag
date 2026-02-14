@@ -1,4 +1,4 @@
-<div class="row">
+<div class="mb-3 row">
     <div class="col-md-6">
         @include('admin.layouts.partials.sales.edit.order-summary')
     </div>

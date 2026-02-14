@@ -206,7 +206,7 @@ return [
     'po_modal_details_title' => 'Detail Pesanan Pembelian',
     'loading' => 'Memuat...',
     'po_modal_details_loading_message' => 'Memuat detail pesanan pembelian...',
-    'po_modal_details_info_message' => 'Lihat detail pesanan pembelian lengkap dan periksa kembali faktur',
+    'po_modal_details_info_message' => 'Akses Lihat Penuh untuk detail pesanan lengkap, verifikasi faktur, dan riwayat pembayaran.',
     'po_modal_details_full_view_button' => 'Lihat Penuh',
     'po_modal_details_print_button' => 'Cetak',
     'po_modal_paid_warning_message1' => 'Faktur yang sudah dibayar tidak dapat diedit.',
@@ -1343,4 +1343,8 @@ return [
     'all_warehouses' => 'Semua Gudang',
     'all_types' => 'Semua Jenis',
     'no_stock_adjustments_found_message' => 'Penyesuaian stok akan muncul di sini ketika dibuat.',
+    'payment_history' => 'Riwayat Pembayaran',
+    'add_payment' => 'Tambah Pembayaran',
+    'no_payment_history_found' => 'Tidak ada riwayat pembayaran ditemukan',
+    'back_to_po_list' => 'Kembali ke Pesanan Pembelian',
 ];

@@ -3,9 +3,12 @@
         <div class="row align-items-center">
             <div class="col">
                 <div class="page-pretitle">{{ __('messages.overview') }}</div>
-                <h2 class="page-title no-print">{{ __('messages.view_po_invoice') }}</h2>
+                <h2 class="page-title no-print fw-bold">{{ __('messages.view_po_invoice') }}</h2>
             </div>
             <div class="col text-end">
+                <a href="{{ route('admin.po') }}" class="btn btn-outline-primary d-none d-sm-inline-block me-2">
+                    <i class="ti ti-arrow-left me-1"></i> {{ __('messages.back_to_po_list') }}
+                </a>
                 <a href="{{ route('admin.po.print', $pos->id) }}" target="_blank" class="btn btn-secondary me-2">
                     <i class="ti ti-printer me-1"></i> {{ __('messages.print_invoice') }}
                 </a>

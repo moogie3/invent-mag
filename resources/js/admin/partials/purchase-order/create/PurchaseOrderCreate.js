@@ -509,6 +509,22 @@ export class PurchaseOrderCreate extends PurchaseOrderModule {
 
         this.elements.productTableBody.innerHTML = "";
 
+        if (this.products.length === 0) {
+            const row = document.createElement("tr");
+            row.innerHTML = `
+                <td colspan="9" class="text-center py-5">
+                    <div class="empty-state">
+                        <i class="ti ti-shopping-cart-off fs-1 text-muted mb-3 d-block" style="font-size: 2rem;"></i>
+                        <h4 class="text-muted">No items added yet</h4>
+                        <p class="text-muted small">Select a product above to add it to the order</p>
+                    </div>
+                </td>
+            `;
+            this.elements.productTableBody.appendChild(row);
+            this.updateTotalPrice();
+            return;
+        }
+
         this.products.forEach((product, index) => {
             const row = document.createElement("tr");
             row.innerHTML = `

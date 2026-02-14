@@ -1,3 +1,4 @@
+<!-- Delete PO Modal -->
 <div class="modal modal-blur fade" id="deleteModal" tabindex="-1" role="dialog" aria-hidden="true">
     <div class="modal-dialog modal-sm modal-dialog-centered" role="document">
         <div class="modal-content border-0 shadow-lg rounded-3">
@@ -8,9 +9,8 @@
             <div class="modal-status bg-danger"></div>
             <div class="modal-body text-center py-4">
                 <i class="ti ti-alert-triangle text-danger" style="font-size: 3rem;"></i>
-                <h3>{{ __('messages.are_you_sure') }}</h3>
-                <div class="text-muted">{{ __('messages.po_modal_delete_warning') }}
-                </div>
+                <h3 class="mt-3">{{ __('messages.are_you_sure') }}</h3>
+                <div class="text-muted">{{ __('messages.po_modal_delete_warning') }}</div>
             </div>
             <div class="modal-footer">
                 <div class="w-100">
@@ -34,6 +34,7 @@
     </div>
 </div>
 
+<!-- Bulk Delete Modal -->
 <div class="modal modal-blur fade" id="bulkDeleteModal" tabindex="-1" aria-labelledby="bulkDeleteModalLabel"
     aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
@@ -105,6 +106,7 @@
     </div>
 </div>
 
+<!-- Bulk Mark As Paid Modal -->
 <div class="modal fade" id="bulkMarkAsPaidModal" tabindex="-1" aria-labelledby="bulkMarkAsPaidModalLabel"
     aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
@@ -168,6 +170,7 @@
     </div>
 </div>
 
+<!-- View PO Modal -->
 <div class="modal modal-blur fade" id="viewPoModal" tabindex="-1" role="dialog" aria-hidden="true">
     <div class="modal-dialog modal-xl modal-dialog-centered" role="document">
         <div class="modal-content border-0 shadow-lg rounded-3">
@@ -205,13 +208,14 @@
 </div>
 
 @if (isset($isPaid) && $isPaid)
+    <!-- Paid Invoice Warning Modal -->
     <div class="modal fade" id="paidInvoiceModal" tabindex="-1" aria-labelledby="paidInvoiceModalLabel"
         aria-hidden="true">
         <div class="modal-dialog modal-sm modal-dialog-centered">
             <div class="modal-content border-0 shadow-lg rounded-3">
                 <button type="button" class="btn-close m-2" data-bs-dismiss="modal" aria-label="Close"></button>
                 <div class="modal-body text-center py-4">
-                    <i class="ti ti-alert-triangle icon text-warning icon-lg mb-4"></i>
+                    <i class="ti ti-alert-triangle icon text-warning icon-lg mb-4" style="font-size: 3rem;"></i>
                     <h3 class="mb-3">{{ __('messages.warning') }}</h3>
                     <div class="text-secondary">
                         <div class="text-warning text-center">
@@ -250,6 +254,7 @@
         });
     </script>
 @endif
+
 <!-- Expiring Soon Purchase Orders Modal -->
 <div class="modal modal-blur fade" id="expiringPurchaseModal" tabindex="-1" role="dialog" aria-hidden="true">
     <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
@@ -282,7 +287,7 @@
                 </div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary-lt"
+                <button type="button" class="btn btn-secondary"
                     data-bs-dismiss="modal">{{ __('messages.close') }}</button>
             </div>
         </div>

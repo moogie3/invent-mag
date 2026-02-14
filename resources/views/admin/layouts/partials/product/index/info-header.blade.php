@@ -31,7 +31,7 @@
                         </div>
                         <div class="flex-grow-1">
                             <div class="small text-muted">{{ __('messages.total_product') }}</div>
-                            <div class="fw-bold fs-3" id="totalProductCount">{{ $totalproduct }}</div>
+                            <div class="fw-bold fs-3 text-primary" id="totalProductCount">{{ $totalproduct }}</div>
                         </div>
                     </div>
                     <div class="d-flex align-items-center">
@@ -41,7 +41,7 @@
                         </div>
                         <div class="flex-grow-1">
                             <div class="small text-muted">{{ __('messages.total_category') }}</div>
-                            <div class="fw-bold fs-3" id="totalCategoryCount">{{ $totalcategory }}</div>
+                            <div class="fw-bold fs-3 text-success" id="totalCategoryCount">{{ $totalcategory }}</div>
                         </div>
                     </div>
                 </div>

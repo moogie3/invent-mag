@@ -206,7 +206,7 @@ return [
     'po_modal_details_title' => 'Purchase Order Details',
     'loading' => 'Loading...',
     'po_modal_details_loading_message' => 'Loading purchase order details...',
-    'po_modal_details_info_message' => 'View complete purchase order details and recheck the invoice',
+    'po_modal_details_info_message' => 'Access the Full View for complete order details, invoice verification, and payment history.',
     'po_modal_details_full_view_button' => 'Full View',
     'po_modal_details_print_button' => 'Print',
     'po_modal_paid_warning_message1' => 'Paid invoices cannot be edited.',
@@ -1387,4 +1387,8 @@ return [
     'all_types' => 'All Types',
     'no_stock_adjustments_found' => 'No stock adjustments found',
     'no_stock_adjustments_found_message' => 'Stock adjustments will appear here when they are made.',
+    'payment_history' => 'Payment History',
+    'add_payment' => 'Add Payment',
+    'no_payment_history_found' => 'No payment history found',
+    'back_to_po_list' => 'Back to Purchase Orders',
 ];

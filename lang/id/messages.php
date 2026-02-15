@@ -245,6 +245,7 @@ return [
     'pos_select_unit' => 'Pilih Satuan',
     'pos_buying_price' => 'Harga Beli',
     'pos_selling_price' => 'Harga Jual',
+    'past_price' => 'Harga Sebelumnya',
     'pos_optional_description' => 'Deskripsi opsional',
     'pos_product_image' => 'Gambar Produk',
     'pos_product_has_expiry' => 'Produk memiliki tanggal kadaluarsa',

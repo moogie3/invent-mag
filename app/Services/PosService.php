@@ -98,7 +98,7 @@ class PosService
             'tax_rate' => $taxRate,
             'total_tax' => $taxAmount,
             'total' => $grandTotal,
-            'order_discount' => $orderDiscountAmount,
+            'order_discount' => $orderDiscount,
             'order_discount_type' => $orderDiscountType,
             'status' => 'Paid',
             'payment_type' => $data['payment_method'],

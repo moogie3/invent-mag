@@ -1,12 +1,12 @@
 <div class="h-100 p-4 bg-light rounded-3">
-    <h4 class="fw-semibold mb-3 d-flex align-items-center">
+    <h4 class="card-title mb-4">
         <i class="ti ti-percentage me-2 text-primary"></i> {{ __('messages.order_discount') }}
     </h4>
     <label class="form-label fw-bold">{{ __('messages.apply_order_discount') }}</label>
     <div class="input-group mb-2">
         <input type="number" min="0" class="form-control" id="discountTotalValue" name="discount_total"
             placeholder="0" />
-        <select class="form-select" id="discountTotalType" name="discount_total_type" style="max-width: 80px;">
+        <select class="form-select" id="discountTotalType" name="discount_total_type" style="max-width: 110px;">
             <option value="fixed">{{ __('messages.sales_fixed') }}</option>
             <option value="percentage">{{ __('messages.percentage') }}</option>
         </select>
@@ -16,4 +16,6 @@
     </div>
     <small class="text-muted">{{ __('messages.discount_hint') }}</small>
     <input type="hidden" id="totalDiscountInput" name="total_discount" value="0">
+    <input type="hidden" id="orderDiscountInput" name="order_discount" value="0">
+    <input type="hidden" id="orderDiscountTypeInput" name="order_discount_type" value="fixed">
 </div>

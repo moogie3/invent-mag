@@ -35,6 +35,16 @@
                             <div class="fw-bold fs-3 text-primary">{{ $shopname }}</div>
                         </div>
                     </div>
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="me-3 d-flex align-items-center justify-content-center rounded-3 badge bg-white shadow-sm"
+                            style="width: 40px; height: 40px;">
+                            <i class="ti ti-map fs-3 text-success"></i>
+                        </div>
+                        <div class="flex-grow-1">
+                            <div class="small text-muted">{{ __('messages.store_address') }}</div>
+                            <div class="fw-bold fs-4">{{ $address }}</div>
+                        </div>
+                    </div>
                     <div class="d-flex align-items-center">
                         <div class="me-3 d-flex align-items-center justify-content-center rounded-3 badge bg-white shadow-sm"
                             style="width: 40px; height: 40px;">
@@ -50,7 +60,7 @@
         </div>
 
         <!-- Financial Overview -->
-        <div class="col-md-3">
+        <div class="col-md-6">
             <div class="card border-0 shadow-sm rounded-3 bg-azure-lt">
                 <div class="card-body py-3">
                     <div class="mb-2">
@@ -58,63 +68,105 @@
                             {{ __('messages.financial_overview') }}
                         </label>
                     </div>
-                    <div class="d-flex align-items-center mb-3">
-                        <div class="me-3 d-flex align-items-center justify-content-center rounded-3 badge bg-white shadow-sm"
-                            style="width: 40px; height: 40px;">
-                            <i class="ti ti-currency fs-3 text-primary"></i>
-                        </div>
-                        <div class="flex-grow-1">
-                            <div class="small text-muted">{{ __('messages.monthly_purchase') }}</div>
-                            <div class="fw-bold fs-3 text-primary" id="monthlyPurchase">
-                                {{ \App\Helpers\CurrencyHelper::format($totalMonthly) }}</div>
-                        </div>
-                    </div>
-                    <div class="d-flex align-items-center">
-                        <div class="me-3 d-flex align-items-center justify-content-center rounded-3 badge bg-white shadow-sm"
-                            style="width: 40px; height: 40px;">
-                            <i class="ti ti-credit-card-pay fs-3 text-success"></i>
-                        </div>
-                        <div class="flex-grow-1">
-                            <div class="small text-muted">{{ __('messages.monthly_payment') }}</div>
-                            <div class="fw-bold fs-3 text-success" id="monthlyPayment">
-                                {{ \App\Helpers\CurrencyHelper::format($paymentMonthly) }}
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <div class="d-flex align-items-center">
+                                <div class="me-3 d-flex align-items-center justify-content-center rounded-3 badge bg-white shadow-sm"
+                                    style="width: 40px; height: 40px;">
+                                    <i class="ti ti-currency fs-3 text-primary"></i>
+                                </div>
+                                <div class="flex-grow-1">
+                                    <div class="small text-muted">{{ __('messages.monthly_purchase') }}</div>
+                                    <div class="fw-bold fs-3 text-primary" id="monthlyPurchase">
+                                        {{ \App\Helpers\CurrencyHelper::format($totalMonthly) }}</div>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Expiry Status -->
-        <div class="col-md-3">
-            <div class="card border-0 shadow-sm rounded-3 bg-orange-lt">
-                <div class="card-body py-3">
-                    <div class="mb-2">
-                        <label
-                            class="form-label {{ $expiringPurchaseCount > 0 ? 'text-warning' : 'text-success' }} mb-2 d-block fw-bold">
-                            {{ __('messages.expiry_status') }}
-                        </label>
-                    </div>
-                    <div class="d-flex align-items-center">
-                        <div class="me-3 d-flex align-items-center justify-content-center rounded-3 badge bg-white shadow-sm"
-                            style="width: 48px; height: 48px;">
-                            <i
-                                class="ti ti-calendar-time fs-2 {{ $expiringPurchaseCount > 0 ? 'text-warning' : 'text-success' }}"></i>
+                        <div class="col-md-6">
+                            <div class="d-flex align-items-center">
+                                <div class="me-3 d-flex align-items-center justify-content-center rounded-3 badge bg-white shadow-sm"
+                                    style="width: 40px; height: 40px;">
+                                    <i class="ti ti-credit-card-pay fs-3 text-success"></i>
+                                </div>
+                                <div class="flex-grow-1">
+                                    <div class="small text-muted">{{ __('messages.monthly_payment') }}</div>
+                                    <div class="fw-bold fs-3 text-success" id="monthlyPayment">
+                                        {{ \App\Helpers\CurrencyHelper::format($paymentMonthly) }}
+                                    </div>
+                                </div>
+                            </div>
                         </div>
-                        <div>
-                            <div
-                                class="small {{ $expiringPurchaseCount > 0 ? 'text-warning' : 'text-success' }}">
-                                {{ __('messages.expiring_soon_purchase_orders') }}</div>
-                            <div class="h3 mb-0 {{ $expiringPurchaseCount > 0 ? 'text-warning' : 'text-success' }}"
-                                id="expiringPurchaseItemsCount">
-                                {{ $expiringPurchaseCount }}</div>
-                            @if ($expiringPurchaseCount > 0)
-                                <a href="#" class="mt-2 btn btn-sm btn-outline-warning rounded-pill"
-                                    id="viewExpiringPurchase" data-bs-toggle="modal"
-                                    data-bs-target="#expiringPurchaseModal">
-                                    {{ __('messages.view_details') }}
-                                </a>
-                            @endif
+                        <div class="col-md-6">
+                            <div class="d-flex align-items-center">
+                                <div class="me-3 d-flex align-items-center justify-content-center rounded-3 badge bg-white shadow-sm"
+                                    style="width: 40px; height: 40px;">
+                                    <i class="ti ti-arrow-down-circle fs-3 text-info"></i>
+                                </div>
+                                <div class="flex-grow-1">
+                                    <div class="small text-muted">{{ __('messages.in_count') }}</div>
+                                    <div class="fw-bold fs-3 text-info" id="inCount">{{ $inCount }}</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="d-flex align-items-center">
+                                <div class="me-3 d-flex align-items-center justify-content-center rounded-3 badge bg-white shadow-sm"
+                                    style="width: 40px; height: 40px;">
+                                    <i class="ti ti-arrow-up-circle fs-3 text-purple"></i>
+                                </div>
+                                <div class="flex-grow-1">
+                                    <div class="small text-muted">{{ __('messages.out_count') }}</div>
+                                    <div class="fw-bold fs-3 text-purple" id="outCount">{{ $outCount }}</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="d-flex align-items-center">
+                                <div class="me-3 d-flex align-items-center justify-content-center rounded-3 badge bg-white shadow-sm"
+                                    style="width: 40px; height: 40px;">
+                                    <i class="ti ti-cash fs-3 text-warning"></i>
+                                </div>
+                                <div class="flex-grow-1">
+                                    <div class="small text-muted">{{ __('messages.in_value') }}</div>
+                                    <div class="fw-bold fs-3 text-warning" id="inCountamount">
+                                        {{ \App\Helpers\CurrencyHelper::format($inCountamount) }}</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="d-flex align-items-center">
+                                <div class="me-3 d-flex align-items-center justify-content-center rounded-3 badge bg-white shadow-sm"
+                                    style="width: 40px; height: 40px;">
+                                    <i class="ti ti-cash-off fs-3 text-danger"></i>
+                                </div>
+                                <div class="flex-grow-1">
+                                    <div class="small text-muted">{{ __('messages.out_value') }}</div>
+                                    <div class="fw-bold fs-3 text-danger" id="outCountamount">
+                                        {{ \App\Helpers\CurrencyHelper::format($outCountamount) }}</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-12">
+                            <div class="d-flex align-items-center pt-2 border-top">
+                                <div class="me-3 d-flex align-items-center justify-content-center rounded-3 badge bg-white shadow-sm"
+                                    style="width: 40px; height: 40px;">
+                                    <i class="ti ti-calendar-time fs-3 text-muted"></i>
+                                </div>
+                                <div class="flex-grow-1">
+                                    <div class="small text-muted">{{ __('messages.expiring_soon_purchase_orders') }}</div>
+                                    <div class="d-flex align-items-center gap-3">
+                                        <div class="fw-bold fs-3 text-muted" id="expiringPurchaseItemsCount">
+                                            {{ $expiringPurchaseCount }}</div>
+                                        @if ($expiringPurchaseCount > 0)
+                                            <a href="#" class="btn btn-sm btn-outline-secondary rounded-pill"
+                                                id="viewExpiringPurchase" data-bs-toggle="modal"
+                                                data-bs-target="#expiringPurchaseModal">
+                                                {{ __('messages.view_details') }}
+                                            </a>
+                                        @endif
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -123,7 +175,7 @@
 
         <!-- Filters -->
         <div class="col-md-3">
-            <div class="card border-0 shadow-sm rounded-3 bg-light">
+            <div class="card border-0 shadow-sm rounded-3 bg-light h-100">
                 <div class="card-body py-3 d-flex align-items-center">
                     <div class="w-100">
                         @include('admin.layouts.partials.po.index.filters')

@@ -1,7 +1,7 @@
 <h5 class="text-muted fw-bold mt-2 mb-3">{{ __('messages.add_product_to_order') }}</h5>
 <div class="row g-3">
     <div class="col-md-3">
-        <label class="form-label fw-bold">{{ __('messages.product') }}</label>
+        <label class="form-label fw-bold">{{ __('messages.products') }}</label>
         <select class="form-select" name="product_id" id="product_id">
             <option value="">{{ __('messages.select_product') }}</option>
             @foreach ($products as $product)
@@ -26,7 +26,7 @@
         </small>
     </div>
     <div class="col-md-2">
-        <label class="form-label fw-bold">{{ __('messages.pos_selling_price') }}</label>
+        <label class="form-label fw-bold">{{ __('messages.past_price') }}</label>
         <input type="text" class="form-control bg-light" name="past_price" id="past_price"
             placeholder="{{ __('messages.autofill') }}" readonly disabled />
     </div>
@@ -37,7 +37,7 @@
     <div class="col-md-2">
         <label class="form-label fw-bold">{{ __('messages.discount') }}</label>
         <div class="input-group">
-            <input type="number" min="0" class="form-control" id="discount" placeholder="0" />
+            <input type="number" min="0" step="1" class="form-control" id="discount" placeholder="0" />
             <select class="form-select" id="discount_type" style="max-width: 70px;">
                 <option value="fixed">{{ __('messages.sales_fixed') }}</option>
                 <option value="percentage">%</option>

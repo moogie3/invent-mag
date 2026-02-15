@@ -1,5 +1,5 @@
 <div class="h-100 p-4 bg-primary-lt rounded-3">
-    <h4 class="fw-semibold mb-3 d-flex align-items-center">
+    <h4 class="card-title mb-4">
         <i class="ti ti-report me-2 text-primary"></i> {{ __('messages.po_order_summary_title') }}
     </h4>
     <div class="d-flex justify-content-between mb-2">

@@ -1,6 +1,6 @@
 <div class="mb-5 border-bottom pb-4">
     <h4 class="card-title mb-4">
-        <i class="ti ti-report-money me-2 text-primary"></i> {{ __('messages.sales_information_title') }}
+        <i class="ti ti-report-money me-2 text-primary"></i> {{ __('messages.sales_order_information_title') }}
     </h4>
     @include('admin.layouts.partials.sales.create.basic-info')
     @include('admin.layouts.partials.sales.create.product-selection')

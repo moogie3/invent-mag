@@ -220,7 +220,7 @@ class SalesService
                 'tax_rate' => $taxRate,
                 'total_tax' => $taxAmount,
                 'total' => $grandTotal,
-                'order_discount' => $orderDiscountAmount,
+                'order_discount' => $orderDiscount,
                 'order_discount_type' => $orderDiscountType,
                 'status' => 'Unpaid',
                 'payment_type' => '-',
@@ -245,8 +245,8 @@ class SalesService
                     'quantity' => $productData['quantity'],
                     'customer_price' => $productData['customer_price'],
                     'discount' => $productData['discount'] ?? 0,
-                    'discount_type' => $productData['discount_type'] ?? 'fixed',
-                    'total' => SalesHelper::calculateTotal($productData['customer_price'], $productData['quantity'], $productData['discount'] ?? 0, $productData['discount_type'] ?? 'fixed'),
+                    'discount_type' => $productData['discountType'] ?? 'fixed',
+                    'total' => SalesHelper::calculateTotal($productData['customer_price'], $productData['quantity'], $productData['discount'] ?? 0, $productData['discountType'] ?? 'fixed'),
                 ]);
 
                 // Deduct stock from specific warehouse
@@ -411,8 +411,8 @@ class SalesService
                     'quantity' => $productData['quantity'],
                     'customer_price' => $productData['customer_price'],
                     'discount' => $productData['discount'] ?? 0,
-                    'discount_type' => $productData['discount_type'] ?? 'fixed',
-                    'total' => SalesHelper::calculateTotal($productData['customer_price'], $productData['quantity'], $productData['discount'] ?? 0, $productData['discount_type'] ?? 'fixed'),
+                    'discount_type' => $productData['discountType'] ?? 'fixed',
+                    'total' => SalesHelper::calculateTotal($productData['customer_price'], $productData['quantity'], $productData['discount'] ?? 0, $productData['discountType'] ?? 'fixed'),
                 ]);
 
                 // Deduct from NEW warehouse

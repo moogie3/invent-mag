@@ -523,6 +523,22 @@ export class SalesOrderCreate extends SalesOrderModule {
     renderTable() {
         this.elements.productTableBody.innerHTML = "";
 
+        if (this.products.length === 0) {
+            const row = document.createElement("tr");
+            row.innerHTML = `
+                <td colspan="8" class="text-center py-5">
+                    <div class="empty-state">
+                        <i class="ti ti-shopping-cart-off fs-1 text-muted mb-3 d-block" style="font-size: 2rem;"></i>
+                        <h4 class="text-muted">No items added yet</h4>
+                        <p class="text-muted small">Select a product above to add it to the order</p>
+                    </div>
+                </td>
+            `;
+            this.elements.productTableBody.appendChild(row);
+            this.updateTotalPrice();
+            return;
+        }
+
         this.products.forEach((product, index) => {
             const totalStockQuantity = product.stock; // Changed from totalRemainingQuantity
             const totalOrderedForProduct = this.products
@@ -568,7 +584,7 @@ export class SalesOrderCreate extends SalesOrderModule {
                             value="${product.discount}" data-unique-id="${
                                 product.uniqueId
                             }"
-                            min="0" step="0.01" />
+                            min="0" step="1" />
                         <select class="form-select discount-type" data-unique-id="${
                             product.uniqueId
                         }">

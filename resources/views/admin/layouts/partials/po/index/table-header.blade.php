@@ -10,7 +10,7 @@
             <button class="table-sort fs-4 py-3" data-sort="sort-invoice">{{ __('messages.invoice') }}</button>
         </th>
         <th class="sticky-top " style="z-index: 1020;">
-            <button class="table-sort fs-4 py-3" data-sort="sort-warehouse">{{ __('messages.warehouse') }}</button>
+            <button class="table-sort fs-4 py-3" data-sort="sort-warehouse">{{ __('messages.warehouset') }}</button>
         </th>
         <th class="sticky-top " style="z-index: 1020;">
             <button class="table-sort fs-4 py-3" data-sort="sort-supplier">{{ __('messages.supplier') }}</button>
@@ -25,7 +25,7 @@
             <button class="table-sort fs-4 py-3" data-sort="sort-amount">{{ __('messages.amount') }}</button>
         </th>
         <th class="no-print sticky-top " style="z-index: 1020;">
-            <button class="table-sort fs-4 py-3" data-sort="sort-payment">{{ __('messages.payment_type') }}</button>
+            <button class="table-sort fs-4 py-3" data-sort="sort-payment">{{ __('messages.payment_typet') }}</button>
         </th>
         <th class="sticky-top " style="z-index: 1020;">
             <button class="table-sort fs-4 py-3" data-sort="sort-status">{{ __('messages.status') }}</button>

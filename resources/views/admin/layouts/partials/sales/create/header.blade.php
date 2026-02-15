@@ -7,7 +7,7 @@
             </div>
             <div class="col-auto ms-auto">
                 <div class="btn-list">
-                    <a href="{{ route('admin.sales.index') }}" class="btn btn-outline-primary">
+                    <a href="{{ route('admin.sales') }}" class="btn btn-outline-primary">
                         <i class="ti ti-arrow-left me-1"></i> {{ __('messages.back_to_sales') }}
                     </a>
                 </div>

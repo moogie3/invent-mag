@@ -30,7 +30,6 @@
     </div>
     <div class="col-md-2">
         <label class="form-label fw-bold">{{ __('messages.due_date') }}</label>
-        <input type="date" class="form-control bg-light" name="due_date" id="due_date" placeholder="{{ __('messages.autofill') }}"
-            readonly />
+        <input type="text" class="form-control" name="due_date" id="due_date" placeholder="{{ __('messages.autofill') }}" readonly />
     </div>
 </div>

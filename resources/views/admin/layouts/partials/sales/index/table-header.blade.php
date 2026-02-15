@@ -1,4 +1,4 @@
-<thead class="" style="font-size: large">
+<thead style="font-size: large">
     <tr>
         <th class="sticky-top " style="z-index: 1020;">
             <input type="checkbox" id="selectAll" class="form-check-input">

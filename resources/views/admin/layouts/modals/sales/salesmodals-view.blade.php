@@ -109,7 +109,7 @@
                             $summary = \App\Helpers\SalesHelper::calculateInvoiceSummary(
                                 $sales->salesItems,
                                 $sales->order_discount ?? 0,
-                                $sales->order_discount_type ?? __('messages.percentage'),
+                                $sales->order_discount_type ?? 'fixed',
                                 $sales->tax_rate ?? 0,
                             );
                         @endphp
@@ -141,7 +141,7 @@
                                 <td class="text-end">
                                     @if ($item->discount > 0)
                                         <span class="text-danger">
-                                            {{ $item->discount_type === __('messages.percentage') ? $item->discount . '%' : \App\Helpers\CurrencyHelper::formatWithPosition($item->discount) }}
+                                            {{ $item->discount_type === 'percentage' ? $item->discount . '%' : \App\Helpers\CurrencyHelper::formatWithPosition($item->discount) }}
                                         </span>
                                     @else
                                         -
@@ -194,8 +194,8 @@
                             <div>
                                 {{ __('messages.sales_order_discount') }}
                                 <small class="text-muted">
-                                    ({{ ($sales->order_discount_type ?? __('messages.fixed')) === __('messages.percentage') ? ($sales->order_discount ?? 0) . '%' : __('messages.sales_fixed') }})
-                                </small>:
+                                    ({{ ($sales->order_discount_type ?? 'fixed') === 'percentage' ? ($sales->order_discount ?? 0) . '%' : __('messages.sales_fixed') }})
+                                </small>
                             </div>
                             <div class="text-danger">-
                                 {{ \App\Helpers\CurrencyHelper::formatWithPosition($summary['orderDiscount']) }}
@@ -206,7 +206,7 @@
                                 {{ __('messages.tax') }}
                                 <small class="text-muted">
                                     ({{ $sales->tax_rate ?? 0 }}%)
-                                </small>:
+                                </small>
                             </div>
                             <div>
                                 {{ \App\Helpers\CurrencyHelper::formatWithPosition($summary['taxAmount']) }}
@@ -214,8 +214,8 @@
                         </div>
                         <hr>
                         <div class="d-flex justify-content-between align-items-center">
-                            <div class="fs-5"><strong>{{ __('messages.sales_grand_total') }}</strong></div>
-                            <div class="fs-3 fw-bold text-primary">
+                            <div><strong>{{ __('messages.sales_grand_total') }}</strong></div>
+                            <div class="fw-bold text-primary">
                                 {{ \App\Helpers\CurrencyHelper::formatWithPosition($summary['finalTotal']) }}</div>
                         </div>
                     </div>

@@ -144,7 +144,7 @@
                                 <td class="text-end">
                                     @if ($item->discount > 0)
                                         <span class="text-danger">
-                                            {{ $item->discount_type === __('messages.percentage') ? $item->discount . '%' : \App\Helpers\CurrencyHelper::formatWithPosition($item->discount) }}
+                                            {{ $item->discount_type === 'percentage' ? $item->discount . '%' : \App\Helpers\CurrencyHelper::formatWithPosition($item->discount) }}
                                         </span>
                                     @else
                                         -
@@ -201,16 +201,16 @@
                             <div>
                                 {{ __('messages.po_order_discount') }}
                                 <small class="text-muted">
-                                    ({{ $pos->discount_total_type === __('messages.percentage') ? $pos->discount_total . '%' : __('messages.po_fixed') }})
-                                </small>:
+                                    ({{ $pos->discount_total_type === 'percentage' ? $pos->discount_total . '%' : __('messages.po_fixed') }})
+                                </small>
                             </div>
                             <div class="text-danger">- {{ \App\Helpers\CurrencyHelper::formatWithPosition($orderDiscount) }}
                             </div>
                         </div>
                         <hr>
                         <div class="d-flex justify-content-between align-items-center">
-                            <div class="fs-5"><strong>{{ __('messages.po_grand_total') }}</strong></div>
-                            <div class="fs-3 fw-bold text-primary">
+                            <div><strong>{{ __('messages.po_grand_total') }}</strong></div>
+                            <div class="fw-bold text-primary">
                                 {{ \App\Helpers\CurrencyHelper::formatWithPosition($finalTotal) }}</div>
                         </div>
                     </div>

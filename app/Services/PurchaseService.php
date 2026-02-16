@@ -165,7 +165,7 @@ class PurchaseService
 
             $totalAmount = 0;
             foreach ($products as $productData) {
-                $itemTotal = PurchaseHelper::calculateTotal($productData['price'], $productData['quantity'], $productData['discount'] ?? 0, $productData['discount_type'] ?? 'fixed');
+                $itemTotal = PurchaseHelper::calculateTotal($productData['price'], $productData['quantity'], $productData['discount'] ?? 0, $productData['discountType'] ?? 'fixed');
                 POItem::create([
                     'po_id' => $purchase->id,
                     'product_id' => $productData['product_id'],
@@ -173,7 +173,7 @@ class PurchaseService
                     'remaining_quantity' => $productData['quantity'],
                     'price' => $productData['price'],
                     'discount' => $productData['discount'] ?? 0,
-                    'discount_type' => $productData['discount_type'] ?? 'fixed',
+                    'discount_type' => $productData['discountType'] ?? 'fixed',
                     'total' => $itemTotal,
                     'expiry_date' => !empty($productData['expiry_date']) ? $productData['expiry_date'] : null,
                 ]);
@@ -267,7 +267,7 @@ class PurchaseService
 
             $totalAmount = 0;
             foreach ($products as $productData) {
-                $itemTotal = PurchaseHelper::calculateTotal($productData['price'], $productData['quantity'], $productData['discount'] ?? 0, $productData['discount_type'] ?? 'fixed');
+                $itemTotal = PurchaseHelper::calculateTotal($productData['price'], $productData['quantity'], $productData['discount'] ?? 0, $productData['discountType'] ?? 'fixed');
                 POItem::create([
                     'po_id' => $purchase->id,
                     'product_id' => $productData['product_id'],
@@ -275,7 +275,7 @@ class PurchaseService
                     'remaining_quantity' => $productData['quantity'],
                     'price' => $productData['price'],
                     'discount' => $productData['discount'] ?? 0,
-                    'discount_type' => $productData['discount_type'] ?? 'fixed',
+                    'discount_type' => $productData['discountType'] ?? 'fixed',
                     'total' => $itemTotal,
                     'expiry_date' => !empty($productData['expiry_date']) ? $productData['expiry_date'] : null,
                 ]);

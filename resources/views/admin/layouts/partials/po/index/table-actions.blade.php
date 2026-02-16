@@ -5,7 +5,7 @@
     <div class="dropdown-menu">
         <a href="javascript:void(0)" onclick="loadPoDetails('{{ $po->id }}')" data-bs-toggle="modal"
             data-bs-target="#viewPoModal" class="dropdown-item">
-            <i class="ti ti-zoom-scan me-2"></i> {{ __('messages.view') }}
+            <i class="ti ti-zoom-scan me-2"></i> {{ __('messages.view_details') }}
         </a>
         <a href="{{ route('admin.po.edit', $po->id) }}" class="dropdown-item">
             <i class="ti ti-edit me-2"></i> {{ __('messages.edit') }}

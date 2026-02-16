@@ -33,7 +33,7 @@
                     <div class="card-body p-3">
                         <h4 class="card-title mb-3"><i class="ti ti-building-store me-2 text-info"></i>{{ __('messages.supplier_title') }}
                         </h4>
-                        <h5 class="mb-2">{{ $pos->supplier->name }}</h5>
+                        <div class="mb-2 fw-bold">{{ $pos->supplier->name }}</div>
                         <div class="text-muted mb-1"><i class="ti ti-map-pin me-1"></i>
                             {{ $pos->supplier->address }}
                         </div>
@@ -58,7 +58,7 @@
                         </div>
                         <div class="d-flex justify-content-between mb-2">
                             <div><strong>{{ __('messages.po_payment_type') }}</strong></div>
-                            <div>{{ $pos->payment_type }}</div>
+                            <div>{{ $pos->payment_type ?? __('messages.not_available') }}</div>
                         </div>
                         @if ($pos->status === 'Paid' && $pos->payments->isNotEmpty())
                             <div class="d-flex justify-content-between mb-2">
@@ -149,10 +149,10 @@
                                     @else
                                         -
                                     @endif
-                        </td>
-                        <td class="text-end">
-                            {{ \App\Helpers\CurrencyHelper::formatWithPosition($finalAmount) }}
-                        </td>
+                                </td>
+                                <td class="text-end">
+                                    {{ \App\Helpers\CurrencyHelper::formatWithPosition($finalAmount) }}
+                                </td>
                                 <td class="text-center">
                                     @if ($item->expiry_date)
                                         {{ \Carbon\Carbon::parse($item->expiry_date)->format('d M Y') }}

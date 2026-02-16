@@ -3,15 +3,15 @@
         <i class="ti ti-calendar-event me-2 text-muted"></i>{{ __('messages.order_information') }}
     </h5>
     <div class="d-flex justify-content-between mb-2">
-        <div><strong>{{ __('messages.order_date') }}:</strong></div>
+        <div><strong>{{ __('messages.order_date') }}</strong></div>
         <div>{{ $sales->order_date->format('d F Y') }}</div>
     </div>
     <div class="d-flex justify-content-between mb-2">
-        <div><strong>{{ __('messages.due_date') }}:</strong></div>
+        <div><strong>{{ __('messages.due_date') }}</strong></div>
         <div>{{ $sales->due_date->format('d F Y') }}</div>
     </div>
     <div class="d-flex justify-content-between mb-2">
-        <div><strong>{{ __('messages.payment_type') }}:</strong></div>
+        <div><strong>{{ __('messages.payment_type') }}</strong></div>
         <div>{{ $sales->payment_type ?? __('messages.not_available') }}</div>
     </div>
     @if ($sales->status === 'Paid' && $sales->payments->isNotEmpty())

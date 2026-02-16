@@ -35,7 +35,7 @@
                         <h4 class="card-title mb-3"><i
                                 class="ti ti-user me-2 text-info"></i>{{ __('messages.model_customer') }}
                         </h4>
-                        <h5 class="mb-2">{{ $sales->customer->name }}</h5>
+                        <div class="mb-2 fw-bold">{{ $sales->customer->name }}</div>
                         <div class="text-muted mb-1"><i class="ti ti-map-pin me-1"></i>
                             {{ $sales->customer->address }}
                         </div>
@@ -166,12 +166,10 @@
                                 class="ti ti-info-circle me-2 text-info"></i>{{ __('messages.sales_order_summary_title') }}
                         </h5>
                         <div class="mb-2">
-                            <i class="ti ti-package me-1"></i> {{ __('messages.sales_total_items') }}
-                            <strong>{{ $summary['itemCount'] }}</strong>
+                            <i class="ti ti-package me-1"></i> {{ __('messages.sales_total_items') }} <strong>{{ $summary['itemCount'] }}</strong>
                         </div>
                         <div class="mb-2">
-                            <i class="ti ti-receipt me-1"></i> {{ __('messages.sales_payment_type') }}
-                            <strong>{{ $sales->payment_type ?? __('messages.not_available') }}</strong>
+                            <i class="ti ti-receipt me-1"></i> {{ __('messages.sales_payment_type') }} <strong>{{ $sales->payment_type ?? __('messages.not_available') }}</strong>
                         </div>
                         @if (property_exists($sales, 'notes') && $sales->notes)
                             <div class="mt-3">

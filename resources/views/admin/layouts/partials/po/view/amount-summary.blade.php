@@ -9,7 +9,7 @@
             {{ __('messages.po_order_discount') }}
             <small class="text-muted">
                 ({{ $pos->discount_total_type === 'percentage' ? $pos->discount_total . '%' : __('messages.po_fixed') }})
-            </small>:
+            </small>
         </div>
         <div class="text-danger">-
             {{ \App\Helpers\CurrencyHelper::format($orderDiscount) }}

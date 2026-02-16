@@ -194,7 +194,7 @@ class SalesService
                     $product['customer_price'], 
                     $product['quantity'], 
                     $product['discount'] ?? 0, 
-                    $product['discount_type'] ?? 'fixed'
+                    $product['discountType'] ?? 'fixed'
                 );
             }
 
@@ -371,7 +371,7 @@ class SalesService
             $subTotal = 0;
             $subtotalBeforeDiscounts = 0;
             foreach ($products as $productData) {
-                $subTotal += SalesHelper::calculateTotal($productData['customer_price'], $productData['quantity'], $productData['discount'] ?? 0, $productData['discount_type'] ?? 'fixed');
+                $subTotal += SalesHelper::calculateTotal($productData['customer_price'], $productData['quantity'], $productData['discount'] ?? 0, $productData['discountType'] ?? 'fixed');
                 $subtotalBeforeDiscounts += $productData['customer_price'] * $productData['quantity'];
             }
 

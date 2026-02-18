@@ -391,13 +391,13 @@ function renderAdjustmentLog(logData) {
             <table class="table table-vcenter card-table">
                 <thead>
                     <tr>
-                        <th>Date</th>
-                        <th>Type</th>
-                        <th>Qty Before</th>
-                        <th>Qty After</th>
-                        <th>Change</th>
-                        <th>Reason</th>
-                        <th>Adjusted By</th>
+                        <th class="fs-4 fw-bold">Date</th>
+                        <th class="fs-4 fw-bold">Type</th>
+                        <th class="fs-4 fw-bold">Qty Before</th>
+                        <th class="fs-4 fw-bold">Qty After</th>
+                        <th class="fs-4 fw-bold">Change</th>
+                        <th class="fs-4 fw-bold">Reason</th>
+                        <th class="fs-4 fw-bold">Adjusted By</th>
                     </tr>
                 </thead>
                 <tbody>

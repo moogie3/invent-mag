@@ -257,7 +257,7 @@
 
 <!-- Expiring Soon Purchase Orders Modal -->
 <div class="modal modal-blur fade" id="expiringPurchaseModal" tabindex="-1" role="dialog" aria-hidden="true">
-    <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+    <div class="modal-dialog modal-xl modal-dialog-centered" role="document">
         <div class="modal-content border-0 shadow-lg rounded-3">
             <div class="modal-header bg-warning text-white">
                 <h4 class="modal-title"><i
@@ -270,11 +270,11 @@
                     <table class="table card-table table-vcenter">
                         <thead>
                             <tr>
-                                <th>{{ __('messages.table_invoice') }}</th>
-                                <th>{{ __('messages.supplier_title') }}</th>
-                                <th class="text-center">{{ __('messages.po_due_date') }}</th>
-                                <th class="text-end">{{ __('messages.table_total') }}</th>
-                                <th class="text-end">{{ __('messages.table_action') }}</th>
+                                <th class="fs-4 fw-bold">{{ __('messages.table_invoice') }}</th>
+                                <th class="fs-4 fw-bold">{{ __('messages.supplier_title') }}</th>
+                                <th class="text-center fs-4 fw-bold">{{ __('messages.po_due_date') }}</th>
+                                <th class="text-end fs-4 fw-bold">{{ __('messages.table_total') }}</th>
+                                <th class="text-end fs-4 fw-bold">{{ __('messages.table_action') }}</th>
                             </tr>
                         </thead>
                         <tbody id="expiringPurchaseTableBody">

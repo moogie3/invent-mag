@@ -26,8 +26,8 @@
                     </div>
                     <div class="d-flex align-items-center mb-3">
                         <div class="me-3 d-flex align-items-center justify-content-center rounded-3 badge bg-white shadow-sm"
-                            style="width: 40px; height: 40px;">
-                            <i class="ti ti-box fs-3 text-primary"></i>
+                            style="width: 48px; height: 48px;">
+                            <i class="ti ti-box fs-2 text-primary"></i>
                         </div>
                         <div class="flex-grow-1">
                             <div class="small text-muted">{{ __('messages.total_product') }}</div>
@@ -36,8 +36,8 @@
                     </div>
                     <div class="d-flex align-items-center">
                         <div class="me-3 d-flex align-items-center justify-content-center rounded-3 badge bg-white shadow-sm"
-                            style="width: 40px; height: 40px;">
-                            <i class="ti ti-category fs-3 text-success"></i>
+                            style="width: 48px; height: 48px;">
+                            <i class="ti ti-category fs-2 text-success"></i>
                         </div>
                         <div class="flex-grow-1">
                             <div class="small text-muted">{{ __('messages.total_category') }}</div>

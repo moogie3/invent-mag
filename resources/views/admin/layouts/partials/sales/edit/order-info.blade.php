@@ -6,7 +6,7 @@
         <div class="col-md-6">
             <div class="mb-2">
                 <label class="form-label fw-bold">{{ __('messages.sales_invoice') }}</label>
-                <input type="text" class="form-control" name="invoice" value="{{ $sales->invoice }}" required>
+                <input type="text" class="form-control" name="invoice" value="{{ $sales->invoice }}" readonly style="background-color: #f8f9fa;">
             </div>
             <div class="mb-2">
                 <label class="form-label fw-bold">{{ __('messages.order_date') }}</label>

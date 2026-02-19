@@ -73,25 +73,25 @@
                         </div>
                         <div class="col-6">
                             <div class="d-flex align-items-center">
-                                <div class="me-2 d-flex align-items-center justify-content-center rounded-3 badge bg-white shadow-sm"
-                                    style="width: 32px; height: 32px;">
-                                    <i class="ti ti-clock fs-4 text-warning"></i>
+                                <div class="me-3 d-flex align-items-center justify-content-center rounded-3 badge bg-white shadow-sm"
+                                    style="width: 40px; height: 40px;">
+                                    <i class="ti ti-clock fs-3 text-warning"></i>
                                 </div>
                                 <div>
                                     <div class="small text-muted">{{ __('messages.pending') }}</div>
-                                    <div class="fw-bold fs-5 text-warning">{{ $pending_count }}</div>
+                                    <div class="fw-bold fs-4 text-warning">{{ $pending_count }}</div>
                                 </div>
                             </div>
                         </div>
                         <div class="col-6">
                             <div class="d-flex align-items-center">
-                                <div class="me-2 d-flex align-items-center justify-content-center rounded-3 badge bg-white shadow-sm"
-                                    style="width: 32px; height: 32px;">
-                                    <i class="ti ti-circle-x fs-4 text-danger"></i>
+                                <div class="me-3 d-flex align-items-center justify-content-center rounded-3 badge bg-white shadow-sm"
+                                    style="width: 40px; height: 40px;">
+                                    <i class="ti ti-circle-x fs-3 text-danger"></i>
                                 </div>
                                 <div>
                                     <div class="small text-muted">{{ __('messages.canceled') }}</div>
-                                    <div class="fw-bold fs-5 text-danger">{{ $canceled_count }}</div>
+                                    <div class="fw-bold fs-4 text-danger">{{ $canceled_count }}</div>
                                 </div>
                             </div>
                         </div>
@@ -111,12 +111,12 @@
                     </div>
                     <div class="d-flex align-items-center">
                         <div class="me-3 d-flex align-items-center justify-content-center rounded-3 badge bg-white shadow-sm"
-                            style="width: 48px; height: 48px;">
-                            <i class="ti ti-file-invoice fs-2 text-orange"></i>
+                            style="width: 40px; height: 40px;">
+                            <i class="ti ti-file-invoice fs-3 text-orange"></i>
                         </div>
                         <div>
                             <div class="text-orange small">{{ __('messages.linked_po_returns') }}</div>
-                            <div class="h3 mb-0 text-orange">{{ $total_returns }}</div>
+                            <div class="fw-bold fs-4 text-orange">{{ $total_returns }}</div>
                         </div>
                     </div>
                 </div>

@@ -2,7 +2,7 @@
     <div class="{{ $containerClass ?? "container-xl" }}">
         <div class="row align-items-center">
             <div class="col">
-                <div class="page-pretitle">{{ __('messages.warehouse_overview') }}</div>
+                <div class="page-pretitle">{{ __('messages.overview') }}</div>
                 <h2 class="page-title"><i class="ti ti-building-warehouse me-2"></i>{{ __('messages.warehouse_title') }}
                 </h2>
             </div>

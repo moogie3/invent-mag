@@ -152,15 +152,12 @@
                         <div class="row">
                             <div class="col-md-6 ms-auto">
                                 <div class="h-100 p-4 bg-primary-lt rounded-3">
-                                    <div class="d-flex justify-content-between align-items-center">
-                                        <div>
-                                            <h4 class="fw-semibold mb-1">{{ __('messages.pr_total_return_amount') }}</h4>
+                                    <div class="d-flex justify-content-end">
+                                        <div class="text-end">
+                                            <div class="fs-5"><strong>{{ __('messages.pr_total_return_amount') }}</strong></div>
                                             <div class="fs-3 fw-bold text-primary">
                                                 {{ \App\Helpers\CurrencyHelper::formatWithPosition($por->total_amount) }}
                                             </div>
-                                        </div>
-                                        <div class="bg-white rounded-3 p-3 shadow-sm">
-                                            <i class="ti ti-receipt-refund fs-1 text-primary"></i>
                                         </div>
                                     </div>
                                 </div>

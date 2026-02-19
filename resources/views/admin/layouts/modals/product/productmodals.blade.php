@@ -131,7 +131,7 @@
                     <table class="table card-table table-vcenter">
                         <thead>
                             <tr>
-                                <th class="fs-4 fw-bold">{{ __('messages.name') }}</th>
+                                <th class="fs-4 fw-bold">{{ __('messages.product_name') }}</th>
                                 <th class="text-center fs-4 fw-bold">{{ __('messages.product_current_stock') }}</th>
                                 <th class="text-center fs-4 fw-bold">{{ __('messages.threshold') }}</th>
                                 <th class="text-end fs-4 fw-bold">{{ __('messages.action') }}</th>

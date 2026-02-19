@@ -158,7 +158,7 @@
 
         <!-- Filters -->
         <div class="col-md-3">
-            <div class="card border-0 shadow-sm rounded-3 bg-light h-100">
+            <div class="card border-0 shadow-sm rounded-3 bg-light">
                 <div class="card-body py-3 d-flex align-items-center">
                     <div class="w-100">
                         @include('admin.layouts.partials.sales.index.filters')

@@ -122,6 +122,14 @@ class JournalEntry extends Model
     }
 
     /**
+     * Check if this entry has dependent entries (reversals).
+     */
+    public function hasDependentEntries(): bool
+    {
+        return $this->reversingEntry()->exists();
+    }
+
+    /**
      * Check if this entry can be voided.
      */
     public function canBeVoided(): bool

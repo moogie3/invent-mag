@@ -65,65 +65,83 @@ class SalesReturnService
                 throw new \Exception('No items selected for return.');
             }
 
-            $totalAmount = array_reduce($items, function ($carry, $item) {
-                return $carry + ($item['return_price'] * $item['returned_quantity']);
-            }, 0);
+            $returnedItems = array_filter($items, function($item) {
+                return isset($item['returned_quantity']) && $item['returned_quantity'] > 0;
+            });
+
+            if (empty($returnedItems)) {
+                throw new \Exception('No items selected for return.');
+            }
+
+            $totalAmount = 0;
+            foreach ($returnedItems as $item) {
+                $totalAmount += ($item['price'] ?? 0) * $item['returned_quantity'];
+            }
 
             $salesReturn = SalesReturn::create([
                 'sales_id' => $data['sales_id'],
                 'return_date' => $data['return_date'],
-                'reason' => $data['reason'],
+                'reason' => $data['reason'] ?? null,
                 'status' => $data['status'],
                 'total_amount' => $totalAmount,
                 'user_id' => Auth::id(),
             ]);
 
-            foreach ($items as $itemData) {
-                if ($itemData['returned_quantity'] > 0) {
-                    SalesReturnItem::create([
-                        'sales_return_id' => $salesReturn->id,
-                        'product_id' => $itemData['product_id'],
-                        'quantity' => $itemData['returned_quantity'],
-                        'price' => $itemData['return_price'],
-                        'total' => $itemData['return_price'] * $itemData['returned_quantity'],
-                    ]);
+            foreach ($returnedItems as $itemData) {
+                $price = $itemData['price'] ?? 0;
+                $returnedQuantity = $itemData['returned_quantity'];
+                
+                SalesReturnItem::create([
+                    'sales_return_id' => $salesReturn->id,
+                    'product_id' => $itemData['product_id'],
+                    'quantity' => $returnedQuantity,
+                    'price' => $price,
+                    'total' => $price * $returnedQuantity,
+                ]);
 
-                    $product = Product::find($itemData['product_id']);
-                    if ($product) {
-                        $sale = Sales::find($data['sales_id']);
-                        $warehouseId = $sale->warehouse_id ?? Product::getMainWarehouseId();
-                        
-                        $stockRecord = ProductWarehouse::firstOrCreate(
-                            ['product_id' => $product->id, 'warehouse_id' => $warehouseId, 'tenant_id' => $product->tenant_id],
-                            ['quantity' => 0]
-                        );
-                        $stockRecord->increment('quantity', $itemData['returned_quantity']);
-                    }
+                $product = Product::find($itemData['product_id']);
+                if ($product) {
+                    $sale = Sales::find($data['sales_id']);
+                    $warehouseId = $sale->warehouse_id ?? Product::getMainWarehouseId();
+                    
+                    $stockRecord = ProductWarehouse::firstOrCreate(
+                        ['product_id' => $product->id, 'warehouse_id' => $warehouseId, 'tenant_id' => $product->tenant_id],
+                        ['quantity' => 0]
+                    );
+                    $stockRecord->increment('quantity', $returnedQuantity);
                 }
             }
 
             $sale = Sales::find($data['sales_id']);
             $totalOriginalQuantitySold = $sale->salesItems()->sum('quantity');
-            $totalQuantityReturnedSoFar = $sale->salesReturns->flatMap(function ($sr) {
+            $totalQuantityReturnedSoFar = $sale->salesReturns()->with('items')->get()->flatMap(function ($sr) {
                 return $sr->items;
             })->sum('quantity');
 
             if ($totalQuantityReturnedSoFar >= $totalOriginalQuantitySold) {
-                $sale->status = 'Returned';
+                $sale->update(['status' => 'Returned']);
             } elseif ($totalQuantityReturnedSoFar > 0) {
-                $sale->status = 'Partial';
-            } else {
-                // Do nothing, leave the status as is
+                $sale->update(['status' => 'Partial']);
             }
-            $sale->save();
 
-            // Create journal entry for sales return
+            $accountingSettings = Auth::user()->accounting_settings;
+            if (!$accountingSettings || !isset($accountingSettings['inventory_account_id']) || !isset($accountingSettings['accounts_receivable_account_id'])) {
+                throw new \Exception('Accounting settings for inventory or accounts receivable are not configured.');
+            }
+
+            $inventoryAccount = Account::find($accountingSettings['inventory_account_id']);
+            $accountsReceivableAccount = Account::find($accountingSettings['accounts_receivable_account_id']);
+
+            if (!$inventoryAccount || !$accountsReceivableAccount) {
+                throw new \Exception('Required accounts (Inventory, AR) not found for Sales Return. Please check Accounting Settings.');
+            }
+
             $this->accountingService->createJournalEntry(
-                'Sales return recorded',
+                "Sales Return for SO #{$sale->invoice}",
                 Carbon::parse($salesReturn->return_date),
                 [
-                    ['account_name' => 'Sales Returns', 'type' => 'debit', 'amount' => $totalAmount],
-                    ['account_name' => 'Accounts Receivable', 'type' => 'credit', 'amount' => $totalAmount],
+                    ['account_name' => $accountsReceivableAccount->name, 'type' => 'credit', 'amount' => $totalAmount],
+                    ['account_name' => $inventoryAccount->name, 'type' => 'debit', 'amount' => $totalAmount],
                 ],
                 $salesReturn
             );

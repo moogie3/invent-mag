@@ -752,52 +752,63 @@ class SalesService
                 throw new \Exception('Invalid items data');
             }
 
+            $returnedItems = array_filter($items, function($item) {
+                return isset($item['returned_quantity']) && $item['returned_quantity'] > 0;
+            });
+
+            if (empty($returnedItems)) {
+                throw new \Exception('No items selected for return.');
+            }
+
             $totalReturnAmount = 0;
-            foreach ($items as $itemData) {
-                $totalReturnAmount += $itemData['price'] * $itemData['quantity'];
+            foreach ($returnedItems as $itemData) {
+                $totalReturnAmount += ($itemData['price'] ?? 0) * $itemData['returned_quantity'];
             }
 
             $salesReturn = SalesReturn::create([
                 'sales_id' => $sale->id,
                 'user_id' => Auth::id(),
                 'return_date' => $data['return_date'],
-                'reason' => $data['reason'],
+                'reason' => $data['reason'] ?? null,
                 'total_amount' => $totalReturnAmount,
                 'status' => $data['status'],
             ]);
 
-            foreach ($items as $itemData) {
+            foreach ($returnedItems as $itemData) {
+                $returnedQuantity = $itemData['returned_quantity'];
+                $price = $itemData['price'] ?? 0;
+
                 SalesReturnItem::create([
                     'sales_return_id' => $salesReturn->id,
                     'product_id' => $itemData['product_id'],
-                    'quantity' => $itemData['quantity'],
-                    'price' => $itemData['price'],
-                    'total' => $itemData['price'] * $itemData['quantity'],
+                    'quantity' => $returnedQuantity,
+                    'price' => $price,
+                    'total' => $price * $returnedQuantity,
                 ]);
 
-                $product = Product::where('id', $itemData['product_id'])
-                                  ->where('tenant_id', $sale->tenant_id)
-                                  ->first();
+                $product = Product::find($itemData['product_id']);
                 if ($product) {
-                    // Increment stock in the first available warehouse
-                    $stockRecord = ProductWarehouse::where('product_id', $product->id)->first();
-                    if ($stockRecord) {
-                        $stockRecord->increment('quantity', $itemData['quantity']);
-                    }
+                    $warehouseId = $sale->warehouse_id ?? Product::getMainWarehouseId();
+                    
+                    $stockRecord = ProductWarehouse::firstOrCreate(
+                        ['product_id' => $product->id, 'warehouse_id' => $warehouseId, 'tenant_id' => $product->tenant_id],
+                        ['quantity' => 0]
+                    );
+                    $stockRecord->increment('quantity', $returnedQuantity);
                 }
             }
 
-            // Update original sales status
-            $totalSoldQuantity = $sale->salesItems->sum('quantity');
-            $totalReturnedQuantity = $sale->salesReturns->flatMap->items->sum('quantity');
+            $totalSoldQuantity = $sale->salesItems()->sum('quantity');
+            $totalReturnedQuantity = $sale->salesReturns()->with('items')->get()->flatMap(function($sr) {
+                return $sr->items;
+            })->sum('quantity');
 
             if ($totalReturnedQuantity >= $totalSoldQuantity) {
                 $sale->update(['status' => 'Returned']);
-            } else {
+            } elseif ($totalReturnedQuantity > 0) {
                 $sale->update(['status' => 'Partial']);
             }
 
-            // Create Journal Entry for the return
             $accountingSettings = Auth::user()->accounting_settings;
             if (!$accountingSettings || !isset($accountingSettings['inventory_account_id']) || !isset($accountingSettings['accounts_receivable_account_id'])) {
                 throw new \Exception('Accounting settings for inventory or accounts receivable are not configured.');
@@ -812,48 +823,6 @@ class SalesService
 
             $inventoryAccountName = $inventoryAccount->name;
             $accountsReceivableAccountName = $accountsReceivableAccount->name;
-
-            // Create Sales Return
-            $salesReturn = SalesReturn::create([
-                'sales_id' => $sale->id,
-                'user_id' => Auth::id(),
-                'return_date' => $data['return_date'],
-                'reason' => $data['reason'],
-                'total_amount' => $totalReturnAmount,
-                'status' => $data['status'],
-            ]);
-
-            foreach ($items as $itemData) {
-                SalesReturnItem::create([
-                    'sales_return_id' => $salesReturn->id,
-                    'product_id' => $itemData['product_id'],
-                    'quantity' => $itemData['quantity'],
-                    'price' => $itemData['price'],
-                    'total' => $itemData['price'] * $itemData['quantity'],
-                ]);
-
-                // Increment stock in the original warehouse
-                $stockRecord = \App\Models\ProductWarehouse::firstOrCreate(
-                    [
-                        'product_id' => $itemData['product_id'],
-                        'warehouse_id' => $sale->warehouse_id,
-                        'tenant_id' => $sale->tenant_id
-                    ],
-                    ['quantity' => 0]
-                );
-                
-                $stockRecord->increment('quantity', $itemData['quantity']);
-            }
-
-            // Update original sales status
-            $totalSoldQuantity = $sale->salesItems->sum('quantity');
-            $totalReturnedQuantity = $sale->salesReturns->flatMap->items->sum('quantity');
-
-            if ($totalReturnedQuantity >= $totalSoldQuantity) {
-                $sale->update(['status' => 'Returned']);
-            } else {
-                $sale->update(['status' => 'Partial']);
-            }
 
             $transactions = [
                 ['account_name' => $accountsReceivableAccountName, 'type' => 'credit', 'amount' => $totalReturnAmount],

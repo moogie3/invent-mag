@@ -19,6 +19,9 @@
                                     <div class="col-lg-6">
                                         <label class="form-label fw-bold">{{ __('messages.sales_invoice') }}</label>
                                         <input type="hidden" name="sales_id" value="{{ $salesReturn->sales_id }}">
+                                        <select id="sales-select" class="d-none">
+                                            <option value="{{ $salesReturn->sales_id }}" selected>{{ $salesReturn->sale->invoice }}</option>
+                                        </select>
                                         <div class="form-control-plaintext fw-bold">
                                             <a href="{{ route('admin.sales.view', $salesReturn->sales_id) }}" class="text-primary">
                                                 {{ $salesReturn->sale->invoice }}
@@ -69,7 +72,7 @@
                             <div class="row mb-5">
                                 <div class="col-md-6">
                                     <div class="h-100 p-4 bg-light rounded-3">
-                                        <h4 class="fw-semibold mb-3 d-flex align-items-center">
+                                        <h4 class="card-title mb-4">
                                             <i class="ti ti-report me-2 text-primary"></i> {{ __('messages.sr_return_summary_title') }}
                                         </h4>
                                         <div class="mb-3">

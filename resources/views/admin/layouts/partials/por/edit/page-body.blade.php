@@ -19,6 +19,9 @@
                                     <div class="col-lg-6">
                                         <label class="form-label fw-bold">{{ __('messages.purchase_invoice') }}</label>
                                         <input type="hidden" name="purchase_id" value="{{ $por->purchase_id }}">
+                                        <select id="purchase-select" class="d-none">
+                                            <option value="{{ $por->purchase_id }}" selected>{{ $por->purchase->invoice }}</option>
+                                        </select>
                                         <div class="form-control-plaintext fw-bold">
                                             <a href="{{ route('admin.po.view', $por->purchase_id) }}" class="text-primary">
                                                 {{ $por->purchase->invoice }}
@@ -69,7 +72,7 @@
                             <div class="row mb-5">
                                 <div class="col-md-6">
                                     <div class="h-100 p-4 bg-light rounded-3">
-                                        <h4 class="fw-semibold mb-3 d-flex align-items-center">
+                                        <h4 class="card-title mb-4">
                                             <i class="ti ti-report me-2 text-primary"></i> {{ __('messages.pr_return_summary_title') }}
                                         </h4>
                                         <div class="mb-3">

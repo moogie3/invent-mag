@@ -76,7 +76,7 @@
                             <div class="row mb-5">
                                 <div class="col-md-6">
                                     <div class="h-100 p-4 bg-light rounded-3">
-                                        <h4 class="fw-semibold mb-3 d-flex align-items-center">
+                                        <h4 class="card-title mb-4">
                                             <i class="ti ti-report me-2 text-primary"></i> {{ __('messages.sr_return_summary_title') }}
                                         </h4>
                                         <div class="mb-3">

@@ -154,7 +154,12 @@
                     </div>
                     @if ($adjustments->hasPages())
                         <div class="card-footer d-flex align-items-center">
-                            {{ $adjustments->links() }}
+                            <p class="m-0 text-secondary">
+                                {{ __('messages.pagination_showing_entries', ['first' => $adjustments->firstItem(), 'last' => $adjustments->lastItem(), 'total' => $adjustments->total()]) }}
+                            </p>
+                            <div class="ms-auto">
+                                {{ $adjustments->appends(request()->query())->links('vendor.pagination.tabler') }}
+                            </div>
                         </div>
                     @endif
                 </div>

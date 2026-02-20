@@ -127,7 +127,12 @@
                             </table>
                         </div>
                         <div class="card-footer d-flex align-items-center">
-                            {{ $entries->links() }}
+                            <p class="m-0 text-secondary">
+                                {{ __('messages.pagination_showing_entries', ['first' => $entries->firstItem(), 'last' => $entries->lastItem(), 'total' => $entries->total()]) }}
+                            </p>
+                            <div class="ms-auto">
+                                {{ $entries->appends(request()->query())->links('vendor.pagination.tabler') }}
+                            </div>
                         </div>
                     @endif
                 </div>

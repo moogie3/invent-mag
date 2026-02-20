@@ -139,7 +139,7 @@ export class SalesReturnCreate {
         if (quantity > 0) {
             this.returnedItems[itemId] = {
                 product_id: productId,
-                quantity: quantity,
+                returned_quantity: quantity,
                 price: price
             };
         } else {
@@ -153,7 +153,7 @@ export class SalesReturnCreate {
         let totalAmount = 0;
         for (const itemId in this.returnedItems) {
             const item = this.returnedItems[itemId];
-            totalAmount += item.price * item.quantity;
+            totalAmount += item.price * item.returned_quantity;
         }
         this.totalAmountInput.value = formatCurrency(totalAmount);
     }
@@ -166,12 +166,12 @@ export class SalesReturnCreate {
             return;
         }
         
-        const plainTotalAmount = Object.values(this.returnedItems).reduce((sum, item) => sum + (item.price * item.quantity), 0);
+        const plainTotalAmount = Object.values(this.returnedItems).reduce((sum, item) => sum + (item.price * item.returned_quantity), 0);
         this.totalAmountInput.value = plainTotalAmount.toFixed(2);
         
         this.itemsInput.value = JSON.stringify(itemsArray.map(item => ({
             ...item,
-            quantity: parseInt(item.quantity, 10) // Ensure quantity is an integer
+            returned_quantity: parseInt(item.returned_quantity, 10)
         })));
     }
 }

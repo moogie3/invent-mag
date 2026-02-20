@@ -12,8 +12,6 @@ export default defineConfig({
     plugins: [
         laravel({
             input: [
-                "resources/css/app.css",
-                "resources/css/auth.css",
                 "resources/js/app.js",
                 "resources/js/admin/auth.js",
                 "resources/js/admin/accounting.js",
@@ -38,11 +36,9 @@ export default defineConfig({
                 "resources/js/admin/warehouse.js",
                 "resources/js/admin/helpers/notification.js",
                 "resources/js/admin/layouts/page-loader.js",
-                "resources/css/navbar.css",
                 "resources/js/admin/layouts/navbar.js",
                 "resources/js/admin/sales-pipeline.js",
                 "resources/js/admin/layouts/settings.js",
-                "resources/css/menu-sidebar.css",
                 "resources/js/admin/layouts/menu-sidebar.js",
                 "resources/js/admin/layouts/theme-toggle.js",
                 "resources/js/admin/layouts/theme-visibility.js",
@@ -52,6 +48,11 @@ export default defineConfig({
                 "resources/js/admin/layouts/global-keyboard-shortcuts.js",
                 "resources/js/admin/layouts/selectable-table.js",
                 "resources/js/admin/tax.js",
+                "resources/js/admin/reports/stock-transfer.js",
+                "resources/css/app.css",
+                "resources/css/auth.css",
+                "resources/css/navbar.css",
+                "resources/css/menu-sidebar.css",
                 "resources/css/pos-receipt.css",
                 "resources/css/error.css",
             ],
@@ -71,10 +72,10 @@ export default defineConfig({
     },
     server: {
         cors: {
-            origin: '*'
+            origin: "*",
         },
         hmr: {
-            host: 'localhost',
-        }
+            host: "localhost",
+        },
     },
 });

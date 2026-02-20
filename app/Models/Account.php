@@ -96,7 +96,7 @@ class Account extends Model
         $debits = $this->transactions()
             ->whereHas('journalEntry', function ($query) use ($date) {
                 $query->where('date', '<=', $date)
-                    ->where('status', 'posted');
+                    ->where('status', JournalEntry::STATUS_POSTED);
             })
             ->where('type', 'debit')
             ->sum('amount');
@@ -104,7 +104,7 @@ class Account extends Model
         $credits = $this->transactions()
             ->whereHas('journalEntry', function ($query) use ($date) {
                 $query->where('date', '<=', $date)
-                    ->where('status', 'posted');
+                    ->where('status', JournalEntry::STATUS_POSTED);
             })
             ->where('type', 'credit')
             ->sum('amount');

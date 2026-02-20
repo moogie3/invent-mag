@@ -1,7 +1,7 @@
 # Invent-MAG: Technical Specification Document
 
-**Document Version:** 1.0  
-**Last Updated:** February 2025  
+**Document Version:** 1.1  
+**Last Updated:** February 2026  
 **System Version:** 1.2
 
 ---
@@ -12,8 +12,8 @@ Invent-MAG is a production-ready, enterprise-grade ERP system built on Laravel 1
 
 ### Key Technical Highlights
 
-- **Multi-tenant SaaS architecture** with database-level isolation
-- **60+ test files** ensuring code reliability
+- **Multi-tenant SaaS architecture** with row-level database isolation
+- **236 test files** ensuring code reliability
 - **371+ commits** demonstrating sustained development
 - **Docker + CI/CD** for modern DevOps practices
 - **Service-oriented architecture** with clean separation of concerns
@@ -63,7 +63,7 @@ Invent-MAG is a production-ready, enterprise-grade ERP system built on Laravel 1
 ### 1.2 Multi-tenancy Implementation
 
 **Architecture:** Spatie Laravel Multitenancy  
-**Isolation Level:** Database-level (tenant_id column)  
+**Isolation Level:** Row-level isolation (tenant_id column)  
 **Tenant Resolution:** Domain-based automatic detection
 
 ```php
@@ -92,7 +92,7 @@ class Product extends Model
 | ----------------- | ----- | ------------------------------- |
 | **Feature Tests** | 25+   | Controllers, Routes, End-to-end |
 | **Unit Tests**    | 35+   | Services, Helpers, DTOs         |
-| **Total Tests**   | 60+   | Comprehensive coverage          |
+| **Total Tests**   | 236   | Comprehensive coverage          |
 
 ### 2.2 Test Structure
 
@@ -182,7 +182,7 @@ class TransactionDTO
 | ------------------ | ----------------- | -------------------------------- |
 | **Authentication** | Laravel Fortify   | Email/password with verification |
 | **API Auth**       | Laravel Sanctum   | Token-based API access           |
-| **Authorization**  | Spatie Permission | 50+ granular permissions         |
+| **Authorization**  | Spatie Permission | 79 granular permissions          |
 | **Passwords**      | Bcrypt            | Industry-standard hashing        |
 | **Sessions**       | Encrypted cookies | Secure session management        |
 
@@ -197,7 +197,7 @@ class TransactionDTO
 'view-accounting'
 'edit-chart-of-accounts'
 'post-manual-journal'
-// ... 50+ total permissions
+// ... 79 total permissions
 
 // Usage in controller
 public function store(Request $request)
@@ -628,9 +628,10 @@ Common extension points:
 
 ## Document History
 
-| Version | Date     | Changes                         |
-| ------- | -------- | ------------------------------- |
-| 1.0     | Feb 2026 | Initial technical specification |
+| Version | Date     | Changes                                                              |
+| ------- | -------- | -------------------------------------------------------------------- |
+| 1.0     | Feb 2026 | Initial technical specification                                      |
+| 1.1     | Feb 2026 | Added comprehensive test coverage stats and documented returns fixes |
 
 ---
 

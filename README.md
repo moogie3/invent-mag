@@ -13,9 +13,9 @@
 | Metric               | Value                                    |
 | -------------------- | ---------------------------------------- |
 | **🏗️ Architecture**  | Multi-tenant SaaS                        |
-| **🧪 Test Coverage** | 60+ test files (Feature & Unit)          |
+| **🧪 Test Coverage** | 236 test files (68 PHP + 168 JS)       |
 | **💻 Codebase**      | 371+ commits, 1.5 years development      |
-| **🔐 Security**      | RBAC with 50+ permissions, audit logging |
+| **🔐 Security**      | RBAC with 79 permissions, audit logging  |
 | **🐳 DevOps**        | Docker + GitHub Actions CI/CD            |
 | **📡 API**           | RESTful API with Sanctum authentication  |
 | **🌍 Multi-tenancy** | Database-level tenant isolation          |
@@ -73,7 +73,7 @@ Experience Invent-MAG firsthand:
 - **Sales Order Management:** Full lifecycle from quote to payment
 - **Point of Sale (POS):** Dedicated interface with receipt printing
 - **Multiple Payment Methods:** Cash, card, transfer per transaction
-- **Sales Returns:** Complete returns workflow with refunds
+- **Sales Returns:** Complete returns workflow with configurable accounting entries
 - **Invoice Generation:** PDF invoice creation
 
 #### Customer Intelligence
@@ -109,7 +109,7 @@ Experience Invent-MAG firsthand:
 
 - **Purchase Order Management:** Full CRUD with stock reconciliation
 - **Multi-warehouse Receiving:** Receive to specific warehouses
-- **Purchase Returns:** Complete returns to suppliers
+- **Purchase Returns:** Complete returns to suppliers with stock and accounting adjustments
 - **Expiry Date Tracking:** Monitor product expiration dates
 
 #### Supplier Intelligence
@@ -155,7 +155,7 @@ Experience Invent-MAG firsthand:
 
 #### Advanced Accounting Features
 
-- **Double-Entry Bookkeeping:** Automatic journal entry creation
+- **Double-Entry Bookkeeping:** Automatic journal entry creation from sales, purchases, and returns
 - **Multi-Currency Support:** Transaction recording in multiple currencies
 - **Opening Balances:** Setup wizard for new fiscal years
 - **Recurring Entries:** Infrastructure for automated recurring journals
@@ -175,8 +175,8 @@ Experience Invent-MAG firsthand:
 
 #### User Management
 
-- **Role-Based Access Control:** Admin, Manager, Staff roles
-- **Granular Permissions:** 50+ specific permissions
+- **Role-Based Access Control:** Superuser, Staff, POS roles
+- **Granular Permissions:** 79 specific permissions
 - **User Profiles:** Avatar support, password management
 - **Email Verification:** Required for account activation
 
@@ -245,8 +245,8 @@ Data:
 
 #### Testing
 
-- **60+ Test Files:** Feature and unit tests
-- **PHPUnit 10+:** Modern PHP testing
+- **236 Test Files:** PHP Feature/Unit and JS Vitest tests
+- **PHPUnit 11+:** Modern PHP testing
 - **Parallel Testing:** `php artisan test --parallel`
 - **Multi-tenancy Tests:** Tenant isolation testing
 
@@ -272,8 +272,8 @@ Data:
 | --------------------- | ------------------------------------ |
 | **Authentication**    | Laravel Fortify + Email Verification |
 | **API Security**      | Laravel Sanctum (Token-based)        |
-| **Authorization**     | Spatie Permission (50+ permissions)  |
-| **Tenant Isolation**  | Spatie Multitenancy (Database-level) |
+| **Authorization**     | Spatie Permission (79 permissions)    |
+| **Tenant Isolation**  | Spatie Multitenancy (Row-level isolation) |
 | **Password Security** | Bcrypt hashing                       |
 | **CSRF Protection**   | Built-in token validation            |
 | **XSS Prevention**    | Blade auto-escaping + sanitize.js    |
@@ -321,7 +321,7 @@ Data:
 
 ## 🧪 Test Coverage
 
-**60+ Test Files Covering:**
+**236 Test Files Covering:**
 
 ### Feature Tests
 

@@ -1,6 +1,6 @@
 # Invent-MAG: Complete Feature Checklist
 
-**Last Updated:** February 2025  
+**Last Updated:** February 2026  
 **Version:** 1.2
 
 ---
@@ -14,7 +14,7 @@
 - [x] Domain-based tenant resolution
 - [x] User authentication (Laravel Fortify)
 - [x] Email verification required
-- [x] Role-based access control (50+ permissions)
+- [x] Role-based access control (79 permissions, 3 roles)
 - [x] API authentication (Laravel Sanctum)
 - [x] Password security (bcrypt hashing)
 - [x] Session management
@@ -54,7 +54,7 @@
 - [x] Multiple payment methods per order
 - [x] Payment tracking
 - [x] Invoice generation (PDF)
-- [x] Sales returns processing
+- [x] Sales returns processing (with configurable accounting entries)
 - [x] Refund handling
 - [x] Customer database (CRUD)
 - [x] Customer interaction tracking
@@ -73,7 +73,7 @@
 - [x] PO workflow
 - [x] Multi-warehouse receiving
 - [x] Payment tracking for POs
-- [x] Purchase returns processing
+- [x] Purchase returns processing (with stock adjustment and accounting entries)
 - [x] Supplier database (CRUD)
 - [x] Supplier interaction tracking
 - [x] Purchase history per supplier
@@ -189,6 +189,7 @@
 - [x] Edit draft entries
 - [x] Duplicate entries
 - [x] Audit trail for all changes
+- [x] Dependent entry validation before unposting
 
 #### Core Accounting
 
@@ -196,7 +197,7 @@
 - [x] General Ledger
 - [x] Trial Balance with validation
 - [x] Double-entry bookkeeping
-- [x] Automatic journal entry creation (from sales/purchases)
+- [x] Automatic journal entry creation (from sales/purchases/returns)
 
 #### Advanced Accounting
 
@@ -225,8 +226,8 @@
 ### 👥 User Management
 
 - [x] User CRUD
-- [x] Role assignment (Admin, Manager, Staff)
-- [x] Granular permissions (50+)
+- [x] Role assignment (Superuser, Staff, POS)
+- [x] Granular permissions (79)
 - [x] Email verification
 - [x] Password reset
 - [x] Profile management
@@ -283,13 +284,13 @@
 ### 🧪 Testing
 
 - [x] PHPUnit 10+ configured
-- [x] 60+ test files
+- [x] 236 test files (33 Feature + 35 Unit PHP, 168 JS)
 - [x] Feature tests (controllers, routes)
 - [x] Unit tests (services, helpers)
 - [x] Multi-tenancy tests
 - [x] Tenant creation trait
 - [x] Parallel testing support
-- [x] Vitest for frontend
+- [x] Vitest for frontend (168 JS test files)
 
 ---
 
@@ -386,16 +387,19 @@
 | Metric               | Value     |
 | -------------------- | --------- |
 | **Total Features**   | 200+      |
-| **Controllers**      | 30+       |
-| **Services**         | 20+       |
-| **Models**           | 30+       |
-| **Test Files**       | 60+       |
+| **Controllers**      | 30        |
+| **Services**         | 34        |
+| **Models**           | 35        |
+| **Helpers**          | 6         |
+| **Test Files**       | 236       |
 | **API Endpoints**    | 50+       |
-| **Database Tables**  | 40+       |
-| **Migrations**       | 42        |
-| **Seeders**          | 25        |
-| **Routes**           | 150+      |
-| **JavaScript Files** | 20+       |
+| **Database Tables**  | 38        |
+| **Migrations**       | 44        |
+| **Seeders**          | 26        |
+| **Permissions**      | 79        |
+| **Routes**           | 200+      |
+| **JavaScript Files** | 161       |
+| **Languages**        | 2 (EN/ID) |
 | **Development Time** | 1.5 years |
 | **Total Commits**    | 371+      |
 
@@ -407,11 +411,11 @@
 2. **Complete Accounting** - Double-entry with manual journal entries
 3. **Multi-tenant SaaS** - True isolation, single codebase
 4. **Sales Pipeline** - Kanban with forecasting
-5. **60+ Tests** - Enterprise-grade testing
+5. **236 Test Files** - Enterprise-grade testing (PHP + JS)
 6. **Docker + CI/CD** - Modern DevOps ready
 7. **Comprehensive Audit Trail** - Security and accounting
 
 ---
 
-**Document Version:** 1.0  
+**Document Version:** 1.1  
 **Last Updated:** February 2026

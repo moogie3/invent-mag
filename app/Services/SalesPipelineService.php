@@ -213,6 +213,21 @@ class SalesPipelineService
         return $opportunity;
     }
 
+    public function printOpportunity(int $id)
+    {
+        $opportunity = SalesOpportunity::with(['customer', 'items.product', 'pipeline', 'stage'])->findOrFail($id);
+        $shopname = \App\Models\User::whereNotNull('shopname')->value('shopname');
+        $address = \App\Models\User::whereNotNull('address')->value('address');
+
+        $html = view('admin.sales.opportunity-print-pdf', compact('opportunity', 'shopname', 'address'))->render();
+        $dompdf = new \Dompdf\Dompdf();
+        $dompdf->loadHtml($html);
+        $dompdf->setPaper('A4', 'portrait');
+        $dompdf->render();
+
+        return $dompdf->stream('quotation-' . $opportunity->id . '.pdf', ['Attachment' => false]);
+    }
+
     public function convertToSalesOrder(SalesOpportunity $opportunity): Sales
     {
         if ($opportunity->status === 'converted' || $opportunity->sales_id) {

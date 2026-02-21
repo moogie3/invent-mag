@@ -325,6 +325,72 @@ class PurchaseReturnService
         return null;
     }
 
+    public function deletePurchaseReturn(PurchaseReturn $purchaseReturn): void
+    {
+        DB::transaction(function () use ($purchaseReturn) {
+            // Reverse associated journal entries for accurate accounting
+            $journalEntries = \App\Models\JournalEntry::where('sourceable_type', get_class($purchaseReturn))
+                ->where('sourceable_id', $purchaseReturn->id)
+                ->get();
+                
+            foreach ($journalEntries as $entry) {
+                if ($entry->status === \App\Models\JournalEntry::STATUS_POSTED && $entry->canBeReversed()) {
+                    $this->accountingService->reverseJournalEntry($entry, "Auto-reversal due to deleted Purchase Return #{$purchaseReturn->id}");
+                }
+            }
+
+            $purchase = $purchaseReturn->purchase;
+            if ($purchase) {
+                foreach ($purchaseReturn->items as $item) {
+                    $product = \App\Models\Product::find($item->product_id);
+                    if ($product) {
+                        $warehouseId = $purchase->warehouse_id ?? \App\Models\Product::getMainWarehouseId();
+                        
+                        $stockRecord = \App\Models\ProductWarehouse::where('product_id', $product->id)
+                            ->where('warehouse_id', $warehouseId)
+                            ->where('tenant_id', $product->tenant_id)
+                            ->first();
+                            
+                        if ($stockRecord) {
+                            $stockRecord->increment('quantity', $item->quantity);
+                        }
+                    }
+                }
+            }
+
+            $purchaseReturn->delete();
+
+            if ($purchase) {
+                $totalPurchasedQuantity = $purchase->items()->sum('quantity');
+                $totalQuantityReturnedSoFar = $purchase->purchaseReturns()->with('items')->get()->flatMap(function ($pr) {
+                    return $pr->items;
+                })->sum('quantity');
+
+                if ($totalQuantityReturnedSoFar <= 0) {
+                    if ($purchase->total_paid >= $purchase->total) {
+                        $purchase->update(['status' => 'Paid']);
+                    } elseif ($purchase->total_paid > 0) {
+                        $purchase->update(['status' => 'Partial']);
+                    } else {
+                        $purchase->update(['status' => 'Unpaid']);
+                    }
+                } elseif ($totalQuantityReturnedSoFar < $totalPurchasedQuantity) {
+                    $purchase->update(['status' => 'Partial']);
+                }
+            }
+        });
+    }
+
+    public function bulkDeletePurchaseReturns(array $ids): void
+    {
+        DB::transaction(function () use ($ids) {
+            $purchaseReturns = PurchaseReturn::whereIn('id', $ids)->with('items')->get();
+            foreach ($purchaseReturns as $pr) {
+                $this->deletePurchaseReturn($pr);
+            }
+        });
+    }
+
     public function printReturn($id)
     {
         $por = PurchaseReturn::with(['purchase.supplier', 'items.product', 'user'])->findOrFail($id);

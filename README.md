@@ -89,6 +89,7 @@ Experience Invent-MAG firsthand:
 - **Sales Pipeline:** Kanban-style opportunity management
 - **Pipeline Stages:** Customizable stages with drag-and-drop
 - **Opportunity Tracking:** Value, probability, expected close dates
+- **Quotation PDF Generation:** Generate professional Quotation/Estimate PDFs directly from the pipeline
 - **Pipeline Conversion:** Convert opportunities to sales orders
 - **Interaction Tracking:** Log calls, emails, meetings, notes
 
@@ -155,7 +156,8 @@ Experience Invent-MAG firsthand:
 
 #### Advanced Accounting Features
 
-- **Double-Entry Bookkeeping:** Automatic journal entry creation from sales, purchases, and returns
+- **Double-Entry Bookkeeping:** Strict automated journal entry creation with dynamic **FIFO (First-In, First-Out) Cost of Goods Sold (COGS)** calculation.
+- **Automated Reversals:** Deleting a Sale, Purchase, or Return automatically reverses the associated Journal Entries to maintain a perfectly balanced General Ledger.
 - **Multi-Currency Support:** Transaction recording in multiple currencies
 - **Opening Balances:** Setup wizard for new fiscal years
 - **Recurring Entries:** Infrastructure for automated recurring journals

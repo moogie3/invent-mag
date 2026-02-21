@@ -27,6 +27,18 @@ class SalesPipelineControllerTest extends TestCase
         \App\Models\Tax::factory()->create(['is_active' => true, 'rate' => 10]); // Ensure an active tax exists
     }
 
+    public function test_it_can_print_sales_opportunity()
+    {
+        ob_start(); // Start output buffering
+        $opportunity = \App\Models\SalesOpportunity::factory()->create();
+
+        $response = $this->get(route('admin.sales_pipeline.opportunities.print', $opportunity));
+        $output = ob_get_clean(); // Capture the output
+
+        $this->assertStringContainsString('%PDF-', $output);
+        $response->assertStatus(200);
+    }
+
     public function test_it_can_display_the_sales_pipeline_index_page()
     {
         $response = $this->get(route('admin.sales_pipeline.index'));

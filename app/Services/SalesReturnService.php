@@ -299,6 +299,72 @@ class SalesReturnService
         return null;
     }
 
+    public function deleteSalesReturn(SalesReturn $salesReturn): void
+    {
+        DB::transaction(function () use ($salesReturn) {
+            // Reverse associated journal entries for accurate accounting
+            $journalEntries = \App\Models\JournalEntry::where('sourceable_type', get_class($salesReturn))
+                ->where('sourceable_id', $salesReturn->id)
+                ->get();
+                
+            foreach ($journalEntries as $entry) {
+                if ($entry->status === \App\Models\JournalEntry::STATUS_POSTED && $entry->canBeReversed()) {
+                    $this->accountingService->reverseJournalEntry($entry, "Auto-reversal due to deleted Sales Return #{$salesReturn->id}");
+                }
+            }
+
+            $sale = $salesReturn->sale;
+            if ($sale) {
+                foreach ($salesReturn->items as $item) {
+                    $product = \App\Models\Product::find($item->product_id);
+                    if ($product) {
+                        $warehouseId = $sale->warehouse_id ?? \App\Models\Product::getMainWarehouseId();
+                        
+                        $stockRecord = \App\Models\ProductWarehouse::where('product_id', $product->id)
+                            ->where('warehouse_id', $warehouseId)
+                            ->where('tenant_id', $product->tenant_id)
+                            ->first();
+                            
+                        if ($stockRecord) {
+                            $stockRecord->decrement('quantity', $item->quantity);
+                        }
+                    }
+                }
+            }
+
+            $salesReturn->delete();
+
+            if ($sale) {
+                $totalSoldQuantity = $sale->salesItems()->sum('quantity');
+                $totalQuantityReturnedSoFar = $sale->salesReturns()->with('items')->get()->flatMap(function ($sr) {
+                    return $sr->items;
+                })->sum('quantity');
+
+                if ($totalQuantityReturnedSoFar <= 0) {
+                    if ($sale->total_paid >= $sale->total) {
+                        $sale->update(['status' => 'Paid']);
+                    } elseif ($sale->total_paid > 0) {
+                        $sale->update(['status' => 'Partial']);
+                    } else {
+                        $sale->update(['status' => 'Unpaid']);
+                    }
+                } elseif ($totalQuantityReturnedSoFar < $totalSoldQuantity) {
+                    $sale->update(['status' => 'Partial']);
+                }
+            }
+        });
+    }
+
+    public function bulkDeleteSalesReturns(array $ids): void
+    {
+        DB::transaction(function () use ($ids) {
+            $salesReturns = SalesReturn::whereIn('id', $ids)->with('items')->get();
+            foreach ($salesReturns as $salesReturn) {
+                $this->deleteSalesReturn($salesReturn);
+            }
+        });
+    }
+
     public function bulkCompleteSalesReturns(array $ids): void
     {
         SalesReturn::whereIn('id', $ids)->update(['status' => 'Completed']);

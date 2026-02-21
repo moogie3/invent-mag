@@ -116,9 +116,9 @@ class SalesReturnControllerTest extends TestCase
     {
         $returnData = [
             'sales_id' => $this->sale->id,
-            'return_date' => Carbon::now()->format('Y-m-d'),
+            'return_date' => \Carbon\Carbon::now()->format('Y-m-d'),
             'items' => json_encode([
-                ['product_id' => $this->product->id, 'quantity' => 1, 'price' => 100]
+                ['product_id' => $this->product->id, 'returned_quantity' => 1, 'price' => 100]
             ]),
             'total_amount' => 100,
             'status' => 'Completed',
@@ -134,7 +134,7 @@ class SalesReturnControllerTest extends TestCase
 
     public function test_it_can_show_a_sales_return()
     {
-        $salesReturn = SalesReturn::create([
+        $salesReturn = \App\Models\SalesReturn::create([
             'sales_id' => $this->sale->id,
             'user_id' => $this->user->id,
             'return_date' => '2025-12-12',
@@ -142,7 +142,7 @@ class SalesReturnControllerTest extends TestCase
             'status' => 'Completed',
             'reason' => 'Test reason',
         ]);
-        SalesReturnItem::create([ // Create a SalesReturnItem
+        \App\Models\SalesReturnItem::create([ // Create a SalesReturnItem
             'sales_return_id' => $salesReturn->id,
             'product_id' => $this->product->id,
             'quantity' => 1,
@@ -159,7 +159,7 @@ class SalesReturnControllerTest extends TestCase
 
     public function test_it_can_display_the_edit_page()
     {
-        $salesReturn = SalesReturn::create([
+        $salesReturn = \App\Models\SalesReturn::create([
             'sales_id' => $this->sale->id,
             'user_id' => $this->user->id,
             'return_date' => '2025-12-12',
@@ -176,14 +176,14 @@ class SalesReturnControllerTest extends TestCase
 
     public function test_it_can_update_a_sales_return()
     {
-        $salesReturn = SalesReturn::create([
+        $salesReturn = \App\Models\SalesReturn::create([
             'sales_id' => $this->sale->id,
             'user_id' => $this->user->id,
             'return_date' => '2025-12-12',
             'total_amount' => 100,
             'status' => 'Completed',
         ]);
-        SalesReturnItem::create([
+        \App\Models\SalesReturnItem::create([
             'sales_return_id' => $salesReturn->id,
             'product_id' => $this->product->id,
             'quantity' => 1,
@@ -193,9 +193,9 @@ class SalesReturnControllerTest extends TestCase
 
         $updateData = [
             'sales_id' => $this->sale->id,
-            'return_date' => Carbon::now()->addDay()->format('Y-m-d'),
+            'return_date' => \Carbon\Carbon::now()->addDay()->format('Y-m-d'),
             'items' => json_encode([
-                ['product_id' => $this->product->id, 'quantity' => 2, 'price' => 150]
+                ['product_id' => $this->product->id, 'returned_quantity' => 2, 'price' => 150]
             ]),
             'total_amount' => 300,
             'status' => 'Pending',

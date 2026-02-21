@@ -106,6 +106,7 @@
 - [x] Opportunity value tracking
 - [x] Probability scoring
 - [x] Expected close dates
+- [x] Quotation / Estimate PDF Generation
 - [x] Pipeline conversion to sales orders
 - [x] Stage progression tracking
 - [x] Opportunity product associations
@@ -198,6 +199,8 @@
 - [x] Trial Balance with validation
 - [x] Double-entry bookkeeping
 - [x] Automatic journal entry creation (from sales/purchases/returns)
+- [x] Automatic Reversing Journal Entries on Invoice Deletion
+- [x] FIFO (First-In, First-Out) COGS Calculation
 
 #### Advanced Accounting
 

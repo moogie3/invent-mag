@@ -85,7 +85,7 @@ class PurchaseReturnController extends Controller
 
     public function destroy(PurchaseReturn $por)
     {
-        $por->delete();
+        $this->purchaseReturnService->deletePurchaseReturn($por);
         return redirect()->route('admin.por.index')->with('success', 'Purchase return deleted successfully.');
     }
     public function getPurchaseItems(Purchase $purchase)
@@ -96,7 +96,7 @@ class PurchaseReturnController extends Controller
     public function bulkDelete(Request $request)
     {
         $ids = $request->input('ids');
-        PurchaseReturn::whereIn('id', $ids)->delete();
+        $this->purchaseReturnService->bulkDeletePurchaseReturns($ids);
         return response()->json(['success' => true, 'message' => 'Selected purchase returns have been deleted.']);
     }
 

@@ -204,6 +204,7 @@ Route::middleware('web')->prefix('admin')->group(function () {
                 Route::get('/opportunities', [SalesPipelineController::class, 'indexOpportunities'])->name('admin.sales_pipeline.opportunities.index');
                 Route::get('/opportunities/{opportunity}', [SalesPipelineController::class, 'showOpportunity'])->name('admin.sales_pipeline.opportunities.show');
                 Route::get('/opportunities/{opportunity}/convert', [SalesPipelineController::class, 'showConvertForm'])->name('admin.sales_pipeline.opportunities.convert.show');
+                Route::get('/opportunities/{opportunity}/print', [SalesPipelineController::class, 'print'])->name('admin.sales_pipeline.opportunities.print');
                 Route::post('/export', [SalesPipelineController::class, 'exportAll'])->name('admin.sales-pipeline.export');
 
                 // Pipeline management routes
@@ -554,6 +555,7 @@ Route::middleware('web')->prefix('admin')->group(function () {
             Route::get('/notifications', [NotificationController::class, 'index'])->name('admin.notifications');
             Route::get('/list', [NotificationController::class, 'getNotifications'])->name('admin.notifications.list');
             Route::post('/mark-read/{id}', [NotificationController::class, 'markAsRead'])->name('admin.notifications.mark-read');
+            Route::post('/clear-all', [NotificationController::class, 'clearAll'])->name('admin.notifications.clear-all');
             Route::get('/count', [NotificationController::class, 'count'])->name('admin.notifications.count');
             Route::get('/view/{id}', [NotificationController::class, 'view'])->name('admin.notifications.view');
         });

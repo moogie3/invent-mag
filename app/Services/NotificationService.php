@@ -14,40 +14,32 @@ class NotificationService
     public function getDueNotifications(): Collection
     {
         $today = Carbon::today();
+        $user = auth()->user();
+        $settings = $user ? ($user->system_settings ?? []) : [];
+        $dismissed = $settings['dismissed_notifications'] ?? [];
 
         return collect()
             ->concat($this->getPurchaseNotifications($today))
             ->concat($this->getSalesNotifications($today))
             ->concat($this->getLowStockNotifications())
             ->concat($this->getExpiringProductNotifications())
-            ->filter(fn($item) => $item['show_notification'])
+            ->filter(fn($item) => $item['show_notification'] && !in_array($item['id'], $dismissed))
             ->sortBy([['days_remaining', 'asc']]);
     }
 
     public function getNotificationCounts(): array
     {
-        $poCount = Purchase::where('due_date', '<=', Carbon::now()->addDays(7))
-            ->where('status', '!=', 'Paid')
-            ->count();
+        $notifications = $this->getDueNotifications();
 
-        $salesCount = Sales::where('due_date', '<=', Carbon::now()->addDays(7))
-            ->where('status', '!=', 'Paid')
-            ->count();
-
-        $lowStockCount = \App\Models\ProductWarehouse::with(['product'])
-            ->whereHas('product')
-            ->get()
-            ->filter(function ($pw) {
-                $threshold = $pw->product->low_stock_threshold ?? 10;
-                return $pw->quantity <= $threshold;
-            })
-            ->count();
+        $poCount = $notifications->where('type', 'purchase')->count();
+        $salesCount = $notifications->where('type', 'sales')->count();
+        $lowStockCount = $notifications->where('status_text', 'Low Stock')->count();
 
         return [
             'poCount' => $poCount,
             'salesCount' => $salesCount,
             'lowStockCount' => $lowStockCount,
-            'total' => $poCount + $salesCount + $lowStockCount,
+            'total' => $notifications->count(),
         ];
     }
 

@@ -85,7 +85,7 @@ class SalesReturnController extends Controller
 
     public function destroy(SalesReturn $salesReturn)
     {
-        $salesReturn->delete();
+        $this->salesReturnService->deleteSalesReturn($salesReturn);
         return redirect()->route('admin.sales-returns.index')->with('success', 'Sales return deleted successfully.');
     }
 
@@ -97,7 +97,7 @@ class SalesReturnController extends Controller
     public function bulkDelete(Request $request)
     {
         $ids = $request->input('ids');
-        SalesReturn::whereIn('id', $ids)->delete();
+        $this->salesReturnService->bulkDeleteSalesReturns($ids);
         return response()->json(['success' => true, 'message' => 'Selected sales returns have been deleted.']);
     }
 

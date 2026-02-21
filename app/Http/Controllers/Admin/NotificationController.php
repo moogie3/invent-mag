@@ -75,7 +75,37 @@ class NotificationController extends Controller
 
     public function markAsRead($id)
     {
-        // Logic to mark notification as read can be implemented here if needed
+        $user = auth()->user();
+        if ($user) {
+            $settings = $user->system_settings ?? [];
+            $dismissed = $settings['dismissed_notifications'] ?? [];
+            
+            if (!in_array($id, $dismissed)) {
+                $dismissed[] = $id;
+                $settings['dismissed_notifications'] = $dismissed;
+                $user->system_settings = $settings;
+                $user->save();
+            }
+        }
+        
+        return response()->json(['success' => true]);
+    }
+
+    public function clearAll()
+    {
+        $user = auth()->user();
+        if ($user) {
+            $notifications = $this->notificationService->getDueNotifications();
+            $allIds = $notifications->pluck('id')->toArray();
+
+            $settings = $user->system_settings ?? [];
+            $dismissed = $settings['dismissed_notifications'] ?? [];
+            
+            $settings['dismissed_notifications'] = array_values(array_unique(array_merge($dismissed, $allIds)));
+            $user->system_settings = $settings;
+            $user->save();
+        }
+        
         return response()->json(['success' => true]);
     }
 

@@ -392,6 +392,17 @@ class PurchaseService
     public function deletePurchase(Purchase $purchase): void
     {
         DB::transaction(function () use ($purchase) {
+            // Reverse associated journal entries for accurate accounting
+            $journalEntries = \App\Models\JournalEntry::where('sourceable_type', get_class($purchase))
+                ->where('sourceable_id', $purchase->id)
+                ->get();
+                
+            foreach ($journalEntries as $entry) {
+                if ($entry->status === \App\Models\JournalEntry::STATUS_POSTED && $entry->canBeReversed()) {
+                    $this->accountingService->reverseJournalEntry($entry, "Auto-reversal due to deleted PO #{$purchase->invoice}");
+                }
+            }
+
             foreach ($purchase->items as $item) {
                 // Decrement stock from the specific warehouse
                 $stockRecord = ProductWarehouse::where('product_id', $item->product_id)

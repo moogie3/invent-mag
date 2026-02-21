@@ -207,6 +207,15 @@ class SalesPipelineController extends Controller
         return view('admin.layouts.modals.sales.sales-pipeline-modals', compact('opportunity'));
     }
 
+    public function print($id)
+    {
+         try {
+            return $this->salesPipelineService->printOpportunity($id);
+        } catch (\Exception $e) {
+            return back()->with('error', 'Error generating quotation. ' . $e->getMessage());
+        }
+    }
+
     public function convertToSalesOrder(SalesOpportunity $opportunity)
     {
         try {

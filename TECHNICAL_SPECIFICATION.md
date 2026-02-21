@@ -140,9 +140,18 @@ class SalesService
     {
         DB::transaction(function () use ($data) {
             $sale = Sales::create($data);
-            $this->createAccountingEntries($sale);
+            $this->createAccountingEntries($sale); // Dynamic FIFO COGS
             $this->updateInventory($sale);
             return $sale;
+        });
+    }
+
+    public function deleteSale(Sales $sale): void
+    {
+        DB::transaction(function () use ($sale) {
+            $this->accountingService->reverseJournalEntry($sale->journalEntry); // Strict Reversals
+            $this->revertInventory($sale);
+            $sale->delete();
         });
     }
 }

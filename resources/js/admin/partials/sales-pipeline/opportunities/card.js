@@ -33,6 +33,9 @@ export function createOpportunityCard(opportunity) {
     }</span>
             </p>
             <div class="btn-group btn-group-sm" role="group">
+                <a href="/admin/sales-pipeline/opportunities/${opportunity.id}/print" target="_blank" class="btn btn-outline-info btn-sm">
+                    <i class="ti ti-printer"></i> Print
+                </a>
                 <button type="button" class="btn btn-outline-primary btn-sm edit-opportunity-btn"
                         data-opportunity-id="${opportunity.id}" ${
         opportunity.status === "converted" ? "disabled" : ""
@@ -45,7 +48,7 @@ export function createOpportunityCard(opportunity) {
                 </button>
                 ${
                     opportunity.status === "won" && !opportunity.sales_id
-                        ? `<button type="button" class="btn btn-success btn-sm convert-opportunity-btn" data-opportunity-id="${opportunity.id}"><i class="ti ti-check"></i> Convert to Sales Order</button>`
+                        ? `<button type="button" class="btn btn-success btn-sm convert-opportunity-btn" data-opportunity-id="${opportunity.id}"><i class="ti ti-check"></i> Convert</button>`
                         : ""
                 }
             </div>

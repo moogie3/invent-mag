@@ -236,7 +236,6 @@ class SalesService
                 if (!$product) {
                     throw new \Exception("Product with ID {$productData['product_id']} not found in this tenant.");
                 }
-                $totalCostOfGoods += $product->price * $productData['quantity'];
 
                 SalesItem::create([
                     'sales_id' => $sale->id,
@@ -272,13 +271,15 @@ class SalesService
                     ]);
                 }
 
-                // FEFO Logic (Global Batch Tracking)
+                // FEFO Logic (Global Batch Tracking) for COGS calculation
                 $poItems = POItem::where('product_id', $product->id)
                     ->where('remaining_quantity', '>', 0)
                     ->orderBy('expiry_date', 'asc')
+                    ->orderBy('created_at', 'asc')
                     ->get();
 
                 $quantityToDecrement = $productData['quantity'];
+                $itemCOGS = 0;
 
                 foreach ($poItems as $poItem) {
                     if ($quantityToDecrement <= 0) {
@@ -286,9 +287,20 @@ class SalesService
                     }
 
                     $decrement = min($poItem->remaining_quantity, $quantityToDecrement);
+                    
+                    // Calculate COGS using the specific batch price
+                    $itemCOGS += $decrement * $poItem->price;
+
                     $poItem->decrement('remaining_quantity', $decrement);
                     $quantityToDecrement -= $decrement;
                 }
+
+                // Fallback to static product price if negative stock/missing PO batches
+                if ($quantityToDecrement > 0) {
+                    $itemCOGS += $quantityToDecrement * $product->price;
+                }
+
+                $totalCostOfGoods += $itemCOGS;
             }
 
             // Get accounting settings from the user
@@ -532,8 +544,16 @@ class SalesService
     public function deleteSale(Sales $sale): void
     {
         DB::transaction(function () use ($sale) {
-            // Note: Proper accounting for deletions would require a reversing journal entry.
-            // This is left as a future improvement.
+            // Reverse associated journal entries for accurate accounting
+            $journalEntries = \App\Models\JournalEntry::where('sourceable_type', get_class($sale))
+                ->where('sourceable_id', $sale->id)
+                ->get();
+                
+            foreach ($journalEntries as $entry) {
+                if ($entry->status === \App\Models\JournalEntry::STATUS_POSTED && $entry->canBeReversed()) {
+                    $this->accountingService->reverseJournalEntry($entry, "Auto-reversal due to deleted Sale #{$sale->invoice}");
+                }
+            }
 
             foreach ($sale->salesItems as $item) {
                 // Revert stock to the warehouse it was sold from

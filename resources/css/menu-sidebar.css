@@ -716,8 +716,8 @@ html[data-bs-theme="dark"] .sidebar,
 body[data-bs-theme="dark"] .sidebar,
 .dark .sidebar,
 [data-theme="dark"] .sidebar {
-    background-color: #1e293b !important;
-    border-right-color: #334155 !important;
+    background-color: #0d1520 !important;
+    border-right-color: rgba(255, 255, 255, 0.08) !important;
 }
 
 [data-bs-theme="dark"] .sidebar .sidebar-header,
@@ -725,7 +725,7 @@ html[data-bs-theme="dark"] .sidebar .sidebar-header,
 body[data-bs-theme="dark"] .sidebar .sidebar-header,
 .dark .sidebar .sidebar-header,
 [data-theme="dark"] .sidebar .sidebar-header {
-    border-bottom-color: #475569 !important;
+    border-bottom-color: rgba(255, 255, 255, 0.08) !important;
 }
 
 [data-bs-theme="dark"] .sidebar-user::after,
@@ -733,7 +733,7 @@ html[data-bs-theme="dark"] .sidebar-user::after,
 body[data-bs-theme="dark"] .sidebar-user::after,
 .dark .sidebar-user::after,
 [data-theme="dark"] .sidebar-user::after {
-    background-color: #475569 !important;
+    background-color: rgba(255, 255, 255, 0.08) !important;
 }
 
 [data-bs-theme="dark"] .sidebar-footer::before,
@@ -741,7 +741,7 @@ html[data-bs-theme="dark"] .sidebar-footer::before,
 body[data-bs-theme="dark"] .sidebar-footer::before,
 .dark .sidebar-footer::before,
 [data-theme="dark"] .sidebar-footer::before {
-    background-color: #475569 !important;
+    background-color: rgba(255, 255, 255, 0.08) !important;
 }
 
 [data-bs-theme="dark"] .sidebar .navbar-brand,

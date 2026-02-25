@@ -1,5 +1,5 @@
 <tbody id="invoiceTableBody" class="table-tbody">
-    @foreach ($products as $index => $product)
+    @forelse ($products as $index => $product)
         <tr class="table-row" data-id="{{ $product->id }}">
             <td>
                 <input type="checkbox" class="form-check-input row-checkbox" value="{{ $product->id }}">
@@ -42,5 +42,19 @@
                 @include('admin.layouts.partials.product.index.action-dropdown', compact('product'))
             </td>
         </tr>
-    @endforeach
+    @empty
+        <tr>
+            <td colspan="12">
+                <div class="empty">
+                    <div class="empty-img">
+                        <i class="ti ti-mood-sad" style="font-size: 5rem; color: #ccc;"></i>
+                    </div>
+                    <p class="empty-title">{{ __('messages.no_products_found') }}</p>
+                    <p class="empty-subtitle text-muted">
+                        {{ __('messages.it_looks_like_you_havent_added_any_products_yet') }}
+                    </p>
+                </div>
+            </td>
+        </tr>
+    @endforelse
 </tbody>

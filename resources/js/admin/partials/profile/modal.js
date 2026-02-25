@@ -15,7 +15,7 @@ export function submitProfileForm() {
     ).value;
 
     if (!currentPassword) {
-        showToast(
+        InventMagApp.showToast(
             "Warning",
             "Please enter your current password.",
             "warning"
@@ -24,7 +24,7 @@ export function submitProfileForm() {
     }
 
     if (newPassword && newPassword !== confirmNewPassword) {
-        showToast(
+        InventMagApp.showToast(
             "Warning",
             "New password and re-entered password do not match.",
             "warning"

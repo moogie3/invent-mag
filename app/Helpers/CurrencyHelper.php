@@ -47,7 +47,7 @@ class CurrencyHelper
     /**
      * Default fallback settings
      */
-    protected static function getDefaultSettings()
+    public static function getDefaultSettings()
     {
         return (object) [
             'currency_code' => 'IDR',
@@ -69,21 +69,34 @@ class CurrencyHelper
     }
 
     /**
+     * Set settings for testing purposes.
+     */
+    public static function setSettingsForTesting($settings)
+    {
+        self::$settings = $settings;
+    }
+
+    /**
      * Format amount with currency symbol in correct position
      */
     public static function formatWithPosition($amount)
     {
         $settings = self::getSettings();
+        $isNegative = $amount < 0;
+        $absoluteAmount = abs($amount);
+
         $formatted = number_format(
-            (float) $amount,
+            (float) $absoluteAmount, // Use absolute amount here
             $settings->decimal_places,
             $settings->decimal_separator,
             $settings->thousand_separator
         );
 
-        return $settings->position === 'prefix'
+        $result = $settings->position === 'prefix'
             ? $settings->currency_symbol . ' ' . $formatted
             : $formatted . ' ' . $settings->currency_symbol;
+
+        return $isNegative ? '-' . $result : $result;
     }
 
     public static function formatDate($date)

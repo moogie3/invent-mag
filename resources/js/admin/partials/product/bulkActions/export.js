@@ -1,9 +1,9 @@
 import { getSelectedProductIds } from './selection.js';
 
-export function bulkExportProducts() {
+export function bulkExportProducts(exportOption = 'csv') {
     const selected = getSelectedProductIds();
     if (!selected.length) {
-        showToast("Warning", "Please select products to export.", "warning");
+        InventMagApp.showToast("Warning", "Please select products to export.", "warning");
         return;
     }
 
@@ -20,6 +20,12 @@ export function bulkExportProducts() {
         token.value = csrf.getAttribute("content");
         form.appendChild(token);
     }
+
+    const exportOptionInput = document.createElement("input");
+    exportOptionInput.type = "hidden";
+    exportOptionInput.name = "export_option";
+    exportOptionInput.value = exportOption;
+    form.appendChild(exportOptionInput);
 
     selected.forEach((id) => {
         const input = document.createElement("input");

@@ -7,6 +7,8 @@ use App\Models\Categories;
 use App\Models\Supplier;
 use App\Models\Unit;
 use App\Models\Warehouse;
+use App\Helpers\CurrencyHelper;
+use Dompdf\Dompdf;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
@@ -45,7 +47,7 @@ class ProductService
         if (isset($data['image'])) {
             $image = $data['image'];
             $imageName = Str::random(10) . '_' . $image->getClientOriginalName();
-            $image->storeAs('public/image', $imageName);
+            $image->storeAs('image', $imageName, 'public');
             $data['image'] = $imageName;
         }
 
@@ -76,15 +78,14 @@ class ProductService
         }
 
         if (isset($data['image'])) {
-            $oldImagePath = 'public/image/' . basename($product->image);
-
-            if (!empty($product->image) && Storage::exists($oldImagePath)) {
-                Storage::delete($oldImagePath);
+            $oldImageName = $product->getRawOriginal('image');
+            if (!empty($oldImageName)) {
+                Storage::disk('public')->delete('image/' . $oldImageName);
             }
 
             $image = $data['image'];
             $imageName = Str::random(10) . '_' . $image->getClientOriginalName();
-            $image->storeAs('public/image', $imageName);
+            $image->storeAs('image', $imageName, 'public');
             $data['image'] = $imageName;
         }
 
@@ -95,8 +96,9 @@ class ProductService
 
     public function deleteProduct(Product $product)
     {
-        if (!empty($product->image)) {
-            Storage::delete('public/image/' . basename($product->image));
+        $imageName = $product->getRawOriginal('image');
+        if (!empty($imageName)) {
+            Storage::disk('public')->delete('image/' . $imageName);
         }
 
         $product->delete();
@@ -115,11 +117,12 @@ class ProductService
             }
 
             foreach ($products as $product) {
-                if (!empty($product->image)) {
-                    $imagePath = 'public/image/' . basename($product->image);
+                $imageName = $product->getRawOriginal('image');
+                if (!empty($imageName)) {
+                    $imagePath = 'image/' . $imageName;
 
-                    if (Storage::exists($imagePath)) {
-                        Storage::delete($imagePath);
+                    if (Storage::disk('public')->exists($imagePath)) {
+                        Storage::disk('public')->delete($imagePath);
                         $imagesDeleted++;
                     }
                 }
@@ -132,6 +135,65 @@ class ProductService
             'deleted_count' => $deletedCount,
             'images_deleted' => $imagesDeleted,
         ];
+    }
+
+    public function bulkExportProducts(array $ids, string $exportOption)
+    {
+        $products = Product::with(['category', 'supplier', 'unit', 'warehouse'])->whereIn('id', $ids)->get();
+
+        if ($exportOption === 'pdf') {
+            $html = view('admin.product.bulk-export-pdf', compact('products'))->render();
+            $dompdf = new Dompdf();
+            $dompdf->loadHtml($html);
+            $dompdf->setPaper('A4', 'landscape');
+            $dompdf->render();
+            return $dompdf->stream('products.pdf');
+        }
+
+        if ($exportOption === 'csv') {
+            $headers = [
+                'Content-type' => 'text/csv',
+                'Content-Disposition' => 'attachment; filename=products.csv',
+                'Pragma' => 'no-cache',
+                'Cache-Control' => 'must-revalidate, post-check=0, pre-check=0',
+                'Expires' => '0',
+            ];
+
+            $callback = function () use ($products) {
+                $file = fopen('php://output', 'w');
+                fputcsv($file, [
+                    'Code',
+                    'Name',
+                    'Category',
+                    'Supplier',
+                    'Warehouse',
+                    'Unit',
+                    'Stock',
+                    'Price',
+                    'Selling Price',
+                ]);
+
+                foreach ($products as $product) {
+                    fputcsv($file, [
+                        $product->code,
+                        $product->name,
+                        $product->category->name,
+                        $product->supplier->name,
+                        $product->warehouse->name,
+                        $product->unit->name,
+                        $product->stock_quantity,
+                        CurrencyHelper::format($product->price),
+                        CurrencyHelper::format($product->selling_price),
+                    ]);
+                }
+
+                fclose($file);
+            };
+
+            return response()->stream($callback, 200, $headers);
+        }
+
+        return null;
     }
 
     public function bulkUpdateStock(array $updates, ?string $reason, ?int $adjustedBy)
@@ -243,7 +305,8 @@ class ProductService
 
         $productsQuery->where(function ($q) use ($query) {
             $q->where('name', 'LIKE', "%{$query}%")
-              ->orWhere('code', 'LIKE', "%{$query}%");
+              ->orWhere('code', 'LIKE', "%{$query}%")
+              ->orWhere('barcode', 'LIKE', "%{$query}%");
 
             $q->orWhereHas('category', function ($cat) use ($query) {
                 $cat->where('name', 'LIKE', "%{$query}%");
@@ -258,6 +321,11 @@ class ProductService
             ->orderBy('name', 'asc')
             ->limit(50)
             ->get();
+    }
+
+    public function searchByBarcode(string $barcode)
+    {
+        return Product::with('unit')->where('barcode', $barcode)->first();
     }
 
     public function getExpiringSoonPOItems()

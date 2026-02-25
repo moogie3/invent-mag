@@ -1,7 +1,5 @@
 
 document.addEventListener('DOMContentLoaded', function () {
-    const storageKey = 'invent-mag-show-theme-toggle';
-
     // Find all theme toggle containers
     const navbarToggleContainer = document.getElementById('theme-toggle-navbar-container');
     const sidebarToggleContainer = document.getElementById('theme-toggle-sidebar-container');
@@ -13,8 +11,8 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Function to update the visibility of the theme toggle icons
     function updateIconVisibility() {
-        // Default to true if the setting isn't in localStorage yet
-        const shouldShow = localStorage.getItem(storageKey) === 'true' || localStorage.getItem(storageKey) === null;
+        // Use window.userSettings for the source of truth
+        const shouldShow = window.userSettings ? (window.userSettings.show_theme_toggle ?? true) : true;
         const displayValue = shouldShow ? 'block' : 'none';
 
         themeToggleContainers.forEach(container => {
@@ -28,8 +26,8 @@ document.addEventListener('DOMContentLoaded', function () {
             return; // We are not on the settings page
         }
 
-        // Default to true if the setting isn't in localStorage yet
-        const shouldShow = localStorage.getItem(storageKey) === 'true' || localStorage.getItem(storageKey) === null;
+        // Use window.userSettings for the source of truth
+        const shouldShow = window.userSettings ? (window.userSettings.show_theme_toggle ?? true) : true;
 
         // 1. Set the checkbox state
         visibilityCheckbox.checked = shouldShow;
@@ -44,22 +42,29 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // --- Event Listeners ---
 
-    // Listen for clicks on the visibility checkbox on the settings page
+    // Listen for changes on the visibility checkbox on the settings page
     if (visibilityCheckbox) {
         visibilityCheckbox.addEventListener('change', function () {
-            const isChecked = visibilityCheckbox.checked;
-            // Save the preference to localStorage
-            localStorage.setItem(storageKey, isChecked);
-
-            // Immediately update the UI based on the new preference
+            // The actual saving to the backend is handled by the form submission
+            // on the settings page. This just updates the local state immediately.
+            if (window.userSettings) {
+                window.userSettings.show_theme_toggle = visibilityCheckbox.checked;
+            }
             updateIconVisibility();
             updateSettingsPage();
         });
     }
 
+    // Listen for when user settings are loaded (from settings.js)
+    document.addEventListener('usersettingsloaded', () => {
+        updateIconVisibility();
+        updateSettingsPage();
+    });
+
     // --- Initial Execution ---
 
     // Run the functions on page load to set the correct initial state
+    // This will use the default values until window.userSettings is loaded
     updateIconVisibility();
     updateSettingsPage();
 });

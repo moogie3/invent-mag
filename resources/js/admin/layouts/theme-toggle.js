@@ -63,18 +63,12 @@ document.addEventListener("DOMContentLoaded", function () {
         const currentTheme = htmlElement.getAttribute('data-bs-theme');
         const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
 
-        if (newTheme === 'dark') {
-            htmlElement.setAttribute('data-bs-theme', 'dark');
-        } else {
-            htmlElement.removeAttribute('data-bs-theme');
-        }
-
+        htmlElement.setAttribute('data-bs-theme', newTheme);
+        localStorage.setItem('theme', newTheme);
         updateThemeIcons(newTheme);
 
         if (!csrfTokenMeta) {
-            // Save to local storage if no CSRF token
-            localStorage.setItem('theme', newTheme);
-            return;
+            return; // Not logged in, no need to sync with server
         }
 
         // Send an AJAX request to update the user's system settings
@@ -90,29 +84,28 @@ document.addEventListener("DOMContentLoaded", function () {
         })
         .then(response => {
             if (!response.ok) {
-                console.error('Failed to save theme setting:', response.statusText);
+                // console.error('Failed to save theme setting:', response.statusText);
             }
             return response.json();
         })
         .then(data => {
             if (data.success) {
-                console.log('Theme setting saved successfully.');
-                // Dispatch a custom event to notify other parts of the application
+                // console.log('Theme setting saved successfully.');
                 const event = new CustomEvent('themeModeUpdated', {
                     detail: { themeMode: newTheme }
                 });
                 document.dispatchEvent(event);
             } else {
-                console.error('Error saving theme setting:', data.message);
+                // console.error('Error saving theme setting:', data.message);
             }
         })
         .catch(error => {
-            console.error('Error sending AJAX request for theme setting:', error);
+            // console.error('Error sending AJAX request for theme setting:', error);
         });
     }
 
-    // Initialize theme icons based on current theme mode from html element
-    const initialTheme = htmlElement.getAttribute('data-bs-theme') === 'dark' ? 'dark' : 'light';
+    // Initialize theme icons based on the current theme
+    const initialTheme = htmlElement.getAttribute('data-bs-theme');
     updateThemeIcons(initialTheme);
 
     // Add event listeners to the toggle buttons
@@ -129,7 +122,6 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
 
-    // Also add event listeners to any theme toggle buttons inside the containers
     const navbarToggleBtn = document.querySelector("#theme-toggle-navbar");
     const sidebarToggleBtn = document.querySelector("#theme-toggle-sidebar");
 
@@ -148,7 +140,6 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
 
-    // Add event listener for the login page theme toggle button
     if (themeToggleButton) {
         themeToggleButton.addEventListener("click", function (e) {
             e.preventDefault();

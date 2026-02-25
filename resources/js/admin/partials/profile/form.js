@@ -1,15 +1,3 @@
-import { openPasswordModal } from './modal.js';
-
-export function initProfileForm() {
-    const profileForm = document.getElementById("profileForm");
-    if (profileForm) {
-        profileForm.addEventListener("submit", function (event) {
-            let newPassword = document.getElementById("new_password").value;
-
-            if (newPassword) {
-                event.preventDefault();
-                openPasswordModal();
-            }
-        });
-    }
-}
+// This file is no longer needed as the profile form submission is now handled directly by the browser.
+// The custom password modal logic has been removed in favor of Fortify's default.
+// The Ctrl+S shortcut now directly calls profileForm.requestSubmit().

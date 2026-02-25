@@ -1,0 +1,205 @@
+[
+            {
+                "name": "Assets",
+                "code": "1000",
+                "type": "asset",
+                "children": [
+                    {
+                        "name": "Current Assets",
+                        "code": "1100",
+                        "type": "asset",
+                        "children": [
+                            {
+                                "name": "Cash",
+                                "code": "1101",
+                                "type": "asset",
+                                "children": []
+                            },
+                            {
+                                "name": "Accounts Receivable",
+                                "code": "1102",
+                                "type": "asset",
+                                "children": []
+                            },
+                            {
+                                "name": "Inventory",
+                                "code": "1103",
+                                "type": "asset",
+                                "children": []
+                            },
+                            {
+                                "name": "Prepaid Expenses",
+                                "code": "1104",
+                                "type": "asset",
+                                "children": []
+                            }
+                        ]
+                    },
+                    {
+                        "name": "Fixed Assets",
+                        "code": "1200",
+                        "type": "asset",
+                        "children": [
+                            {
+                                "name": "Land",
+                                "code": "1201",
+                                "type": "asset",
+                                "children": []
+                            },
+                            {
+                                "name": "Buildings",
+                                "code": "1202",
+                                "type": "asset",
+                                "children": []
+                            },
+                            {
+                                "name": "Vehicles",
+                                "code": "1203",
+                                "type": "asset",
+                                "children": []
+                            },
+                            {
+                                "name": "Accumulated Depreciation",
+                                "code": "1209",
+                                "type": "asset",
+                                "children": []
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                "name": "Liabilities",
+                "code": "2000",
+                "type": "liability",
+                "children": [
+                    {
+                        "name": "Current Liabilities",
+                        "code": "2100",
+                        "type": "liability",
+                        "children": [
+                            {
+                                "name": "Accounts Payable",
+                                "code": "2101",
+                                "type": "liability",
+                                "children": []
+                            },
+                            {
+                                "name": "Accrued Expenses",
+                                "code": "2102",
+                                "type": "liability",
+                                "children": []
+                            },
+                            {
+                                "name": "Short-term Loans",
+                                "code": "2103",
+                                "type": "liability",
+                                "children": []
+                            }
+                        ]
+                    },
+                    {
+                        "name": "Long-term Liabilities",
+                        "code": "2200",
+                        "type": "liability",
+                        "children": [
+                            {
+                                "name": "Long-term Bank Loans",
+                                "code": "2201",
+                                "type": "liability",
+                                "children": []
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                "name": "Equity",
+                "code": "3000",
+                "type": "equity",
+                "children": [
+                    {
+                        "name": "Owner's Capital",
+                        "code": "3101",
+                        "type": "equity",
+                        "children": []
+                    },
+                    {
+                        "name": "Retained Earnings",
+                        "code": "3102",
+                        "type": "equity",
+                        "children": []
+                    }
+                ]
+            },
+            {
+                "name": "Revenue",
+                "code": "4000",
+                "type": "revenue",
+                "children": [
+                    {
+                        "name": "Sales Revenue",
+                        "code": "4101",
+                        "type": "revenue",
+                        "children": []
+                    },
+                    {
+                        "name": "Service Revenue",
+                        "code": "4102",
+                        "type": "revenue",
+                        "children": []
+                    }
+                ]
+            },
+            {
+                "name": "Cost of Goods Sold (Category)",
+                "code": "5000",
+                "type": "expense",
+                "children": [
+                    {
+                        "name": "Cost of Goods Sold",
+                        "code": "5101",
+                        "type": "expense",
+                        "children": []
+                    }
+                ]
+            },
+            {
+                "name": "Expenses",
+                "code": "6000",
+                "type": "expense",
+                "children": [
+                    {
+                        "name": "Operating Expenses",
+                        "code": "6100",
+                        "type": "expense",
+                        "children": [
+                            {
+                                "name": "Salaries and Wages",
+                                "code": "6101",
+                                "type": "expense",
+                                "children": []
+                            },
+                            {
+                                "name": "Rent Expense",
+                                "code": "6102",
+                                "type": "expense",
+                                "children": []
+                            },
+                            {
+                                "name": "Utilities Expense",
+                                "code": "6103",
+                                "type": "expense",
+                                "children": []
+                            },
+                            {
+                                "name": "Marketing Expense",
+                                "code": "6104",
+                                "type": "expense",
+                                "children": []
+                            }
+                        ]
+                    }
+                ]
+            }
+        ]

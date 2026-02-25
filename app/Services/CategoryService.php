@@ -15,20 +15,19 @@ class CategoryService
 
     public function createCategory(array $data)
     {
-        if (Categories::where('name', $data['name'])->exists()) {
+        if (Categories::whereRaw('LOWER(name) = ?', [strtolower($data['name'])])->first()) {
             return ['success' => false, 'message' => 'This category already exists.'];
         }
+        $category = Categories::create($data);
 
-        Categories::create($data);
-
-        return ['success' => true, 'message' => 'Category created successfully.'];
+        return ['success' => true, 'message' => 'Category created successfully.', 'category' => $category];
     }
 
     public function updateCategory(Categories $category, array $data)
     {
         $category->update($data);
 
-        return ['success' => true, 'message' => 'Category updated successfully.'];
+        return ['success' => true, 'message' => 'Category updated successfully.', 'category' => $category];
     }
 
     public function deleteCategory(Categories $category)

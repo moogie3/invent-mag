@@ -8,6 +8,7 @@ use App\Models\CustomerInteraction;
 use App\Models\SupplierInteraction;
 use Illuminate\Support\Facades\Auth;
 use App\Helpers\CurrencyHelper;
+use App\Models\Sales;
 
 class CrmService
 {
@@ -76,9 +77,9 @@ class CrmService
         $supplier = Supplier::with(['interactions.user'])->findOrFail($id);
 
         $allPurchases = $supplier->purchases()->with('items.product')->get();
-        $lifetimeValue = $allPurchases->sum('total_amount');
+        $lifetimeValue = $allPurchases->sum('total');
         $totalPurchasesCount = $allPurchases->count();
-        $averageOrderValue = $totalPurchasesCount > 0 ? $lifetimeValue / $totalPurchasesCount : 0;
+        $averagePurchaseValue = $totalPurchasesCount > 0 ? $lifetimeValue / $totalPurchasesCount : 0;
 
         $categoryCounts = [];
         $productQuantities = [];
@@ -122,7 +123,7 @@ class CrmService
             'supplier' => $supplier,
             'lifetimeValue' => $lifetimeValue,
             'totalPurchasesCount' => $totalPurchasesCount,
-            'averageOrderValue' => $averageOrderValue,
+            'averagePurchaseValue' => $averagePurchaseValue,
             'favoriteCategory' => $favoriteCategory,
             'lastPurchaseDate' => $allPurchases->max('order_date'),
             'lastInteractionDate' => $lastInteractionDate,
@@ -149,12 +150,12 @@ class CrmService
                     'due_date' => $purchase->due_date,
                     'payment_method' => $purchase->payment_type,
                     'status' => $purchase->status,
-                    'total_amount' => $purchase->grand_total,
+                    'total' => $purchase->total,
                     'discount_amount' => $purchase->discount_total,
-                    'purchase_items' => $purchase->items->map(function ($item) {
+                    'items' => $purchase->items->map(function ($item) {
                         return [
                             'id' => $item->id,
-                            'product' => $item->product,
+                            'product_name' => $item->product->name,
                             'quantity' => $item->quantity,
                             'price' => $item->price,
                             'total' => $item->total,
@@ -162,6 +163,55 @@ class CrmService
                     }),
                 ];
             });
+
+        return $historicalPurchases;
+    }
+
+    public function getHistoricalPurchases(Customer $customer)
+    {
+        $sales = Sales::where('customer_id', $customer->id)
+            ->with('salesItems.product')
+            ->orderBy('order_date', 'desc')
+            ->get();
+
+        $historicalPurchases = [];
+        $latestProductPrices = [];
+
+        foreach ($sales as $sale) {
+            foreach ($sale->salesItems as $item) {
+                if ($item->product) {
+                    $productId = $item->product->id;
+                    $purchaseDate = $sale->order_date;
+
+                    $historicalPurchases[] = [
+                        'sale_id' => $sale->id,
+                        'invoice' => $sale->invoice,
+                        'order_date' => $purchaseDate,
+                        'product_id' => $productId,
+                        'product_name' => $item->product->name,
+                        'quantity' => $item->quantity,
+                        'price_at_purchase' => $item->customer_price,
+                        'line_total' => $item->total,
+                    ];
+
+                    if (!isset($latestProductPrices[$productId]) || $purchaseDate > $latestProductPrices[$productId]['date']) {
+                        $latestProductPrices[$productId] = [
+                            'price' => $item->customer_price,
+                            'date' => $purchaseDate,
+                        ];
+                    }
+                }
+            }
+        }
+
+        foreach ($historicalPurchases as &$purchase) {
+            $productId = $purchase['product_id'];
+            if (isset($latestProductPrices[$productId])) {
+                $purchase['customer_latest_price'] = $latestProductPrices[$productId]['price'];
+            } else {
+                $purchase['customer_latest_price'] = $purchase['price_at_purchase'];
+            }
+        }
 
         return $historicalPurchases;
     }
@@ -199,21 +249,25 @@ class CrmService
         $customer = Customer::findOrFail($id);
 
         $salesItems = \App\Models\SalesItem::whereIn('sales_id', $customer->sales()->pluck('id'))
-            ->with(['product', 'sale'])
+            ->with(['product', 'sales'])
             ->get();
 
-        return $salesItems->groupBy('product.name')
+        $productHistory = $salesItems->groupBy('product.name')
             ->map(function ($items, $productName) {
-                $history = $items->sortByDesc('sale.order_date')->map(function ($item) {
+                $history = $items->sortByDesc('sales.order_date')->map(function ($item) {
+                    // Ensure product and sales exist before accessing properties
+                    if (!$item->product || !$item->sales) {
+                        return null; // Or handle this case appropriately
+                    }
                     return [
-                        'invoice' => $item->sale->invoice,
-                        'order_date' => $item->sale->order_date,
+                        'invoice' => $item->sales->invoice,
+                        'order_date' => $item->sales->order_date,
                         'quantity' => $item->quantity,
                         'price_at_purchase' => $item->customer_price,
                     ];
-                })->values();
+                })->filter()->values(); // Filter out nulls if any were returned
 
-                $lastPrice = $history->first()['price_at_purchase'];
+                $lastPrice = $history->isNotEmpty() ? $history->first()['price_at_purchase'] : null;
 
                 return [
                     'product_name' => $productName,
@@ -221,8 +275,13 @@ class CrmService
                     'history' => $history,
                 ];
             })
+            ->filter(function ($item) { // Filter out products with no valid history
+                return $item['history']->isNotEmpty();
+            })
             ->sortBy('product_name')
             ->values();
+
+        return $productHistory;
     }
 
     public function getSupplierProductHistory($id)

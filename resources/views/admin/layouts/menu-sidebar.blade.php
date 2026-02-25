@@ -58,13 +58,18 @@
             @foreach (config('navigation.menu') as $item)
                 @can($item['permission'] ?? null)
                     <li class="nav-item @if(isset($item['children'])) dropdown @endif">
-                        <a class="nav-link @if(isset($item['children'])) dropdown-toggle @endif" href="{{ isset($item['route']) ? route($item['route']) : '#' }}" @if(isset($item['children'])) data-bs-toggle="collapse" data-bs-target="#submenu-{{ $loop->index }}" role="button" aria-expanded="false" aria-controls="submenu-{{ $loop->index }}" @endif>
+                        <a class="nav-link" href="{{ isset($item['route']) ? route($item['route']) : '#' }}" @if(isset($item['children'])) data-bs-toggle="collapse" data-bs-target="#submenu-{{ $loop->index }}" role="button" aria-expanded="false" aria-controls="submenu-{{ $loop->index }}" @endif>
                             @if(isset($item['icon']))
                             <div class="nav-link-icon">
                                 <i class="{{ $item['icon'] }}"></i>
                             </div>
                             @endif
-                            <span class="nav-link-title">{{ $item['title'] ?? '' }}</span>
+                            <span class="nav-link-title">{{ __($item['title'] ?? '') }}</span>
+                            @if(isset($item['children']))
+                            <div class="nav-link-arrow">
+                                <i class="ti ti-chevron-down"></i>
+                            </div>
+                            @endif
                         </a>
                         @if (isset($item['children']))
                             <div class="collapse" id="submenu-{{ $loop->index }}">
@@ -78,7 +83,7 @@
                                                         <i class="{{ $child['icon'] }}"></i>
                                                     </div>
                                                     @endif
-                                                    <span class="nav-link-title">{{ $child['title'] ?? '' }}</span>
+                                                    <span class="nav-link-title">{{ __($child['title'] ?? '') }}</span>
                                                 </a>
                                             </li>
                                         @endcan
@@ -102,7 +107,7 @@
                     <div class="nav-link-icon">
                         <i class="ti ti-settings"></i>
                     </div>
-                    <span class="nav-link-title">Settings</span>
+                    <span class="nav-link-title">{{ __('messages.settings') }}</span>
                 </a>
             </li>
 
@@ -114,7 +119,7 @@
                         <div class="nav-link-icon">
                             <i class="ti ti-users"></i>
                         </div>
-                        <span class="nav-link-title">User Management</span>
+                        <span class="nav-link-title">{{ __('messages.user_management') }}</span>
                     </a>
                 </li>
             @endcan
@@ -125,7 +130,7 @@
                     <div class="nav-link-icon">
                         <i class="ti ti-logout"></i>
                     </div>
-                    <span class="nav-link-title">Logout</span>
+                    <span class="nav-link-title">{{ __('messages.logout') }}</span>
                 </a>
                 <form id="logout-form" method="POST" action="{{ route('admin.logout') }}" style="display: none;">
                     @csrf

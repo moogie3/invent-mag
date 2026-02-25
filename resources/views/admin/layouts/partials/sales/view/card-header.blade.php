@@ -11,7 +11,7 @@
                     style="width: 6px; height: 36px; border-radius: 3px; margin-right: 15px;">
                 </div>
                 <div>
-                    <h2 class="mb-0">Invoice #{{ $sales->invoice }}</h2>
+                    <h2 class="mb-0">{{ __('messages.invoice_no') }}{{ $sales->invoice }}</h2>
                     <div class="text-muted fs-5">
                         {{ $sales->customer->name }} - {{ $sales->customer->address ?? 'N/A' }}
                     </div>

@@ -17,12 +17,13 @@
         <div class="d-flex justify-content-between mb-2">
             <div><strong>{{ __('messages.po_payment_type') }}</strong></div>
             <div>
-                <select class="form-select form-select-sm" name="payment_type" id="payment_type">
+                <select class="form-select form-select-sm" name="payment_type" id="payment_type"
+                    {{ $pos->status == __('messages.paid') ? 'disabled' : '' }}>
                     <option value="Cash" {{ $pos->payment_type == 'Cash' ? 'selected' : '' }}>
-                        {{ __('messages.pos_payment_method_cash') }}
+                        {{ __('messages.payment_method_cash') }}
                     </option>
                     <option value="Transfer" {{ $pos->payment_type == 'Transfer' ? 'selected' : '' }}>
-                        {{ __('messages.pos_payment_method_transfer') }}
+                        {{ __('messages.payment_method_transfer') }}
                     </option>
                 </select>
             </div>
@@ -32,17 +33,17 @@
             <div><strong>{{ __('messages.payment_status') }}</strong></div>
             <div>
                 <select class="form-select form-select-sm" name="status" id="status">
-                    <option value="Paid" {{ $pos->status == 'Paid' ? 'selected' : '' }}>
+                    <option value="Paid" {{ $pos->status == __('messages.paid') ? 'selected' : '' }}>
                         {{ __('messages.paid') }}
                     </option>
-                    <option value="Unpaid" {{ $pos->status != 'Paid' ? 'selected' : '' }}>
+                    <option value="Unpaid" {{ $pos->status != __('messages.paid') ? 'selected' : '' }}>
                         {{ __('messages.unpaid') }}
                     </option>
                 </select>
             </div>
         </div>
 
-        @if ($pos->status === 'Paid' && isset($pos->payment_date))
+        @if ($pos->status === __('messages.paid') && isset($pos->payment_date))
             <div class="d-flex justify-content-between mt-2">
                 <div><strong>{{ __('messages.po_payment_date') }}</strong></div>
                 <div>

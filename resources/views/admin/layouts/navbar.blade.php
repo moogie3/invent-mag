@@ -15,34 +15,64 @@
         <nav class="nav-dropdown d-none d-md-flex" id="nav-dropdown">
             <ul class="d-flex gap-3">
                 @foreach ($navigationItems as $item)
-                    @can($item['permission'] ?? null) {{-- Apply @can to top-level item --}}
-                        @if (isset($item['children']))
-                            <li class="nav-item dropdown">
-                                <a class="nav-link dropdown-toggle" href="#navbar-{{ Str::slug($item['title']) }}" data-bs-toggle="dropdown" data-bs-auto-close="outside" role="button" aria-expanded="false">
-                                    <i class="{{ $item['icon'] }}"></i>
-                                    <span class="nav-link-title">
-                                        {{ $item['title'] }}
-                                    </span>
-                                </a>
-                                <div class="dropdown-menu">
-                                    <div class="dropdown-menu-columns">
-                                        <div class="dropdown-menu-column">
-                                            @foreach ($item['children'] as $child)
-                                                @can($child['permission'] ?? null) {{-- Apply @can to child item --}}
-                                                    <a class="dropdown-item" href="{{ route($child['route']) }}">
-                                                        {{ $child['title'] }}
-                                                    </a>
-                                                @endcan
-                                            @endforeach
-                                        </div>
+                    {{-- Check if the item has a special key, e.g., 'reports' or 'accounting' --}}
+                    @if (isset($item['key']) && in_array($item['key'], ['reports', 'accounting']))
+                        <li class="nav-item dropdown" id="{{ $item['key'] }}-nav-item">
+                            <a class="nav-link dropdown-toggle" href="#navbar-{{ Str::slug($item['title']) }}"
+                                data-bs-toggle="dropdown" data-bs-auto-close="outside" role="button"
+                                aria-expanded="false">
+                                <i class="{{ $item['icon'] }}"></i>
+                                <span class="nav-link-title">
+                                    {{ __($item['title']) }}
+                                </span>
+                            </a>
+                            <div class="dropdown-menu">
+                                <div class="dropdown-menu-columns">
+                                    <div class="dropdown-menu-column">
+                                        {{-- Loop through children without permission check for special items --}}
+                                        @foreach ($item['children'] as $child)
+                                            <a class="dropdown-item" href="{{ route($child['route']) }}">
+                                                <i class="{{ $child['icon'] ?? 'ti ti-point' }}"></i>
+                                                <span>{{ __($child['title']) }}</span>
+                                            </a>
+                                        @endforeach
                                     </div>
                                 </div>
-                            </li>
-                        @else
-                            <li><a href="{{ route($item['route']) }}"><i
-                                        class="{{ $item['icon'] }}"></i><span class="nav-link-title">{{ $item['title'] }}</span></a></li>
-                        @endif
-                    @endcan
+                            </div>
+                        </li>
+                    @else
+                        {{-- For all other items, apply the original permission check --}}
+                        @can($item['permission'] ?? null)
+                            @if (isset($item['children']))
+                                <li class="nav-item dropdown">
+                                    <a class="nav-link dropdown-toggle" href="#navbar-{{ Str::slug($item['title']) }}"
+                                        data-bs-toggle="dropdown" data-bs-auto-close="outside" role="button"
+                                        aria-expanded="false">
+                                        <i class="{{ $item['icon'] }}"></i>
+                                        <span class="nav-link-title">
+                                            {{ __($item['title']) }}
+                                        </span>
+                                    </a>
+                                    <div class="dropdown-menu">
+                                        <div class="dropdown-menu-columns">
+                                            <div class="dropdown-menu-column">
+                                                @foreach ($item['children'] as $child)
+                                                    @can($child['permission'] ?? null)
+                                                        <a class="dropdown-item" href="{{ route($child['route']) }}">
+                                                            {{ __($child['title']) }}
+                                                        </a>
+                                                    @endcan
+                                                @endforeach
+                                            </div>
+                                        </div>
+                                    </div>
+                                </li>
+                            @else
+                                <li><a href="{{ route($item['route']) }}"><i class="{{ $item['icon'] }}"></i><span
+                                            class="nav-link-title">{{ __($item['title']) }}</span></a></li>
+                            @endif
+                        @endcan
+                    @endif
                 @endforeach
             </ul>
         </nav>
@@ -54,8 +84,6 @@
 
         <!-- Right Side Icons -->
         <div class="d-flex flex-grow-1 justify-content-end align-items-center" id="navbar-right-content">
-
-
             <!-- Theme Toggle Button -->
             <div class="nav-item me-2" id="theme-toggle-navbar-container">
                 <a href="#" class="nav-link px-0" id="theme-toggle-navbar">
@@ -314,21 +342,21 @@
                         <span class="avatar avatar-sm"
                             style="background-image: url('{{ asset('storage/default-avatar.png') }}');"></span>
                         <div class="d-none d-xl-block ps-2">
-                            <div>Guest</div>
-                            <div class="mt-1 small text-secondary">Not logged in</div>
+                            <div>{{ __('messages.guest') }}</div>
+                            <div class="mt-1 small text-secondary">{{ __('messages.not_logged_in') }}</div>
                         </div>
                     @endif
                 </a>
-                <div class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
+                <div class="dropdown-menu dropdown-menu-arrow">
                     <a href="{{ route('admin.setting.profile.edit') }}" class="dropdown-item">
-                        <i class="ti ti-settings me-2"></i>Settings
+                        <i class="ti ti-settings me-2"></i>{{ __('messages.settings') }}
                     </a>
                     <form id="logout-form" action="{{ route('admin.logout') }}" method="POST" class="d-none">
                         @csrf
                     </form>
                     <a href="#" class="dropdown-item"
                         onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
-                        <i class="ti ti-logout me-2"></i>Logout
+                        <i class="ti ti-logout me-2"></i>{{ __('messages.logout') }}
                     </a>
                 </div>
             </div>

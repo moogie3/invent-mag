@@ -1,3 +1,5 @@
+import { playNotificationSound, playSuccessSound, playErrorSound } from '../utils/sound.js';
+
 /**
  * Displays a modern, minimal toast notification.
  * This function should be called globally via `window.showToast`.
@@ -7,13 +9,27 @@
  * @param {string} [type='info'] - The type of toast ('success', 'error', 'warning', 'info'). Determines color and icon.
  * @param {number} [duration=4000] - How long the toast should be visible in milliseconds.
  */
-window.showToast = function (title, message, type = "info", duration) {
-    if (type === 'success' && window.userSettings && !window.userSettings.show_success_messages) {
+window.InventMagApp = window.InventMagApp || {};
+
+window.InventMagApp.showToast = function (
+    title,
+    message,
+    type = "info",
+    duration
+) {
+    if (
+        type === "success" &&
+        window.userSettings &&
+        !window.userSettings.show_success_messages
+    ) {
         return; // Do not show success messages if disabled
     }
 
-    const userDuration = window.userSettings ? parseInt(window.userSettings.notification_duration, 10) * 1000 : 4000;
-    const notificationDuration = duration !== undefined ? duration : userDuration;
+    const userDuration = window.userSettings
+        ? parseInt(window.userSettings.notification_duration, 10) * 1000
+        : 4000;
+    const notificationDuration =
+        duration !== undefined ? duration : userDuration;
 
     let container = document.getElementById("toast-container");
     if (!container) {
@@ -108,6 +124,22 @@ window.showToast = function (title, message, type = "info", duration) {
     });
 
     toast.show();
+
+    // Play sound using the centralized sound utility
+    playNotificationSound(type);
+
+    // Show browser notification if enabled and supported
+    if (window.userSettings && window.userSettings.enable_browser_notifications && "Notification" in window) {
+        if (Notification.permission === "granted") {
+            new Notification(title, { body: message, icon: '/favicon.ico' });
+        } else if (Notification.permission !== "denied") {
+            Notification.requestPermission().then(permission => {
+                if (permission === "granted") {
+                    new Notification(title, { body: message, icon: '/favicon.ico' });
+                }
+            });
+        }
+    }
 };
 
 // Global function for confirmation modal
@@ -156,13 +188,20 @@ window.showConfirmModal = function (title, message, onConfirm) {
     confirmModal.show();
 };
 
-// Global function for authentication page modals (success/error)
+    // Global function for authentication page modals (success/error)
 window.showAuthModal = function (title, message, type) {
     const iconClass =
         type === "success"
             ? "ti ti-check text-success"
             : "ti ti-alert-circle text-danger";
     const modalStatusClass = type === "success" ? "bg-success" : "bg-danger";
+
+    // Play sound based on type
+    if (type === "success") {
+        playSuccessSound();
+    } else if (type === "error") {
+        playErrorSound();
+    }
 
     const authModalHtml = `
         <div class="modal modal-blur fade" id="statusModal" tabindex="-1" role="dialog" aria-hidden="true">
@@ -214,13 +253,13 @@ window.handleSessionNotifications = function () {
             if (isAuthPage) {
                 window.showAuthModal("Success", successMessage, "success");
             } else {
-                window.showToast("Success", successMessage, "success");
+                InventMagApp.showToast("Success", successMessage, "success");
             }
         } else if (errorMessage) {
             if (isAuthPage) {
                 window.showAuthModal("Error", errorMessage, "error");
-            } else {
-                window.showToast("Error", errorMessage, "error");
+            } else { // <--- Added this else block
+                InventMagApp.showToast("Error", errorMessage, "error");
             }
         }
     }

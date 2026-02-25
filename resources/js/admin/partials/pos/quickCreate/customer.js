@@ -36,8 +36,8 @@ function setupQuickCreateCustomerForm() {
 
         const url = form.getAttribute("action");
         if (!url) {
-            console.error("Form action URL is missing");
-            showToast("Error", "Form configuration error", "error");
+            // // console.error("Form action URL is missing");
+            InventMagApp.showToast("Error", "Form configuration error", "error");
             return;
         }
 
@@ -45,8 +45,8 @@ function setupQuickCreateCustomerForm() {
             'meta[name="csrf-token"]'
         )?.content;
         if (!csrfToken) {
-            console.error("CSRF token not found");
-            showToast("Error", "Security token missing", "error");
+            // // console.error("CSRF token not found");
+            InventMagApp.showToast("Error", "Security token missing", "error");
             return;
         }
 
@@ -91,23 +91,23 @@ function setupQuickCreateCustomerForm() {
 
                     form.reset();
 
-                    showToast(
+                    InventMagApp.showToast(
                         "Success",
                         "Customer created successfully",
                         "success"
                     );
                 } else {
-                    showToast(
+                    InventMagApp.showToast(
                         "Error",
                         data.message || "Failed to create customer",
                         "error"
                     );
-                    console.error("Error response:", data);
+                    // // console.error("Error response:", data);
                 }
             })
             .catch((error) => {
-                console.error("Error:", error);
-                showToast(
+                // // console.error("Error:", error);
+                InventMagApp.showToast(
                     "Error",
                     "An error occurred while creating the customer",
                     "error"

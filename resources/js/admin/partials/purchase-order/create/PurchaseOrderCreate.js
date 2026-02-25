@@ -1,5 +1,5 @@
-import { PurchaseOrderModule } from '../common/PurchaseOrderModule.js';
-import { formatCurrency } from '../../../../utils/currencyFormatter.js';
+import { PurchaseOrderModule } from "../common/PurchaseOrderModule.js";
+import { formatCurrency } from "../../../../utils/currencyFormatter.js";
 
 export class PurchaseOrderCreate extends PurchaseOrderModule {
     constructor(config = {}) {
@@ -52,7 +52,7 @@ export class PurchaseOrderCreate extends PurchaseOrderModule {
 
     initFlatpickr() {
         if (typeof flatpickr === "undefined") {
-            console.warn("Flatpickr library not loaded");
+            // console.warn("Flatpickr library not loaded");
             return;
         }
 
@@ -74,10 +74,10 @@ export class PurchaseOrderCreate extends PurchaseOrderModule {
                     }
                 );
             } catch (error) {
-                console.warn(
-                    "Failed to initialize order date flatpickr:",
-                    error
-                );
+                // console.warn(
+                //     "Failed to initialize order date flatpickr:",
+                //     error
+                // );
             }
         }
 
@@ -88,7 +88,7 @@ export class PurchaseOrderCreate extends PurchaseOrderModule {
                     flatpickrConfig
                 );
             } catch (error) {
-                console.warn("Failed to initialize due date flatpickr:", error);
+                // console.warn("Failed to initialize due date flatpickr:", error);
             }
         }
     }
@@ -136,9 +136,14 @@ export class PurchaseOrderCreate extends PurchaseOrderModule {
         if (this.elements.invoiceForm) {
             this.elements.invoiceForm.addEventListener("submit", (e) => {
                 if (this.elements.productsField) {
-                    this.elements.productsField.value = JSON.stringify(
-                        this.products
-                    );
+                    const productsToSerialize = this.products.map(product => {
+                        const newProduct = { ...product };
+                        if (newProduct.expiry_date === "") {
+                            newProduct.expiry_date = null;
+                        }
+                        return newProduct;
+                    });
+                    this.elements.productsField.value = JSON.stringify(productsToSerialize);
                 }
                 this.sessionJustSubmitted = true;
             });
@@ -231,9 +236,11 @@ export class PurchaseOrderCreate extends PurchaseOrderModule {
                 this.elements.quantity.value = "";
             }
 
-            const hasExpiry = selectedOption.getAttribute("data-has-expiry") === "1";
+            const hasExpiry =
+                selectedOption.getAttribute("data-has-expiry") === "1";
             if (this.elements.expiry_date) {
-                this.elements.expiry_date.parentElement.style.display = hasExpiry ? 'block' : 'none';
+                this.elements.expiry_date.parentElement.style.display =
+                    hasExpiry ? "block" : "none";
             }
         } else {
             this.elements.stock_available.textContent = "-";
@@ -242,7 +249,7 @@ export class PurchaseOrderCreate extends PurchaseOrderModule {
                 this.elements.quantity.removeAttribute("max");
             }
             if (this.elements.expiry_date) {
-                this.elements.expiry_date.parentElement.style.display = 'none';
+                this.elements.expiry_date.parentElement.style.display = "none";
             }
         }
     }
@@ -290,8 +297,7 @@ export class PurchaseOrderCreate extends PurchaseOrderModule {
         if (orderDiscountTotalEl)
             orderDiscountTotalEl.innerText =
                 formatCurrency(orderDiscountAmount);
-        if (finalTotalEl)
-            finalTotalEl.innerText = formatCurrency(finalTotal);
+        if (finalTotalEl) finalTotalEl.innerText = formatCurrency(finalTotal);
         if (totalDiscountInputEl)
             totalDiscountInputEl.value = orderDiscountAmount;
 
@@ -306,7 +312,7 @@ export class PurchaseOrderCreate extends PurchaseOrderModule {
             !this.elements.quantity ||
             !this.elements.new_price
         ) {
-            console.warn("Required form elements not found for adding product");
+            // console.warn("Required form elements not found for adding product");
             return;
         }
 
@@ -320,18 +326,19 @@ export class PurchaseOrderCreate extends PurchaseOrderModule {
         const discount = parseFloat(this.elements.discount?.value) || 0;
         const discountType = this.elements.discount_type?.value || "fixed";
 
-        if (quantity <= 0) {
-            alert("Please enter a valid quantity greater than 0.");
-            return;
-        }
-
         const selectedOption =
             this.elements.product_id.options[
                 this.elements.product_id.selectedIndex
             ];
         const stock = parseInt(selectedOption.getAttribute("data-stock")) || 0;
-        const hasExpiry = selectedOption.getAttribute("data-has-expiry") === "1";
-        const expiryDate = this.elements.expiry_date ? this.elements.expiry_date.value : null;
+        const hasExpiry =
+            selectedOption.getAttribute("data-has-expiry") === "1";
+        let expiryDate = null; // Default to null
+
+        // Only get value from input if product has expiry and input exists
+        if (hasExpiry && this.elements.expiry_date) {
+            expiryDate = this.elements.expiry_date.value;
+        }
 
         const uniqueId = `${Date.now()}-${Math.random()
             .toString(36)
@@ -546,7 +553,9 @@ export class PurchaseOrderCreate extends PurchaseOrderModule {
                                 product.discountType === "fixed"
                                     ? "selected"
                                     : ""
-                            }>${window.currencySettings.currency_symbol}</option>
+                            }>${
+                window.currencySettings.currency_symbol
+            }</option>
                             <option value="percentage" ${
                                 product.discountType === "percentage"
                                     ? "selected"
@@ -559,12 +568,18 @@ export class PurchaseOrderCreate extends PurchaseOrderModule {
                     product.total
                 )}</td>
                 <td class="text-center">
-                    ${product.hasExpiry ? `
+                    ${
+                        product.hasExpiry
+                            ? `
                     <input type="date" class="form-control expiry-date-input text-center"
-                        value="${product.expiry_date ? product.expiry_date : ''}" data-unique-id="${
-                            product.uniqueId
-                        }" style="width:120px;" />
-                    ` : '-'}
+                        value="${
+                            product.expiry_date ? product.expiry_date : ""
+                        }" data-unique-id="${
+                                  product.uniqueId
+                              }" style="width:120px;" />
+                    `
+                            : "-"
+                    }
                 </td>
                 <td class="text-center">
                     <button type="button" class="btn btn-danger btn-sm removeProduct"

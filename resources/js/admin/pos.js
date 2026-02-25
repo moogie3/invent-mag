@@ -40,11 +40,38 @@ document.addEventListener("DOMContentLoaded", function () {
     const processPaymentBtn = document.getElementById("processPaymentBtn");
     processPaymentBtn.addEventListener("click", function () {
         if (getProducts().length === 0) {
-            alert("Please add at least one product to the cart.");
+            InventMagApp.showToast("Warning", "Please add at least one product to the cart.", "warning");
             return;
         }
         populatePaymentModal();
     });
+
+    const barcodeInput = document.getElementById("barcodeScannerInput");
+
+    if (barcodeInput) {
+        barcodeInput.addEventListener("keypress", function (event) {
+            if (event.key === "Enter") {
+                event.preventDefault();
+                const barcode = this.value.trim();
+                if (barcode) {
+                    fetch(`/admin/product/search-by-barcode?barcode=${barcode}`)
+                        .then(response => {
+                            if (!response.ok) {
+                                throw new Error('Product not found');
+                            }
+                            return response.json();
+                        })
+                        .then(product => {
+                            addToProductList(product.id, product.name, product.selling_price, product.unit.symbol, product.stock_quantity);
+                            this.value = '';
+                        })
+                        .catch(error => {
+                            InventMagApp.showToast("Error", "Product not found for the given barcode.", "error");
+                        });
+                }
+            }
+        });
+    }
 
     const searchInput = document.getElementById("searchProduct");
     const productCards = document.querySelectorAll("#productGrid .col-md-4");
@@ -75,4 +102,14 @@ document.addEventListener("DOMContentLoaded", function () {
             expiryDateField.style.display = this.checked ? "block" : "none";
         });
     }
+
+    document.addEventListener('ctrl-s-pressed', function () {
+        if (getProducts().length === 0) {
+            InventMagApp.showToast("Warning", "Please add at least one product to the cart.", "warning");
+            return;
+        }
+        populatePaymentModal();
+        const paymentModal = new bootstrap.Modal(document.getElementById('paymentModal'));
+        paymentModal.show();
+    });
 });

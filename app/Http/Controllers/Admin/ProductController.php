@@ -22,26 +22,33 @@ class ProductController extends Controller
 
     public function index(Request $request)
     {
-        $entries = $request->input('entries', 10);
-        $products = $this->productService->getPaginatedProducts($entries);
-        $totalproduct = Product::count();
-        $lowStockCount = Product::lowStockCount();
-        $expiringSoonCount = $this->productService->getExpiringSoonPOItemsCount();
-        $totalcategory = Categories::count();
+        try {
+            $entries = $request->input('entries', 10);
+            $products = $this->productService->getPaginatedProducts($entries);
+            $totalproduct = Product::count();
+            $lowStockCount = Product::lowStockCount();
+            $expiringSoonCount = $this->productService->getExpiringSoonPOItemsCount();
+            $totalcategory = Categories::count();
 
-        $formData = $this->productService->getProductFormData();
+            $formData = $this->productService->getProductFormData();
 
-        $lowStockProducts = Product::getLowStockProducts();
-        $expiringSoonProducts = $this->productService->getExpiringSoonPOItems();
+            $lowStockProducts = Product::getLowStockProducts();
+            $expiringSoonProducts = $this->productService->getExpiringSoonPOItems();
 
-        return view('admin.product.index', compact('totalcategory', 'products', 'entries', 'totalproduct', 'lowStockCount', 'lowStockProducts', 'expiringSoonCount', 'expiringSoonProducts') + $formData);
+            return view('admin.product.index', compact('totalcategory', 'products', 'entries', 'totalproduct', 'lowStockCount', 'lowStockProducts', 'expiringSoonCount', 'expiringSoonProducts') + $formData);
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Error loading products. Please try again.');
+        }
     }
 
     public function create()
     {
-        $formData = $this->productService->getProductFormData();
-
-        return view('admin.product.product-create', $formData);
+        try {
+            $formData = $this->productService->getProductFormData();
+            return view('admin.product.product-create', $formData);
+        } catch (\Exception $e) {
+            return redirect()->route('admin.product')->with('error', 'Error loading form. Please try again.');
+        }
     }
 
     public function modalView($id)
@@ -92,11 +99,29 @@ class ProductController extends Controller
             'has_expiry' => 'sometimes|boolean',
         ]);
 
-        $this->productService->createProduct($request->all());
-
-        return redirect()->route('admin.product')->with('success', 'Product created');
+        try {
+            $this->productService->createProduct($request->all());
+            return redirect()->route('admin.product')->with('success', 'Product created');
+        } catch (\Exception $e) {
+            return redirect()->back()
+                ->withInput()
+                ->with('error', 'Error creating product. Please try again.');
+        }
     }
 
+    /**
+     * @group Products
+     * @summary Quickly Create a Product
+     * @bodyParam code string required The product code. Example: "PROD-001"
+     * @bodyParam name string required The product name. Example: "New Product"
+     * @bodyParam stock_quantity integer required The initial stock quantity. Example: 100
+     * @bodyParam price number required The purchase price of the product. Example: 99.99
+     * @bodyParam selling_price number required The selling price of the product. Example: 149.99
+     * @bodyParam category_id integer required The ID of the product category. Example: 1
+     * @bodyParam units_id integer required The ID of the product unit. Example: 1
+     * @bodyParam supplier_id integer required The ID of the product supplier. Example: 1
+     * @response 200 {"success": true, "message": "Product created successfully", "product": {"id": 1, "name": "New Product"}}
+     */
     public function quickCreate(Request $request)
     {
         $request->validate([
@@ -106,22 +131,30 @@ class ProductController extends Controller
             'low_stock_threshold' => 'nullable|integer|min:1',
             'price' => 'required|numeric',
             'selling_price' => 'required|numeric',
-            'category_id' => 'required|integer',
-            'units_id' => 'required|integer',
-            'supplier_id' => 'required|integer',
+            'category_id' => 'required|integer|exists:categories,id',
+            'units_id' => 'required|integer|exists:units,id',
+            'supplier_id' => 'required|integer|exists:suppliers,id',
             'warehouse_id' => 'nullable|integer|exists:warehouses,id',
             'description' => 'nullable|string',
             'image' => 'nullable|image|mimes:jpeg,jpg,png',
             'has_expiry' => 'nullable|sometimes|boolean',
         ]);
 
-        $product = $this->productService->quickCreateProduct($request->all());
+        try {
+            $product = $this->productService->quickCreateProduct($request->all());
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Product created successfully',
-            'product' => $product,
-        ]);
+            return response()->json([
+                'success' => true,
+                'message' => 'Product created successfully',
+                'product' => $product,
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error creating product. Please try again.',
+                'error_details' => config('app.debug') ? $e->getMessage() : 'Internal server error',
+            ], 500);
+        }
     }
 
     public function update(Request $request, $id)
@@ -130,6 +163,7 @@ class ProductController extends Controller
 
         $request->validate([
             'code' => 'string',
+            'barcode' => 'nullable|string|unique:products,barcode,' . $product->id,
             'name' => 'string',
             'stock_quantity' => 'integer',
             'low_stock_threshold' => 'nullable|integer|min:1',
@@ -144,17 +178,26 @@ class ProductController extends Controller
             'has_expiry' => 'sometimes|boolean',
         ]);
 
-        $this->productService->updateProduct($product, $request->all());
-
-        return redirect()->route('admin.product')->with('success', 'Product updated successfully');
+        try {
+            $this->productService->updateProduct($product, $request->all());
+            return redirect()->route('admin.product')->with('success', 'Product updated successfully');
+        } catch (\Exception $e) {
+            return redirect()->back()
+                ->withInput()
+                ->with('error', 'Error updating product. Please try again.');
+        }
     }
 
     public function destroy($id)
     {
-        $product = Product::findOrFail($id);
-        $this->productService->deleteProduct($product);
-
-        return redirect()->route('admin.product')->with('success', 'Product deleted');
+        try {
+            $product = Product::findOrFail($id);
+            $this->productService->deleteProduct($product);
+            return redirect()->route('admin.product')->with('success', 'Product deleted');
+        } catch (\Exception $e) {
+            return redirect()->back()
+                ->with('error', 'Error deleting product. Please try again.');
+        }
     }
 
     public function getProductMetrics()
@@ -170,6 +213,12 @@ class ProductController extends Controller
         ]);
     }
 
+    /**
+     * @group Products
+     * @summary Bulk Delete Products
+     * @bodyParam ids array required An array of product IDs to delete. Example: [1, 2, 3]
+     * @response 200 {"success": true, "message": "Successfully deleted 2 product(s)", "deleted_count": 2, "images_deleted": 1}
+     */
     public function bulkDelete(Request $request)
     {
         $request->validate([
@@ -189,6 +238,33 @@ class ProductController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Error deleting products. Please try again.',
+                'error_details' => config('app.debug') ? $e->getMessage() : 'Internal server error',
+            ], 500);
+        }
+    }
+
+    /**
+     * @group Products
+     * @summary Bulk Export Products
+     * @bodyParam ids array required An array of product IDs to export. Example: [1, 2, 3]
+     * @bodyParam export_option string required The export format ('pdf' or 'csv'). Example: "csv"
+     * @response 200 "The exported file."
+     */
+    public function bulkExport(Request $request)
+    {
+        $request->validate([
+            'ids' => 'required|array|min:1',
+            'ids.*' => 'required|integer|exists:products,id',
+            'export_option' => 'required|string|in:pdf,csv',
+        ]);
+
+        try {
+            $file = $this->productService->bulkExportProducts($request->ids, $request->export_option);
+            return $file;
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error exporting products. Please try again.',
                 'error_details' => config('app.debug') ? $e->getMessage() : 'Internal server error',
             ], 500);
         }
@@ -270,23 +346,39 @@ class ProductController extends Controller
 
     public function search(Request $request)
     {
-        $query = trim($request->get('q', ''));
+        try {
+            $query = trim($request->get('q', ''));
 
-        if (empty($query)) {
-            // If the query is empty, return all products
-            $products = Product::all();
-        } else {
-            // Otherwise, perform the search
-            $products = $this->productService->searchProducts($query);
+            if (empty($query)) {
+                // If the query is empty, return all products
+                $products = Product::all();
+            } else {
+                // Otherwise, perform the search
+                $products = $this->productService->searchProducts($query);
+            }
+
+            return response()->json($products);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error searching products.',
+                'error_details' => config('app.debug') ? $e->getMessage() : 'Internal server error',
+            ], 500);
         }
-
-        return response()->json($products);
     }
 
     public function getExpiringSoonProducts()
     {
-        $expiringSoonProducts = $this->productService->getExpiringSoonPOItems();
-        return response()->json($expiringSoonProducts);
+        try {
+            $expiringSoonProducts = $this->productService->getExpiringSoonPOItems();
+            return response()->json($expiringSoonProducts);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error fetching expiring products.',
+                'error_details' => config('app.debug') ? $e->getMessage() : 'Internal server error',
+            ], 500);
+        }
     }
 
     public function getAdjustmentLog($id)
@@ -302,6 +394,26 @@ class ProductController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Error fetching adjustment log.',
+                'error_details' => config('app.debug') ? $e->getMessage() : 'Internal server error',
+            ], 500);
+        }
+    }
+
+    public function searchByBarcode(Request $request)
+    {
+        try {
+            $request->validate(['barcode' => 'required|string']);
+            $product = $this->productService->searchByBarcode($request->barcode);
+
+            if ($product) {
+                return response()->json($product);
+            }
+
+            return response()->json(['message' => 'Product not found'], 404);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error searching by barcode.',
                 'error_details' => config('app.debug') ? $e->getMessage() : 'Internal server error',
             ], 500);
         }

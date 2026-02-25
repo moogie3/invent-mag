@@ -241,7 +241,7 @@ export function loadExpiringSoonProductsModal(expiringSoonProducts) {
 
     if (expiringSoonProducts && expiringSoonProducts.length > 0) {
         expiringSoonProducts.forEach(item => {
-            console.log('Processing item:', item);
+            // // console.log('Processing item:', item);
             const expiryDate = item.expiry_date ? new Date(item.expiry_date).toLocaleDateString("en-GB", { day: "2-digit", month: "long", year: "numeric" }) : 'N/A';
             const today = new Date();
             const itemExpiryDate = item.expiry_date ? new Date(item.expiry_date) : null;

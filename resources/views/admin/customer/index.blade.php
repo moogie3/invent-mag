@@ -16,10 +16,18 @@
                         </h2>
                     </div>
                     <div class="col-auto ms-auto">
-                        <button type="button" class="btn btn-secondary d-none d-sm-inline-block"
-                            onclick="javascript:window.print();">
-                            <i class="ti ti-printer fs-4"></i> {{ __('messages.warehouse_export_pdf') }}
-                        </button>
+                        <div class="btn-group d-none d-sm-inline-block me-2">
+                            <button type="button" class="btn btn-secondary dropdown-toggle" data-bs-toggle="dropdown"
+                                aria-expanded="false">
+                                <i class="ti ti-printer fs-4 me-2"></i> {{ __('messages.export') }}
+                            </button>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" href="#" onclick="exportCustomers('csv')">Export as
+                                        CSV</a></li>
+                                <li><a class="dropdown-item" href="#" onclick="exportCustomers('pdf')">Export as
+                                        PDF</a></li>
+                            </ul>
+                        </div>
                         <button type="button" class="btn btn-primary d-none d-sm-inline-block" data-bs-toggle="modal"
                             data-bs-target="#createCustomerModal">
                             <i class="ti ti-plus fs-4"></i> {{ __('messages.customer_create_customer') }}
@@ -36,18 +44,23 @@
                         <div class="card card-primary">
                             <div class="card-body border-bottom py-3">
                                 <div class="d-flex justify-content-between">
-                                    <div class="col-md-6">
-                                        <div class="card">
-                                            <div class="card-body">
-                                                <div class="card-title">{{ __('messages.customer_info_title') }}</div>
-                                                <div class="row">
-                                                    <div class="col-md-6">
-                                                        <div class="mb-2">
-                                                            <span
-                                                                class="nav-link-icon d-md-none d-lg-inline-block align-middle">
-                                                                <i class="ti ti-user fs-2"></i>
-                                                            </span>
-                                                            {{ __('messages.customer_info_total') }} <strong>{{ $totalcustomer }}</strong>
+                                    <div class="col-md-2">
+                                        <div class="card border-0 bg-teal-lt">
+                                            <div class="card-body py-3">
+                                                <div class="mb-2">
+                                                    <label class="form-label text-muted mb-2 d-block">
+                                                        {{ __('messages.customer_info_title') }}
+                                                    </label>
+                                                </div>
+                                                <div class="d-flex align-items-center mb-3">
+                                                    <div class="me-3 d-flex align-items-center justify-content-center badge"
+                                                        style="width: 40px; height: 40px;">
+                                                        <i class="ti ti-users fs-3 text-primary"></i>
+                                                    </div>
+                                                    <div class="flex-grow-1">
+                                                        <div class="small text-muted">
+                                                            {{ __('messages.customer_info_total') }}</div>
+                                                        <div class="fw-bold" id="totalCustomerCount">{{ $totalcustomer }}
                                                         </div>
                                                     </div>
                                                 </div>
@@ -83,22 +96,30 @@
                                     <table class="table card-table table-vcenter">
                                         <thead style="font-size: large">
                                             <tr>
-                                                <th><button class="table-sort fs-4 py-3" data-sort="sort-no">{{ __('messages.table_no') }}</th>
-                                                <th><button class="table-sort fs-4 py-3" data-sort="sort-image">{{ __('messages.table_image') }}</th>
-                                                <th><button class="table-sort fs-4 py-3" data-sort="sort-name">{{ __('messages.table_name') }}</th>
-                                                <th><button class="table-sort fs-4 py-3" data-sort="sort-address">{{ __('messages.table_address') }}
-                                                </th>
-                                                <th><button class="table-sort fs-4 py-3" data-sort="sort-phonenumber">{{ __('messages.supplier_modal_phone_number') }}
-                                                        </th>
                                                 <th><button class="table-sort fs-4 py-3"
-                                                        data-sort="sort-phonenumber">{{ __('messages.table_payment_terms') }}</th>
-                                                <th><button class="table-sort fs-4 py-3" data-sort="sort-email">{{ __('messages.table_email') }}</th>
-                                                <th style="width:180px;text-align:center" class="fs-4 py-3 no-print">{{ __('messages.table_action') }}
+                                                        data-sort="sort-no">{{ __('messages.table_no') }}</th>
+                                                <th><button class="table-sort fs-4 py-3"
+                                                        data-sort="sort-image">{{ __('messages.table_image') }}</th>
+                                                <th><button class="table-sort fs-4 py-3"
+                                                        data-sort="sort-name">{{ __('messages.table_name') }}</th>
+                                                <th><button class="table-sort fs-4 py-3"
+                                                        data-sort="sort-address">{{ __('messages.table_address') }}
+                                                </th>
+                                                <th><button class="table-sort fs-4 py-3"
+                                                        data-sort="sort-phonenumber">{{ __('messages.supplier_modal_phone_number') }}
+                                                </th>
+                                                <th><button class="table-sort fs-4 py-3"
+                                                        data-sort="sort-phonenumber">{{ __('messages.table_payment_terms') }}
+                                                </th>
+                                                <th><button class="table-sort fs-4 py-3"
+                                                        data-sort="sort-email">{{ __('messages.table_email') }}</th>
+                                                <th style="width:180px;text-align:center" class="fs-4 py-3 no-print">
+                                                    {{ __('messages.table_action') }}
                                                 </th>
                                             </tr>
                                         </thead>
                                         <tbody id="invoiceTableBody" class="table-tbody">
-                                            @foreach ($customers as $index => $customer)
+                                            @forelse ($customers as $index => $customer)
                                                 <tr>
                                                     <td class="sort-no">{{ $customers->firstItem() + $index }}</td>
                                                     <td class="sort-image">
@@ -127,7 +148,8 @@
                                                                     data-bs-toggle="modal"
                                                                     data-bs-target="#crmCustomerModal"
                                                                     data-id="{{ $customer->id }}">
-                                                                    <i class="ti ti-eye me-2"></i> {{ __('messages.customer_action_view_crm') }}
+                                                                    <i class="ti ti-eye me-2"></i>
+                                                                    {{ __('messages.customer_action_view_crm') }}
                                                                 </a>
                                                                 <a href="#" class="dropdown-item"
                                                                     data-bs-toggle="modal"
@@ -139,19 +161,37 @@
                                                                     data-payment_terms="{{ $customer->payment_terms }}"
                                                                     data-email="{{ $customer->email }}"
                                                                     data-image="{{ $customer->image }}">
-                                                                    <i class="ti ti-edit me-2"></i> {{ __('messages.edit') }}
+                                                                    <i class="ti ti-edit me-2"></i>
+                                                                    {{ __('messages.edit') }}
                                                                 </a>
 
                                                                 <button type="button" class="dropdown-item text-danger"
                                                                     data-bs-toggle="modal" data-bs-target="#deleteModal"
                                                                     onclick="setDeleteFormAction('{{ route('admin.customer.destroy', $customer->id) }}')">
-                                                                    <i class="ti ti-trash me-2"></i> {{ __('messages.delete') }}
+                                                                    <i class="ti ti-trash me-2"></i>
+                                                                    {{ __('messages.delete') }}
                                                                 </button>
                                                             </div>
                                                         </div>
                                                     </td>
                                                 </tr>
-                                            @endforeach
+                                            @empty
+                                                <tr>
+                                                    <td colspan="8">
+                                                        <div class="empty">
+                                                            <div class="empty-img">
+                                                                <i class="ti ti-mood-sad"
+                                                                    style="font-size: 5rem; color: #ccc;"></i>
+                                                            </div>
+                                                            <p class="empty-title">{{ __('messages.no_customers_found') }}
+                                                            </p>
+                                                            <p class="empty-subtitle text-muted">
+                                                                {{ __('messages.it_looks_like_you_havent_added_any_customers_yet') }}
+                                                            </p>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            @endforelse
                                         </tbody>
                                     </table>
                                 </div>
@@ -176,6 +216,6 @@
             </div>
         </div>
     </div>
-    @include('admin.layouts.modals.custmodals')
-    @include('admin.layouts.modals.crm-modal')
+    @include('admin.layouts.modals.customer.custmodals')
+    @include('admin.layouts.modals.customer.crm-modal')
 @endsection

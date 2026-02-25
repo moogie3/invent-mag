@@ -70,10 +70,10 @@ export function handleCustomerImage(button) {
                 }
             })
             .catch((error) => {
-                console.error(
-                    "Error fetching customer details for edit modal:",
-                    error
-                );
+                // // console.error(
+                //     "Error fetching customer details for edit modal:",
+                //     error
+                // );
                 if (currentCustomerImageContainer) {
                     currentCustomerImageContainer.innerHTML = `
                         <div class="img-thumbnail d-flex align-items-center justify-content-center"

@@ -202,18 +202,18 @@ document.addEventListener("DOMContentLoaded", function () {
                                             }
                                         })
                                         .catch((error) => {
-                                            console.error(
-                                                "Error checking notification count:",
-                                                error
-                                            );
+                                            // console.error(
+                                            //     "Error checking notification count:",
+                                            //     error
+                                            // );
                                         });
                                 }
                             })
                             .catch((error) => {
-                                console.error(
-                                    "Error marking notification as read:",
-                                    error
-                                );
+                                // console.error(
+                                //     "Error marking notification as read:",
+                                //     error
+                                // );
                             });
                     }
                 });
@@ -278,10 +278,10 @@ document.addEventListener("DOMContentLoaded", function () {
                                 }
                             })
                             .catch((error) => {
-                                console.error(
-                                    "Error fetching notification list:",
-                                    error
-                                );
+                                // console.error(
+                                //     "Error fetching notification list:",
+                                //     error
+                                // );
                             });
                     }
                 } else if (data.count === 0 && notificationDot) {
@@ -290,7 +290,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 }
             })
             .catch((error) => {
-                console.error("Error checking notifications:", error);
+                // console.error("Error checking notifications:", error);
             });
     };
 
@@ -345,12 +345,18 @@ document.addEventListener("DOMContentLoaded", function () {
     // Staggered dropdown children animation
     const initStaggeredDropdown = () => {
         document.querySelectorAll('.nav-item.dropdown > .nav-link.dropdown-toggle').forEach(toggle => {
+            const dropdown = toggle.closest('.nav-item.dropdown');
+            if (dropdown && (dropdown.id === 'reports-nav-item' || dropdown.id === 'accounting-nav-item')) {
+                // For these menus, let the default Bootstrap data-bs-toggle handle it.
+                return;
+            }
+
             toggle.addEventListener('click', function (e) {
                 e.preventDefault(); // Prevent default Bootstrap dropdown behavior
                 e.stopPropagation(); // Stop propagation to prevent parent dropdowns from closing
 
-                const dropdownMenu = this.nextElementSibling; // The .dropdown-menu
-                if (!dropdownMenu || !dropdownMenu.classList.contains('dropdown-menu')) return;
+                const dropdownMenu = this.closest('.dropdown').querySelector('.dropdown-menu');
+                if (!dropdownMenu) return;
 
                 // Toggle the 'show' class for Bootstrap's internal handling
                 dropdownMenu.classList.toggle('show');
@@ -471,6 +477,60 @@ document.addEventListener("DOMContentLoaded", function () {
     if (sidebarToggle) {
         sidebarToggle.addEventListener("click", function () {
             body.classList.toggle("sidebar-open");
+        });
+    }
+});
+
+// HYBRID ANIMATION FOR REPORTS DROPDOWN
+document.addEventListener('DOMContentLoaded', function () {
+    const reportsNavItem = document.getElementById('reports-nav-item');
+
+    if (reportsNavItem) {
+        reportsNavItem.addEventListener('shown.bs.dropdown', function () {
+            const dropdownMenu = this.querySelector('.dropdown-menu');
+            const dropdownItems = dropdownMenu.querySelectorAll('.dropdown-item');
+
+            dropdownMenu.classList.add('staggered-open');
+            dropdownItems.forEach((item, index) => {
+                item.style.animationDelay = `${index * 0.05}s`;
+            });
+        });
+
+        reportsNavItem.addEventListener('hide.bs.dropdown', function () {
+            const dropdownMenu = this.querySelector('.dropdown-menu');
+            const dropdownItems = dropdownMenu.querySelectorAll('.dropdown-item');
+
+            dropdownMenu.classList.remove('staggered-open');
+            dropdownItems.forEach(item => {
+                item.style.animationDelay = '';
+            });
+        });
+    }
+});
+
+// HYBRID ANIMATION FOR ACCOUNTING DROPDOWN
+document.addEventListener('DOMContentLoaded', function () {
+    const accountingNavItem = document.getElementById('accounting-nav-item');
+
+    if (accountingNavItem) {
+        accountingNavItem.addEventListener('shown.bs.dropdown', function () {
+            const dropdownMenu = this.querySelector('.dropdown-menu');
+            const dropdownItems = dropdownMenu.querySelectorAll('.dropdown-item');
+
+            dropdownMenu.classList.add('staggered-open');
+            dropdownItems.forEach((item, index) => {
+                item.style.animationDelay = `${index * 0.05}s`;
+            });
+        });
+
+        accountingNavItem.addEventListener('hide.bs.dropdown', function () {
+            const dropdownMenu = this.querySelector('.dropdown-menu');
+            const dropdownItems = dropdownMenu.querySelectorAll('.dropdown-item');
+
+            dropdownMenu.classList.remove('staggered-open');
+            dropdownItems.forEach(item => {
+                item.style.animationDelay = '';
+            });
         });
     }
 });

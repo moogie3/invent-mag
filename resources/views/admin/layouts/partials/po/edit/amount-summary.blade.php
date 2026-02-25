@@ -20,7 +20,7 @@
                     <select name="discount_total_type" class="form-select" id="discountTotalType"
                         style="min-width: 70px;">
                         <option value="percentage" {{ $pos->discount_total_type === 'percentage' ? 'selected' : '' }}>
-                            %</option>
+                            {{ __('messages.percentage') }}</option>
                         <option value="fixed" {{ $pos->discount_total_type === 'fixed' ? 'selected' : '' }}>
                             {{ __('messages.po_fixed') }}</option>
                     </select>
@@ -36,6 +36,14 @@
             <div class="fs-3 fw-bold text-primary" id="finalTotal">
                 {{ \App\Helpers\CurrencyHelper::format($summary['finalTotal']) }}
             </div>
+        </div>
+        <div class="d-flex justify-content-between text-success mb-2">
+            <span>{{ __('messages.total_paid') }}</span>
+            <span>{{ \App\Helpers\CurrencyHelper::format($pos->total_paid) }}</span>
+        </div>
+        <div class="d-flex justify-content-between text-danger fw-bold">
+            <span>{{ __('messages.balance') }}</span>
+            <span>{{ \App\Helpers\CurrencyHelper::format($pos->balance) }}</span>
         </div>
         <input type="hidden" id="totalDiscountInput" name="total_discount" value="{{ $summary['orderDiscount'] }}">
     </div>

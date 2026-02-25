@@ -14,7 +14,7 @@
         </select>
     </div>
     <div class="col-md-3">
-        <label class="form-label fw-bold">{{ __('messages.pos_stock_quantity') }}</label>
+        <label class="form-label fw-bold">{{ __('messages.product_stock_quantity') }}</label>
         <div class="d-flex align-items-center gap-2 mb-2">
             <div class="form-control d-flex align-items-center" style="width: 50%;">
                 <i class="ti ti-package me-2 text-muted"></i>
@@ -46,7 +46,7 @@
             <input type="number" min="0" step="0" class="form-control" id="discount" placeholder="0" />
             <select class="form-select" id="discount_type" style="max-width: 70px;">
                 <option value="fixed">{{ __('messages.po_fixed') }}</option>
-                <option value="percentage">%</option>
+                <option value="percentage">{{ __('messages.percentage') }}</option>
             </select>
         </div>
     </div>

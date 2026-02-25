@@ -17,4 +17,11 @@ document.addEventListener("DOMContentLoaded", function () {
 
     setupModalEventListeners();
     handleFormSubmission();
+
+    window.shortcutManager.register('ctrl+s', () => {
+        const form = document.getElementById('currencySettingsForm');
+        if (form) {
+            form.requestSubmit();
+        }
+    }, 'Save Currency Settings');
 });

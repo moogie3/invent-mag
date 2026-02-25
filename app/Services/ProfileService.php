@@ -11,7 +11,9 @@ class ProfileService
     public function updateUser(User $user, array $data)
     {
         $user->name = $data['name'];
-        $user->email = $data['email'];
+        if (isset($data['email'])) {
+            $user->email = $data['email'];
+        }
         $user->shopname = $data['shopname'];
         $user->address = $data['address'];
         $user->timezone = $data['timezone'];
@@ -21,6 +23,10 @@ class ProfileService
                 Storage::disk('public')->delete($user->avatar);
             }
             $user->avatar = $data['avatar']->store('avatars', 'public');
+        }
+
+        if ($user->isDirty('email')) {
+            $user->email_verified_at = null;
         }
 
         $user->save();
@@ -39,7 +45,7 @@ class ProfileService
     public function deleteAvatar(User $user)
     {
         if ($user->avatar) {
-            Storage::delete('public/' . $user->avatar);
+            Storage::disk('public')->delete($user->avatar);
             $user->avatar = null;
             $user->save();
         }

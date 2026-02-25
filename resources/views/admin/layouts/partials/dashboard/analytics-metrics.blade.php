@@ -3,29 +3,29 @@
         $type === 'customer'
             ? [
                 [
-                    'label' => 'Customer Retention Rate',
+                    'label' => __('messages.customer_retention_rate'),
                     'value' => $analytics['retentionRate'] ?? 0,
                     'type' => 'percent',
                 ],
-                ['label' => 'Average Order Value', 'value' => $analytics['avgOrderValue'] ?? 0, 'type' => 'currency'],
+                ['label' => __('messages.customer_crm_key_metrics_average_order_value'), 'value' => $analytics['avgOrderValue'] ?? 0, 'type' => 'currency'],
                 [
-                    'label' => 'Customer Lifetime Value',
+                    'label' => __('messages.customer_lifetime_value'),
                     'value' => $analytics['customerLifetimeValue'] ?? 0,
                     'type' => 'currency',
                 ],
             ]
             : [
                 [
-                    'label' => 'Payment Performance',
+                    'label' => __('messages.payment_performance'),
                     'value' => $analytics['supplierPaymentPerformance'] ?? 0,
                     'type' => 'percent',
                 ],
                 [
-                    'label' => 'Average Purchase Value',
+                    'label' => __('messages.average_purchase_value'),
                     'value' => $analytics['avgPurchaseValue'] ?? 0,
                     'type' => 'currency',
                 ],
-                ['label' => 'Total Outstanding', 'value' => $analytics['totalOutstanding'] ?? 0, 'type' => 'currency'],
+                ['label' => __('messages.total_outstanding'), 'value' => $analytics['totalOutstanding'] ?? 0, 'type' => 'currency'],
             ];
 @endphp
 @foreach ($metrics as $metric)

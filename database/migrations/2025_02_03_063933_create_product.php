@@ -14,7 +14,9 @@ return new class extends Migration
         Schema::create('products', function (Blueprint $table) {
             $table->id();
             $table->string('code');
+            $table->string('barcode')->unique()->nullable();
             $table->string('name');
+            $table->index('name');
             $table->integer('stock_quantity');
             $table->integer('low_stock_threshold')->nullable();
             $table->double('price');
@@ -22,7 +24,7 @@ return new class extends Migration
             $table->integer('category_id');
             $table->integer('units_id');
             $table->integer('supplier_id');
-            $table->text('description');
+            $table->text('description')->nullable();
             $table->integer('warehouse_id');
             $table->string('image')->nullable();
             $table->boolean('has_expiry')->default(false);

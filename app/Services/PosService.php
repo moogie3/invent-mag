@@ -87,16 +87,27 @@ class PosService
             'payment_type' => $data['payment_method'],
             'amount_received' => $data['amount_received'] ?? $grandTotal,
             'change_amount' => $data['change_amount'] ?? 0,
-            'payment_date' => now(),
             'is_pos' => true,
         ]);
 
+        $sale->payments()->create([
+            'amount' => $grandTotal,
+            'payment_date' => now(),
+            'payment_method' => $data['payment_method'],
+            'notes' => 'Payment for POS sale ' . $invoice,
+        ]);
+
         foreach ($products as $product) {
+            $productModel = Product::find($product['id']);
+            if (!$productModel) {
+                continue;
+            }
             $productSubtotal = $product['price'] * $product['quantity'];
 
             SalesItem::create([
                 'sales_id' => $sale->id,
                 'product_id' => $product['id'],
+                'name' => $productModel->name, // Added product name
                 'quantity' => $product['quantity'],
                 'customer_price' => $product['price'],
                 'discount' => 0,
@@ -104,15 +115,12 @@ class PosService
                 'total' => $productSubtotal,
             ]);
 
-            $productModel = Product::find($product['id']);
-            if ($productModel) {
-                if (isset($productModel->stock_quantity)) {
-                    $productModel->decrement('stock_quantity', $product['quantity']);
-                } elseif (isset($productModel->quantity)) {
-                    $productModel->decrement('quantity', $product['quantity']);
-                } elseif (isset($productModel->stock)) {
-                    $productModel->decrement('stock', $product['quantity']);
-                }
+            if (isset($productModel->stock_quantity)) {
+                $productModel->decrement('stock_quantity', $product['quantity']);
+            } elseif (isset($productModel->quantity)) {
+                $productModel->decrement('quantity', $product['quantity']);
+            } elseif (isset($productModel->stock)) {
+                $productModel->decrement('stock', $product['quantity']);
             }
         }
 

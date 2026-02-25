@@ -1,0 +1,6264 @@
+openapi: 3.0.3
+info:
+  title: 'INVENT-MAG API Documentation'
+  description: ''
+  version: 1.0.0
+servers:
+  -
+    url: 'http://localhost'
+tags:
+  -
+    name: Accounts
+    description: ''
+  -
+    name: Categories
+    description: ''
+  -
+    name: 'Currency Settings'
+    description: ''
+  -
+    name: 'Customer Interactions'
+    description: ''
+  -
+    name: Customers
+    description: ''
+  -
+    name: 'Journal Entries'
+    description: ''
+  -
+    name: Notifications
+    description: ''
+  -
+    name: POS
+    description: ''
+  -
+    name: Payments
+    description: ''
+  -
+    name: Products
+    description: ''
+  -
+    name: 'Purchase Order Items'
+    description: ''
+  -
+    name: 'Purchase Orders'
+    description: ''
+  -
+    name: Reports
+    description: ''
+  -
+    name: Roles
+    description: ''
+  -
+    name: 'Sales Items'
+    description: ''
+  -
+    name: 'Sales Opportunities'
+    description: ''
+  -
+    name: 'Sales Opportunity Items'
+    description: ''
+  -
+    name: 'Sales Orders'
+    description: ''
+  -
+    name: 'Sales Pipeline Stages'
+    description: ''
+  -
+    name: 'Sales Pipelines'
+    description: ''
+  -
+    name: 'Stock Adjustments'
+    description: ''
+  -
+    name: 'Supplier Interactions'
+    description: ''
+  -
+    name: Suppliers
+    description: ''
+  -
+    name: Taxes
+    description: ''
+  -
+    name: Transactions
+    description: ''
+  -
+    name: Units
+    description: ''
+  -
+    name: 'User Settings'
+    description: ''
+  -
+    name: Users
+    description: ''
+  -
+    name: Warehouses
+    description: ''
+components:
+  securitySchemes:
+    default:
+      type: http
+      scheme: bearer
+      description: 'You can retrieve your token by visiting your dashboard and clicking <b>Generate API token</b>.'
+security:
+  -
+    default: []
+paths:
+  /api/v1/accounts:
+    get:
+      summary: 'Display a listing of the accounts.'
+      operationId: displayAListingOfTheAccounts
+      description: ''
+      parameters:
+        -
+          in: query
+          name: per_page
+          description: 'The number of accounts to return per page. Defaults to 15.'
+          example: 25
+          required: false
+          schema:
+            type: integer
+            description: 'The number of accounts to return per page. Defaults to 15.'
+            example: 25
+            nullable: false
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+      tags:
+        - Accounts
+    post:
+      summary: 'Store a newly created resource in storage.'
+      operationId: storeANewlyCreatedResourceInStorage
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Accounts
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                parent_id:
+                  type: integer
+                  description: 'The ID of the parent account.'
+                  example: 1
+                  nullable: true
+                name:
+                  type: string
+                  description: 'The name of the account.'
+                  example: '"Cash"'
+                  nullable: false
+                code:
+                  type: string
+                  description: 'The account code. Must be unique.'
+                  example: '"1110"'
+                  nullable: false
+                type:
+                  type: string
+                  description: 'The type of the account.'
+                  example: '"asset"'
+                  nullable: false
+                description:
+                  type: string
+                  description: 'The description of the account.'
+                  example: '"Cash on hand"'
+                  nullable: true
+                level:
+                  type: integer
+                  description: 'The level of the account in the hierarchy.'
+                  example: 2
+                  nullable: false
+                is_active:
+                  type: boolean
+                  description: 'Whether the account is active.'
+                  example: true
+                  nullable: false
+              required:
+                - name
+                - code
+                - type
+                - level
+                - is_active
+  '/api/v1/accounts/{id}':
+    get:
+      summary: 'Display the specified account.'
+      operationId: displayTheSpecifiedAccount
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+      tags:
+        - Accounts
+    put:
+      summary: 'Update the specified resource in storage.'
+      operationId: updateTheSpecifiedResourceInStorage
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Accounts
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                parent_id:
+                  type: integer
+                  description: 'The ID of the parent account.'
+                  example: 1
+                  nullable: true
+                name:
+                  type: string
+                  description: 'The name of the account.'
+                  example: '"Cash"'
+                  nullable: false
+                code:
+                  type: string
+                  description: 'The account code. Must be unique.'
+                  example: '"1110"'
+                  nullable: false
+                type:
+                  type: string
+                  description: 'The type of the account.'
+                  example: '"asset"'
+                  nullable: false
+                description:
+                  type: string
+                  description: 'The description of the account.'
+                  example: '"Cash on hand"'
+                  nullable: true
+                level:
+                  type: integer
+                  description: 'The level of the account in the hierarchy.'
+                  example: 2
+                  nullable: false
+                is_active:
+                  type: boolean
+                  description: 'Whether the account is active.'
+                  example: true
+                  nullable: false
+              required:
+                - name
+                - code
+                - type
+                - level
+                - is_active
+    delete:
+      summary: 'Remove the specified resource from storage.'
+      operationId: removeTheSpecifiedResourceFromStorage
+      description: ''
+      parameters: []
+      responses:
+        204:
+          description: Success
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: ''
+      tags:
+        - Accounts
+    parameters:
+      -
+        in: path
+        name: id
+        description: 'The ID of the account.'
+        example: 1
+        required: true
+        schema:
+          type: integer
+      -
+        in: path
+        name: account
+        description: 'The ID of the account.'
+        example: 1
+        required: true
+        schema:
+          type: integer
+  /api/v1/categories:
+    get:
+      summary: 'Display a listing of the categories.'
+      operationId: displayAListingOfTheCategories
+      description: ''
+      parameters:
+        -
+          in: query
+          name: per_page
+          description: 'The number of categories to return per page. Defaults to 15.'
+          example: 25
+          required: false
+          schema:
+            type: integer
+            description: 'The number of categories to return per page. Defaults to 15.'
+            example: 25
+            nullable: false
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+      tags:
+        - Categories
+    post:
+      summary: 'Store a newly created resource in storage.'
+      operationId: storeANewlyCreatedResourceInStorage
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Categories
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  description: 'The name of the category.'
+                  example: '"Electronics"'
+                  nullable: false
+                description:
+                  type: string
+                  description: 'The description of the category.'
+                  example: '"Electronic components and devices"'
+                  nullable: true
+                parent_id:
+                  type: integer
+                  description: 'The ID of the parent category.'
+                  example: 1
+                  nullable: true
+              required:
+                - name
+  '/api/v1/categories/{id}':
+    get:
+      summary: 'Display the specified category.'
+      operationId: displayTheSpecifiedCategory
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+      tags:
+        - Categories
+    put:
+      summary: 'Update the specified resource in storage.'
+      operationId: updateTheSpecifiedResourceInStorage
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Categories
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  description: 'The name of the category.'
+                  example: '"Electronics"'
+                  nullable: false
+                description:
+                  type: string
+                  description: 'The description of the category.'
+                  example: '"Electronic components and devices"'
+                  nullable: true
+                parent_id:
+                  type: integer
+                  description: 'The ID of the parent category.'
+                  example: 1
+                  nullable: true
+              required:
+                - name
+    delete:
+      summary: 'Remove the specified resource from storage.'
+      operationId: removeTheSpecifiedResourceFromStorage
+      description: ''
+      parameters: []
+      responses:
+        204:
+          description: Success
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: ''
+      tags:
+        - Categories
+    parameters:
+      -
+        in: path
+        name: id
+        description: 'The ID of the category.'
+        example: 1
+        required: true
+        schema:
+          type: integer
+      -
+        in: path
+        name: category
+        description: 'The ID of the category.'
+        example: '1'
+        required: true
+        schema:
+          type: string
+  /api/v1/currency-settings:
+    get:
+      summary: 'Display a listing of the currency settings.'
+      operationId: displayAListingOfTheCurrencySettings
+      description: ''
+      parameters:
+        -
+          in: query
+          name: per_page
+          description: 'The number of settings to return per page. Defaults to 15.'
+          example: 25
+          required: false
+          schema:
+            type: integer
+            description: 'The number of settings to return per page. Defaults to 15.'
+            example: 25
+            nullable: false
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+      tags:
+        - 'Currency Settings'
+    post:
+      summary: 'Store a newly created resource in storage.'
+      operationId: storeANewlyCreatedResourceInStorage
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - 'Currency Settings'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                currency_symbol:
+                  type: string
+                  description: 'The currency symbol.'
+                  example: '"$"'
+                  nullable: false
+                decimal_separator:
+                  type: string
+                  description: 'The decimal separator.'
+                  example: '"."'
+                  nullable: false
+                thousand_separator:
+                  type: string
+                  description: 'The thousand separator.'
+                  example: '","'
+                  nullable: false
+                decimal_places:
+                  type: integer
+                  description: 'The number of decimal places.'
+                  example: 2
+                  nullable: false
+                position:
+                  type: string
+                  description: 'The position of the currency symbol.'
+                  example: '"prefix"'
+                  nullable: false
+                currency_code:
+                  type: string
+                  description: 'The currency code.'
+                  example: '"USD"'
+                  nullable: false
+                locale:
+                  type: string
+                  description: 'The locale.'
+                  example: '"en_US"'
+                  nullable: false
+              required:
+                - currency_symbol
+                - decimal_separator
+                - thousand_separator
+                - decimal_places
+                - position
+                - currency_code
+                - locale
+  '/api/v1/currency-settings/{id}':
+    get:
+      summary: 'Display the specified currency setting.'
+      operationId: displayTheSpecifiedCurrencySetting
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+      tags:
+        - 'Currency Settings'
+    put:
+      summary: 'Update the specified resource in storage.'
+      operationId: updateTheSpecifiedResourceInStorage
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - 'Currency Settings'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                currency_symbol:
+                  type: string
+                  description: 'The currency symbol.'
+                  example: '"$"'
+                  nullable: false
+                decimal_separator:
+                  type: string
+                  description: 'The decimal separator.'
+                  example: '"."'
+                  nullable: false
+                thousand_separator:
+                  type: string
+                  description: 'The thousand separator.'
+                  example: '","'
+                  nullable: false
+                decimal_places:
+                  type: integer
+                  description: 'The number of decimal places.'
+                  example: 2
+                  nullable: false
+                position:
+                  type: string
+                  description: 'The position of the currency symbol.'
+                  example: '"prefix"'
+                  nullable: false
+                currency_code:
+                  type: string
+                  description: 'The currency code.'
+                  example: '"USD"'
+                  nullable: false
+                locale:
+                  type: string
+                  description: 'The locale.'
+                  example: '"en_US"'
+                  nullable: false
+              required:
+                - currency_symbol
+                - decimal_separator
+                - thousand_separator
+                - decimal_places
+                - position
+                - currency_code
+                - locale
+    delete:
+      summary: 'Remove the specified resource from storage.'
+      operationId: removeTheSpecifiedResourceFromStorage
+      description: ''
+      parameters: []
+      responses:
+        204:
+          description: Success
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: ''
+      tags:
+        - 'Currency Settings'
+    parameters:
+      -
+        in: path
+        name: id
+        description: 'The ID of the currency setting.'
+        example: 1
+        required: true
+        schema:
+          type: integer
+      -
+        in: path
+        name: currency_setting
+        description: 'The ID of the currency setting.'
+        example: '1'
+        required: true
+        schema:
+          type: string
+  /api/v1/customer-interactions:
+    get:
+      summary: 'Display a listing of the customer interactions.'
+      operationId: displayAListingOfTheCustomerInteractions
+      description: ''
+      parameters:
+        -
+          in: query
+          name: per_page
+          description: 'The number of interactions to return per page. Defaults to 15.'
+          example: 25
+          required: false
+          schema:
+            type: integer
+            description: 'The number of interactions to return per page. Defaults to 15.'
+            example: 25
+            nullable: false
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+      tags:
+        - 'Customer Interactions'
+    post:
+      summary: 'Store a newly created resource in storage.'
+      operationId: storeANewlyCreatedResourceInStorage
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - 'Customer Interactions'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                customer_id:
+                  type: integer
+                  description: 'The ID of the customer.'
+                  example: 1
+                  nullable: false
+                user_id:
+                  type: integer
+                  description: 'The ID of the user.'
+                  example: 1
+                  nullable: false
+                type:
+                  type: string
+                  description: 'The type of interaction.'
+                  example: '"call"'
+                  nullable: false
+                notes:
+                  type: string
+                  description: 'The notes for the interaction.'
+                  example: '"Followed up on the recent order."'
+                  nullable: true
+                interaction_date:
+                  type: date
+                  description: 'The date of the interaction.'
+                  example: '"2025-11-28"'
+                  nullable: false
+              required:
+                - customer_id
+                - user_id
+                - type
+                - interaction_date
+  '/api/v1/customer-interactions/{id}':
+    get:
+      summary: 'Display the specified customer interaction.'
+      operationId: displayTheSpecifiedCustomerInteraction
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+      tags:
+        - 'Customer Interactions'
+    put:
+      summary: 'Update the specified resource in storage.'
+      operationId: updateTheSpecifiedResourceInStorage
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - 'Customer Interactions'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                customer_id:
+                  type: integer
+                  description: 'The ID of the customer.'
+                  example: 1
+                  nullable: false
+                user_id:
+                  type: integer
+                  description: 'The ID of the user.'
+                  example: 1
+                  nullable: false
+                type:
+                  type: string
+                  description: 'The type of interaction.'
+                  example: '"call"'
+                  nullable: false
+                notes:
+                  type: string
+                  description: 'The notes for the interaction.'
+                  example: '"Followed up on the recent order."'
+                  nullable: true
+                interaction_date:
+                  type: date
+                  description: 'The date of the interaction.'
+                  example: '"2025-11-28"'
+                  nullable: false
+              required:
+                - customer_id
+                - user_id
+                - type
+                - interaction_date
+    delete:
+      summary: 'Remove the specified resource from storage.'
+      operationId: removeTheSpecifiedResourceFromStorage
+      description: ''
+      parameters: []
+      responses:
+        204:
+          description: Success
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: ''
+      tags:
+        - 'Customer Interactions'
+    parameters:
+      -
+        in: path
+        name: id
+        description: 'The ID of the customer interaction.'
+        example: 1
+        required: true
+        schema:
+          type: integer
+      -
+        in: path
+        name: customer_interaction
+        description: 'The ID of the customer interaction.'
+        example: '1'
+        required: true
+        schema:
+          type: string
+  /api/v1/customers:
+    get:
+      summary: 'Display a listing of the customers.'
+      operationId: displayAListingOfTheCustomers
+      description: 'Retrieves a paginated list of customers. You can specify the number of customers per page.'
+      parameters:
+        -
+          in: query
+          name: per_page
+          description: 'The number of customers to return per page. Defaults to 15.'
+          example: 25
+          required: false
+          schema:
+            type: integer
+            description: 'The number of customers to return per page. Defaults to 15.'
+            example: 25
+            nullable: false
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+      tags:
+        - Customers
+    post:
+      summary: 'Create a new customer.'
+      operationId: createANewCustomer
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Customers
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  description: 'The name of the customer.'
+                  example: '"John Doe"'
+                  nullable: false
+                address:
+                  type: string
+                  description: 'The address of the customer.'
+                  example: '"123 Main St"'
+                  nullable: false
+                phone_number:
+                  type: string
+                  description: 'The phone number of the customer.'
+                  example: '"555-1234"'
+                  nullable: false
+                email:
+                  type: string
+                  description: 'The email of the customer. Must be unique.'
+                  example: '"john.doe@example.com"'
+                  nullable: true
+                payment_terms:
+                  type: string
+                  description: 'The payment terms.'
+                  example: '"Net 30"'
+                  nullable: false
+              required:
+                - name
+                - address
+                - phone_number
+                - payment_terms
+  '/api/v1/customers/{id}':
+    get:
+      summary: 'Display the specified customer.'
+      operationId: displayTheSpecifiedCustomer
+      description: 'Retrieves a single customer by its ID.'
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+      tags:
+        - Customers
+    put:
+      summary: 'Update the specified customer.'
+      operationId: updateTheSpecifiedCustomer
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Customers
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  description: 'The name of the customer.'
+                  example: '"Jane Doe"'
+                  nullable: false
+                address:
+                  type: string
+                  description: 'The address of the customer.'
+                  example: '"456 Oak Ave"'
+                  nullable: false
+                phone_number:
+                  type: string
+                  description: 'The phone number of the customer.'
+                  example: '"555-5678"'
+                  nullable: false
+                email:
+                  type: string
+                  description: 'The email of the customer. Must be unique.'
+                  example: '"jane.doe@example.com"'
+                  nullable: true
+                payment_terms:
+                  type: string
+                  description: 'The payment terms.'
+                  example: '"Net 60"'
+                  nullable: false
+    delete:
+      summary: 'Delete the specified customer.'
+      operationId: deleteTheSpecifiedCustomer
+      description: ''
+      parameters: []
+      responses:
+        204:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example: {  }
+                properties: {  }
+      tags:
+        - Customers
+    parameters:
+      -
+        in: path
+        name: id
+        description: 'The ID of the customer.'
+        example: 1
+        required: true
+        schema:
+          type: integer
+      -
+        in: path
+        name: customer
+        description: 'The ID of the customer.'
+        example: 1
+        required: true
+        schema:
+          type: integer
+  /api/v1/customers/quick-create:
+    post:
+      summary: 'Quick Create Customer'
+      operationId: quickCreateCustomer
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Customers
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  description: 'The name of the customer.'
+                  example: '"Quick Customer"'
+                  nullable: false
+                email:
+                  type: string
+                  description: 'The email of the customer.'
+                  example: '"quick@example.com"'
+                  nullable: false
+                phone_number:
+                  type: string
+                  description: 'The phone number.'
+                  example: '"555-555-5555"'
+                  nullable: false
+              required:
+                - name
+                - email
+                - phone_number
+  /api/v1/customers/metrics:
+    get:
+      summary: 'Get Customer Metrics'
+      operationId: getCustomerMetrics
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+      tags:
+        - Customers
+  '/api/v1/customers/{customer_id}/historical-purchases':
+    get:
+      summary: 'Get Customer Historical Purchases'
+      operationId: getCustomerHistoricalPurchases
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+      tags:
+        - Customers
+    parameters:
+      -
+        in: path
+        name: customer_id
+        description: 'The ID of the customer.'
+        example: 1
+        required: true
+        schema:
+          type: integer
+      -
+        in: path
+        name: customer
+        description: 'The ID of the customer.'
+        example: 1
+        required: true
+        schema:
+          type: integer
+  '/api/v1/customers/{id}/product-history':
+    get:
+      summary: 'Get Customer Product History'
+      operationId: getCustomerProductHistory
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+      tags:
+        - Customers
+    parameters:
+      -
+        in: path
+        name: id
+        description: 'The ID of the customer.'
+        example: 1
+        required: true
+        schema:
+          type: integer
+  /api/v1/journal-entries:
+    get:
+      summary: 'Display a listing of the journal entries.'
+      operationId: displayAListingOfTheJournalEntries
+      description: ''
+      parameters:
+        -
+          in: query
+          name: per_page
+          description: 'The number of entries to return per page. Defaults to 15.'
+          example: 25
+          required: false
+          schema:
+            type: integer
+            description: 'The number of entries to return per page. Defaults to 15.'
+            example: 25
+            nullable: false
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+      tags:
+        - 'Journal Entries'
+    post:
+      summary: 'Store a newly created resource in storage.'
+      operationId: storeANewlyCreatedResourceInStorage
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - 'Journal Entries'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                date:
+                  type: date
+                  description: 'The date of the journal entry.'
+                  example: '"2025-11-28"'
+                  nullable: false
+                description:
+                  type: string
+                  description: 'The description of the journal entry.'
+                  example: '"Initial investment"'
+                  nullable: false
+                sourceable_id:
+                  type: integer
+                  description: 'The ID of the sourceable model.'
+                  example: 1
+                  nullable: true
+                sourceable_type:
+                  type: string
+                  description: 'The type of the sourceable model.'
+                  example: '"App\\Models\\User"'
+                  nullable: true
+              required:
+                - date
+                - description
+  '/api/v1/journal-entries/{id}':
+    get:
+      summary: 'Display the specified journal entry.'
+      operationId: displayTheSpecifiedJournalEntry
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+      tags:
+        - 'Journal Entries'
+    put:
+      summary: 'Update the specified resource in storage.'
+      operationId: updateTheSpecifiedResourceInStorage
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - 'Journal Entries'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                date:
+                  type: date
+                  description: 'The date of the journal entry.'
+                  example: '"2025-11-28"'
+                  nullable: false
+                description:
+                  type: string
+                  description: 'The description of the journal entry.'
+                  example: '"Initial investment"'
+                  nullable: false
+                sourceable_id:
+                  type: integer
+                  description: 'The ID of the sourceable model.'
+                  example: 1
+                  nullable: true
+                sourceable_type:
+                  type: string
+                  description: 'The type of the sourceable model.'
+                  example: '"App\\Models\\User"'
+                  nullable: true
+              required:
+                - date
+                - description
+    delete:
+      summary: 'Remove the specified resource from storage.'
+      operationId: removeTheSpecifiedResourceFromStorage
+      description: ''
+      parameters: []
+      responses:
+        204:
+          description: Success
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: ''
+      tags:
+        - 'Journal Entries'
+    parameters:
+      -
+        in: path
+        name: id
+        description: 'The ID of the journal entry.'
+        example: 1
+        required: true
+        schema:
+          type: integer
+      -
+        in: path
+        name: journal_entry
+        description: 'The ID of the journal entry.'
+        example: '1'
+        required: true
+        schema:
+          type: string
+  /api/v1/notifications/count:
+    get:
+      summary: 'Get Notification Count'
+      operationId: getNotificationCount
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+      tags:
+        - Notifications
+  /api/v1/notifications:
+    get:
+      summary: 'Get All Notifications'
+      operationId: getAllNotifications
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+      tags:
+        - Notifications
+  '/api/v1/notifications/{id}/mark-as-read':
+    post:
+      summary: 'Mark Notification as Read'
+      operationId: markNotificationAsRead
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Notifications
+    parameters:
+      -
+        in: path
+        name: id
+        description: 'The composite ID of the notification to mark as read.'
+        example: '"po::1"'
+        required: true
+        schema:
+          type: string
+  /api/v1/pos:
+    get:
+      summary: 'Display a listing of the resource.'
+      operationId: displayAListingOfTheResource
+      description: ''
+      parameters:
+        -
+          in: query
+          name: per_page
+          description: 'The number of items to return per page. Defaults to 15.'
+          example: 25
+          required: false
+          schema:
+            type: integer
+            description: 'The number of items to return per page. Defaults to 15.'
+            example: 25
+            nullable: false
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+      tags:
+        - POS
+    post:
+      summary: 'Store a newly created resource in storage.'
+      operationId: storeANewlyCreatedResourceInStorage
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - POS
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                invoice:
+                  type: string
+                  description: 'The invoice number.'
+                  example: INV-2023-001
+                  nullable: false
+                supplier_id:
+                  type: integer
+                  description: 'The ID of the supplier.'
+                  example: 1
+                  nullable: false
+                order_date:
+                  type: date
+                  description: 'The date of the order.'
+                  example: '2023-10-26'
+                  nullable: false
+                due_date:
+                  type: date
+                  description: 'The due date of the payment.'
+                  example: '2023-11-26'
+                  nullable: true
+                payment_type:
+                  type: string
+                  description: 'The payment type (e.g., Cash, Credit Card).'
+                  example: Cash
+                  nullable: false
+                total:
+                  type: numeric
+                  description: 'The total amount of the purchase order.'
+                  example: '1500.00'
+                  nullable: false
+                status:
+                  type: string
+                  description: 'The status of the purchase order (e.g., Pending, Paid).'
+                  example: Pending
+                  nullable: false
+                payment_date:
+                  type: date
+                  description: 'The date of payment.'
+                  example: '2023-10-26'
+                  nullable: true
+              required:
+                - invoice
+                - supplier_id
+                - order_date
+                - payment_type
+                - total
+                - status
+  '/api/v1/pos/{id}':
+    get:
+      summary: 'Display the specified resource.'
+      operationId: displayTheSpecifiedResource
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+      tags:
+        - POS
+    put:
+      summary: 'Update the specified resource in storage.'
+      operationId: updateTheSpecifiedResourceInStorage
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - POS
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                invoice:
+                  type: string
+                  description: 'The invoice number.'
+                  example: INV-2023-002
+                  nullable: false
+                supplier_id:
+                  type: integer
+                  description: 'The ID of the supplier.'
+                  example: 2
+                  nullable: false
+                order_date:
+                  type: date
+                  description: 'The date of the order.'
+                  example: '2023-10-27'
+                  nullable: false
+                due_date:
+                  type: date
+                  description: 'The due date of the payment.'
+                  example: '2023-11-27'
+                  nullable: true
+                payment_type:
+                  type: string
+                  description: 'The payment type (e.g., Cash, Credit Card).'
+                  example: 'Credit Card'
+                  nullable: false
+                total:
+                  type: numeric
+                  description: 'The total amount of the purchase order.'
+                  example: '2000.00'
+                  nullable: false
+                status:
+                  type: string
+                  description: 'The status of the purchase order (e.g., Pending, Paid).'
+                  example: Paid
+                  nullable: false
+                payment_date:
+                  type: date
+                  description: 'The date of payment.'
+                  example: '2023-10-27'
+                  nullable: true
+    delete:
+      summary: 'Remove the specified resource from storage.'
+      operationId: removeTheSpecifiedResourceFromStorage
+      description: ''
+      parameters: []
+      responses:
+        204:
+          description: Success
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: ''
+      tags:
+        - POS
+    parameters:
+      -
+        in: path
+        name: id
+        description: 'The ID of the po.'
+        example: 1
+        required: true
+        schema:
+          type: integer
+      -
+        in: path
+        name: po
+        description: 'The ID of the resource.'
+        example: '1'
+        required: true
+        schema:
+          type: string
+  /api/v1/payments:
+    get:
+      summary: 'Display a listing of the payments.'
+      operationId: displayAListingOfThePayments
+      description: ''
+      parameters:
+        -
+          in: query
+          name: per_page
+          description: 'The number of payments to return per page. Defaults to 15.'
+          example: 25
+          required: false
+          schema:
+            type: integer
+            description: 'The number of payments to return per page. Defaults to 15.'
+            example: 25
+            nullable: false
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+      tags:
+        - Payments
+    post:
+      summary: 'Store a newly created resource in storage.'
+      operationId: storeANewlyCreatedResourceInStorage
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Payments
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                paymentable_id:
+                  type: integer
+                  description: 'The ID of the paymentable model (e.g., Purchase, Sales).'
+                  example: 1
+                  nullable: false
+                paymentable_type:
+                  type: string
+                  description: 'The type of the paymentable model (e.g., "App\\Models\\Purchase", "App\\Models\\Sales").'
+                  example: '"App\\Models\\Purchase"'
+                  nullable: false
+                amount:
+                  type: number
+                  description: 'The amount of the payment.'
+                  example: 100.0
+                  nullable: false
+                payment_date:
+                  type: date
+                  description: 'The date of the payment.'
+                  example: '"2025-11-28"'
+                  nullable: false
+                payment_method:
+                  type: string
+                  description: 'The payment method.'
+                  example: '"Cash"'
+                  nullable: false
+                notes:
+                  type: string
+                  description: 'The notes for the payment.'
+                  example: '"Paid in full"'
+                  nullable: true
+              required:
+                - paymentable_id
+                - paymentable_type
+                - amount
+                - payment_date
+                - payment_method
+  '/api/v1/payments/{id}':
+    get:
+      summary: 'Display the specified payment.'
+      operationId: displayTheSpecifiedPayment
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+      tags:
+        - Payments
+    put:
+      summary: 'Update the specified resource in storage.'
+      operationId: updateTheSpecifiedResourceInStorage
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Payments
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                paymentable_id:
+                  type: integer
+                  description: 'The ID of the paymentable model (e.g., Purchase, Sales).'
+                  example: 1
+                  nullable: false
+                paymentable_type:
+                  type: string
+                  description: 'The type of the paymentable model (e.g., "App\\Models\\Purchase", "App\\Models\\Sales").'
+                  example: '"App\\Models\\Purchase"'
+                  nullable: false
+                amount:
+                  type: number
+                  description: 'The amount of the payment.'
+                  example: 100.0
+                  nullable: false
+                payment_date:
+                  type: date
+                  description: 'The date of the payment.'
+                  example: '"2025-11-28"'
+                  nullable: false
+                payment_method:
+                  type: string
+                  description: 'The payment method.'
+                  example: '"Cash"'
+                  nullable: false
+                notes:
+                  type: string
+                  description: 'The notes for the payment.'
+                  example: '"Paid in full"'
+                  nullable: true
+              required:
+                - paymentable_id
+                - paymentable_type
+                - amount
+                - payment_date
+                - payment_method
+    delete:
+      summary: 'Remove the specified resource from storage.'
+      operationId: removeTheSpecifiedResourceFromStorage
+      description: ''
+      parameters: []
+      responses:
+        204:
+          description: Success
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: ''
+      tags:
+        - Payments
+    parameters:
+      -
+        in: path
+        name: id
+        description: 'The ID of the payment.'
+        example: 1
+        required: true
+        schema:
+          type: integer
+      -
+        in: path
+        name: payment
+        description: 'The ID of the payment.'
+        example: '1'
+        required: true
+        schema:
+          type: string
+  /api/v1/products:
+    get:
+      summary: 'Display a listing of the products.'
+      operationId: displayAListingOfTheProducts
+      description: 'Retrieves a paginated list of products. You can specify the number of products per page.'
+      parameters:
+        -
+          in: query
+          name: per_page
+          description: 'The number of products to return per page. Defaults to 15.'
+          example: 25
+          required: false
+          schema:
+            type: integer
+            description: 'The number of products to return per page. Defaults to 15.'
+            example: 25
+            nullable: false
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+      tags:
+        - Products
+    post:
+      summary: 'Create a new product.'
+      operationId: createANewProduct
+      description: 'Creates a new product with the provided data.'
+      parameters: []
+      responses: {  }
+      tags:
+        - Products
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  description: 'The name of the product.'
+                  example: '"Laptop Pro"'
+                  nullable: false
+                code:
+                  type: string
+                  description: 'A unique code for the product.'
+                  example: '"LP-001"'
+                  nullable: false
+                price:
+                  type: number
+                  description: 'The cost price of the product.'
+                  example: 1200.5
+                  nullable: false
+                selling_price:
+                  type: number
+                  description: 'The selling price of the product.'
+                  example: 1499.99
+                  nullable: false
+                category_id:
+                  type: integer
+                  description: 'The ID of the category.'
+                  example: 1
+                  nullable: false
+                supplier_id:
+                  type: integer
+                  description: 'The ID of the supplier.'
+                  example: 1
+                  nullable: true
+                units_id:
+                  type: integer
+                  description: 'The ID of the unit.'
+                  example: 1
+                  nullable: false
+                warehouse_id:
+                  type: integer
+                  description: 'The ID of the warehouse.'
+                  example: 1
+                  nullable: true
+                stock_quantity:
+                  type: number
+                  description: 'The initial stock quantity.'
+                  example: 50.0
+                  nullable: true
+                description:
+                  type: string
+                  description: 'A description for the product.'
+                  example: 'Dolores dolorum amet iste laborum eius est dolor.'
+                  nullable: true
+              required:
+                - name
+                - code
+                - price
+                - selling_price
+                - category_id
+                - units_id
+  '/api/v1/products/{id}':
+    get:
+      summary: 'Display the specified product.'
+      operationId: displayTheSpecifiedProduct
+      description: 'Retrieves a single product by its ID.'
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+      tags:
+        - Products
+    put:
+      summary: 'Update the specified product.'
+      operationId: updateTheSpecifiedProduct
+      description: 'Updates a product with the provided data.'
+      parameters: []
+      responses: {  }
+      tags:
+        - Products
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  description: 'The name of the product.'
+                  example: '"Laptop Pro v2"'
+                  nullable: false
+                code:
+                  type: string
+                  description: 'The product code. Must be unique.'
+                  example: '"LP-001"'
+                  nullable: false
+                price:
+                  type: number
+                  description: 'The cost price of the product.'
+                  example: 1250.0
+                  nullable: false
+                selling_price:
+                  type: number
+                  description: 'The selling price of the product.'
+                  example: 1499.99
+                  nullable: false
+                category_id:
+                  type: integer
+                  description: 'The ID of the category.'
+                  example: 1
+                  nullable: false
+                supplier_id:
+                  type: integer
+                  description: 'The ID of the supplier.'
+                  example: 1
+                  nullable: true
+                units_id:
+                  type: integer
+                  description: 'The ID of the unit.'
+                  example: 1
+                  nullable: false
+                warehouse_id:
+                  type: integer
+                  description: 'The ID of the warehouse.'
+                  example: 1
+                  nullable: true
+                stock_quantity:
+                  type: number
+                  description: 'The initial stock quantity.'
+                  example: 50.0
+                  nullable: true
+                description:
+                  type: string
+                  description: 'A description for the product.'
+                  example: 'Dolores dolorum amet iste laborum eius est dolor.'
+                  nullable: true
+    delete:
+      summary: 'Delete the specified product.'
+      operationId: deleteTheSpecifiedProduct
+      description: 'Deletes a single product by its ID.'
+      parameters: []
+      responses:
+        204:
+          description: Success
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: ''
+      tags:
+        - Products
+    parameters:
+      -
+        in: path
+        name: id
+        description: 'The ID of the product.'
+        example: 1
+        required: true
+        schema:
+          type: integer
+      -
+        in: path
+        name: product
+        description: 'The ID of the product.'
+        example: '1'
+        required: true
+        schema:
+          type: string
+  /api/v1/products/quick-create:
+    post:
+      summary: 'Quick Create Product'
+      operationId: quickCreateProduct
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Products
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                code:
+                  type: string
+                  description: 'The product code.'
+                  example: '"PROD-001"'
+                  nullable: false
+                name:
+                  type: string
+                  description: 'The name of the product.'
+                  example: '"New Product"'
+                  nullable: false
+                stock_quantity:
+                  type: integer
+                  description: 'The initial stock quantity.'
+                  example: 100
+                  nullable: false
+                low_stock_threshold:
+                  type: integer
+                  description: 'Must be at least 1.'
+                  example: 45
+                  nullable: true
+                price:
+                  type: number
+                  description: 'The purchase price.'
+                  example: 99.99
+                  nullable: false
+                selling_price:
+                  type: number
+                  description: 'The selling price.'
+                  example: 149.99
+                  nullable: false
+                category_id:
+                  type: integer
+                  description: 'The ID of the category.'
+                  example: 1
+                  nullable: false
+                units_id:
+                  type: integer
+                  description: 'The ID of the unit.'
+                  example: 1
+                  nullable: false
+                supplier_id:
+                  type: integer
+                  description: 'The ID of the supplier.'
+                  example: 1
+                  nullable: false
+                warehouse_id:
+                  type: integer
+                  description: 'nullable The ID of the warehouse.'
+                  example: 1
+                  nullable: true
+                description:
+                  type: string
+                  description: 'nullable A description of the product.'
+                  example: 'Dolores dolorum amet iste laborum eius est dolor.'
+                  nullable: true
+                image:
+                  type: string
+                  format: binary
+                  description: 'nullable An image of the product.'
+                  nullable: true
+                has_expiry:
+                  type: boolean
+                  description: 'nullable Whether the product has an expiry date.'
+                  example: false
+                  nullable: true
+              required:
+                - code
+                - name
+                - stock_quantity
+                - price
+                - selling_price
+                - category_id
+                - units_id
+                - supplier_id
+  /api/v1/products/bulk-delete:
+    post:
+      summary: 'Bulk Delete Products'
+      operationId: bulkDeleteProducts
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Products
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                ids:
+                  type: array
+                  description: 'An array of product IDs to delete.'
+                  example:
+                    - 1
+                    - 2
+                    - 3
+                  items:
+                    type: string
+              required:
+                - ids
+  /api/v1/products/bulk-update-stock:
+    put:
+      summary: 'Bulk Update Product Stock'
+      operationId: bulkUpdateProductStock
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Products
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                updates:
+                  type: array
+                  description: 'An array of product stock updates.'
+                  example:
+                    - consequatur
+                  items:
+                    type: string
+                reason:
+                  type: string
+                  description: 'nullable A reason for the stock adjustment.'
+                  example: '"Annual stock take"'
+                  nullable: true
+              required:
+                - updates
+  /api/v1/products/adjust-stock:
+    post:
+      summary: 'Adjust Product Stock'
+      operationId: adjustProductStock
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Products
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                product_id:
+                  type: integer
+                  description: 'The ID of the product to adjust.'
+                  example: 1
+                  nullable: false
+                adjustment_amount:
+                  type: number
+                  description: 'The amount to adjust the stock by.'
+                  example: 11613.31890586
+                  nullable: false
+                adjustment_type:
+                  type: string
+                  description: "The type of adjustment. Must be one of 'increase', 'decrease', 'correction'."
+                  example: "'increase'"
+                  nullable: false
+                reason:
+                  type: string
+                  description: 'nullable A reason for the adjustment.'
+                  example: '"Found extra unit during count."'
+                  nullable: true
+              required:
+                - product_id
+                - adjustment_amount
+                - adjustment_type
+  /api/v1/products/search:
+    get:
+      summary: 'Search Products'
+      operationId: searchProducts
+      description: ''
+      parameters:
+        -
+          in: query
+          name: q
+          description: 'The search query.'
+          example: consequatur
+          required: true
+          schema:
+            type: string
+            description: 'The search query.'
+            example: consequatur
+            nullable: false
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+      tags:
+        - Products
+  /api/v1/products/expiring-soon:
+    get:
+      summary: 'Get Expiring Soon Products'
+      operationId: getExpiringSoonProducts
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+      tags:
+        - Products
+  /api/v1/products/metrics:
+    get:
+      summary: 'Get Product Metrics'
+      operationId: getProductMetrics
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+      tags:
+        - Products
+  '/api/v1/products/{id}/adjustment-log':
+    get:
+      summary: 'Get Product Adjustment Log'
+      operationId: getProductAdjustmentLog
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+      tags:
+        - Products
+    parameters:
+      -
+        in: path
+        name: id
+        description: 'The ID of the product.'
+        example: 1
+        required: true
+        schema:
+          type: integer
+  /api/v1/products/search-by-barcode:
+    get:
+      summary: 'Search Product by Barcode'
+      operationId: searchProductByBarcode
+      description: ''
+      parameters:
+        -
+          in: query
+          name: barcode
+          description: 'The barcode to search for.'
+          example: '"1234567890123"'
+          required: true
+          schema:
+            type: string
+            description: 'The barcode to search for.'
+            example: '"1234567890123"'
+            nullable: false
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+      tags:
+        - Products
+  /api/v1/po-items:
+    get:
+      summary: 'Display a listing of the purchase order items.'
+      operationId: displayAListingOfThePurchaseOrderItems
+      description: ''
+      parameters:
+        -
+          in: query
+          name: per_page
+          description: 'The number of items to return per page. Defaults to 15.'
+          example: 25
+          required: false
+          schema:
+            type: integer
+            description: 'The number of items to return per page. Defaults to 15.'
+            example: 25
+            nullable: false
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+      tags:
+        - 'Purchase Order Items'
+    post:
+      summary: 'Store a newly created resource in storage.'
+      operationId: storeANewlyCreatedResourceInStorage
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - 'Purchase Order Items'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                po_id:
+                  type: integer
+                  description: 'The ID of the purchase order.'
+                  example: 1
+                  nullable: false
+                product_id:
+                  type: integer
+                  description: 'The ID of the product.'
+                  example: 1
+                  nullable: false
+                quantity:
+                  type: number
+                  description: 'The quantity of the product.'
+                  example: 10.0
+                  nullable: false
+                price:
+                  type: number
+                  description: 'The price of the product.'
+                  example: 50.0
+                  nullable: false
+                discount:
+                  type: number
+                  description: 'The discount applied.'
+                  example: 5.0
+                  nullable: true
+                discount_type:
+                  type: string
+                  description: 'The type of discount applied.'
+                  example: '"fixed"'
+                  nullable: true
+                total:
+                  type: number
+                  description: 'The total price for the item.'
+                  example: 450.0
+                  nullable: false
+                expiry_date:
+                  type: date
+                  description: 'The expiry date of the product.'
+                  example: '"2026-12-31"'
+                  nullable: true
+                remaining_quantity:
+                  type: number
+                  description: 'The remaining quantity of the product.'
+                  example: 10.0
+                  nullable: true
+              required:
+                - po_id
+                - product_id
+                - quantity
+                - price
+                - total
+  '/api/v1/po-items/{id}':
+    get:
+      summary: 'Display the specified purchase order item.'
+      operationId: displayTheSpecifiedPurchaseOrderItem
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+      tags:
+        - 'Purchase Order Items'
+    put:
+      summary: 'Update the specified resource in storage.'
+      operationId: updateTheSpecifiedResourceInStorage
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - 'Purchase Order Items'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                po_id:
+                  type: integer
+                  description: 'The ID of the purchase order.'
+                  example: 1
+                  nullable: false
+                product_id:
+                  type: integer
+                  description: 'The ID of the product.'
+                  example: 1
+                  nullable: false
+                quantity:
+                  type: number
+                  description: 'The quantity of the product.'
+                  example: 10.0
+                  nullable: false
+                price:
+                  type: number
+                  description: 'The price of the product.'
+                  example: 50.0
+                  nullable: false
+                discount:
+                  type: number
+                  description: 'The discount applied.'
+                  example: 5.0
+                  nullable: true
+                discount_type:
+                  type: string
+                  description: 'The type of discount applied.'
+                  example: '"fixed"'
+                  nullable: true
+                total:
+                  type: number
+                  description: 'The total price for the item.'
+                  example: 450.0
+                  nullable: false
+                expiry_date:
+                  type: date
+                  description: 'The expiry date of the product.'
+                  example: '"2026-12-31"'
+                  nullable: true
+                remaining_quantity:
+                  type: number
+                  description: 'The remaining quantity of the product.'
+                  example: 10.0
+                  nullable: true
+              required:
+                - po_id
+                - product_id
+                - quantity
+                - price
+                - total
+    delete:
+      summary: 'Remove the specified resource from storage.'
+      operationId: removeTheSpecifiedResourceFromStorage
+      description: ''
+      parameters: []
+      responses:
+        204:
+          description: Success
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: ''
+      tags:
+        - 'Purchase Order Items'
+    parameters:
+      -
+        in: path
+        name: id
+        description: 'The ID of the po item.'
+        example: 1
+        required: true
+        schema:
+          type: integer
+      -
+        in: path
+        name: po_item
+        description: 'The ID of the purchase order item.'
+        example: '1'
+        required: true
+        schema:
+          type: string
+  /api/v1/purchases:
+    get:
+      summary: 'Display a listing of the purchase orders.'
+      operationId: displayAListingOfThePurchaseOrders
+      description: 'Retrieves a paginated list of purchase orders.'
+      parameters:
+        -
+          in: query
+          name: per_page
+          description: 'The number of purchase orders to return per page. Defaults to 15.'
+          example: 25
+          required: false
+          schema:
+            type: integer
+            description: 'The number of purchase orders to return per page. Defaults to 15.'
+            example: 25
+            nullable: false
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+      tags:
+        - 'Purchase Orders'
+    post:
+      summary: 'Store a newly created resource in storage.'
+      operationId: storeANewlyCreatedResourceInStorage
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - 'Purchase Orders'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                invoice:
+                  type: string
+                  description: 'The invoice number.'
+                  example: INV-2023-001
+                  nullable: false
+                supplier_id:
+                  type: integer
+                  description: 'The ID of the supplier.'
+                  example: 1
+                  nullable: false
+                user_id:
+                  type: integer
+                  description: 'The ID of the user.'
+                  example: 1
+                  nullable: false
+                order_date:
+                  type: date
+                  description: 'The date of the order.'
+                  example: '2023-10-26'
+                  nullable: false
+                due_date:
+                  type: date
+                  description: 'The due date of the payment.'
+                  example: '2023-11-26'
+                  nullable: true
+                payment_type:
+                  type: string
+                  description: 'The payment type (e.g., Cash, Credit Card).'
+                  example: Cash
+                  nullable: false
+                discount_total:
+                  type: numeric
+                  description: 'The total discount applied.'
+                  example: '5.00'
+                  nullable: true
+                discount_total_type:
+                  type: string
+                  description: 'The type of discount (e.g., percentage, fixed).'
+                  example: fixed
+                  nullable: true
+                total:
+                  type: numeric
+                  description: 'The total amount of the purchase order.'
+                  example: '1500.00'
+                  nullable: false
+                status:
+                  type: string
+                  description: 'The status of the purchase order (e.g., Pending, Paid).'
+                  example: Pending
+                  nullable: false
+              required:
+                - invoice
+                - supplier_id
+                - user_id
+                - order_date
+                - payment_type
+                - total
+                - status
+  '/api/v1/purchases/{id}':
+    get:
+      summary: 'Display the specified purchase order.'
+      operationId: displayTheSpecifiedPurchaseOrder
+      description: 'Retrieves a single purchase order by its ID.'
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+      tags:
+        - 'Purchase Orders'
+    put:
+      summary: 'Update the specified resource in storage.'
+      operationId: updateTheSpecifiedResourceInStorage
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - 'Purchase Orders'
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                invoice:
+                  type: string
+                  description: 'The invoice number.'
+                  example: INV-2023-002
+                  nullable: false
+                supplier_id:
+                  type: integer
+                  description: 'The ID of the supplier.'
+                  example: 2
+                  nullable: false
+                user_id:
+                  type: integer
+                  description: 'The ID of the user.'
+                  example: 1
+                  nullable: false
+                order_date:
+                  type: date
+                  description: 'The date of the order.'
+                  example: '2023-10-27'
+                  nullable: false
+                due_date:
+                  type: date
+                  description: 'The due date of the payment.'
+                  example: '2023-11-27'
+                  nullable: true
+                payment_type:
+                  type: string
+                  description: 'The payment type (e.g., Cash, Credit Card).'
+                  example: 'Credit Card'
+                  nullable: false
+                discount_total:
+                  type: numeric
+                  description: 'The total discount applied.'
+                  example: '10.00'
+                  nullable: true
+                discount_total_type:
+                  type: string
+                  description: 'The type of discount (e.g., percentage, fixed).'
+                  example: percentage
+                  nullable: true
+                total:
+                  type: numeric
+                  description: 'The total amount of the purchase order.'
+                  example: '2000.00'
+                  nullable: false
+                status:
+                  type: string
+                  description: 'The status of the purchase order (e.g., Pending, Paid).'
+                  example: Paid
+                  nullable: false
+    delete:
+      summary: 'Remove the specified resource from storage.'
+      operationId: removeTheSpecifiedResourceFromStorage
+      description: ''
+      parameters: []
+      responses:
+        204:
+          description: Success
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: ''
+      tags:
+        - 'Purchase Orders'
+    parameters:
+      -
+        in: path
+        name: id
+        description: 'The ID of the purchase.'
+        example: 1
+        required: true
+        schema:
+          type: integer
+      -
+        in: path
+        name: purchase
+        description: 'The ID of the purchase order.'
+        example: '1'
+        required: true
+        schema:
+          type: string
+  /api/v1/purchases/bulk-delete:
+    post:
+      summary: 'Bulk Delete Purchase Orders'
+      operationId: bulkDeletePurchaseOrders
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - 'Purchase Orders'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                ids:
+                  type: array
+                  description: 'An array of purchase order IDs to delete.'
+                  example:
+                    - 1
+                    - 2
+                    - 3
+                  items:
+                    type: string
+              required:
+                - ids
+  /api/v1/purchases/bulk-mark-paid:
+    put:
+      summary: 'Bulk Mark Purchase Orders as Paid'
+      operationId: bulkMarkPurchaseOrdersAsPaid
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - 'Purchase Orders'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                ids:
+                  type: array
+                  description: 'An array of purchase order IDs to mark as paid.'
+                  example:
+                    - 1
+                    - 2
+                    - 3
+                  items:
+                    type: string
+              required:
+                - ids
+  /api/v1/purchases/metrics:
+    get:
+      summary: 'Get Purchase Metrics'
+      operationId: getPurchaseMetrics
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+      tags:
+        - 'Purchase Orders'
+  /api/v1/purchases/expiring-soon:
+    get:
+      summary: 'Get Expiring Soon Purchases'
+      operationId: getExpiringSoonPurchases
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+      tags:
+        - 'Purchase Orders'
+  '/api/v1/purchases/{id}/payment':
+    post:
+      summary: 'Add Payment to Purchase Order'
+      operationId: addPaymentToPurchaseOrder
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - 'Purchase Orders'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                amount:
+                  type: number
+                  description: 'The payment amount.'
+                  example: 100.0
+                  nullable: false
+                payment_date:
+                  type: date
+                  description: 'The date of the payment.'
+                  example: '"2023-10-27"'
+                  nullable: false
+                payment_method:
+                  type: string
+                  description: 'The method of payment.'
+                  example: '"Bank Transfer"'
+                  nullable: false
+                notes:
+                  type: string
+                  description: 'nullable Any notes about the payment.'
+                  example: consequatur
+                  nullable: true
+              required:
+                - amount
+                - payment_date
+                - payment_method
+    parameters:
+      -
+        in: path
+        name: id
+        description: 'The ID of the purchase order.'
+        example: 1
+        required: true
+        schema:
+          type: integer
+  /api/v1/reports/adjustment-log:
+    get:
+      summary: 'Get Stock Adjustment Log'
+      operationId: getStockAdjustmentLog
+      description: ''
+      parameters:
+        -
+          in: query
+          name: page
+          description: 'The page number to retrieve.'
+          example: 1
+          required: false
+          schema:
+            type: integer
+            description: 'The page number to retrieve.'
+            example: 1
+            nullable: false
+        -
+          in: query
+          name: per_page
+          description: 'The number of items to return per page. Defaults to 20.'
+          example: 20
+          required: false
+          schema:
+            type: integer
+            description: 'The number of items to return per page. Defaults to 20.'
+            example: 20
+            nullable: false
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+      tags:
+        - Reports
+  /api/v1/reports/recent-transactions:
+    get:
+      summary: 'Get Recent Transactions'
+      operationId: getRecentTransactions
+      description: ''
+      parameters:
+        -
+          in: query
+          name: per_page
+          description: 'The number of transactions per page.'
+          example: 25
+          required: false
+          schema:
+            type: integer
+            description: 'The number of transactions per page.'
+            example: 25
+            nullable: false
+        -
+          in: query
+          name: type
+          description: "Filter by type (e.g., 'purchase', 'sale')."
+          example: consequatur
+          required: false
+          schema:
+            type: string
+            description: "Filter by type (e.g., 'purchase', 'sale')."
+            example: consequatur
+            nullable: false
+        -
+          in: query
+          name: status
+          description: "Filter by status (e.g., 'paid', 'due')."
+          example: consequatur
+          required: false
+          schema:
+            type: string
+            description: "Filter by status (e.g., 'paid', 'due')."
+            example: consequatur
+            nullable: false
+        -
+          in: query
+          name: date_range
+          description: "Date range filter ('today', 'this_week', 'this_month', 'all')."
+          example: "'this_month'"
+          required: false
+          schema:
+            type: string
+            description: "Date range filter ('today', 'this_week', 'this_month', 'all')."
+            example: "'this_month'"
+            nullable: false
+        -
+          in: query
+          name: search
+          description: 'Search term.'
+          example: consequatur
+          required: false
+          schema:
+            type: string
+            description: 'Search term.'
+            example: consequatur
+            nullable: false
+        -
+          in: query
+          name: start_date
+          description: 'date Start date for filtering.'
+          example: '2023-01-01'
+          required: false
+          schema:
+            type: string
+            description: 'date Start date for filtering.'
+            example: '2023-01-01'
+            nullable: false
+        -
+          in: query
+          name: end_date
+          description: 'date End date for filtering.'
+          example: '2023-12-31'
+          required: false
+          schema:
+            type: string
+            description: 'date End date for filtering.'
+            example: '2023-12-31'
+            nullable: false
+        -
+          in: query
+          name: sort
+          description: 'Field to sort by.'
+          example: date
+          required: false
+          schema:
+            type: string
+            description: 'Field to sort by.'
+            example: date
+            nullable: false
+        -
+          in: query
+          name: direction
+          description: 'Sort direction (asc or desc).'
+          example: desc
+          required: false
+          schema:
+            type: string
+            description: 'Sort direction (asc or desc).'
+            example: desc
+            nullable: false
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+      tags:
+        - Reports
+  /api/v1/reports/transactions/bulk-mark-paid:
+    post:
+      summary: 'Bulk Mark Transactions as Paid'
+      operationId: bulkMarkTransactionsAsPaid
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Reports
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                transaction_ids:
+                  type: array
+                  description: 'An array of transaction IDs to mark as paid.'
+                  example:
+                    - 1
+                    - 2
+                    - 3
+                  items:
+                    type: string
+              required:
+                - transaction_ids
+  '/api/v1/reports/transactions/{id}/mark-paid':
+    post:
+      summary: 'Mark a Single Transaction as Paid'
+      operationId: markASingleTransactionAsPaid
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Reports
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                type:
+                  type: string
+                  description: "The type of the transaction ('purchase' or 'sale')."
+                  example: '"sale"'
+                  nullable: false
+              required:
+                - type
+    parameters:
+      -
+        in: path
+        name: id
+        description: 'The ID of the transaction.'
+        example: 1
+        required: true
+        schema:
+          type: integer
+  /api/v1/roles:
+    get:
+      summary: 'Display a listing of the roles.'
+      operationId: displayAListingOfTheRoles
+      description: ''
+      parameters:
+        -
+          in: query
+          name: per_page
+          description: 'The number of roles to return per page. Defaults to 15.'
+          example: 25
+          required: false
+          schema:
+            type: integer
+            description: 'The number of roles to return per page. Defaults to 15.'
+            example: 25
+            nullable: false
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+      tags:
+        - Roles
+    post:
+      summary: 'Store a newly created resource in storage.'
+      operationId: storeANewlyCreatedResourceInStorage
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Roles
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  description: 'The name of the role.'
+                  example: Admin
+                  nullable: false
+              required:
+                - name
+  '/api/v1/roles/{id}':
+    get:
+      summary: 'Display the specified role.'
+      operationId: displayTheSpecifiedRole
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+      tags:
+        - Roles
+    put:
+      summary: 'Update the specified resource in storage.'
+      operationId: updateTheSpecifiedResourceInStorage
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Roles
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  description: 'The name of the role.'
+                  example: Editor
+                  nullable: false
+              required:
+                - name
+    delete:
+      summary: 'Remove the specified resource from storage.'
+      operationId: removeTheSpecifiedResourceFromStorage
+      description: ''
+      parameters: []
+      responses:
+        204:
+          description: Success
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: ''
+      tags:
+        - Roles
+    parameters:
+      -
+        in: path
+        name: id
+        description: 'The ID of the role.'
+        example: 1
+        required: true
+        schema:
+          type: integer
+      -
+        in: path
+        name: role
+        description: 'The ID of the role.'
+        example: '1'
+        required: true
+        schema:
+          type: string
+  /api/v1/sales-items:
+    get:
+      summary: 'Display a listing of the sales items.'
+      operationId: displayAListingOfTheSalesItems
+      description: ''
+      parameters:
+        -
+          in: query
+          name: per_page
+          description: 'The number of items to return per page. Defaults to 15.'
+          example: 25
+          required: false
+          schema:
+            type: integer
+            description: 'The number of items to return per page. Defaults to 15.'
+            example: 25
+            nullable: false
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+      tags:
+        - 'Sales Items'
+    post:
+      summary: 'Store a newly created resource in storage.'
+      operationId: storeANewlyCreatedResourceInStorage
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - 'Sales Items'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                sales_id:
+                  type: integer
+                  description: 'The ID of the sales order.'
+                  example: 1
+                  nullable: false
+                product_id:
+                  type: integer
+                  description: 'The ID of the product.'
+                  example: 1
+                  nullable: false
+                quantity:
+                  type: integer
+                  description: 'The quantity of the product.'
+                  example: 5
+                  nullable: false
+                discount:
+                  type: numeric
+                  description: 'The discount applied to the item.'
+                  example: '0.00'
+                  nullable: true
+                discount_type:
+                  type: string
+                  description: 'The type of discount (e.g., percentage, fixed).'
+                  example: fixed
+                  nullable: true
+                customer_price:
+                  type: numeric
+                  description: 'The price charged to the customer.'
+                  example: '100.00'
+                  nullable: false
+                total:
+                  type: numeric
+                  description: 'The total amount for the item.'
+                  example: '500.00'
+                  nullable: false
+              required:
+                - sales_id
+                - product_id
+                - quantity
+                - total
+  '/api/v1/sales-items/{id}':
+    get:
+      summary: 'Display the specified sales item.'
+      operationId: displayTheSpecifiedSalesItem
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+      tags:
+        - 'Sales Items'
+    put:
+      summary: 'Update the specified resource in storage.'
+      operationId: updateTheSpecifiedResourceInStorage
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - 'Sales Items'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                sales_id:
+                  type: integer
+                  description: 'The ID of the sales order.'
+                  example: 1
+                  nullable: false
+                product_id:
+                  type: integer
+                  description: 'The ID of the product.'
+                  example: 1
+                  nullable: false
+                quantity:
+                  type: integer
+                  description: 'The quantity of the product.'
+                  example: 10
+                  nullable: false
+                discount:
+                  type: numeric
+                  description: 'The discount applied to the item.'
+                  example: '0.00'
+                  nullable: true
+                discount_type:
+                  type: string
+                  description: 'The type of discount (e.g., percentage, fixed).'
+                  example: fixed
+                  nullable: true
+                customer_price:
+                  type: numeric
+                  description: 'The price charged to the customer.'
+                  example: '100.00'
+                  nullable: false
+                total:
+                  type: numeric
+                  description: 'The total amount for the item.'
+                  example: '1000.00'
+                  nullable: false
+              required:
+                - sales_id
+                - product_id
+                - quantity
+                - total
+    delete:
+      summary: 'Remove the specified resource from storage.'
+      operationId: removeTheSpecifiedResourceFromStorage
+      description: ''
+      parameters: []
+      responses:
+        204:
+          description: Success
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: ''
+      tags:
+        - 'Sales Items'
+    parameters:
+      -
+        in: path
+        name: id
+        description: 'The ID of the sales item.'
+        example: 1
+        required: true
+        schema:
+          type: integer
+      -
+        in: path
+        name: sales_item
+        description: 'The ID of the sales item.'
+        example: '1'
+        required: true
+        schema:
+          type: string
+  /api/v1/sales-opportunities:
+    get:
+      summary: 'Display a listing of the sales opportunities.'
+      operationId: displayAListingOfTheSalesOpportunities
+      description: ''
+      parameters:
+        -
+          in: query
+          name: per_page
+          description: 'The number of opportunities to return per page. Defaults to 15.'
+          example: 25
+          required: false
+          schema:
+            type: integer
+            description: 'The number of opportunities to return per page. Defaults to 15.'
+            example: 25
+            nullable: false
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+      tags:
+        - 'Sales Opportunities'
+    post:
+      summary: 'Store a newly created resource in storage.'
+      operationId: storeANewlyCreatedResourceInStorage
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - 'Sales Opportunities'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                customer_id:
+                  type: integer
+                  description: 'The ID of the customer.'
+                  example: 1
+                  nullable: false
+                sales_pipeline_id:
+                  type: integer
+                  description: 'The ID of the sales pipeline.'
+                  example: 1
+                  nullable: false
+                pipeline_stage_id:
+                  type: integer
+                  description: 'The ID of the pipeline stage.'
+                  example: 1
+                  nullable: false
+                name:
+                  type: string
+                  description: 'The name of the sales opportunity.'
+                  example: 'New Client Project'
+                  nullable: false
+                description:
+                  type: string
+                  description: 'A description of the sales opportunity.'
+                  example: 'Develop a new e-commerce platform.'
+                  nullable: true
+                expected_close_date:
+                  type: date
+                  description: 'The expected close date of the opportunity.'
+                  example: '2024-12-31'
+                  nullable: true
+                status:
+                  type: string
+                  description: 'The status of the opportunity (e.g., Open, Won, Lost).'
+                  example: Open
+                  nullable: false
+                items:
+                  type: array
+                  description: 'A list of product items for the opportunity.'
+                  example:
+                    - consequatur
+                  items:
+                    type: string
+                amount:
+                  type: numeric
+                  description: 'The estimated amount of the opportunity.'
+                  example: '50000.00'
+                  nullable: false
+              required:
+                - customer_id
+                - sales_pipeline_id
+                - pipeline_stage_id
+                - name
+                - items
+  '/api/v1/sales-opportunities/{id}':
+    get:
+      summary: 'Display the specified sales opportunity.'
+      operationId: displayTheSpecifiedSalesOpportunity
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+      tags:
+        - 'Sales Opportunities'
+    put:
+      summary: 'Update the specified resource in storage.'
+      operationId: updateTheSpecifiedResourceInStorage
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - 'Sales Opportunities'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                customer_id:
+                  type: integer
+                  description: 'The ID of the customer.'
+                  example: 1
+                  nullable: false
+                sales_pipeline_id:
+                  type: integer
+                  description: 'The ID of the sales pipeline.'
+                  example: 1
+                  nullable: false
+                pipeline_stage_id:
+                  type: integer
+                  description: 'The ID of the pipeline stage.'
+                  example: 1
+                  nullable: false
+                name:
+                  type: string
+                  description: 'The name of the sales opportunity.'
+                  example: 'New Client Project'
+                  nullable: false
+                description:
+                  type: string
+                  description: 'A description of the sales opportunity.'
+                  example: 'Develop a new e-commerce platform.'
+                  nullable: true
+                expected_close_date:
+                  type: date
+                  description: 'The expected close date of the opportunity.'
+                  example: '2024-12-31'
+                  nullable: true
+                status:
+                  type: string
+                  description: 'The status of the opportunity (e.g., Open, Won, Lost).'
+                  example: Open
+                  nullable: false
+                items:
+                  type: array
+                  description: 'A list of product items for the opportunity.'
+                  example:
+                    - consequatur
+                  items:
+                    type: string
+                amount:
+                  type: numeric
+                  description: 'The estimated amount of the opportunity.'
+                  example: '50000.00'
+                  nullable: false
+              required:
+                - customer_id
+                - sales_pipeline_id
+                - pipeline_stage_id
+                - name
+                - items
+    delete:
+      summary: 'Remove the specified resource from storage.'
+      operationId: removeTheSpecifiedResourceFromStorage
+      description: ''
+      parameters: []
+      responses:
+        204:
+          description: Success
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: ''
+      tags:
+        - 'Sales Opportunities'
+    parameters:
+      -
+        in: path
+        name: id
+        description: 'The ID of the sales opportunity.'
+        example: 17
+        required: true
+        schema:
+          type: integer
+      -
+        in: path
+        name: sales_opportunity
+        description: 'The ID of the sales opportunity.'
+        example: '1'
+        required: true
+        schema:
+          type: string
+  '/api/v1/sales-opportunities/{opportunity_id}/move':
+    put:
+      summary: 'Move Opportunity to a new Stage'
+      operationId: moveOpportunityToANewStage
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - 'Sales Opportunities'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                pipeline_stage_id:
+                  type: integer
+                  description: 'The ID of the new pipeline stage.'
+                  example: 2
+                  nullable: false
+              required:
+                - pipeline_stage_id
+    parameters:
+      -
+        in: path
+        name: opportunity_id
+        description: 'The ID of the opportunity.'
+        example: 17
+        required: true
+        schema:
+          type: integer
+      -
+        in: path
+        name: opportunity
+        description: 'The ID of the sales opportunity.'
+        example: 1
+        required: true
+        schema:
+          type: integer
+  '/api/v1/sales-opportunities/{opportunity_id}/convert':
+    post:
+      summary: 'Convert Opportunity to Sales Order'
+      operationId: convertOpportunityToSalesOrder
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - 'Sales Opportunities'
+    parameters:
+      -
+        in: path
+        name: opportunity_id
+        description: 'The ID of the opportunity.'
+        example: 17
+        required: true
+        schema:
+          type: integer
+      -
+        in: path
+        name: opportunity
+        description: 'The ID of the sales opportunity.'
+        example: 1
+        required: true
+        schema:
+          type: integer
+  /api/v1/sales-opportunity-items:
+    get:
+      summary: 'Display a listing of the sales opportunity items.'
+      operationId: displayAListingOfTheSalesOpportunityItems
+      description: ''
+      parameters:
+        -
+          in: query
+          name: per_page
+          description: 'The number of items to return per page. Defaults to 15.'
+          example: 25
+          required: false
+          schema:
+            type: integer
+            description: 'The number of items to return per page. Defaults to 15.'
+            example: 25
+            nullable: false
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+      tags:
+        - 'Sales Opportunity Items'
+    post:
+      summary: 'Store a newly created resource in storage.'
+      operationId: storeANewlyCreatedResourceInStorage
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - 'Sales Opportunity Items'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                sales_opportunity_id:
+                  type: integer
+                  description: 'The ID of the sales opportunity.'
+                  example: 1
+                  nullable: false
+                product_id:
+                  type: integer
+                  description: 'The ID of the product.'
+                  example: 1
+                  nullable: false
+                quantity:
+                  type: integer
+                  description: 'The quantity of the product.'
+                  example: 5
+                  nullable: false
+                price:
+                  type: numeric
+                  description: 'The price of the product.'
+                  example: '100.00'
+                  nullable: false
+              required:
+                - sales_opportunity_id
+                - product_id
+                - quantity
+                - price
+  '/api/v1/sales-opportunity-items/{id}':
+    get:
+      summary: 'Display the specified sales opportunity item.'
+      operationId: displayTheSpecifiedSalesOpportunityItem
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+      tags:
+        - 'Sales Opportunity Items'
+    put:
+      summary: 'Update the specified resource in storage.'
+      operationId: updateTheSpecifiedResourceInStorage
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - 'Sales Opportunity Items'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                sales_opportunity_id:
+                  type: integer
+                  description: 'The ID of the sales opportunity.'
+                  example: 1
+                  nullable: false
+                product_id:
+                  type: integer
+                  description: 'The ID of the product.'
+                  example: 1
+                  nullable: false
+                quantity:
+                  type: integer
+                  description: 'The quantity of the product.'
+                  example: 10
+                  nullable: false
+                price:
+                  type: numeric
+                  description: 'The price of the product.'
+                  example: '100.00'
+                  nullable: false
+              required:
+                - sales_opportunity_id
+                - product_id
+                - quantity
+                - price
+    delete:
+      summary: 'Remove the specified resource from storage.'
+      operationId: removeTheSpecifiedResourceFromStorage
+      description: ''
+      parameters: []
+      responses:
+        204:
+          description: Success
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: ''
+      tags:
+        - 'Sales Opportunity Items'
+    parameters:
+      -
+        in: path
+        name: id
+        description: 'The ID of the sales opportunity item.'
+        example: 17
+        required: true
+        schema:
+          type: integer
+      -
+        in: path
+        name: sales_opportunity_item
+        description: 'The ID of the sales opportunity item.'
+        example: '1'
+        required: true
+        schema:
+          type: string
+  /api/v1/sales:
+    get:
+      summary: 'Display a listing of the sales orders.'
+      operationId: displayAListingOfTheSalesOrders
+      description: 'Retrieves a paginated list of sales orders.'
+      parameters:
+        -
+          in: query
+          name: per_page
+          description: 'The number of sales orders to return per page. Defaults to 15.'
+          example: 25
+          required: false
+          schema:
+            type: integer
+            description: 'The number of sales orders to return per page. Defaults to 15.'
+            example: 25
+            nullable: false
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+      tags:
+        - 'Sales Orders'
+    post:
+      summary: 'Store a newly created resource in storage.'
+      operationId: storeANewlyCreatedResourceInStorage
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - 'Sales Orders'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                invoice:
+                  type: string
+                  description: 'The invoice number.'
+                  example: INV-SALES-001
+                  nullable: false
+                customer_id:
+                  type: integer
+                  description: 'The ID of the customer.'
+                  example: 1
+                  nullable: false
+                user_id:
+                  type: integer
+                  description: 'The ID of the user.'
+                  example: 1
+                  nullable: false
+                order_date:
+                  type: date
+                  description: 'The date of the order.'
+                  example: '2023-10-26'
+                  nullable: false
+                due_date:
+                  type: date
+                  description: 'The due date of the payment.'
+                  example: '2023-11-26'
+                  nullable: true
+                payment_type:
+                  type: string
+                  description: 'The payment type (e.g., Cash, Credit Card).'
+                  example: Cash
+                  nullable: false
+                order_discount:
+                  type: numeric
+                  description: 'The total discount applied.'
+                  example: '5.00'
+                  nullable: true
+                order_discount_type:
+                  type: string
+                  description: 'The type of discount (e.g., percentage, fixed).'
+                  example: fixed
+                  nullable: true
+                total:
+                  type: numeric
+                  description: 'The total amount of the sales order.'
+                  example: '1500.00'
+                  nullable: false
+                status:
+                  type: string
+                  description: 'The status of the sales order (e.g., Pending, Paid).'
+                  example: Pending
+                  nullable: false
+                tax_rate:
+                  type: numeric
+                  description: 'The tax rate applied.'
+                  example: '0.05'
+                  nullable: true
+                total_tax:
+                  type: numeric
+                  description: 'The total tax amount.'
+                  example: '75.00'
+                  nullable: true
+                amount_received:
+                  type: numeric
+                  description: 'The amount received.'
+                  example: '1575.00'
+                  nullable: true
+                change_amount:
+                  type: numeric
+                  description: 'The change amount.'
+                  example: '0.00'
+                  nullable: true
+                is_pos:
+                  type: boolean
+                  description: 'Is this a point of sale transaction.'
+                  example: true
+                  nullable: false
+                sales_opportunity_id:
+                  type: integer
+                  description: 'The ID of the sales opportunity.'
+                  example: 1
+                  nullable: true
+              required:
+                - invoice
+                - customer_id
+                - user_id
+                - order_date
+                - payment_type
+                - total
+                - status
+  '/api/v1/sales/{id}':
+    get:
+      summary: 'Display the specified sales order.'
+      operationId: displayTheSpecifiedSalesOrder
+      description: 'Retrieves a single sales order by its ID.'
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+      tags:
+        - 'Sales Orders'
+    put:
+      summary: 'Update the specified resource in storage.'
+      operationId: updateTheSpecifiedResourceInStorage
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - 'Sales Orders'
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                invoice:
+                  type: string
+                  description: 'The invoice number.'
+                  example: INV-SALES-002
+                  nullable: false
+                customer_id:
+                  type: integer
+                  description: 'The ID of the customer.'
+                  example: 2
+                  nullable: false
+                user_id:
+                  type: integer
+                  description: 'The ID of the user.'
+                  example: 1
+                  nullable: false
+                order_date:
+                  type: date
+                  description: 'The date of the order.'
+                  example: '2023-10-27'
+                  nullable: false
+                due_date:
+                  type: date
+                  description: 'The due date of the payment.'
+                  example: '2023-11-27'
+                  nullable: true
+                payment_type:
+                  type: string
+                  description: 'The payment type (e.g., Cash, Credit Card).'
+                  example: 'Credit Card'
+                  nullable: false
+                order_discount:
+                  type: numeric
+                  description: 'The total discount applied.'
+                  example: '10.00'
+                  nullable: true
+                order_discount_type:
+                  type: string
+                  description: 'The type of discount (e.g., percentage, fixed).'
+                  example: percentage
+                  nullable: true
+                total:
+                  type: numeric
+                  description: 'The total amount of the sales order.'
+                  example: '2000.00'
+                  nullable: false
+                status:
+                  type: string
+                  description: 'The status of the sales order (e.g., Pending, Paid).'
+                  example: Paid
+                  nullable: false
+                tax_rate:
+                  type: numeric
+                  description: 'The tax rate applied.'
+                  example: '0.05'
+                  nullable: true
+                total_tax:
+                  type: numeric
+                  description: 'The total tax amount.'
+                  example: '100.00'
+                  nullable: true
+                amount_received:
+                  type: numeric
+                  description: 'The amount received.'
+                  example: '2000.00'
+                  nullable: true
+                change_amount:
+                  type: numeric
+                  description: 'The change amount.'
+                  example: '0.00'
+                  nullable: true
+                is_pos:
+                  type: boolean
+                  description: 'Is this a point of sale transaction.'
+                  example: false
+                  nullable: false
+                sales_opportunity_id:
+                  type: integer
+                  description: 'The ID of the sales opportunity.'
+                  example: 1
+                  nullable: true
+    delete:
+      summary: 'Remove the specified resource from storage.'
+      operationId: removeTheSpecifiedResourceFromStorage
+      description: ''
+      parameters: []
+      responses:
+        204:
+          description: Success
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: ''
+      tags:
+        - 'Sales Orders'
+    parameters:
+      -
+        in: path
+        name: id
+        description: 'The ID of the sale.'
+        example: 1
+        required: true
+        schema:
+          type: integer
+      -
+        in: path
+        name: sale
+        description: 'The ID of the sales order.'
+        example: '1'
+        required: true
+        schema:
+          type: string
+  /api/v1/sales/bulk-delete:
+    post:
+      summary: 'Bulk Delete Sales Orders'
+      operationId: bulkDeleteSalesOrders
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - 'Sales Orders'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                ids:
+                  type: array
+                  description: 'An array of sales order IDs to delete.'
+                  example:
+                    - 1
+                    - 2
+                    - 3
+                  items:
+                    type: string
+              required:
+                - ids
+  /api/v1/sales/bulk-mark-paid:
+    put:
+      summary: 'Bulk Mark Sales Orders as Paid'
+      operationId: bulkMarkSalesOrdersAsPaid
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - 'Sales Orders'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                ids:
+                  type: array
+                  description: 'An array of sales order IDs to mark as paid.'
+                  example:
+                    - 1
+                    - 2
+                    - 3
+                  items:
+                    type: string
+              required:
+                - ids
+  /api/v1/sales/metrics:
+    get:
+      summary: 'Get Sales Metrics'
+      operationId: getSalesMetrics
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+      tags:
+        - 'Sales Orders'
+  /api/v1/sales/expiring-soon:
+    get:
+      summary: 'Get Expiring Soon Sales'
+      operationId: getExpiringSoonSales
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+      tags:
+        - 'Sales Orders'
+  '/api/v1/sales/{id}/payment':
+    post:
+      summary: 'Add Payment to Sales Order'
+      operationId: addPaymentToSalesOrder
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - 'Sales Orders'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                amount:
+                  type: number
+                  description: 'The payment amount.'
+                  example: 100.0
+                  nullable: false
+                payment_date:
+                  type: date
+                  description: 'The date of the payment.'
+                  example: '"2023-10-27"'
+                  nullable: false
+                payment_method:
+                  type: string
+                  description: 'The method of payment.'
+                  example: '"Bank Transfer"'
+                  nullable: false
+                notes:
+                  type: string
+                  description: 'nullable Any notes about the payment.'
+                  example: consequatur
+                  nullable: true
+              required:
+                - amount
+                - payment_date
+                - payment_method
+    parameters:
+      -
+        in: path
+        name: id
+        description: 'The ID of the sales order.'
+        example: 1
+        required: true
+        schema:
+          type: integer
+  '/api/v1/sales/customer-price/{customer_id}/{product_id}':
+    get:
+      summary: 'Get Past Customer Price for a Product'
+      operationId: getPastCustomerPriceForAProduct
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+      tags:
+        - 'Sales Orders'
+    parameters:
+      -
+        in: path
+        name: customer_id
+        description: 'The ID of the customer.'
+        example: 1
+        required: true
+        schema:
+          type: integer
+      -
+        in: path
+        name: product_id
+        description: 'The ID of the product.'
+        example: 1
+        required: true
+        schema:
+          type: integer
+      -
+        in: path
+        name: customer
+        description: 'The ID of the customer.'
+        example: 1
+        required: true
+        schema:
+          type: integer
+      -
+        in: path
+        name: product
+        description: 'The ID of the product.'
+        example: 1
+        required: true
+        schema:
+          type: integer
+  '/api/v1/pipeline-stages/{id}':
+    put:
+      summary: 'Update a Pipeline Stage'
+      operationId: updateAPipelineStage
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - 'Sales Pipeline Stages'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  description: 'The new name of the stage.'
+                  example: '"Negotiation"'
+                  nullable: false
+                position:
+                  type: integer
+                  description: 'The new position of the stage.'
+                  example: 1
+                  nullable: false
+                is_closed:
+                  type: boolean
+                  description: 'Whether this stage represents a closed state.'
+                  example: false
+                  nullable: false
+              required:
+                - name
+                - position
+    delete:
+      summary: 'Delete a Pipeline Stage'
+      operationId: deleteAPipelineStage
+      description: ''
+      parameters: []
+      responses:
+        204:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example: {  }
+                properties: {  }
+      tags:
+        - 'Sales Pipeline Stages'
+    parameters:
+      -
+        in: path
+        name: id
+        description: 'The ID of the pipeline stage.'
+        example: 17
+        required: true
+        schema:
+          type: integer
+      -
+        in: path
+        name: stage
+        description: 'The ID of the pipeline stage to update.'
+        example: 1
+        required: true
+        schema:
+          type: integer
+  /api/v1/sales-pipelines:
+    get:
+      summary: 'Display a listing of the sales pipelines.'
+      operationId: displayAListingOfTheSalesPipelines
+      description: ''
+      parameters:
+        -
+          in: query
+          name: per_page
+          description: 'The number of pipelines to return per page. Defaults to 15.'
+          example: 25
+          required: false
+          schema:
+            type: integer
+            description: 'The number of pipelines to return per page. Defaults to 15.'
+            example: 25
+            nullable: false
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+      tags:
+        - 'Sales Pipelines'
+    post:
+      summary: 'Store a newly created resource in storage.'
+      operationId: storeANewlyCreatedResourceInStorage
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - 'Sales Pipelines'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  description: 'The name of the sales pipeline.'
+                  example: 'Initial Sales Pipeline'
+                  nullable: false
+                description:
+                  type: string
+                  description: 'A description of the sales pipeline.'
+                  example: 'Pipeline for initial customer contact.'
+                  nullable: true
+                is_default:
+                  type: boolean
+                  description: 'Is this the default pipeline.'
+                  example: false
+                  nullable: false
+              required:
+                - name
+  '/api/v1/sales-pipelines/{id}':
+    get:
+      summary: 'Display the specified sales pipeline.'
+      operationId: displayTheSpecifiedSalesPipeline
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+      tags:
+        - 'Sales Pipelines'
+    put:
+      summary: 'Update the specified resource in storage.'
+      operationId: updateTheSpecifiedResourceInStorage
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - 'Sales Pipelines'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  description: 'The name of the sales pipeline.'
+                  example: 'New Sales Pipeline'
+                  nullable: false
+                description:
+                  type: string
+                  description: 'A description of the sales pipeline.'
+                  example: 'Pipeline for new leads.'
+                  nullable: true
+                is_default:
+                  type: boolean
+                  description: 'Is this the default pipeline.'
+                  example: true
+                  nullable: false
+              required:
+                - name
+    delete:
+      summary: 'Remove the specified resource from storage.'
+      operationId: removeTheSpecifiedResourceFromStorage
+      description: ''
+      parameters: []
+      responses:
+        204:
+          description: Success
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: ''
+      tags:
+        - 'Sales Pipelines'
+    parameters:
+      -
+        in: path
+        name: id
+        description: 'The ID of the sales pipeline.'
+        example: 17
+        required: true
+        schema:
+          type: integer
+      -
+        in: path
+        name: sales_pipeline
+        description: 'The ID of the sales pipeline.'
+        example: '1'
+        required: true
+        schema:
+          type: string
+  '/api/v1/sales-pipelines/{pipeline_id}/stages':
+    post:
+      summary: 'Add Stage to Pipeline'
+      operationId: addStageToPipeline
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - 'Sales Pipelines'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  description: 'The name of the new stage.'
+                  example: '"Qualification"'
+                  nullable: false
+                is_closed:
+                  type: boolean
+                  description: 'Whether this stage represents a closed state.'
+                  example: false
+                  nullable: false
+              required:
+                - name
+    parameters:
+      -
+        in: path
+        name: pipeline_id
+        description: 'The ID of the pipeline.'
+        example: 17
+        required: true
+        schema:
+          type: integer
+      -
+        in: path
+        name: pipeline
+        description: 'The ID of the sales pipeline.'
+        example: 1
+        required: true
+        schema:
+          type: integer
+  '/api/v1/sales-pipelines/{pipeline_id}/stages/reorder':
+    post:
+      summary: 'Reorder Stages in Pipeline'
+      operationId: reorderStagesInPipeline
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - 'Sales Pipelines'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                stages:
+                  type: array
+                  description: 'An array of stage objects with id and new position.'
+                  example:
+                    - consequatur
+                  items:
+                    type: string
+              required:
+                - stages
+    parameters:
+      -
+        in: path
+        name: pipeline_id
+        description: 'The ID of the pipeline.'
+        example: 17
+        required: true
+        schema:
+          type: integer
+      -
+        in: path
+        name: pipeline
+        description: 'The ID of the sales pipeline.'
+        example: 1
+        required: true
+        schema:
+          type: integer
+  /api/v1/stock-adjustments:
+    get:
+      summary: 'Display a listing of the stock adjustments.'
+      operationId: displayAListingOfTheStockAdjustments
+      description: ''
+      parameters:
+        -
+          in: query
+          name: per_page
+          description: 'The number of adjustments to return per page. Defaults to 15.'
+          example: 25
+          required: false
+          schema:
+            type: integer
+            description: 'The number of adjustments to return per page. Defaults to 15.'
+            example: 25
+            nullable: false
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+      tags:
+        - 'Stock Adjustments'
+    post:
+      summary: 'Store a newly created resource in storage.'
+      operationId: storeANewlyCreatedResourceInStorage
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - 'Stock Adjustments'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                product_id:
+                  type: integer
+                  description: 'The ID of the product.'
+                  example: 1
+                  nullable: false
+                adjustment_type:
+                  type: string
+                  description: 'The type of adjustment (e.g., increase, decrease).'
+                  example: decrease
+                  nullable: false
+                quantity_before:
+                  type: numeric
+                  description: 'The quantity before adjustment.'
+                  example: '100.00'
+                  nullable: false
+                quantity_after:
+                  type: numeric
+                  description: 'The quantity after adjustment.'
+                  example: '90.00'
+                  nullable: false
+                adjustment_amount:
+                  type: numeric
+                  description: 'The amount of adjustment.'
+                  example: '10.00'
+                  nullable: false
+                reason:
+                  type: string
+                  description: 'A reason for the adjustment.'
+                  example: 'Damaged goods.'
+                  nullable: true
+                adjusted_by:
+                  type: integer
+                  description: 'The ID of the user who made the adjustment.'
+                  example: 1
+                  nullable: false
+              required:
+                - product_id
+                - adjustment_type
+                - quantity_before
+                - quantity_after
+                - adjustment_amount
+                - adjusted_by
+  '/api/v1/stock-adjustments/{id}':
+    get:
+      summary: 'Display the specified stock adjustment.'
+      operationId: displayTheSpecifiedStockAdjustment
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+      tags:
+        - 'Stock Adjustments'
+    put:
+      summary: 'Update the specified resource in storage.'
+      operationId: updateTheSpecifiedResourceInStorage
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - 'Stock Adjustments'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                product_id:
+                  type: integer
+                  description: 'The ID of the product.'
+                  example: 1
+                  nullable: false
+                adjustment_type:
+                  type: string
+                  description: 'The type of adjustment (e.g., increase, decrease).'
+                  example: increase
+                  nullable: false
+                quantity_before:
+                  type: numeric
+                  description: 'The quantity before adjustment.'
+                  example: '100.00'
+                  nullable: false
+                quantity_after:
+                  type: numeric
+                  description: 'The quantity after adjustment.'
+                  example: '110.00'
+                  nullable: false
+                adjustment_amount:
+                  type: numeric
+                  description: 'The amount of adjustment.'
+                  example: '10.00'
+                  nullable: false
+                reason:
+                  type: string
+                  description: 'A reason for the adjustment.'
+                  example: 'Inventory count discrepancy.'
+                  nullable: true
+                adjusted_by:
+                  type: integer
+                  description: 'The ID of the user who made the adjustment.'
+                  example: 1
+                  nullable: false
+              required:
+                - product_id
+                - adjustment_type
+                - quantity_before
+                - quantity_after
+                - adjustment_amount
+                - adjusted_by
+    delete:
+      summary: 'Remove the specified resource from storage.'
+      operationId: removeTheSpecifiedResourceFromStorage
+      description: ''
+      parameters: []
+      responses:
+        204:
+          description: Success
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: ''
+      tags:
+        - 'Stock Adjustments'
+    parameters:
+      -
+        in: path
+        name: id
+        description: 'The ID of the stock adjustment.'
+        example: 17
+        required: true
+        schema:
+          type: integer
+      -
+        in: path
+        name: stock_adjustment
+        description: 'The ID of the stock adjustment.'
+        example: '1'
+        required: true
+        schema:
+          type: string
+  /api/v1/supplier-interactions:
+    get:
+      summary: 'Display a listing of the supplier interactions.'
+      operationId: displayAListingOfTheSupplierInteractions
+      description: ''
+      parameters:
+        -
+          in: query
+          name: per_page
+          description: 'The number of interactions to return per page. Defaults to 15.'
+          example: 25
+          required: false
+          schema:
+            type: integer
+            description: 'The number of interactions to return per page. Defaults to 15.'
+            example: 25
+            nullable: false
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+      tags:
+        - 'Supplier Interactions'
+    post:
+      summary: 'Store a newly created resource in storage.'
+      operationId: storeANewlyCreatedResourceInStorage
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - 'Supplier Interactions'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                supplier_id:
+                  type: integer
+                  description: 'The ID of the supplier.'
+                  example: 1
+                  nullable: false
+                user_id:
+                  type: integer
+                  description: 'The ID of the user.'
+                  example: 1
+                  nullable: false
+                type:
+                  type: string
+                  description: 'The type of interaction (e.g., Call, Email, Meeting).'
+                  example: Email
+                  nullable: false
+                notes:
+                  type: string
+                  description: 'Notes about the interaction.'
+                  example: 'Sent follow-up email.'
+                  nullable: true
+                interaction_date:
+                  type: date
+                  description: 'The date of the interaction.'
+                  example: '2023-10-26'
+                  nullable: false
+              required:
+                - supplier_id
+                - user_id
+                - type
+                - interaction_date
+  '/api/v1/supplier-interactions/{id}':
+    get:
+      summary: 'Display the specified supplier interaction.'
+      operationId: displayTheSpecifiedSupplierInteraction
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+      tags:
+        - 'Supplier Interactions'
+    put:
+      summary: 'Update the specified resource in storage.'
+      operationId: updateTheSpecifiedResourceInStorage
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - 'Supplier Interactions'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                supplier_id:
+                  type: integer
+                  description: 'The ID of the supplier.'
+                  example: 1
+                  nullable: false
+                user_id:
+                  type: integer
+                  description: 'The ID of the user.'
+                  example: 1
+                  nullable: false
+                type:
+                  type: string
+                  description: 'The type of interaction (e.g., Call, Email, Meeting).'
+                  example: Call
+                  nullable: false
+                notes:
+                  type: string
+                  description: 'Notes about the interaction.'
+                  example: 'Discussed new product line.'
+                  nullable: true
+                interaction_date:
+                  type: date
+                  description: 'The date of the interaction.'
+                  example: '2023-10-27'
+                  nullable: false
+              required:
+                - supplier_id
+                - user_id
+                - type
+                - interaction_date
+    delete:
+      summary: 'Remove the specified resource from storage.'
+      operationId: removeTheSpecifiedResourceFromStorage
+      description: ''
+      parameters: []
+      responses:
+        204:
+          description: Success
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: ''
+      tags:
+        - 'Supplier Interactions'
+    parameters:
+      -
+        in: path
+        name: id
+        description: 'The ID of the supplier interaction.'
+        example: 1
+        required: true
+        schema:
+          type: integer
+      -
+        in: path
+        name: supplier_interaction
+        description: 'The ID of the supplier interaction.'
+        example: '1'
+        required: true
+        schema:
+          type: string
+  /api/v1/suppliers:
+    get:
+      summary: 'Display a listing of the suppliers.'
+      operationId: displayAListingOfTheSuppliers
+      description: 'Retrieves a paginated list of suppliers.'
+      parameters:
+        -
+          in: query
+          name: per_page
+          description: 'The number of suppliers to return per page. Defaults to 15.'
+          example: 25
+          required: false
+          schema:
+            type: integer
+            description: 'The number of suppliers to return per page. Defaults to 15.'
+            example: 25
+            nullable: false
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+      tags:
+        - Suppliers
+    post:
+      summary: 'Store a newly created resource in storage.'
+      operationId: storeANewlyCreatedResourceInStorage
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Suppliers
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                code:
+                  type: string
+                  description: 'The unique code for the supplier.'
+                  example: SUP-001
+                  nullable: false
+                name:
+                  type: string
+                  description: 'The name of the supplier.'
+                  example: 'Supplier A'
+                  nullable: false
+                address:
+                  type: string
+                  description: 'The address of the supplier.'
+                  example: '123 Main St'
+                  nullable: true
+                phone_number:
+                  type: string
+                  description: 'The phone number of the supplier.'
+                  example: 555-1234
+                  nullable: true
+                location:
+                  type: string
+                  description: 'The location of the supplier.'
+                  example: London
+                  nullable: true
+                payment_terms:
+                  type: string
+                  description: 'The payment terms with the supplier.'
+                  example: 'Net 30'
+                  nullable: true
+                email:
+                  type: string
+                  description: 'The email address of the supplier.'
+                  example: supplierA@example.com
+                  nullable: true
+                image:
+                  type: string
+                  description: "The URL or path to the supplier's image."
+                  example: 'http://example.com/image1.jpg'
+                  nullable: true
+              required:
+                - code
+                - name
+  '/api/v1/suppliers/{id}':
+    get:
+      summary: 'Display the specified supplier.'
+      operationId: displayTheSpecifiedSupplier
+      description: 'Retrieves a single supplier by its ID.'
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+      tags:
+        - Suppliers
+    put:
+      summary: 'Update the specified resource in storage.'
+      operationId: updateTheSpecifiedResourceInStorage
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Suppliers
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                code:
+                  type: string
+                  description: 'The unique code for the supplier.'
+                  example: SUP-002
+                  nullable: false
+                name:
+                  type: string
+                  description: 'The name of the supplier.'
+                  example: 'Supplier B'
+                  nullable: false
+                address:
+                  type: string
+                  description: 'The address of the supplier.'
+                  example: '456 Oak Ave'
+                  nullable: true
+                phone_number:
+                  type: string
+                  description: 'The phone number of the supplier.'
+                  example: 555-5678
+                  nullable: true
+                location:
+                  type: string
+                  description: 'The location of the supplier.'
+                  example: 'New York'
+                  nullable: true
+                payment_terms:
+                  type: string
+                  description: 'The payment terms with the supplier.'
+                  example: 'Net 60'
+                  nullable: true
+                email:
+                  type: string
+                  description: 'The email address of the supplier.'
+                  example: supplierb@example.com
+                  nullable: false
+                image:
+                  type: string
+                  description: "The URL or path to the supplier's image."
+                  example: 'http://example.com/image2.jpg'
+                  nullable: true
+              required:
+                - code
+                - name
+    delete:
+      summary: 'Remove the specified resource from storage.'
+      operationId: removeTheSpecifiedResourceFromStorage
+      description: ''
+      parameters: []
+      responses:
+        204:
+          description: Success
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: ''
+      tags:
+        - Suppliers
+    parameters:
+      -
+        in: path
+        name: id
+        description: 'The ID of the supplier.'
+        example: 1
+        required: true
+        schema:
+          type: integer
+      -
+        in: path
+        name: supplier
+        description: 'The ID of the supplier.'
+        example: '1'
+        required: true
+        schema:
+          type: string
+  /api/v1/suppliers/metrics:
+    get:
+      summary: 'Get Supplier Metrics'
+      operationId: getSupplierMetrics
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+      tags:
+        - Suppliers
+  '/api/v1/suppliers/{id}/historical-purchases':
+    get:
+      summary: 'Get Supplier Historical Purchases'
+      operationId: getSupplierHistoricalPurchases
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+      tags:
+        - Suppliers
+    parameters:
+      -
+        in: path
+        name: id
+        description: 'The ID of the supplier.'
+        example: 1
+        required: true
+        schema:
+          type: integer
+  '/api/v1/suppliers/{id}/product-history':
+    get:
+      summary: 'Get Supplier Product History'
+      operationId: getSupplierProductHistory
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+      tags:
+        - Suppliers
+    parameters:
+      -
+        in: path
+        name: id
+        description: 'The ID of the supplier.'
+        example: 1
+        required: true
+        schema:
+          type: integer
+  /api/v1/taxes:
+    get:
+      summary: 'Display a listing of the taxes.'
+      operationId: displayAListingOfTheTaxes
+      description: ''
+      parameters:
+        -
+          in: query
+          name: per_page
+          description: 'The number of taxes to return per page. Defaults to 15.'
+          example: 25
+          required: false
+          schema:
+            type: integer
+            description: 'The number of taxes to return per page. Defaults to 15.'
+            example: 25
+            nullable: false
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+      tags:
+        - Taxes
+    post:
+      summary: 'Store a newly created resource in storage.'
+      operationId: storeANewlyCreatedResourceInStorage
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Taxes
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  description: 'The name of the tax.'
+                  example: 'Sales Tax'
+                  nullable: false
+                rate:
+                  type: numeric
+                  description: 'The tax rate.'
+                  example: '0.05'
+                  nullable: false
+                is_active:
+                  type: boolean
+                  description: 'Is the tax active.'
+                  example: true
+                  nullable: false
+              required:
+                - name
+                - rate
+  '/api/v1/taxes/{id}':
+    get:
+      summary: 'Display the specified tax.'
+      operationId: displayTheSpecifiedTax
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+      tags:
+        - Taxes
+    put:
+      summary: 'Update the specified resource in storage.'
+      operationId: updateTheSpecifiedResourceInStorage
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Taxes
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  description: 'The name of the tax.'
+                  example: VAT
+                  nullable: false
+                rate:
+                  type: numeric
+                  description: 'The tax rate.'
+                  example: '0.10'
+                  nullable: false
+                is_active:
+                  type: boolean
+                  description: 'Is the tax active.'
+                  example: true
+                  nullable: false
+              required:
+                - name
+                - rate
+    delete:
+      summary: 'Remove the specified resource from storage.'
+      operationId: removeTheSpecifiedResourceFromStorage
+      description: ''
+      parameters: []
+      responses:
+        204:
+          description: Success
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: ''
+      tags:
+        - Taxes
+    parameters:
+      -
+        in: path
+        name: id
+        description: 'The ID of the tax.'
+        example: 17
+        required: true
+        schema:
+          type: integer
+      -
+        in: path
+        name: tax
+        description: 'The ID of the tax.'
+        example: '1'
+        required: true
+        schema:
+          type: string
+  /api/v1/tax/active-rate:
+    get:
+      summary: 'Get Active Tax Rate'
+      operationId: getActiveTaxRate
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+      tags:
+        - Taxes
+  /api/v1/transactions:
+    get:
+      summary: 'Display a listing of the transactions.'
+      operationId: displayAListingOfTheTransactions
+      description: ''
+      parameters:
+        -
+          in: query
+          name: per_page
+          description: 'The number of transactions to return per page. Defaults to 15.'
+          example: 25
+          required: false
+          schema:
+            type: integer
+            description: 'The number of transactions to return per page. Defaults to 15.'
+            example: 25
+            nullable: false
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+      tags:
+        - Transactions
+    post:
+      summary: 'Store a newly created resource in storage.'
+      operationId: storeANewlyCreatedResourceInStorage
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Transactions
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                journal_entry_id:
+                  type: integer
+                  description: 'The ID of the journal entry.'
+                  example: 1
+                  nullable: false
+                account_id:
+                  type: integer
+                  description: 'The ID of the account.'
+                  example: 1
+                  nullable: false
+                type:
+                  type: string
+                  description: 'The type of transaction (e.g., debit, credit).'
+                  example: credit
+                  nullable: false
+                amount:
+                  type: numeric
+                  description: 'The amount of the transaction.'
+                  example: '50.00'
+                  nullable: false
+              required:
+                - journal_entry_id
+                - account_id
+                - type
+                - amount
+  '/api/v1/transactions/{id}':
+    get:
+      summary: 'Display the specified transaction.'
+      operationId: displayTheSpecifiedTransaction
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+      tags:
+        - Transactions
+    put:
+      summary: 'Update the specified resource in storage.'
+      operationId: updateTheSpecifiedResourceInStorage
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Transactions
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                journal_entry_id:
+                  type: integer
+                  description: 'The ID of the journal entry.'
+                  example: 1
+                  nullable: false
+                account_id:
+                  type: integer
+                  description: 'The ID of the account.'
+                  example: 1
+                  nullable: false
+                type:
+                  type: string
+                  description: 'The type of transaction (e.g., debit, credit).'
+                  example: debit
+                  nullable: false
+                amount:
+                  type: numeric
+                  description: 'The amount of the transaction.'
+                  example: '100.00'
+                  nullable: false
+              required:
+                - journal_entry_id
+                - account_id
+                - type
+                - amount
+    delete:
+      summary: 'Remove the specified resource from storage.'
+      operationId: removeTheSpecifiedResourceFromStorage
+      description: ''
+      parameters: []
+      responses:
+        204:
+          description: Success
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: ''
+      tags:
+        - Transactions
+    parameters:
+      -
+        in: path
+        name: id
+        description: 'The ID of the transaction.'
+        example: 1
+        required: true
+        schema:
+          type: integer
+      -
+        in: path
+        name: transaction
+        description: 'The ID of the transaction.'
+        example: '1'
+        required: true
+        schema:
+          type: string
+  /api/v1/units:
+    get:
+      summary: 'Display a listing of the units.'
+      operationId: displayAListingOfTheUnits
+      description: ''
+      parameters:
+        -
+          in: query
+          name: per_page
+          description: 'The number of units to return per page. Defaults to 15.'
+          example: 25
+          required: false
+          schema:
+            type: integer
+            description: 'The number of units to return per page. Defaults to 15.'
+            example: 25
+            nullable: false
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+      tags:
+        - Units
+    post:
+      summary: 'Store a newly created resource in storage.'
+      operationId: storeANewlyCreatedResourceInStorage
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Units
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  description: 'The name of the unit.'
+                  example: Piece
+                  nullable: false
+                symbol:
+                  type: string
+                  description: 'The symbol of the unit.'
+                  example: pc
+                  nullable: false
+              required:
+                - name
+                - symbol
+  '/api/v1/units/{id}':
+    get:
+      summary: 'Display the specified unit.'
+      operationId: displayTheSpecifiedUnit
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+      tags:
+        - Units
+    put:
+      summary: 'Update the specified resource in storage.'
+      operationId: updateTheSpecifiedResourceInStorage
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Units
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  description: 'The name of the unit.'
+                  example: Kilogram
+                  nullable: false
+                symbol:
+                  type: string
+                  description: 'The symbol of the unit.'
+                  example: kg
+                  nullable: false
+              required:
+                - name
+                - symbol
+    delete:
+      summary: 'Remove the specified resource from storage.'
+      operationId: removeTheSpecifiedResourceFromStorage
+      description: ''
+      parameters: []
+      responses:
+        204:
+          description: Success
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: ''
+      tags:
+        - Units
+    parameters:
+      -
+        in: path
+        name: id
+        description: 'The ID of the unit.'
+        example: 1
+        required: true
+        schema:
+          type: integer
+      -
+        in: path
+        name: unit
+        description: 'The ID of the unit.'
+        example: '1'
+        required: true
+        schema:
+          type: string
+  /api/v1/settings:
+    get:
+      summary: 'Get User Settings'
+      operationId: getUserSettings
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+      tags:
+        - 'User Settings'
+  /api/v1/settings/theme-mode:
+    put:
+      summary: 'Update Theme Mode'
+      operationId: updateThemeMode
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - 'User Settings'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                theme_mode:
+                  type: string
+                  description: "The new theme mode. Must be 'light' or 'dark'."
+                  example: '"dark"'
+                  nullable: false
+              required:
+                - theme_mode
+  /api/v1/users:
+    get:
+      summary: 'Display a listing of the users.'
+      operationId: displayAListingOfTheUsers
+      description: ''
+      parameters:
+        -
+          in: query
+          name: per_page
+          description: 'The number of users to return per page. Defaults to 15.'
+          example: 25
+          required: false
+          schema:
+            type: integer
+            description: 'The number of users to return per page. Defaults to 15.'
+            example: 25
+            nullable: false
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+      tags:
+        - Users
+    post:
+      summary: 'Store a newly created resource in storage.'
+      operationId: storeANewlyCreatedResourceInStorage
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Users
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  description: 'The name of the user.'
+                  example: 'John Doe'
+                  nullable: false
+                shopname:
+                  type: string
+                  description: 'The shop name of the user.'
+                  example: "John's Shop"
+                  nullable: true
+                address:
+                  type: string
+                  description: 'The address of the user.'
+                  example: '123 Main St'
+                  nullable: true
+                email:
+                  type: string
+                  description: 'The email address of the user.'
+                  example: john.doe@example.com
+                  nullable: false
+                password:
+                  type: string
+                  description: 'The password for the user.'
+                  example: password123
+                  nullable: false
+                avatar:
+                  type: string
+                  description: "The URL or path to the user's avatar."
+                  example: 'http://example.com/avatar1.jpg'
+                  nullable: true
+                timezone:
+                  type: string
+                  description: 'The timezone of the user.'
+                  example: Asia/Jakarta
+                  nullable: true
+                system_settings:
+                  type: array
+                  description: 'System settings for the user.'
+                  example:
+                    - consequatur
+                  items:
+                    type: string
+                    nullable: true
+                accounting_settings:
+                  type: array
+                  description: 'Accounting settings for the user.'
+                  example:
+                    - consequatur
+                  items:
+                    type: string
+                    nullable: true
+              required:
+                - name
+                - email
+                - password
+  '/api/v1/users/{id}':
+    get:
+      summary: 'Display the specified user.'
+      operationId: displayTheSpecifiedUser
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+      tags:
+        - Users
+    put:
+      summary: 'Update the specified resource in storage.'
+      operationId: updateTheSpecifiedResourceInStorage
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Users
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  description: 'The name of the user.'
+                  example: 'Jane Doe'
+                  nullable: false
+                shopname:
+                  type: string
+                  description: 'The shop name of the user.'
+                  example: "Jane's Shop"
+                  nullable: true
+                address:
+                  type: string
+                  description: 'The address of the user.'
+                  example: '456 Oak Ave'
+                  nullable: true
+                email:
+                  type: string
+                  description: 'The email address of the user.'
+                  example: jane.doe@example.com
+                  nullable: false
+                password:
+                  type: string
+                  description: 'The password for the user.'
+                  example: newpassword123
+                  nullable: true
+                avatar:
+                  type: string
+                  description: "The URL or path to the user's avatar."
+                  example: 'http://example.com/avatar2.jpg'
+                  nullable: true
+                timezone:
+                  type: string
+                  description: 'The timezone of the user.'
+                  example: America/New_York
+                  nullable: true
+                system_settings:
+                  type: array
+                  description: 'System settings for the user.'
+                  example:
+                    - consequatur
+                  items:
+                    type: string
+                    nullable: true
+                accounting_settings:
+                  type: array
+                  description: 'Accounting settings for the user.'
+                  example:
+                    - consequatur
+                  items:
+                    type: string
+                    nullable: true
+              required:
+                - name
+                - email
+    delete:
+      summary: 'Remove the specified resource from storage.'
+      operationId: removeTheSpecifiedResourceFromStorage
+      description: ''
+      parameters: []
+      responses:
+        204:
+          description: Success
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: ''
+      tags:
+        - Users
+    parameters:
+      -
+        in: path
+        name: id
+        description: 'The ID of the user.'
+        example: 1
+        required: true
+        schema:
+          type: integer
+      -
+        in: path
+        name: user
+        description: 'The ID of the user.'
+        example: '1'
+        required: true
+        schema:
+          type: string
+  /api/v1/users/roles-permissions:
+    get:
+      summary: 'Get All Roles and Permissions'
+      operationId: getAllRolesAndPermissions
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+      tags:
+        - Users
+  /api/v1/warehouses:
+    get:
+      summary: 'Display a listing of the warehouses.'
+      operationId: displayAListingOfTheWarehouses
+      description: ''
+      parameters:
+        -
+          in: query
+          name: per_page
+          description: 'The number of warehouses to return per page. Defaults to 15.'
+          example: 25
+          required: false
+          schema:
+            type: integer
+            description: 'The number of warehouses to return per page. Defaults to 15.'
+            example: 25
+            nullable: false
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+      tags:
+        - Warehouses
+    post:
+      summary: 'Store a newly created resource in storage.'
+      operationId: storeANewlyCreatedResourceInStorage
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Warehouses
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  description: 'The name of the warehouse.'
+                  example: 'Secondary Warehouse'
+                  nullable: false
+                address:
+                  type: string
+                  description: 'The address of the warehouse.'
+                  example: '456 Storage Rd'
+                  nullable: true
+                description:
+                  type: string
+                  description: 'A description of the warehouse.'
+                  example: 'Overflow storage.'
+                  nullable: true
+                is_main:
+                  type: boolean
+                  description: 'Is this the main warehouse.'
+                  example: false
+                  nullable: false
+              required:
+                - name
+  '/api/v1/warehouses/{id}':
+    get:
+      summary: 'Display the specified warehouse.'
+      operationId: displayTheSpecifiedWarehouse
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+      tags:
+        - Warehouses
+    put:
+      summary: 'Update the specified resource in storage.'
+      operationId: updateTheSpecifiedResourceInStorage
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Warehouses
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  description: 'The name of the warehouse.'
+                  example: 'Main Warehouse'
+                  nullable: false
+                address:
+                  type: string
+                  description: 'The address of the warehouse.'
+                  example: '123 Warehouse St'
+                  nullable: true
+                description:
+                  type: string
+                  description: 'A description of the warehouse.'
+                  example: 'Primary storage facility.'
+                  nullable: true
+                is_main:
+                  type: boolean
+                  description: 'Is this the main warehouse.'
+                  example: true
+                  nullable: false
+              required:
+                - name
+    delete:
+      summary: 'Remove the specified resource from storage.'
+      operationId: removeTheSpecifiedResourceFromStorage
+      description: ''
+      parameters: []
+      responses:
+        204:
+          description: Success
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: ''
+      tags:
+        - Warehouses
+    parameters:
+      -
+        in: path
+        name: id
+        description: 'The ID of the warehouse.'
+        example: 1
+        required: true
+        schema:
+          type: integer
+      -
+        in: path
+        name: warehouse
+        description: 'The ID of the warehouse.'
+        example: '1'
+        required: true
+        schema:
+          type: string
+  '/api/v1/warehouses/{id}/set-main':
+    post:
+      summary: 'Set as Main Warehouse'
+      operationId: setAsMainWarehouse
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Warehouses
+    parameters:
+      -
+        in: path
+        name: id
+        description: 'The ID of the warehouse to set as main.'
+        example: 1
+        required: true
+        schema:
+          type: integer
+  '/api/v1/warehouses/{id}/unset-main':
+    post:
+      summary: 'Unset as Main Warehouse'
+      operationId: unsetAsMainWarehouse
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Warehouses
+    parameters:
+      -
+        in: path
+        name: id
+        description: 'The ID of the warehouse to unset as main.'
+        example: 1
+        required: true
+        schema:
+          type: integer

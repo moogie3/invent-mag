@@ -1,6 +1,5 @@
-import { grandTotal } from '../cart/totals.js';
-import { playCashSound } from '../utils/sound.js';
-import { clearCart } from '../cart/actions.js';
+import { grandTotal } from "../cart/totals.js";
+import { clearCart } from "../cart/actions.js";
 
 const completePaymentBtn = document.getElementById("completePaymentBtn");
 const invoiceForm = document.getElementById("invoiceForm");
@@ -11,7 +10,6 @@ const paymentModal = new bootstrap.Modal(
 );
 
 function completePayment() {
-    playCashSound();
     completePaymentBtn.disabled = true;
 
     const paymentMethodMap = {
@@ -65,17 +63,29 @@ function completePayment() {
             "X-CSRF-TOKEN": document
                 .querySelector('meta[name="csrf-token"]')
                 .getAttribute("content"),
+            "Accept": "application/json", // Add this line
         },
     })
-        .then((response) => response.json())
+        .then((response) => {
+            const contentType = response.headers.get("content-type");
+            if (contentType && contentType.indexOf("application/json") !== -1) {
+                return response.json();
+            } else {
+                return response.text().then((text) => {
+                    throw new Error(
+                        `Expected JSON, but received ${contentType || "unknown"}: ${text}`
+                    );
+                });
+            }
+        })
         .then((data) => {
             if (data.success) {
-                showToast("Success", data.message, "success");
+                InventMagApp.showToast("Success", data.message, "success");
                 paymentModal.hide();
                 clearCart();
                 window.location.href = `/admin/pos/receipt/${data.sale_id}`;
             } else {
-                showToast(
+                InventMagApp.showToast(
                     "Error",
                     data.message || "Failed to process payment.",
                     "error"
@@ -85,7 +95,7 @@ function completePayment() {
         })
         .catch((error) => {
             console.error("Error processing payment:", error);
-            showToast(
+            InventMagApp.showToast(
                 "Error",
                 "An error occurred while processing payment. Please check the console for details.",
                 "error"

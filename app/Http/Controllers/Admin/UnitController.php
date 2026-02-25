@@ -53,7 +53,14 @@ class UnitController extends Controller
         ]);
 
         $unit = Unit::find($id);
-        $this->unitService->updateUnit($unit, $request->all());
+        $result = $this->unitService->updateUnit($unit, $request->all());
+
+        if (!$result['success']) {
+            if ($request->ajax()) {
+                return response()->json(['success' => false, 'message' => $result['message'], 'errors' => ['name' => [$result['message']]]], 422);
+            }
+            return back()->withErrors(['name' => $result['message']])->withInput();
+        }
 
         if ($request->ajax()) {
             return response()->json(['success' => true, 'message' => 'Unit updated successfully.']);
@@ -61,11 +68,21 @@ class UnitController extends Controller
         return redirect()->route('admin.setting.unit')->with('success', 'Unit updated');
     }
 
-    public function destroy($id)
+    public function destroy(Request $request, $id)
     {
         $unit = Unit::find($id);
-        $this->unitService->deleteUnit($unit);
+        $result = $this->unitService->deleteUnit($unit);
 
+        if (!$result['success']) {
+            if ($request->ajax()) {
+                return response()->json(['success' => false, 'message' => $result['message']], 500);
+            }
+            return redirect()->route('admin.setting.unit')->with('error', $result['message']);
+        }
+
+        if ($request->ajax()) {
+            return response()->json(['success' => true, 'message' => 'Unit deleted successfully.']);
+        }
         return redirect()->route('admin.setting.unit')->with('success', 'Unit deleted');
     }
 }

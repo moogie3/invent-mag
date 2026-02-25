@@ -67,7 +67,7 @@ class SupplierController extends Controller
             'name' => 'required',
             'address' => 'required',
             'phone_number' => 'required',
-            'location' => 'required',
+            'location' => 'required|in:IN,OUT',
             'payment_terms' => 'required',
             'email' => 'nullable|email',
             'image' => 'nullable|image|mimes:jpeg,jpg,png',
@@ -76,20 +76,75 @@ class SupplierController extends Controller
             'image.mimes' => 'The image must be a file of type: jpeg, jpg, png.',
         ]);
 
-        $supplier = Supplier::find($id);
-        $this->supplierService->updateSupplier($supplier, $request->all());
+        try {
+            $supplier = Supplier::findOrFail($id);
+            $result = $this->supplierService->updateSupplier($supplier, $request->all());
 
-        if ($request->ajax()) {
-            return response()->json(['success' => true, 'message' => 'Supplier updated successfully.']);
+            if (!$result['success']) {
+                if ($request->ajax()) {
+                    return response()->json(['success' => false, 'message' => $result['message']], 422);
+                }
+                return back()->with('error', $result['message'])->withInput();
+            }
+
+            if ($request->ajax()) {
+                return response()->json(['success' => true, 'message' => 'Supplier updated successfully.']);
+            }
+            return redirect()->route('admin.supplier')->with('success', 'Supplier updated');
+        } catch (\Exception $e) {
+            if ($request->ajax()) {
+                return response()->json(['success' => false, 'message' => 'An unexpected error occurred.'], 500);
+            }
+            return back()->with('error', 'An unexpected error occurred.')->withInput();
         }
-        return redirect()->route('admin.supplier')->with('success', 'Supplier updated');
     }
 
-    public function destroy($id)
+    public function destroy(Request $request, $id)
     {
-        $supplier = Supplier::find($id);
-        $this->supplierService->deleteSupplier($supplier);
+        try {
+            $supplier = Supplier::findOrFail($id);
+            $result = $this->supplierService->deleteSupplier($supplier);
 
-        return redirect()->route('admin.supplier')->with('success', 'Supplier deleted');
+            if (!$result['success']) {
+                if ($request->ajax()) {
+                    return response()->json(['success' => false, 'message' => $result['message']], 500);
+                }
+                return redirect()->route('admin.supplier')->with('error', $result['message']);
+            }
+
+            if ($request->ajax()) {
+                return response()->json(['success' => true, 'message' => 'Supplier deleted successfully.']);
+            }
+            return redirect()->route('admin.supplier')->with('success', 'Supplier deleted');
+        } catch (\Exception $e) {
+            if ($request->ajax()) {
+                return response()->json(['success' => false, 'message' => 'An unexpected error occurred.'], 500);
+            }
+            return redirect()->route('admin.supplier')->with('error', 'An unexpected error occurred.');
+        }
+    }
+
+    /**
+     * @group Suppliers
+     * @summary Export All Suppliers
+     * @bodyParam export_option string required The export format ('pdf' or 'csv'). Example: "csv"
+     * @response 200 "The exported file."
+     */
+    public function exportAll(Request $request)
+    {
+        $request->validate([
+            'export_option' => 'required|string|in:pdf,csv',
+        ]);
+
+        try {
+            $file = $this->supplierService->exportAllSuppliers($request->export_option);
+            return $file;
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error exporting suppliers. Please try again.',
+                'error_details' => config('app.debug') ? $e->getMessage() : 'Internal server error',
+            ], 500);
+        }
     }
 }

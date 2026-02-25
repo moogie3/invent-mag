@@ -33,26 +33,37 @@ class SupplierCrmController extends Controller
             'interaction_date' => 'required|date',
         ]);
 
-        $interaction = $this->crmService->storeSupplierInteraction($request->all(), $supplierId);
-
-        return response()->json($interaction);
+        try {
+            $interaction = $this->crmService->storeSupplierInteraction($request->all(), $supplierId);
+            return response()->json($interaction);
+        } catch (\Exception $e) {
+            return response()->json(['message' => 'Failed to store interaction: ' . $e->getMessage()], 500);
+        }
     }
 
     public function getHistoricalPurchases(Request $request, $id)
     {
-        $historicalPurchases = $this->crmService->getSupplierHistoricalPurchases($id);
+        try {
+            $historicalPurchases = $this->crmService->getSupplierHistoricalPurchases($id);
 
-        return response()->json([
-            'historical_purchases' => $historicalPurchases,
-        ]);
+            return response()->json([
+                'historical_purchases' => $historicalPurchases,
+            ]);
+        } catch (\Exception $e) {
+            return response()->json(['message' => 'Failed to load historical purchases: ' . $e->getMessage()], 500);
+        }
     }
 
     public function getProductHistory(Request $request, $id)
     {
-        $productHistory = $this->crmService->getSupplierProductHistory($id);
+        try {
+            $productHistory = $this->crmService->getSupplierProductHistory($id);
 
-        return response()->json([
-            'product_history' => $productHistory,
-        ]);
+            return response()->json([
+                'product_history' => $productHistory,
+            ]);
+        } catch (\Exception $e) {
+            return response()->json(['message' => 'Failed to load product history: ' . $e->getMessage()], 500);
+        }
     }
 }

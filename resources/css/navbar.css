@@ -668,3 +668,47 @@ body.layout-navbar-v2.sidebar-open #navbar-brand-title {
         transform: translateY(0);
     }
 }
+
+/* =================================================================
+   CUSTOM STYLES for Main Navigation Dropdown
+   - Isolates main nav dropdowns from icon dropdowns (avatar, bell).
+   - Sets custom background, font size, alignment, and hover effects.
+   ================================================================= */
+
+/* Variables for the main navigation dropdown */
+:root {
+    --main-nav-dropdown-bg: rgba(20, 20, 20, 0.98); /* Near-black background */
+    --main-nav-dropdown-item-color: #ffffff; /* White text */
+    --main-nav-dropdown-item-hover-bg: rgba(255, 255, 255, 0.1); /* Lighter grey hover */
+    --main-nav-dropdown-item-hover-color: #ffffff; /* White hover text */
+    --main-nav-dropdown-font-size: 0.8125rem; /* Smaller font size (13px) */
+}
+
+/* Apply styles to the main navigation dropdown menu */
+.nav-dropdown .dropdown-menu {
+    background-color: var(--main-nav-dropdown-bg) !important;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    padding: 0.5rem;
+}
+
+/* Style for the dropdown items (the links) */
+.nav-dropdown .dropdown-menu .dropdown-item {
+    color: var(--main-nav-dropdown-item-color) !important;
+    font-size: var(--main-nav-dropdown-font-size) !important;
+    justify-content: center !important; /* Center content */
+    text-align: center !important;
+    gap: 0.75rem; /* Space between icon and text */
+}
+
+/* Hover/Focus state for the dropdown items */
+.nav-dropdown .dropdown-menu .dropdown-item:hover,
+.nav-dropdown .dropdown-menu .dropdown-item:focus {
+    color: var(--main-nav-dropdown-item-hover-color) !important;
+    background-color: var(--main-nav-dropdown-item-hover-bg) !important;
+    text-decoration: none !important; /* Remove underline on hover */
+}
+
+/* General override to remove underline from main nav links on hover */
+.nav-dropdown > ul > li > a:hover {
+    text-decoration: none !important;
+}

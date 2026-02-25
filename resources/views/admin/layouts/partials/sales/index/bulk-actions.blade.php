@@ -10,9 +10,9 @@
                     <div>
                         <div class="selection-text">
                             <span id="selectedCount" class="text-primary">0</span>
-                            <span class="text-muted">sales orders selected</span>
+                            <span class="text-muted">{{ __('messages.sales_orders_selected') }}</span>
                         </div>
-                        <div class="selection-subtext">Choose an action to apply to selected items</div>
+                        <div class="selection-subtext">{{ __('messages.choose_an_action_to_apply_to_selected_items') }}</div>
                     </div>
                 </div>
             </div>

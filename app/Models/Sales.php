@@ -35,7 +35,6 @@ class Sales extends Model
         'user_id',
         'order_date',
         'due_date',
-        'payment_date',
         'payment_type',
         'order_discount',
         'order_discount_type',
@@ -60,6 +59,7 @@ class Sales extends Model
         'Paid',
         'Partial',
         'Unpaid',
+        'Returned',
     ];
 
     public static $paymentTypes = [
@@ -85,6 +85,11 @@ class Sales extends Model
         return $this->hasMany(SalesItem::class, 'sales_id');
     }
 
+    public function salesReturns(): HasMany
+    {
+        return $this->hasMany(SalesReturn::class);
+    }
+
     public function product(): BelongsTo
     {
         return $this->belongsTo(Product::class, 'product_id');
@@ -93,6 +98,21 @@ class Sales extends Model
     public function tax(): BelongsTo
     {
         return $this->belongsTo(Tax::class, 'tax_id');
+    }
+
+    public function payments()
+    {
+        return $this->morphMany(Payment::class, 'paymentable');
+    }
+
+    public function getTotalPaidAttribute()
+    {
+        return $this->payments->sum('amount');
+    }
+
+    public function getBalanceAttribute()
+    {
+        return $this->total - $this->total_paid;
     }
 
     public function salesOpportunity(): BelongsTo
@@ -108,8 +128,13 @@ class Sales extends Model
         'amount_received' => 'float',
         'change_amount' => 'float',
         'is_pos' => 'boolean',
-        'payment_date' => 'datetime'
     ];
+
+    // Explicitly define the factory for the model
+    protected static function newFactory()
+    {
+        return \Database\Factories\SalesFactory::new();
+    }
 
     // Get user timezone or fallback to app timezone
     protected function getUserTimezone()
@@ -170,5 +195,13 @@ class Sales extends Model
             ->setTimezone('UTC');
     }
 
-    
+    /**
+     * Get the path to view the model.
+     *
+     * @return string
+     */
+    public function path(): string
+    {
+        return route('admin.sales.view', $this);
+    }
 }

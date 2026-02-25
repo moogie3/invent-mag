@@ -41,7 +41,7 @@ export function confirmBulkMarkAsPaid() {
                     backdrops.forEach(backdrop => backdrop.remove());
                 });
 
-                showToast(
+                InventMagApp.showToast(
                     "Success",
                     `${
                         data.updated_count || selected.length
@@ -68,7 +68,7 @@ export function confirmBulkMarkAsPaid() {
                 });
                 updateBulkActions();
             } else {
-                showToast(
+                InventMagApp.showToast(
                     "Error",
                     data.message || "Failed to update transactions.",
                     "error"
@@ -76,8 +76,8 @@ export function confirmBulkMarkAsPaid() {
             }
         })
         .catch((error) => {
-            console.error("Error:", error);
-            showToast(
+            // // console.error("Error:", error);
+            InventMagApp.showToast(
                 "Error",
                 "An error occurred while updating the transactions.",
                 "error"

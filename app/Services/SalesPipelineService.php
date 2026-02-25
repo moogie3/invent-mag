@@ -11,11 +11,34 @@ use App\Models\Product;
 use App\Models\Tax;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 use App\Models\Customer;
 
 class SalesPipelineService
 {
+    public function getOpportunitiesByFilters(Request $request)
+    {
+        $opportunitiesQuery = SalesOpportunity::with(['customer', 'pipeline', 'stage']);
+
+        if ($request->pipeline_id) {
+            $opportunitiesQuery->where('sales_pipeline_id', $request->pipeline_id);
+        }
+
+        if ($request->stage_id) {
+            $opportunitiesQuery->where('pipeline_stage_id', $request->stage_id);
+        }
+
+        $opportunities = $opportunitiesQuery->get();
+        $totalPipelineValue = $opportunities->sum('amount');
+
+        return [
+            'opportunities' => $opportunities,
+            'total_pipeline_value' => $totalPipelineValue,
+        ];
+    }
+
     public function getSalesPipelineIndexData()
     {
         $pipelines = SalesPipeline::with('stages')->get();
@@ -42,7 +65,9 @@ class SalesPipelineService
 
     public function createStage(SalesPipeline $pipeline, array $data): PipelineStage
     {
-        $data['position'] = $pipeline->stages()->count();
+        // Get the maximum existing position for stages within this pipeline,
+        // or -1 if no stages exist, then add 1 to get the next position.
+        $data['position'] = ($pipeline->stages()->max('position') ?? -1) + 1;
         return $pipeline->stages()->create($data);
     }
 
@@ -59,35 +84,54 @@ class SalesPipelineService
 
     public function reorderStages(SalesPipeline $pipeline, array $stages): void
     {
-        foreach ($stages as $stageData) {
-            PipelineStage::where('id', $stageData['id'])
-                ->where('sales_pipeline_id', $pipeline->id)
-                ->update(['position' => $stageData['position']]);
-        }
+        DB::transaction(function () use ($pipeline, $stages) {
+            // Step 1: Temporarily set positions to a non-conflicting value
+            // We'll use a large number to avoid conflicts with existing positions
+            $tempPositionOffset = 1000000; // A sufficiently large offset
+
+            foreach ($stages as $stageData) {
+                PipelineStage::where('id', $stageData['id'])
+                    ->where('sales_pipeline_id', $pipeline->id)
+                    ->update(['position' => $stageData['id'] + $tempPositionOffset]);
+            }
+
+            // Step 2: Update to final positions
+            foreach ($stages as $stageData) {
+                PipelineStage::where('id', $stageData['id'])
+                    ->where('sales_pipeline_id', $pipeline->id)
+                    ->update(['position' => $stageData['position']]);
+            }
+        });
     }
 
     public function createOpportunity(array $data): SalesOpportunity
     {
+        \Log::debug('createOpportunity: Starting with data', $data);
         return DB::transaction(function () use ($data) {
+            \Log::debug('createOpportunity: Inside transaction');
             $opportunity = SalesOpportunity::create([
                 'customer_id' => $data['customer_id'],
                 'sales_pipeline_id' => $data['sales_pipeline_id'],
                 'pipeline_stage_id' => $data['pipeline_stage_id'],
                 'name' => $data['name'],
-                'description' => $data['description'],
+                'description' => $data['description'] ?? null, // Provide a default value for description
                 'amount' => 0, // Will be calculated from items
                 'expected_close_date' => $data['expected_close_date'],
                 'status' => $data['status'],
             ]);
+            \Log::debug('createOpportunity: Opportunity created', ['opportunity_id' => $opportunity->id]);
 
             $totalAmount = 0;
             foreach ($data['items'] as $itemData) {
+                \Log::debug('createOpportunity: Processing item', $itemData);
                 $itemData['price'] = round($itemData['price'], 2);
                 $opportunity->items()->create($itemData);
                 $totalAmount += ($itemData['quantity'] * $itemData['price']);
             }
+            \Log::debug('createOpportunity: Items processed, totalAmount', ['totalAmount' => $totalAmount]);
 
             $opportunity->update(['amount' => round($totalAmount, 2)]);
+            \Log::debug('createOpportunity: Opportunity amount updated', ['amount' => $opportunity->amount]);
 
             return $opportunity;
         });
@@ -95,22 +139,28 @@ class SalesPipelineService
 
     public function updateOpportunity(SalesOpportunity $opportunity, array $data): SalesOpportunity
     {
+        \Log::debug('updateOpportunity: Starting with opportunity and data', ['opportunity_id' => $opportunity->id, 'data' => $data]);
         return DB::transaction(function () use ($opportunity, $data) {
+            \Log::debug('updateOpportunity: Inside transaction');
             $updateData = [
                 'customer_id' => $data['customer_id'],
                 'sales_pipeline_id' => $data['sales_pipeline_id'],
                 'pipeline_stage_id' => $data['pipeline_stage_id'],
                 'name' => $data['name'],
-                'description' => $data['description'],
+                'description' => $data['description'] ?? null, // Provide a default value for description
                 'expected_close_date' => $data['expected_close_date'],
                 'status' => $data['status'],
             ];
+            \Log::debug('updateOpportunity: Update data prepared', $updateData);
 
             $opportunity->items()->delete();
+            \Log::debug('updateOpportunity: Existing items deleted');
+
             $totalAmount = 0;
             $itemsToCreate = [];
             if (!empty($data['items'])) {
                 foreach ($data['items'] as $itemData) {
+                    \Log::debug('updateOpportunity: Processing item', $itemData);
                     $price = round($itemData['price'], 2);
                     $quantity = $itemData['quantity'];
                     $itemsToCreate[] = [
@@ -121,13 +171,17 @@ class SalesPipelineService
                     $totalAmount += ($quantity * $price);
                 }
             }
+            \Log::debug('updateOpportunity: Items processed, totalAmount', ['totalAmount' => $totalAmount]);
 
             $updateData['amount'] = round($totalAmount, 2);
+            \Log::debug('updateOpportunity: Opportunity amount updated in updateData', ['amount' => $updateData['amount']]);
 
             $opportunity->update($updateData);
+            \Log::debug('updateOpportunity: Opportunity updated');
 
             if (!empty($itemsToCreate)) {
                 $opportunity->items()->createMany($itemsToCreate);
+                \Log::debug('updateOpportunity: New items created');
             }
 
             return $opportunity->load('items');

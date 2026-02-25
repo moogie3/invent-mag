@@ -9,7 +9,7 @@
                 placeholder="0" />
             <select class="form-select" id="discountTotalType" name="discount_total_type" style="max-width: 80px;">
                 <option value="fixed">{{ __('messages.po_fixed') }}</option>
-                <option value="percentage">%</option>
+                <option value="percentage">{{ __('messages.percentage') }}</option>
             </select>
             <button type="button" id="applyTotalDiscount" class="btn btn-secondary d-none d-sm-inline-block">
                 <i class="ti ti-discount-check"></i> {{ __('messages.apply') }}

@@ -33,7 +33,7 @@ export function initConvertOpportunityForm() {
                     convertModal.hide();
 
                     if (data.type === "success") {
-                        window.showToast("Success", data.message, "success");
+                        InventMagApp.showToast("Success", data.message, "success");
 
                         const opportunityCard = document.querySelector(
                             `.opportunity-card[data-opportunity-id='${opportunityId}']`
@@ -57,16 +57,16 @@ export function initConvertOpportunityForm() {
                             }
                         }
                     } else {
-                        window.showToast("Error", data.message, "error");
+                        InventMagApp.showToast("Error", data.message, "error");
                     }
                 })
                 .catch((error) => {
-                    console.error("Error:", error);
+                    // // console.error("Error:", error);
                     const convertModal = bootstrap.Modal.getInstance(
                         document.getElementById("convertOpportunityModal")
                     );
                     convertModal.hide();
-                    window.showToast(
+                    InventMagApp.showToast(
                         "Error",
                         "An unexpected error occurred.",
                         "error"

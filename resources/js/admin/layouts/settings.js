@@ -7,9 +7,10 @@ async function fetchSystemSettings() {
         }
         const settings = await response.json();
         window.userSettings = settings;
-        console.log('System settings loaded:', window.userSettings);
+        // console.log('System settings loaded:', window.userSettings);
+        document.dispatchEvent(new Event('usersettingsloaded'));
     } catch (error) {
-        console.error('Error fetching system settings:', error);
+        // console.error('Error fetching system settings:', error);
         // Fallback to default settings if fetch fails
         window.userSettings = {
             enable_sound_notifications: true,
@@ -18,14 +19,12 @@ async function fetchSystemSettings() {
         };
     }
 
-    // Once settings are loaded, check for and display any session-based notifications.
-    if (window.handleSessionNotifications) {
-        window.handleSessionNotifications();
-    }
-
-    // Apply performance settings globally
+    // Initialize features that depend on these settings
     if (window.userSettings) {
         applyPerformanceSettings(window.userSettings);
+        applyDebugSettings(window.userSettings);
+        applyTooltipSettings(window.userSettings);
+        initAutoLogout(window.userSettings);
     }
 
     // Initialize the settings page functionality if the form exists on the current page.
@@ -72,8 +71,39 @@ function applyPerformanceSettings(settings) {
     if (refreshRate > 0) {
         window.dataRefreshInterval = setInterval(() => {
             document.dispatchEvent(new CustomEvent('datarefresh'));
-            console.log('Dispatched datarefresh event.');
+            // console.log('Dispatched datarefresh event.');
         }, refreshRate * 1000);
+    }
+}
+
+function applyDebugSettings(settings) {
+    if (settings.enable_debug_mode === true) {
+        document.body.classList.add('debug-mode');
+        // console.log('Debug mode enabled.');
+    } else {
+        document.body.classList.remove('debug-mode');
+    }
+}
+
+/**
+ * Applies global tooltip settings based on user preferences.
+ * @param {object} settings - The user settings object.
+ */
+function applyTooltipSettings(settings) {
+    const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
+
+    // Always destroy existing tooltips first to prevent duplicates or lingering instances
+    tooltipTriggerList.forEach(tooltipTriggerEl => {
+        const tooltipInstance = bootstrap.Tooltip.getInstance(tooltipTriggerEl);
+        if (tooltipInstance) {
+            tooltipInstance.dispose();
+        }
+    });
+
+    if (settings.show_tooltips === true) {
+        tooltipTriggerList.forEach(tooltipTriggerEl => {
+            new bootstrap.Tooltip(tooltipTriggerEl);
+        });
     }
 }
 
@@ -81,7 +111,7 @@ function initSettingsPage() {
     const systemSettingsForm = document.getElementById('systemSettingsForm');
 
     if (systemSettingsForm) {
-        /* systemSettingsForm.addEventListener('submit', function (e) {
+        systemSettingsForm.addEventListener('submit', function (e) {
             e.preventDefault();
 
             const formData = new FormData(systemSettingsForm);
@@ -103,29 +133,27 @@ function initSettingsPage() {
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    // Update global settings object FIRST
-                    if (window.userSettings) {
-                        for (const key in data.settings) {
-                            if (Object.hasOwnProperty.call(data.settings, key)) {
-                                window.userSettings[key] = data.settings[key];
-                            }
-                        }
-                    }
-                    showToast('Success', data.message, 'success');
+                    window.location.href = window.location.pathname + '?status=success&message=' + encodeURIComponent(data.message);
                 } else {
-                    showToast('Error', data.message || 'An error occurred.', 'error');
+                    InventMagApp.showToast('Error', data.message || 'An error occurred.', 'error');
                 }
             })
             .catch(error => {
-                console.error('Error:', error);
-                showToast('Error', 'An unexpected error occurred.', 'error');
+                // console.error('Error:', error);
+                InventMagApp.showToast('Error', 'An unexpected error occurred.', 'error');
             })
             .finally(() => {
                 saveButton.disabled = false;
                 saveButton.innerHTML = originalButtonText;
             });
-        }); */
+        });
+
+        window.shortcutManager.register('ctrl+s', () => {
+            systemSettingsForm.requestSubmit();
+        }, 'Save System Settings');
     }
+
+    
 
     const navigationTypeSelect = document.querySelector('select[name="navigation_type"]');
     if (navigationTypeSelect) {
@@ -177,21 +205,25 @@ function initSettingsPage() {
         // Add event listener for changes
         navigationTypeSelect.addEventListener('change', toggleNavigationOptions);
     }
+
+    const resetButton = document.getElementById('resetButton');
+    if (resetButton) {
+        resetButton.addEventListener('click', resetToDefaults);
+    }
 }
 
-// Initialize settings on script load
-fetchSystemSettings();
 
-document.addEventListener('DOMContentLoaded', function () {
+// Add a new function to initialize the auto-logout feature
+function initAutoLogout(settings) {
     let logoutTimer;
     let modalVisible = false;
+    // Convert minutes to milliseconds
+    const autoLogoutTime = parseFloat(settings.auto_logout_time) * 60 * 1000;
 
-    const autoLogoutTimeInput = document.getElementById('autoLogoutTime');
-    if (!autoLogoutTimeInput) {
+    // If logout time is 0 or not a number, disable the feature
+    if (!autoLogoutTime || autoLogoutTime <= 0) {
         return;
     }
-
-    let autoLogoutTime = parseFloat(autoLogoutTimeInput.value) * 60 * 1000;
 
     function showInactivityModal() {
         if (modalVisible) return;
@@ -221,7 +253,6 @@ document.addEventListener('DOMContentLoaded', function () {
 
         const modalElement = document.getElementById('inactivityModal');
         const modal = new bootstrap.Modal(modalElement);
-
         modal.show();
 
         document.getElementById('stayLoggedInBtn').addEventListener('click', () => {
@@ -231,7 +262,7 @@ document.addEventListener('DOMContentLoaded', function () {
         document.getElementById('logoutBtn').addEventListener('click', () => {
             const form = document.createElement('form');
             form.method = 'POST';
-            form.action = '/admin/logout'; // Use the correct logout route
+            form.action = '/admin/logout';
             const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
             const csrfInput = document.createElement('input');
             csrfInput.type = 'hidden';
@@ -250,16 +281,96 @@ document.addEventListener('DOMContentLoaded', function () {
 
     function resetLogoutTimer() {
         clearTimeout(logoutTimer);
-        if (autoLogoutTime > 0) {
-            logoutTimer = setTimeout(showInactivityModal, autoLogoutTime);
-        }
+        logoutTimer = setTimeout(showInactivityModal, autoLogoutTime);
     }
 
-    if (autoLogoutTime > 0) {
-        window.addEventListener('mousemove', resetLogoutTimer);
-        window.addEventListener('keydown', resetLogoutTimer);
-        window.addEventListener('click', resetLogoutTimer);
-        window.addEventListener('scroll', resetLogoutTimer);
-        resetLogoutTimer();
+    // Attach event listeners
+    window.addEventListener('mousemove', resetLogoutTimer, { passive: true });
+    window.addEventListener('keydown', resetLogoutTimer, { passive: true });
+    window.addEventListener('click', resetLogoutTimer, { passive: true });
+    window.addEventListener('scroll', resetLogoutTimer, { passive: true });
+
+    // Initial timer start
+    resetLogoutTimer();
+}
+
+// Initialize settings on script load
+if (document.querySelector('meta[name="csrf-token"]')) {
+    fetchSystemSettings();
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    // Handle session-based notifications immediately on DOM load
+    if (window.handleSessionNotifications) {
+        window.handleSessionNotifications();
+    }
+
+    // Also handle notifications passed via URL parameters
+    const urlParams = new URLSearchParams(window.location.search);
+    const status = urlParams.get('status');
+    const message = urlParams.get('message');
+
+    if (status && message) {
+        if (status === 'success') {
+            InventMagApp.showToast('Success', decodeURIComponent(message), 'success');
+        } else if (status === 'error') {
+            InventMagApp.showToast('Error', decodeURIComponent(message), 'error');
+        }
+
+        // Clean up the URL
+        window.history.replaceState({}, document.title, window.location.pathname);
     }
 });
+
+function resetToDefaults() {
+    const form = document.getElementById('systemSettingsForm');
+    if (form) {
+        // Interface Layout Settings
+        form.querySelector('select[name="navigation_type"]').value = 'sidebar';
+        form.querySelector('input[name="sidebar_lock"]').checked = false;
+        form.querySelector('input[name="sticky_navbar"]').checked = false;
+
+        // Theme Settings
+        form.querySelector('select[name="theme_mode"]').value = 'light';
+        form.querySelector('input[name="show_theme_toggle"]').checked = true;
+
+        // Notification Settings
+        form.querySelector('input[name="enable_sound_notifications"]').checked = true;
+        form.querySelector('input[name="enable_browser_notifications"]').checked = true;
+        form.querySelector('input[name="show_success_messages"]').checked = true;
+        form.querySelector('select[name="notification_duration"]').value = '5';
+
+        // Session & Security Settings
+        form.querySelector('select[name="auto_logout_time"]').value = '60';
+        form.querySelector('input[name="remember_last_page"]').checked = true;
+
+        // Performance Settings
+        form.querySelector('input[name="enable_animations"]').checked = true;
+        form.querySelector('input[name="lazy_load_images"]').checked = true;
+        form.querySelector('select[name="data_refresh_rate"]').value = '30';
+
+        // Language & Localization
+        form.querySelector('select[name="system_language"]').value = 'en';
+
+        // Advanced Settings
+        form.querySelector('input[name="enable_debug_mode"]').checked = false;
+        form.querySelector('input[name="enable_keyboard_shortcuts"]').checked = true;
+        form.querySelector('input[name="show_tooltips"]').checked = true;
+        form.querySelector('input[name="compact_mode"]').checked = false;
+
+        // After resetting, re-run the logic to toggle visibility of dependent options
+        const navigationTypeSelect = form.querySelector('select[name="navigation_type"]');
+        if (navigationTypeSelect) {
+            navigationTypeSelect.dispatchEvent(new Event('change'));
+        }
+
+        InventMagApp.showToast('Success', 'Settings have been reset to their default values.', 'success');
+    }
+}
+
+const showShortcutsModalBtn = document.getElementById('showShortcutsModalBtn');
+if (showShortcutsModalBtn) {
+    showShortcutsModalBtn.addEventListener('click', () => {
+        window.shortcutManager.showShortcutsModal();
+    });
+}

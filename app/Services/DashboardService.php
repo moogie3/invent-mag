@@ -29,10 +29,14 @@ class DashboardService
         $inCountUnpaid = $this->getPurchaseCountbyLocation('IN', 'Unpaid');
         $recentSales = Sales::with('customer')->orderBy('created_at', 'desc')->limit(3)->get();
         $recentPurchases = Purchase::with('supplier')->orderBy('created_at', 'desc')->limit(3)->get();
+        
+        // New aging calculations
+        $arAging = $this->getAccountsReceivableAging();
+        $apAging = $this->getAccountsPayableAging();
 
         $keyMetrics = $this->formatKeyMetrics($totalLiability, $unpaidLiability, $totalRevenue, $unpaidRevenue, $monthlySales, $outCountUnpaid, $inCountUnpaid);
         $financialItems = $this->prepareFinancialItems($totalLiability, $unpaidLiability, $totalRevenue);
-        $invoiceStatusData = $this->prepareInvoiceStatusData();
+        $invoiceStatusData = $this->prepareInvoiceStatusData($arAging, $apAging); // Pass aging data here
         $customerInsights = $this->prepareCustomerInsights();
         $customerAnalytics = $this->getCustomerAnalytics($dates);
         $supplierAnalytics = $this->getSupplierAnalytics($dates);
@@ -42,23 +46,26 @@ class DashboardService
         $lowStockProducts = Product::getLowStockProducts();
         $expiringSoonItems = \App\Models\POItem::getExpiringSoonItems();
 
-        $salesData = Sales::selectRaw('
-            DATE_FORMAT(order_date, "%b") as month,
-            MONTH(order_date) as month_num,
+        $monthFormat = DB::connection()->getDriverName() === 'sqlite' ? "strftime('%b', order_date)" : "DATE_FORMAT(order_date, '%b')";
+        $monthNumFormat = DB::connection()->getDriverName() === 'sqlite' ? "strftime('%m', order_date)" : "MONTH(order_date)";
+
+        $salesData = Sales::selectRaw("
+            $monthFormat as month,
+            $monthNumFormat as month_num,
             SUM(total) as total
-        ')
+        ")
             ->whereYear('order_date', now()->year)
-            ->groupBy(DB::raw('MONTH(order_date)'), DB::raw('DATE_FORMAT(order_date, "%b")'))
+            ->groupBy(DB::raw($monthNumFormat), DB::raw($monthFormat))
             ->orderBy('month_num')
             ->get();
 
-        $purchaseData = Purchase::selectRaw('
-            DATE_FORMAT(order_date, "%b") as month,
-            MONTH(order_date) as month_num,
+        $purchaseData = Purchase::selectRaw("
+            $monthFormat as month,
+            $monthNumFormat as month_num,
             SUM(total) as total
-        ')
+        ")
             ->whereYear('order_date', now()->year)
-            ->groupBy(DB::raw('MONTH(order_date)'), DB::raw('DATE_FORMAT(order_date, "%b")'))
+            ->groupBy(DB::raw($monthNumFormat), DB::raw($monthFormat))
             ->orderBy('month_num')
             ->get();
 
@@ -84,8 +91,6 @@ class DashboardService
             'countRevenue' => $unpaidRevenue,
             'countSales' => $monthlySales,
             'liabilitypaymentMonthly' => $this->getLiabilityPaymentsMonthly(),
-            'inCount' => $this->getPurchaseCountByLocation('IN'),
-            'outCount' => $this->getPurchaseCountByLocation('OUT'),
             'inCountUnpaid' => $inCountUnpaid,
             'outCountUnpaid' => $outCountUnpaid,
             'totalRevenue' => $totalRevenue,
@@ -95,6 +100,8 @@ class DashboardService
             'financialItems' => $financialItems,
             'invoiceStatusData' => $invoiceStatusData,
             'customerInsights' => $customerInsights,
+            'arAging' => $arAging, // Add AR aging to the dashboard data
+            'apAging' => $apAging, // Add AP aging to the dashboard data
         ];
     }
 
@@ -238,7 +245,7 @@ class DashboardService
         }
 
         if ($categoryId) {
-            $query->whereHas('items.product', function ($q) use ($categoryId) {
+            $query->whereHas('salesItems.product', function ($q) use ($categoryId) {
                 $q->where('category_id', $categoryId);
             });
         }
@@ -263,7 +270,7 @@ class DashboardService
     {
         return [
             [
-                'title' => 'Remaining Liability',
+                'title' => __('messages.remaining_liability'),
                 'icon' => 'ti-building-warehouse',
                 'value' => $unpaidLiability,
                 'total' => $totalLiability,
@@ -278,7 +285,7 @@ class DashboardService
                 'badge_class' => $unpaidLiability < $totalLiability * 0.5 ? 'bg-success-lt' : 'bg-danger-lt',
             ],
             [
-                'title' => 'Account Receivable',
+                'title' => __('messages.account_receivable'),
                 'icon' => 'ti-moneybag',
                 'value' => $unpaidRevenue,
                 'total' => $totalRevenue,
@@ -293,7 +300,7 @@ class DashboardService
                 'badge_class' => $unpaidRevenue > $totalRevenue * 0.5 ? 'bg-success-lt' : 'bg-danger-lt',
             ],
             [
-                'title' => 'Monthly Earnings',
+                'title' => __('messages.monthly_earnings'),
                 'icon' => 'ti-chart-pie',
                 'value' => $monthlySales,
                 'total' => null,
@@ -303,12 +310,12 @@ class DashboardService
                 'route' => null,
                 'percentage' => 0,
                 'trend' => $monthlySales > 0 ? 'positive' : 'neutral',
-                'trend_label' => 'This Month',
+                'trend_label' => __('messages.this_month'),
                 'trend_icon' => '',
                 'badge_class' => $monthlySales > 0 ? 'bg-success-lt' : 'bg-muted-lt',
             ],
             [
-                'title' => 'Payment Overdue',
+                'title' => __('messages.payment_overdue'),
                 'icon' => 'ti-alert-triangle',
                 'value' => $this->getOverdueInvoicesCount(),
                 'total' => null,
@@ -318,7 +325,7 @@ class DashboardService
                 'route' => route('admin.po', ['status' => 'Overdue']),
                 'percentage' => 0,
                 'trend' => $this->getOverdueInvoicesCount() == 0 ? 'positive' : 'negative',
-                'trend_label' => $this->getOverdueInvoicesCount() == 0 ? 'No overdue payments' : 'Action required',
+                'trend_label' => $this->getOverdueInvoicesCount() == 0 ? __('messages.no_overdue_payments') : __('messages.action_required'),
                 'trend_icon' => $this->getOverdueInvoicesCount() == 0 ? 'ti ti-check' : 'ti ti-alert-circle',
                 'badge_class' => $this->getOverdueInvoicesCount() == 0 ? 'bg-success-lt' : 'bg-danger-lt',
             ],
@@ -329,73 +336,223 @@ class DashboardService
     {
         return Purchase::where('status', 'Unpaid')->where('due_date', '<', now())->count();
     }
+
+    private function getAccountsReceivableAging()
+    {
+        $now = Carbon::now();
+        $aging = [
+            'current' => 0,
+            '1-30' => 0,
+            '31-60' => 0,
+            '61-90' => 0,
+            '90+' => 0,
+            'total_overdue' => 0,
+        ];
+
+        $unpaidSales = Sales::whereIn('status', ['Unpaid', 'Partial'])
+            ->whereNotNull('due_date')
+            ->get();
+
+        foreach ($unpaidSales as $sale) {
+            $daysOverdue = $now->diffInDays($sale->due_date, false); // false for absolute difference
+
+            if ($daysOverdue >= 0) { // Due date is today or in the future
+                $aging['current'] += $sale->total;
+            } elseif ($daysOverdue >= -30) { // 1-30 days overdue
+                $aging['1-30'] += $sale->total;
+                $aging['total_overdue'] += $sale->total;
+            } elseif ($daysOverdue >= -60) { // 31-60 days overdue
+                $aging['31-60'] += $sale->total;
+                $aging['total_overdue'] += $sale->total;
+            } elseif ($daysOverdue >= -90) { // 61-90 days overdue
+                $aging['61-90'] += $sale->total;
+                $aging['total_overdue'] += $sale->total;
+            } else { // 90+ days overdue
+                $aging['90+'] += $sale->total;
+                $aging['total_overdue'] += $sale->total;
+            }
+        }
+        return $aging;
+    }
+
+    private function getAccountsPayableAging()
+    {
+        $now = Carbon::now();
+        $aging = [
+            'current' => 0,
+            '1-30' => 0,
+            '31-60' => 0,
+            '61-90' => 0,
+            '90+' => 0,
+            'total_overdue' => 0,
+        ];
+
+        $unpaidPurchases = Purchase::whereIn('status', ['Unpaid', 'Partial'])
+            ->whereNotNull('due_date')
+            ->get();
+
+        foreach ($unpaidPurchases as $purchase) {
+            $daysOverdue = $now->diffInDays($purchase->due_date, false);
+
+            if ($daysOverdue >= 0) { // Due date is today or in the future
+                $aging['current'] += $purchase->total;
+            } elseif ($daysOverdue >= -30) { // 1-30 days overdue
+                $aging['1-30'] += $purchase->total;
+                $aging['total_overdue'] += $purchase->total;
+            } elseif ($daysOverdue >= -60) { // 31-60 days overdue
+                $aging['31-60'] += $purchase->total;
+                $aging['total_overdue'] += $purchase->total;
+            } elseif ($daysOverdue >= -90) { // 61-90 days overdue
+                $aging['61-90'] += $purchase->total;
+                $aging['total_overdue'] += $purchase->total;
+            } else { // 90+ days overdue
+                $aging['90+'] += $purchase->total;
+                $aging['total_overdue'] += $purchase->total;
+            }
+        }
+        return $aging;
+    }
+
     private function prepareFinancialItems($totalLiability, $unpaidLiability, $totalRevenue)
     {
         $operatingExpenses = $totalLiability - $unpaidLiability;
 
+        // Previous month
+        $lastMonthStart = now()->subMonth()->startOfMonth();
+        $lastMonthEnd = now()->subMonth()->endOfMonth();
+
+        $prevMonthPaidLiabilities = Purchase::whereBetween('updated_at', [$lastMonthStart, $lastMonthEnd])->where('status', 'Paid')->sum('total');
+        $prevMonthReceivablePaid = Sales::whereBetween('updated_at', [$lastMonthStart, $lastMonthEnd])->where('status', 'Paid')->sum('total');
+        $prevMonthTotalLiability = Purchase::where('order_date', '<=', $lastMonthEnd)->sum('total');
+        $prevMonthUnpaidLiability = Purchase::where('order_date', '<=', $lastMonthEnd)->where('status', 'Unpaid')->sum('total');
+        $prevMonthOperatingExpenses = $prevMonthTotalLiability - $prevMonthUnpaidLiability;
+        $prevMonthTotalRevenue = Sales::whereBetween('order_date', [$lastMonthStart, $lastMonthEnd])->sum('total');
+        $prevNetProfit = $prevMonthTotalRevenue - $prevMonthOperatingExpenses;
+
+        // New metrics
+        $cogs = $this->getTotalPurchases(['start' => now()->startOfMonth(), 'end' => now()->endOfMonth()]); // Cost of Goods Sold for current month
+        $grossProfit = $totalRevenue - $cogs;
+        $operatingIncome = $grossProfit - $operatingExpenses;
+
+        // Previous month for new metrics
+        $prevMonthCogs = $this->getTotalPurchases(['start' => $lastMonthStart, 'end' => $lastMonthEnd]);
+        $prevGrossProfit = $prevMonthTotalRevenue - $prevMonthCogs;
+        $prevOperatingIncome = $prevGrossProfit - $prevMonthOperatingExpenses;
+
+
+        $paidLiabilities = $this->getLiabilityPaymentsMonthly();
+        $receivablePaid = $this->getPaidDebtMonthly();
+        $netProfit = $totalRevenue - $operatingExpenses;
+
+        $paidLiabilitiesChange = $prevMonthPaidLiabilities > 0 ? (($paidLiabilities - $prevMonthPaidLiabilities) / $prevMonthPaidLiabilities) * 100 : 0;
+        $receivablePaidChange = $prevMonthReceivablePaid > 0 ? (($receivablePaid - $prevMonthReceivablePaid) / $prevMonthReceivablePaid) * 100 : 0;
+        $operatingExpensesChange = $prevMonthOperatingExpenses > 0 ? (($operatingExpenses - $prevMonthOperatingExpenses) / $prevMonthOperatingExpenses) * 100 : 0;
+        $netProfitChange = $prevNetProfit > 0 ? (($netProfit - $prevNetProfit) / $prevNetProfit) * 100 : 0;
+        $grossProfitChange = $prevGrossProfit > 0 ? (($grossProfit - $prevGrossProfit) / $prevGrossProfit) * 100 : 0;
+        $operatingIncomeChange = $prevOperatingIncome > 0 ? (($operatingIncome - $prevOperatingIncome) / $prevOperatingIncome) * 100 : 0;
+
+
         return [
             [
-                'label' => 'Total Liabilities',
+                'label' => __('messages.total_liabilities'),
                 'value' => $totalLiability,
-                'icon' => 'ti-wallet',
+                'icon' => 'ti-receipt-2',
+                'change' => 0,
             ],
             [
-                'label' => 'This Month Paid Liabilities',
-                'value' => $this->getLiabilityPaymentsMonthly(),
-                'icon' => 'ti-calendar',
+                'label' => __('messages.this_month_paid_liabilities'),
+                'value' => $paidLiabilities,
+                'icon' => 'ti-calendar-check',
+                'change' => $paidLiabilitiesChange,
             ],
             [
-                'label' => 'Total Account Receivable',
+                'label' => __('messages.total_account_receivable'),
                 'value' => $totalRevenue,
-                'icon' => 'ti-report-money',
+                'icon' => 'ti-file-invoice',
+                'change' => 0,
             ],
             [
-                'label' => 'This Month Receivable Paid',
-                'value' => $this->getPaidDebtMonthly(),
-                'icon' => 'ti-coin',
+                'label' => __('messages.this_month_receivable_paid'),
+                'value' => $receivablePaid,
+                'icon' => 'ti-cash',
+                'change' => $receivablePaidChange,
             ],
             [
-                'label' => 'Operating Expenses',
+                'label' => __('messages.operating_expenses'),
                 'value' => $operatingExpenses,
-                'icon' => 'ti-shopping-cart',
+                'icon' => 'ti-shopping-cart-cog',
+                'change' => $operatingExpensesChange,
+            ],
+            [
+                'label' => __('messages.net_profit'),
+                'value' => $netProfit,
+                'icon' => 'ti-chart-infographic',
+                'change' => $netProfitChange,
+            ],
+            [
+                'label' => __('messages.gross_profit'),
+                'value' => $grossProfit,
+                'icon' => 'ti-moneybag',
+                'change' => $grossProfitChange,
+            ],
+            [
+                'label' => __('messages.operating_income'),
+                'value' => $operatingIncome,
+                'icon' => 'ti-building-bank',
+                'change' => $operatingIncomeChange,
             ],
         ];
     }
 
-    private function prepareInvoiceStatusData()
+    private function prepareInvoiceStatusData(array $arAging, array $apAging)
     {
-        $inCount = $this->getPurchaseCountByLocation('IN');
-        $outCount = $this->getPurchaseCountByLocation('OUT');
-        $inCountUnpaid = $this->getPurchaseCountByLocation('IN', 'Unpaid');
-        $outCountUnpaid = $this->getPurchaseCountByLocation('OUT', 'Unpaid');
-        $totalInvoices = ($outCount ?? 0) + ($inCount ?? 0);
+        // Recalculate counts based on aging data
+        $outCount = Sales::count(); // Total sales invoices
+        $inCount = Purchase::count(); // Total purchase invoices
+
+        $outCountUnpaid = $arAging['current'] + $arAging['total_overdue']; // Unpaid AR
+        $inCountUnpaid = $apAging['current'] + $apAging['total_overdue']; // Unpaid AP
+
+        $totalInvoices = $outCount + $inCount;
         $collectionRate = $this->getCollectionRate();
         $avgDueDays = $this->getAverageDueDays();
 
-        $outPercentage = ($outCount ?? 0) > 0 ? ((($outCount ?? 0) - ($outCountUnpaid ?? 0)) / ($outCount ?? 1)) * 100 : 0;
-
-        $inPercentage = ($inCount ?? 0) > 0 ? ((($inCount ?? 0) - ($inCountUnpaid ?? 0)) / ($inCount ?? 1)) * 100 : 0;
+        $outPercentage = ($outCount > 0) ? (($outCount - $outCountUnpaid) / $outCount) * 100 : 0;
+        $inPercentage = ($inCount > 0) ? (($inCount - $inCountUnpaid) / $inCount) * 100 : 0;
 
         return [
             'totalInvoices' => $totalInvoices,
             'collectionRate' => $collectionRate,
             'collectionRateDisplay' => round($collectionRate),
-            'outCount' => $outCount ?? 0,
-            'inCount' => $inCount ?? 0,
-            'outCountUnpaid' => $outCountUnpaid ?? 0,
-            'inCountUnpaid' => $inCountUnpaid ?? 0,
+            'outCount' => $outCount,
+            'inCount' => $inCount,
+            'outCountUnpaid' => $outCountUnpaid,
+            'inCountUnpaid' => $inCountUnpaid,
             'outPercentage' => $outPercentage,
             'inPercentage' => $inPercentage,
             'avgDueDays' => $avgDueDays,
+            'arAging' => $arAging, // Include AR aging details
+            'apAging' => $apAging, // Include AP aging details
         ];
     }
 
     private function prepareCustomerInsights()
     {
-        $avgDueDays = Sales::whereNotNull('payment_date')->whereNotNull('due_date')->select(DB::raw('AVG(DATEDIFF(payment_date, due_date)) as avg_days'))->value('avg_days') ?? 0;
+        $dateDiffRaw = DB::connection()->getDriverName() === 'sqlite'
+            ? 'julianday(payments.payment_date) - julianday(sales.due_date)'
+            : 'DATEDIFF(payments.payment_date, sales.due_date)';
+
+        $avgDueDays = Sales::where('sales.status', 'Paid')
+            ->whereNotNull('sales.due_date')
+            ->join('payments', function ($join) {
+                $join->on('sales.id', '=', 'payments.paymentable_id')
+                    ->where('payments.paymentable_type', Sales::class);
+            })
+            ->select(DB::raw("AVG($dateDiffRaw) as avg_days"))
+            ->value('avg_days') ?? 0;
 
         $totalInvoices = Sales::count();
-        $paidInvoices = Sales::whereNotNull('payment_date')->count();
+        $paidInvoices = Sales::where('status', 'Paid')->count();
         $collectionRate = $totalInvoices > 0 ? ($paidInvoices / $totalInvoices) * 100 : 0;
 
         $paymentTermsRaw = Customer::select('payment_terms', DB::raw('count(*) as count'))->groupBy('payment_terms')->get();
@@ -609,11 +766,14 @@ class DashboardService
     private function getAverageDueDays()
     {
         $avgDays = Sales::where('status', 'Paid')
-            ->whereNotNull('payment_date')
             ->whereNotNull('due_date')
             ->get()
             ->avg(function ($sale) {
-                return $sale->payment_date->diffInDays($sale->payment_date);
+                $latestPaymentDate = $sale->payments()->latest('payment_date')->value('payment_date');
+                if ($latestPaymentDate && $sale->due_date) {
+                    return Carbon::parse($latestPaymentDate)->diffInDays($sale->due_date);
+                }
+                return 0;
             });
 
         return round($avgDays) ?? 0;

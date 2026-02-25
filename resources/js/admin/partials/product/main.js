@@ -1,7 +1,8 @@
 import { initModals } from './modals/init.js';
 import { initProductModal, loadExpiringSoonProductsModal } from './modals/product.js'; // Import loadExpiringSoonProductsModal
-import { initBulkSelection } from './bulkActions/selection.js';
-import { initializeSearch } from './search/main.js';
+import { initBulkSelection, clearProductSelection } from './bulkActions/selection.js';
+
+
 import { initializeEntriesSelector, initKeyboardShortcuts, initExport } from './events.js';
 import { bulkUpdateStock } from './bulkActions/stock.js'; // Import bulkUpdateStock
 import { bulkDeleteProducts } from './bulkActions/delete.js'; // Import bulkDeleteProducts
@@ -18,7 +19,6 @@ export function initProductPage() {
         initModals();
         initProductModal();
         initBulkSelection();
-        initializeSearch();
         initializeEntriesSelector();
         initKeyboardShortcuts();
         initExport();
@@ -53,7 +53,7 @@ export function initProductPage() {
                         loadExpiringSoonProductsModal(data);
                     })
                     .catch(error => {
-                        console.error('Error fetching expiring products:', error);
+                        // // console.error('Error fetching expiring products:', error);
                         if (tableBody) {
                             tableBody.innerHTML = `
                                 <tr>
@@ -67,11 +67,7 @@ export function initProductPage() {
             });
         }
 
-        const searchInput = document.getElementById("searchInput");
-        if (searchInput && !searchInput.hasAttribute("data-search-initialized")) {
-            initializeSearch();
-            searchInput.setAttribute("data-search-initialized", "true");
-        }
+        
 
         const selectAllCheckbox = document.getElementById("selectAll");
         if (
@@ -174,7 +170,7 @@ export function initProductPage() {
             }
 
             if (!adjustmentAmount || adjustmentAmount < 0) {
-                alert('Please enter a valid adjustment amount.');
+                InventMagApp.showToast("Warning", 'Please enter a valid adjustment amount.', "warning");
                 return;
             }
 
@@ -229,14 +225,14 @@ export function initProductPage() {
                         modal.hide();
                     }
 
-                    window.showToast('Success', data.message, 'success');
+                    InventMagApp.showToast('Success', data.message, 'success');
                 } else {
-                    window.showToast('Error', data.message || 'Failed to update stock.', 'error');
+                    InventMagApp.showToast('Error', data.message || 'Failed to update stock.', 'error');
                 }
             })
             .catch(error => {
-                console.error('Error:', error);
-                window.showToast('Error', 'An error occurred during stock adjustment.', 'error');
+                // // console.error('Error:', error);
+                InventMagApp.showToast('Error', 'An error occurred during stock adjustment.', 'error');
             });
         });
 
@@ -249,5 +245,6 @@ export function initProductPage() {
         }
 
         window.bulkDeleteProducts = bulkDeleteProducts; // Expose globally
+        window.clearProductSelection = clearProductSelection; // Expose globally
     });
 }

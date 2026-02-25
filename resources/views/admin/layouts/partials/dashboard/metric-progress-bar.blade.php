@@ -3,7 +3,7 @@
 </div>
 <div class="text-muted d-flex justify-content-between align-items-center">
     <span>
-        of
+        {{ __('messages.of') }}
         {{ $metric['format'] === 'currency' ? \App\Helpers\CurrencyHelper::format($metric['total']) : $metric['total'] }}
     </span>
     @unless ($metric['route'])

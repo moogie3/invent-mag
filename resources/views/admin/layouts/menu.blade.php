@@ -26,6 +26,10 @@
             class="list-group-item list-group-item-action d-flex align-items-center {{ request()->routeIs('admin.setting.tax') ? 'active' : '' }}">
             <i class="ti ti-receipt-tax fs-2 me-2"></i> {{ __('messages.tax') }}
         </a>
+        <a href="{{ route('admin.setting.accounting') }}"
+            class="list-group-item list-group-item-action d-flex align-items-center {{ request()->routeIs('admin.setting.accounting') ? 'active' : '' }}">
+            <i class="ti ti-calculator fs-2 me-2"></i> {{ __('messages.accounting') }}
+        </a>
         <a href="{{ route('admin.setting.index') }}"
             class="list-group-item list-group-item-action d-flex align-items-center {{ request()->routeIs('admin.setting.index') ? 'active' : '' }}">
             <i class="ti ti-settings-2 fs-2 me-2"></i> {{ __('messages.system') }}

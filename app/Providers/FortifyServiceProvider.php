@@ -15,9 +15,11 @@ use App\Actions\Fortify\UpdateUserPassword;
 use App\Actions\Fortify\UpdateUserProfileInformation;
 use App\Http\Responses\CustomLoginResponse;
 use App\Http\Responses\CustomRegisterResponse;
+use App\Http\Responses\VerifyEmailResponse;
 use Laravel\Fortify\Fortify;
 use Laravel\Fortify\Contracts\LoginResponse;
 use Laravel\Fortify\Contracts\RegisterResponse;
+use Laravel\Fortify\Contracts\VerifyEmailResponse as VerifyEmailResponseContract;
 use Laravel\Fortify\Features;
 use Laravel\Fortify\Actions\AttemptToAuthenticate;
 use Laravel\Fortify\Actions\EnsureLoginIsNotThrottled;
@@ -34,6 +36,8 @@ class FortifyServiceProvider extends ServiceProvider
     {
         $this->app->singleton(LoginResponse::class, CustomLoginResponse::class);
         $this->app->singleton(RegisterResponse::class, CustomRegisterResponse::class);
+        $this->app->singleton(VerifyEmailResponseContract::class, VerifyEmailResponse::class);
+        $this->app->singleton(\Laravel\Fortify\Contracts\PasswordResetResponse::class, \App\Http\Responses\PasswordResetResponse::class);
     }
 
     /**
@@ -46,6 +50,8 @@ class FortifyServiceProvider extends ServiceProvider
         Fortify::registerView(fn() => view('admin.auth.register'));
         Fortify::requestPasswordResetLinkView(fn() => view('admin.auth.forgot-password'));
         Fortify::resetPasswordView(fn($request) => view('admin.auth.reset-password', ['request' => $request]));
+        Fortify::verifyEmailView(fn() => view('admin.auth.verify-email'));
+        Fortify::confirmPasswordView(fn() => view('admin.auth.confirm-password'));
 
         // Register Fortify actions
         Fortify::createUsersUsing(CreateNewUser::class);

@@ -17,7 +17,7 @@ export function handleFormSubmission(event, modalElement, isCreate = false) {
     .then(response => response.json())
     .then(data => {
         if (data.success) {
-            showToast('Success', data.message, 'success');
+            InventMagApp.showToast('Success', data.message, 'success');
             const bsModal = bootstrap.Modal.getInstance(modalElement);
             if (bsModal) {
                 bsModal._element.addEventListener('hidden.bs.modal', function handler() {
@@ -33,12 +33,12 @@ export function handleFormSubmission(event, modalElement, isCreate = false) {
                 location.reload();
             }
         } else {
-            showToast('Error', data.message || 'Operation failed.', 'error');
+            InventMagApp.showToast('Error', data.message || 'Operation failed.', 'error');
             console.error('Form submission error:', data.errors);
         }
     })
     .catch(error => {
         console.error('Error during fetch:', error);
-        showToast('Error', 'An error occurred. Please check the console.', 'error');
+        InventMagApp.showToast('Error', 'An error occurred. Please check the console.', 'error');
     });
 }

@@ -17,6 +17,10 @@ class SupplierInteraction extends Model
         'interaction_date',
     ];
 
+    protected $casts = [
+        'interaction_date' => 'datetime',
+    ];
+
     public function supplier()
     {
         return $this->belongsTo(Supplier::class);

@@ -15,9 +15,20 @@ use App\Helpers\SalesHelper;
 use App\Helpers\CurrencyHelper;
 use App\Models\Customer;
 use Carbon\Carbon;
+use App\Models\Account;
+use App\Models\SalesReturn;
+use App\Models\SalesReturnItem;
+use Dompdf\Dompdf;
 
 class SalesService
 {
+    protected AccountingService $accountingService;
+
+    public function __construct(AccountingService $accountingService)
+    {
+        $this->accountingService = $accountingService;
+    }
+
     public function getSalesIndexData(array $filters, int $entries)
     {
         $query = Sales::with(['product', 'customer', 'user']);
@@ -69,11 +80,7 @@ class SalesService
     public function getSalesViewData($id)
     {
         /** @var \App\Models\Sales $sales */
-        $sales = Sales::with(['salesItems', 'customer'])->find($id);
-
-        if (strpos($sales->invoice, 'POS-') === 0) {
-            return redirect()->route('admin.pos.receipt', $id);
-        }
+        $sales = Sales::with(['salesItems', 'customer', 'payments'])->find($id);
 
         $customer = Customer::all();
         $tax = Tax::first();
@@ -131,7 +138,7 @@ class SalesService
     public function getSalesMetrics()
     {
         $totalinvoice = Sales::count();
-        $unpaidDebt = Sales::all()->where('status', 'Unpaid')->sum('total');
+        $unpaidDebt = Sales::where('status', 'Unpaid')->sum('total');
         $totalMonthly = Sales::whereMonth('created_at', now()->month)->whereYear('created_at', now()->year)->sum('total');
         $pendingOrders = Sales::where('status', 'Unpaid')->count();
         $dueInvoices = Sales::where('status', 'Unpaid')
@@ -191,10 +198,19 @@ class SalesService
                 'is_pos' => false,
             ]);
 
+            $totalCostOfGoods = 0;
+
             foreach ($products as $productData) {
+                $product = Product::find($productData['product_id']);
+                if (!$product) {
+                    throw new \Exception("Product with ID {$productData['product_id']} not found.");
+                }
+                $totalCostOfGoods += $product->price * $productData['quantity'];
+
                 SalesItem::create([
                     'sales_id' => $sale->id,
                     'product_id' => $productData['product_id'],
+                    'name' => $product->name,
                     'quantity' => $productData['quantity'],
                     'customer_price' => $productData['customer_price'],
                     'discount' => $productData['discount'] ?? 0,
@@ -202,7 +218,6 @@ class SalesService
                     'total' => SalesHelper::calculateTotal($productData['customer_price'], $productData['quantity'], $productData['discount'] ?? 0, $productData['discount_type'] ?? 'fixed'),
                 ]);
 
-                $product = Product::find($productData['product_id']);
                 if ($product) {
                     $product->decrement('stock_quantity', $productData['quantity']);
 
@@ -226,13 +241,42 @@ class SalesService
                 }
             }
 
+            // Get accounting settings from the user
+            $accountingSettings = Auth::user()->accounting_settings;
+
+            // Retrieve account names using the IDs from settings
+            $salesRevenueAccountName = Account::find($accountingSettings['sales_revenue_account_id'])->name;
+            $accountsReceivableAccountName = Account::find($accountingSettings['accounts_receivable_account_id'])->name;
+            $costOfGoodsSoldAccountName = Account::find($accountingSettings['cost_of_goods_sold_account_id'])->name;
+            $inventoryAccountName = Account::find($accountingSettings['inventory_account_id'])->name;
+
+            // Create Journal Entry for the sale
+            $transactions = [
+                ['account_name' => $accountsReceivableAccountName, 'type' => 'debit', 'amount' => $grandTotal],
+                ['account_name' => $salesRevenueAccountName, 'type' => 'credit', 'amount' => $grandTotal],
+                ['account_name' => $costOfGoodsSoldAccountName, 'type' => 'debit', 'amount' => $totalCostOfGoods],
+                ['account_name' => $inventoryAccountName, 'type' => 'credit', 'amount' => $totalCostOfGoods],
+            ];
+
+            $this->accountingService->createJournalEntry(
+                "Sale Invoice #{$sale->invoice}",
+                Carbon::parse($data['order_date']),
+                $transactions,
+                $sale
+            );
+
             return $sale;
         });
     }
 
     public function updateSale(Sales $sale, array $data): Sales
     {
+        Log::info('Updating sale with data: ', $data);
         return DB::transaction(function () use ($sale, $data) {
+            // Note: Proper accounting for updates is complex.
+            // A simple approach is to create a reversing entry and then a new entry.
+            // For now, this is left as a future improvement.
+
             $products = json_decode($data['products'], true);
             if (!$products || !is_array($products)) {
                 throw new \Exception('Invalid product data');
@@ -293,13 +337,14 @@ class SalesService
                 'order_discount_type' => $orderDiscountType,
                 'status' => $data['status'] ?? 'Unpaid',
                 'payment_type' => $data['payment_type'] ?? '-',
-                'payment_date' => ($data['status'] ?? 'Unpaid') === 'Paid' ? now() : null,
             ]);
 
             foreach ($products as $productData) {
+                $product = Product::find($productData['product_id']); // Find product to get its name
                 SalesItem::create([
                     'sales_id' => $sale->id,
                     'product_id' => $productData['product_id'],
+                    'name' => $product->name, // Added product name
                     'quantity' => $productData['quantity'],
                     'customer_price' => $productData['customer_price'],
                     'discount' => $productData['discount'] ?? 0,
@@ -335,9 +380,70 @@ class SalesService
         });
     }
 
+    public function addPayment(Sales $sale, array $data): \App\Models\Payment
+    {
+        return DB::transaction(function () use ($sale, $data) {
+            $payment = $sale->payments()->create([
+                'amount' => $data['amount'],
+                'payment_date' => $data['payment_date'],
+                'payment_method' => $data['payment_method'],
+                'notes' => $data['notes'] ?? null,
+            ]);
+
+            $sale->load('payments'); // Refresh the payments relationship
+            $this->updateSaleStatus($sale);
+            $sale->refresh();
+
+            // Get accounting settings from the user
+            $accountingSettings = Auth::user()->accounting_settings;
+
+            if (!$accountingSettings || !isset($accountingSettings['cash_account_id']) || !isset($accountingSettings['accounts_receivable_account_id'])) {
+                throw new \Exception('Accounting settings for cash or accounts receivable are not configured.');
+            }
+
+            // Retrieve account names using the IDs from settings
+            $cashAccountName = Account::find($accountingSettings['cash_account_id'])->name;
+            $accountsReceivableAccountName = Account::find($accountingSettings['accounts_receivable_account_id'])->name;
+
+            // Create Journal Entry for the payment
+            $transactions = [
+                ['account_name' => $cashAccountName, 'type' => 'debit', 'amount' => $data['amount']],
+                ['account_name' => $accountsReceivableAccountName, 'type' => 'credit', 'amount' => $data['amount']],
+            ];
+
+            $this->accountingService->createJournalEntry(
+                "Payment for Sale #{$sale->invoice}",
+                Carbon::parse($data['payment_date']),
+                $transactions,
+                $payment
+            );
+
+            return $payment;
+        });
+    }
+
+    public function updateSaleStatus(Sales $sale)
+    {
+        $totalPaid = $sale->total_paid;
+        $grandTotal = $sale->total;
+
+        if ($totalPaid >= $grandTotal) {
+            $sale->status = 'Paid';
+        } elseif ($totalPaid > 0 && $totalPaid < $grandTotal) {
+            $sale->status = 'Partial';
+        } else {
+            $sale->status = 'Unpaid';
+        }
+
+        $sale->save();
+    }
+
     public function deleteSale(Sales $sale): void
     {
         DB::transaction(function () use ($sale) {
+            // Note: Proper accounting for deletions would require a reversing journal entry.
+            // This is left as a future improvement.
+
             foreach ($sale->salesItems as $item) {
                 $product = Product::find($item->product_id);
                 if ($product) {
@@ -370,47 +476,88 @@ class SalesService
         DB::transaction(function () use ($ids) {
             $sales = Sales::whereIn('id', $ids)->with('salesItems')->get();
             foreach ($sales as $sale) {
-                foreach ($sale->salesItems as $item) {
-                    $product = Product::find($item->product_id);
-                    if ($product) {
-                        $product->increment('stock_quantity', $item->quantity);
-
-                        // Revert remaining quantity
-                        $poItems = POItem::where('product_id', $product->id)
-                            ->orderBy('expiry_date', 'desc')
-                            ->get();
-
-                        $quantityToIncrement = $item->quantity;
-
-                        foreach ($poItems as $poItem) {
-                            if ($quantityToIncrement <= 0) {
-                                break;
-                            }
-
-                            $increment = min($poItem->quantity - $poItem->remaining_quantity, $quantityToIncrement);
-                            $poItem->increment('remaining_quantity', $increment);
-                            $quantityToIncrement -= $increment;
-                        }
-                    }
-                }
-                $sale->delete();
+                $this->deleteSale($sale);
             }
         });
     }
 
     public function bulkMarkPaid(array $ids): int
     {
-        return Sales::whereIn('id', $ids)->update([
-            'status' => 'Paid',
-            'payment_date' => now(),
-            'amount_received' => DB::raw('total'),
-            'change_amount' => 0,
-        ]);
+        $updatedCount = 0;
+        DB::transaction(function () use ($ids, &$updatedCount) {
+            $sales = Sales::whereIn('id', $ids)->with('payments')->get(); // Added with('payments')
+            foreach ($sales as $sale) {
+                if ($sale->balance > 0) {
+                    $this->addPayment($sale, [
+                        'amount' => $sale->balance,
+                        'payment_date' => now(),
+                        'payment_method' => 'Unknown',
+                        'notes' => 'Bulk marked as paid.',
+                    ]);
+                }
+                $sale->refresh(); // Refresh the sale model to get the latest status
+                $updatedCount++;
+            }
+        });
+        return $updatedCount;
+    }
+
+    public function bulkExportSales(array $ids, string $exportOption)
+    {
+        $sales = Sales::with(['customer', 'salesItems'])->whereIn('id', $ids)->get();
+
+        if ($exportOption === 'pdf') {
+            $html = view('admin.sales.bulk-export-pdf', compact('sales'))->render();
+            $dompdf = new Dompdf();
+            $dompdf->loadHtml($html);
+            $dompdf->setPaper('A4', 'landscape');
+            $dompdf->render();
+            return $dompdf->stream('sales-orders.pdf');
+        }
+
+        if ($exportOption === 'csv') {
+            $headers = [
+                'Content-type' => 'text/csv',
+                'Content-Disposition' => 'attachment; filename=sales-orders.csv',
+                'Pragma' => 'no-cache',
+                'Cache-Control' => 'must-revalidate, post-check=0, pre-check=0',
+                'Expires' => '0',
+            ];
+
+            $callback = function () use ($sales) {
+                $file = fopen('php://output', 'w');
+                fputcsv($file, [
+                    'Invoice',
+                    'Customer',
+                    'Order Date',
+                    'Due Date',
+                    'Total',
+                    'Status',
+                ]);
+
+                foreach ($sales as $sale) {
+                    fputcsv($file, [
+                        $sale->invoice,
+                        $sale->customer->name,
+                        $sale->order_date->format('Y-m-d'),
+                        $sale->due_date->format('Y-m-d'),
+                        CurrencyHelper::format($sale->total),
+                        $sale->status,
+                    ]);
+                }
+
+                fclose($file);
+            };
+
+            return response()->stream($callback, 200, $headers);
+        }
+
+        return null;
     }
 
     public function getSalesForModal($id)
     {
-        return Sales::with(['customer', 'salesItems.product'])->findOrFail($id);
+        return Sales::with(['customer', 'salesItems.product', 'payments'])->findOrFail($id);
     }
 
     public function getPastCustomerPriceForProduct(Customer $customer, Product $product)
@@ -424,12 +571,12 @@ class SalesService
 
         $pastPrice = 0;
 
-        if ($latestSale) {
-            $saleItem = $latestSale->salesItems()->where('product_id', $product->id)->first();
-            if ($saleItem) {
-                $pastPrice = floor($saleItem->customer_price);
+            if ($latestSale) {
+                $saleItem = $latestSale->salesItems()->where('product_id', $product->id)->first();
+                if ($saleItem) {
+                    $pastPrice = $saleItem->customer_price; // Removed floor()
+                }
             }
-        }
 
         return $pastPrice;
     }
@@ -447,7 +594,7 @@ class SalesService
 
     public function getExpiringSalesCount(): int
     {
-        return Sales::where('due_date', '<=', Carbon::now()->addDays(90))
+        return Sales::where('due_date', '<=', Carbon::now()->addDays(10))
                         ->where('status', '!=', 'Paid')
                         ->count();
     }
@@ -468,6 +615,79 @@ class SalesService
                 'due_date' => Carbon::parse($sale->due_date)->format('d M Y'),
                 'total' => CurrencyHelper::format($sale->total),
             ];
+        });
+    }
+
+    public function createSalesReturn(array $data): SalesReturn
+    {
+        return DB::transaction(function () use ($data) {
+            $sale = Sales::findOrFail($data['sales_id']);
+            $items = json_decode($data['items'], true);
+            if (!$items || !is_array($items)) {
+                throw new \Exception('Invalid items data');
+            }
+
+            $totalReturnAmount = 0;
+            foreach ($items as $itemData) {
+                $totalReturnAmount += $itemData['price'] * $itemData['quantity'];
+            }
+
+            $salesReturn = SalesReturn::create([
+                'sales_id' => $sale->id,
+                'user_id' => Auth::id(),
+                'return_date' => $data['return_date'],
+                'reason' => $data['reason'],
+                'total_amount' => $totalReturnAmount,
+                'status' => $data['status'],
+            ]);
+
+            foreach ($items as $itemData) {
+                SalesReturnItem::create([
+                    'sales_return_id' => $salesReturn->id,
+                    'product_id' => $itemData['product_id'],
+                    'quantity' => $itemData['quantity'],
+                    'price' => $itemData['price'],
+                    'total' => $itemData['price'] * $itemData['quantity'],
+                ]);
+
+                $product = Product::find($itemData['product_id']);
+                if ($product) {
+                    $product->increment('stock_quantity', $itemData['quantity']);
+                }
+            }
+
+            // Update original sales status
+            $totalSoldQuantity = $sale->salesItems->sum('quantity');
+            $totalReturnedQuantity = $sale->salesReturns->flatMap->items->sum('quantity');
+
+            if ($totalReturnedQuantity >= $totalSoldQuantity) {
+                $sale->update(['status' => 'Returned']);
+            } else {
+                $sale->update(['status' => 'Partial']);
+            }
+
+            // Create Journal Entry for the return
+            $accountingSettings = Auth::user()->accounting_settings;
+            if (!$accountingSettings || !isset($accountingSettings['inventory_account_id']) || !isset($accountingSettings['accounts_receivable_account_id'])) {
+                throw new \Exception('Accounting settings for inventory or accounts receivable are not configured.');
+            }
+
+            $inventoryAccountName = Account::find($accountingSettings['inventory_account_id'])->name;
+            $accountsReceivableAccountName = Account::find($accountingSettings['accounts_receivable_account_id'])->name;
+
+            $transactions = [
+                ['account_name' => $accountsReceivableAccountName, 'type' => 'credit', 'amount' => $totalReturnAmount],
+                ['account_name' => $inventoryAccountName, 'type' => 'debit', 'amount' => $totalReturnAmount],
+            ];
+
+            $this->accountingService->createJournalEntry(
+                "Sales Return for SO #{$sale->invoice}",
+                Carbon::parse($data['return_date']),
+                $transactions,
+                $salesReturn
+            );
+
+            return $salesReturn;
         });
     }
 }

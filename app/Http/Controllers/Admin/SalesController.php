@@ -54,6 +54,12 @@ class SalesController extends Controller
 
     public function view($id)
     {
+        $sale = Sales::findOrFail($id);
+
+        if ($sale->is_pos) {
+            return redirect()->route('admin.pos.receipt', $id);
+        }
+
         $data = $this->salesService->getSalesViewData($id);
 
         return view('admin.sales.sales-view', $data);
@@ -63,7 +69,7 @@ class SalesController extends Controller
     {
         try {
             $sales = $this->salesService->getSalesForModal($id);
-            return view('admin.layouts.modals.salesmodals-view', compact('sales'));
+            return view('admin.layouts.modals.sales.salesmodals-view', compact('sales'));
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
             Log::error("Sales record not found for modal view: {$id}");
             return response('<div class="alert alert-danger">Sales record not found.</div>', 404);
@@ -97,12 +103,41 @@ class SalesController extends Controller
 
     public function update(Request $request, $id)
     {
-
         $sale = Sales::findOrFail($id);
+
+        $request->validate([
+            'invoice' => 'nullable|string|unique:sales,invoice,' . $sale->id,
+            'customer_id' => 'required|exists:customers,id',
+            'order_date' => 'required|date',
+            'due_date' => 'required|date',
+            'products' => 'required|json',
+            'discount_total' => 'nullable|numeric|min:0',
+            'discount_total_type' => 'nullable|in:fixed,percentage',
+        ]);
 
         try {
             $this->salesService->updateSale($sale, $request->all());
             return redirect()->route('admin.sales.view', $id)->with('success', 'Sale updated successfully.');
+        } catch (\Exception $e) {
+            return back()
+                ->withErrors(['error' => 'Something went wrong: ' . $e->getMessage()])
+                ->withInput();
+        }
+    }
+
+    public function addPayment(Request $request, $id)
+    {
+        $request->validate([
+            'amount' => 'required|numeric|min:0.01',
+            'payment_date' => 'required|date',
+            'payment_method' => 'required|string',
+            'notes' => 'nullable|string',
+        ]);
+
+        try {
+            $sale = Sales::findOrFail($id);
+            $this->salesService->addPayment($sale, $request->all());
+            return redirect()->route('admin.sales.view', $sale->id)->with('success', 'Payment added successfully.');
         } catch (\Exception $e) {
             return back()
                 ->withErrors(['error' => 'Something went wrong: ' . $e->getMessage()])
@@ -163,6 +198,33 @@ class SalesController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'An error occurred while updating sales orders.',
+            ], 500);
+        }
+    }
+
+    /**
+     * @group Sales Orders
+     * @summary Bulk Export Sales Orders
+     * @bodyParam ids array required An array of sales order IDs to export. Example: [1, 2, 3]
+     * @bodyParam export_option string required The export format ('pdf' or 'csv'). Example: "csv"
+     * @response 200 "The exported file."
+     */
+    public function bulkExport(Request $request)
+    {
+        $request->validate([
+            'ids' => 'required|array|min:1',
+            'ids.*' => 'required|integer|exists:sales,id',
+            'export_option' => 'required|string|in:pdf,csv',
+        ]);
+
+        try {
+            $file = $this->salesService->bulkExportSales($request->ids, $request->export_option);
+            return $file;
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error exporting sales orders. Please try again.',
+                'error_details' => config('app.debug') ? $e->getMessage() : 'Internal server error',
             ], 500);
         }
     }

@@ -7,10 +7,18 @@ use App\Models\Purchase;
 use App\Models\Supplier;
 use App\Models\Product;
 use App\Models\POItem;
+use App\Services\AccountingService;
 use Carbon\Carbon;
 
 class PurchaseSeeder extends Seeder
 {
+    protected $accountingService;
+
+    public function __construct(AccountingService $accountingService)
+    {
+        $this->accountingService = $accountingService;
+    }
+
     /**
      * Run the database seeds.
      *
@@ -28,10 +36,10 @@ class PurchaseSeeder extends Seeder
 
         for ($i = 0; $i < 10; $i++) {
             $supplier = $suppliers->random();
-            $orderDate = Carbon::now()->subDays(rand(1, 60));
+            $orderDate = Carbon::now()->subDays(rand(0, 29));
             $dueDate = $orderDate->copy()->addDays(rand(7, 30));
             $paymentType = collect(['Cash', 'Transfer', '-'])->random();
-            $status = collect(['Unpaid', 'Paid'])->random();
+            $status = collect(['Unpaid', 'Paid', 'Partial'])->random();
 
             $purchase = Purchase::create([
                 'invoice' => 'PO-' . str_pad(Purchase::count() + 1, 5, '0', STR_PAD_LEFT),
@@ -43,7 +51,6 @@ class PurchaseSeeder extends Seeder
                 'discount_total_type' => collect(['percentage', 'fixed'])->random(),
                 'total' => 0, // Will be calculated from items
                 'status' => $status,
-                'payment_date' => ($status === 'Paid') ? $orderDate->copy()->addDays(rand(0, 5)) : null,
             ]);
 
             $totalPurchaseAmount = 0;
@@ -97,6 +104,60 @@ class PurchaseSeeder extends Seeder
             }
 
             $purchase->update(['total' => $totalPurchaseAmount]);
+            
+            $paidAmount = 0;
+
+            // Add payment logic
+            if ($totalPurchaseAmount > 0) { // Ensure there's an amount to pay
+                if ($status === 'Paid') {
+                    $paidAmount = $totalPurchaseAmount;
+                    $purchase->payments()->create([
+                        'amount' => $paidAmount,
+                        'payment_date' => $orderDate->copy()->addDays(rand(0, 5)),
+                        'payment_method' => $paymentType,
+                        'notes' => 'Full payment during seeding.',
+                    ]);
+                } elseif ($status === 'Partial') {
+                    $paidAmount = rand(1, (int)($totalPurchaseAmount * 0.8)); // Pay between 1 and 80%
+                    $purchase->payments()->create([
+                        'amount' => $paidAmount,
+                        'payment_date' => $orderDate->copy()->addDays(rand(0, 5)),
+                        'payment_method' => $paymentType,
+                        'notes' => 'Partial payment during seeding.',
+                    ]);
+                }
+            }
+
+            // Create Journal Entry
+            $transactions = [];
+            $description = "Purchase of goods, invoice {$purchase->invoice}";
+
+            // Debit Inventory for the full purchase amount
+            $transactions[] = ['account_name' => 'accounting.accounts.inventory.name', 'type' => 'debit', 'amount' => $totalPurchaseAmount];
+
+            if ($status === 'Paid') {
+                // Credit Cash for the full amount
+                $transactions[] = ['account_name' => 'accounting.accounts.cash.name', 'type' => 'credit', 'amount' => $totalPurchaseAmount];
+            } elseif ($status === 'Unpaid') {
+                // Credit Accounts Payable for the full amount
+                $transactions[] = ['account_name' => 'accounting.accounts.accounts_payable.name', 'type' => 'credit', 'amount' => $totalPurchaseAmount];
+            } elseif ($status === 'Partial') {
+                // Credit Cash for the paid amount
+                if ($paidAmount > 0) {
+                    $transactions[] = ['account_name' => 'accounting.accounts.cash.name', 'type' => 'credit', 'amount' => $paidAmount];
+                }
+                // Credit Accounts Payable for the remaining balance
+                $remainingBalance = $totalPurchaseAmount - $paidAmount;
+                if ($remainingBalance > 0) {
+                    $transactions[] = ['account_name' => 'accounting.accounts.accounts_payable.name', 'type' => 'credit', 'amount' => $remainingBalance];
+                }
+            }
+            
+            try {
+                $this->accountingService->createJournalEntry($description, $orderDate, $transactions, $purchase);
+            } catch (\Exception $e) {
+                $this->command->error("Failed to create journal entry for purchase {$purchase->invoice}: " . $e->getMessage());
+            }
         }
     }
 }

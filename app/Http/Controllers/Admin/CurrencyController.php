@@ -26,22 +26,45 @@ class CurrencyController extends Controller
 
     public function update(Request $request)
     {
-        $request->validate([
-            'currency_symbol' => 'required|string|max:5',
-            'decimal_separator' => 'required|string|max:1',
-            'thousand_separator' => 'required|string|max:1',
-            'decimal_places' => 'required|integer|min:0|max:4',
-            'position' => 'required|string|in:prefix,suffix',
-            'currency_code' => 'required|string|max:3',
-            'locale' => 'required|string|max:10',
-        ]);
+        try {
+            $validatedData = $request->validate([
+                'currency_symbol' => 'required|string|max:5',
+                'decimal_separator' => 'required|string|max:1',
+                'thousand_separator' => 'required|string|max:1',
+                'decimal_places' => 'required|integer|min:0|max:4',
+                'position' => 'required|string|in:prefix,suffix',
+                'currency_code' => 'required|string|max:3',
+                'locale' => 'required|string|max:10',
+            ]);
 
-        $this->currencyService->updateCurrency($request->all());
+            $result = $this->currencyService->updateCurrency($validatedData);
 
-        if ($request->ajax()) {
-            return response()->json(['success' => true, 'message' => 'Currency settings updated successfully.']);
+            if (!$result['success']) {
+                $message = $result['message'] ?? 'An unexpected error occurred.';
+                if ($request->ajax()) {
+                    return response()->json(['success' => false, 'message' => $message], 500);
+                }
+                return redirect()->route('admin.setting.currency.edit')->with('error', $message);
+            }
+
+            $message = 'Currency settings updated successfully.';
+            if ($request->ajax()) {
+                return response()->json(['success' => true, 'message' => $message]);
+            }
+
+            return redirect()->route('admin.setting.currency.edit')->with('success', $message);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            if ($request->ajax()) {
+                return response()->json(['errors' => $e->errors()], 422);
+            }
+            return redirect()->back()->withErrors($e->errors())->withInput();
+        } catch (\Exception $e) {
+
+            $message = 'An unexpected error occurred. Please try again.';
+            if ($request->ajax()) {
+                return response()->json(['success' => false, 'message' => $message], 500);
+            }
+            return redirect()->route('admin.setting.currency.edit')->with('error', $message);
         }
-
-        return redirect()->back()->with('success', 'Currency settings updated successfully.');
     }
 }

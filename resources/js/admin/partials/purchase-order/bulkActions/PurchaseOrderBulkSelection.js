@@ -30,7 +30,7 @@ export class PurchaseOrderBulkSelection {
                 !this.bulkActionsBar ||
                 !this.selectedCount
             ) {
-                console.warn("Bulk selection essential elements not found.");
+                // console.warn("Bulk selection essential elements not found.");
                 if (this.bulkActionsBar) {
                     this.bulkActionsBar.style.display = "none";
                 }

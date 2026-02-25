@@ -45,27 +45,27 @@ export function handleFormSubmission() {
                 .then((response) => response.json())
                 .then((data) => {
                     if (data.success) {
-                        showToast("Success", data.message, "success");
+                        InventMagApp.showToast("Success", data.message, "success");
                         const newValues = getCurrentFormValues();
                         updateOriginalValues(newValues);
                         updateFormatPreview(newValues);
                     } else {
-                        showToast(
+                        InventMagApp.showToast(
                             "Error",
                             data.message ||
                                 "Failed to update currency settings.",
                             "error"
                         );
-                        console.error(
-                            "Error updating currency settings:",
-                            data.errors
-                        );
+                        // console.error(
+                        //     "Error updating currency settings:",
+                        //     data.errors
+                        // );
                         restoreOriginalValues();
                     }
                 })
                 .catch((error) => {
-                    console.error("Error updating currency settings:", error);
-                    showToast(
+                    // console.error("Error updating currency settings:", error);
+                    InventMagApp.showToast(
                         "Error",
                         "An error occurred while updating currency settings. Please check the console for details.",
                         "error"

@@ -204,7 +204,7 @@ class SalesPipelineController extends Controller
 
     public function showConvertForm(SalesOpportunity $opportunity)
     {
-        return view('admin.layouts.modals.sales-pipeline-modals', compact('opportunity'));
+        return view('admin.layouts.modals.sales.sales-pipeline-modals', compact('opportunity'));
     }
 
     public function convertToSalesOrder(SalesOpportunity $opportunity)

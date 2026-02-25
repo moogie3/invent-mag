@@ -1,0 +1,69 @@
+name: Laravel CI/CD
+
+on:
+  push:
+    branches: [ "main", "develop" ]
+  pull_request:
+    branches: [ "main", "develop" ]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup PHP
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: '8.2'
+        extensions: bcmath, ctype, fileinfo, json, mbstring, openssl, pdo, tokenizer, xml
+        coverage: none # Set to 'xdebug' if you want code coverage reports
+
+    - name: Copy .env
+      run: php -r "file_exists('.env') || copy('.env.example', '.env');"
+
+    - name: Install Composer Dependencies
+      uses: ramsey/composer-install@v3
+      with:
+        dependency-versions: "locked"
+        # Omitting --no-dev so that testing tools are included
+        
+    - name: Generate Application Key
+      run: php artisan key:generate
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+        cache: 'npm'
+
+    - name: Install NPM Dependencies
+      run: npm install
+
+    - name: Build Frontend Assets
+      run: npm run build
+
+    - name: Run Tests
+      run: php artisan test
+
+    - name: Prepare Artifact
+      run: |
+        mkdir -p build-artifact
+        rsync -av --progress . build-artifact/ \
+          --exclude ".git" \
+          --exclude ".github" \
+          --exclude "node_modules" \
+          --exclude ".env" \
+          --exclude ".env.example" \
+          --exclude "storage/framework/cache/data" \
+          --exclude "storage/framework/sessions" \
+          --exclude "storage/framework/views" \
+          --exclude "storage/logs"
+
+    - name: Upload Artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: build-artifact
+        path: build-artifact/

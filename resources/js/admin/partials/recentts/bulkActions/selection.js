@@ -1,6 +1,7 @@
 import { updateBulkActions } from '../utils/dom.js';
 
 export function initBulkSelection() {
+    // // console.log('initBulkSelection called');
     const selectAll = document.getElementById("selectAll");
     const rowCheckboxes = document.querySelectorAll(".row-checkbox");
 
@@ -25,7 +26,13 @@ export function smartSelectUnpaidOnly() {
         const statusBadge = row.querySelector(".badge");
         const status = statusBadge ? statusBadge.textContent.trim() : "";
 
-        if (status === "Paid") {
+        const isPaid =
+            status === "Paid" ||
+            status.toLowerCase().includes("paid") ||
+            statusBadge?.classList.contains("bg-success-lt") ||
+            statusBadge?.classList.contains("bg-success");
+
+        if (isPaid) {
             checkbox.checked = false;
             row.classList.add("table-warning");
             setTimeout(() => {
@@ -40,7 +47,7 @@ export function smartSelectUnpaidOnly() {
     updateBulkActions();
 
     if (excludedCount > 0) {
-        showToast(
+        InventMagApp.showToast(
             "Info",
             `${excludedCount} paid transaction(s) were excluded from selection.`,
             "info",
@@ -62,7 +69,7 @@ export function bulkMarkAsPaid() {
         );
 
         if (newSelected.length === 0) {
-            showToast(
+            InventMagApp.showToast(
                 "Info",
                 "No unpaid transactions available to mark as paid.",
                 "info"
@@ -74,7 +81,12 @@ export function bulkMarkAsPaid() {
             const row = checkbox.closest("tr");
             const statusBadge = row.querySelector(".badge");
             const status = statusBadge ? statusBadge.textContent.trim() : "";
-            return status === "Paid";
+            const isPaid =
+                status === "Paid" ||
+                status.toLowerCase().includes("paid") ||
+                statusBadge?.classList.contains("bg-success-lt") ||
+                statusBadge?.classList.contains("bg-success");
+            return isPaid;
         });
 
         if (selectedPaidTransactions.length > 0) {
@@ -89,7 +101,7 @@ export function bulkMarkAsPaid() {
 
             updateBulkActions();
 
-            showToast(
+            InventMagApp.showToast(
                 "Warning",
                 `${selectedPaidTransactions.length} paid transaction(s) were excluded from selection.`,
                 "warning"
@@ -116,4 +128,18 @@ export function bulkMarkAsPaid() {
         document.getElementById("bulkMarkAsPaidModal")
     );
     modal.show();
+}
+
+export function clearSelection() {
+    const selectAll = document.getElementById("selectAll");
+    if (selectAll) {
+        selectAll.checked = false;
+    }
+
+    const rowCheckboxes = document.querySelectorAll(".row-checkbox");
+    rowCheckboxes.forEach((checkbox) => {
+        checkbox.checked = false;
+    });
+
+    updateBulkActions();
 }

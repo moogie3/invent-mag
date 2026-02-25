@@ -1,26 +1,27 @@
 import { getProducts } from './state.js';
 import { formatCurrency } from '@/js/utils/currencyFormatter.js';
 
-const subtotalElement = document.getElementById("subtotal");
-const finalTotalElement = document.getElementById("finalTotal");
-const orderDiscountInput = document.getElementById("orderDiscountInput");
-const orderDiscountTypeInput = document.getElementById(
-    "orderDiscountTypeInput"
-);
-const taxInput = document.getElementById("taxInput");
-const cartCountElement = document.getElementById("cartCount");
-const grandTotalInput = document.getElementById("grandTotalInput");
-const processPaymentBtn = document.getElementById("processPaymentBtn");
-const orderDiscountElement = document.getElementById("orderDiscount");
-const discountTypeElement = document.getElementById("discountType");
-const taxRateElement = document.getElementById("taxRate");
-
 export let subtotal = 0;
 export let orderDiscount = 0;
 export let taxAmount = 0;
 export let grandTotal = 0;
 
 export function calculateTotals() {
+    // Query DOM elements inside the function so they are found during test execution
+    const subtotalElement = document.getElementById("subtotal");
+    const finalTotalElement = document.getElementById("finalTotal");
+    const orderDiscountInput = document.getElementById("orderDiscountInput");
+    const orderDiscountTypeInput = document.getElementById(
+        "orderDiscountTypeInput"
+    );
+    const taxInput = document.getElementById("taxInput");
+    const cartCountElement = document.getElementById("cartCount");
+    const grandTotalInput = document.getElementById("grandTotalInput");
+    const processPaymentBtn = document.getElementById("processPaymentBtn");
+    const orderDiscountElement = document.getElementById("orderDiscount");
+    const discountTypeElement = document.getElementById("discountType");
+    const taxRateElement = document.getElementById("taxRate");
+
     const products = getProducts();
     subtotal = products.reduce((sum, product) => sum + product.total, 0);
 
@@ -40,7 +41,7 @@ export function calculateTotals() {
 
     subtotalElement.innerText = formatCurrency(subtotal);
     finalTotalElement.innerText = formatCurrency(grandTotal);
-    cartCountElement.innerText = products.length;
+    cartCountElement.innerText = products.length.toString();
 
     orderDiscountInput.value = orderDiscount;
     orderDiscountTypeInput.value = discountType;

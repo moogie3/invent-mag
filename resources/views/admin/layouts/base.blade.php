@@ -79,6 +79,7 @@
         @include('admin.layouts.menu-sidebar')
         <div class="main-content">
             @include('admin.layouts.navbar')
+            @include('admin.layouts.partials.trial-banner')
             @yield('content')
         </div>
     </div>

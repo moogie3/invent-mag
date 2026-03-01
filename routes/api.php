@@ -2,6 +2,8 @@
 use App\Http\Controllers\Api\Auth\AuthController;
 use App\Http\Controllers\Api\Auth\RegisteredUserController;
 use App\Http\Controllers\Api\TenantLookupController;
+use App\Models\Plan;
+use App\Services\PlanService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -28,16 +30,26 @@ Route::post('/lookup-tenant', [TenantLookupController::class, 'lookup'])->middle
 Route::middleware(['auth:sanctum', 'throttle:api'])->prefix('v1')->group(function () {
     Route::post('/refresh-token', function (Request $request) {
         $user = $request->user();
-        
+
         // Revoke old tokens
         $user->tokens()->delete();
-        
+
         // Create new token
         $token = $user->createToken('auth_token', ['*'], now()->addDay())->plainTextToken;
-        
+
         return response()->json([
             'token' => $token,
             'expires_at' => now()->addDay()->toISOString(),
         ]);
     })->name('api.refresh-token');
+
+    // Plan endpoints
+    Route::get('/plans', function () {
+        return response()->json(Plan::active()->ordered()->get());
+    })->name('api.plans.index');
+
+    Route::get('/plan/current', function (Request $request) {
+        $planService = app(PlanService::class);
+        return response()->json($planService->getUsageStats());
+    })->name('api.plan.current');
 });

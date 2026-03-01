@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Models\Plan;
 use App\Models\Tenant;
 use Database\Seeders\AccountSeeder;
 use Database\Seeders\CategorySeeder;
@@ -12,16 +13,29 @@ use Database\Seeders\TaxSeeder;
 use Database\Seeders\UnitSeeder;
 use Database\Seeders\WarehouseSeeder;
 use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\Log;
 
 class TenantSetupService
 {
+    protected PlanService $planService;
+
+    public function __construct()
+    {
+        $this->planService = new PlanService();
+    }
+
     /**
-     * Set up default data for a new tenant
+     * Set up default data for a new tenant.
+     *
+     * @param  string|null  $planSlug  The plan slug to assign (e.g., 'starter', 'professional', 'enterprise')
      */
-    public function setup(Tenant $tenant): void
+    public function setup(Tenant $tenant, ?string $planSlug = null): void
     {
         // Make tenant current
         $tenant->makeCurrent();
+
+        // Assign plan to tenant (backward compatible: defaults to config value)
+        $this->assignPlan($tenant, $planSlug);
 
         // Run essential seeders for new tenant
         $this->runEssentialSeeders();
@@ -34,6 +48,33 @@ class TenantSetupService
 
         // Forget tenant context
         Tenant::forgetCurrent();
+    }
+
+    /**
+     * Assign a plan to the tenant during setup.
+     * If no plan slug is provided, uses the configured default plan.
+     * If no plans exist in the database yet, gracefully skips (backward compat).
+     */
+    private function assignPlan(Tenant $tenant, ?string $planSlug): void
+    {
+        // If no plans table or no plans exist yet, skip gracefully
+        try {
+            if (Plan::count() === 0) {
+                Log::info("No plans found in database. Skipping plan assignment for tenant '{$tenant->name}'.");
+                return;
+            }
+        } catch (\Exception $e) {
+            Log::info("Plans table not available yet. Skipping plan assignment for tenant '{$tenant->name}'.");
+            return;
+        }
+
+        $slug = $planSlug ?? config('plans.default_plan', 'starter');
+
+        // Determine if trial should start (Professional and Enterprise offer trials)
+        $plan = Plan::findBySlug($slug);
+        $startTrial = $plan && $plan->hasTrial();
+
+        $this->planService->assignPlanToTenant($tenant, $slug, $startTrial);
     }
 
     /**
@@ -53,7 +94,7 @@ class TenantSetupService
             try {
                 $instance = new $seeder();
                 $instance->run();
-            } catch (\Exception $e) {
+            } catch (\Throwable $e) {
                 \Log::error("Error running seeder {$seeder}: " . $e->getMessage());
                 // Continue with other seeders
             }

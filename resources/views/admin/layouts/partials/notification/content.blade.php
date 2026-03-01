@@ -2,4 +2,5 @@
     @include('admin.layouts.partials.notification.financial-tab')
     @include('admin.layouts.partials.notification.lowstock-tab')
     @include('admin.layouts.partials.notification.expiring-tab')
+    @include('admin.layouts.partials.notification.system-tab')
 </div>

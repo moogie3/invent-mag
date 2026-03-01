@@ -16,7 +16,9 @@ class AccountSeeder extends Seeder
             $tenantId = app('currentTenant')->id;
         $tenantName = app('currentTenant')->name;
 
-        $this->command->info("Seeding Chart of Accounts for tenant: {$tenantName} (ID: {$tenantId})");
+        if (isset($this->command)) {
+            $this->command->info("Seeding Chart of Accounts for tenant: {$tenantName} (ID: {$tenantId})");
+        }
         
         $accountsData = [
             // Group 1: Assets
@@ -115,8 +117,10 @@ class AccountSeeder extends Seeder
 
         $createdCount = $this->seedAccounts($accountsData, $tenantId);
         
-        $this->command->info("Chart of Accounts seeded successfully!");
-        $this->command->info("Total accounts created/updated: {$createdCount}");
+        if (isset($this->command)) {
+            $this->command->info("Chart of Accounts seeded successfully!");
+            $this->command->info("Total accounts created/updated: {$createdCount}");
+        }
         
         // Show summary by type
         $accountsByType = Account::where('tenant_id', $tenantId)
@@ -124,10 +128,12 @@ class AccountSeeder extends Seeder
             ->groupBy('type')
             ->pluck('count', 'type');
         
-        $this->command->newLine();
-        $this->command->info("Account Summary by Type:");
-        foreach ($accountsByType as $type => $count) {
-            $this->command->info("  - " . ucfirst($type) . ": {$count} accounts");
+        if (isset($this->command)) {
+            $this->command->newLine();
+            $this->command->info("Account Summary by Type:");
+            foreach ($accountsByType as $type => $count) {
+                $this->command->info("  - " . ucfirst($type) . ": {$count} accounts");
+            }
         }
     }
 

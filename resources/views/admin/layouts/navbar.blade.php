@@ -98,42 +98,59 @@
                     aria-expanded="false" id="notification-bell">
                     <i class="ti ti-bell fs-2"></i>
 
-                    @if (isset($notificationCount) && $notificationCount > 0)
+                    @if (isset($totalNotificationCount) && $totalNotificationCount > 0)
                         <span id="notification-dot"
                             class="position-absolute bg-danger border border-light rounded-circle">
                         </span>
                     @endif
                 </a>
                 <div class="dropdown-menu dropdown-menu-end notification-dropdown p-0"
-                    style="width: 380px; max-height: 500px;">
+                    style="width: 400px; max-height: 520px;">
 
                     <!-- Notification Header -->
-                    <div class="border-bottom d-flex justify-content-between align-items-center p-3">
-                        <h3 class="mb-0 fw-bold">Notifications</h3>
-                        @if (isset($notificationCount) && $notificationCount > 0)
-                            <span class="badge bg-primary-lt rounded-pill">{{ $notificationCount }}</span>
+                    <div class="notification-header d-flex justify-content-between align-items-center px-3 py-3">
+                        <div class="d-flex align-items-center gap-2">
+                            <h3 class="mb-0 fw-bold">{{ __('plan.notif_header') }}</h3>
+                        </div>
+                        @if (isset($totalNotificationCount) && $totalNotificationCount > 0)
+                            <span class="badge bg-primary rounded-pill px-2 py-1 notification-count-badge">{{ $totalNotificationCount }}</span>
                         @endif
                     </div>
 
                     <!-- Notification Tabs -->
                     <div class="notification-tabs">
-                        <ul class="nav nav-tabs nav-fill border-bottom" id="notificationTabs" role="tablist">
+                        <ul class="nav nav-tabs nav-fill" id="notificationTabs" role="tablist">
                             <li class="nav-item" role="presentation">
-                                <button class="nav-link active py-2" id="financial-tab" data-bs-toggle="tab"
+                                <button class="nav-link active py-2 position-relative" id="financial-tab" data-bs-toggle="tab"
                                     data-bs-target="#financial" type="button" role="tab">
-                                    <i class="ti ti-receipt me-1"></i>PO & Sales
+                                    <i class="ti ti-receipt me-1"></i>{{ __('plan.notif_tab_orders') }}
+                                    @php
+                                        $financialCount = isset($notifications) ? $notifications->filter(fn($n) => in_array($n['type'], ['purchase', 'sales']))->count() : 0;
+                                    @endphp
+                                    @if ($financialCount > 0)
+                                        <span class="notification-tab-badge">{{ $financialCount }}</span>
+                                    @endif
                                 </button>
                             </li>
                             <li class="nav-item" role="presentation">
-                                <button class="nav-link py-2" id="inventory-tab" data-bs-toggle="tab"
+                                <button class="nav-link py-2 position-relative" id="inventory-tab" data-bs-toggle="tab"
                                     data-bs-target="#inventory" type="button" role="tab">
-                                    <i class="ti ti-package me-1"></i>Inventory
+                                    <i class="ti ti-package me-1"></i>{{ __('plan.notif_tab_inventory') }}
+                                    @php
+                                        $inventoryCount = isset($notifications) ? $notifications->filter(fn($n) => $n['type'] === 'product')->count() : 0;
+                                    @endphp
+                                    @if ($inventoryCount > 0)
+                                        <span class="notification-tab-badge">{{ $inventoryCount }}</span>
+                                    @endif
                                 </button>
                             </li>
                             <li class="nav-item" role="presentation">
-                                <button class="nav-link py-2" id="system-tab" data-bs-toggle="tab"
+                                <button class="nav-link py-2 position-relative" id="system-tab" data-bs-toggle="tab"
                                     data-bs-target="#system" type="button" role="tab">
-                                    <i class="ti ti-adjustments me-1"></i>System
+                                    <i class="ti ti-adjustments me-1"></i>{{ __('plan.notif_tab_system') }}
+                                    @if (isset($systemNotificationCount) && $systemNotificationCount > 0)
+                                        <span class="notification-tab-badge">{{ $systemNotificationCount }}</span>
+                                    @endif
                                 </button>
                             </li>
                         </ul>
@@ -142,7 +159,9 @@
                             <!-- Financial Tab Content -->
                             <div class="tab-pane fade show active" id="financial" role="tabpanel">
                                 <div class="notification-group py-2">
-                                    <div class="small fw-medium text-muted px-3 py-1">Purchase Orders</div>
+                                    <div class="notification-section-label px-3 py-1">
+                                        <i class="ti ti-truck-delivery me-1"></i>{{ __('plan.notif_purchase_orders') }}
+                                    </div>
 
                                     @if (isset($notifications) &&
                                             $notifications->filter(function ($n) {
@@ -157,32 +176,37 @@
 
                                         @foreach ($purchaseNotifications->take(3) as $notification)
                                             <a href="{{ $notification['route'] }}"
-                                                class="dropdown-item d-flex p-2 border-bottom notification-item">
+                                                class="dropdown-item d-flex p-2 notification-item">
                                                 <div class="flex-shrink-0 me-2 mt-1">
                                                     <span
-                                                        class="avatar avatar-sm bg-{{ str_replace('text-', '', $notification['status_badge']) }}-lt">
+                                                        class="notification-icon-wrapper bg-{{ str_replace('text-', '', $notification['status_badge']) }}-lt">
                                                         <i class="{{ $notification['status_icon'] }}"></i>
                                                     </span>
                                                 </div>
                                                 <div class="flex-grow-1 overflow-hidden">
-                                                    <p class="mb-0 text-truncate fw-medium">
+                                                    <p class="mb-0 text-truncate fw-medium notification-title">
                                                         {{ $notification['title'] }}</p>
-                                                    <div class="text-muted small text-truncate">
+                                                    <div class="text-muted small text-truncate notification-desc">
                                                         {{ $notification['description'] }}</div>
                                                 </div>
                                             </a>
                                         @endforeach
 
                                         @if ($purchaseCount > 3)
-                                            <div class="text-center py-2 text-muted small">
-                                                + {{ $purchaseCount - 3 }} more purchase notifications
+                                            <div class="notification-more-link text-center py-2">
+                                                {{ __('plan.notif_more_purchase', ['count' => $purchaseCount - 3]) }}
                                             </div>
                                         @endif
                                     @else
-                                        <div class="text-center py-3 text-muted">No purchase notifications</div>
+                                        <div class="notification-empty py-3">
+                                            <i class="ti ti-checks text-success"></i>
+                                            <span>{{ __('plan.notif_no_purchase') }}</span>
+                                        </div>
                                     @endif
 
-                                    <div class="small fw-medium text-muted px-3 py-1 mt-1">Sales</div>
+                                    <div class="notification-section-label px-3 py-1 mt-1">
+                                        <i class="ti ti-receipt me-1"></i>{{ __('plan.notif_sales') }}
+                                    </div>
 
                                     @if (isset($notifications) &&
                                             $notifications->filter(function ($n) {
@@ -197,29 +221,32 @@
 
                                         @foreach ($salesNotifications->take(3) as $notification)
                                             <a href="{{ $notification['route'] }}"
-                                                class="dropdown-item d-flex p-2 border-bottom notification-item">
+                                                class="dropdown-item d-flex p-2 notification-item">
                                                 <div class="flex-shrink-0 me-2 mt-1">
                                                     <span
-                                                        class="avatar avatar-sm bg-{{ str_replace('text-', '', $notification['status_badge']) }}-lt">
+                                                        class="notification-icon-wrapper bg-{{ str_replace('text-', '', $notification['status_badge']) }}-lt">
                                                         <i class="{{ $notification['status_icon'] }}"></i>
                                                     </span>
                                                 </div>
                                                 <div class="flex-grow-1 overflow-hidden">
-                                                    <p class="mb-0 text-truncate fw-medium">
+                                                    <p class="mb-0 text-truncate fw-medium notification-title">
                                                         {{ $notification['title'] }}</p>
-                                                    <div class="text-muted small text-truncate">
+                                                    <div class="text-muted small text-truncate notification-desc">
                                                         {{ $notification['description'] }}</div>
                                                 </div>
                                             </a>
                                         @endforeach
 
                                         @if ($salesCount > 3)
-                                            <div class="text-center py-2 text-muted small">
-                                                + {{ $salesCount - 3 }} more sales notifications
+                                            <div class="notification-more-link text-center py-2">
+                                                {{ __('plan.notif_more_sales', ['count' => $salesCount - 3]) }}
                                             </div>
                                         @endif
                                     @else
-                                        <div class="text-center py-3 text-muted">No sales notifications</div>
+                                        <div class="notification-empty py-3">
+                                            <i class="ti ti-checks text-success"></i>
+                                            <span>{{ __('plan.notif_no_sales') }}</span>
+                                        </div>
                                     @endif
                                 </div>
                             </div>
@@ -227,7 +254,9 @@
                             <!-- Inventory Tab Content -->
                             <div class="tab-pane fade" id="inventory" role="tabpanel">
                                 <div class="notification-group py-2">
-                                    <div class="small fw-medium text-muted px-3 py-1">Low Stock Alerts</div>
+                                    <div class="notification-section-label px-3 py-1">
+                                        <i class="ti ti-alert-triangle me-1"></i>{{ __('plan.notif_low_stock') }}
+                                    </div>
 
                                     @if (isset($notifications) &&
                                             $notifications->filter(function ($n) {
@@ -242,32 +271,37 @@
 
                                         @foreach ($lowStockNotifications->take(3) as $notification)
                                             <a href="{{ $notification['route'] }}"
-                                                class="dropdown-item d-flex p-2 border-bottom notification-item">
+                                                class="dropdown-item d-flex p-2 notification-item">
                                                 <div class="flex-shrink-0 me-2 mt-1">
                                                     <span
-                                                        class="avatar avatar-sm bg-{{ str_replace('text-', '', $notification['status_badge']) }}-lt">
+                                                        class="notification-icon-wrapper bg-{{ str_replace('text-', '', $notification['status_badge']) }}-lt">
                                                         <i class="{{ $notification['status_icon'] }}"></i>
                                                     </span>
                                                 </div>
                                                 <div class="flex-grow-1 overflow-hidden">
-                                                    <p class="mb-0 text-truncate fw-medium">
+                                                    <p class="mb-0 text-truncate fw-medium notification-title">
                                                         {{ $notification['title'] }}</p>
-                                                    <div class="text-muted small text-truncate">
+                                                    <div class="text-muted small text-truncate notification-desc">
                                                         {{ $notification['description'] }}</div>
                                                 </div>
                                             </a>
                                         @endforeach
 
                                         @if ($lowStockCount > 3)
-                                            <div class="text-center py-2 text-muted small">
-                                                + {{ $lowStockCount - 3 }} more low stock alerts
+                                            <div class="notification-more-link text-center py-2">
+                                                {{ __('plan.notif_more_low_stock', ['count' => $lowStockCount - 3]) }}
                                             </div>
                                         @endif
                                     @else
-                                        <div class="text-center py-3 text-muted">No low stock alerts</div>
+                                        <div class="notification-empty py-3">
+                                            <i class="ti ti-checks text-success"></i>
+                                            <span>{{ __('plan.notif_no_low_stock') }}</span>
+                                        </div>
                                     @endif
 
-                                    <div class="small fw-medium text-muted px-3 py-1 mt-1">Expiring Products</div>
+                                    <div class="notification-section-label px-3 py-1 mt-1">
+                                        <i class="ti ti-calendar-time me-1"></i>{{ __('plan.notif_expiring') }}
+                                    </div>
 
                                     @if (isset($notifications) &&
                                             $notifications->filter(function ($n) {
@@ -282,29 +316,32 @@
 
                                         @foreach ($expiringNotifications->take(3) as $notification)
                                             <a href="{{ $notification['route'] }}"
-                                                class="dropdown-item d-flex p-2 border-bottom notification-item">
+                                                class="dropdown-item d-flex p-2 notification-item">
                                                 <div class="flex-shrink-0 me-2 mt-1">
                                                     <span
-                                                        class="avatar avatar-sm bg-{{ str_replace('text-', '', $notification['status_badge']) }}-lt">
+                                                        class="notification-icon-wrapper bg-{{ str_replace('text-', '', $notification['status_badge']) }}-lt">
                                                         <i class="{{ $notification['status_icon'] }}"></i>
                                                     </span>
                                                 </div>
                                                 <div class="flex-grow-1 overflow-hidden">
-                                                    <p class="mb-0 text-truncate fw-medium">
+                                                    <p class="mb-0 text-truncate fw-medium notification-title">
                                                         {{ $notification['title'] }}</p>
-                                                    <div class="text-muted small text-truncate">
+                                                    <div class="text-muted small text-truncate notification-desc">
                                                         {{ $notification['description'] }}</div>
                                                 </div>
                                             </a>
                                         @endforeach
 
                                         @if ($expiringCount > 3)
-                                            <div class="text-center py-2 text-muted small">
-                                                + {{ $expiringCount - 3 }} more expiring product alerts
+                                            <div class="notification-more-link text-center py-2">
+                                                {{ __('plan.notif_more_expiring', ['count' => $expiringCount - 3]) }}
                                             </div>
                                         @endif
                                     @else
-                                        <div class="text-center py-3 text-muted">No expiring products</div>
+                                        <div class="notification-empty py-3">
+                                            <i class="ti ti-checks text-success"></i>
+                                            <span>{{ __('plan.notif_no_expiring') }}</span>
+                                        </div>
                                     @endif
                                 </div>
                             </div>
@@ -312,18 +349,55 @@
                             <!-- System Tab Content -->
                             <div class="tab-pane fade" id="system" role="tabpanel">
                                 <div class="notification-group py-2">
-                                    <div class="small fw-medium text-muted px-3 py-1">System Updates</div>
+                                    <div class="notification-section-label px-3 py-1">
+                                        <i class="ti ti-info-circle me-1"></i>{{ __('plan.notif_system_updates') }}
+                                    </div>
 
-                                    <div class="text-center py-3 text-muted">No system notifications</div>
+                                    @if (isset($systemNotifications) && $systemNotifications->count() > 0)
+                                        @foreach ($systemNotifications as $sysNotif)
+                                            <div class="system-notification-item d-flex align-items-start px-3 py-2">
+                                                <div class="flex-shrink-0 me-3">
+                                                    <span class="system-notif-icon system-notif-icon-{{ $sysNotif['color'] }}">
+                                                        <i class="{{ $sysNotif['icon'] }}"></i>
+                                                    </span>
+                                                </div>
+                                                <div class="flex-grow-1 min-w-0">
+                                                    <div class="d-flex align-items-center gap-2 mb-1">
+                                                        <span class="fw-semibold small notification-title">{{ $sysNotif['title'] }}</span>
+                                                        @if ($sysNotif['urgency'] === 'critical')
+                                                            <span class="system-notif-urgency-dot bg-danger"></span>
+                                                        @elseif ($sysNotif['urgency'] === 'high')
+                                                            <span class="system-notif-urgency-dot bg-warning"></span>
+                                                        @endif
+                                                    </div>
+                                                    <p class="text-muted small mb-2 notification-desc lh-sm">{{ $sysNotif['description'] }}</p>
+                                                    @if (isset($sysNotif['action_route']))
+                                                        <a href="{{ $sysNotif['action_route'] }}"
+                                                           class="btn btn-sm btn-{{ $sysNotif['color'] }} rounded-pill px-3 py-1 system-notif-action">
+                                                            <i class="ti ti-arrow-right me-1" style="font-size: 0.7rem;"></i>
+                                                            <span>{{ $sysNotif['action_label'] }}</span>
+                                                        </a>
+                                                    @endif
+                                                </div>
+                                            </div>
+                                        @endforeach
+                                    @else
+                                        <div class="notification-empty py-4">
+                                            <div class="notification-empty-icon mb-2">
+                                                <i class="ti ti-circle-check"></i>
+                                            </div>
+                                            <span>{{ __('plan.notif_no_system') }}</span>
+                                        </div>
+                                    @endif
                                 </div>
                             </div>
                         </div>
                     </div>
 
                     <!-- Footer with View All Link -->
-                    <div class="border-top p-2 text-center">
-                        <a href="{{ route('admin.notifications') }}" class="text-primary fw-medium">
-                            View all notifications
+                    <div class="notification-footer p-2 text-center">
+                        <a href="{{ route('admin.notifications') }}" class="notification-footer-link">
+                            <i class="ti ti-external-link me-1"></i>{{ __('plan.notif_view_all') }}
                         </a>
                     </div>
                 </div>

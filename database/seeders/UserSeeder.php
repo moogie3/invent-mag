@@ -24,6 +24,18 @@ class UserSeeder extends Seeder
 
         $email = 'admin-' . $tenantNameSlug . '@gmail.com';
         
+        if (str_starts_with($tenantName, 'Demo ')) {
+            if (str_contains($tenantName, 'Starter')) {
+                $email = 'starter@demo.com';
+            } elseif (str_contains($tenantName, 'Professional')) {
+                $email = 'pro@demo.com';
+            } elseif (str_contains($tenantName, 'Enterprise')) {
+                $email = 'enterprise@demo.com';
+            } else {
+                $email = 'admin@demo.com';
+            }
+        }
+        
         $this->command->info("Creating admin user for tenant: {$tenantName}");
         
         $user = User::updateOrCreate(

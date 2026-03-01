@@ -4,7 +4,9 @@ namespace App\Providers;
 
 use App\Helpers\CurrencyHelper;
 use App\Services\NotificationService;
+use App\Services\SystemNotificationService;
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\View;
 use App\Models\Purchase;
 use Illuminate\Auth\Notifications\VerifyEmail;
@@ -50,6 +52,37 @@ class AppServiceProvider extends ServiceProvider
             return $url;
         });
 
+        // ---------------------------------------------------------------
+        // Custom Blade Directives for Plan System
+        // ---------------------------------------------------------------
+
+        /**
+         * @planHas('feature_slug') ... @endPlanHas
+         * Conditionally renders content if the current tenant's plan includes the feature.
+         * Returns true (show content) if: no tenant context, legacy tenant, or plan has feature.
+         */
+        Blade::if('planHas', function (string $feature) {
+            try {
+                $tenant = app('currentTenant');
+                return $tenant instanceof \App\Models\Tenant ? $tenant->hasFeature($feature) : true;
+            } catch (\Exception $e) {
+                return true; // No tenant context, allow content
+            }
+        });
+
+        /**
+         * @onTrial ... @endOnTrial
+         * Conditionally renders content if the current tenant is on a trial period.
+         */
+        Blade::if('onTrial', function () {
+            try {
+                $tenant = app('currentTenant');
+                return $tenant instanceof \App\Models\Tenant && $tenant->onTrial();
+            } catch (\Exception $e) {
+                return false;
+            }
+        });
+
         if (! app()->environment('testing')) {
             View::composer(['admin.*'], function ($view) {
                 // ... (Existing notification logic) ...
@@ -72,10 +105,22 @@ class AppServiceProvider extends ServiceProvider
 
                     $view->with('notificationCount', $notificationCount);
                     $view->with('notifications', $notifications);
+
+                    // System notifications (trial, plan expiry, usage limits, setup)
+                    $systemNotificationService = app(SystemNotificationService::class);
+                    $systemNotifications = $systemNotificationService->getSystemNotifications();
+                    $systemNotificationCount = $systemNotifications->count();
+
+                    $view->with('systemNotifications', $systemNotifications);
+                    $view->with('systemNotificationCount', $systemNotificationCount);
+                    $view->with('totalNotificationCount', $notificationCount + $systemNotificationCount);
                 } else {
                     // Provide empty defaults for pages without a tenant (like the central login page)
                     $view->with('notificationCount', 0);
                     $view->with('notifications', collect());
+                    $view->with('systemNotifications', collect());
+                    $view->with('systemNotificationCount', 0);
+                    $view->with('totalNotificationCount', 0);
                 }
             });
         }

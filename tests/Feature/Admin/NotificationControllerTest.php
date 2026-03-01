@@ -17,6 +17,7 @@ class NotificationControllerTest extends TestCase
     use WithFaker, RefreshDatabase, CreatesTenant;
 
     protected $notificationServiceMock;
+    protected $systemNotificationServiceMock;
 
     protected function setUp(): void
     {
@@ -28,6 +29,12 @@ class NotificationControllerTest extends TestCase
         // Mock the NotificationService
         $this->notificationServiceMock = Mockery::mock(NotificationService::class);
         $this->app->instance(NotificationService::class, $this->notificationServiceMock);
+
+        // Mock the SystemNotificationService
+        $this->systemNotificationServiceMock = Mockery::mock(\App\Services\SystemNotificationService::class);
+        $this->systemNotificationServiceMock->shouldReceive('getSystemNotifications')->andReturn(collect([]))->byDefault();
+        $this->systemNotificationServiceMock->shouldReceive('getSystemNotificationCount')->andReturn(0)->byDefault();
+        $this->app->instance(\App\Services\SystemNotificationService::class, $this->systemNotificationServiceMock);
     }
 
     public function test_index_displays_notifications_page()

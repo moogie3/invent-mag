@@ -26,6 +26,15 @@
             @endif
         </a>
     </li>
+    <li class="nav-item" role="presentation">
+        <a class="nav-link rounded-2 fw-medium d-flex align-items-center justify-content-center py-2 transition-all" data-bs-toggle="tab" href="#tab-system" role="tab">
+            <i class="ti ti-adjustments fs-2 me-2 opacity-75"></i>
+            {{ __('plan.notif_tab_system') }}
+            @if(isset($systemNotifications) && $systemNotifications->count() > 0)
+                <span class="badge bg-info text-white ms-2">{{ $systemNotifications->count() }}</span>
+            @endif
+        </a>
+    </li>
 </ul>
 
 <style>
@@ -61,5 +70,37 @@
     }
     .nav-pills .nav-link.active[href="#tab-expiring"] .opacity-75 {
         color: #f76707;
+    }
+    .nav-pills .nav-link.active[href="#tab-system"] {
+        color: #0dcaf0;
+        background-color: #f0fdfa;
+        box-shadow: inset 0 0 0 1px rgba(13, 202, 240, 0.1);
+    }
+    .nav-pills .nav-link.active[href="#tab-system"] .opacity-75 {
+        color: #0dcaf0;
+    }
+
+    [data-bs-theme="dark"] .nav-pills {
+        background-color: #1e293b !important;
+        border-color: rgba(255, 255, 255, 0.08) !important;
+    }
+    [data-bs-theme="dark"] .nav-pills .nav-link {
+        color: #94a3b8;
+    }
+    [data-bs-theme="dark"] .nav-pills .nav-link:hover:not(.active) {
+        background-color: rgba(255, 255, 255, 0.05);
+        color: #e2e8f0;
+    }
+    [data-bs-theme="dark"] .nav-pills .nav-link.active {
+        background-color: rgba(32, 107, 196, 0.15);
+    }
+    [data-bs-theme="dark"] .nav-pills .nav-link.active[href="#tab-lowstock"] {
+        background-color: rgba(214, 57, 57, 0.15);
+    }
+    [data-bs-theme="dark"] .nav-pills .nav-link.active[href="#tab-expiring"] {
+        background-color: rgba(247, 103, 7, 0.15);
+    }
+    [data-bs-theme="dark"] .nav-pills .nav-link.active[href="#tab-system"] {
+        background-color: rgba(13, 202, 240, 0.15);
     }
 </style>

@@ -41,8 +41,17 @@ return Application::configure(basePath: dirname(__DIR__))
             'role_or_permission' => \Spatie\Permission\Middleware\RoleOrPermissionMiddleware::class,
             'guest' => \App\Http\Middleware\RedirectIfAuthenticated::class,
             'throttle' => \Illuminate\Routing\Middleware\ThrottleRequests::class,
+            'plan.feature' => \App\Http\Middleware\CheckPlanFeature::class,
+            'plan.limit' => \App\Http\Middleware\CheckPlanLimit::class,
+            'subscription.active' => \App\Http\Middleware\CheckSubscriptionStatus::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
-        //
+        $exceptions->render(function (\Spatie\Multitenancy\Exceptions\NoCurrentTenant $e, Illuminate\Http\Request $request) {
+            if ($request->expectsJson() || $request->is('api/*')) {
+                return response()->json(['message' => 'Workspace not found or no tenant specified.'], 404);
+            }
+            $frontendUrl = config('app.frontend_url', 'http://localhost:4321');
+            return redirect()->away($frontendUrl . '/login');
+        });
     })->create();

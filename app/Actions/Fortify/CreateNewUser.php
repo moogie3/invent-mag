@@ -35,62 +35,65 @@ class CreateNewUser implements CreatesNewUsers
                 Rule::unique(User::class),
             ],
             'password' => $this->passwordRules(),
+            'plan' => ['nullable', 'string', 'in:starter,professional,enterprise'],
         ])->validate();
 
-        $tenant = Tenant::create([
-            'name' => $input['shopname'],
-            'domain' => Str::slug($input['shopname']) . '.' . config('app.domain'),
-        ]);
+        return \Illuminate\Support\Facades\DB::transaction(function () use ($input) {
+            $tenant = Tenant::create([
+                'name' => $input['shopname'],
+                'domain' => Str::slug($input['shopname']) . '.' . config('app.domain'),
+            ]);
 
-        $tenant = Tenant::findOrFail($tenant->id);
+            $tenant = Tenant::findOrFail($tenant->id);
 
-        // Set up tenant with default data
-        $setupService = new TenantSetupService();
-        $setupService->setup($tenant);
+            // Set up tenant with default data and assign plan
+            $planSlug = $input['plan'] ?? null;
+            $setupService = new TenantSetupService();
+            $setupService->setup($tenant, $planSlug);
 
-        // Make the tenant current
-        $tenant->makeCurrent();
+            // Make the tenant current
+            $tenant->makeCurrent();
 
-        // Now create user in tenant context
-        $user = new User([
-            'name' => $input['name'],
-            'email' => $input['email'],
-            'shopname' => $input['shopname'] ?? null,
-            'address' => $input['address'] ?? null,
-            'avatar' => $input['avatar'] ?? null,
-            'timezone' => $input['timezone'] ?? null,
-        ]);
-        $user->password = $input['password'];
-        $user->save();
-
-        // Assign role inside tenant context
-        $superuserRole = Role::firstOrCreate(['name' => 'superuser']);
-        $user->assignRole($superuserRole);
-
-        // Set default accounting settings
-        $tenantId = $tenant->id;
-        $cashAccount = Account::where('code', '1110-' . $tenantId)->first();
-        $accountsPayableAccount = Account::where('code', '2110-' . $tenantId)->first();
-        $inventoryAccount = Account::where('code', '1140-' . $tenantId)->first();
-        $salesRevenueAccount = Account::where('code', '4100-' . $tenantId)->first();
-        $accountsReceivableAccount = Account::where('code', '1130-' . $tenantId)->first();
-        $costOfGoodsSoldAccount = Account::where('code', '5200-' . $tenantId)->first();
-
-        if ($cashAccount && $accountsPayableAccount && $inventoryAccount && $salesRevenueAccount && $accountsReceivableAccount && $costOfGoodsSoldAccount) {
-            $user->accounting_settings = [
-                'cash_account_id' => $cashAccount->id,
-                'accounts_payable_account_id' => $accountsPayableAccount->id,
-                'inventory_account_id' => $inventoryAccount->id,
-                'sales_revenue_account_id' => $salesRevenueAccount->id,
-                'accounts_receivable_account_id' => $accountsReceivableAccount->id,
-                'cost_of_goods_sold_account_id' => $costOfGoodsSoldAccount->id,
-            ];
+            // Now create user in tenant context
+            $user = new User([
+                'name' => $input['name'],
+                'email' => $input['email'],
+                'shopname' => $input['shopname'] ?? null,
+                'address' => $input['address'] ?? null,
+                'avatar' => $input['avatar'] ?? null,
+                'timezone' => $input['timezone'] ?? null,
+            ]);
+            $user->password = $input['password'];
             $user->save();
-        }
 
+            // Assign role inside tenant context
+            $superuserRole = Role::firstOrCreate(['name' => 'superuser']);
+            $user->assignRole($superuserRole);
 
-        event(new Registered($user));
+            // Set default accounting settings
+            $tenantId = $tenant->id;
+            $cashAccount = Account::where('code', '1110-' . $tenantId)->first();
+            $accountsPayableAccount = Account::where('code', '2110-' . $tenantId)->first();
+            $inventoryAccount = Account::where('code', '1140-' . $tenantId)->first();
+            $salesRevenueAccount = Account::where('code', '4100-' . $tenantId)->first();
+            $accountsReceivableAccount = Account::where('code', '1130-' . $tenantId)->first();
+            $costOfGoodsSoldAccount = Account::where('code', '5200-' . $tenantId)->first();
 
-        return $user;
+            if ($cashAccount && $accountsPayableAccount && $inventoryAccount && $salesRevenueAccount && $accountsReceivableAccount && $costOfGoodsSoldAccount) {
+                $user->accounting_settings = [
+                    'cash_account_id' => $cashAccount->id,
+                    'accounts_payable_account_id' => $accountsPayableAccount->id,
+                    'inventory_account_id' => $inventoryAccount->id,
+                    'sales_revenue_account_id' => $salesRevenueAccount->id,
+                    'accounts_receivable_account_id' => $accountsReceivableAccount->id,
+                    'cost_of_goods_sold_account_id' => $costOfGoodsSoldAccount->id,
+                ];
+                $user->save();
+            }
+
+            event(new Registered($user));
+
+            return $user;
+        });
     }
 }

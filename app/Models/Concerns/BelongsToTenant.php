@@ -14,8 +14,14 @@ trait BelongsToTenant
 
         static::creating(function (Model $model) {
             if (! $model->tenant_id) {
-                if ($currentTenant = app('currentTenant')) {
-                    $model->tenant_id = $currentTenant->id;
+                if (app()->has('currentTenant')) {
+                    try {
+                        if ($currentTenant = app('currentTenant')) {
+                            $model->tenant_id = $currentTenant->id;
+                        }
+                    } catch (\Exception $e) {
+                        // Not bound or resolving error
+                    }
                 }
             }
         });

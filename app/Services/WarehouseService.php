@@ -27,6 +27,18 @@ class WarehouseService
             return ['success' => false, 'message' => 'This warehouse already exists.'];
         }
 
+        // Defense-in-depth: check plan warehouse limit before creating
+        try {
+            $planService = app(\App\Services\PlanService::class);
+            if (! $planService->canAddWarehouse()) {
+                $limit = $planService->getWarehouseLimit();
+                return ['success' => false, 'message' => "You have reached the maximum number of warehouses ({$limit}) allowed on your current plan. Please upgrade to add more warehouses."];
+            }
+        } catch (\Exception $e) {
+            // If PlanService is unavailable (e.g., plans table doesn't exist yet),
+            // allow warehouse creation to proceed (backward compatibility)
+        }
+
         if (isset($data['is_main']) && $data['is_main'] && Warehouse::hasMainWarehouse()) {
             return ['success' => false, 'message' => 'There is already a main warehouse defined. Please unset the current main warehouse first.'];
         }

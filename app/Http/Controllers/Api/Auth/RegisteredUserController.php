@@ -27,6 +27,7 @@ class RegisteredUserController extends Controller
             'shopname' => ['required', 'string', 'max:255', 'unique:tenants,name'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
             'password' => ['required', 'string', Password::default(), 'confirmed'],
+            'plan' => ['nullable', 'string', 'in:starter,professional,enterprise'],
         ]);
 
         // Use the existing action to create the user and tenant
@@ -35,12 +36,22 @@ class RegisteredUserController extends Controller
         // Create a token for the new user
         $token = $user->createToken('auth_token')->plainTextToken;
 
+        // Load fresh tenant with plan relationship
+        $tenant = $user->tenant->load('plan');
+
         return response()->json([
             'message' => 'Registration successful',
             'user' => $user,
             'access_token' => $token,
             'token_type' => 'Bearer',
-            'tenant_domain' => $user->tenant->domain,
+            'tenant_domain' => $tenant->domain,
+            'plan' => [
+                'name' => $tenant->plan?->name,
+                'slug' => $tenant->plan?->slug,
+                'status' => $tenant->plan_status,
+                'on_trial' => $tenant->onTrial(),
+                'trial_ends_at' => $tenant->trial_ends_at?->toISOString(),
+            ],
         ], 201);
     }
 }

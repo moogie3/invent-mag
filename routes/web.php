@@ -5,7 +5,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Str;
-use App\Http\Controllers\Admin\{CategoryController, CustomerController, ProductController, PurchaseController, SalesPipelineController, SupplierController, UnitController, CurrencyController, SalesController, DashboardController, ProfileController, NotificationController, POSController, ReportController, WarehouseController, TaxController, UserController, CustomerCrmController, SupplierCrmController, SettingsController, PurchaseReturnController, SalesReturnController, JournalEntryController, StockTransferController};
+use App\Http\Controllers\Admin\{CategoryController, CustomerController, ProductController, PurchaseController, SalesPipelineController, SupplierController, UnitController, CurrencyController, SalesController, DashboardController, ProfileController, NotificationController, POSController, ReportController, WarehouseController, TaxController, UserController, CustomerCrmController, SupplierCrmController, SettingsController, PurchaseReturnController, SalesReturnController, JournalEntryController, StockTransferController, PlanController};
 use Laravel\Fortify\Http\Controllers\AuthenticatedSessionController;
 use Laravel\Fortify\Http\Controllers\NewPasswordController;
 use Laravel\Fortify\Http\Controllers\PasswordResetLinkController;
@@ -54,7 +54,7 @@ Route::middleware('web')->prefix('admin')->group(function () {
     Route::post('/logout', [LoginController::class, 'destroy'])->name('admin.logout');
 
     // Protected Admin Routes
-    Route::middleware(['auth', 'verified'])->group(function () {
+    Route::middleware(['auth', 'verified', 'subscription.active'])->group(function () {
         // Dashboard
         Route::get('/dashboard', [DashboardController::class, 'index'])->name('admin.dashboard');
 
@@ -194,8 +194,8 @@ Route::middleware('web')->prefix('admin')->group(function () {
             Route::post('/suppliers/{id}/interactions', [SupplierCrmController::class, 'storeInteraction'])->where('id', '[0-9]+');
         });
 
-        // Sales Pipeline Routes - Protected by sales pipeline permissions
-        Route::middleware('can:view-sales-pipeline')->group(function () {
+        // Sales Pipeline Routes - Protected by plan feature + sales pipeline permissions
+        Route::middleware(['plan.feature:crm', 'can:view-sales-pipeline'])->group(function () {
             Route::get('/sales-pipeline', [SalesPipelineController::class, 'index'])->name('admin.sales_pipeline.index');
 
             Route::prefix('sales-pipeline')->group(function () {
@@ -371,25 +371,29 @@ Route::middleware('web')->prefix('admin')->group(function () {
                 ->middleware('can:edit-sales');
         });
 
-        // Sales Return Routes
-        Route::get('sales-returns/sale/{sale}', [SalesReturnController::class, 'getSalesItems'])->name('admin.sales-returns.items');
-        Route::get('sales-returns/{salesReturn}/modal-view', [SalesReturnController::class, 'modalView'])->name('admin.sales-returns.modal-view');
-        Route::resource('sales-returns', SalesReturnController::class)->names('admin.sales-returns');
-        Route::post('sales-returns/bulk-delete', [SalesReturnController::class, 'bulkDelete'])->name('admin.sales-returns.bulk-delete');
-        Route::post('sales-returns/bulk-complete', [SalesReturnController::class, 'bulkComplete'])->name('admin.sales-returns.bulk-complete');
-        Route::post('sales-returns/bulk-cancel', [SalesReturnController::class, 'bulkCancel'])->name('admin.sales-returns.bulk-cancel');
-        Route::post('sales-returns/bulk-export', [SalesReturnController::class, 'bulkExport'])->name('admin.sales-returns.bulk-export');
-        Route::get('sales-returns/print/{id}', [SalesReturnController::class, 'print'])->name('admin.sales-returns.print');
+        // Sales Return Routes - Protected by plan feature
+        Route::middleware('plan.feature:sales_returns')->group(function () {
+            Route::get('sales-returns/sale/{sale}', [SalesReturnController::class, 'getSalesItems'])->name('admin.sales-returns.items');
+            Route::get('sales-returns/{salesReturn}/modal-view', [SalesReturnController::class, 'modalView'])->name('admin.sales-returns.modal-view');
+            Route::resource('sales-returns', SalesReturnController::class)->names('admin.sales-returns');
+            Route::post('sales-returns/bulk-delete', [SalesReturnController::class, 'bulkDelete'])->name('admin.sales-returns.bulk-delete');
+            Route::post('sales-returns/bulk-complete', [SalesReturnController::class, 'bulkComplete'])->name('admin.sales-returns.bulk-complete');
+            Route::post('sales-returns/bulk-cancel', [SalesReturnController::class, 'bulkCancel'])->name('admin.sales-returns.bulk-cancel');
+            Route::post('sales-returns/bulk-export', [SalesReturnController::class, 'bulkExport'])->name('admin.sales-returns.bulk-export');
+            Route::get('sales-returns/print/{id}', [SalesReturnController::class, 'print'])->name('admin.sales-returns.print');
+        });
 
-        // Purchase Return Routes
-        Route::resource('por', PurchaseReturnController::class)->names('admin.por');
-        Route::get('por/{por}/modal-view', [PurchaseReturnController::class, 'modalView'])->name('admin.por.modal-view');
-        Route::get('por/purchase/{purchase}', [PurchaseReturnController::class, 'getPurchaseItems'])->name('admin.por.items');
-        Route::post('por/bulk-delete', [PurchaseReturnController::class, 'bulkDelete'])->name('admin.por.bulk-delete');
-        Route::post('por/bulk-complete', [PurchaseReturnController::class, 'bulkComplete'])->name('admin.por.bulk-complete');
-        Route::post('por/bulk-cancel', [PurchaseReturnController::class, 'bulkCancel'])->name('admin.por.bulk-cancel');
-        Route::post('por/bulk-export', [PurchaseReturnController::class, 'bulkExport'])->name('admin.por.bulk-export');
-        Route::get('por/print/{id}', [PurchaseReturnController::class, 'print'])->name('admin.por.print');
+        // Purchase Return Routes - Protected by plan feature
+        Route::middleware('plan.feature:purchase_returns')->group(function () {
+            Route::resource('por', PurchaseReturnController::class)->names('admin.por');
+            Route::get('por/{por}/modal-view', [PurchaseReturnController::class, 'modalView'])->name('admin.por.modal-view');
+            Route::get('por/purchase/{purchase}', [PurchaseReturnController::class, 'getPurchaseItems'])->name('admin.por.items');
+            Route::post('por/bulk-delete', [PurchaseReturnController::class, 'bulkDelete'])->name('admin.por.bulk-delete');
+            Route::post('por/bulk-complete', [PurchaseReturnController::class, 'bulkComplete'])->name('admin.por.bulk-complete');
+            Route::post('por/bulk-cancel', [PurchaseReturnController::class, 'bulkCancel'])->name('admin.por.bulk-cancel');
+            Route::post('por/bulk-export', [PurchaseReturnController::class, 'bulkExport'])->name('admin.por.bulk-export');
+            Route::get('por/print/{id}', [PurchaseReturnController::class, 'print'])->name('admin.por.print');
+        });
 
         // Warehouse Routes
         Route::prefix('warehouses')->group(function () {
@@ -403,7 +407,7 @@ Route::middleware('web')->prefix('admin')->group(function () {
 
             Route::post('/store', [WarehouseController::class, 'store'])
                 ->name('admin.warehouse.store')
-                ->middleware('can:create-warehouses');
+                ->middleware(['can:create-warehouses', 'plan.limit:warehouses']);
 
             Route::get('/edit/{id}', [WarehouseController::class, 'edit'])
                 ->name('admin.warehouse.edit')
@@ -434,8 +438,8 @@ Route::middleware('web')->prefix('admin')->group(function () {
                 ->middleware('can:view-warehouses');
         });
 
-        // POS Routes
-        Route::prefix('pos')->group(function () {
+        // POS Routes - Protected by plan feature
+        Route::prefix('pos')->middleware('plan.feature:pos')->group(function () {
             Route::get('/', [POSController::class, 'index'])
                 ->name('admin.pos')
                 ->middleware('can:access-pos');
@@ -475,22 +479,43 @@ Route::middleware('web')->prefix('admin')->group(function () {
 
         // Reports Routes
         Route::prefix('reports')->group(function () {
-            Route::get('/income-statement', [ReportController::class, 'incomeStatement'])
-                ->name('admin.reports.income-statement')
-                ->middleware('can:view-financial-reports');
+            // Financial Reports - Protected by plan feature
+            Route::middleware('plan.feature:financial_reports')->group(function () {
+                Route::get('/income-statement', [ReportController::class, 'incomeStatement'])
+                    ->name('admin.reports.income-statement')
+                    ->middleware('can:view-financial-reports');
 
-            Route::get('/balance-sheet', [ReportController::class, 'balanceSheet'])
-                ->name('admin.reports.balance-sheet')
-                ->middleware('can:view-financial-reports');
+                Route::get('/balance-sheet', [ReportController::class, 'balanceSheet'])
+                    ->name('admin.reports.balance-sheet')
+                    ->middleware('can:view-financial-reports');
 
-            Route::get('/aged-receivables', [ReportController::class, 'agedReceivables'])
-                ->name('admin.reports.aged-receivables')
-                ->middleware('can:view-financial-reports');
+                Route::get('/aged-receivables', [ReportController::class, 'agedReceivables'])
+                    ->name('admin.reports.aged-receivables')
+                    ->middleware('can:view-financial-reports');
 
-            Route::get('/aged-payables', [ReportController::class, 'agedPayables'])
-                ->name('admin.reports.aged-payables')
-                ->middleware('can:view-financial-reports');
+                Route::get('/aged-payables', [ReportController::class, 'agedPayables'])
+                    ->name('admin.reports.aged-payables')
+                    ->middleware('can:view-financial-reports');
 
+                // Financial report exports
+                Route::post('/income-statement/export', [ReportController::class, 'exportIncomeStatement'])
+                    ->name('admin.reports.income-statement.export')
+                    ->middleware('can:view-financial-reports');
+
+                Route::post('/balance-sheet/export', [ReportController::class, 'exportBalanceSheet'])
+                    ->name('admin.reports.balance-sheet.export')
+                    ->middleware('can:view-financial-reports');
+
+                Route::post('/aged-receivables/export', [ReportController::class, 'exportAgedReceivables'])
+                    ->name('admin.reports.aged-receivables.export')
+                    ->middleware('can:view-financial-reports');
+
+                Route::post('/aged-payables/export', [ReportController::class, 'exportAgedPayables'])
+                    ->name('admin.reports.aged-payables.export')
+                    ->middleware('can:view-financial-reports');
+            });
+
+            // Basic reports - available on all plans
             Route::get('/adjustment-log', [ReportController::class, 'adjustmentLog'])
                 ->name('admin.reports.adjustment-log')
                 ->middleware('can:view-reports');
@@ -512,23 +537,7 @@ Route::middleware('web')->prefix('admin')->group(function () {
                 ->name('admin.reports.recent-transactions')
                 ->middleware('can:view-reports');
 
-            // Export routes
-            Route::post('/income-statement/export', [ReportController::class, 'exportIncomeStatement'])
-                ->name('admin.reports.income-statement.export')
-                ->middleware('can:view-financial-reports');
-
-            Route::post('/balance-sheet/export', [ReportController::class, 'exportBalanceSheet'])
-                ->name('admin.reports.balance-sheet.export')
-                ->middleware('can:view-financial-reports');
-
-            Route::post('/aged-receivables/export', [ReportController::class, 'exportAgedReceivables'])
-                ->name('admin.reports.aged-receivables.export')
-                ->middleware('can:view-financial-reports');
-
-            Route::post('/aged-payables/export', [ReportController::class, 'exportAgedPayables'])
-                ->name('admin.reports.aged-payables.export')
-                ->middleware('can:view-financial-reports');
-
+            // Basic report export routes - available on all plans
             Route::post('/adjustment-log/export', [ReportController::class, 'exportAdjustmentLog'])
                 ->name('admin.reports.adjustment-log.export')
                 ->middleware('can:view-reports');
@@ -560,8 +569,8 @@ Route::middleware('web')->prefix('admin')->group(function () {
             Route::get('/view/{id}', [NotificationController::class, 'view'])->name('admin.notifications.view');
         });
 
-        // User Management Routes
-        Route::middleware(['role:superuser'])->group(function () {
+        // User Management Routes - with plan limit on user creation
+        Route::middleware(['role:superuser', 'plan.limit:users'])->group(function () {
             Route::resource('users', UserController::class)->names('admin.users');
         });
 
@@ -569,8 +578,8 @@ Route::middleware('web')->prefix('admin')->group(function () {
 
         // Settings Routes
         Route::prefix('settings')->group(function () {
-            // Currency Settings
-            Route::prefix('currency')->middleware(['role:superuser'])->group(function () {
+            // Currency Settings - Protected by plan feature
+            Route::prefix('currency')->middleware(['role:superuser', 'plan.feature:multi_currency'])->group(function () {
                 Route::get('/', [CurrencyController::class, 'edit'])->name('admin.setting.currency.edit');
                 Route::post('/update', [CurrencyController::class, 'update'])->name('admin.setting.currency.update');
             });
@@ -622,10 +631,17 @@ Route::middleware('web')->prefix('admin')->group(function () {
             Route::get('/accounting', [\App\Http\Controllers\Admin\AccountingController::class, 'accounting'])->name('admin.setting.accounting');
             Route::post('/accounting', [\App\Http\Controllers\Admin\AccountingController::class, 'updateAccounting'])->name('admin.setting.accounting.update');
             Route::post('/reset-coa-default', [\App\Http\Controllers\Admin\AccountingController::class, 'resetToDefault'])->name('admin.setting.reset-coa-default');
+
+            // Subscription Plan Settings
+            Route::prefix('plan')->group(function () {
+                Route::get('/', [PlanController::class, 'index'])->name('admin.setting.plan');
+                Route::get('/upgrade', [PlanController::class, 'upgrade'])->name('admin.setting.plan.upgrade');
+                Route::post('/change', [PlanController::class, 'change'])->name('admin.setting.plan.change');
+            });
         });
 
-        // Accounting Routes
-        Route::prefix('accounting')->middleware('can:view-accounting')->group(function () {
+        // Accounting Routes - Protected by plan feature
+        Route::prefix('accounting')->middleware(['plan.feature:accounting', 'can:view-accounting'])->group(function () {
             Route::get('/', fn() => redirect()->route('admin.accounting.ledger'));
 
             Route::get('/chart-of-accounts', [\App\Http\Controllers\Admin\AccountingController::class, 'chartOfAccounts'])
@@ -703,6 +719,7 @@ Route::middleware('web')->prefix('admin')->group(function () {
                 Route::post('/validate', [JournalEntryController::class, 'validateEntry'])->name('admin.accounting.journal-entries.validate');
             });
         });
+
     });
 });
 

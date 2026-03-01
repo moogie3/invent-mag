@@ -34,6 +34,39 @@
         .z-index-2 {
             z-index: 2;
         }
+
+        /* Dark mode compatibility */
+        [data-bs-theme="dark"] .notification-item {
+            background-color: #1e293b !important;
+            border-color: rgba(255, 255, 255, 0.08) !important;
+            color: #e2e8f0;
+        }
+        [data-bs-theme="dark"] .notification-item.transition-all:hover {
+            box-shadow: 0 .5rem 1rem rgba(0,0,0,.3) !important;
+            border-color: rgba(255, 255, 255, 0.15) !important;
+            background-color: #273449 !important;
+        }
+        [data-bs-theme="dark"] .text-reset {
+            color: #e2e8f0 !important;
+        }
+        [data-bs-theme="dark"] .text-secondary,
+        [data-bs-theme="dark"] .text-muted {
+            color: #94a3b8 !important;
+        }
+        [data-bs-theme="dark"] .mark-as-read-btn {
+            color: #94a3b8;
+            border-color: rgba(255, 255, 255, 0.1);
+        }
+        [data-bs-theme="dark"] .mark-as-read-btn:hover {
+            color: #ef6b6b;
+            background-color: rgba(214, 57, 57, 0.15);
+        }
+        /* Color variants for dark mode list items */
+        [data-bs-theme="dark"] .bg-primary-lt { background-color: rgba(32, 107, 196, 0.15) !important; color: #4d8fd6 !important; }
+        [data-bs-theme="dark"] .bg-danger-lt { background-color: rgba(214, 57, 57, 0.15) !important; color: #ef6b6b !important; }
+        [data-bs-theme="dark"] .bg-warning-lt { background-color: rgba(245, 159, 0, 0.15) !important; color: #f7b740 !important; }
+        [data-bs-theme="dark"] .bg-info-lt { background-color: rgba(13, 202, 240, 0.15) !important; color: #5bcaf0 !important; }
+        [data-bs-theme="dark"] .bg-success-lt { background-color: rgba(47, 179, 68, 0.15) !important; color: #5cc86e !important; }
     </style>
 
     <script>

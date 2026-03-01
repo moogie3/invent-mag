@@ -43,7 +43,7 @@
                     <a href="{{ route('admin.setting.notifications') }}" class="nav-link px-1 position-relative"
                         id="notification-bell-sidebar" data-turbolinks-action="replace">
                         <i class="ti ti-bell fs-2"></i>
-                        @if (isset($notificationCount) && $notificationCount > 0)
+                        @if (isset($totalNotificationCount) && $totalNotificationCount > 0)
                             <span id="notification-dot-sidebar"
                                 class="position-absolute bg-danger border border-light rounded-circle"></span>
                         @endif
@@ -55,7 +55,7 @@
 
     <nav class="sidebar-nav">
         <ul class="navbar-nav">
-            @foreach (config('navigation.menu') as $item)
+            @foreach ($navigationItems as $item)
                 @can($item['permission'] ?? null)
                     <li class="nav-item @if(isset($item['children'])) dropdown @endif">
                         <a class="nav-link" href="{{ isset($item['route']) ? route($item['route']) : '#' }}" @if(isset($item['children'])) data-bs-toggle="collapse" data-bs-target="#submenu-{{ $loop->index }}" role="button" aria-expanded="false" aria-controls="submenu-{{ $loop->index }}" @endif>

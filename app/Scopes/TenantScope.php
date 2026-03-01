@@ -17,8 +17,14 @@ class TenantScope implements Scope
      */
     public function apply(Builder $builder, Model $model)
     {
-        if ($currentTenant = app('currentTenant')) {
-            $builder->where($model->qualifyColumn('tenant_id'), $currentTenant->id);
+        if (app()->has('currentTenant')) {
+            try {
+                if ($currentTenant = app('currentTenant')) {
+                    $builder->where($model->qualifyColumn('tenant_id'), $currentTenant->id);
+                }
+            } catch (\Exception $e) {
+                // Not bound or resolving error
+            }
         }
     }
 }

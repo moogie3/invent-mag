@@ -27,11 +27,17 @@ RUN apt-get update && apt-get install -y \
     unzip \
     libzip-dev \
     default-mysql-client \
-    nginx # // NOTE: Added Nginx to serve the PHP application
+    nginx \
+    libfreetype6-dev \
+    libjpeg62-turbo-dev \
+    libwebp-dev \
+    libxpm-dev # // NOTE: Added dependencies for advanced GD support (needed for PDFs/Images)
 
 RUN apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # Install PHP extensions
+# // NOTE: Configure and install GD with support for multiple formats
+RUN docker-php-ext-configure gd --with-freetype --with-jpeg --with-webp
 RUN docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd zip
 
 # Get latest Composer
@@ -47,7 +53,8 @@ COPY . /var/www
 COPY --from=frontend_build /app/public/build /var/www/public/build
 
 # Install PHP dependencies
-RUN composer install --no-interaction --prefer-dist --optimize-autoloader --no-dev
+# // NOTE: Added --ignore-platform-req=php to allow building even if lock file has a slightly different minor version
+RUN composer install --no-interaction --prefer-dist --optimize-autoloader --no-dev --ignore-platform-req=php
 
 # // NOTE: Configure Nginx - copy our custom config to replace the default one
 COPY docker/nginx.conf /etc/nginx/sites-available/default

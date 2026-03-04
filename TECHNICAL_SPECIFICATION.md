@@ -149,6 +149,7 @@ Internet → [Railway Load Balancer] → [Nginx (Container Port 80)]
 - **Database:** MySQL 8.0+
 - **Frontend Hosting:** Vercel (Marketing site & Auth landing)
 - **Storage:** local disk or AWS S3 (configured via filesystems.php)
+- **PHP Extensions:** GD (with FreeType/WebP/JPEG support), BCMath, PCNTL, PDO MySQL, Zip, Exif, Mbstring
 
 #### Deployment Workflow
 
@@ -589,13 +590,14 @@ class SalesForecastService
 
 ### 9.1 Current Integrations
 
-| System      | Integration    | Status                |
+| System | Integration | Status |
 | ----------- | -------------- | --------------------- |
-| **Email**   | Laravel Mail   | ✅ Notifications      |
-| **PDF**     | DomPDF         | ✅ Invoice generation |
-| **Queue**   | Database/Redis | ✅ Job processing     |
-| **Cache**   | File/Redis     | ✅ Performance        |
-| **Storage** | Local/S3       | ✅ File uploads       |
+| **Payment** | Midtrans | ✅ Subscriptions |
+| **Email** | Laravel Mail | ✅ Notifications |
+| **PDF** | DomPDF | ✅ Invoice generation |
+| **Queue** | Database/Redis | ✅ Job processing |
+| **Cache** | File/Redis | ✅ Performance |
+| **Storage** | Local/S3 | ✅ File uploads |
 
 ### 9.2 API-Ready Architecture
 
@@ -721,10 +723,11 @@ Common extension points:
 
 ## Document History
 
-| Version | Date     | Changes                                                              |
+| Version | Date | Changes |
 | ------- | -------- | -------------------------------------------------------------------- |
-| 1.0     | Feb 2026 | Initial technical specification                                      |
-| 1.1     | Feb 2026 | Added comprehensive test coverage stats and documented returns fixes |
+| 1.0 | Feb 2026 | Initial technical specification |
+| 1.1 | Feb 2026 | Added comprehensive test coverage stats and documented returns fixes |
+| 1.2 | Mar 2026 | Documented Subscription system, Midtrans integration, and Railway deployment architecture |
 
 ---
 

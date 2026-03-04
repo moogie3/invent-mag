@@ -153,6 +153,11 @@
 @vite('resources/js/admin/layouts/global-keyboard-shortcuts.js')
 @vite('resources/js/admin/layouts/selectable-table.js')
 
+{{-- SCRIPT FOR PLAN CHECKOUT --}}
+@if (request()->is('admin/settings/plan/change'))
+    @vite('resources/js/admin/plan/checkout.js')
+@endif
+
 {{-- DELETE MODAL --}}
 <script>
     function setDeleteFormAction(action) {

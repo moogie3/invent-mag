@@ -1,6 +1,6 @@
 # Invent-MAG: Complete Feature Checklist
 
-**Last Updated:** February 2026  
+**Last Updated:** March 2026  
 **Version:** 1.2
 
 ---
@@ -24,6 +24,27 @@
 - [x] Rate limiting (custom thresholds)
 - [x] Security audit logging
 - [x] Comprehensive audit trail
+
+---
+
+### 💳 Subscription & Payment System
+
+- [x] Three-tier subscription plans (Starter, Professional, Enterprise)
+- [x] Feature-gated access based on plan
+- [x] Usage limits per plan (users, warehouses, products)
+- [x] Midtrans payment gateway integration
+- [x] Credit card payment processing
+- [x] Sandbox testing environment
+- [x] Dynamic pricing (USD displayed, IDR charged)
+- [x] Payment confirmation via frontend API
+- [x] Webhook-based payment verification
+- [x] Invoice email sent on successful payment
+- [x] Subscription order tracking
+- [x] Plan upgrade/downgrade support
+- [x] Current plan badge in sidebar
+- [x] Security: Signature verification for webhooks
+- [x] Security: Tenant ownership verification
+- [x] Security: Double-processing prevention
 
 ---
 

@@ -1363,4 +1363,6 @@ return [
     'create_your_first_sales_return' => 'Buat retur penjualan pertama Anda',
     'sales_order' => 'Pesanan Penjualan',
     'back_to_sales' => 'Kembali ke Pesanan Penjualan',
+    'no_forecast_data' => 'Tidak ada data ramalan',
+    'forecast_description' => 'Ramalan penjualan memerlukan setidaknya 3 bulan data penjualan untuk menghasilkan prediksi.',
 ];

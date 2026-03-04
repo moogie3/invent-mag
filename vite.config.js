@@ -49,6 +49,7 @@ export default defineConfig({
                 "resources/js/admin/layouts/selectable-table.js",
                 "resources/js/admin/tax.js",
                 "resources/js/admin/reports/stock-transfer.js",
+                "resources/js/admin/plan/checkout.js",
                 "resources/css/app.css",
                 "resources/css/auth.css",
                 "resources/css/navbar.css",

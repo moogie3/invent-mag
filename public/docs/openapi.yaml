@@ -26,6 +26,67 @@ security:
   -
     default: []
 paths:
+  /api/webhooks/midtrans:
+    post:
+      summary: ''
+      operationId: postApiWebhooksMidtrans
+      description: ''
+      parameters: []
+      responses:
+        400:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Invalid payload'
+                properties:
+                  message:
+                    type: string
+                    example: 'Invalid payload'
+      tags:
+        - Endpoints
+  /api/payment/confirm:
+    post:
+      summary: 'Confirm payment directly from frontend after successful Snap transaction.'
+      operationId: confirmPaymentDirectlyFromFrontendAfterSuccessfulSnapTransaction
+      description: "This ensures the plan is updated immediately without waiting for webhook.\n\nSecurity: Verifies the order belongs to the current tenant."
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+      tags:
+        - Endpoints
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                order_id:
+                  type: string
+                  description: ''
+                  example: consequatur
+                transaction_result:
+                  type: object
+                  description: ''
+                  example: []
+                  properties: {  }
+              required:
+                - order_id
+                - transaction_result
   /api/login:
     post:
       summary: ''
@@ -103,6 +164,15 @@ paths:
                   type: string
                   description: ''
                   example: 'O[2UZ5ij-e/dl4m{o,'
+                plan:
+                  type: string
+                  description: ''
+                  example: starter
+                  enum:
+                    - starter
+                    - professional
+                    - enterprise
+                  nullable: true
               required:
                 - name
                 - shopname
@@ -146,6 +216,48 @@ paths:
     post:
       summary: ''
       operationId: postApiV1RefreshToken
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+      tags:
+        - Endpoints
+  /api/v1/plans:
+    get:
+      summary: ''
+      operationId: getApiV1Plans
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+      tags:
+        - Endpoints
+  /api/v1/plan/current:
+    get:
+      summary: ''
+      operationId: getApiV1PlanCurrent
       description: ''
       parameters: []
       responses:
@@ -262,7 +374,7 @@ paths:
                 has_expiry:
                   type: boolean
                   description: ''
-                  example: true
+                  example: false
                   nullable: true
               required:
                 - code

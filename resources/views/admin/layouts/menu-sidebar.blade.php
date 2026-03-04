@@ -24,6 +24,13 @@
                 @if (Auth::check())
                     <span class="user-name">{{ Auth::user()->name }}</span>
                     <span class="user-role">{{ Auth::user()->getRoleNames()->first() }}</span>
+                    @php
+                        $tenant = app('currentTenant');
+                        $currentPlan = $tenant?->plan;
+                    @endphp
+                    @if($currentPlan)
+                        <span class="badge bg-{{ $currentPlan->slug === 'enterprise' ? 'purple' : ($currentPlan->slug === 'professional' ? 'blue' : 'teal') }} text-white mt-1" style="font-size: 0.65rem;">{{ $currentPlan->slug === 'professional' ? 'Pro' : $currentPlan->name }}</span>
+                    @endif
                 @else
                     <span class="user-name">Guest</span>
                     <span class="user-role">Not logged in</span>

@@ -93,14 +93,13 @@
                                     <i class="ti ti-check me-2"></i>{{ __('plan.current_plan') }}
                                 </button>
                             @else
-                                <form method="POST" action="{{ route('admin.setting.plan.change') }}">
-                                    @csrf
-                                    <input type="hidden" name="plan" value="{{ $plan->slug }}">
-                                    <button type="submit" class="btn {{ $isSuggested ? 'btn-primary' : 'btn-outline-primary' }} w-100 rounded-pill py-2 shadow-sm"
-                                            onclick="return confirm('{{ __('plan.confirm_switch', ['plan' => $plan->name]) }}')">
-                                        {{ $isSuggested ? __('plan.upgrade_now') : __('plan.switch_plan') }}
-                                    </button>
-                                </form>
+                                <button type="button" class="btn {{ $isSuggested ? 'btn-primary' : 'btn-outline-primary' }} w-100 rounded-pill py-2 shadow-sm"
+                                        data-bs-toggle="modal" data-bs-target="#upgradeModal"
+                                        data-plan-name="{{ $plan->name }}"
+                                        data-plan-price="{{ $plan->price }}"
+                                        data-plan-slug="{{ $plan->slug }}">
+                                    {{ $isSuggested ? __('plan.upgrade_now') : __('plan.switch_plan') }}
+                                </button>
                             @endif
                         </div>
                     </div>
@@ -110,3 +109,49 @@
     </div>
 </div>
 @endsection
+
+<div class="modal modal-blur fade" id="upgradeModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-sm modal-dialog-centered" role="document">
+        <div class="modal-content border-0 shadow-lg rounded-3">
+            <div class="modal-header">
+                <h5 class="modal-title">{{ __('plan.confirm_upgrade_title') }}</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-status bg-primary"></div>
+            <div class="modal-body text-center py-4">
+                <div class="mb-3">
+                    <i class="ti ti-rocket text-primary" style="font-size: 3rem;"></i>
+                </div>
+                <h4 class="mb-2">{{ __('plan.upgrade_to') }} <span id="modalPlanName"></span>?</h4>
+                <div class="text-muted">{{ __('plan.upgrade_amount') }}: <strong>$<span id="modalPlanPrice"></span></strong></div>
+            </div>
+            <div class="modal-footer">
+                <form method="POST" action="{{ route('admin.setting.plan.change') }}" id="upgradeForm">
+                    @csrf
+                    <input type="hidden" name="plan" id="modalPlanSlug">
+                    <button type="submit" class="btn btn-primary w-100">
+                        <i class="ti ti-check me-2"></i>{{ __('plan.confirm_upgrade') }}
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    var upgradeModal = document.getElementById('upgradeModal');
+    if (upgradeModal) {
+        upgradeModal.addEventListener('show.bs.modal', function(event) {
+            var button = event.relatedTarget;
+            var planName = button.getAttribute('data-plan-name');
+            var planPrice = button.getAttribute('data-plan-price');
+            var planSlug = button.getAttribute('data-plan-slug');
+
+            document.getElementById('modalPlanName').textContent = planName;
+            document.getElementById('modalPlanPrice').textContent = planPrice;
+            document.getElementById('modalPlanSlug').value = planSlug;
+        });
+    }
+});
+</script>

@@ -122,6 +122,33 @@ Experience Invent-MAG firsthand:
 
 ---
 
+### **💳 Subscription & Payment System**
+
+#### Subscription Tiers
+
+- **Starter Plan:** Basic features, limited users/warehouses/products
+- **Professional Plan:** Advanced features, higher limits
+- **Enterprise Plan:** Full access, unlimited users/warehouses/products
+
+#### Features
+
+- **Feature-Gated Access:** Route middleware blocks features not in user's plan
+- **Usage Limits:** Enforced per-plan limits for users, warehouses, products
+- **Midtrans Integration:** Secure payment processing
+- **Dynamic Pricing:** USD displayed, IDR charged (Indonesian market)
+- **Invoice Emails:** Automatic receipt sent on successful payment
+- **Plan Badges:** Current tier displayed in sidebar
+
+#### Payment Flow
+
+1. User selects plan on upgrade page
+2. Redirected to checkout with invoice details
+3. Midtrans Snap popup for credit card payment
+4. Frontend confirms payment → Plan updated immediately
+5. Webhook serves as backup verification
+
+---
+
 ### **📊 Financial & Accounting Suite**
 
 #### Chart of Accounts

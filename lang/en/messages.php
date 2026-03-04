@@ -1405,4 +1405,6 @@ return [
     'back_to_po_list' => 'Back to Purchase Orders',
     'order_summary_title' => 'Order Summary',
     'amount_summary_title' => 'Amount Summary',
+    'no_forecast_data' => 'No forecast data available',
+    'forecast_description' => 'Sales forecasting requires at least 3 months of sales data to generate predictions.',
 ];

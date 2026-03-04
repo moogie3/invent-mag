@@ -7,6 +7,9 @@ use App\Services\PlanService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
+use App\Http\Controllers\Api\Webhook\MidtransController;
+use App\Http\Controllers\Api\PaymentController;
+
 /*
 |--------------------------------------------------------------------------
 | API Routes - Essential Endpoints Only
@@ -16,6 +19,14 @@ use Illuminate\Support\Facades\Route;
 | authentication. All other functionality uses the web admin panel.
 |
 */
+
+// Webhooks (Must be outside of CSRF and auth middleware)
+Route::post('/webhooks/midtrans', [MidtransController::class, 'handle'])->name('api.webhooks.midtrans');
+
+// Payment confirmation - requires authentication
+Route::middleware('auth:sanctum')->group(function () {
+    Route::post('/payment/confirm', [PaymentController::class, 'confirm'])->name('api.payment.confirm');
+});
 
 // Public routes - Authentication & Tenant Lookup
 Route::middleware(['throttle:auth'])->group(function () {

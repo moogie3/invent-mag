@@ -2,14 +2,25 @@
     <div class="card-header">
         <ul class="nav nav-tabs card-header-tabs" data-bs-toggle="tabs">
             <li class="nav-item">
-                <a href="#overview-tab" class="nav-link active fw-bold fs-4" data-bs-toggle="tab">{{ __('messages.overview') }}</a>
+                <a href="#overview-tab" class="nav-link active fw-bold fs-4" data-bs-toggle="tab">
+                    <i class="ti ti-layout-dashboard me-2"></i>{{ __('messages.overview') }}
+                </a>
             </li>
             <li class="nav-item">
-                <a href="#sales-products-tab" class="nav-link fw-bold fs-4" data-bs-toggle="tab">{{ __('messages.sales_products') }}</a>
+                <a href="#sales-products-tab" class="nav-link fw-bold fs-4" data-bs-toggle="tab">
+                    <i class="ti ti-shopping-cart me-2"></i>{{ __('messages.sales_products') }}
+                </a>
             </li>
-            <li class="nav-item">
-                <a href="#analysis-reports-tab" class="nav-link fw-bold fs-4" data-bs-toggle="tab">{{ __('messages.analysis_reports') }}</a>
-            </li>
+            @php
+                $tenant = app('currentTenant');
+            @endphp
+            @if($tenant && $tenant->hasFeature('basic_reports'))
+                <li class="nav-item">
+                    <a href="#analysis-reports-tab" class="nav-link fw-bold fs-4" data-bs-toggle="tab">
+                        <i class="ti ti-chart-bar me-2"></i>{{ __('messages.analysis_reports') }}
+                    </a>
+                </li>
+            @endif
         </ul>
     </div>
     <div class="card-body">
@@ -24,47 +35,51 @@
                 @include('admin.layouts.partials.dashboard.top-categories-card')
                 @include('admin.layouts.partials.dashboard.recent-transactions')
             </div>
-            <!-- Analysis & Reports Tab -->
-            <div class="tab-pane" id="analysis-reports-tab">
-                <div class="row mb-4">
-                    <div class="col-12">
-                        @include('admin.layouts.partials.dashboard.revenue-expenses-table')
+            @if($tenant && $tenant->hasFeature('basic_reports'))
+                <!-- Analysis & Reports Tab -->
+                <div class="tab-pane" id="analysis-reports-tab">
+                    <div class="row mb-4">
+                        @if($tenant->hasFeature('accounting'))
+                            <div class="col-12">
+                                @include('admin.layouts.partials.dashboard.revenue-expenses-table')
+                            </div>
+                        @endif
+                        <div class="col-12">
+                            @include('admin.layouts.partials.dashboard.financial-summary')
+                        </div>
                     </div>
-                    <div class="col-12">
-                        @include('admin.layouts.partials.dashboard.financial-summary')
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            @include('admin.layouts.partials.dashboard.invoice-status')
+                        </div>
+                        <div class="col-md-6">
+                            @include('admin.layouts.partials.dashboard.customer-insights')
+                        </div>
+                    </div>
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            @include('admin.layouts.partials.dashboard.analytics-card', [
+                                'title' => __('messages.customer_analysis'),
+                                'icon' => 'ti-users',
+                                'color' => 'azure',
+                                'route' => route('admin.customer'),
+                                'analytics' => $customerAnalytics,
+                                'type' => 'customer',
+                            ])
+                        </div>
+                        <div class="col-md-6">
+                            @include('admin.layouts.partials.dashboard.analytics-card', [
+                                'title' => __('messages.supplier_analysis'),
+                                'icon' => 'ti-truck',
+                                'color' => 'purple',
+                                'route' => route('admin.supplier'),
+                                'analytics' => $supplierAnalytics,
+                                'type' => 'supplier',
+                            ])
+                        </div>
                     </div>
                 </div>
-                <div class="row mb-4">
-                    <div class="col-md-6">
-                        @include('admin.layouts.partials.dashboard.invoice-status')
-                    </div>
-                    <div class="col-md-6">
-                        @include('admin.layouts.partials.dashboard.customer-insights')
-                    </div>
-                </div>
-                <div class="row mb-4">
-                    <div class="col-md-6">
-                        @include('admin.layouts.partials.dashboard.analytics-card', [
-                            'title' => __('messages.customer_analysis'),
-                            'icon' => 'ti-users',
-                            'color' => 'azure',
-                            'route' => route('admin.customer'),
-                            'analytics' => $customerAnalytics,
-                            'type' => 'customer',
-                        ])
-                    </div>
-                    <div class="col-md-6">
-                        @include('admin.layouts.partials.dashboard.analytics-card', [
-                            'title' => __('messages.supplier_analysis'),
-                            'icon' => 'ti-truck',
-                            'color' => 'purple',
-                            'route' => route('admin.supplier'),
-                            'analytics' => $supplierAnalytics,
-                            'type' => 'supplier',
-                        ])
-                    </div>
-                </div>
-            </div>
+            @endif
         </div>
     </div>
 </div>

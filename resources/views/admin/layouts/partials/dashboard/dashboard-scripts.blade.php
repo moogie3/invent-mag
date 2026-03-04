@@ -38,11 +38,13 @@
         }
     };
 
+    @if(isset($salesForecast) && $salesForecast !== null)
     const salesForecastData = {
         labels: @json($salesForecast['labels'] ?? []),
         historical: @json($salesForecast['historical'] ?? []),
         forecast: @json($salesForecast['forecast'] ?? [])
     };
+    @endif
 
     const chartConfigs = {
         sales: {
@@ -108,6 +110,7 @@
     }
 
     function createSalesForecastChart() {
+        @if(isset($salesForecast) && $salesForecast !== null)
         if (salesForecastData.labels.length === 0) {
             return;
         }
@@ -186,6 +189,7 @@
                 }
             }
         });
+        @endif
     }
 
     function initChart() {

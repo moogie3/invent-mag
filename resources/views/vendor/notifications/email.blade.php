@@ -52,7 +52,7 @@
                                 <tr>
                                     <td style="background-color: #0f172a; border: 1px solid #334155; border-radius: 12px; padding: 16px 24px; text-align: center;">
                                         <span style="color: #3b82f6; font-size: 16px; margin-right: 8px;">✉</span>
-                                        <span style="color: #f8fafc; font-size: 15px; font-weight: 500; font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;">{{ $notifiable->email ?? 'your email address' }}</span>
+                                        <span style="color: #f8fafc; font-size: 15px; font-weight: 500; font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;">{{ $notifiable->email }}</span>
                                     </td>
                                 </tr>
                             </table>

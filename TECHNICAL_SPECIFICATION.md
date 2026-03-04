@@ -1,7 +1,7 @@
 # Invent-MAG: Technical Specification Document
 
-**Document Version:** 1.1  
-**Last Updated:** February 2026  
+**Document Version:** 1.2  
+**Last Updated:** March 2026  
 **System Version:** 1.2
 
 ---
@@ -81,6 +81,80 @@ class Product extends Model
 - Single codebase serving multiple organizations
 - Automatic query scoping
 - Tenant-aware queues and jobs
+
+---
+
+### 1.3 Subscription & Payment System
+
+**Payment Gateway:** Midtrans (Indonesian market)  
+**Pricing Model:** Three-tier SaaS subscription  
+**Currency:** USD displayed, IDR charged (16,000 exchange rate)
+
+#### Subscription Tiers
+
+| Tier | Users | Warehouses | Products | Features |
+|------|-------|------------|----------|----------|
+| Starter | 3 | 2 | 50 | Basic |
+| Professional | 10 | 5 | 500 | Advanced + CRM |
+| Enterprise | Unlimited | Unlimited | Unlimited | Full + Forecasting |
+
+#### Payment Flow
+
+1. User selects plan on upgrade page
+2. Invoice generated with USD price + IDR conversion
+3. Midtrans Snap popup for payment
+4. Frontend confirms via API → Plan updated immediately
+5. Webhook serves as backup verification
+6. Invoice email sent to user
+
+#### Security Features
+
+- **Signature Verification:** SHA-512 for webhook validation
+- **Tenant Ownership:** Orders verified to belong to current tenant
+- **Double-Processing Prevention:** Status check before processing
+- **CSP Updated:** Midtrans domains whitelisted
+
+#### Key Files
+
+```
+app/Http/Controllers/Api/PaymentController.php    # Frontend payment confirmation
+app/Http/Controllers/Api/Webhook/MidtransController.php  # Webhook handler
+app/Http/Middleware/CheckPlanFeature.php          # Feature gating
+app/Http/Middleware/CheckPlanLimit.php            # Usage limits
+app/Services/PlanService.php                      # Plan logic
+app/Models/Plan.php                               # Plan model
+app/Mail/SubscriptionInvoiceMail.php             # Invoice email
+config/plans.php                                  # Plan configuration
+```
+
+### 1.4 Deployment & Infrastructure
+
+**Strategy:** Containerized "Fat Container" Architecture  
+**Platform:** Compatible with Railway, DigitalOcean App Platform, AWS ECS, or any VPS.
+
+#### Deployment Architecture
+
+```
+Internet → [Railway Load Balancer] → [Nginx (Container Port 80)]
+                                            ↓ (FastCGI)
+                                       [PHP-FPM (Port 9000)]
+                                            ↓
+                                       [Laravel Core]
+```
+
+#### Key Infrastructure Components
+
+- **Web Server:** Nginx (built into the Docker container)
+- **Application Server:** PHP-FPM 8.2
+- **Database:** MySQL 8.0+
+- **Frontend Hosting:** Vercel (Marketing site & Auth landing)
+- **Storage:** local disk or AWS S3 (configured via filesystems.php)
+
+#### Deployment Workflow
+
+1. **Build Stage:** Vite compiles assets (JS/CSS) in a Node.js environment.
+2. **Production Stage:** PHP environment set up, Nginx installed, assets copied.
+3. **Execution:** `start.sh` runs migrations, caches config, starts both PHP-FPM and Nginx.
 
 ---
 
@@ -569,6 +643,16 @@ class SalesForecastService
 - OPcache enabled
 - Database query optimization
 - Asset caching
+
+---
+
+## 11. Version History
+
+| Version | Date | Changes |
+|---------|------|---------|
+| 1.2 | March 2026 | Implemented subscription & payment system with Midtrans, tiered plans (Starter/Professional/Enterprise), feature gating, usage limits, plan badges in sidebar, invoice emails |
+| 1.1 | February 2026 | Dark theme improvements, notification system enhancements |
+| 1.0 | January 2026 | Initial release with full ERP features |
 
 ---
 

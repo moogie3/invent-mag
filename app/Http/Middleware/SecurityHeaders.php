@@ -22,13 +22,17 @@ class SecurityHeaders
         $localSources = app()->environment('local') ? ' http://localhost:5173 ws://localhost:5173 http://localhost:4000 ws://localhost:4000' : '';
         $localImages = app()->environment('local') ? ' http://localhost:5173 http://localhost:4000' : '';
         
+        // Midtrans domains for payment gateway
+        $midtransSources = ' https://app.sandbox.midtrans.com https://app.midtrans.com';
+        
         $response->headers->set('Content-Security-Policy', 
             "default-src 'self'; " .
-            "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://code.jquery.com https://cdnjs.cloudflare.com{$localSources}; " .
+            "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://code.jquery.com https://cdnjs.cloudflare.com{$midtransSources}{$localSources}; " .
             "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.jsdelivr.net https://rsms.me{$localSources}; " .
             "font-src 'self' https://fonts.gstatic.com https://cdn.jsdelivr.net https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest data: https://rsms.me; " .
             "img-src 'self' data: https:{$localImages}; " .
-            "connect-src 'self' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com{$localSources};"
+            "frame-src 'self'{$midtransSources}; " .
+            "connect-src 'self' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com{$midtransSources}{$localSources};"
         );
 
         return $response;

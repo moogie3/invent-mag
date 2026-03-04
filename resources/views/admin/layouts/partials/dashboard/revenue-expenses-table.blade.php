@@ -1,5 +1,6 @@
 <div class="col-md-12">
-    <div class="card shadow-sm border-1 mb-4">
+    <div class="card border-0 shadow-sm rounded-4 mb-4">
+        <div class="card-status-top bg-warning"></div>
         <div class="card-header d-flex justify-content-between align-items-center">
             <h3 class="card-title">
                 <i class="ti ti-chart-bar fs-3 me-2"></i> {{ __('messages.revenue_vs_expenses') }}

@@ -29,12 +29,22 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         VerifyEmail::createUrlUsing(function ($notifiable) {
-            $tenantDomain = $notifiable->tenant->domain;
-            $isSecure = $this->app->environment('production');
-            $schema = $isSecure ? 'https' : 'http';
-            $rootUrl = "{$schema}://{$tenantDomain}";
+            // // NOTE: Get the frontend URL from config (e.g. your Vercel domain)
+            // If not set, it defaults to the tenant domain
+            $frontendUrl = config('app.frontend_url');
+            
+            if ($frontendUrl) {
+                // If a central frontend exists, we use it
+                $rootUrl = $frontendUrl;
+            } else {
+                // Otherwise fallback to tenant-specific domain
+                $tenantDomain = $notifiable->tenant->domain;
+                $isSecure = $this->app->environment('production');
+                $schema = $isSecure ? 'https' : 'http';
+                $rootUrl = "{$schema}://{$tenantDomain}";
+            }
 
-            // Temporarily force the root URL to the tenant's domain for signing
+            // Temporarily force the root URL for signing the route
             URL::forceRootUrl($rootUrl);
 
             $url = URL::temporarySignedRoute(
@@ -50,6 +60,21 @@ class AppServiceProvider extends ServiceProvider
             URL::forceRootUrl(null);
 
             return $url;
+        });
+
+        // // NOTE: Pass the user object to the custom email notification view
+        // This fixes the "your email address" bug in the template
+        VerifyEmail::toMailUsing(function ($notifiable, $url) {
+            return (new \Illuminate\Notifications\Messages\MailMessage)
+                ->subject(__('Verify Email Address'))
+                ->view('vendor.notifications.email', [
+                    'notifiable' => $notifiable,
+                    'actionUrl'  => $url,
+                    'actionText' => __('Verify Email Address'),
+                    'level'      => 'info',
+                    'introLines' => [__('Please click the button below to verify your email address.')],
+                    'outroLines' => [__('If you did not create an account, no further action is required.')]
+                ]);
         });
 
         // ---------------------------------------------------------------

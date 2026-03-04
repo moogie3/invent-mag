@@ -31,7 +31,8 @@ RUN apt-get update && apt-get install -y \
     libfreetype6-dev \
     libjpeg62-turbo-dev \
     libwebp-dev \
-    libxpm-dev # // NOTE: Added dependencies for advanced GD support (needed for PDFs/Images)
+    libxpm-dev \
+    netcat-openbsd # // NOTE: Added netcat (nc) for the database wait loop in start.sh
 
 RUN apt-get clean && rm -rf /var/lib/apt/lists/*
 

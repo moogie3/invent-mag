@@ -1,8 +1,10 @@
 #!/bin/sh
 
 # // NOTE: Run migrations on every deployment to ensure database schema is up-to-date
-# // The --force flag is required when running migrations in production
 php artisan migrate --force
+
+# // NOTE: Ensure storage link exists for public access to uploaded files
+php artisan storage:link --force
 
 # // NOTE: Clear and cache configuration to optimize performance
 php artisan config:cache

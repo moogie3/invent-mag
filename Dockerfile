@@ -53,8 +53,8 @@ COPY . /var/www
 COPY --from=frontend_build /app/public/build /var/www/public/build
 
 # Install PHP dependencies
-# // NOTE: Added --ignore-platform-req=php to allow building even if lock file has a slightly different minor version
-RUN composer install --no-interaction --prefer-dist --optimize-autoloader --no-dev --ignore-platform-req=php
+# // NOTE: Set dummy DB env vars during build to prevent Laravel from trying to connect to a non-existent database
+RUN DB_CONNECTION=sqlite DB_DATABASE=:memory: composer install --no-interaction --prefer-dist --optimize-autoloader --no-dev --ignore-platform-req=php
 
 # // NOTE: Configure Nginx - copy our custom config to replace the default one
 COPY docker/nginx.conf /etc/nginx/sites-available/default

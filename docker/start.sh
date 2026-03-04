@@ -1,5 +1,12 @@
 #!/bin/sh
 
+# // NOTE: Wait for MySQL to be ready
+# This prevents "Connection refused" errors if MySQL starts slower than the App
+while ! nc -z $DB_HOST ${DB_PORT:-3306}; do
+  echo "Waiting for MySQL at $DB_HOST..."
+  sleep 2
+done
+
 # // NOTE: Run migrations on every deployment to ensure database schema is up-to-date
 php artisan migrate --force
 

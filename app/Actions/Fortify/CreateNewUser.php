@@ -24,6 +24,9 @@ class CreateNewUser implements CreatesNewUsers
 
     public function create(array $input): User
     {
+        set_time_limit(0); // Prevent PHP timeout for heavy tenant creation
+        Log::info('Registration attempt started for: ' . ($input['email'] ?? 'unknown'));
+        
         Validator::make($input, [
             'name' => ['required', 'string', 'max:255'],
             'shopname' => ['required', 'string', 'max:255', Rule::unique('tenants', 'name')],

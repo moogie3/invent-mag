@@ -74,26 +74,28 @@ class FortifyServiceProvider extends ServiceProvider
         
         // Custom, self-contained authentication logic for multi-tenancy with direct rate limiting
         Fortify::authenticateUsing(function (Request $request) {
-            $throttleKey = Str::lower($request->input('email')) . '|' . $request->ip();
+            $email = Str::lower($request->input('email', ''));
+            $ip = $request->ip() ?? 'unknown';
+            $throttleKey = "login|{$email}|{$ip}";
 
             // Store the attempted email in session for back button protection
-            $request->session()->put('attempted_email', $request->input('email'));
+            $request->session()->put('attempted_email', $email);
 
             // Manually handle the rate limiting directly.
             if (RateLimiter::tooManyAttempts($throttleKey, 5)) {
                 $seconds = RateLimiter::availableIn($throttleKey);
+                \Illuminate\Support\Facades\Log::warning("Rate limit hit for {$email} at {$ip}");
                 // Abort directly with the 429 error page. This stops everything.
                 abort(response()->view('errors.429', ['seconds' => $seconds], 429));
             }
 
             // Find the user by email, respecting the global TenantScope automatically.
-            // Since User model has BelongsToTenant trait and global TenantScope,
-            // this query will ONLY look for users where tenant_id matches the current tenant.
             $user = User::where('email', $request->email)->first();
 
             // If user not found (in this tenant) or password fails:
             if (! $user || ! Hash::check($request->password, $user->password)) {
-                RateLimiter::hit($throttleKey);
+                \Illuminate\Support\Facades\Log::info("Failed login attempt for {$email} at {$ip}");
+                RateLimiter::hit($throttleKey, 60);
                 throw ValidationException::withMessages(['email' => [__('auth.failed')]]);
             }
 

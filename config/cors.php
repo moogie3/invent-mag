@@ -26,6 +26,8 @@ return [
     'allowed_origins_patterns' => [
         '/^https:\/\/.*\.vercel\.app$/',
         '/^https:\/\/.*\.railway\.app$/',
+        '/^https:\/\/.*\.invent-mag\.web\.id$/',
+        '/^https:\/\/invent-mag\.web\.id$/',
     ],
 
     'allowed_headers' => [

@@ -31,6 +31,7 @@ class TenantSetupService
      */
     public function setup(Tenant $tenant, ?string $planSlug = null): void
     {
+        set_time_limit(0); // Ensure long-running setup completes
         // Make tenant current
         $tenant->makeCurrent();
 

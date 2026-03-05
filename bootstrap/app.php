@@ -19,6 +19,7 @@ return Application::configure(basePath: dirname(__DIR__))
         \App\Providers\TestingServiceProvider::class,
     ])
     ->withMiddleware(function (Middleware $middleware) {
+        $middleware->trustProxies(at: '*');
         $middleware->prepend(\Illuminate\Http\Middleware\HandleCors::class);
 
         $middleware->web(append: [

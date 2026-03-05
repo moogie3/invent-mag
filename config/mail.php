@@ -62,14 +62,7 @@ return [
         ],
 
         'resend' => [
-            'transport' => 'smtp',
-            'host' => 'smtp.resend.com',
-            'port' => 587,
-            'encryption' => 'tls',
-            'username' => 'resend',
-            'password' => env('RESEND_KEY'),
-            'timeout' => null,
-            'local_domain' => env('MAIL_EHLO_DOMAIN', parse_url(env('APP_URL', 'http://localhost'), PHP_URL_HOST)),
+            'transport' => 'resend',
         ],
 
         'sendmail' => [
@@ -116,7 +109,7 @@ return [
     */
 
     'from' => [
-        'address' => env('MAIL_FROM_ADDRESS', 'noreply@inventmag.com'),
+        'address' => env('MAIL_FROM_ADDRESS', 'noreply@invent-mag.web.id'),
         'name' => env('MAIL_FROM_NAME', 'Invent-MAG'),
     ],
 

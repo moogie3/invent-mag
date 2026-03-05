@@ -38,10 +38,17 @@ class UserSeeder extends Seeder
         
         $this->command->info("Creating admin user for tenant: {$tenantName}");
         
+        // Generate shopname from tenant name
+        $shopname = $tenantNameSlug;
+        if (str_starts_with($tenantName, 'Demo ')) {
+            $shopname = strtolower(str_replace(' ', '-', preg_replace('/\s+Workspace\s*$/', '', $tenantName)));
+        }
+        
         $user = User::updateOrCreate(
             ['email' => $email, 'tenant_id' => $tenantId],
             [
                 'name' => 'admin-' . $tenantNameSlug,
+                'shopname' => $shopname,
                 'password' => Hash::make('password'),
                 'avatar' => '',
                 'created_at' => now(),

@@ -21,6 +21,9 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware) {
         $middleware->prepend(\Illuminate\Http\Middleware\HandleCors::class);
 
+        // Handle workspace param BEFORE tenant middleware
+        $middleware->prepend(\App\Http\Middleware\HandleWorkspaceParam::class);
+
         $middleware->web(append: [
             \Spatie\Multitenancy\Http\Middleware\NeedsTenant::class,
             \App\Http\Middleware\SetLocale::class,

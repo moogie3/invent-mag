@@ -723,20 +723,8 @@ Route::middleware('web')->prefix('admin')->group(function () {
     });
 });
 
-Route::get('/', function (Illuminate\Http\Request $request) {
-    $workspace = $request->query('workspace');
-    
-    if ($workspace) {
-        $tenant = \App\Models\Tenant::where('domain', 'like', $workspace . '.%')
-                      ->orWhere('name', 'like', '%' . str_replace('-', ' ', $workspace) . '%')
-                      ->first();
-        
-        if ($tenant && $tenant->domain) {
-            return redirect()->away('https://' . $tenant->domain . '/admin/login');
-        }
-    }
-    
-    // No workspace specified - redirect to frontend
+Route::get('/', function () {
+    // Root URL with no workspace - redirect to frontend
     $frontendUrl = config('app.frontend_url', 'https://invent-mag-fe.vercel.app');
     return redirect()->away($frontendUrl . '/login');
 });

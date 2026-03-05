@@ -17,6 +17,7 @@
         "laravel/sanctum": "^4.0",
         "laravel/tinker": "^2.9",
         "midtrans/midtrans-php": "*",
+        "resend/resend-php": "^0.10.0",
         "spatie/laravel-backup": "^9.3",
         "spatie/laravel-multitenancy": "^4.0",
         "spatie/laravel-permission": "^6.20"

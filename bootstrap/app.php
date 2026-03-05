@@ -21,10 +21,8 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware) {
         $middleware->prepend(\Illuminate\Http\Middleware\HandleCors::class);
 
-        // Handle workspace param BEFORE tenant middleware
-        $middleware->prepend(\App\Http\Middleware\HandleWorkspaceParam::class);
-
         $middleware->web(append: [
+            \App\Http\Middleware\HandleWorkspaceParam::class,
             \Spatie\Multitenancy\Http\Middleware\NeedsTenant::class,
             \App\Http\Middleware\SetLocale::class,
             \App\Http\Middleware\DebugModeMiddleware::class,
@@ -53,6 +51,16 @@ return Application::configure(basePath: dirname(__DIR__))
         $exceptions->render(function (\Spatie\Multitenancy\Exceptions\NoCurrentTenant $e, Illuminate\Http\Request $request) {
             if ($request->expectsJson() || $request->is('api/*')) {
                 return response()->json(['message' => 'Workspace not found or no tenant specified.'], 404);
+            }
+            // Check if tenant ID is in session (user logged in via workspace)
+            $tenantId = $request->session()->get('tenant_id');
+            if ($tenantId) {
+                $tenant = \App\Models\Tenant::find($tenantId);
+                if ($tenant) {
+                    $tenant->makeCurrent();
+                    // Re-attempt the request
+                    return redirect($request->getRequestUri());
+                }
             }
             // Check if there's a workspace param we can use
             $workspace = $request->query('workspace');

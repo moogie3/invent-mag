@@ -35,18 +35,26 @@ class LoginController extends Controller
         }
 
         $tenantDomain = $user->tenant->domain;
-
-        // If the user is not on their correct tenant domain, redirect them
-        if ($tenantDomain !== $request->getHost()) {
+        $requestHost = $request->getHost();
+        
+        // Check if user is on correct domain (subdomain) OR if we're on main domain with workspace
+        $isCorrectDomain = $tenantDomain === $requestHost;
+        $isMainDomainWithWorkspace = $request->query('workspace') !== null;
+        
+        // If not on correct domain and not using workspace param, redirect to subdomain
+        if (!$isCorrectDomain && !$isMainDomainWithWorkspace) {
             // Reconstruct the URL with the correct domain and path
-            $redirectUrl = "http://{$tenantDomain}" . $request->getRequestUri();
+            $redirectUrl = "https://{$tenantDomain}" . $request->getRequestUri();
             
             return redirect()->away($redirectUrl)->withInput($request->only('email'));
         }
 
-        // If the user is on the correct domain, attempt to log them in
+        // If the user is on the correct domain (or using workspace), attempt to log them in
         if (Auth::attempt($request->only('email', 'password'), $request->boolean('remember'))) {
             $request->session()->regenerate();
+            
+            // Store tenant ID in session for workspace-based routing
+            $request->session()->put('tenant_id', $user->tenant_id);
 
             return redirect()->intended(config('fortify.home'));
         }

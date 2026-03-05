@@ -23,6 +23,12 @@ class HandleWorkspaceParam
             $tenant = Tenant::find($tenantId);
             if ($tenant) {
                 $tenant->makeCurrent();
+                
+                // If logged in and hitting root, redirect to dashboard
+                if ($request->path() === '/' && \Illuminate\Support\Facades\Auth::check()) {
+                    return redirect('/admin/dashboard');
+                }
+                
                 return $next($request);
             }
         }

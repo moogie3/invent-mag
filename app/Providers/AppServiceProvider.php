@@ -29,23 +29,16 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         VerifyEmail::createUrlUsing(function ($notifiable) {
-            // // NOTE: Get the frontend URL from config (e.g. your Vercel domain)
-            // If not set, it defaults to the tenant domain
-            $frontendUrl = config('app.frontend_url');
+            // Get the root application URL (main domain)
+            $appUrl = config('app.url', 'https://invent-mag.up.railway.app');
             
-            if ($frontendUrl) {
-                // If a central frontend exists, we use it
-                $rootUrl = $frontendUrl;
-            } else {
-                // Otherwise fallback to tenant-specific domain
-                $tenantDomain = $notifiable->tenant->domain;
-                $isSecure = $this->app->environment('production');
-                $schema = $isSecure ? 'https' : 'http';
-                $rootUrl = "{$schema}://{$tenantDomain}";
-            }
+            // Extract the workspace slug from the tenant's domain
+            // e.g., "my-shop.invent-mag.up.railway.app" -> "my-shop"
+            $tenantDomain = $notifiable->tenant->domain;
+            $workspaceSlug = explode('.', $tenantDomain)[0];
 
-            // Temporarily force the root URL for signing the route
-            URL::forceRootUrl($rootUrl);
+            // Use the main app URL as the base for the signed route
+            URL::forceRootUrl($appUrl);
 
             $url = URL::temporarySignedRoute(
                 'verification.verify',
@@ -53,6 +46,7 @@ class AppServiceProvider extends ServiceProvider
                 [
                     'id' => $notifiable->getKey(),
                     'hash' => sha1($notifiable->getEmailForVerification()),
+                    'workspace' => $workspaceSlug, // Add the workspace parameter to the verification link
                 ]
             );
 
@@ -60,6 +54,15 @@ class AppServiceProvider extends ServiceProvider
             URL::forceRootUrl(null);
 
             return $url;
+        });
+
+        // Custom Reset Password URL to include workspace
+        \Illuminate\Auth\Notifications\ResetPassword::createUrlUsing(function ($user, string $token) {
+            $appUrl = config('app.url', 'https://invent-mag.up.railway.app');
+            $tenantDomain = $user->tenant->domain;
+            $workspaceSlug = explode('.', $tenantDomain)[0];
+
+            return "{$appUrl}/admin/reset-password/{$token}?email={$user->email}&workspace={$workspaceSlug}";
         });
 
         // // NOTE: Pass the user object to the custom email notification view

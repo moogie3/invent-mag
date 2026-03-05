@@ -38,6 +38,7 @@ class RegisteredUserController extends Controller
 
         // Load fresh tenant with plan relationship
         $tenant = $user->tenant->load('plan');
+        $workspaceSlug = explode('.', $tenant->domain)[0];
 
         return response()->json([
             'message' => 'Registration successful',
@@ -45,6 +46,7 @@ class RegisteredUserController extends Controller
             'access_token' => $token,
             'token_type' => 'Bearer',
             'tenant_domain' => $tenant->domain,
+            'workspace_slug' => $workspaceSlug,
             'plan' => [
                 'name' => $tenant->plan?->name,
                 'slug' => $tenant->plan?->slug,

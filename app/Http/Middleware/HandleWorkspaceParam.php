@@ -23,9 +23,15 @@ class HandleWorkspaceParam
                           ->orWhere('name', 'like', '%' . str_replace('-', ' ', $workspace) . '%')
                           ->first();
             
-            if ($tenant && $tenant->domain) {
-                // Redirect to tenant's specific domain login
-                return redirect()->away('https://' . $tenant->domain . '/admin/login');
+            if ($tenant) {
+                // Make this tenant current - this allows the tenant's routes to work
+                // without needing subdomain SSL
+                $tenant->makeCurrent();
+                
+                // Update request to go to /admin/login for this tenant
+                $request->merge([]); // Clear workspace from query
+                $request->server->set('REQUEST_URI', '/admin/login');
+                $request->server->set('PATH_INFO', '/admin/login');
             }
         }
         

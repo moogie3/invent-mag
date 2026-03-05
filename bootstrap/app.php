@@ -54,7 +54,20 @@ return Application::configure(basePath: dirname(__DIR__))
             if ($request->expectsJson() || $request->is('api/*')) {
                 return response()->json(['message' => 'Workspace not found or no tenant specified.'], 404);
             }
-            $frontendUrl = config('app.frontend_url', 'http://localhost:4321');
+            // Check if there's a workspace param we can use
+            $workspace = $request->query('workspace');
+            if ($workspace) {
+                // Try to find tenant and redirect to workspace URL
+                $tenant = \App\Models\Tenant::where('domain', 'like', $workspace . '.%')
+                              ->orWhere('name', 'like', '%' . str_replace('-', ' ', $workspace) . '%')
+                              ->first();
+                if ($tenant) {
+                    $workspaceSlug = explode('.', $tenant->domain)[0];
+                    $mainDomain = config('app.url', 'https://invent-mag.up.railway.app');
+                    return redirect()->away($mainDomain . '/?workspace=' . $workspaceSlug);
+                }
+            }
+            $frontendUrl = config('app.frontend_url', 'https://invent-mag-fe.vercel.app');
             return redirect()->away($frontendUrl . '/login');
         });
     })->create();

@@ -35,8 +35,11 @@ class TenantLookupController extends Controller
         }
 
         if ($tenant && $tenant->domain) {
+            // Return workspace slug instead of full domain (subdomains don't have SSL)
+            $workspaceSlug = explode('.', $tenant->domain)[0];
             return response()->json([
                 'tenant_domain' => $tenant->domain,
+                'workspace_slug' => $workspaceSlug,
             ]);
         }
 

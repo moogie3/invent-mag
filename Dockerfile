@@ -64,8 +64,9 @@ COPY docker/nginx.conf /etc/nginx/sites-available/default
 COPY docker/start.sh /usr/local/bin/start.sh
 RUN chmod +x /usr/local/bin/start.sh
 
-# Set permissions
-RUN chown -R www-data:www-data /var/www \
+# Set permissions - create storage directories if they don't exist
+RUN mkdir -p /var/www/storage/logs /var/www/storage/framework/cache /var/www/storage/framework/sessions /var/www/storage/framework/views /var/www/storage/app/public \
+    && chown -R www-data:www-data /var/www \
     && chmod -R 775 /var/www/storage /var/www/bootstrap/cache
 
 # // NOTE: Railway handles port mapping, exposing 80 is standard for the container

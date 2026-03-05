@@ -28,6 +28,11 @@ php artisan migrate --force
 # // NOTE: Ensure storage link exists for public access to uploaded files
 php artisan storage:link --force
 
+# // NOTE: Ensure log file exists and has correct permissions
+touch /var/www/storage/logs/laravel.log
+chown www-data:www-data /var/www/storage/logs/laravel.log
+chmod 664 /var/www/storage/logs/laravel.log
+
 # // NOTE: Clear and cache configuration to optimize performance
 php artisan config:cache
 php artisan route:cache

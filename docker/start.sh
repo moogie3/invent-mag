@@ -33,6 +33,11 @@ touch /var/www/storage/logs/laravel.log
 chown www-data:www-data /var/www/storage/logs/laravel.log
 chmod 664 /var/www/storage/logs/laravel.log
 
+# // NOTE: Create cache directories for rate limiter
+mkdir -p /var/www/storage/framework/cache/data
+chown -R www-data:www-data /var/www/storage/framework/cache
+chmod -R 775 /var/www/storage/framework/cache
+
 # // NOTE: Clear and cache configuration to optimize performance
 php artisan config:cache
 php artisan route:cache

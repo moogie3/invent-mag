@@ -19,7 +19,20 @@ class TenantLookupController extends Controller
             'shopname' => 'required|string|max:255',
         ]);
 
-        $tenant = Tenant::where('name', $request->shopname)->first();
+        $shopname = $request->shopname;
+        
+        // First try exact name match
+        $tenant = Tenant::where('name', $shopname)->first();
+        
+        // If not found, try matching by domain prefix (e.g., "demo-starter" matches "demo-starter.invent-mag.up.railway.app")
+        if (!$tenant) {
+            $tenant = Tenant::where('domain', 'like', $shopname . '.%')->first();
+        }
+        
+        // If still not found, try matching by name containing the shopname (case insensitive)
+        if (!$tenant) {
+            $tenant = Tenant::where('name', 'ilike', '%' . $shopname . '%')->first();
+        }
 
         if ($tenant && $tenant->domain) {
             return response()->json([

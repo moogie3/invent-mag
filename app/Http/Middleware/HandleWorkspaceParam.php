@@ -45,14 +45,4 @@ class HandleWorkspaceParam
         
         return $next($request);
     }
-                
-                // If accessing root with workspace, redirect to admin login
-                if ($request->path() === '/') {
-                    return redirect('/admin/login?workspace=' . $workspace);
-                }
-            }
-        }
-        
-        return $next($request);
-    }
 }

@@ -17,7 +17,8 @@ class WorkspaceTenantFinder extends TenantFinder
         // 1. Check for workspace query parameter (priority)
         $workspace = $request->query('workspace');
         if ($workspace) {
-            $tenant = app(IsTenant::class)::where('domain', 'like', strtolower($workspace) . '.%')
+            $tenantModel = config('multitenancy.tenant_model');
+            $tenant = $tenantModel::where('domain', 'like', strtolower($workspace) . '.%')
                         ->orWhere('name', 'like', '%' . str_replace('-', ' ', $workspace) . '%')
                         ->first();
             
@@ -30,12 +31,14 @@ class WorkspaceTenantFinder extends TenantFinder
         if ($request->hasSession()) {
             $tenantId = $request->session()->get('tenant_id');
             if ($tenantId) {
-                return app(IsTenant::class)::find($tenantId);
+                $tenantModel = config('multitenancy.tenant_model');
+                return $tenantModel::find($tenantId);
             }
         }
 
         // 3. Fallback to domain (subdomains)
         $host = $request->getHost();
-        return app(IsTenant::class)::whereDomain($host)->first();
+        $tenantModel = config('multitenancy.tenant_model');
+        return $tenantModel::whereDomain($host)->first();
     }
 }

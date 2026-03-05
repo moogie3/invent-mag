@@ -35,27 +35,18 @@ class LoginController extends Controller
         }
 
         $tenantDomain = $user->tenant->domain;
-        $requestHost = $request->getHost();
-        $appDomain = config('app.domain', 'invent-mag.up.railway.app');
-        
-        // Check if user is on correct domain (subdomain) 
-        // OR if we're on the main app domain (which we allow for SSL reasons)
-        $isCorrectDomain = ($tenantDomain === $requestHost);
-        $isMainDomain = ($requestHost === $appDomain);
-        
-        // If not on tenant domain AND not on the main domain, redirect to subdomain
-        if (!$isCorrectDomain && !$isMainDomain) {
+
+        // If the user is not on their correct tenant domain, redirect them
+        if ($tenantDomain !== $request->getHost()) {
+            // Reconstruct the URL with the correct domain and path
             $redirectUrl = "https://{$tenantDomain}" . $request->getRequestUri();
             
             return redirect()->away($redirectUrl)->withInput($request->only('email'));
         }
 
-        // If the user is on a valid domain, attempt to log them in
+        // If the user is on the correct domain, attempt to log them in
         if (Auth::attempt($request->only('email', 'password'), $request->boolean('remember'))) {
             $request->session()->regenerate();
-            
-            // Store tenant ID in session for workspace-based routing
-            $request->session()->put('tenant_id', $user->tenant_id);
 
             return redirect()->intended(config('fortify.home'));
         }

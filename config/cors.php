@@ -28,6 +28,7 @@ return [
         '/^https:\/\/.*\.railway\.app$/',
         '/^https:\/\/.*\.invent-mag\.web\.id$/',
         '/^https:\/\/invent-mag\.web\.id$/',
+        '/^https:\/\/.*\.nip\.io:[0-9]+$/', // Keep support for local/nip.io testing
     ],
 
     'allowed_headers' => [

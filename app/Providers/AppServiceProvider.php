@@ -29,16 +29,10 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         VerifyEmail::createUrlUsing(function ($notifiable) {
-            // Get the root application URL (main domain)
-            $appUrl = config('app.url', 'https://invent-mag.up.railway.app');
-            
-            // Extract the workspace slug from the tenant's domain
-            // e.g., "my-shop.invent-mag.up.railway.app" -> "my-shop"
             $tenantDomain = $notifiable->tenant->domain;
-            $workspaceSlug = explode('.', $tenantDomain)[0];
-
-            // Use the main app URL as the base for the signed route
-            URL::forceRootUrl($appUrl);
+            
+            // Temporarily force the root URL to the tenant subdomain for signing
+            URL::forceRootUrl("https://{$tenantDomain}");
 
             $url = URL::temporarySignedRoute(
                 'verification.verify',
@@ -46,7 +40,6 @@ class AppServiceProvider extends ServiceProvider
                 [
                     'id' => $notifiable->getKey(),
                     'hash' => sha1($notifiable->getEmailForVerification()),
-                    'workspace' => $workspaceSlug, // Add the workspace parameter to the verification link
                 ]
             );
 
@@ -56,13 +49,9 @@ class AppServiceProvider extends ServiceProvider
             return $url;
         });
 
-        // Custom Reset Password URL to include workspace
+        // Custom Reset Password URL using tenant subdomain
         \Illuminate\Auth\Notifications\ResetPassword::createUrlUsing(function ($user, string $token) {
-            $appUrl = config('app.url', 'https://invent-mag.up.railway.app');
-            $tenantDomain = $user->tenant->domain;
-            $workspaceSlug = explode('.', $tenantDomain)[0];
-
-            return "{$appUrl}/admin/reset-password/{$token}?email={$user->email}&workspace={$workspaceSlug}";
+            return "https://{$user->tenant->domain}/admin/reset-password/{$token}?email={$user->email}";
         });
 
         // // NOTE: Pass the user object to the custom email notification view

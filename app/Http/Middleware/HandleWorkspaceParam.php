@@ -18,7 +18,7 @@ class HandleWorkspaceParam
     {
         $workspace = $request->query('workspace');
         
-        // 1. Identify by Query Parameter
+        // 1. Priority: Identify by Query Parameter (URL always wins)
         if ($workspace) {
             $tenant = Tenant::where('domain', 'like', strtolower($workspace) . '.%')
                           ->orWhere('name', 'like', '%' . str_replace('-', ' ', $workspace) . '%')
@@ -35,7 +35,17 @@ class HandleWorkspaceParam
                 }
             }
         } 
-        // 2. Identify by Session (for dashboard and other routes)
+        // 2. Secondary: Identify by Authenticated User (The ultimate safety net)
+        else if (auth()->check() && auth()->user()->tenant_id) {
+            $tenant = Tenant::find(auth()->user()->tenant_id);
+            if ($tenant) {
+                $tenant->makeCurrent();
+                if ($request->hasSession()) {
+                    $request->session()->put('tenant_id', $tenant->id);
+                }
+            }
+        }
+        // 3. Fallback: Identify by Session
         else if ($request->hasSession() && $tenantId = $request->session()->get('tenant_id')) {
             $tenant = Tenant::find($tenantId);
             if ($tenant) {

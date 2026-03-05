@@ -77,13 +77,15 @@ class FortifyServiceProvider extends ServiceProvider
             $email = Str::lower($request->input('email', ''));
             $ip = $request->ip() ?? 'unknown';
             $throttleKey = "login|{$email}|{$ip}";
+            $ipKey = "login_ip|{$ip}";
 
             // Store the attempted email in session for back button protection
             $request->session()->put('attempted_email', $email);
 
             // Manually handle the rate limiting directly.
-            if (RateLimiter::tooManyAttempts($throttleKey, 5)) {
-                $seconds = RateLimiter::availableIn($throttleKey);
+            if (RateLimiter::tooManyAttempts($throttleKey, 5) || RateLimiter::tooManyAttempts($ipKey, 10)) {
+                $key = RateLimiter::tooManyAttempts($throttleKey, 5) ? $throttleKey : $ipKey;
+                $seconds = RateLimiter::availableIn($key);
                 \Illuminate\Support\Facades\Log::warning("Rate limit hit for {$email} at {$ip}");
                 // Abort directly with the 429 error page. This stops everything.
                 abort(response()->view('errors.429', ['seconds' => $seconds], 429));
@@ -96,11 +98,13 @@ class FortifyServiceProvider extends ServiceProvider
             if (! $user || ! Hash::check($request->password, $user->password)) {
                 \Illuminate\Support\Facades\Log::info("Failed login attempt for {$email} at {$ip}");
                 RateLimiter::hit($throttleKey, 60);
+                RateLimiter::hit($ipKey, 60);
                 throw ValidationException::withMessages(['email' => [__('auth.failed')]]);
             }
 
             // If we get here, the user exists IN THIS TENANT and password is correct.
             RateLimiter::clear($throttleKey);
+            RateLimiter::clear($ipKey);
             return $user;
         });
 

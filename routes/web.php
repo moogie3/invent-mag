@@ -18,14 +18,22 @@ Route::middleware('web')->prefix('admin')->group(function () {
         // Login
         Route::get('/login', function (Request $request) {
             $email = $request->session()->get('attempted_email');
+            $ip = $request->ip() ?? 'unknown';
 
+            // 1. Check by Email if session has it
             if ($email) {
-                $throttleKey = Str::lower($email) . '|' . $request->ip();
-
+                $throttleKey = "login|" . Str::lower($email) . "|" . $ip;
                 if (RateLimiter::tooManyAttempts($throttleKey, 5)) {
                     $seconds = RateLimiter::availableIn($throttleKey);
                     return response()->view('errors.429', ['seconds' => $seconds], 429);
                 }
+            }
+
+            // 2. Secondary check by IP only to prevent "New Tab" bypass
+            $ipKey = "login_ip|" . $ip;
+            if (RateLimiter::tooManyAttempts($ipKey, 10)) {
+                $seconds = RateLimiter::availableIn($ipKey);
+                return response()->view('errors.429', ['seconds' => $seconds], 429);
             }
 
             return view('admin.auth.login');

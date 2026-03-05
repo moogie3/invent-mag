@@ -41,6 +41,10 @@ RUN apt-get clean && rm -rf /var/lib/apt/lists/*
 RUN docker-php-ext-configure gd --with-freetype --with-jpeg --with-webp
 RUN docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd zip
 
+# Set PHP memory limit
+RUN echo "memory_limit=512M" > /usr/local/etc/php/conf.d/memory-limit.ini
+RUN echo "max_execution_time=300" >> /usr/local/etc/php/conf.d/memory-limit.ini
+
 # Get latest Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 

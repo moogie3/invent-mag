@@ -52,27 +52,42 @@ return Application::configure(basePath: dirname(__DIR__))
             if ($request->expectsJson() || $request->is('api/*')) {
                 return response()->json(['message' => 'Workspace not found or no tenant specified.'], 404);
             }
+            
             // Check if tenant ID is in session (user logged in via workspace)
-            $tenantId = $request->session()->get('tenant_id');
-            if ($tenantId) {
-                $tenant = \App\Models\Tenant::find($tenantId);
-                if ($tenant) {
-                    $tenant->makeCurrent();
-                    // Re-attempt the request
-                    return redirect($request->getRequestUri());
+            // Safety check: only access session if it exists
+            if ($request->hasSession()) {
+                $tenantId = $request->session()->get('tenant_id');
+                if ($tenantId) {
+                    $tenant = \App\Models\Tenant::find($tenantId);
+                    if ($tenant) {
+                        $tenant->makeCurrent();
+                        // Re-attempt the request
+                        return redirect($request->getRequestUri());
+                    }
                 }
             }
+            
             // Check if there's a workspace param we can use
             $workspace = $request->query('workspace');
-            if ($workspace) {
-                // Try to find tenant and redirect to workspace URL
-                $tenant = \App\Models\Tenant::where('domain', 'like', $workspace . '.%')
+            if ($workspace && $request->path() !== '/') {
+                // Try to find tenant
+                $tenant = \App\Models\Tenant::where('domain', 'like', strtolower($workspace) . '.%')
                               ->orWhere('name', 'like', '%' . str_replace('-', ' ', $workspace) . '%')
                               ->first();
+                
                 if ($tenant) {
+                    // Store in session to help the next request
+                    if ($request->hasSession()) {
+                        $request->session()->put('tenant_id', $tenant->id);
+                    }
+                    
                     $workspaceSlug = explode('.', $tenant->domain)[0];
                     $mainDomain = config('app.url', 'https://invent-mag.up.railway.app');
-                    return redirect()->away($mainDomain . '/?workspace=' . $workspaceSlug);
+                    
+                    // Only redirect if we're not already on the main domain with this workspace
+                    if ($request->fullUrl() !== $mainDomain . '/?workspace=' . $workspaceSlug) {
+                        return redirect()->away($mainDomain . '/?workspace=' . $workspaceSlug);
+                    }
                 }
             }
             $frontendUrl = config('app.frontend_url', 'https://invent-mag-fe.vercel.app');

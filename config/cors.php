@@ -19,7 +19,9 @@ return [
 
     'allowed_methods' => ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
 
-    'allowed_origins' => explode(',', env('CORS_ALLOWED_ORIGINS', 'http://localhost:4321')),
+    'allowed_origins' => array_map(function($item) {
+        return trim($item, " \t\n\r\0\x0B\"'");
+    }, explode(',', env('CORS_ALLOWED_ORIGINS', 'http://localhost:4321'))),
 
     'allowed_origins_patterns' => [
         '/^https:\/\/.*\.vercel\.app$/',

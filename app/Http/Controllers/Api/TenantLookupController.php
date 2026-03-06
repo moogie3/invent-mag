@@ -21,7 +21,7 @@ class TenantLookupController extends Controller
 
         $shopname = strtolower($request->shopname);
         
-        // First try matching by domain prefix (e.g., "demo-starter" matches "demo-starter.invent-mag.up.railway.app")
+        // First try matching by domain prefix (e.g., "demo-starter" matches "demo-starter.invent-mag.web.id")
         $tenant = Tenant::where('domain', 'like', $shopname . '.%')->first();
         
         // If not found, try matching by name (MySQL LIKE is case-insensitive)

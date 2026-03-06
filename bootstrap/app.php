@@ -54,7 +54,7 @@ return Application::configure(basePath: dirname(__DIR__))
             }
             
             // Redirect to frontend login - stop the local loop
-            $frontendUrl = config('app.frontend_url', 'https://invent-mag-fe.vercel.app');
+            $frontendUrl = config('app.frontend_url');
             return redirect()->away($frontendUrl . '/login');
         });
     })->create();

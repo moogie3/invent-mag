@@ -24,11 +24,10 @@ return [
     }, explode(',', env('CORS_ALLOWED_ORIGINS', 'http://localhost:4321'))),
 
     'allowed_origins_patterns' => [
-        '/^https:\/\/.*\.vercel\.app$/',
-        '/^https:\/\/.*\.railway\.app$/',
-        '/^https:\/\/.*\.invent-mag\.web\.id$/',
-        '/^https:\/\/invent-mag\.web\.id$/',
-        '/^https:\/\/.*\.nip\.io:[0-9]+$/', // Keep support for local/nip.io testing
+        '/^https:\/\/.*\.vercel\.app$/',           // Vercel preview deployments
+        '/^https:\/\/.*\.invent-mag\.web\.id$/',   // All *.invent-mag.web.id subdomains (tenant + API)
+        '/^https:\/\/invent-mag\.web\.id$/',        // Apex domain
+        '/^https?:\/\/.*\.nip\.io(:[0-9]+)?$/',    // Local nip.io testing
     ],
 
     'allowed_headers' => [

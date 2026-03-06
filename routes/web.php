@@ -734,6 +734,6 @@ Route::middleware('web')->prefix('admin')->group(function () {
 Route::get('/', function (\Illuminate\Http\Request $request) {
     // If workspace param exists, the HandleWorkspaceParam middleware will handle it
     // This route only handles requests without workspace
-    $frontendUrl = config('app.frontend_url', 'https://invent-mag-fe.vercel.app');
+    $frontendUrl = config('app.frontend_url');
     return redirect()->away($frontendUrl . '/login');
 });

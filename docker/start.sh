@@ -33,10 +33,16 @@ touch /var/www/storage/logs/laravel.log
 chown www-data:www-data /var/www/storage/logs/laravel.log
 chmod 664 /var/www/storage/logs/laravel.log
 
-# // NOTE: Create cache directories for rate limiter
+# // NOTE: Ensure storage directories have correct permissions
 mkdir -p /var/www/storage/framework/cache/data
-chown -R www-data:www-data /var/www/storage/framework/cache
-chmod -R 775 /var/www/storage/framework/cache
+mkdir -p /var/www/storage/framework/sessions
+mkdir -p /var/www/storage/framework/views
+mkdir -p /var/www/storage/logs
+mkdir -p /var/www/storage/app/public
+mkdir -p /var/www/bootstrap/cache
+
+chown -R www-data:www-data /var/www/storage /var/www/bootstrap/cache
+chmod -R 775 /var/www/storage /var/www/bootstrap/cache
 
 # // NOTE: Clear and cache configuration to optimize performance
 php artisan config:cache

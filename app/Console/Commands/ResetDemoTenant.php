@@ -3,6 +3,7 @@
 namespace App\Console\Commands;
 
 use App\Models\Tenant;
+use App\Models\User;
 use Database\Seeders\AccountSeeder;
 use Database\Seeders\CategorySeeder;
 use Database\Seeders\UnitSeeder;
@@ -42,7 +43,13 @@ class ResetDemoTenant extends Command
      *
      * @var string
      */
-    protected $description = 'Resets demo tenant data while preserving all user accounts.';
+    protected $description = 'Resets demo tenant data while preserving demo user accounts.';
+
+    private array $demoUserEmails = [
+        'starter@demo.com',
+        'pro@demo.com',
+        'enterprise@demo.com',
+    ];
 
     /**
      * Execute the console command.
@@ -83,7 +90,7 @@ class ResetDemoTenant extends Command
             foreach ($tables as $tableRow) {
                 $tableName = array_values((array)$tableRow)[0];
                 
-                // Skip users table to preserve all user accounts (demo + registered)
+                // Skip users table - handled separately below
                 if ($tableName === 'users') {
                     continue;
                 }
@@ -94,6 +101,17 @@ class ResetDemoTenant extends Command
                         $this->info("  - Deleted {$deleted} records from {$tableName}");
                     }
                 }
+            }
+            
+            // Delete all users from demo tenant EXCEPT the demo users
+            $deletedUsers = User::where('tenant_id', $tenant->id)
+                ->whereNotIn('email', $this->demoUserEmails)
+                ->delete();
+            
+            if ($deletedUsers > 0) {
+                $this->info("  - Deleted {$deletedUsers} non-demo users");
+            } else {
+                $this->info("  - No non-demo users to delete");
             }
         }
         

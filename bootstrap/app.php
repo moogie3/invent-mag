@@ -27,6 +27,7 @@ return Application::configure(basePath: dirname(__DIR__))
             \App\Http\Middleware\SetLocale::class,
             \App\Http\Middleware\DebugModeMiddleware::class,
             \App\Http\Middleware\SecurityHeaders::class,
+            \App\Http\Middleware\SetSessionCookieName::class,
         ]);
 
         $middleware->api(append: [

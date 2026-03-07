@@ -5,15 +5,12 @@ namespace App\Http\Middleware;
 use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Spatie\Multitenancy\Traits\UsesTenantModel;
 
 class SetSessionCookieName
 {
-    use UsesTenantModel;
-
     public function handle(Request $request, Closure $next): Response
     {
-        $tenant = $this->getCurrentTenant();
+        $tenant = $this->getCurrentTenant($request);
 
         if ($tenant) {
             $domain = $this->extractDomainPart($tenant->domain);
@@ -34,19 +31,15 @@ class SetSessionCookieName
         return str_replace('.', '_', $domainWithoutTld);
     }
 
-    private function getCurrentTenant()
+    private function getCurrentTenant($request)
     {
-        if (method_exists(tenant(), 'get')) {
-            return tenant()->get();
-        }
+        $hostname = $request->getHost();
         
-        $tenantModel = config('multitenancy.tenant_model', 'App\Models\Tenant');
-        
-        if (class_exists($tenantModel)) {
-            $currentTenantId = tenant()->id ?? null;
+        if ($hostname && $hostname !== config('app.domain', 'localhost')) {
+            $tenantModel = config('multitenancy.tenant_model', 'App\Models\Tenant');
             
-            if ($currentTenantId) {
-                return (new $tenantModel())->find($currentTenantId);
+            if (class_exists($tenantModel)) {
+                return (new $tenantModel())->where('domain', $hostname)->first();
             }
         }
         

@@ -28,6 +28,7 @@ jobs:
       uses: ramsey/composer-install@v3
       with:
         dependency-versions: "locked"
+        composer-options: "--ignore-platform-reqs"
         # Omitting --no-dev so that testing tools are included
         
     - name: Generate Application Key

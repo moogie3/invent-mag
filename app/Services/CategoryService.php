@@ -24,7 +24,6 @@ class CategoryService
                 'max:255',
                 Rule::unique('categories', 'name')->where('tenant_id', auth()->user()->tenant_id),
             ],
-            // Add other validation rules here if needed
         ])->validate();
         
         $category = Categories::create($data);
@@ -34,6 +33,15 @@ class CategoryService
 
     public function updateCategory(Categories $category, array $data)
     {
+        Validator::make($data, [
+            'name' => [
+                'required',
+                'string',
+                'max:255',
+                Rule::unique('categories', 'name')->where('tenant_id', auth()->user()->tenant_id)->ignore($category->id),
+            ],
+        ])->validate();
+
         $category->update($data);
 
         return ['success' => true, 'message' => 'Category updated successfully.', 'category' => $category];

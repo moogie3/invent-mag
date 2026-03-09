@@ -15,7 +15,8 @@ class UnitService
 
     public function createUnit(array $data)
     {
-        if (Unit::whereRaw('LOWER(name) = ?', [strtolower($data['name'])])->first()) {
+        $tenantId = auth()->user()->tenant_id;
+        if (Unit::where('tenant_id', $tenantId)->whereRaw('LOWER(name) = ?', [strtolower($data['name'])])->first()) {
             return ['success' => false, 'message' => 'This unit already exists.'];
         }
         $unit = Unit::create($data);
@@ -25,6 +26,10 @@ class UnitService
 
     public function updateUnit(Unit $unit, array $data)
     {
+        $tenantId = auth()->user()->tenant_id;
+        if (Unit::where('tenant_id', $tenantId)->where('id', '!=', $unit->id)->whereRaw('LOWER(name) = ?', [strtolower($data['name'])])->first()) {
+            return ['success' => false, 'message' => 'This unit already exists.'];
+        }
         $unit->update($data);
 
         return ['success' => true, 'message' => 'Unit updated successfully.', 'unit' => $unit];

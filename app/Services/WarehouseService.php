@@ -23,7 +23,8 @@ class WarehouseService
 
     public function createWarehouse(array $data)
     {
-        if (Warehouse::whereRaw('LOWER(name) = ?', [strtolower($data['name'])])->exists()) {
+        $tenantId = auth()->user()->tenant_id;
+        if (Warehouse::where('tenant_id', $tenantId)->whereRaw('LOWER(name) = ?', [strtolower($data['name'])])->exists()) {
             return ['success' => false, 'message' => 'This warehouse already exists.'];
         }
 
@@ -49,6 +50,11 @@ class WarehouseService
 
     public function updateWarehouse(Warehouse $warehouse, array $data)
     {
+        $tenantId = auth()->user()->tenant_id;
+        if (Warehouse::where('tenant_id', $tenantId)->where('id', '!=', $warehouse->id)->whereRaw('LOWER(name) = ?', [strtolower($data['name'])])->exists()) {
+            return ['success' => false, 'message' => 'This warehouse already exists.'];
+        }
+
         if (isset($data['is_main']) && $data['is_main'] && Warehouse::hasMainWarehouse($warehouse->id)) {
             return ['success' => false, 'message' => 'There is already a main warehouse defined. Please unset the current main warehouse first.'];
         }

@@ -147,14 +147,17 @@ class AccountService
     protected function validateAccountData(array $data, ?int $ignoreId = null): void
     {
         $rules = [
-            'name' => 'required|string|max:255',
+            'name' => [
+                'required',
+                'string',
+                'max:255',
+                Rule::unique('accounts', 'name')->where('tenant_id', auth()->user()->tenant_id)->ignore($ignoreId)
+            ],
             'code' => [
                 'required',
                 'string',
                 'max:255',
-                Rule::unique('accounts', 'code')
-                    ->where('tenant_id', auth()->user()->tenant_id)
-                    ->ignore($ignoreId)
+                Rule::unique('accounts', 'code')->where('tenant_id', auth()->user()->tenant_id)->ignore($ignoreId)
             ],
             'type' => 'required|in:asset,liability,equity,revenue,expense',
             'parent_id' => 'nullable|exists:accounts,id',

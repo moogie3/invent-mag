@@ -29,7 +29,6 @@ class CustomerService
                 'max:255',
                 Rule::unique('customers', 'name')->where('tenant_id', auth()->user()->tenant_id),
             ],
-            // Add other validation rules here if needed
         ])->validate();
 
         if (isset($data['image'])) {
@@ -43,6 +42,15 @@ class CustomerService
 
     public function quickCreateCustomer(array $data)
     {
+        Validator::make($data, [
+            'name' => [
+                'required',
+                'string',
+                'max:255',
+                Rule::unique('customers', 'name')->where('tenant_id', auth()->user()->tenant_id),
+            ],
+        ])->validate();
+
         if (isset($data['image'])) {
             $data['image'] = $this->storeImage($data['image']);
         }
@@ -54,6 +62,15 @@ class CustomerService
 
     public function updateCustomer(Customer $customer, array $data)
     {
+        Validator::make($data, [
+            'name' => [
+                'required',
+                'string',
+                'max:255',
+                Rule::unique('customers', 'name')->where('tenant_id', auth()->user()->tenant_id)->ignore($customer->id),
+            ],
+        ])->validate();
+
         if (isset($data['image'])) {
             $oldImage = $customer->getRawOriginal('image');
             if ($oldImage) {

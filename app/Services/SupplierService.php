@@ -8,6 +8,8 @@ use Illuminate\Support\Str;
 use Illuminate\Http\UploadedFile;
 use Dompdf\Dompdf;
 use App\Helpers\CurrencyHelper;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\Rule;
 
 class SupplierService
 {
@@ -22,6 +24,21 @@ class SupplierService
 
     public function createSupplier(array $data)
     {
+        Validator::make($data, [
+            'name' => [
+                'required',
+                'string',
+                'max:255',
+                Rule::unique('suppliers', 'name')->where('tenant_id', auth()->user()->tenant_id),
+            ],
+            'code' => [
+                'required',
+                'string',
+                'max:255',
+                Rule::unique('suppliers', 'code')->where('tenant_id', auth()->user()->tenant_id),
+            ],
+        ])->validate();
+
         \Log::debug('createSupplier: Starting with data', $data);
         if (isset($data['image']) && $data['image'] instanceof UploadedFile) {
             $data['image'] = $this->storeImage($data['image']);
@@ -35,6 +52,21 @@ class SupplierService
 
     public function updateSupplier(Supplier $supplier, array $data)
     {
+        Validator::make($data, [
+            'name' => [
+                'required',
+                'string',
+                'max:255',
+                Rule::unique('suppliers', 'name')->where('tenant_id', auth()->user()->tenant_id)->ignore($supplier->id),
+            ],
+            'code' => [
+                'required',
+                'string',
+                'max:255',
+                Rule::unique('suppliers', 'code')->where('tenant_id', auth()->user()->tenant_id)->ignore($supplier->id),
+            ],
+        ])->validate();
+
         if (isset($data['image'])) {
             $oldImage = $supplier->getRawOriginal('image');
             if ($oldImage && !filter_var($oldImage, FILTER_VALIDATE_URL)) {

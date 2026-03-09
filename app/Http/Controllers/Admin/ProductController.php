@@ -96,8 +96,8 @@ class ProductController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'code' => 'required|string|max:100',
-            'name' => 'required|string|max:255',
+            'code' => ['required', 'string', 'max:100', \Illuminate\Validation\Rule::unique('products', 'code')->where('tenant_id', auth()->user()->tenant_id)],
+            'name' => ['required', 'string', 'max:255', \Illuminate\Validation\Rule::unique('products', 'name')->where('tenant_id', auth()->user()->tenant_id)],
             'stock_quantity' => 'nullable|integer|min:0', // Optional opening stock
             'low_stock_threshold' => 'nullable|integer|min:1',
             'price' => 'required|numeric|min:0',
@@ -138,8 +138,8 @@ class ProductController extends Controller
     public function quickCreate(Request $request)
     {
         $request->validate([
-            'code' => 'required|string',
-            'name' => 'required|string',
+            'code' => ['required', 'string', \Illuminate\Validation\Rule::unique('products', 'code')->where('tenant_id', auth()->user()->tenant_id)],
+            'name' => ['required', 'string', \Illuminate\Validation\Rule::unique('products', 'name')->where('tenant_id', auth()->user()->tenant_id)],
             'stock_quantity' => 'required|integer',
             'low_stock_threshold' => 'nullable|integer|min:1',
             'price' => 'required|numeric',
@@ -175,9 +175,9 @@ class ProductController extends Controller
         $product = Product::findOrFail($id);
 
         $request->validate([
-            'code' => 'required|string|max:100',
+            'code' => ['required', 'string', 'max:100', \Illuminate\Validation\Rule::unique('products', 'code')->where('tenant_id', auth()->user()->tenant_id)->ignore($product->id)],
             'barcode' => 'nullable|string|max:100|unique:products,barcode,' . $product->id,
-            'name' => 'required|string|max:255',
+            'name' => ['required', 'string', 'max:255', \Illuminate\Validation\Rule::unique('products', 'name')->where('tenant_id', auth()->user()->tenant_id)->ignore($product->id)],
             'low_stock_threshold' => 'nullable|integer|min:1',
             'price' => 'required|numeric|min:0',
             'selling_price' => 'required|numeric|min:0',

@@ -69,6 +69,7 @@ class SupplierServiceTest extends TestCase
         $supplier = Supplier::factory()->create();
         $data = [
             'name' => 'Updated Supplier',
+            'code' => $supplier->code,
             'email' => 'updated@example.com',
         ];
 
@@ -116,6 +117,7 @@ class SupplierServiceTest extends TestCase
         $supplier = Supplier::factory()->create();
         $data = [
             'name' => 'Updated Supplier with Image',
+            'code' => $supplier->code,
             'email' => 'updated-image@example.com',
             'image' => UploadedFile::fake()->image('new_supplier.jpg'),
         ];
@@ -139,6 +141,7 @@ class SupplierServiceTest extends TestCase
 
         $data = [
             'name' => 'Updated Supplier Name',
+            'code' => $supplier->code,
             'image' => UploadedFile::fake()->image('new.jpg'),
         ];
 

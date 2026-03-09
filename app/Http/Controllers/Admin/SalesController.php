@@ -83,7 +83,7 @@ class SalesController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'invoice' => 'nullable|string|unique:sales,invoice',
+            'invoice' => ['nullable', 'string', Rule::unique('sales', 'invoice')->where('tenant_id', auth()->user()->tenant_id)],
             'customer_id' => 'required|exists:customers,id',
             'warehouse_id' => 'required|exists:warehouses,id', // Added
             'order_date' => 'required|date',
@@ -109,7 +109,7 @@ class SalesController extends Controller
         $sale = Sales::findOrFail($id);
 
         $request->validate([
-            'invoice' => ['nullable', 'string', Rule::unique('sales', 'invoice')->ignore($sale->id)->where('tenant_id', $sale->tenant_id)],
+            'invoice' => ['nullable', 'string', Rule::unique('sales', 'invoice')->where('tenant_id', auth()->user()->tenant_id)->ignore($sale->id)],
             'customer_id' => 'required|exists:customers,id',
             'warehouse_id' => 'required|exists:warehouses,id', // Added
             'order_date' => 'required|date',

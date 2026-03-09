@@ -81,7 +81,7 @@ class PurchaseController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'invoice' => 'required|string|unique:po,invoice',
+            'invoice' => ['required', 'string', Rule::unique('po', 'invoice')->where('tenant_id', auth()->user()->tenant_id)],
             'supplier_id' => 'required|exists:suppliers,id',
             'warehouse_id' => 'required|exists:warehouses,id', // Added
             'order_date' => 'required|date',
@@ -107,7 +107,7 @@ class PurchaseController extends Controller
         $purchase = Purchase::findOrFail($id);
 
         $request->validate([
-            'invoice' => ['required', 'string', Rule::unique('po', 'invoice')->ignore($purchase->id)->where('tenant_id', $purchase->tenant_id)],
+            'invoice' => ['required', 'string', Rule::unique('po', 'invoice')->where('tenant_id', auth()->user()->tenant_id)->ignore($purchase->id)],
             'supplier_id' => 'required|exists:suppliers,id',
             'warehouse_id' => 'required|exists:warehouses,id', // Added
             'order_date' => 'required|date',

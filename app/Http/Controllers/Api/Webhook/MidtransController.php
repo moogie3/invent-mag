@@ -40,7 +40,7 @@ class MidtransController extends Controller
         }
 
         // Verify Signature Key
-        $serverKey = env('MIDTRANS_SERVER_KEY');
+        $serverKey = config('midtrans.server_key', env('MIDTRANS_SERVER_KEY'));
         $calculatedSignature = hash("sha512", $orderId . $statusCode . $grossAmount . $serverKey);
 
         if ($calculatedSignature !== $signatureKey) {
@@ -75,13 +75,16 @@ class MidtransController extends Controller
             $tenant = $order->tenant;
             $plan = $order->plan;
             
+            // Explicitly set tenant context for database operations
+            $tenant->makeCurrent();
+
             // Check if plan needs updating
             if ($tenant->plan_id !== $plan->id) {
                 $this->planService->assignPlanToTenant($tenant, $plan->slug, false);
                 
-                // Send invoice email to the user who owns the tenant
+                // Send invoice email to the first user (usually the owner/admin)
                 $order->refresh();
-                $recipientEmail = $tenant->users()->first()?->email;
+                $recipientEmail = \App\Models\User::first()?->email;
                 if ($recipientEmail) {
                     Mail::to($recipientEmail)->send(new SubscriptionInvoiceMail($order));
                     Log::info("Invoice email sent to {$recipientEmail} for order {$orderId}.");
@@ -91,6 +94,8 @@ class MidtransController extends Controller
             } else {
                 Log::info("Order {$orderId} marked as paid. Plan already assigned (processed via frontend).");
             }
+            
+            \Spatie\Multitenancy\Models\Tenant::forgetCurrent();
             
         } elseif ($transactionStatus == 'cancel' || $transactionStatus == 'deny' || $transactionStatus == 'expire') {
             $order->update([

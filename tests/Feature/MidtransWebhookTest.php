@@ -52,6 +52,8 @@ class MidtransWebhookTest extends TestCase
     public function test_webhook_rejects_order_not_found(): void
     {
         $serverKey = 'test_server_key';
+        config(['midtrans.server_key' => $serverKey]);
+        
         $orderId = 'INV-NONEXISTENT-001';
         $statusCode = '200';
         $grossAmount = '49000.00';
@@ -87,6 +89,7 @@ class MidtransWebhookTest extends TestCase
             'name' => 'Professional',
             'price' => 49000,
             'is_active' => true,
+            'features' => [],
         ]);
 
         // Create pending order
@@ -148,6 +151,7 @@ class MidtransWebhookTest extends TestCase
             'name' => 'Enterprise',
             'price' => 89000,
             'is_active' => true,
+            'features' => [],
         ]);
 
         // Create already paid order
@@ -200,6 +204,7 @@ class MidtransWebhookTest extends TestCase
             'name' => 'Professional',
             'price' => 49000,
             'is_active' => true,
+            'features' => [],
         ]);
 
         // Create pending order

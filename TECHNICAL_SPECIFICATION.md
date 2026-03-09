@@ -1,8 +1,8 @@
 # Invent-MAG: Technical Specification Document
 
-**Document Version:** 1.2  
+**Document Version:** 1.3  
 **Last Updated:** March 2026  
-**System Version:** 1.2
+**System Version:** 1.3
 
 ---
 
@@ -64,7 +64,7 @@ Invent-MAG is a production-ready, enterprise-grade ERP system built on Laravel 1
 
 **Architecture:** Spatie Laravel Multitenancy  
 **Isolation Level:** Row-level isolation (tenant_id column)  
-**Tenant Resolution:** Domain-based automatic detection
+**Tenant Resolution:** Domain-based automatic detection (Subdomain Architecture)
 
 ```php
 // Tenant isolation via BelongsToTenant trait
@@ -81,6 +81,7 @@ class Product extends Model
 - Single codebase serving multiple organizations
 - Automatic query scoping
 - Tenant-aware queues and jobs
+- **Session Isolation:** Using subdomains (`tenant.invent-mag.web.id`) allows users to be logged into multiple different workspaces simultaneously in different browser tabs without session conflicts.
 
 ---
 
@@ -135,11 +136,19 @@ config/plans.php                                  # Plan configuration
 #### Deployment Architecture
 
 ```
-Internet → [Railway Load Balancer] → [Nginx (Container Port 80)]
-                                            ↓ (FastCGI)
-                                       [PHP-FPM (Port 9000)]
-                                            ↓
-                                       [Laravel Core]
+Internet → [DNS: invent-mag.web.id]
+               │
+               ├─→ [Vercel] → Frontend Landing Page & Signup
+               │
+               └─→ [Railway] → *.invent-mag.web.id (Subdomain Tenants)
+                         ↓
+                    [Load Balancer]
+                         ↓
+                    [Nginx (Container Port 80)]
+                         ↓ (FastCGI)
+                    [PHP-FPM (Port 9000)]
+                         ↓
+                    [Laravel Core]
 ```
 
 #### Key Infrastructure Components
@@ -148,6 +157,8 @@ Internet → [Railway Load Balancer] → [Nginx (Container Port 80)]
 - **Application Server:** PHP-FPM 8.2
 - **Database:** MySQL 8.0+
 - **Frontend Hosting:** Vercel (Marketing site & Auth landing)
+- **Domain DNS:** Domainesia with Wildcard (`*.invent-mag.web.id`) for automatic SSL on tenant subdomains.
+- **Email Service:** Resend PHP SDK (API-based, bypassing SMTP port restrictions)
 - **Storage:** local disk or AWS S3 (configured via filesystems.php)
 - **PHP Extensions:** GD (with FreeType/WebP/JPEG support), BCMath, PCNTL, PDO MySQL, Zip, Exif, Mbstring
 
@@ -165,9 +176,9 @@ Internet → [Railway Load Balancer] → [Nginx (Container Port 80)]
 
 | Category          | Count | Coverage                        |
 | ----------------- | ----- | ------------------------------- |
-| **Feature Tests** | 25+   | Controllers, Routes, End-to-end |
-| **Unit Tests**    | 35+   | Services, Helpers, DTOs         |
-| **Total Tests**   | 236   | Comprehensive coverage          |
+| **Feature Tests** | 40+   | Controllers, Routes, End-to-end |
+| **Unit Tests**    | 40+   | Services, Helpers, DTOs         |
+| **Total Tests**   | 776   | Comprehensive coverage (2600+ assertions) |
 
 ### 2.2 Test Structure
 
@@ -652,6 +663,7 @@ class SalesForecastService
 
 | Version | Date | Changes |
 |---------|------|---------|
+| 1.3 | March 2026 | Full Production Architecture: Subdomain isolation (`*.invent-mag.web.id`), Resend API Email Integration, Advanced Rate Limiting, Midtrans Tenant-Aware Webhooks, CI/CD fixes. |
 | 1.2 | March 2026 | Implemented subscription & payment system with Midtrans, tiered plans (Starter/Professional/Enterprise), feature gating, usage limits, plan badges in sidebar, invoice emails |
 | 1.1 | February 2026 | Dark theme improvements, notification system enhancements |
 | 1.0 | January 2026 | Initial release with full ERP features |
@@ -727,6 +739,7 @@ Common extension points:
 | ------- | -------- | -------------------------------------------------------------------- |
 | 1.0 | Feb 2026 | Initial technical specification |
 | 1.1 | Feb 2026 | Added comprehensive test coverage stats and documented returns fixes |
+| 1.3 | Mar 2026 | Full Production Architecture: Subdomain isolation (`*.invent-mag.web.id`), Resend API Email Integration, Advanced Rate Limiting, Midtrans Tenant-Aware Webhooks, CI/CD fixes. |
 | 1.2 | Mar 2026 | Documented Subscription system, Midtrans integration, and Railway deployment architecture |
 
 ---

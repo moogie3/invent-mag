@@ -1,9 +1,9 @@
 # Invent-MAG: Enterprise Inventory & Accounting System
 
-**Version:** 1.2  
+**Version:** 1.3  
 **Author:** moogie3  
 **License:** MIT  
-**Development Time:** 1.5 years (371+ commits)  
+**Development Time:** 1.5+ years (400+ commits)  
 **Status:** Production-Ready
 
 ---
@@ -13,12 +13,12 @@
 | Metric               | Value                                    |
 | -------------------- | ---------------------------------------- |
 | **🏗️ Architecture**  | Multi-tenant SaaS                        |
-| **🧪 Test Coverage** | 236 test files (68 PHP + 168 JS)       |
+| **🧪 Test Coverage** | 776 total tests (2600+ assertions)       |
 | **💻 Codebase**      | 371+ commits, 1.5 years development      |
 | **🔐 Security**      | RBAC with 79 permissions, audit logging  |
 | **🐳 DevOps**        | Docker + GitHub Actions CI/CD            |
 | **📡 API**           | RESTful API with Sanctum authentication  |
-| **🌍 Multi-tenancy** | Database-level tenant isolation          |
+| **🌍 Multi-tenancy** | Subdomain-based SaaS (`*.invent-mag.web.id`) |
 
 ---
 
@@ -36,10 +36,10 @@ Unlike basic inventory systems, Invent-MAG provides **sophisticated business int
 
 Experience Invent-MAG firsthand:
 
-- **URL:** `https://invent-mag.com`
-- **Super User Login:** `superuser@example.com` / `password`
-- **POS Login:** `pos@example.com` / `password`
-- **Staff Login:** `staff@example.com` / `password`
+- **URL:** `https://invent-mag.web.id`
+- **Demo Starter:** `https://demo-starter.invent-mag.web.id/admin/login` (starter@demo.com / password)
+- **Demo Pro:** `https://demo-pro.invent-mag.web.id/admin/login` (pro@demo.com / password)
+- **Super User:** `superuser@example.com` / `password` (Depends on tenant context)
 
 ---
 

@@ -1,7 +1,7 @@
 # Invent-MAG: Complete Feature Checklist
 
 **Last Updated:** March 2026  
-**Version:** 1.2
+**Version:** 1.3
 
 ---
 
@@ -11,7 +11,9 @@
 
 - [x] Multi-tenant SaaS architecture
 - [x] Database-level tenant isolation
-- [x] Domain-based tenant resolution
+- [x] Subdomain-based tenant resolution (`*.invent-mag.web.id`)
+- [x] Centralized API architecture (`api.invent-mag.web.id`)
+- [x] Resend API Email integration
 - [x] User authentication (Laravel Fortify)
 - [x] Email verification required
 - [x] Role-based access control (79 permissions, 3 roles)

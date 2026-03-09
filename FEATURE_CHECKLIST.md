@@ -1,7 +1,7 @@
 # Invent-MAG: Complete Feature Checklist
 
 **Last Updated:** March 2026  
-**Version:** 1.3
+**Version:** 1.2
 
 ---
 

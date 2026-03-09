@@ -1,8 +1,8 @@
 # Invent-MAG: Technical Specification Document
 
-**Document Version:** 1.3  
+**Document Version:** 1.2  
 **Last Updated:** March 2026  
-**System Version:** 1.3
+**System Version:** 1.2
 
 ---
 
@@ -93,11 +93,11 @@ class Product extends Model
 
 #### Subscription Tiers
 
-| Tier | Users | Warehouses | Products | Features |
-|------|-------|------------|----------|----------|
-| Starter | 3 | 2 | 50 | Basic |
-| Professional | 10 | 5 | 500 | Advanced + CRM |
-| Enterprise | Unlimited | Unlimited | Unlimited | Full + Forecasting |
+| Tier         | Users     | Warehouses | Products  | Features           |
+| ------------ | --------- | ---------- | --------- | ------------------ |
+| Starter      | 3         | 2          | 50        | Basic              |
+| Professional | 10        | 5          | 500       | Advanced + CRM     |
+| Enterprise   | Unlimited | Unlimited  | Unlimited | Full + Forecasting |
 
 #### Payment Flow
 
@@ -142,7 +142,7 @@ Internet → [DNS: invent-mag.web.id]
                │
                └─→ [Railway] → *.invent-mag.web.id (Subdomain Tenants)
                          ↓
-                    [Load Balancer]
+                    [Railway Load Balancer]
                          ↓
                     [Nginx (Container Port 80)]
                          ↓ (FastCGI)
@@ -178,7 +178,7 @@ Internet → [DNS: invent-mag.web.id]
 | ----------------- | ----- | ------------------------------- |
 | **Feature Tests** | 40+   | Controllers, Routes, End-to-end |
 | **Unit Tests**    | 40+   | Services, Helpers, DTOs         |
-| **Total Tests**   | 776   | Comprehensive coverage (2600+ assertions) |
+| **Total Tests**   | 366   | test files                      |
 
 ### 2.2 Test Structure
 
@@ -601,14 +601,14 @@ class SalesForecastService
 
 ### 9.1 Current Integrations
 
-| System | Integration | Status |
+| System      | Integration    | Status                |
 | ----------- | -------------- | --------------------- |
-| **Payment** | Midtrans | ✅ Subscriptions |
-| **Email** | Laravel Mail | ✅ Notifications |
-| **PDF** | DomPDF | ✅ Invoice generation |
-| **Queue** | Database/Redis | ✅ Job processing |
-| **Cache** | File/Redis | ✅ Performance |
-| **Storage** | Local/S3 | ✅ File uploads |
+| **Payment** | Midtrans       | ✅ Subscriptions      |
+| **Email**   | Laravel Mail   | ✅ Notifications      |
+| **PDF**     | DomPDF         | ✅ Invoice generation |
+| **Queue**   | Database/Redis | ✅ Job processing     |
+| **Cache**   | File/Redis     | ✅ Performance        |
+| **Storage** | Local/S3       | ✅ File uploads       |
 
 ### 9.2 API-Ready Architecture
 
@@ -661,12 +661,12 @@ class SalesForecastService
 
 ## 11. Version History
 
-| Version | Date | Changes |
-|---------|------|---------|
-| 1.3 | March 2026 | Full Production Architecture: Subdomain isolation (`*.invent-mag.web.id`), Resend API Email Integration, Advanced Rate Limiting, Midtrans Tenant-Aware Webhooks, CI/CD fixes. |
-| 1.2 | March 2026 | Implemented subscription & payment system with Midtrans, tiered plans (Starter/Professional/Enterprise), feature gating, usage limits, plan badges in sidebar, invoice emails |
-| 1.1 | February 2026 | Dark theme improvements, notification system enhancements |
-| 1.0 | January 2026 | Initial release with full ERP features |
+| Version | Date          | Changes                                                                                                                                                                       |
+| ------- | ------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1.2     | March 2026    | Full Production Architecture: Subdomain isolation (`*.invent-mag.web.id`), Resend API Email Integration, Advanced Rate Limiting, Midtrans Tenant-Aware Webhooks, CI/CD fixes. |
+| 1.2     | March 2026    | Implemented subscription & payment system with Midtrans, tiered plans (Starter/Professional/Enterprise), feature gating, usage limits, plan badges in sidebar, invoice emails |
+| 1.2     | February 2026 | Dark theme improvements, notification system enhancements                                                                                                                     |
+| 1.2     | January 2026  | Initial release with full ERP features                                                                                                                                        |
 
 ---
 
@@ -695,28 +695,28 @@ Common extension points:
 
 ### Pre-deployment
 
-- [ ] Environment variables configured
-- [ ] Database credentials secured
-- [ ] APP_KEY generated
-- [ ] SSL certificate installed
-- [ ] Email SMTP configured
+- [✅] Environment variables configured
+- [✅] Database credentials secured
+- [✅] APP_KEY generated
+- [✅] SSL certificate installed
+- [✅] Email SMTP configured
 
 ### Deployment
 
-- [ ] Run migrations
-- [ ] Seed initial data
-- [ ] Build production assets
-- [ ] Configure queues
-- [ ] Set up backups
-- [ ] Configure monitoring
+- [✅] Run migrations
+- [✅] Seed initial data
+- [✅] Build production assets
+- [✅] Configure queues
+- [✅] Set up backups
+- [✅] Configure monitoring
 
 ### Post-deployment
 
-- [ ] Test all critical paths
-- [ ] Verify email delivery
-- [ ] Check error logging
-- [ ] Monitor performance
-- [ ] Set up alerts
+- [✅] Test all critical paths
+- [✅] Verify email delivery
+- [✅] Check error logging
+- [✅] Monitor performance
+- [✅] Set up alerts
 
 ---
 
@@ -735,12 +735,12 @@ Common extension points:
 
 ## Document History
 
-| Version | Date | Changes |
-| ------- | -------- | -------------------------------------------------------------------- |
-| 1.0 | Feb 2026 | Initial technical specification |
-| 1.1 | Feb 2026 | Added comprehensive test coverage stats and documented returns fixes |
-| 1.3 | Mar 2026 | Full Production Architecture: Subdomain isolation (`*.invent-mag.web.id`), Resend API Email Integration, Advanced Rate Limiting, Midtrans Tenant-Aware Webhooks, CI/CD fixes. |
-| 1.2 | Mar 2026 | Documented Subscription system, Midtrans integration, and Railway deployment architecture |
+| Version | Date     | Changes                                                                                                                                                                       |
+| ------- | -------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1.0     | Feb 2026 | Initial technical specification                                                                                                                                               |
+| 1.0     | Feb 2026 | Added comprehensive test coverage stats and documented returns fixes                                                                                                          |
+| 1.0     | Mar 2026 | Full Production Architecture: Subdomain isolation (`*.invent-mag.web.id`), Resend API Email Integration, Advanced Rate Limiting, Midtrans Tenant-Aware Webhooks, CI/CD fixes. |
+| 1.0     | Mar 2026 | Documented Subscription system, Midtrans integration, and Railway deployment architecture                                                                                     |
 
 ---
 

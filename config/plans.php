@@ -114,6 +114,9 @@ return [
         'purchase_returns' => [
             'admin.por.*',
         ],
+        'api_access' => [
+            'admin.setting.profile.token',
+        ],
     ],
 
     /*

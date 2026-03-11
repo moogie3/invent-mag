@@ -11,6 +11,7 @@
     "require": {
         "php": "^8.2",
         "dompdf/dompdf": "^3.1",
+        "hotwired-laravel/turbo-laravel": "^2.0",
         "knuckleswtf/scribe": "^5.8",
         "laravel/fortify": "^1.25",
         "laravel/framework": "^11.31",

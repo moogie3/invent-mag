@@ -28,6 +28,7 @@ return Application::configure(basePath: dirname(__DIR__))
             \App\Http\Middleware\DebugModeMiddleware::class,
             \App\Http\Middleware\SecurityHeaders::class,
             \App\Http\Middleware\SetSessionCookieName::class,
+            \HotwiredLaravel\TurboLaravel\Http\Middleware\TurboMiddleware::class,
         ]);
 
         $middleware->api(append: [

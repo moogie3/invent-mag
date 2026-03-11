@@ -598,7 +598,9 @@ Route::middleware('web')->prefix('admin')->group(function () {
                 Route::put('/update', [ProfileController::class, 'update'])->name('admin.setting.profile.update');
                 Route::put('/update-password', [ProfileController::class, 'updatePassword'])->name('admin.setting.profile.update-password');
                 Route::delete('/delete-avatar', [ProfileController::class, 'deleteAvatar'])->name('admin.setting.profile.delete-avatar');
-                Route::post('/token', [ProfileController::class, 'generateApiToken'])->name('admin.setting.profile.token');
+                Route::middleware('plan.feature:api_access')->group(function () {
+                    Route::post('/token', [ProfileController::class, 'generateApiToken'])->name('admin.setting.profile.token');
+                });
             });
 
             // Tax Settings
@@ -636,9 +638,11 @@ Route::middleware('web')->prefix('admin')->group(function () {
             Route::get('/', [SettingsController::class, 'index'])->name('admin.setting.index');
             Route::put('/', [SettingsController::class, 'update'])->name('admin.setting.update');
             Route::put('/update-theme-mode', [SettingsController::class, 'updateThemeMode'])->name('admin.setting.update-theme-mode');
-            Route::get('/accounting', [\App\Http\Controllers\Admin\AccountingController::class, 'accounting'])->name('admin.setting.accounting');
-            Route::post('/accounting', [\App\Http\Controllers\Admin\AccountingController::class, 'updateAccounting'])->name('admin.setting.accounting.update');
-            Route::post('/reset-coa-default', [\App\Http\Controllers\Admin\AccountingController::class, 'resetToDefault'])->name('admin.setting.reset-coa-default');
+            Route::middleware('plan.feature:accounting')->group(function () {
+                Route::get('/accounting', [\App\Http\Controllers\Admin\AccountingController::class, 'accounting'])->name('admin.setting.accounting');
+                Route::post('/accounting', [\App\Http\Controllers\Admin\AccountingController::class, 'updateAccounting'])->name('admin.setting.accounting.update');
+                Route::post('/reset-coa-default', [\App\Http\Controllers\Admin\AccountingController::class, 'resetToDefault'])->name('admin.setting.reset-coa-default');
+            });
 
             // Subscription Plan Settings
             Route::prefix('plan')->group(function () {

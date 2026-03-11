@@ -93,6 +93,8 @@
     @vite('resources/js/admin/layouts/theme-toggle.js')
     @vite('resources/js/admin/layouts/theme-visibility.js')
 
+    @turbo
+
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const showThemeToggle =

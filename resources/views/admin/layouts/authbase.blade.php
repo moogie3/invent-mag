@@ -41,6 +41,7 @@
     @include('admin.layouts.script')
     @vite('resources/js/admin/layouts/theme-visibility.js')
     @vite('resources/js/admin/layouts/theme-toggle.js')
+    @turbo
 </body>
 
 </html>

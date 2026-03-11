@@ -128,10 +128,14 @@ class Product extends Model
      */
     public static function getLowStockProducts()
     {
+        $tenantId = app('currentTenant')->id ?? null;
+        
         return \App\Models\ProductWarehouse::with(['product', 'warehouse'])
-            ->join('products', 'product_warehouse.product_id', '=', 'products.id')
-            ->whereRaw('product_warehouse.quantity <= COALESCE(products.low_stock_threshold, 10)')
-            ->select('product_warehouse.*')
+            ->where('product_warehouse.tenant_id', $tenantId)
+            ->whereHas('product', function ($query) use ($tenantId) {
+                $query->where('tenant_id', $tenantId)
+                    ->whereRaw('products.low_stock_threshold >= product_warehouse.quantity');
+            })
             ->get();
     }
 
@@ -142,8 +146,13 @@ class Product extends Model
      */
     public static function lowStockCount(): int
     {
-        return \App\Models\ProductWarehouse::join('products', 'product_warehouse.product_id', '=', 'products.id')
-            ->whereRaw('product_warehouse.quantity <= COALESCE(products.low_stock_threshold, 10)')
+        $tenantId = app('currentTenant')->id ?? null;
+        
+        return \App\Models\ProductWarehouse::where('product_warehouse.tenant_id', $tenantId)
+            ->whereHas('product', function ($query) use ($tenantId) {
+                $query->where('tenant_id', $tenantId)
+                    ->whereRaw('products.low_stock_threshold >= product_warehouse.quantity');
+            })
             ->count();
     }
 

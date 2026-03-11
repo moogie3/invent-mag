@@ -46,10 +46,13 @@ class DashboardService
         // $lowStockProducts = Product::getLowStockProducts(); // Old logic
         
         // Fetch low stock items per warehouse - optimized to filter in database
+        $tenantId = app('currentTenant')->id;
         $lowStockProducts = \App\Models\ProductWarehouse::with(['product', 'warehouse'])
-            ->join('products', 'product_warehouse.product_id', '=', 'products.id')
-            ->whereRaw('product_warehouse.quantity <= COALESCE(products.low_stock_threshold, 10)')
-            ->select('product_warehouse.*')
+            ->where('product_warehouse.tenant_id', $tenantId)
+            ->whereHas('product', function ($query) use ($tenantId) {
+                $query->where('tenant_id', $tenantId)
+                    ->whereRaw('products.low_stock_threshold >= product_warehouse.quantity');
+            })
             ->get();
 
         $expiringSoonItems = \App\Models\POItem::getExpiringSoonItems();

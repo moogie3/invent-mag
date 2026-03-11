@@ -109,10 +109,13 @@ class NotificationService
 
     protected function getLowStockNotifications(): Collection
     {
+        $tenantId = app('currentTenant')->id;
         return \App\Models\ProductWarehouse::with(['product', 'warehouse'])
-            ->join('products', 'product_warehouse.product_id', '=', 'products.id')
-            ->whereRaw('product_warehouse.quantity <= COALESCE(products.low_stock_threshold, 10)')
-            ->select('product_warehouse.*')
+            ->where('product_warehouse.tenant_id', $tenantId)
+            ->whereHas('product', function ($query) use ($tenantId) {
+                $query->where('tenant_id', $tenantId)
+                    ->whereRaw('products.low_stock_threshold >= product_warehouse.quantity');
+            })
             ->get()
             ->map(function ($pw) {
                 $product = $pw->product;

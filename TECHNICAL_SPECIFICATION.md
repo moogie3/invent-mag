@@ -439,7 +439,7 @@ GET /admin/api/settings           # System settings
     - Interactive "Try It Out"
     - Code examples (cURL, JavaScript, PHP)
     - Request/response schemas
-    - Authentication examples
+    - Authentication exampless
 
 ---
 

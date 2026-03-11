@@ -55,8 +55,6 @@ class Sales extends Model
         'tenant_id',
     ];
 
-    protected $with = ['salesItems'];
-
     protected $attributes = [
         'status' => 'Unpaid',
         'is_pos' => 'false',

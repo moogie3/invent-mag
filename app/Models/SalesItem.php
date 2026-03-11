@@ -25,7 +25,6 @@ class SalesItem extends Model
         'tenant_id',
     ];
 
-    protected $with = ['product'];
     protected $appends = ['price'];
 
     public function product() {

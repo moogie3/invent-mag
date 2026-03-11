@@ -109,14 +109,11 @@ class NotificationService
 
     protected function getLowStockNotifications(): Collection
     {
-        // Match DashboardService approach - check per warehouse
         return \App\Models\ProductWarehouse::with(['product', 'warehouse'])
-            ->whereHas('product')
+            ->join('products', 'product_warehouse.product_id', '=', 'products.id')
+            ->whereRaw('product_warehouse.quantity <= COALESCE(products.low_stock_threshold, 10)')
+            ->select('product_warehouse.*')
             ->get()
-            ->filter(function ($pw) {
-                $threshold = $pw->product->low_stock_threshold ?? 10;
-                return $pw->quantity <= $threshold;
-            })
             ->map(function ($pw) {
                 $product = $pw->product;
                 $warehouse = $pw->warehouse;

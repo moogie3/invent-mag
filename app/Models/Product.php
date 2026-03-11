@@ -129,12 +129,10 @@ class Product extends Model
     public static function getLowStockProducts()
     {
         return \App\Models\ProductWarehouse::with(['product', 'warehouse'])
-            ->whereHas('product')
-            ->get()
-            ->filter(function ($pw) {
-                $threshold = $pw->product->low_stock_threshold ?? 10;
-                return $pw->quantity <= $threshold;
-            });
+            ->join('products', 'product_warehouse.product_id', '=', 'products.id')
+            ->whereRaw('product_warehouse.quantity <= COALESCE(products.low_stock_threshold, 10)')
+            ->select('product_warehouse.*')
+            ->get();
     }
 
     /**
@@ -144,13 +142,8 @@ class Product extends Model
      */
     public static function lowStockCount(): int
     {
-        return \App\Models\ProductWarehouse::with(['product'])
-            ->whereHas('product')
-            ->get()
-            ->filter(function ($pw) {
-                $threshold = $pw->product->low_stock_threshold ?? 10;
-                return $pw->quantity <= $threshold;
-            })
+        return \App\Models\ProductWarehouse::join('products', 'product_warehouse.product_id', '=', 'products.id')
+            ->whereRaw('product_warehouse.quantity <= COALESCE(products.low_stock_threshold, 10)')
             ->count();
     }
 

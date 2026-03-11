@@ -45,14 +45,12 @@ class DashboardService
         $monthlyData = $this->getMonthlyData($dates, $categoryId);
         // $lowStockProducts = Product::getLowStockProducts(); // Old logic
         
-        // Fetch low stock items per warehouse
+        // Fetch low stock items per warehouse - optimized to filter in database
         $lowStockProducts = \App\Models\ProductWarehouse::with(['product', 'warehouse'])
-            ->whereHas('product')
-            ->get()
-            ->filter(function ($pw) {
-                $threshold = $pw->product->low_stock_threshold ?? 10;
-                return $pw->quantity <= $threshold;
-            });
+            ->join('products', 'product_warehouse.product_id', '=', 'products.id')
+            ->whereRaw('product_warehouse.quantity <= COALESCE(products.low_stock_threshold, 10)')
+            ->select('product_warehouse.*')
+            ->get();
 
         $expiringSoonItems = \App\Models\POItem::getExpiringSoonItems();
 
@@ -679,21 +677,29 @@ class DashboardService
     private function getTopSellingProducts()
     {
         $tenantId = app('currentTenant')->id;
-        return SalesItem::select('product_id', DB::raw('SUM(quantity) as units_sold'), DB::raw('SUM(total) as revenue'))
+        return SalesItem::select(
+                'sales_items.product_id', 
+                DB::raw('SUM(sales_items.quantity) as units_sold'), 
+                DB::raw('SUM(sales_items.total) as revenue'),
+                'products.name as product_name',
+                'products.code as product_code',
+                'products.image as product_image',
+                'categories.name as category_name'
+            )
+            ->join('products', 'sales_items.product_id', '=', 'products.id')
+            ->leftJoin('categories', 'products.category_id', '=', 'categories.id')
             ->where('sales_items.tenant_id', $tenantId)
-            ->with('product')
-            ->whereHas('product')
-            ->groupBy('product_id')
+            ->groupBy('sales_items.product_id', 'products.name', 'products.code', 'products.image', 'categories.name')
             ->orderByDesc('units_sold')
             ->limit(5)
             ->get()
             ->map(
                 fn($item) => (object) [
                     'id' => $item->product_id,
-                    'name' => $item->product->name ?? 'Unknown Product',
-                    'code' => $item->product->code ?? 'N/A',
-                    'image' => $item->product->image ?? null,
-                    'category' => $item->product->category ?? null,
+                    'name' => $item->product_name ?? 'Unknown Product',
+                    'code' => $item->product_code ?? 'N/A',
+                    'image' => $item->product_image ?? null,
+                    'category' => $item->category_name ?? null,
                     'units_sold' => $item->units_sold,
                     'revenue' => $item->revenue,
                 ],
@@ -726,13 +732,20 @@ class DashboardService
 
         $customerLifetimeValue = $totalCustomers > 0 ? Sales::sum('total') / $totalCustomers : 0;
 
-        $topCustomers = Sales::select('customer_id', DB::raw('SUM(total) as total_sales'))->with('customer')->whereHas('customer')->groupBy('customer_id')->orderByDesc('total_sales')->limit(5)->get()->map(
-            fn($item) => (object) [
-                'id' => $item->customer_id,
-                'name' => $item->customer->name ?? 'Unknown Customer',
-                'total_sales' => $item->total_sales,
-            ],
-        );
+        $topCustomers = Sales::select('customer_id', DB::raw('SUM(total) as total_sales'))
+            ->join('customers', 'sales.customer_id', '=', 'customers.id')
+            ->whereNotNull('sales.customer_id')
+            ->groupBy('customer_id', 'customers.name')
+            ->orderByDesc('total_sales')
+            ->limit(5)
+            ->get()
+            ->map(
+                fn($item) => (object) [
+                    'id' => $item->customer_id,
+                    'name' => $item->customers->name ?? 'Unknown Customer',
+                    'total_sales' => $item->total_sales,
+                ],
+            );
 
         return [
             'totalCustomers' => $totalCustomers,
@@ -766,14 +779,21 @@ class DashboardService
                 ->whereIn('status', ['Unpaid', 'Partial'])
                 ->sum('total') ?? 0;
 
-        $topSuppliers = Purchase::select('supplier_id', DB::raw('SUM(total) as total_purchases'))->with('supplier')->whereHas('supplier')->groupBy('supplier_id')->orderByDesc('total_purchases')->limit(5)->get()->map(
-            fn($item) => (object) [
-                'id' => $item->supplier_id,
-                'name' => $item->supplier->name ?? 'Unknown Supplier',
-                'location' => $item->supplier->location ?? 'N/A',
-                'total_purchases' => $item->total_purchases,
-            ],
-        );
+        $topSuppliers = Purchase::select('supplier_id', DB::raw('SUM(total) as total_purchases'))
+            ->join('suppliers', 'po.supplier_id', '=', 'suppliers.id')
+            ->whereNotNull('po.supplier_id')
+            ->groupBy('supplier_id', 'suppliers.name', 'suppliers.location')
+            ->orderByDesc('total_purchases')
+            ->limit(5)
+            ->get()
+            ->map(
+                fn($item) => (object) [
+                    'id' => $item->supplier_id,
+                    'name' => $item->suppliers->name ?? 'Unknown Supplier',
+                    'location' => $item->suppliers->location ?? 'N/A',
+                    'total_purchases' => $item->total_purchases,
+                ],
+            );
 
         return [
             'totalSuppliers' => $totalSuppliers,

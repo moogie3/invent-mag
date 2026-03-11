@@ -29,7 +29,13 @@
                     </div>
                 </div>
                 <div class="form-footer">
-                    <button type="submit" class="btn btn-primary w-100">Sign in</button>
+                    <button type="submit" class="btn btn-primary w-100" id="loginSubmitBtn">
+                        <span class="login-btn-text">Sign in</span>
+                        <span class="login-btn-loading d-none">
+                            <span class="spinner-border spinner-border-sm me-2" role="status" style="width: 14px; height: 14px;"></span>
+                            Signing in...
+                        </span>
+                    </button>
                 </div>
             </form>
         </div>

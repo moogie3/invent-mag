@@ -139,7 +139,9 @@ class CrmService
         $supplier = Supplier::findOrFail($id);
 
         $historicalPurchases = $supplier->purchases()
-            ->with('items.product')
+            ->with(['items.product' => function ($query) {
+                $query->orderBy('id');
+            }])
             ->orderByDesc('order_date')
             ->get()
             ->map(function ($purchase) {

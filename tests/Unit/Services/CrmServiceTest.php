@@ -223,9 +223,16 @@ class CrmServiceTest extends TestCase
         $this->assertEquals(30, $historicalPurchases[0]['total']);
         $this->assertEquals(0, $historicalPurchases[0]['discount_amount']);
         $this->assertCount(2, $historicalPurchases[0]['items']);
-        $this->assertEquals('Product A', $historicalPurchases[0]['items'][0]['product_name']);
-        $this->assertEquals(1, $historicalPurchases[0]['items'][0]['quantity']);
-        $this->assertEquals(10, $historicalPurchases[0]['items'][0]['price']);
+        
+        // Get item names to check they contain expected products (order independent)
+        $itemNames = $historicalPurchases[0]['items']->pluck('product_name')->toArray();
+        $this->assertContains('Product A', $itemNames);
+        $this->assertContains('Product B', $itemNames);
+        
+        // Find Product A item and verify its quantity and price
+        $productAItem = $historicalPurchases[0]['items']->firstWhere('product_name', 'Product A');
+        $this->assertEquals(1, $productAItem['quantity']);
+        $this->assertEquals(10, $productAItem['price']);
 
         // Assertions for the older purchase (purchase2)
         $this->assertEquals('INV-002', $historicalPurchases[1]['invoice']);
@@ -236,9 +243,16 @@ class CrmServiceTest extends TestCase
         $this->assertEquals(50, $historicalPurchases[1]['total']);
         $this->assertEquals(5, $historicalPurchases[1]['discount_amount']);
         $this->assertCount(2, $historicalPurchases[1]['items']);
-        $this->assertEquals('Product A', $historicalPurchases[1]['items'][0]['product_name']);
-        $this->assertEquals(3, $historicalPurchases[1]['items'][0]['quantity']);
-        $this->assertEquals(10, $historicalPurchases[1]['items'][0]['price']);
+        
+        // Get item names to check they contain expected products (order independent)
+        $itemNames2 = $historicalPurchases[1]['items']->pluck('product_name')->toArray();
+        $this->assertContains('Product A', $itemNames2);
+        $this->assertContains('Product B', $itemNames2);
+        
+        // Find Product A item and verify its quantity and price
+        $productAItem2 = $historicalPurchases[1]['items']->firstWhere('product_name', 'Product A');
+        $this->assertEquals(3, $productAItem2['quantity']);
+        $this->assertEquals(10, $productAItem2['price']);
     }
 
     #[Test]

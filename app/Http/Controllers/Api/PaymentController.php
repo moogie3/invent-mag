@@ -79,19 +79,7 @@ class PaymentController extends Controller
         } catch (\Exception $e) {
             Log::error('Payment confirmation error: ' . $e->getMessage());
             
-            // If we can't verify with Midtrans, check if the frontend result indicates success
-            if (isset($transactionResult['transaction_status']) && 
-                ($transactionResult['transaction_status'] === 'settlement' || $transactionResult['transaction_status'] === 'capture')) {
-                
-                $this->processSuccessfulPayment($order, $transactionResult);
-
-                return response()->json([
-                    'message' => 'Payment confirmed (offline verification)',
-                    'plan' => $order->plan->name
-                ]);
-            }
-            
-            return response()->json(['message' => 'Payment verification failed: ' . $e->getMessage()], 500);
+            return response()->json(['message' => 'Payment verification failed. Please try again later.'], 500);
         }
     }
 

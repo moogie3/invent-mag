@@ -31,7 +31,7 @@
                                     <div class="dropdown-menu-column">
                                         {{-- Loop through children without permission check for special items --}}
                                         @foreach ($item['children'] as $child)
-                                            <a class="dropdown-item" href="{{ route($child['route']) }}">
+                                            <a class="dropdown-item" href="{{ route($child['route']) }}" data-turbo="true">
                                                 <i class="{{ $child['icon'] ?? 'ti ti-point' }}"></i>
                                                 <span>{{ __($child['title']) }}</span>
                                             </a>
@@ -58,7 +58,7 @@
                                             <div class="dropdown-menu-column">
                                                 @foreach ($item['children'] as $child)
                                                     @can($child['permission'] ?? null)
-                                                        <a class="dropdown-item" href="{{ route($child['route']) }}">
+                                                        <a class="dropdown-item" href="{{ route($child['route']) }}" data-turbo="true">
                                                             {{ __($child['title']) }}
                                                         </a>
                                                     @endcan
@@ -68,7 +68,7 @@
                                     </div>
                                 </li>
                             @else
-                                <li><a href="{{ route($item['route']) }}"><i class="{{ $item['icon'] }}"></i><span
+                                <li><a href="{{ route($item['route']) }}" data-turbo="true"><i class="{{ $item['icon'] }}"></i><span
                                             class="nav-link-title">{{ __($item['title']) }}</span></a></li>
                             @endif
                         @endcan
@@ -396,7 +396,7 @@
 
                     <!-- Footer with View All Link -->
                     <div class="notification-footer p-2 text-center">
-                        <a href="{{ route('admin.notifications') }}" class="notification-footer-link">
+                        <a href="{{ route('admin.notifications') }}" class="notification-footer-link" data-turbo="true">
                             <i class="ti ti-external-link me-1"></i>{{ __('plan.notif_view_all') }}
                         </a>
                     </div>
@@ -422,13 +422,13 @@
                     @endif
                 </a>
                 <div class="dropdown-menu dropdown-menu-arrow">
-                    <a href="{{ route('admin.setting.profile.edit') }}" class="dropdown-item">
+                    <a href="{{ route('admin.setting.profile.edit') }}" class="dropdown-item" data-turbo="true">
                         <i class="ti ti-settings me-2"></i>{{ __('messages.settings') }}
                     </a>
                     <form id="logout-form" action="{{ route('admin.logout') }}" method="POST" class="d-none">
                         @csrf
                     </form>
-                    <a href="#" class="dropdown-item"
+                    <a href="#" class="dropdown-item" data-turbo="false"
                         onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
                         <i class="ti ti-logout me-2"></i>{{ __('messages.logout') }}
                     </a>

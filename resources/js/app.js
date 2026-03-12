@@ -1,5 +1,9 @@
 import "./bootstrap";
 
+// Import Turbo
+import * as Turbo from "@hotwired/turbo";
+window.Turbo = Turbo;
+
 import Alpine from "alpinejs";
 
 window.Alpine = Alpine;

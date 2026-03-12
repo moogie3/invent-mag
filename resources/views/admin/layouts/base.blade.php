@@ -44,6 +44,7 @@
 
     @vite('resources/css/app.css')
     @vite('resources/css/menu-sidebar.css')
+    @vite('resources/js/app.js')
     @vite('resources/js/admin/layouts/menu-sidebar.js')
 
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
@@ -80,7 +81,21 @@
         <div class="main-content">
             @include('admin.layouts.navbar')
             @include('admin.layouts.partials.trial-banner')
-            @yield('content')
+            <turbo-frame id="main-content">
+                <div class="turbo-frame-loader">
+                    <div class="container container-slim py-4">
+                        <div class="text-center">
+                            <div class="mb-3">
+                                <a class="navbar-brand navbar-brand-autodark">
+                                    <i class="ti ti-brand-minecraft fs-2 me-2"></i>Invent-MAG
+                                </a>
+                            </div>
+                            <div class="spinner-border text-primary" role="status"></div>
+                        </div>
+                    </div>
+                </div>
+                @yield('content')
+            </turbo-frame>
         </div>
     </div>
 

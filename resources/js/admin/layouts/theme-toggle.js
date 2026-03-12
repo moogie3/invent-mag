@@ -147,3 +147,108 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
 });
+
+// Re-initialize theme toggle after Turbo navigation
+document.addEventListener("turbo:load", function () {
+    const htmlElement = document.documentElement;
+    const navbarToggleContainer = document.getElementById(
+        "theme-toggle-navbar-container"
+    );
+    const sidebarToggleContainer = document.getElementById(
+        "theme-toggle-sidebar-container"
+    );
+    const themeToggleButton = document.getElementById("theme-toggle-button");
+
+    function updateThemeIcons(theme) {
+        const navbarLightIcon = document.querySelector(
+            "#theme-toggle-navbar .theme-icon-light"
+        );
+        const navbarDarkIcon = document.querySelector(
+            "#theme-toggle-navbar .theme-icon-dark"
+        );
+
+        if (navbarLightIcon && navbarDarkIcon) {
+            if (theme === "dark") {
+                navbarLightIcon.style.display = "inline";
+                navbarDarkIcon.style.display = "none";
+            } else {
+                navbarLightIcon.style.display = "none";
+                navbarDarkIcon.style.display = "inline";
+            }
+        }
+
+        const sidebarLightIcon = document.querySelector(
+            "#theme-toggle-sidebar .theme-icon-light"
+        );
+        const sidebarDarkIcon = document.querySelector(
+            "#theme-toggle-sidebar .theme-icon-dark"
+        );
+
+        if (sidebarLightIcon && sidebarDarkIcon) {
+            if (theme === "dark") {
+                sidebarLightIcon.style.display = "inline";
+                sidebarDarkIcon.style.display = "none";
+            } else {
+                sidebarLightIcon.style.display = "none";
+                sidebarDarkIcon.style.display = "inline";
+            }
+        }
+    }
+
+    function toggleTheme() {
+        const csrfTokenMeta = document.querySelector('meta[name="csrf-token"]');
+        const currentTheme = htmlElement.getAttribute('data-bs-theme');
+        const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+
+        htmlElement.setAttribute('data-bs-theme', newTheme);
+        localStorage.setItem('theme', newTheme);
+        updateThemeIcons(newTheme);
+
+        if (!csrfTokenMeta) {
+            return;
+        }
+
+        fetch('/admin/settings/update-theme-mode', {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': csrfTokenMeta.getAttribute('content')
+            },
+            body: JSON.stringify({
+                theme_mode: newTheme,
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                const event = new CustomEvent('themeModeUpdated', {
+                    detail: { themeMode: newTheme }
+                });
+                document.dispatchEvent(event);
+            }
+        })
+        .catch(error => {
+            // console.error('Error:', error);
+        });
+    }
+
+    // Re-attach event listeners
+    if (navbarToggleContainer) {
+        navbarToggleContainer.addEventListener("click", function (e) {
+            e.preventDefault();
+            toggleTheme();
+        });
+    }
+    if (sidebarToggleContainer) {
+        sidebarToggleContainer.addEventListener("click", function (e) {
+            e.preventDefault();
+            toggleTheme();
+        });
+    }
+    if (themeToggleButton) {
+        themeToggleButton.addEventListener("click", function (e) {
+            e.preventDefault();
+            toggleTheme();
+        });
+    }
+});

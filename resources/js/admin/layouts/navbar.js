@@ -534,3 +534,65 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 });
+
+// Re-initialize Bootstrap components and navbar functionality after Turbo navigation
+document.addEventListener("turbo:load", function () {
+    // Re-initialize Bootstrap tooltips
+    var tooltipTriggerList = [].slice.call(
+        document.querySelectorAll('[data-bs-toggle="tooltip"]')
+    );
+    tooltipTriggerList.map(function (tooltipTriggerEl) {
+        return new bootstrap.Tooltip(tooltipTriggerEl);
+    });
+
+    // Re-initialize notification tab click handlers
+    const notificationTabs = document.querySelectorAll("#notificationTabs .nav-link");
+    notificationTabs.forEach((tab) => {
+        tab.addEventListener("click", function (e) {
+            const tabId = e.target.id;
+            localStorage.setItem("activeNotificationTab", tabId);
+            e.stopPropagation();
+        });
+    });
+
+    // Re-initialize fix for notification tabs dropdown
+    const notificationTabs2 = document.querySelectorAll(".notification-tabs .nav-link");
+    notificationTabs2.forEach((tab) => {
+        tab.addEventListener("click", function (e) {
+            e.stopPropagation();
+        });
+    });
+
+    // Re-initialize staggered dropdown
+    document.querySelectorAll('.nav-item.dropdown > .nav-link.dropdown-toggle').forEach(toggle => {
+        const dropdown = toggle.closest('.nav-item.dropdown');
+        if (dropdown && (dropdown.id === 'reports-nav-item' || dropdown.id === 'accounting-nav-item')) {
+            return;
+        }
+
+        toggle.addEventListener('click', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+
+            const dropdownMenu = this.closest('.dropdown').querySelector('.dropdown-menu');
+            if (!dropdownMenu) return;
+
+            dropdownMenu.classList.toggle('show');
+            this.setAttribute('aria-expanded', dropdownMenu.classList.contains('show'));
+
+            const dropdownItems = dropdownMenu.querySelectorAll('.dropdown-item');
+
+            if (dropdownMenu.classList.contains('show')) {
+                dropdownMenu.classList.add('staggered-open');
+                dropdownItems.forEach((item, index) => {
+                    item.style.animationDelay = `${index * 0.05}s`;
+                });
+            } else {
+                dropdownMenu.classList.remove('staggered-open');
+                dropdownItems.forEach(item => {
+                    item.style.animationDelay = '';
+                });
+            }
+        });
+    });
+});

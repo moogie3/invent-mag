@@ -1,13 +1,27 @@
 document.addEventListener("usersettingsloaded", function () {
+    initSidebar();
+});
+
+// Also re-init after Turbo navigation
+document.addEventListener("turbo:load", function () {
+    initSidebar();
+});
+
+function initSidebar() {
     const sidebar = document.querySelector(".sidebar");
     const sidebarToggle = document.getElementById("sidebar-toggle");
     const mainContent = document.querySelector(".main-content");
     const body = document.body;
 
     if (!sidebar || !mainContent) {
-        // console.error("Required elements not found!");
         return;
     }
+
+    // Check if already initialized
+    if (sidebar.dataset.turboInitialized === "true") {
+        return;
+    }
+    sidebar.dataset.turboInitialized = "true";
 
     // Create lock button
     const createLockButton = function () {
@@ -349,6 +363,4 @@ document.addEventListener("usersettingsloaded", function () {
             toggleSidebarWithPersistence();
         }
     });
-
-    // Removed the debug logging that was causing the text to appear
-});
+}

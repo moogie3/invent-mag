@@ -2,6 +2,8 @@
 # Stage 1: Build Frontend Assets
 # Purpose: Compile JavaScript and CSS assets using Node.js/Vite.
 # ==============================================================================
+ARG CACHE_BUST=2
+
 FROM node:18-alpine as frontend_build
 
 WORKDIR /app

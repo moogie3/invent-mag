@@ -1,8 +1,10 @@
 import { initEditCustomerModal } from "./partials/customer/editModal/main.js";
 import { initCrmCustomerModal } from "./partials/customer/crmModal/main.js";
 import { initSelectableTable } from "./layouts/selectable-table.js";
+import { onPageLoad } from "./utils/onPageLoad.js";
 
-document.addEventListener("DOMContentLoaded", function () {
+onPageLoad(function () {
+    if (!window.location.pathname.includes("/admin/customer")) return;
     initEditCustomerModal();
     initCrmCustomerModal();
     initSelectableTable();

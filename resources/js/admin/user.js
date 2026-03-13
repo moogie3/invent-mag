@@ -7,8 +7,10 @@ import { initDeleteUserFormSubmission } from './partials/user/delete/api.js';
 import { editUserModal, deleteUserModal, editUserForm, editRolesContainer, editPermissionsContainer } from './partials/user/common/elements.js';
 import { resetPermissionStates } from './partials/user/rolesPermissions/sync.js';
 import { initSelectableTable } from "./layouts/selectable-table.js";
+import { onPageLoad } from './utils/onPageLoad.js';
 
-document.addEventListener("DOMContentLoaded", function () {
+onPageLoad(function () {
+    if (!window.location.pathname.includes("/admin/users")) return;
     fetchRolePermissions()
         .then(() => {
             setupCreateUserModal();

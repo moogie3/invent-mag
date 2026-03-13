@@ -10,6 +10,7 @@ import {
     clearSelection,
 } from "./partials/recentts/bulkActions/selection.js";
 import { confirmBulkMarkAsPaid as confirmBulkMarkAsPaidApi } from "./partials/recentts/bulkActions/api.js";
+import { onPageLoad } from "./utils/onPageLoad.js";
 
 function getSelectedTransactionIds() {
     const selectedCheckboxes = document.querySelectorAll(
@@ -102,7 +103,8 @@ window.exportRecentTransactions = exportRecentTransactions;
 window.bulkExport = bulkExport;
 window.getSelectedTransactionIds = getSelectedTransactionIds;
 
-document.addEventListener("DOMContentLoaded", function () {
+onPageLoad(function () {
+    if (!window.location.pathname.includes("/admin/reports/recent-transactions")) return;
     const dateRangeSelect = document.querySelector('select[name="date_range"]');
     const customDateRange = document.getElementById("customDateRange");
 

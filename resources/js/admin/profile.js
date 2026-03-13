@@ -1,4 +1,7 @@
-document.addEventListener("DOMContentLoaded", function () {
+import { onPageLoad } from './utils/onPageLoad.js';
+
+onPageLoad(function () {
+    if (!window.location.pathname.includes("/admin/settings/profile")) return;
 
     window.shortcutManager.register('ctrl+s', () => {
         const profileForm = document.getElementById('profileForm');

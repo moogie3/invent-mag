@@ -1,4 +1,7 @@
-document.addEventListener('DOMContentLoaded', function() {
+import { onPageLoad } from '../utils/onPageLoad.js';
+
+onPageLoad(function() {
+    if (!window.location.pathname.includes("/admin/reports/stock-transfer")) return;
     const fromWarehouseSelect = document.querySelector('select[name="from_warehouse_id"]');
     const toWarehouseSelect = document.querySelector('select[name="to_warehouse_id"]');
     const productSelect = document.getElementById('productSelect');

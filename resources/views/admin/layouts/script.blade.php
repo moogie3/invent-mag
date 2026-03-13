@@ -15,137 +15,94 @@
 @vite('resources/js/admin/utils/sound.js')
 @vite('resources/js/admin/helpers/notification.js')
 
-{{-- SCRIPT FOR ADMIN POS  --}}
-@if (request()->is('admin/pos'))
-    @vite('resources/js/admin/pos.js')
-@endif
+{{--
+    NOTE: All page-specific scripts are loaded unconditionally so that
+    Turbo Drive navigation (which reuses the same JS bundle from the initial
+    page load) can re-initialize the correct JS on every page visit.
+    Each script guards itself via window.location.pathname checks.
+--}}
 
-{{-- SCRIPT FOR RECENT TRANSACTIONS  --}}
-@if (request()->is('admin/reports/recent-transactions'))
-    @vite('resources/js/admin/recentts.js')
-@endif
+{{-- SCRIPT FOR ADMIN POS --}}
+@vite('resources/js/admin/pos.js')
 
-{{-- SCRIPT FOR ADMIN LOGIN & PASSWORD RESET --}}
-@if (request()->is('admin/login', 'admin/register', 'forgot-password', 'admin/reset-password/*'))
-    @vite('resources/js/admin/auth.js')
-    @if (request()->is('admin/reset-password/*'))
-        @vite('resources/js/admin/reset-password.js')
-    @endif
-@endif
+{{-- SCRIPT FOR RECENT TRANSACTIONS --}}
+@vite('resources/js/admin/recentts.js')
 
 {{-- SCRIPT FOR USER MANAGEMENT --}}
-@if (request()->is('admin/users'))
-    @vite('resources/js/admin/user.js')
-@endif
+@vite('resources/js/admin/user.js')
 
-{{-- SCRIPT FOR  PROFILE --}}
-@if (request()->is('admin/settings/profile'))
-    @vite('resources/js/admin/profile.js')
-@endif
+{{-- SCRIPT FOR PROFILE --}}
+@vite('resources/js/admin/profile.js')
 
 {{-- SCRIPT FOR ADMIN SALES CREATE & EDIT --}}
-@if (request()->is('admin/sales', 'admin/sales/create', 'admin/sales/edit/*'))
-    @vite('resources/js/admin/sales-order.js')
-@endif
+@vite('resources/js/admin/sales-order.js')
 
-{{-- SCRIPT FOR ADMIN SALES RETURN CREATE & EDIT --}}
-@if (request()->is('admin/sales-returns', 'admin/sales-returns/create', 'admin/sales-returns/*/edit'))
-    @vite('resources/js/admin/sales-return.js')
-@endif
+{{-- SCRIPT FOR ADMIN SALES RETURN --}}
+@vite('resources/js/admin/sales-return.js')
 
-{{-- SCRIPT FOR ADMIN PO CREATE & EDIT --}}
-@if (request()->is('admin/po', 'admin/po/create', 'admin/po/edit/*'))
-    @vite('resources/js/admin/purchase-order.js')
-@endif
+{{-- SCRIPT FOR ADMIN PO --}}
+@vite('resources/js/admin/purchase-order.js')
 
-{{-- SCRIPT FOR ADMIN PURCHASE RETURN CREATE & EDIT --}}
-@if (request()->is('admin/por', 'admin/por/create', 'admin/por/*/edit'))
-    @vite('resources/js/admin/purchase-return.js')
-@endif
+{{-- SCRIPT FOR ADMIN PURCHASE RETURN --}}
+@vite('resources/js/admin/purchase-return.js')
 
 {{-- SCRIPT FOR PRODUCT --}}
-@if (request()->is('admin/product', 'admin/product/edit/*', 'admin/product/create'))
-    @vite('resources/js/admin/product.js')
-@endif
-
-{{-- SCRIPT FOR ADMIN DASHBOARD --}}
-@if (request()->is('admin/dashboard'))
-    <script src="{{ asset('tabler/dist/libs/apexcharts/dist/apexcharts.min.js') }}"></script>
-@endif
+@vite('resources/js/admin/product.js')
 
 {{-- SCRIPT FOR WAREHOUSE --}}
-@if (request()->is('admin/warehouses*'))
-    @vite('resources/js/admin/warehouse.js')
-@endif
+@vite('resources/js/admin/warehouse.js')
 
 {{-- SCRIPT FOR UNIT --}}
-@if (request()->is('admin/settings/unit*'))
-    @vite('resources/js/admin/unit.js')
-@endif
+@vite('resources/js/admin/unit.js')
 
 {{-- SCRIPT FOR CATEGORY --}}
-@if (request()->is('admin/settings/categories*'))
-    @vite('resources/js/admin/category.js')
-@endif
+@vite('resources/js/admin/category.js')
 
 {{-- SCRIPT FOR SUPPLIER --}}
-@if (request()->is('admin/supplier'))
-    @vite('resources/js/admin/supplier.js')
-@endif
+@vite('resources/js/admin/supplier.js')
 
 {{-- SCRIPT FOR CUSTOMER --}}
-@if (request()->is('admin/customer'))
-    @vite('resources/js/admin/customer.js')
-@endif
+@vite('resources/js/admin/customer.js')
 
 {{-- SCRIPT FOR SORTING TABLE --}}
-@if (request()->is(
-        'admin/warehouse',
-        'admin/po',
-        'admin/sales',
-        'admin/product',
-        'admin/supplier',
-        'admin/customer',
-        'admin/settings/unit',
-        'admin/settings/category'))
-    @vite('resources/js/admin/sorting.js')
-@endif
+@vite('resources/js/admin/sorting.js')
 
 {{-- SCRIPT FOR CURRENCY settings --}}
-@if (request()->is('admin/settings/currency'))
-    @vite('resources/js/admin/currency.js')
-@endif
+@vite('resources/js/admin/currency.js')
 
 {{-- SCRIPT FOR ACCOUNTING settings --}}
-@if (request()->is('admin/settings/accounting', 'admin/accounting/accounting-setting', 'admin/accounting/journal', 'admin/accounting/general-ledger', 'admin/reports/income-statement', 'admin/reports/balance-sheet', 'admin/reports/aged-receivables', 'admin/reports/aged-payables'))
-    @vite('resources/js/admin/accounting.js')
-@endif
+@vite('resources/js/admin/accounting.js')
 
 {{-- SCRIPT FOR JOURNAL ENTRIES --}}
-@if (request()->is('admin/accounting/journal-entries*', 'admin/accounting/journal-entries/create', 'admin/accounting/journal-entries/*/edit'))
-    @vite('resources/js/admin/journal-entry.js')
-@endif
+@vite('resources/js/admin/journal-entry.js')
 
 {{-- SCRIPT FOR ADJUSTMENT LOG --}}
-@if (request()->is('admin/reports/adjustment-log'))
-    @vite('resources/js/admin/adjustment-log.js')
-@endif
+@vite('resources/js/admin/adjustment-log.js')
 
 {{-- SCRIPT FOR STOCK TRANSFER --}}
-@if (request()->is('admin/reports/stock-transfer*'))
-    @vite('resources/js/admin/reports/stock-transfer.js')
-@endif
+@vite('resources/js/admin/reports/stock-transfer.js')
 
 {{-- SCRIPT FOR TAX settings --}}
-@if (request()->is('admin/settings/tax'))
-    @vite('resources/js/admin/tax.js')
-@endif
+@vite('resources/js/admin/tax.js')
 
-{{-- SCRIPT FOR SALES PIPELINE --}}
-@if (request()->is('admin/sales-pipeline'))
-    <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.14.0/Sortable.min.js"></script>
-    @vite('resources/js/admin/sales-pipeline.js')
-@endif
+{{-- SCRIPT FOR SALES PIPELINE (SortableJS only loaded when needed) --}}
+<script>
+    // Lazily load SortableJS only when navigating to the sales-pipeline page
+    document.addEventListener('turbo:load', function () {
+        if (window.location.pathname.includes('/admin/sales-pipeline')) {
+            if (typeof Sortable === 'undefined') {
+                var s = document.createElement('script');
+                s.src = 'https://cdn.jsdelivr.net/npm/sortablejs@1.14.0/Sortable.min.js';
+                document.head.appendChild(s);
+            }
+        }
+    });
+</script>
+@vite('resources/js/admin/sales-pipeline.js')
+
+{{-- SCRIPT FOR ADMIN LOGIN & PASSWORD RESET --}}
+@vite('resources/js/admin/auth.js')
+@vite('resources/js/admin/reset-password.js')
 
 {{-- SCRIPT FOR SETTINGS --}}
 @vite('resources/js/admin/layouts/settings.js')
@@ -154,9 +111,18 @@
 @vite('resources/js/admin/layouts/selectable-table.js')
 
 {{-- SCRIPT FOR PLAN CHECKOUT --}}
-@if (request()->is('admin/settings/plan/change'))
-    @vite('resources/js/admin/plan/checkout.js')
-@endif
+@vite('resources/js/admin/plan/checkout.js')
+
+{{-- SCRIPT FOR ADMIN DASHBOARD (ApexCharts lazy-loaded) --}}
+<script>
+    document.addEventListener('turbo:load', function () {
+        if (window.location.pathname.includes('/admin/dashboard') && typeof ApexCharts === 'undefined') {
+            var s = document.createElement('script');
+            s.src = '{{ asset('tabler/dist/libs/apexcharts/dist/apexcharts.min.js') }}';
+            document.head.appendChild(s);
+        }
+    });
+</script>
 
 {{-- DELETE MODAL --}}
 <script>

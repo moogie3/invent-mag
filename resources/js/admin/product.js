@@ -10,10 +10,12 @@ import {
 } from "./partials/product/bulkActions/selection.js";
 import { bulkExportProducts } from "./partials/product/bulkActions/export.js";
 import { initSelectableTable } from "./layouts/selectable-table.js";
+import { onPageLoad } from "./utils/onPageLoad.js";
 
-initProductPage();
+onPageLoad(function () {
+    if (!window.location.pathname.includes("/admin/product")) return;
+    initProductPage();
 
-document.addEventListener("DOMContentLoaded", function () {
     setTimeout(() => {
         window.shortcutManager.unregister("ctrl+s");
         const pathname = window.location.pathname;

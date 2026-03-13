@@ -5,9 +5,11 @@ import {
     getSelectedSalesReturnIds,
     clearSalesReturnSelection,
 } from "./partials/sales-returns/bulkActions/selection.js";
+import { onPageLoad } from "./utils/onPageLoad.js";
 
-document.addEventListener("DOMContentLoaded", function () {
+onPageLoad(function () {
     const pathname = window.location.pathname;
+    if (!pathname.includes("/admin/sales-returns")) return;
 
     if (sessionStorage.getItem("salesReturnBulkDeleteSuccess")) {
         InventMagApp.showToast(

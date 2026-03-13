@@ -1,8 +1,10 @@
 import { initEditSupplierModal } from "./partials/supplier/editModal/main.js";
 import { initSrmSupplierModal } from "./partials/supplier/srmModal/main.js";
 import { initSelectableTable } from "./layouts/selectable-table.js";
+import { onPageLoad } from "./utils/onPageLoad.js";
 
-document.addEventListener("DOMContentLoaded", function () {
+onPageLoad(function () {
+    if (!window.location.pathname.includes("/admin/supplier")) return;
     initEditSupplierModal();
     initSrmSupplierModal();
     initSelectableTable();

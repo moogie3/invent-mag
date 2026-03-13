@@ -4,6 +4,7 @@ import { PurchaseOrderView } from "./partials/purchase-order/view/PurchaseOrderV
 import { PurchaseOrderBulkSelection } from "./partials/purchase-order/bulkActions/PurchaseOrderBulkSelection.js";
 import { initSelectableTable } from "./layouts/selectable-table.js";
 import { escapeHtml } from "../utils/sanitize.js";
+import { onPageLoad } from "./utils/onPageLoad.js";
 
 import {
     bulkDeletePO,
@@ -19,8 +20,11 @@ window.bulkMarkAsPaidPO = bulkMarkAsPaidPO;
 window.exportAllPurchases = exportAllPurchases;
 
 // Keep the existing DOMContentLoaded initialization
-document.addEventListener("DOMContentLoaded", function () {
+onPageLoad(function () {
     const pathname = window.location.pathname;
+    // Only run on PO pages
+    if (!pathname.includes("/admin/po")) return;
+
     if (pathname.includes("/admin/po/edit")) {
         initSelectableTable({
             registerEditShortcut: false,
@@ -157,8 +161,9 @@ document.addEventListener("DOMContentLoaded", function () {
     }, 250);
 });
 
-// JavaScript for Purchase Order Expiring Soon functionality
-document.addEventListener("DOMContentLoaded", function () {
+// Purchase Order Expiring Soon functionality
+onPageLoad(function () {
+    if (!window.location.pathname.includes("/admin/po")) return;
     const expiringPurchaseModalElement = document.getElementById(
         "expiringPurchaseModal",
     );

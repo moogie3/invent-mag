@@ -1,6 +1,15 @@
 import { escapeHtml } from '../utils/sanitize.js';
+import { onPageLoad } from './utils/onPageLoad.js';
 
-document.addEventListener("DOMContentLoaded", function() {
+onPageLoad(function() {
+    const accountingPaths = [
+        '/admin/settings/accounting', '/admin/accounting/accounting-setting',
+        '/admin/accounting/journal', '/admin/accounting/general-ledger',
+        '/admin/reports/income-statement', '/admin/reports/balance-sheet',
+        '/admin/reports/aged-receivables', '/admin/reports/aged-payables'
+    ];
+    if (!accountingPaths.some(p => window.location.pathname.includes(p))) return;
+
     const coaTemplateModalElement = document.getElementById("coaTemplateConfirmationModal");
 
     if (coaTemplateModalElement) {

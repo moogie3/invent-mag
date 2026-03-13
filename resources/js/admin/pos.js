@@ -7,8 +7,10 @@ import { initPaymentApi } from './partials/pos/payment/api.js';
 import { populatePaymentModal } from './partials/pos/payment/modal.js';
 import { initQuickCreateCustomer } from './partials/pos/quickCreate/customer.js';
 import { initQuickCreateProduct } from './partials/pos/quickCreate/product.js';
+import { onPageLoad } from './utils/onPageLoad.js';
 
-document.addEventListener("DOMContentLoaded", function () {
+onPageLoad(function () {
+    if (!window.location.pathname.includes("/admin/pos")) return;
     const urlParams = new URLSearchParams(window.location.search);
     const successParam = urlParams.get("success");
 

@@ -1,6 +1,9 @@
+import { onPageLoad } from './utils/onPageLoad.js';
+
 let rowCounter = null;
 
-document.addEventListener("DOMContentLoaded", function () {
+onPageLoad(function () {
+    if (!window.location.pathname.includes("/admin/accounting/journal-entries")) return;
     initializeJournalEntry();
 });
 

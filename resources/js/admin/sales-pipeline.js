@@ -24,10 +24,14 @@ import {
     calculateTotalAmount,
 } from "./partials/sales-pipeline/modals/opportunityItems.js";
 
-const pipelineSelect = document.getElementById("pipelineSelect");
-const newStagePipelineId = document.getElementById("newStagePipelineId");
+import { onPageLoad } from './utils/onPageLoad.js';
 
-document.addEventListener("DOMContentLoaded", function () {
+onPageLoad(function () {
+    if (!window.location.pathname.includes("/admin/sales-pipeline")) return;
+
+    const pipelineSelect = document.getElementById("pipelineSelect");
+    const newStagePipelineId = document.getElementById("newStagePipelineId");
+
     initializeData();
     initNewOpportunityForm();
     initNewPipelineForm();

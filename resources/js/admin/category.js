@@ -1,7 +1,9 @@
 import { handleEditCategoryModal } from './partials/category/handleEditCategoryModal.js';
 import { initSelectableTable } from "./layouts/selectable-table.js";
+import { onPageLoad } from './utils/onPageLoad.js';
 
-document.addEventListener("DOMContentLoaded", function () {
+onPageLoad(function () {
+    if (!window.location.pathname.includes("/admin/settings/categor")) return;
     handleEditCategoryModal();
     initSelectableTable();
 

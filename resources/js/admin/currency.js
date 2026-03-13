@@ -4,8 +4,10 @@ import { updateHiddenFields } from './partials/currency/form.js';
 import { setupModalEventListeners } from './partials/currency/modal.js';
 import { handleFormSubmission } from './partials/currency/api.js';
 import * as elements from './partials/currency/elements.js';
+import { onPageLoad } from './utils/onPageLoad.js';
 
-document.addEventListener("DOMContentLoaded", function () {
+onPageLoad(function () {
+    if (!window.location.pathname.includes("/admin/settings/currency")) return;
     updateHiddenFields();
     updateFormatPreview(originalValues);
 

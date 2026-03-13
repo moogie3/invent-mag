@@ -10,6 +10,7 @@ import {
 } from "./partials/sales-order/bulkActions/actions.js";
 import { initSelectableTable } from "./layouts/selectable-table.js";
 import { escapeHtml } from "../utils/sanitize.js";
+import { onPageLoad } from "./utils/onPageLoad.js";
 
 // Expose global functions for inline event handlers
 window.clearSalesSelection = function () {
@@ -27,8 +28,9 @@ window.bulkExportSales = bulkExportSales;
 window.bulkMarkAsPaidSales = bulkMarkAsPaidSales;
 window.exportAllSales = exportAllSales;
 
-document.addEventListener("DOMContentLoaded", function () {
+onPageLoad(function () {
     const pathname = window.location.pathname;
+    if (!pathname.includes("/admin/sales")) return;
     if (pathname.includes("/admin/sales/edit")) {
         initSelectableTable({
             registerEditShortcut: false,
@@ -190,8 +192,9 @@ if (typeof window.loadSalesDetails === "undefined") {
     };
 }
 
-// JavaScript for Sales Expiring Soon functionality
-document.addEventListener("DOMContentLoaded", function () {
+// Sales Expiring Soon functionality
+onPageLoad(function () {
+    if (!window.location.pathname.includes("/admin/sales")) return;
     const expiringSalesModalElement =
         document.getElementById("expiringSalesModal");
     if (expiringSalesModalElement) {

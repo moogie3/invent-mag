@@ -86,7 +86,28 @@
             "php-http/discovery": true
         },
         "platform": {
-            "php": "8.2"
+            "php": "8.2",
+            "ext-bcmath": "1",
+            "ext-curl": "1",
+            "ext-dom": "1",
+            "ext-fileinfo": "1",
+            "ext-gd": "1",
+            "ext-iconv": "1",
+            "ext-intl": "1",
+            "ext-json": "1",
+            "ext-libxml": "1",
+            "ext-mbstring": "1",
+            "ext-openssl": "1",
+            "ext-pcntl": "1",
+            "ext-pcre": "1",
+            "ext-pdo": "1",
+            "ext-pdo_mysql": "1",
+            "ext-simplexml": "1",
+            "ext-tokenizer": "1",
+            "ext-xml": "1",
+            "ext-xmlwriter": "1",
+            "ext-zip": "1.21.1",
+            "ext-zlib": "1"
         }
     },
     "minimum-stability": "stable",

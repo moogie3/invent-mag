@@ -34,6 +34,7 @@ RUN apt-get update && apt-get install -y \
     libjpeg62-turbo-dev \
     libwebp-dev \
     libxpm-dev \
+    libicu-dev \
     netcat-openbsd # // NOTE: Added netcat (nc) for the database wait loop in start.sh
 
 RUN apt-get clean && rm -rf /var/lib/apt/lists/*
@@ -41,7 +42,8 @@ RUN apt-get clean && rm -rf /var/lib/apt/lists/*
 # Install PHP extensions
 # // NOTE: Configure and install GD with support for multiple formats
 RUN docker-php-ext-configure gd --with-freetype --with-jpeg --with-webp
-RUN docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd zip
+# // NOTE: Added intl, xml, dom, simplexml, xmlwriter, curl required by updated packages
+RUN docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd zip intl xml dom simplexml xmlwriter curl
 
 # Set PHP memory limit
 RUN echo "memory_limit=512M" > /usr/local/etc/php/conf.d/memory-limit.ini

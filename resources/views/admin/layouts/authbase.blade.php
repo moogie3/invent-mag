@@ -16,9 +16,11 @@
     <link href="{{ asset('tabler/dist/css/tabler-vendors.min.css') }}" rel="stylesheet" />
     @vite('resources/css/auth.css')
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+    @vite('resources/js/admin/layouts/page-loader.js')
 </head>
 
-<body class="auth-body">
+<body class="auth-body is-loading-page">
+    @include('admin.layouts.partials.global-loader')
     <div class="auth-content">
         <div class="page-center">
             <div class="container-tight">
@@ -41,7 +43,6 @@
     @include('admin.layouts.script')
     @vite('resources/js/admin/layouts/theme-visibility.js')
     @vite('resources/js/admin/layouts/theme-toggle.js')
-    @turbo
 </body>
 
 </html>

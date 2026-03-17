@@ -1,4 +1,6 @@
-document.addEventListener("DOMContentLoaded", function () {
+import { onPageLoad } from './utils/onPageLoad.js';
+
+onPageLoad(function () {
     // ============================================
     // Password Validation Logic
     // ============================================
@@ -9,7 +11,6 @@ document.addEventListener("DOMContentLoaded", function () {
     const mismatchError = document.getElementById('password-mismatch-error');
 
     if (passwordField && confirmPasswordField && submitButton) {
-        
         /**
          * Validate password strength requirements
          * - At least 8 characters
@@ -26,7 +27,7 @@ document.addEventListener("DOMContentLoaded", function () {
             if (!/[a-z]/.test(password)) return false; // Must contain lowercase
             if (!/[A-Z]/.test(password)) return false; // Must contain uppercase
             if (!/\d/.test(password)) return false; // Must contain number
-            if (!/[!@#$%^&*()_+\-=\[\]{}|;:,.<>?]/.test(password)) return false; // Must contain special char
+            if (!/[!@#$%^&*()_+-=[]{}|;:,.<>?]/.test(password)) return false; // Must contain special char
             return true;
         }
 
@@ -41,7 +42,7 @@ document.addEventListener("DOMContentLoaded", function () {
             const confirmPassword = confirmPasswordField.value;
             
             // Only validate if user has started typing in confirmation field
-            if (confirmPassword.length > 0 && password !== confirmPassword) {
+            if (confirmPassword.length > 0 && password !== comparePassword) {
                 confirmPasswordField.classList.add('is-invalid');
                 if (mismatchError) mismatchError.style.display = 'block';
                 return false;

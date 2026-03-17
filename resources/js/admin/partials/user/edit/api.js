@@ -1,6 +1,8 @@
-import { editUserModal, editUserIdInput, editUserForm } from '../common/elements.js';
+import { getEditUserModal, editUserModal, editUserIdInput, editUserForm } from '../common/elements.js';
 
 export function initEditUserFormSubmission() {
+    if (!editUserForm) return;
+    
     editUserForm.addEventListener("submit", function (event) {
         event.preventDefault();
 
@@ -29,20 +31,22 @@ export function initEditUserFormSubmission() {
                 if (data.success) {
                     InventMagApp.showToast("Success", data.message, "success");
 
-                    editUserModal.hide();
-
-                    editUserModal._element.addEventListener(
-                        "hidden.bs.modal",
-                        function handler() {
-                            editUserModal._element.removeEventListener(
-                                "hidden.bs.modal",
-                                handler
-                            );
-                            const backdrops =
-                                document.querySelectorAll(".modal-backdrop");
-                            backdrops.forEach((backdrop) => backdrop.remove());
-                        }
-                    );
+                    const modal = getEditUserModal();
+                    if (modal) {
+                        modal.hide();
+                        modal._element.addEventListener(
+                            "hidden.bs.modal",
+                            function handler() {
+                                modal._element.removeEventListener(
+                                    "hidden.bs.modal",
+                                    handler
+                                );
+                                const backdrops =
+                                    document.querySelectorAll(".modal-backdrop");
+                                backdrops.forEach((backdrop) => backdrop.remove());
+                            }
+                        );
+                    }
 
                     const userRow = document.querySelector(
                         `tr:has(a[data-user-id="${data.user.id}"])`

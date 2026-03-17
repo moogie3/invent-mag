@@ -1,7 +1,9 @@
-import { confirmDeleteBtn, deleteUserModal } from '../common/elements.js';
+import { confirmDeleteBtn, getDeleteUserModal } from '../common/elements.js';
 import { currentUserId, setCurrentUserId } from '../common/state.js';
 
 export function initDeleteUserFormSubmission() {
+    if (!confirmDeleteBtn) return;
+    
     confirmDeleteBtn.addEventListener("click", function (e) {
         e.preventDefault();
 
@@ -43,7 +45,8 @@ export function initDeleteUserFormSubmission() {
             })
             .then((data) => {
                 if (data.success) {
-                    deleteUserModal.hide();
+                    const modal = getDeleteUserModal();
+                    if (modal) modal.hide();
 
                     const userRow = document.querySelector(
                         `tr:has(a[data-user-id="${currentUserId}"])`

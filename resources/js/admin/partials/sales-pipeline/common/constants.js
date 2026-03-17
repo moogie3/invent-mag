@@ -1,6 +1,6 @@
 export const CSRF_TOKEN = document
     .querySelector('meta[name="csrf-token"]')
-    .getAttribute("content");
+    ?.getAttribute("content") || '';
 
 export const SALES_PIPELINE_ROUTES = {
     pipelinesIndex: "/admin/sales-pipeline/pipelines",

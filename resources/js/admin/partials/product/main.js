@@ -9,7 +9,6 @@ import { bulkDeleteProducts } from './bulkActions/delete.js'; // Import bulkDele
 import { getStockClassAndText } from './utils/ui.js';
 
 export function initProductPage() {
-    document.addEventListener("DOMContentLoaded", function () {
         initModals();
         initProductModal();
         initBulkSelection();
@@ -149,7 +148,7 @@ export function initProductPage() {
             // Initialize adjustment preview
             updateAdjustmentPreview();
 
-            new bootstrap.Modal(document.getElementById('adjustStockModal')).show();
+            new bootstrap.Modal(document.getElementById('adjustStockModal', {})).show();
         };
 
         const adjustCurrentStockInput = document.getElementById('adjustCurrentStock');
@@ -318,7 +317,6 @@ export function initProductPage() {
             });
         }
 
-        window.bulkDeleteProducts = bulkDeleteProducts; // Expose globally
-        window.clearProductSelection = clearProductSelection; // Expose globally
-    });
+         window.bulkDeleteProducts = bulkDeleteProducts; // Expose globally
+         window.clearProductSelection = clearProductSelection; // Expose globally
 }

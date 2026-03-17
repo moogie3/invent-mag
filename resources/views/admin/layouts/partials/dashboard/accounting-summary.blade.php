@@ -8,7 +8,7 @@
                 @if(isset($financialItems))
                     @foreach($financialItems as $item)
                         <div class="col-md-4">
-                            <div class="card card-sm border-light shadow-none rounded-3">
+                            <div class="card card-sm border-secondary shadow-none rounded-3">
                                 <div class="card-body">
                                     <div class="row align-items-center">
                                         <div class="col-auto">

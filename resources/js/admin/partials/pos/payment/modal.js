@@ -2,21 +2,33 @@ import { getProducts } from '../cart/state.js';
 import { subtotal, orderDiscount, taxAmount, grandTotal } from '../cart/totals.js';
 import { formatCurrency } from '../../../../utils/currencyFormatter.js';
 
-const paymentModal = new bootstrap.Modal(
-    document.getElementById("paymentModal")
-);
-const modalProductList = document.getElementById("modalProductList");
-const modalSubtotal = document.getElementById("modalSubtotal");
-const modalDiscount = document.getElementById("modalDiscount");
-const modalTax = document.getElementById("modalTax");
-const modalGrandTotal = document.getElementById("modalGrandTotal");
-const amountReceived = document.getElementById("amountReceived");
-const changeAmount = document.getElementById("changeAmount");
-const orderDiscountElement = document.getElementById("orderDiscount");
-const discountTypeElement = document.getElementById("discountType");
-const taxRateElement = document.getElementById("taxRate");
+let _paymentModal = null;
+
+function getPaymentModal() {
+    if (!_paymentModal) {
+        const el = document.getElementById("paymentModal");
+        _paymentModal = el ? new bootstrap.Modal(el, {}) : null;
+    }
+    return _paymentModal;
+}
 
 export function populatePaymentModal() {
+    const paymentModal = getPaymentModal();
+    if (!paymentModal) return;
+    
+    const modalProductList = document.getElementById("modalProductList");
+    const modalSubtotal = document.getElementById("modalSubtotal");
+    const modalDiscount = document.getElementById("modalDiscount");
+    const modalTax = document.getElementById("modalTax");
+    const modalGrandTotal = document.getElementById("modalGrandTotal");
+    const amountReceived = document.getElementById("amountReceived");
+    const changeAmount = document.getElementById("changeAmount");
+    const orderDiscountElement = document.getElementById("orderDiscount");
+    const discountTypeElement = document.getElementById("discountType");
+    const taxRateElement = document.getElementById("taxRate");
+    
+    if (!modalProductList || !modalSubtotal) return;
+    
     const products = getProducts();
     modalProductList.innerHTML = "";
 
@@ -54,5 +66,5 @@ export function populatePaymentModal() {
     amountReceived.value = "";
     changeAmount.textContent = formatCurrency(0);
 
-    paymentModal.show();
+    if (paymentModal) paymentModal.show();
 }

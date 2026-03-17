@@ -63,7 +63,7 @@
                     {{ __('messages.product_modal_bulk_delete_message_part2') }}
                 </p>
 
-                <div class="bg-light p-3 rounded">
+                <div class="bg-body-secondary p-3 rounded">
                     <h6 class="mb-2"><i class="ti ti-info-circle me-1"></i>
                         {{ __('messages.product_modal_bulk_delete_what_deleted_title') }}</h6>
                     <ul class="list-unstyled mb-0 small">
@@ -261,7 +261,7 @@
 <div id="productModalViewTemplate" style="display: none;">
     <div class="card border-0 shadow-sm rounded-3">
         <!-- Header Section -->
-        <div class="card-header py-3 bg-light">
+        <div class="card-header py-3 bg-body-secondary">
             <div class="row align-items-center w-100">
                 <div class="col">
                     <h2 class="mb-0 fw-bold" id="productName"></h2>
@@ -466,7 +466,7 @@
                 </div>
 
                 <!-- Bulk Actions Section -->
-                <div class="border-bottom p-3 bg-light-lt">
+                <div class="border-bottom p-3 bg-body-secondary-lt">
                     <div class="row g-3 align-items-end">
                         <div class="col-md-4">
                             <label class="form-label fw-bold">{{ __('messages.warehouse') }}</label>

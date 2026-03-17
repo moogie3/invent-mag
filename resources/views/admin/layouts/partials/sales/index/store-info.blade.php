@@ -18,7 +18,7 @@
     <div class="row g-3 mb-4">
         <!-- Store Details -->
         <div class="col-md-3">
-            <div class="card border-0 shadow-sm rounded-3 bg-light-lt">
+            <div class="card border-0 shadow-sm rounded-3 h-100">
                 <div class="card-body py-3">
                     <div class="mb-2">
                         <label class="form-label text-muted mb-2 d-block fw-bold">
@@ -26,7 +26,7 @@
                         </label>
                     </div>
                     <div class="d-flex align-items-center mb-3">
-                        <div class="me-3 d-flex align-items-center justify-content-center rounded-3 badge bg-white shadow-sm"
+                        <div class="me-3 d-flex align-items-center justify-content-center rounded-3 badge bg-body border shadow-sm"
                             style="width: 40px; height: 40px;">
                             <i class="ti ti-building-store fs-3 text-primary"></i>
                         </div>
@@ -36,7 +36,7 @@
                         </div>
                     </div>
                     <div class="d-flex align-items-center mb-3">
-                        <div class="me-3 d-flex align-items-center justify-content-center rounded-3 badge bg-white shadow-sm"
+                        <div class="me-3 d-flex align-items-center justify-content-center rounded-3 badge bg-body border shadow-sm"
                             style="width: 40px; height: 40px;">
                             <i class="ti ti-map fs-3 text-success"></i>
                         </div>
@@ -46,7 +46,7 @@
                         </div>
                     </div>
                     <div class="d-flex align-items-center">
-                        <div class="me-3 d-flex align-items-center justify-content-center rounded-3 badge bg-white shadow-sm"
+                        <div class="me-3 d-flex align-items-center justify-content-center rounded-3 badge bg-body border shadow-sm"
                             style="width: 40px; height: 40px;">
                             <i class="ti ti-file-invoice fs-3 text-info"></i>
                         </div>
@@ -61,7 +61,7 @@
 
         <!-- Sales Overview -->
         <div class="col-md-6">
-            <div class="card border-0 shadow-sm rounded-3 bg-azure-lt">
+            <div class="card border-0 shadow-sm rounded-3 h-100">
                 <div class="card-body py-3">
                     <div class="mb-2">
                         <label class="form-label text-primary mb-2 d-block fw-bold">
@@ -71,7 +71,7 @@
                     <div class="row g-3">
                         <div class="col-md-6">
                             <div class="d-flex align-items-center">
-                                <div class="me-3 d-flex align-items-center justify-content-center rounded-3 badge bg-white shadow-sm"
+                                <div class="me-3 d-flex align-items-center justify-content-center rounded-3 badge bg-body border shadow-sm"
                                     style="width: 40px; height: 40px;">
                                     <i class="ti ti-currency fs-3 text-primary"></i>
                                 </div>
@@ -84,7 +84,7 @@
                         </div>
                         <div class="col-md-6">
                             <div class="d-flex align-items-center">
-                                <div class="me-3 d-flex align-items-center justify-content-center rounded-3 badge bg-white shadow-sm"
+                                <div class="me-3 d-flex align-items-center justify-content-center rounded-3 badge bg-body border shadow-sm"
                                     style="width: 40px; height: 40px;">
                                     <i class="ti ti-http-post fs-3 text-success"></i>
                                 </div>
@@ -97,7 +97,7 @@
                         </div>
                         <div class="col-md-6">
                             <div class="d-flex align-items-center">
-                                <div class="me-3 d-flex align-items-center justify-content-center rounded-3 badge bg-white shadow-sm"
+                                <div class="me-3 d-flex align-items-center justify-content-center rounded-3 badge bg-body border shadow-sm"
                                     style="width: 40px; height: 40px;">
                                     <i class="ti ti-moneybag fs-3 text-warning"></i>
                                 </div>
@@ -110,7 +110,7 @@
                         </div>
                         <div class="col-md-6">
                             <div class="d-flex align-items-center">
-                                <div class="me-3 d-flex align-items-center justify-content-center rounded-3 badge bg-white shadow-sm"
+                                <div class="me-3 d-flex align-items-center justify-content-center rounded-3 badge bg-body border shadow-sm"
                                     style="width: 40px; height: 40px;">
                                     <i class="ti ti-loader fs-3 text-warning"></i>
                                 </div>
@@ -122,7 +122,7 @@
                         </div>
                         <div class="col-md-6">
                             <div class="d-flex align-items-center">
-                                <div class="me-3 d-flex align-items-center justify-content-center rounded-3 badge bg-white shadow-sm"
+                                <div class="me-3 d-flex align-items-center justify-content-center rounded-3 badge bg-body border shadow-sm"
                                     style="width: 40px; height: 40px;">
                                     <i class="ti ti-reload fs-3 text-info"></i>
                                 </div>
@@ -134,7 +134,7 @@
                         </div>
                         <div class="col-md-12">
                             <div class="d-flex align-items-center pt-2 border-top">
-                                <div class="me-3 d-flex align-items-center justify-content-center rounded-3 badge bg-white shadow-sm"
+                                <div class="me-3 d-flex align-items-center justify-content-center rounded-3 badge bg-body border shadow-sm"
                                     style="width: 40px; height: 40px;">
                                     <i class="ti ti-calendar-time fs-3 text-muted"></i>
                                 </div>
@@ -158,7 +158,7 @@
 
         <!-- Filters -->
         <div class="col-md-3">
-            <div class="card border-0 shadow-sm rounded-3 bg-light">
+            <div class="card border-0 shadow-sm rounded-3">
                 <div class="card-body py-3 d-flex align-items-center">
                     <div class="w-100">
                         @include('admin.layouts.partials.sales.index.filters')

@@ -257,7 +257,7 @@ function initAutoLogout(settings) {
         document.body.insertAdjacentHTML('beforeend', modalHtml);
 
         const modalElement = document.getElementById('inactivityModal');
-        const modal = new bootstrap.Modal(modalElement);
+        const modal = new bootstrap.Modal(modalElement, {});
         modal.show();
 
         document.getElementById('stayLoggedInBtn').addEventListener('click', () => {
@@ -304,12 +304,12 @@ if (document.querySelector('meta[name="csrf-token"]')) {
     fetchSystemSettings();
 }
 
-document.addEventListener('DOMContentLoaded', () => {
-    // Handle session-based notifications immediately on DOM load
+// Handle session-based notifications on DOM ready (works for both turbo and full page loads)
+function handleNotificationsOnLoad() {
     if (window.handleSessionNotifications) {
         window.handleSessionNotifications();
     }
-
+    
     // Also handle notifications passed via URL parameters
     const urlParams = new URLSearchParams(window.location.search);
     const status = urlParams.get('status');
@@ -321,10 +321,24 @@ document.addEventListener('DOMContentLoaded', () => {
         } else if (status === 'error') {
             InventMagApp.showToast('Error', decodeURIComponent(message), 'error');
         }
-
-        // Clean up the URL
         window.history.replaceState({}, document.title, window.location.pathname);
     }
+}
+
+// Run on DOMContentLoaded for full page loads
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', handleNotificationsOnLoad);
+} else {
+    handleNotificationsOnLoad();
+}
+
+// Also run on turbo:load for turbo navigations
+document.addEventListener('turbo:load', handleNotificationsOnLoad);
+
+import { onPageLoad } from '../utils/onPageLoad.js';
+
+onPageLoad(() => {
+    // Additional handling if needed on turbo navigation
 });
 
 function resetToDefaults() {

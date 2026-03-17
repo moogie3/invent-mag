@@ -25,7 +25,7 @@
                     {{ __('messages.recent_modal_review_transaction_details') }}
                 </p>
 
-                <div class="bg-light p-3 rounded mb-3">
+                <div class="bg-body-secondary p-3 rounded mb-3">
                     <h6 class="mb-3"><i class="ti ti-file-invoice me-1"></i>
                         {{ __('messages.recent_modal_transaction_details') }}</h6>
                     <div class="row mb-2">
@@ -46,7 +46,7 @@
                     </div>
                 </div>
 
-                <div class="bg-light p-3 rounded">
+                <div class="bg-body-secondary p-3 rounded">
                     <h6 class="mb-2"><i class="ti ti-info-circle me-1"></i>
                         {{ __('messages.po_modal_bulk_mark_paid_what_updated_title') }}</h6>
                     <ul class="list-unstyled mb-0 small">
@@ -111,7 +111,7 @@
                     {{ __('messages.recent_modal_bulk_mark_as_paid_message_part2') }}
                 </p>
 
-                <div class="bg-light p-3 rounded">
+                <div class="bg-body-secondary p-3 rounded">
                     <h6 class="mb-2"><i class="ti ti-info-circle me-1"></i>
                         {{ __('messages.po_modal_bulk_mark_paid_what_updated_title') }}</h6>
                     <ul class="list-unstyled mb-0 small">

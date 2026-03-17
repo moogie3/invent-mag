@@ -1,0 +1,36 @@
+--- resources/js/admin/bootstrap-init.js
++++ resources/js/admin/bootstrap-init.js
+@@ -16,13 +16,14 @@
+             var dropdowns = document.querySelectorAll('[data-bs-toggle="dropdown"]:not(.bs-init-done)');
+             var tooltips = document.querySelectorAll('[data-bs-toggle="tooltip"]:not(.bs-init-done)');
+             var popovers = document.querySelectorAll('[data-bs-toggle="popover"]:not(.bs-init-done)');
++            var modals = document.querySelectorAll('.modal:not(.bs-init-done)');
+ 
+-            if (dropdowns.length === 0 && tooltips.length === 0 && popovers.length === 0) {
++            if (dropdowns.length === 0 && tooltips.length === 0 && popovers.length === 0 && modals.length === 0) {
+                 return;
+             }
+ 
+             console.log('Bootstrap found, initializing ' + 
+-                (dropdowns.length + tooltips.length + popovers.length) + ' components...');
++                (dropdowns.length + tooltips.length + popovers.length + modals.length) + ' components...');
+             
+             // Initialize all dropdowns
+             dropdowns.forEach(function(toggle) {
+@@ -53,6 +54,17 @@
+                     } catch(e) {}
+                 }
+             });
++            
++            // Initialize all modals
++            modals.forEach(function(modal) {
++                if (!bootstrap.Modal.getInstance(modal)) {
++                    try {
++                        new bootstrap.Modal(modal, {});
++                        modal.classList.add('bs-init-done');
++                    } catch(e) {}
++                }
++            });
+             
+             console.log('Bootstrap initialization complete');
+         } else {

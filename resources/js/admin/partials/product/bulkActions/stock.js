@@ -35,7 +35,7 @@ export function bulkUpdateStock() {
                 }
             }
 
-            const modal = new bootstrap.Modal(modalElement);
+            const modal = new bootstrap.Modal(modalElement, {});
             modal.show();
             loadBulkUpdateProductsFromTable(selected);
             initializeBulkUpdateHandlers();

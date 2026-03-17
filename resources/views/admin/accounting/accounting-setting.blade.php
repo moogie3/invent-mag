@@ -5,8 +5,7 @@
 @section('content')
     <meta name="apply-template-warning" content="{{ __('messages.apply_template_warning') }}">
     <div class="page-wrapper">
-        <div class="page-wrapper">
-            <div class="page-body">
+        <div class="page-body">
                 <div class="{{ $containerClass ?? "container-xl" }}">
                     <div class="card border-0 shadow-sm rounded-3">
                         <div class="card-body">

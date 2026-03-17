@@ -1,4 +1,4 @@
-<div class="h-100 p-4 bg-light rounded-3">
+<div class="h-100 p-4 bg-body-secondary rounded-3">
     <h5 class="card-title mb-3 text-primary">
         <i class="ti ti-info-circle me-2"></i>{{ __('messages.po_order_summary_title') }}
     </h5>

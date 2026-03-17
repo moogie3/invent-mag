@@ -1,7 +1,8 @@
 import { togglePasswordVisibility } from './partials/auth/togglePasswordVisibility.js';
 import { showContentAfterLoading } from './partials/auth/showContentAfterLoading.js';
+import { onPageLoad } from './utils/onPageLoad.js';
 
-document.addEventListener("DOMContentLoaded", function () {
+onPageLoad(function () {
     togglePasswordVisibility();
     showContentAfterLoading();
 
@@ -11,7 +12,7 @@ document.addEventListener("DOMContentLoaded", function () {
     // Reset button state on page load (in case of validation errors from previous submit)
     if (loginBtn) {
         const btnText = loginBtn.querySelector('.login-btn-text');
-        const btnLoading = loginBtn.querySelector('.login-btn-loading');
+        const btnLoading = loginBtn.querySelector('.btn-loading');
         if (btnText && btnLoading) {
             btnText.classList.remove('d-none');
             btnLoading.classList.add('d-none');
@@ -25,7 +26,7 @@ document.addEventListener("DOMContentLoaded", function () {
         loginForm.addEventListener('submit', function() {
             if (loginBtn) {
                 const btnText = loginBtn.querySelector('.login-btn-text');
-                const btnLoading = loginBtn.querySelector('.login-btn-loading');
+                const btnLoading = loginBtn.querySelector('.btn-loading');
                 if (btnText && btnLoading) {
                     btnText.classList.add('d-none');
                     btnLoading.classList.remove('d-none');

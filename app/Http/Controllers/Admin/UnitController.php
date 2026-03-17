@@ -25,10 +25,17 @@ class UnitController extends Controller
 
     public function store(Request $request)
     {
-        $request->validate([
+        $validator = \Illuminate\Support\Facades\Validator::make($request->all(), [
             'name' => 'required',
             'symbol' => 'required',
         ]);
+
+        if ($validator->fails()) {
+            if ($request->ajax()) {
+                return response()->json(['success' => false, 'message' => $validator->errors()->first(), 'errors' => $validator->errors()], 422);
+            }
+            return redirect()->route('admin.setting.unit')->withErrors($validator)->withInput();
+        }
 
         $result = $this->unitService->createUnit($request->all());
 
@@ -36,7 +43,7 @@ class UnitController extends Controller
             if ($request->ajax()) {
                 return response()->json(['success' => false, 'message' => $result['message'], 'errors' => ['name' => [$result['message']]]], 422);
             }
-            return back()->withErrors(['name' => $result['message']])->withInput();
+            return redirect()->route('admin.setting.unit')->withErrors(['name' => $result['message']])->withInput();
         }
 
         if ($request->ajax()) {
@@ -47,19 +54,33 @@ class UnitController extends Controller
 
     public function update(Request $request, $id)
     {
-        $request->validate([
+        $validator = \Illuminate\Support\Facades\Validator::make($request->all(), [
             'name' => 'required',
             'symbol' => 'required',
         ]);
 
+        if ($validator->fails()) {
+            if ($request->ajax()) {
+                return response()->json(['success' => false, 'message' => $validator->errors()->first(), 'errors' => $validator->errors()], 422);
+            }
+            return redirect()->route('admin.setting.unit')->withErrors($validator)->withInput();
+        }
+
         $unit = Unit::find($id);
+        if (!$unit) {
+            if ($request->ajax()) {
+                return response()->json(['success' => false, 'message' => 'Unit not found.'], 404);
+            }
+            return redirect()->route('admin.setting.unit')->with('error', 'Unit not found.');
+        }
+
         $result = $this->unitService->updateUnit($unit, $request->all());
 
         if (!$result['success']) {
             if ($request->ajax()) {
                 return response()->json(['success' => false, 'message' => $result['message'], 'errors' => ['name' => [$result['message']]]], 422);
             }
-            return back()->withErrors(['name' => $result['message']])->withInput();
+            return redirect()->route('admin.setting.unit')->withErrors(['name' => $result['message']])->withInput();
         }
 
         if ($request->ajax()) {

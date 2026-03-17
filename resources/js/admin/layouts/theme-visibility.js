@@ -1,5 +1,6 @@
+import { onPageLoad } from '../utils/onPageLoad.js';
 
-document.addEventListener('DOMContentLoaded', function () {
+onPageLoad(() => {
     // Find all theme toggle containers
     const navbarToggleContainer = document.getElementById('theme-toggle-navbar-container');
     const sidebarToggleContainer = document.getElementById('theme-toggle-sidebar-container');

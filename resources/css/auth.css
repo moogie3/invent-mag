@@ -7,31 +7,33 @@
 }
 
 .auth-body {
-    background: url('@/images/background.jpeg') no-repeat center center;
+    background: url('@/images/background.jpeg') no-repeat center center fixed;
     background-size: cover;
     min-height: 100vh;
+    width: 100%;
     display: flex;
     align-items: center;
     justify-content: center;
     font-feature-settings: "cv03", "cv04", "cv11";
+    margin: 0;
+    padding: 0;
 }
 
 .auth-content {
     width: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    max-width: 525px;
+    padding: 1.5rem;
+    z-index: 1;
 }
 
 .page-center {
     background: rgba(255, 255, 255, 0.8);
-    padding: 30px;
+    padding: 2rem;
     border-radius: 20px;
-    box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
     width: 100%;
-    max-width: 525px;
-    margin: 0 auto;
-    animation: fadeInUp 0.8s ease-in-out;
+    animation: fadeInUp 0.6s ease-out;
+    backdrop-filter: blur(5px);
 }
 
 @keyframes fadeInUp {
@@ -39,7 +41,6 @@
         opacity: 0;
         transform: translateY(20px);
     }
-
     to {
         opacity: 1;
         transform: translateY(0);
@@ -47,7 +48,6 @@
 }
 
 html[data-bs-theme="dark"] {
-
     /* Ensure Invent-MAG title is white in dark mode */
     .navbar-brand,
     .navbar-brand .nav-link {
@@ -55,7 +55,7 @@ html[data-bs-theme="dark"] {
     }
 
     .page-center {
-        background: rgba(0, 0, 0, 0.6);
+        background: rgba(24, 36, 51, 0.7);
     }
 }
 
@@ -68,11 +68,48 @@ html[data-bs-theme="dark"] {
     border-color: var(--tblr-form-control-focus-border-color);
 }
 
-/* Theme toggle button background to match page-center */
+/* Theme toggle button styling */
+#theme-toggle-button {
+    z-index: 1001;
+    backdrop-filter: blur(4px);
+}
+
 html[data-bs-theme="light"] .theme-toggle-button {
     background-color: rgba(255, 255, 255, 0.8);
 }
 
 html[data-bs-theme="dark"] .theme-toggle-button {
     background-color: rgba(0, 0, 0, 0.6);
+}
+
+/* Global Page Loader Styles (Same as app.css) */
+.page-loader {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(255, 255, 255, 0.9);
+    backdrop-filter: blur(3px);
+    z-index: 10000;
+    display: none;
+    justify-content: center;
+    align-items: center;
+    transition: opacity 0.2s ease-in-out;
+    pointer-events: none;
+    opacity: 0;
+}
+
+[data-bs-theme="dark"] .page-loader {
+    background-color: rgba(24, 36, 51, 0.9);
+}
+
+.is-loading-page {
+    overflow: hidden !important;
+}
+
+.is-loading-page .page-loader {
+    display: flex !important;
+    opacity: 1 !important;
+    pointer-events: all !important;
 }

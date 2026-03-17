@@ -1,6 +1,7 @@
 import { loadMidtrans } from '../utils/midtrans.js';
+import { onPageLoad } from '../utils/onPageLoad.js';
 
-document.addEventListener('DOMContentLoaded', function() {
+onPageLoad(() => {
     initCountdown();
     initPayment();
 });

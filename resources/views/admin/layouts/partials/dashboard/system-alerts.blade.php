@@ -30,11 +30,11 @@
                         @php $product = $item->product; @endphp
                         <a href="{{ route('admin.product.edit', $product->id) }}" class="list-group-item list-group-item-action py-3">
                             <div class="d-flex align-items-start gap-3">
-                                <div class="avatar avatar-md rounded border bg-light flex-shrink-0" style="width: 48px; height: 48px;">
-                                    @if (empty($product->image) || strtolower($product->image) === 'null' || strtolower($product->image) === 'undefined' || $product->image === asset('img/default_placeholder.png'))
+                                <div class="avatar avatar-md rounded border bg-body-secondary flex-shrink-0" style="width: 48px; height: 48px;">
+                                    @if (empty($product->image) || strpos($product->image, 'default_placeholder.png') !== false)
                                         <i class="ti ti-photo text-muted fs-2"></i>
                                     @else
-                                        <img src="{{ asset($product->image) }}" alt="{{ $product->name }}" class="rounded" style="width: 100%; height: 100%; object-fit: cover;">
+                                        <img src="{{ $product->image }}" alt="{{ $product->name }}" class="rounded" style="width: 100%; height: 100%; object-fit: cover;">
                                     @endif
                                 </div>
                                 <div class="flex-grow-1 min-width-0">
@@ -79,11 +79,11 @@
                         @endphp
                         <a href="{{ route('admin.po.edit', $item->po_id) }}" class="list-group-item list-group-item-action py-3">
                             <div class="d-flex align-items-start gap-3">
-                                <div class="avatar avatar-md rounded border bg-light flex-shrink-0" style="width: 48px; height: 48px;">
-                                    @if (empty($product->image) || strtolower($product->image) === 'null' || strtolower($product->image) === 'undefined' || $product->image === asset('img/default_placeholder.png'))
+                                <div class="avatar avatar-md rounded border bg-body-secondary flex-shrink-0" style="width: 48px; height: 48px;">
+                                    @if (empty($product->image) || strpos($product->image, 'default_placeholder.png') !== false)
                                         <i class="ti ti-photo text-muted fs-2"></i>
                                     @else
-                                        <img src="{{ asset($product->image) }}" alt="{{ $product->name }}" class="rounded" style="width: 100%; height: 100%; object-fit: cover;">
+                                        <img src="{{ $product->image }}" alt="{{ $product->name }}" class="rounded" style="width: 100%; height: 100%; object-fit: cover;">
                                     @endif
                                 </div>
                                 <div class="flex-grow-1 min-width-0">

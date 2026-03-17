@@ -415,6 +415,13 @@
     background-color: rgba(255, 255, 255, 0.05);
 }
 
+[data-bs-theme="dark"] .list-group-item.active {
+    background-color: rgba(255, 255, 255, 0.08);
+    border-color: rgba(255, 255, 255, 0.1);
+    color: #fff;
+    font-weight: 600;
+}
+
 /* Nav tabs */
 [data-bs-theme="dark"] .nav-tabs {
     border-bottom-color: rgba(255, 255, 255, 0.1);
@@ -446,6 +453,11 @@
 }
 
 /* Settings Page Specific */
+[data-bs-theme="dark"] .settings-section-content {
+    background-color: rgba(255, 255, 255, 0.03) !important;
+    border: 1px solid rgba(255, 255, 255, 0.08) !important;
+}
+
 [data-bs-theme="dark"] .settings-section {
     border-bottom: 1px solid rgba(255, 255, 255, 0.05);
     padding-bottom: 1.5rem;
@@ -784,50 +796,15 @@
     color: #6c757d !important; /* Even darker gray */
 }
 
-[data-bs-theme="dark"] .toast-content {
-    background-color: var(--tblr-bg-surface) !important;
-    border: 1px solid var(--tblr-border-color) !important;
-    border-radius: 0.375rem !important;
-    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.3) !important;
-}
-
-/* Ensure toast text colors are correct in dark mode */
-[data-bs-theme="dark"] .toast-content .text-dark {
-    color: var(--tblr-body-color) !important;
-}
-
-[data-bs-theme="dark"] .toast-content .text-muted {
-    color: var(--tblr-secondary-color) !important;
-}
-
-/* Toast color bar styling for dark mode */
-[data-bs-theme="dark"] .toast-color-bar {
-    position: absolute !important;
-    top: 0 !important;
-    left: 0 !important;
-    width: 4px !important;
-    height: 100% !important;
-    border-top-left-radius: 0.375rem !important;
-    border-bottom-left-radius: 0.375rem !important;
-}
+/* Removed forced bg-surface override for .toast-content so colors like bg-success can show */
 
 /* Ensure the close button is visible in dark mode */
 [data-bs-theme="dark"] .toast .btn-close {
-    filter: invert(1) grayscale(100%) brightness(200%) !important;
-    opacity: 0.6 !important;
+    opacity: 0.8 !important;
 }
 
 [data-bs-theme="dark"] .toast .btn-close:hover {
     opacity: 1 !important;
-}
-
-/* Toast container styling */
-[data-bs-theme="dark"] .toast-container {
-    pointer-events: none !important;
-}
-
-[data-bs-theme="dark"] .toast-container .toast {
-    pointer-events: auto !important;
 }
 
 /* Dark mode overrides for SRM/CRM accordion items */

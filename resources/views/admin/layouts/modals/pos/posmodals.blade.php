@@ -13,7 +13,7 @@
                 <div class="card border-0 shadow-sm mb-4">
                     <div class="table-responsive">
                         <table class="table table-vcenter mb-0">
-                            <thead class="bg-light">
+                            <thead class="bg-body-secondary">
                                 <tr class="text-uppercase">
                                     <th class="fw-semibold text-muted">{{ __('messages.table_product') }}</th>
                                     <th class="text-center fw-semibold text-muted">{{ __('messages.table_qty') }}</th>
@@ -28,7 +28,7 @@
                     </div>
 
                     <!-- Order Summary Section -->
-                    <div class="bg-light border-top p-4">
+                    <div class="bg-body-secondary border-top p-4">
                         <div class="row mb-2">
                             <div class="col-8 text-end">
                                 <span class="fw-medium text-muted">{{ __('messages.po_subtotal') }}:</span>
@@ -83,7 +83,7 @@
                             <div class="col-md-6" id="cashPaymentDiv">
                                 <label class="form-label fw-semibold">{{ __('messages.pos_amount_received') }}</label>
                                 <div class="input-group">
-                                    <span class="input-group-text bg-light"><i class="ti ti-currency me-2"></i></span>
+                                    <span class="input-group-text bg-body-secondary"><i class="ti ti-currency me-2"></i></span>
                                     <input type="number" class="form-control" id="amountReceived" min="0"
                                         placeholder="0">
                                     <button type="button" class="btn btn-outline-primary" id="exactAmountBtn"
@@ -106,7 +106,7 @@
             </div>
 
             <!-- Modal Footer -->
-            <div class="modal-footer bg-light">
+            <div class="modal-footer bg-body-secondary">
                 <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
                     <i class="ti ti-x me-1"></i>{{ __('messages.cancel') }}
                 </button>
@@ -154,7 +154,7 @@
                             placeholder="e.g., Net 30" required>
                     </div>
                 </div>
-                <div class="modal-footer bg-light">
+                <div class="modal-footer bg-body-secondary">
                     <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal"><i
                             class="ti ti-x me-1"></i>{{ __('messages.cancel') }}</button>
                     <button type="submit" class="btn btn-primary shadow-sm"><i
@@ -276,7 +276,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="modal-footer bg-light">
+                <div class="modal-footer bg-body-secondary">
                     <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal"><i
                             class="ti ti-x me-1"></i>{{ __('messages.cancel') }}</button>
                     <button type="submit" class="btn btn-primary shadow-sm"><i

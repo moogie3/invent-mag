@@ -17,7 +17,7 @@
 
     <div class="row g-3 mb-4">
         <div class="col-md-3">
-            <div class="card border-0 shadow-sm rounded-3 bg-light-lt">
+            <div class="card border-0 shadow-sm rounded-3 bg-body-secondary-lt">
                 <div class="card-body py-3">
                     <div class="mb-2">
                         <label class="form-label text-muted mb-2 d-block fw-bold">
@@ -25,7 +25,7 @@
                         </label>
                     </div>
                     <div class="d-flex align-items-center mb-3">
-                        <div class="me-3 d-flex align-items-center justify-content-center rounded-3 badge bg-white shadow-sm"
+                        <div class="me-3 d-flex align-items-center justify-content-center rounded-3 badge bg-body shadow-sm"
                             style="width: 48px; height: 48px;">
                             <i class="ti ti-box fs-2 text-primary"></i>
                         </div>
@@ -35,7 +35,7 @@
                         </div>
                     </div>
                     <div class="d-flex align-items-center">
-                        <div class="me-3 d-flex align-items-center justify-content-center rounded-3 badge bg-white shadow-sm"
+                        <div class="me-3 d-flex align-items-center justify-content-center rounded-3 badge bg-body shadow-sm"
                             style="width: 48px; height: 48px;">
                             <i class="ti ti-category fs-2 text-success"></i>
                         </div>
@@ -57,7 +57,7 @@
                         </label>
                     </div>
                     <div class="d-flex align-items-center">
-                        <div class="me-3 d-flex align-items-center justify-content-center rounded-3 badge bg-white shadow-sm"
+                        <div class="me-3 d-flex align-items-center justify-content-center rounded-3 badge bg-body shadow-sm"
                             style="width: 48px; height: 48px;">
                             <i
                                 class="ti ti-alert-triangle fs-2 {{ $lowStockCount > 0 ? 'text-danger' : 'text-success' }}"></i>
@@ -90,7 +90,7 @@
                         </label>
                     </div>
                     <div class="d-flex align-items-center">
-                        <div class="me-3 d-flex align-items-center justify-content-center rounded-3 badge bg-white shadow-sm"
+                        <div class="me-3 d-flex align-items-center justify-content-center rounded-3 badge bg-body shadow-sm"
                             style="width: 48px; height: 48px;">
                             <i
                                 class="ti ti-calendar-time fs-2 {{ $expiringSoonCount > 0 ? 'text-warning' : 'text-success' }}"></i>
@@ -115,7 +115,7 @@
             </div>
         </div>
         <div class="col-md-3">
-            <div class="card border-0 shadow-sm rounded-3 bg-light">
+            <div class="card border-0 shadow-sm rounded-3 bg-body-secondary">
                  <div class="card-body py-3 d-flex align-items-center">
                     <div class="w-100">
                         @include('admin.layouts.partials.product.index.search')

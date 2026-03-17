@@ -26,26 +26,31 @@ onPageLoad(function () {
     initDeleteUserFormSubmission();
     initSelectableTable();
 
-    document
-        .getElementById("editUserModal")
-        .addEventListener("hidden.bs.modal", function () {
-            editUserForm.reset();
-            editRolesContainer.innerHTML = "";
-            editPermissionsContainer.innerHTML = "";
-            resetPermissionStates(editPermissionsContainer);
+    const editUserModalEl = document.getElementById("editUserModal");
+    if (editUserModalEl) {
+        editUserModalEl.addEventListener("hidden.bs.modal", function () {
+            if (editUserForm) editUserForm.reset();
+            if (editRolesContainer) editRolesContainer.innerHTML = "";
+            if (editPermissionsContainer) {
+                editPermissionsContainer.innerHTML = "";
+                resetPermissionStates(editPermissionsContainer);
+            }
         });
+    }
 
-    document
-        .getElementById("deleteUserModal")
-        .addEventListener("hidden.bs.modal", function () {
+    const deleteUserModalEl = document.getElementById("deleteUserModal");
+    if (deleteUserModalEl) {
+        deleteUserModalEl.addEventListener("hidden.bs.modal", function () {
             // currentUserId is handled by the delete/api.js now
-            // confirmDeleteBtn.disabled = false;
-            // confirmDeleteBtn.textContent = "Delete";
         });
+    }
 
     window.shortcutManager.register('alt+n', () => {
-        const createModal = new bootstrap.Modal(document.getElementById('createUserModal'));
-        createModal.show();
+        const createModalEl = document.getElementById('createUserModal');
+        if (createModalEl) {
+            const createModal = new bootstrap.Modal(createModalEl, {});
+            createModal.show();
+        }
     }, 'New User');
 
     window.shortcutManager.register('ctrl+s', () => {

@@ -1,5 +1,9 @@
 class ShortcutManager {
     constructor() {
+        if (window.shortcutManager) {
+            return window.shortcutManager;
+        }
+        
         this.shortcuts = [];
         this.descriptions = {
             showHelpModal: "Showing help modal",
@@ -7,10 +11,19 @@ class ShortcutManager {
             closeModal: "Close active modal/popup",
         };
         this.isMac = navigator.platform.toUpperCase().indexOf("MAC") >= 0;
-        document.addEventListener("keydown", this.handleKeydown.bind(this));
+        
+        // Use a bound function so we can remove it if needed, 
+        // though usually we want this to stay globally.
+        this.boundHandleKeydown = this.handleKeydown.bind(this);
+        document.addEventListener("keydown", this.boundHandleKeydown);
+        
+        window.shortcutManager = this;
     }
 
     register(keys, callback, description) {
+        // Overwrite if keys already exist to prevent accumulation
+        this.unregister(keys);
+        
         this.shortcuts.push({
             keys: keys.toLowerCase(),
             callback,
@@ -21,6 +34,14 @@ class ShortcutManager {
     unregister(keys) {
         this.shortcuts = this.shortcuts.filter(
             (shortcut) => shortcut.keys.toLowerCase() !== keys.toLowerCase()
+        );
+    }
+
+    clearPageShortcuts() {
+        // Keep global shortcuts, clear others
+        const globalShortcuts = ["/", "shift+?", "escape"];
+        this.shortcuts = this.shortcuts.filter((shortcut) =>
+            globalShortcuts.includes(shortcut.keys.toLowerCase())
         );
     }
 
@@ -39,7 +60,7 @@ class ShortcutManager {
             const openModal = document.querySelector(".modal.show");
             if (openModal) {
                 const modalInstance = bootstrap.Modal.getInstance(openModal);
-                if (modalInstance) {
+                if (modalInstance && typeof modalInstance.hide === 'function') {
                     modalInstance.hide();
                 }
             }
@@ -102,7 +123,7 @@ class ShortcutManager {
         // console.log(this.shortcuts);
         const modalElement = document.getElementById("keyboardShortcutsModal");
         if (modalElement) {
-            const modal = new bootstrap.Modal(modalElement);
+            const modal = new bootstrap.Modal(modalElement, {});
             const tbody = document.getElementById("keyboardShortcutsList");
             tbody.innerHTML = ""; // Clear previous content
 
@@ -158,7 +179,7 @@ window.shortcutManager.register(
         const openModal = document.querySelector(".modal.show");
         if (openModal) {
             const modalInstance = bootstrap.Modal.getInstance(openModal);
-            if (modalInstance) {
+            if (modalInstance && typeof modalInstance.hide === 'function') {
                 modalInstance.hide();
             }
         }

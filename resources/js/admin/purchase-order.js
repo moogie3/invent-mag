@@ -14,12 +14,6 @@ import {
 } from "./partials/purchase-order/bulkActions/actions.js";
 
 // Expose global functions for inline event handlers
-window.bulkDeletePO = bulkDeletePO;
-window.bulkExportPO = bulkExportPO;
-window.bulkMarkAsPaidPO = bulkMarkAsPaidPO;
-window.exportAllPurchases = exportAllPurchases;
-
-// Keep the existing DOMContentLoaded initialization
 onPageLoad(function () {
     const pathname = window.location.pathname;
     // Only run on PO pages

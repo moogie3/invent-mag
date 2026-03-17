@@ -18,7 +18,7 @@
     <div class="row g-3 mb-4">
         <!-- Return Summary -->
         <div class="col-md-3">
-            <div class="card border-0 shadow-sm rounded-3 bg-light-lt">
+            <div class="card border-0 shadow-sm rounded-3 bg-body-secondary-lt">
                 <div class="card-body py-3">
                     <div class="mb-2">
                         <label class="form-label text-muted mb-2 d-block fw-bold">
@@ -26,7 +26,7 @@
                         </label>
                     </div>
                     <div class="d-flex align-items-center mb-3">
-                        <div class="me-3 d-flex align-items-center justify-content-center rounded-3 badge bg-white shadow-sm"
+                        <div class="me-3 d-flex align-items-center justify-content-center rounded-3 badge bg-body shadow-sm"
                             style="width: 40px; height: 40px;">
                             <i class="ti ti-hash fs-3 text-primary"></i>
                         </div>
@@ -36,7 +36,7 @@
                         </div>
                     </div>
                     <div class="d-flex align-items-center">
-                        <div class="me-3 d-flex align-items-center justify-content-center rounded-3 badge bg-white shadow-sm"
+                        <div class="me-3 d-flex align-items-center justify-content-center rounded-3 badge bg-body shadow-sm"
                             style="width: 40px; height: 40px;">
                             <i class="ti ti-currency fs-3 text-success"></i>
                         </div>
@@ -61,7 +61,7 @@
                     <div class="row g-2">
                         <div class="col-12">
                             <div class="d-flex align-items-center mb-2">
-                                <div class="me-3 d-flex align-items-center justify-content-center rounded-3 badge bg-white shadow-sm"
+                                <div class="me-3 d-flex align-items-center justify-content-center rounded-3 badge bg-body shadow-sm"
                                     style="width: 40px; height: 40px;">
                                     <i class="ti ti-circle-check fs-3 text-success"></i>
                                 </div>
@@ -73,7 +73,7 @@
                         </div>
                         <div class="col-6">
                             <div class="d-flex align-items-center">
-                                <div class="me-3 d-flex align-items-center justify-content-center rounded-3 badge bg-white shadow-sm"
+                                <div class="me-3 d-flex align-items-center justify-content-center rounded-3 badge bg-body shadow-sm"
                                     style="width: 40px; height: 40px;">
                                     <i class="ti ti-clock fs-3 text-warning"></i>
                                 </div>
@@ -85,7 +85,7 @@
                         </div>
                         <div class="col-6">
                             <div class="d-flex align-items-center">
-                                <div class="me-3 d-flex align-items-center justify-content-center rounded-3 badge bg-white shadow-sm"
+                                <div class="me-3 d-flex align-items-center justify-content-center rounded-3 badge bg-body shadow-sm"
                                     style="width: 40px; height: 40px;">
                                     <i class="ti ti-circle-x fs-3 text-danger"></i>
                                 </div>
@@ -110,7 +110,7 @@
                         </label>
                     </div>
                     <div class="d-flex align-items-center">
-                        <div class="me-3 d-flex align-items-center justify-content-center rounded-3 badge bg-white shadow-sm"
+                        <div class="me-3 d-flex align-items-center justify-content-center rounded-3 badge bg-body shadow-sm"
                             style="width: 40px; height: 40px;">
                             <i class="ti ti-file-invoice fs-3 text-orange"></i>
                         </div>
@@ -125,7 +125,7 @@
 
         <!-- Filters -->
         <div class="col-md-3">
-            <div class="card border-0 shadow-sm rounded-3 bg-light">
+            <div class="card border-0 shadow-sm rounded-3 bg-body-secondary">
                 <div class="card-body py-3 d-flex align-items-center">
                     <div class="w-100">
                         @include('admin.layouts.partials.sales-returns.index.filters')

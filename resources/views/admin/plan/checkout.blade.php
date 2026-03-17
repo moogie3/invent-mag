@@ -9,7 +9,7 @@
             <div class="row justify-content-center">
                 <div class="col-lg-8">
                     <div class="card shadow-sm border-0 rounded-4">
-                        <div class="card-header bg-white border-0 pb-0">
+                        <div class="card-header bg-body border-0 pb-0">
                             <div class="row align-items-center">
                                 <div class="col">
                                     <h3 class="mb-0">
@@ -84,7 +84,7 @@
 
                             <div class="row mt-4">
                                 <div class="col-md-6">
-                                    <div class="bg-light rounded-3 p-3">
+                                    <div class="bg-body-secondary rounded-3 p-3">
                                         <h6 class="mb-2">{{ __('plan.current_plan') }}</h6>
                                         <p class="mb-0">
                                             @if($currentPlan)
@@ -96,7 +96,7 @@
                                     </div>
                                 </div>
                                 <div class="col-md-6">
-                                    <div class="bg-light rounded-3 p-3">
+                                    <div class="bg-body-secondary rounded-3 p-3">
                                         <h6 class="mb-2">{{ __('plan.new_plan') }}</h6>
                                         <p class="mb-0">
                                             <span class="badge bg-primary text-white">{{ $newPlan->name }}</span>
@@ -106,7 +106,7 @@
                             </div>
                         </div>
 
-                        <div class="card-footer bg-white border-0">
+                        <div class="card-footer bg-body border-0">
                             @if(empty($snapToken))
                                 <div class="alert alert-danger">
                                     <i class="ti ti-alert-circle me-2"></i>

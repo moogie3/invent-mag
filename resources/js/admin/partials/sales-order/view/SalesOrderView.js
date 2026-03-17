@@ -59,7 +59,7 @@ export class SalesOrderView extends SalesOrderModule {
         const viewSalesModalElement = document.getElementById("viewSalesModal");
         if (viewSalesModalElement) {
             viewSalesModalElement.dataset.salesId = salesId;
-            const salesViewModal = new bootstrap.Modal(viewSalesModalElement);
+            const salesViewModal = new bootstrap.Modal(viewSalesModalElement, {});
             salesViewModal.show();
         }
     }

@@ -31,7 +31,7 @@
                         {{-- Return Information Section --}}
                         <div class="row g-4 mb-4">
                             <div class="col-md-6">
-                                <div class="card bg-light border-0 h-100 rounded-3 shadow-sm">
+                                <div class="card bg-body-secondary border-0 h-100 rounded-3 shadow-sm">
                                     <div class="card-body p-3">
                                         <h4 class="card-title mb-3"><i class="ti ti-user me-2 text-primary"></i>{{ __('messages.customer') }}</h4>
                                         <h5 class="mb-2">{{ $salesReturn->sale->customer->name ?? __('messages.not_available') }}</h5>
@@ -48,7 +48,7 @@
                                 </div>
                             </div>
                             <div class="col-md-6">
-                                <div class="card bg-light border-0 h-100 rounded-3 shadow-sm">
+                                <div class="card bg-body-secondary border-0 h-100 rounded-3 shadow-sm">
                                     <div class="card-body p-3">
                                         <h4 class="card-title mb-3"><i class="ti ti-info-circle me-2 text-primary"></i>{{ __('messages.sr_return_information_title') }}</h4>
                                         <div class="d-flex justify-content-between mb-2">
@@ -78,12 +78,12 @@
 
                         {{-- Returned Items Section --}}
                         <div class="card border-0 shadow-sm rounded-3 mb-4">
-                            <div class="card-header bg-light py-2">
+                            <div class="card-header bg-body-secondary py-2">
                                 <h4 class="card-title mb-0"><i class="ti ti-list me-2 text-primary"></i>{{ __('messages.sr_returned_items_title') }}</h4>
                             </div>
                             <div class="table-responsive">
                                 <table class="table card-table table-vcenter table-hover">
-                                    <thead class="bg-light">
+                                    <thead class="bg-body-secondary">
                                         <tr>
                                             <th class="text-center" style="width: 60px">{{ __('messages.table_no') }}</th>
                                             <th>{{ __('messages.table_product') }}</th>
@@ -114,7 +114,7 @@
                                     </tbody>
                                 </table>
                             </div>
-                            <div class="card-footer bg-light">
+                            <div class="card-footer bg-body-secondary">
                                 <div class="d-flex justify-content-end">
                                     <div class="text-end">
                                         <div class="fs-5"><strong>{{ __('messages.sr_total_return_amount') }}</strong></div>

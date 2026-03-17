@@ -92,7 +92,7 @@ export function bulkDeleteSales() {
 
     document.getElementById("bulkDeleteCount").textContent = selected.length;
     const modalElement = document.getElementById("bulkDeleteModal");
-    const modal = new bootstrap.Modal(modalElement);
+    const modal = new bootstrap.Modal(modalElement, {});
 
     modalElement.addEventListener("hidden.bs.modal", function handler() {
         const backdrops = document.querySelectorAll(".modal-backdrop");

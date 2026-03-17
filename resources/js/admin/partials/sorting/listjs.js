@@ -1,8 +1,11 @@
 export function initListJs() {
     const invoiceTableContainer = document.getElementById("invoiceTableContainer");
-    const tableBody = invoiceTableContainer ? invoiceTableContainer.querySelector(".table-tbody") : null;
+    if (!invoiceTableContainer) return;
+    
+    const tableBody = invoiceTableContainer.querySelector(".table-tbody");
+    if (!tableBody || tableBody.children.length === 0) return;
 
-    if (tableBody && tableBody.children.length > 0) {
+    try {
         const list = new List("invoiceTableContainer", {
             sortClass: "table-sort",
             listClass: "table-tbody",
@@ -39,5 +42,7 @@ export function initListJs() {
                 "sort-status",
             ],
         });
+    } catch (e) {
+        // Ignore List.js initialization errors
     }
 }

@@ -80,7 +80,7 @@
                             @endforelse
                         </tbody>
                         <tfoot>
-                            <tr class="bg-light">
+                            <tr class="bg-body-secondary">
                                 <td colspan="2" class="text-end"><strong>{{ __('messages.total') }}</strong></td>
                                 <td class="text-end">
                                     <strong>{{ \App\Helpers\CurrencyHelper::format($totalDebits) }}</strong>

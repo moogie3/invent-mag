@@ -41,7 +41,7 @@
                             <tbody>
                                 @foreach ($accounts as $type => $accountGroup)
                                     <tr>
-                                        <td colspan="4" class="bg-light">
+                                        <td colspan="4" class="bg-body-secondary">
                                             <strong class="text-uppercase">{{ __('messages.' . $type) }}</strong>
                                         </td>
                                     </tr>

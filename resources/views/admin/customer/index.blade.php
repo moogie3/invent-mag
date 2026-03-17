@@ -69,7 +69,7 @@
                                                     </label>
                                                 </div>
                                                 <div class="d-flex align-items-center">
-                                                    <div class="me-3 d-flex align-items-center justify-content-center rounded-3 badge bg-white shadow-sm"
+                                                    <div class="me-3 d-flex align-items-center justify-content-center rounded-3 badge bg-body border shadow-sm"
                                                         style="width: 48px; height: 48px;">
                                                         <i class="ti ti-users fs-2 text-primary"></i>
                                                     </div>
@@ -84,7 +84,7 @@
                                         </div>
                                     </div>
                                     <div class="col-md-3 ms-auto">
-                                        <div class="card border-0 shadow-sm rounded-3 bg-light">
+                                        <div class="card border-0 shadow-sm rounded-3">
                                             <div class="card-body py-3 d-flex align-items-center">
                                                 <div class="w-100">
                                                     {{ __('messages.search_label') }}

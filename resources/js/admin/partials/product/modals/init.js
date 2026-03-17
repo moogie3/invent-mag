@@ -6,8 +6,9 @@ export function initModals() {
 
     modals.forEach(({ btnId, modalId }) => {
         const btn = document.getElementById(btnId);
-        if (btn) {
-            const modal = new bootstrap.Modal(document.getElementById(modalId));
+        const modalEl = document.getElementById(modalId);
+        if (btn && modalEl) {
+            const modal = new bootstrap.Modal(modalEl, {});
             btn.addEventListener("click", (e) => {
                 e.preventDefault();
                 modal.show();

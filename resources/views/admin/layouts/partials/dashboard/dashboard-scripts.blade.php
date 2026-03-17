@@ -1,31 +1,28 @@
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
 <script>
-    let currencySettings = @json(\App\Helpers\CurrencyHelper::getSettings());
-    let performanceChart;
-    let currentChartType = 'sales';
-    let currentPeriod = '30days';
+(function() {
+    // Prevent multiple executions from interfering with let/const
+    // We use window properties for variables that MUST persist
+    window.currencySettings = @json(\App\Helpers\CurrencyHelper::getSettings());
+    
+    // Use var for script-level variables to allow re-declaration without SyntaxError
+    var currentChartType = window.currentChartType || 'sales';
+    var currentPeriod = window.currentPeriod || '30days';
 
     function formatCurrency(value) {
-        if (value === null || value === undefined) {
-            return '';
-        }
-        const isNegative = value < 0;
-        const absoluteValue = Math.abs(value);
-
-        const formatted = new Intl.NumberFormat(currencySettings.locale, {
-            minimumFractionDigits: currencySettings.decimal_places,
-            maximumFractionDigits: currencySettings.decimal_places
+        if (value === null || value === undefined) return '';
+        var isNegative = value < 0;
+        var absoluteValue = Math.abs(value);
+        var formatted = new Intl.NumberFormat(window.currencySettings.locale, {
+            minimumFractionDigits: window.currencySettings.decimal_places,
+            maximumFractionDigits: window.currencySettings.decimal_places
         }).format(absoluteValue);
-
-        const result = currencySettings.position === 'prefix'
-            ? `${currencySettings.currency_symbol} ${formatted}`
-            : `${formatted} ${currencySettings.currency_symbol}`;
-
+        var result = window.currencySettings.position === 'prefix'
+            ? `${window.currencySettings.currency_symbol} ${formatted}`
+            : `${formatted} ${window.currencySettings.currency_symbol}`;
         return isNegative ? `-${result}` : result;
     }
 
-    const chartData = {
+    var chartData = {
         sales: {
             labels: @json($chartLabels ?? []),
             data: @json($chartData ?? []),
@@ -39,14 +36,14 @@
     };
 
     @if(isset($salesForecast) && $salesForecast !== null)
-    const salesForecastData = {
+    var salesForecastData = {
         labels: @json($salesForecast['labels'] ?? []),
         historical: @json($salesForecast['historical'] ?? []),
         forecast: @json($salesForecast['forecast'] ?? [])
     };
     @endif
 
-    const chartConfigs = {
+    var chartConfigs = {
         sales: {
             type: 'line',
             borderColor: 'rgb(75, 192, 192)',
@@ -62,9 +59,20 @@
     };
 
     function createChart(type) {
-        const ctx = document.getElementById('performanceChart').getContext('2d');
-        const config = chartConfigs[type];
-        const dataset = chartData[type];
+        if (typeof Chart === 'undefined') return null;
+        
+        var el = document.getElementById('performanceChart');
+        if (!el) return null;
+        
+        // RELIABLE CLEANUP: Use Chart.js internal registry to find and kill existing chart on this canvas
+        var existingChart = Chart.getChart(el);
+        if (existingChart) {
+            existingChart.destroy();
+        }
+
+        var ctx = el.getContext('2d');
+        var config = chartConfigs[type];
+        var dataset = chartData[type];
 
         return new Chart(ctx, {
             type: config.type,
@@ -84,9 +92,7 @@
                 responsive: true,
                 maintainAspectRatio: false,
                 plugins: {
-                    legend: {
-                        display: false
-                    },
+                    legend: { display: false },
                     tooltip: {
                         callbacks: {
                             label: function(context) {
@@ -99,9 +105,7 @@
                     y: {
                         beginAtZero: true,
                         ticks: {
-                            callback: function(value) {
-                                return value.toLocaleString();
-                            }
+                            callback: function(value) { return value.toLocaleString(); }
                         }
                     }
                 }
@@ -111,12 +115,15 @@
 
     function createSalesForecastChart() {
         @if(isset($salesForecast) && $salesForecast !== null)
-        if (salesForecastData.labels.length === 0) {
-            return;
-        }
+        if (typeof Chart === 'undefined') return null;
 
-        const forecastCtx = document.getElementById('sales-forecast-chart').getContext('2d');
+        var el = document.getElementById('sales-forecast-chart');
+        if (!el || salesForecastData.labels.length === 0) return;
+        
+        var existingChart = Chart.getChart(el);
+        if (existingChart) existingChart.destroy();
 
+        var forecastCtx = el.getContext('2d');
         new Chart(forecastCtx, {
             type: 'line',
             data: {
@@ -145,19 +152,13 @@
                 responsive: true,
                 maintainAspectRatio: false,
                 plugins: {
-                    legend: {
-                        position: 'top',
-                    },
+                    legend: { position: 'top' },
                     tooltip: {
                         callbacks: {
                             label: function(context) {
-                                let label = context.dataset.label || '';
-                                if (label) {
-                                    label += ': ';
-                                }
-                                if (context.parsed.y !== null) {
-                                    label += formatCurrency(context.parsed.y);
-                                }
+                                var label = context.dataset.label || '';
+                                if (label) label += ': ';
+                                if (context.parsed.y !== null) label += formatCurrency(context.parsed.y);
                                 return label;
                             }
                         }
@@ -169,21 +170,14 @@
                         time: {
                             unit: 'month',
                             parser: 'yyyy-MM',
-                            displayFormats: {
-                                month: 'MMM yyyy'
-                            }
+                            displayFormats: { month: 'MMM yyyy' }
                         },
-                        title: {
-                            display: true,
-                            text: 'Month'
-                        }
+                        title: { display: true, text: 'Month' }
                     },
                     y: {
                         beginAtZero: true,
                         ticks: {
-                            callback: function(value) {
-                                return formatCurrency(value);
-                            }
+                            callback: function(value) { return formatCurrency(value); }
                         }
                     }
                 }
@@ -192,130 +186,84 @@
         @endif
     }
 
-    function initChart() {
+    // Attach to window to make them accessible via onclick attributes in HTML
+    window.switchChart = function(type) {
+        window.currentChartType = type;
+        createChart(type);
+        document.querySelectorAll('.nav-link').forEach(tab => tab.classList.remove('active'));
+        var tab = document.getElementById(`${type}-tab`);
+        if (tab) tab.classList.add('active');
+    };
+
+    window.updateChart = function(period) {
+        if (period) window.currentPeriod = period;
+        var chartContainer = document.querySelector('.chart-container');
+        if (!chartContainer) return;
+
+        chartContainer.innerHTML = '<div class="d-flex justify-content-center align-items-center h-100"><div class="spinner-border" role="status"></div></div>';
+
+        fetch(`{{ route('admin.dashboard') }}?period=${period}&type=${window.currentChartType}`, {
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || ''
+            }
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.labels && data.data) {
+                chartData[window.currentChartType].labels = data.labels;
+                chartData[window.currentChartType].data = data.data;
+                chartData[window.currentChartType].formatted = data.formatted || data.data.map(val => val.toLocaleString());
+            }
+            chartContainer.innerHTML = '<canvas id="performanceChart"></canvas>';
+            createChart(window.currentChartType);
+        })
+        .catch(err => console.error('Error:', err));
+    };
+
+    function handlePageLoad() {
+        if (typeof Chart === 'undefined') {
+            console.warn('Chart.js not yet loaded, retrying...');
+            setTimeout(handlePageLoad, 100);
+            return;
+        }
+
         if (document.getElementById('performanceChart')) {
-            performanceChart = createChart('sales');
+            createChart(window.currentChartType || 'sales');
         }
         if (document.getElementById('sales-forecast-chart')) {
             createSalesForecastChart();
         }
-    }
 
-    function switchChart(type) {
-        currentChartType = type;
-        if (performanceChart) {
-            performanceChart.destroy();
-        }
-        performanceChart = createChart(type);
-
-        // Update active tab
-        document.querySelectorAll('.nav-link').forEach(tab => tab.classList.remove('active'));
-        document.getElementById(`${type}-tab`).classList.add('active');
-    }
-
-    function updateChart(period) {
-        currentPeriod = period;
-
-        // Show loading state
-        const chartContainer = document.querySelector('.chart-container');
-        const originalContent = chartContainer.innerHTML;
-        chartContainer.innerHTML =
-            '<div class="d-flex justify-content-center align-items-center h-100"><div class="spinner-border" role="status"><span class="visually-hidden">{{ __('messages.loading') }}</span></div></div>';
-
-        fetch(`{{ route('admin.dashboard') }}?period=${period}&type=${currentChartType}`, {
-                headers: {
-                    'X-Requested-With': 'XMLHttpRequest',
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || ''
-                }
-            })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('Network response was not ok');
-                }
-                return response.json();
-            })
-            .then(data => {
-                // Update chart data
-                if (data.labels && data.data) {
-                    chartData[currentChartType].labels = data.labels;
-                    chartData[currentChartType].data = data.data;
-                    chartData[currentChartType].formatted = data.formatted || data.data.map(val => val
-                        .toLocaleString());
-                }
-
-                // Restore chart container and recreate chart
-                chartContainer.innerHTML = '<canvas id="performanceChart"></canvas>';
-                switchChart(currentChartType);
-
-                // Close dropdown after selection
-                const dropdown = document.querySelector('.dropdown-toggle');
-                if (dropdown && bootstrap?.Dropdown) {
-                    const dropdownInstance = bootstrap.Dropdown.getInstance(dropdown);
-                    if (dropdownInstance) {
-                        dropdownInstance.hide();
-                    }
-                }
-            })
-            .catch(error => {
-                console.error('Error updating chart:', error);
-
-                // Restore original content on error
-                chartContainer.innerHTML = originalContent;
-
-                // Show error message
-                const errorDiv = document.createElement('div');
-                errorDiv.className = 'alert alert-danger alert-dismissible fade show';
-                errorDiv.innerHTML = `
-                    <strong>Error!</strong> {{ __('messages.failed_to_update_chart_data') }}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                `;
-                chartContainer.parentNode.insertBefore(errorDiv, chartContainer);
-
-                // Reinitialize chart
-                setTimeout(() => {
-                    if (!performanceChart) {
-                        initChart();
-                    }
-                }, 100);
-            });
-    }
-
-    function applyFilter() {
-        const formData = new FormData(document.getElementById('filterForm'));
-        const params = new URLSearchParams(formData);
-        window.location.href = `{{ route('admin.dashboard') }}?${params.toString()}`;
-    }
-
-    function resetFilter() {
-        document.getElementById('filterForm').reset();
-        window.location.href = `{{ route('admin.dashboard') }}`;
-    }
-
-    document.addEventListener('DOMContentLoaded', function() {
-        initChart();
-
-        // Handle custom date range toggle
-        const dateRangeSelect = document.querySelector('select[name="date_range"]');
+        var dateRangeSelect = document.querySelector('select[name="date_range"]');
         if (dateRangeSelect) {
-            dateRangeSelect.addEventListener('change', function() {
-                const customFields = document.querySelectorAll('#customDateStart, #customDateEnd');
-                const display = this.value === 'custom' ? 'block' : 'none';
-                customFields.forEach(field => {
-                    field.style.display = display;
-                    if (display === 'block') {
-                        field.required = true;
-                    } else {
-                        field.required = false;
-                    }
+            dateRangeSelect.onchange = function() {
+                var customFields = document.querySelectorAll('#customDateStart, #customDateEnd');
+                var display = this.value === 'custom' ? 'block' : 'none';
+                customFields.forEach(f => {
+                    f.style.display = display;
+                    f.required = (display === 'block');
                 });
-            });
+            };
         }
+    }
 
-        // Listen for the global datarefresh event
-        document.addEventListener('datarefresh', function() {
-            // console.log('datarefresh event received, updating chart.');
-            updateChart(currentPeriod);
+    // Immediate init
+    handlePageLoad();
+
+    // Turbo render listener (runs once per session)
+    if (!window.dashboardEventsBound) {
+        document.addEventListener('turbo:render', function() {
+            if (document.getElementById('performanceChart')) {
+                handlePageLoad();
+            }
         });
-    });
+        document.addEventListener('datarefresh', function() {
+            if (document.getElementById('performanceChart')) {
+                window.updateChart(window.currentPeriod);
+            }
+        });
+        window.dashboardEventsBound = true;
+    }
+})();
 </script>

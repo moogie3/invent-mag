@@ -1,4 +1,4 @@
-<ul class="nav nav-pills nav-fill bg-white p-2 rounded-3 border shadow-sm mb-4" role="tablist" style="gap: 5px;">
+<ul class="nav nav-pills nav-fill bg-body p-2 rounded-3 border shadow-sm mb-4" role="tablist" style="gap: 5px;">
     <li class="nav-item" role="presentation">
         <a class="nav-link active rounded-2 fw-medium d-flex align-items-center justify-content-center py-2 transition-all" data-bs-toggle="tab" href="#tab-financial" role="tab">
             <i class="ti ti-receipt fs-2 me-2 opacity-75"></i>

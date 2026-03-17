@@ -27,7 +27,7 @@ onPageLoad(function () {
     }, 'Save Warehouse');
 
     window.shortcutManager.register('alt+n', () => {
-        const createModal = new bootstrap.Modal(document.getElementById('createWarehouseModal'));
+        const createModal = new bootstrap.Modal(document.getElementById('createWarehouseModal', {}));
         createModal.show();
     }, 'New Warehouse');
 });

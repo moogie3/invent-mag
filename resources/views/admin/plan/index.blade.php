@@ -183,7 +183,7 @@
                                         </div>
                                     </div>
                                     <div class="settings-section-content">
-                                        <div class="card bg-light border-0 rounded-4">
+                                        <div class="card bg-body-secondary border-0 rounded-4">
                                             <div class="card-body">
                                                 @if($currentPlan && is_array($currentPlan->features))
                                                     <div class="row g-3">

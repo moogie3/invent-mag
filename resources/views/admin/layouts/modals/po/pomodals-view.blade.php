@@ -82,12 +82,12 @@
         </div>
 
         <div class="card border mb-4">
-            <div class="card-header bg-light py-2">
+            <div class="card-header bg-body-secondary py-2">
                 <h4 class="card-title mb-0"><i class="ti ti-list me-2 text-info"></i>{{ __('messages.po_order_items_title') }}</h4>
             </div>
             <div class="table-responsive">
                 <table class="table card-table table-vcenter table-hover">
-                    <thead class="bg-light">
+                    <thead class="bg-body-secondary">
                         <tr>
                             <th class="text-center" style="width: 60px">{{ __('messages.table_no') }}</th>
                             <th>{{ __('messages.table_product') }}</th>

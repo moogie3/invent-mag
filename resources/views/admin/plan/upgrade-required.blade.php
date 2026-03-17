@@ -24,7 +24,7 @@
 
             @if(isset($currentPlan))
                 <p class="text-muted small">
-                    {{ __('plan.you_are_on') }} <strong class="text-dark">{{ $currentPlan->name }}</strong> {{ __('plan.plan') }}
+                    {{ __('plan.you_are_on') }} <strong class="text-body">{{ $currentPlan->name }}</strong> {{ __('plan.plan') }}
                 </p>
             @endif
 

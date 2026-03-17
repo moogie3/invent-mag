@@ -15,7 +15,7 @@
     <div class="col-md-2">
         <label class="form-label fw-bold">{{ __('messages.pos_stock_quantity') }}</label>
         <div class="d-flex align-items-center gap-2 mb-2">
-            <div class="form-control bg-light d-flex align-items-center" style="width: 50%;">
+            <div class="form-control bg-body-secondary d-flex align-items-center" style="width: 50%;">
                 <i class="ti ti-package me-2 text-muted"></i>
                 <span id="stock_available" class="fw-bold text-primary">-</span>
             </div>
@@ -27,7 +27,7 @@
     </div>
     <div class="col-md-2">
         <label class="form-label fw-bold">{{ __('messages.past_price') }}</label>
-        <input type="text" class="form-control bg-light" name="past_price" id="past_price"
+        <input type="text" class="form-control bg-body-secondary" name="past_price" id="past_price"
             placeholder="{{ __('messages.autofill') }}" readonly disabled />
     </div>
     <div class="col-md-2">
@@ -51,12 +51,12 @@
     </div>
     <div class="col-md-2">
         <label class="form-label fw-bold">{{ __('messages.supplier_price') }}</label>
-        <input type="text" class="form-control bg-light" name="price" id="price"
+        <input type="text" class="form-control bg-body-secondary" name="price" id="price"
             placeholder="{{ __('messages.autofill') }}" readonly disabled />
     </div>
     <div class="col-md-2">
         <label class="form-label fw-bold">{{ __('messages.pos_selling_price') }}</label>
-        <input type="text" class="form-control bg-light" name="selling_price" id="selling_price"
+        <input type="text" class="form-control bg-body-secondary" name="selling_price" id="selling_price"
             placeholder="{{ __('messages.autofill') }}" readonly disabled />
     </div>
 </div>

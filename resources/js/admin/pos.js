@@ -40,13 +40,15 @@ onPageLoad(function () {
     initQuickCreateProduct();
 
     const processPaymentBtn = document.getElementById("processPaymentBtn");
-    processPaymentBtn.addEventListener("click", function () {
-        if (getProducts().length === 0) {
-            InventMagApp.showToast("Warning", "Please add at least one product to the cart.", "warning");
-            return;
-        }
-        populatePaymentModal();
-    });
+    if (processPaymentBtn) {
+        processPaymentBtn.addEventListener("click", function () {
+            if (getProducts().length === 0) {
+                InventMagApp.showToast("Warning", "Please add at least one product to the cart.", "warning");
+                return;
+            }
+            populatePaymentModal();
+        });
+    }
 
     const barcodeInput = document.getElementById("barcodeScannerInput");
 
@@ -111,7 +113,7 @@ onPageLoad(function () {
             return;
         }
         populatePaymentModal();
-        const paymentModal = new bootstrap.Modal(document.getElementById('paymentModal'));
+        const paymentModal = new bootstrap.Modal(document.getElementById('paymentModal', {}));
         paymentModal.show();
     });
 });

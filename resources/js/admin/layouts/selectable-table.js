@@ -218,7 +218,7 @@ export function initSelectableTable(options = {}) {
             }
         });
 
-        if (registerEditShortcut) {
+        if (registerEditShortcut && window.shortcutManager) {
             window.shortcutManager.register(
                 "alt+e",
                 () => {
@@ -247,7 +247,7 @@ export function initSelectableTable(options = {}) {
             );
         }
 
-        if (registerDeleteShortcut) {
+        if (registerDeleteShortcut && window.shortcutManager) {
             window.shortcutManager.register(
                 "alt+d",
                 () => {

@@ -71,6 +71,9 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
+            // Get bootstrap from our exposed global (from tabler)
+            const bs = window.bootstrap || (window.tabler && window.tabler.bootstrap);
+            
             const markAsReadBtns = document.querySelectorAll('.mark-as-read-btn');
             
             markAsReadBtns.forEach(btn => {
@@ -154,9 +157,17 @@
             if (clearAllBtn) {
                 clearAllBtn.addEventListener('click', function(e) {
                     e.preventDefault();
-                    // Just open the modal
-                    const modal = new bootstrap.Modal(document.getElementById('clearAllNotificationsModal'));
-                    modal.show();
+                    // Use Tabler's data-bs-toggle approach or fallback to our exposed bootstrap
+                    const modalEl = document.getElementById('clearAllNotificationsModal');
+                    if (bs && bs.Modal) {
+                        const modal = new bs.Modal(modalEl);
+                        modal.show();
+                    } else {
+                        // Fallback: manually trigger show
+                        modalEl.classList.add('show');
+                        modalEl.style.display = 'block';
+                        document.body.classList.add('modal-open');
+                    }
                 });
             }
 

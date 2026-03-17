@@ -33,7 +33,7 @@
                                 {{ Str::limit($entry->description, 50) }}
                             </a>
                             @if($entry->reversingEntry || $entry->reversedEntry)
-                                <span class="badge bg-warning text-dark ms-1" title="{{ __('messages.reversed') }}">
+                                <span class="badge bg-warning text-body ms-1" title="{{ __('messages.reversed') }}">
                                     <i class="ti ti-arrows-left-right"></i>
                                 </span>
                             @endif
@@ -42,7 +42,7 @@
                         <td class="text-end">{{ $entry->total_credit ? \App\Helpers\CurrencyHelper::format($entry->total_credit) : 'Rp 0,00' }}</td>
                         <td>
                             @if($entry->status == 'draft')
-                                <span class="badge bg-warning text-dark">{{ __('messages.draft') }}</span>
+                                <span class="badge bg-warning text-body">{{ __('messages.draft') }}</span>
                             @elseif($entry->status == 'posted')
                                 <span class="badge bg-success">{{ __('messages.posted') }}</span>
                             @else

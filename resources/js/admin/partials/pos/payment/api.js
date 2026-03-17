@@ -1,15 +1,24 @@
 import { grandTotal } from "../cart/totals.js";
 import { clearCart } from "../cart/actions.js";
 
-const completePaymentBtn = document.getElementById("completePaymentBtn");
-const invoiceForm = document.getElementById("invoiceForm");
-const paymentMethod = document.getElementById("paymentMethod");
-const amountReceived = document.getElementById("amountReceived");
-const paymentModal = new bootstrap.Modal(
-    document.getElementById("paymentModal")
-);
+let _paymentModal = null;
+
+function getPaymentModal() {
+    if (!_paymentModal) {
+        const el = document.getElementById("paymentModal");
+        _paymentModal = el ? new bootstrap.Modal(el, {}) : null;
+    }
+    return _paymentModal;
+}
 
 function completePayment() {
+    const completePaymentBtn = document.getElementById("completePaymentBtn");
+    const invoiceForm = document.getElementById("invoiceForm");
+    const paymentMethod = document.getElementById("paymentMethod");
+    const amountReceived = document.getElementById("amountReceived");
+    
+    if (!completePaymentBtn || !invoiceForm || !paymentMethod) return;
+    
     completePaymentBtn.disabled = true;
 
     const paymentMethodMap = {
@@ -81,7 +90,8 @@ function completePayment() {
         .then((data) => {
             if (data.success) {
                 InventMagApp.showToast("Success", data.message, "success");
-                paymentModal.hide();
+                const modal = getPaymentModal();
+                if (modal) modal.hide();
                 clearCart();
                 window.location.href = `/admin/pos/receipt/${data.sale_id}`;
             } else {
@@ -107,5 +117,8 @@ function completePayment() {
 }
 
 export function initPaymentApi() {
-    completePaymentBtn.addEventListener("click", completePayment);
+    const completePaymentBtn = document.getElementById("completePaymentBtn");
+    if (completePaymentBtn) {
+        completePaymentBtn.addEventListener("click", completePayment);
+    }
 }

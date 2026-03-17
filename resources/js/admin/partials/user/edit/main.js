@@ -1,13 +1,17 @@
-import { editUserModal, editUserIdInput, editNameInput, editEmailInput, editRolesContainer, editPermissionsContainer } from '../common/elements.js';
+import { getEditUserModal, editUserModal, editUserIdInput, editNameInput, editEmailInput, editUserForm, editRolesContainer, editPermissionsContainer } from '../common/elements.js';
 import { syncPermissionsFromRoles, setupRolePermissionSync } from '../rolesPermissions/sync.js';
 
 export function initEditUserModal() {
+    const editUserModalEl = document.getElementById("editUserModal");
+    if (!editUserModalEl) return;
+    
     document.querySelectorAll(".edit-user-btn").forEach((button) => {
         button.addEventListener("click", function () {
             const userId = this.dataset.userId;
             editUserIdInput.value = userId;
 
-            editUserModal.show();
+            const modal = getEditUserModal();
+            if (modal) modal.show();
             editRolesContainer.innerHTML =
                 '<div class="text-center"><div class="spinner-border spinner-border-sm" role="status"></div></div>';
             editPermissionsContainer.innerHTML =

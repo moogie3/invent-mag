@@ -5,7 +5,7 @@
         </div>
     </div>
     <div class="col-md-6">
-        <div class="card bg-light">
+        <div class="card bg-body-secondary">
             <div class="card-body">
                 <div class="d-flex justify-content-between">
                     <span>{{ __('messages.total_debit') }}:</span>

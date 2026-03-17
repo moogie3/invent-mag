@@ -43,7 +43,7 @@
 
                         <div class="card-body text-center py-5">
                             <h3 class="card-title mb-1 text-uppercase tracking-wide text-secondary">{{ $plan->name }}</h3>
-                            <div class="display-5 fw-bold my-4 text-dark">
+                            <div class="display-5 fw-bold my-4 text-body">
                                 ${{ number_format($plan->price, 0) }}
                                 <span class="fs-5 fw-normal text-secondary">{{ __('plan.billing_monthly') }}</span>
                             </div>
@@ -67,7 +67,7 @@
                             @endif
                         </div>
 
-                        <div class="card-body border-top border-light py-4 bg-light">
+                        <div class="card-body border-top border-secondary py-4 bg-body-secondary">
                             <ul class="list-unstyled space-y-3 px-3 m-0 text-start">
                                 @foreach($features as $slug => $label)
                                     <li class="d-flex align-items-center {{ $plan->hasFeature($slug) ? '' : 'text-muted' }}">
@@ -87,7 +87,7 @@
                             </ul>
                         </div>
 
-                        <div class="card-footer bg-white border-0 text-center pb-4 pt-3 rounded-bottom-4">
+                        <div class="card-footer bg-body border-0 text-center pb-4 pt-3 rounded-bottom-4">
                             @if($isCurrent)
                                 <button class="btn btn-success w-100 rounded-pill py-2" disabled>
                                     <i class="ti ti-check me-2"></i>{{ __('plan.current_plan') }}

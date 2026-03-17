@@ -52,7 +52,7 @@
                         <i class="ti ti-bell fs-2"></i>
                         @if (isset($totalNotificationCount) && $totalNotificationCount > 0)
                             <span id="notification-dot-sidebar"
-                                class="position-absolute bg-danger border border-light rounded-circle"></span>
+                                class="position-absolute bg-danger border border-secondary rounded-circle"></span>
                         @endif
                     </a>
                 </div>

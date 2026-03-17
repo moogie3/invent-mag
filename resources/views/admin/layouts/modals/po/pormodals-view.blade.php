@@ -28,7 +28,7 @@
 
     <div class="row g-4 mb-4">
         <div class="col-md-6">
-            <div class="card bg-light border-0 h-100">
+            <div class="card bg-body-secondary border-0 h-100">
                 <div class="card-body p-3">
                     <h4 class="card-title mb-3"><i
                             class="ti ti-building-store me-2 text-primary"></i>{{ __('messages.supplier_title') }}</h4>
@@ -46,7 +46,7 @@
             </div>
         </div>
         <div class="col-md-6">
-            <div class="card bg-light border-0 h-100">
+            <div class="card bg-body-secondary border-0 h-100">
                 <div class="card-body p-3">
                     <h4 class="card-title mb-3"><i
                             class="ti ti-info-circle me-2 text-primary"></i>{{ __('messages.pr_return_information_title') }}
@@ -77,13 +77,13 @@
     </div>
 
     <div class="card border mb-4">
-        <div class="card-header bg-light py-2">
+        <div class="card-header bg-body-secondary py-2">
             <h4 class="card-title mb-0"><i
                     class="ti ti-list me-2 text-primary"></i>{{ __('messages.pr_returned_items_title') }}</h4>
         </div>
         <div class="table-responsive">
             <table class="table card-table table-vcenter table-hover">
-                <thead class="bg-light">
+                <thead class="bg-body-secondary">
                     <tr>
                         <th class="text-center" style="width: 60px">{{ __('messages.table_no') }}</th>
                         <th>{{ __('messages.table_product') }}</th>
@@ -115,7 +115,7 @@
                 </tbody>
             </table>
         </div>
-        <div class="card-footer bg-light">
+        <div class="card-footer bg-body-secondary">
             <div class="d-flex justify-content-end">
                 <div class="text-end">
                     <div class="fs-5"><strong>{{ __('messages.pr_total_return_amount') }}</strong></div>

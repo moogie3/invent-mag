@@ -1,6 +1,9 @@
 export function initSearch() {
     const searchInput = document.getElementById("searchInput");
+    if (!searchInput) return;
+    
     const tableRows = document.querySelectorAll("#invoiceTableBody tr");
+    if (!tableRows || tableRows.length === 0) return;
 
     searchInput.addEventListener("keyup", function () {
         const searchTerm = searchInput.value.toLowerCase();

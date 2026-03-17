@@ -44,6 +44,7 @@
 
     @vite('resources/css/app.css')
     @vite('resources/css/menu-sidebar.css')
+    @vite('resources/css/settings.css')
     @vite('resources/js/app.js')
     @vite('resources/js/admin/layouts/menu-sidebar.js')
 
@@ -52,61 +53,44 @@
     <link rel="preload" href="https://cdn.jsdelivr.net/npm/flatpickr" as="script" crossorigin>
     <script src="https://cdn.jsdelivr.net/npm/flatpickr" crossorigin="anonymous"></script>
 
+    {{-- Move all scripts to head for Turbo compatibility --}}
+    @include('admin.layouts.script')
+    @vite('resources/js/admin/layouts/page-loader.js')
+    @vite('resources/js/admin/layouts/theme-toggle.js')
+    @vite('resources/js/admin/layouts/theme-visibility.js')
+
     <style>
         .sidebar-locked .sidebar {
             position: fixed;
         }
     </style>
-    
+
 </head>
 
 <body
-    class="{{ auth()->check() && (auth()->user()->system_settings['navigation_type'] ?? 'sidebar') === 'navbar' ? 'layout-navbar' : ((auth()->user()->system_settings['navigation_type'] ?? 'sidebar') === 'both' ? 'layout-navbar-v2' : '') }} {{ auth()->check() && (auth()->user()->system_settings['sticky_navbar'] ?? false) ? 'sticky-navbar' : '' }} {{ auth()->check() && (auth()->user()->system_settings['sidebar_lock'] ?? false) ? 'sidebar-locked' : '' }} {{ auth()->check() && (auth()->user()->system_settings['compact_mode'] ?? false) ? 'compact-mode' : '' }}">
+    class="is-loading-page {{ auth()->check() && (auth()->user()->system_settings['navigation_type'] ?? 'sidebar') === 'navbar' ? 'layout-navbar' : ((auth()->user()->system_settings['navigation_type'] ?? 'sidebar') === 'both' ? 'layout-navbar-v2' : '') }} {{ auth()->check() && (auth()->user()->system_settings['sticky_navbar'] ?? false) ? 'sticky-navbar' : '' }} {{ auth()->check() && (auth()->user()->system_settings['sidebar_lock'] ?? false) ? 'sidebar-locked' : '' }} {{ auth()->check() && (auth()->user()->system_settings['compact_mode'] ?? false) ? 'compact-mode' : '' }}">
 
-    <div class="page-loader">
-        <div class="container container-slim py-4">
-            <div class="text-center">
-                <div class="mb-3">
-                    <a class="navbar-brand navbar-brand-autodark">
-                        <i class="ti ti-brand-minecraft fs-2 me-2"></i>Invent-MAG
-                    </a>
-                </div>
-                <div class="spinner-border" role="status"></div>
-            </div>
-        </div>
-    </div>
+    @include('admin.layouts.partials.global-loader')
 
     <div class="wrapper">
         @include('admin.layouts.menu-sidebar')
         <div class="main-content">
             @include('admin.layouts.navbar')
             @include('admin.layouts.partials.trial-banner')
-            <turbo-frame id="main-content">
-                <div class="turbo-frame-loader">
-                    <div class="container container-slim py-4">
-                        <div class="text-center">
-                            <div class="mb-3">
-                                <a class="navbar-brand navbar-brand-autodark">
-                                    <i class="ti ti-brand-minecraft fs-2 me-2"></i>Invent-MAG
-                                </a>
-                            </div>
-                            <div class="spinner-border text-primary" role="status"></div>
-                        </div>
-                    </div>
-                </div>
+            @if(request()->routeIs('admin.setting.*') || request()->routeIs('admin.users.*'))
+                {{-- Disable turbo-frame for settings and user management pages to fix modal issues --}}
                 @yield('content')
-            </turbo-frame>
+            @else
+                <turbo-frame id="main-content" data-turbo-action="advance">
+                    @yield('content')
+                </turbo-frame>
+            @endif
         </div>
     </div>
 
     @include('admin.layouts.footer')
-    @include('admin.layouts.script')
     @include('admin.layouts.partials.session-notifications')
     @include('admin.layouts.modals.general.keyboard-shortcuts-modal')
-
-    @vite('resources/js/admin/layouts/page-loader.js')
-    @vite('resources/js/admin/layouts/theme-toggle.js')
-    @vite('resources/js/admin/layouts/theme-visibility.js')
 
     @turbo
 

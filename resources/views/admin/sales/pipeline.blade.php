@@ -68,7 +68,7 @@
 
                                             <div class="row g-3 mb-4">
                                                 <div class="col-md-6">
-                                                    <div class="card border-0 bg-light">
+                                                    <div class="card border-0 bg-body-secondary">
                                                         <div class="card-body py-3">
                                                             <div class="mb-2">
                                                                 <label for="pipelineSelect"
@@ -119,7 +119,7 @@
                                                 <h4 class="mb-0">{{ __('messages.pipeline_board') }}</h4>
                                             </div>
 
-                                            <div class="border rounded p-3 bg-light">
+                                            <div class="border rounded p-3 bg-body-secondary">
                                                 @if (count($pipelines) == 0)
                                                     <div class="empty">
                                                         <div class="empty-img">
@@ -194,7 +194,7 @@
                                 <label for="newOpportunityTotalAmount" class="form-label">
                                     <i class="ti ti-currency-dollar me-1"></i>{{ __('messages.total_amount') }}
                                 </label>
-                                <input type="text" class="form-control bg-light" id="newOpportunityTotalAmount"
+                                <input type="text" class="form-control bg-body-secondary" id="newOpportunityTotalAmount"
                                     readonly>
                             </div>
                             <div class="mb-3">
@@ -418,7 +418,7 @@
                                 <label for="editOpportunityTotalAmount" class="form-label">
                                     <i class="ti ti-currency-dollar me-1"></i>{{ __('messages.total_amount') }}
                                 </label>
-                                <input type="text" class="form-control bg-light" id="editOpportunityTotalAmount"
+                                <input type="text" class="form-control bg-body-secondary" id="editOpportunityTotalAmount"
                                     readonly>
                             </div>
                             <div class="mb-3">

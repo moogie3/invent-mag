@@ -25,10 +25,17 @@ class CategoryController extends Controller
 
     public function store(Request $request)
     {
-        $request->validate([
+        $validator = \Illuminate\Support\Facades\Validator::make($request->all(), [
             'name' => 'required',
             'description' => 'required',
         ]);
+
+        if ($validator->fails()) {
+            if ($request->ajax()) {
+                return response()->json(['success' => false, 'message' => $validator->errors()->first(), 'errors' => $validator->errors()], 422);
+            }
+            return redirect()->route('admin.setting.category')->withErrors($validator)->withInput();
+        }
 
         $result = $this->categoryService->createCategory($request->except('_token'));
 
@@ -36,7 +43,7 @@ class CategoryController extends Controller
             if ($request->ajax()) {
                 return response()->json(['success' => false, 'message' => $result['message'], 'errors' => ['name' => [$result['message']]]], 422);
             }
-            return back()->withErrors(['name' => $result['message']])->withInput();
+            return redirect()->route('admin.setting.category')->withErrors(['name' => $result['message']])->withInput();
         }
 
         if ($request->ajax()) {
@@ -47,19 +54,33 @@ class CategoryController extends Controller
 
     public function update(Request $request, $id)
     {
-        $request->validate([
+        $validator = \Illuminate\Support\Facades\Validator::make($request->all(), [
             'name' => 'required',
             'description' => 'required',
         ]);
 
+        if ($validator->fails()) {
+            if ($request->ajax()) {
+                return response()->json(['success' => false, 'message' => $validator->errors()->first(), 'errors' => $validator->errors()], 422);
+            }
+            return redirect()->route('admin.setting.category')->withErrors($validator)->withInput();
+        }
+
         $category = Categories::find($id);
+        if (!$category) {
+            if ($request->ajax()) {
+                return response()->json(['success' => false, 'message' => 'Category not found.'], 404);
+            }
+            return redirect()->route('admin.setting.category')->with('error', 'Category not found.');
+        }
+
         $result = $this->categoryService->updateCategory($category, $request->except('_token'));
 
         if (!$result['success']) {
             if ($request->ajax()) {
                 return response()->json(['success' => false, 'message' => $result['message'], 'errors' => ['name' => [$result['message']]]], 422);
             }
-            return back()->withErrors(['name' => $result['message']])->withInput();
+            return redirect()->route('admin.setting.category')->withErrors(['name' => $result['message']])->withInput();
         }
 
         if ($request->ajax()) {

@@ -55,32 +55,36 @@ window.InventMagApp.showToast = function (
 
     const typeStyles = {
         success: {
-            bg: "bg-body",
+            bg: "bg-success",
             border: "border-success",
-            icon: "ti ti-check-circle",
-            iconColor: "text-success",
-            barColor: "#198754", // Bootstrap success color
+            icon: "ti ti-check",
+            iconColor: "text-white",
+            textColor: "text-white",
+            mutedColor: "text-white-50"
         },
         error: {
-            bg: "bg-body",
+            bg: "bg-danger",
             border: "border-danger",
             icon: "ti ti-alert-circle",
-            iconColor: "text-danger",
-            barColor: "#dc3545", // Bootstrap danger color
+            iconColor: "text-white",
+            textColor: "text-white",
+            mutedColor: "text-white-50"
         },
         warning: {
-            bg: "bg-body",
+            bg: "bg-warning",
             border: "border-warning",
             icon: "ti ti-alert-triangle",
-            iconColor: "text-warning",
-            barColor: "#ffc107", // Bootstrap warning color
+            iconColor: "text-white",
+            textColor: "text-white",
+            mutedColor: "text-white-50"
         },
         info: {
-            bg: "bg-body",
+            bg: "bg-info",
             border: "border-info",
             icon: "ti ti-info-circle",
-            iconColor: "text-info",
-            barColor: "#0dcaf0", // Bootstrap info color
+            iconColor: "text-white",
+            textColor: "text-white",
+            mutedColor: "text-white-50"
         },
     };
 
@@ -91,21 +95,20 @@ window.InventMagApp.showToast = function (
     const safeMessage = escapeHtml(message);
 
     toastElement.innerHTML = `
-        <div class="toast-content ${currentType.bg} p-3 position-relative overflow-hidden"
-             style="min-width: 320px;">
-            <div class="toast-color-bar" style="background-color: ${currentType.barColor};"></div>
-            <div class="d-flex align-items-start ps-3">
-                <div class="flex-shrink-0 me-3">
-                    <i class="${currentType.icon} ${currentType.iconColor} fs-4"></i>
+        <div class="toast-content ${currentType.bg} text-white p-3 position-relative overflow-hidden shadow-lg"
+             style="min-width: 320px; border-radius: 8px; border: none;">
+            <div class="d-flex align-items-center">
+                <div class="flex-shrink-0 me-3 d-flex align-items-center justify-content-center rounded-circle" style="width: 32px; height: 32px; background: rgba(255,255,255,0.2);">
+                    <i class="${currentType.icon} ${currentType.iconColor} fs-3"></i>
                 </div>
-                <div class="flex-grow-1">
-                    <div class="fw-semibold text-dark mb-1" style="font-size: 0.95rem;">${safeTitle}</div>
-                    <div class="text-muted" style="font-size: 0.875rem; line-height: 1.4;">${safeMessage}</div>
+                <div class="flex-grow-1 pe-2">
+                    <div class="fw-bold ${currentType.textColor} mb-1" style="font-size: 1rem;">${safeTitle}</div>
+                    <div class="${currentType.mutedColor}" style="font-size: 0.875rem; line-height: 1.4;">${safeMessage}</div>
                 </div>
-                <button type="button" class="btn-close ms-3 mt-1" data-bs-dismiss="toast" aria-label="Close"
-                        style="font-size: 0.75rem; opacity: 0.6;"
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast" aria-label="Close"
+                        style="opacity: 0.8;"
                         onmouseover="this.style.opacity='1'"
-                        onmouseout="this.style.opacity='0.6'"></button>
+                        onmouseout="this.style.opacity='0.8'"></button>
             </div>
         </div>
     `;
@@ -179,7 +182,7 @@ window.showConfirmModal = function (title, message, onConfirm) {
     document.body.insertAdjacentHTML("beforeend", confirmModalHtml);
 
     const confirmModalElement = document.getElementById("confirmModal");
-    const confirmModal = new bootstrap.Modal(confirmModalElement);
+    const confirmModal = new bootstrap.Modal(confirmModalElement, {});
 
     confirmModalElement.addEventListener("shown.bs.modal", () => {
         document.getElementById("confirmModalBtn").focus();
@@ -241,7 +244,7 @@ window.showAuthModal = function (title, message, type) {
     document.body.insertAdjacentHTML("beforeend", authModalHtml);
 
     const statusModalElement = document.getElementById("statusModal");
-    const statusModal = new bootstrap.Modal(statusModalElement);
+    const statusModal = new bootstrap.Modal(statusModalElement, {});
 
     statusModalElement.addEventListener("hidden.bs.modal", () => {
         statusModalElement.remove();
@@ -256,25 +259,28 @@ window.handleSessionNotifications = function () {
         "session-notification-data"
     );
 
-    if (notificationDataElement) {
+    if (notificationDataElement && !notificationDataElement.dataset.processed) {
         const successMessage = notificationDataElement.dataset.successMessage;
         const errorMessage = notificationDataElement.dataset.errorMessage;
         const isAuthPage =
             notificationDataElement.dataset.isAuthPage === "true";
 
-        if (successMessage) {
+        if (successMessage && successMessage !== 'null' && successMessage !== '') {
             if (isAuthPage) {
                 window.showAuthModal("Success", successMessage, "success");
             } else {
                 InventMagApp.showToast("Success", successMessage, "success");
             }
-        } else if (errorMessage) {
+        } else if (errorMessage && errorMessage !== 'null' && errorMessage !== '') {
             if (isAuthPage) {
                 window.showAuthModal("Error", errorMessage, "error");
-            } else { // <--- Added this else block
+            } else {
                 InventMagApp.showToast("Error", errorMessage, "error");
             }
         }
+        
+        // Mark as processed so it doesn't fire again for the same element
+        notificationDataElement.dataset.processed = "true";
     }
 };
 

@@ -17,8 +17,13 @@
                     <tr>
                         <td>
                             <div class="d-flex align-items-center">
-                                <span class="avatar avatar-sm me-2 rounded"
-                                    style="background-image: url({{ asset($product->image ?? 'images/placeholder.png') }})"></span>
+                                <div class="avatar avatar-sm me-2 rounded border bg-body-secondary flex-shrink-0">
+                                    @if (empty($product->image) || strpos($product->image, 'default_placeholder.png') !== false)
+                                        <i class="ti ti-photo text-muted"></i>
+                                    @else
+                                        <img src="{{ $product->image }}" alt="{{ $product->name }}" class="rounded" style="width: 100%; height: 100%; object-fit: cover;">
+                                    @endif
+                                </div>
                                 <div>
                                     <div class="fw-semibold">{{ $product->name }}</div>
                                     <div class="small text-muted">{{ $product->code }}</div>

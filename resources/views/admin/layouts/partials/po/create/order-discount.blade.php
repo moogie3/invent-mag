@@ -1,4 +1,4 @@
-<div class="h-100 p-4 bg-light rounded-3">
+<div class="h-100 p-4 bg-body-secondary rounded-3">
     <h4 class="card-title mb-4">
         <i class="ti ti-percentage me-2 text-primary"></i> {{ __('messages.po_order_discount') }}
     </h4>

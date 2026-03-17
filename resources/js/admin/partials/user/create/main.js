@@ -1,15 +1,15 @@
-import { createUserModal, createUserForm, createRolesContainer, createPermissionsContainer } from '../common/elements.js';
+import { getCreateUserModal, createUserForm, createRolesContainer, createPermissionsContainer } from '../common/elements.js';
 import { setupRolePermissionSync, resetPermissionStates, syncPermissionsFromRoles } from '../rolesPermissions/sync.js';
 
 export function setupCreateUserModal() {
+    const createModalElement = document.getElementById("createUserModal");
+    if (!createModalElement) return;
+    
     if (createRolesContainer && createPermissionsContainer) {
         setupRolePermissionSync(
             createRolesContainer,
             createPermissionsContainer
         );
-
-        const createModalElement =
-            document.getElementById("createUserModal");
 
         createModalElement.addEventListener("shown.bs.modal", function () {
             syncPermissionsFromRoles(
@@ -22,6 +22,6 @@ export function setupCreateUserModal() {
             resetPermissionStates(createPermissionsContainer);
         });
     } else {
-        console.error("Create user modal containers not found");
+        console.log("Create user modal containers not found - this is fine on non-user pages");
     }
 }

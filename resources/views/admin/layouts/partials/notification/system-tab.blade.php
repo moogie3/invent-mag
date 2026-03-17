@@ -2,7 +2,7 @@
     @if (isset($systemNotifications) && $systemNotifications->count() > 0)
         <div class="list-group list-group-flush list-group-hoverable">
             @foreach ($systemNotifications as $item)
-                <div class="list-group-item notification-item bg-white p-3 mb-2 rounded border shadow-sm transition-all" id="notif-{{ md5($item['id']) }}">
+                <div class="list-group-item notification-item bg-body p-3 mb-2 rounded border shadow-sm transition-all" id="notif-{{ md5($item['id']) }}">
                     <div class="row align-items-center">
                         <div class="col-auto">
                             <span class="avatar bg-{{ $item['color'] }}-lt">

@@ -28,7 +28,7 @@
                     {{ __('messages.pr_modal_bulk_delete_message_part2') }}
                 </p>
 
-                <div class="bg-light p-3 rounded">
+                <div class="bg-body-secondary p-3 rounded">
                     <h6 class="mb-2"><i class="ti ti-info-circle me-1"></i>
                         {{ __('messages.pr_modal_bulk_delete_what_deleted_title') }}</h6>
                     <ul class="list-unstyled mb-0 small">
@@ -85,7 +85,7 @@
                     <strong id="bulkCompletedCount">0</strong>
                     {{ __('messages.pr_modal_bulk_mark_completed_message_part2') }}
                 </p>
-                <div class="bg-light p-3 rounded">
+                <div class="bg-body-secondary p-3 rounded">
                     <h6 class="mb-2"><i class="ti ti-info-circle me-1"></i>
                         {{ __('messages.pr_modal_bulk_mark_completed_what_happens_title') }}</h6>
                     <ul class="list-unstyled mb-0 small">
@@ -127,7 +127,7 @@
                     <strong id="bulkCanceledCount">0</strong>
                     {{ __('messages.pr_modal_bulk_mark_canceled_message_part2') }}
                 </p>
-                <div class="bg-light p-3 rounded">
+                <div class="bg-body-secondary p-3 rounded">
                     <h6 class="mb-2"><i class="ti ti-info-circle me-1"></i>
                         {{ __('messages.pr_modal_bulk_mark_canceled_what_happens_title') }}</h6>
                     <ul class="list-unstyled mb-0 small">

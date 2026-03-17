@@ -10,25 +10,25 @@
                             <table class="table table-hover align-middle">
                                 <thead style="font-size: large">
                                     <tr>
-                                        <th class="sticky-top bg-white fs-4 py-3" style="z-index: 1020; width: 40px;">
+                                        <th class="sticky-top bg-body fs-4 py-3" style="z-index: 1020; width: 40px;">
                                             <input type="checkbox" id="selectAll" class="form-check-input">
                                         </th>
-                                        <th class="sticky-top bg-white fs-4 py-3" style="z-index: 1020; width: 60px;">
+                                        <th class="sticky-top bg-body fs-4 py-3" style="z-index: 1020; width: 60px;">
                                             {{ __('messages.table_no') }}
                                         </th>
-                                        <th class="sticky-top bg-white fs-4 py-3" style="z-index: 1020;">
+                                        <th class="sticky-top bg-body fs-4 py-3" style="z-index: 1020;">
                                             {{ __('messages.table_invoice') }}
                                         </th>
-                                        <th class="sticky-top bg-white fs-4 py-3" style="z-index: 1020;">
+                                        <th class="sticky-top bg-body fs-4 py-3" style="z-index: 1020;">
                                             {{ __('messages.return_date') }}
                                         </th>
-                                        <th class="sticky-top bg-white fs-4 py-3" style="z-index: 1020;">
+                                        <th class="sticky-top bg-body fs-4 py-3" style="z-index: 1020;">
                                             {{ __('messages.table_total') }}
                                         </th>
-                                        <th class="sticky-top bg-white fs-4 py-3 text-center" style="z-index: 1020;">
+                                        <th class="sticky-top bg-body fs-4 py-3 text-center" style="z-index: 1020;">
                                             {{ __('messages.status') }}
                                         </th>
-                                        <th class="sticky-top bg-white fs-4 py-3 no-print" style="z-index: 1020; width: 120px;">
+                                        <th class="sticky-top bg-body fs-4 py-3 no-print" style="z-index: 1020; width: 120px;">
                                             {{ __('messages.table_action') }}
                                         </th>
                                     </tr>

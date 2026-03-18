@@ -32,9 +32,21 @@ class DashboardController extends Controller
         $dates = $this->dashboardService->calculateDateRange($dateRange, $startDate, $endDate);
 
         if ($request->ajax()) {
-            $period = $request->get('period', '30days');
             $type = $request->get('type', 'sales');
-            $data = $this->dashboardService->getChartData($period, $type);
+
+            // If the caller passes date_range (same parameter as the full page load),
+            // use the monthly aggregation so the refreshed chart matches the initial view.
+            if ($request->has('date_range')) {
+                $ajaxDateRange = $request->get('date_range', 'this_year');
+                $ajaxStart     = $request->get('start_date');
+                $ajaxEnd       = $request->get('end_date');
+                $data = $this->dashboardService->getChartDataByDateRange($ajaxDateRange, $type, $ajaxStart, $ajaxEnd);
+            } else {
+                // Legacy path: rolling period (7days / 30days / 3months / year) → daily granularity
+                $period = $request->get('period', '30days');
+                $data   = $this->dashboardService->getChartData($period, $type);
+            }
+
             return response()->json($data);
         }
 

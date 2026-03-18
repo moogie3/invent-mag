@@ -40,9 +40,6 @@
             if (dropdowns.length === 0 && tooltips.length === 0 && popovers.length === 0) {
                 return;
             }
-
-            console.log('Bootstrap found, initializing ' + 
-                (dropdowns.length + tooltips.length + popovers.length) + ' components...');
             
             // Initialize all dropdowns
             dropdowns.forEach(function(toggle) {
@@ -50,9 +47,7 @@
                     try {
                         new bs.Dropdown(toggle);
                         toggle.classList.add('bs-init-done');
-                    } catch(e) {
-                        console.warn('Dropdown init error:', e);
-                    }
+                    } catch(e) {}
                 }
             });
             
@@ -75,10 +70,6 @@
                     } catch(e) {}
                 }
             });
-
-            console.log('Bootstrap initialization complete');
-        } else {
-            console.warn('Bootstrap not found on window object');
         }
     }
 

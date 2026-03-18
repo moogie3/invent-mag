@@ -9,6 +9,8 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    {{-- Tell Turbo to always do a full page render for the receipt, never a frame swap --}}
+    <meta name="turbo-visit-control" content="reload">
     <title>Invent-MAG | @yield('title')</title>
     <link href="{{ asset('tabler/dist/css/tabler.min.css') }}" rel="stylesheet" />
     <link href="{{ asset('tabler/dist/css/tabler-flags.min.css') }}" rel="stylesheet" />
@@ -20,8 +22,8 @@
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 </head>
 
-<body>
-    <div class="page-loader">
+<body class="is-loading-page">
+    <div class="page-loader" id="global-loader">
         <div class="container container-slim py-4">
             <div class="text-center">
                 <div class="mb-3">
@@ -33,6 +35,7 @@
             </div>
         </div>
     </div>
+
     <div class="main-content">
         <div class="no-print">
             @include('admin.layouts.navbar')
@@ -41,13 +44,15 @@
             @yield('content')
         </div>
     </div>
+
     <div class="no-print">
         @include('admin.layouts.footer')
     </div>
-    @include('admin.layouts.script')
+
     @vite('resources/js/admin/layouts/page-loader.js')
     @vite('resources/js/admin/layouts/theme-toggle.js')
     @vite('resources/js/admin/layouts/theme-visibility.js')
+    @include('admin.layouts.partials.session-notifications')
 </body>
 
 </html>

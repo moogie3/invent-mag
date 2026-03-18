@@ -5,7 +5,7 @@
 @section('content')
     <div class="card card-md border-0 shadow-sm rounded-3">
         <div class="card-body">
-            <h2 class="h2 text-center mb-4">Verify Your Email Address</h2>
+            <h2 class="h2 text-center mb-5">Verify Your Email Address</h2>
 
             <p class="text-center mb-2">Thanks for signing up!</p>
 
@@ -16,27 +16,29 @@
 
             @if (session('status') == 'verification-link-sent')
                 <div class="alert alert-success" role="alert">
-                    A new verification link has been sent to the email address you provided during registration.
+                    {{ __('messages.verification_link_sent') }}
                 </div>
             @endif
 
-            <div class="d-flex gap-3 py-3 mt-4">
-                <form class="w-100" action="{{ route('verification.send') }}" method="POST">
-                    @csrf
-                    <button type="submit" class="btn btn-primary w-100">
-                        <i class="ti ti-mail me-2"></i>
-                        Resend Verification Email
-                    </button>
-                </form>
-
-                <form class="w-100" method="POST" action="{{ route('admin.logout') }}">
-                    @csrf
-                    <button type="submit" class="btn btn-secondary w-100">
-                        <i class="ti ti-logout me-2"></i>
-                        Log Out
-                    </button>
-                </form>
+            <div class="form-footer">
+                <div class="d-grid mt-4">
+                    <form action="{{ route('verification.send') }}" method="POST">
+                        @csrf
+                        <button type="submit" class="btn btn-primary w-100" id="resendVerificationBtn">
+                            <i class="ti ti-mail me-2"></i>
+                            {{ __('messages.resend_verification_email') }}
+                        </button>
+                    </form>
+                </div>
             </div>
         </div>
+    </div>
+    <div class="text-center text-secondary mt-3">
+        <form method="POST" action="{{ route('admin.logout') }}" class="d-inline">
+            @csrf
+            <button type="submit" class="btn btn-link text-secondary p-0 border-0" style="text-decoration: none;">
+                Back to Login
+            </button>
+        </form>
     </div>
 @endsection

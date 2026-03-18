@@ -1,5 +1,6 @@
 import { getProducts, setProducts, saveProductsToCache } from './state.js';
 import { renderList } from './dom.js';
+import { calculateTotals } from './totals.js';
 import { playSuccessPosSound, playDeleteSound, playDecreaseSound } from '../../../utils/sound.js';
 import { showAddToCartFeedback, updateProductCardStockDisplay } from '../utils/ui.js';
 
@@ -227,5 +228,22 @@ export function initCartActions() {
                 event.target.blur();
             }
         });
+    }
+
+    // Listen for discount and tax input changes to recalculate totals
+    const orderDiscountInput = document.getElementById("orderDiscount");
+    const discountTypeSelect = document.getElementById("discountType");
+    const taxRateInput = document.getElementById("taxRate");
+
+    if (orderDiscountInput) {
+        orderDiscountInput.addEventListener("input", calculateTotals);
+        orderDiscountInput.addEventListener("change", calculateTotals);
+    }
+    if (discountTypeSelect) {
+        discountTypeSelect.addEventListener("change", calculateTotals);
+    }
+    if (taxRateInput) {
+        taxRateInput.addEventListener("input", calculateTotals);
+        taxRateInput.addEventListener("change", calculateTotals);
     }
 }

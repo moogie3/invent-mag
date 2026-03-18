@@ -6,9 +6,12 @@ function setupQuickCreateProductButton() {
         document.getElementById("searchProduct")?.parentElement;
     if (!searchProductContainer) return;
 
+    // Prevent duplicate buttons on Turbo re-renders
+    if (searchProductContainer.querySelector('.quick-create-product-btn')) return;
+
     const addButton = document.createElement("button");
     addButton.type = "button";
-    addButton.className = "btn btn-primary";
+    addButton.className = "btn btn-primary quick-create-product-btn";
     addButton.innerHTML = '<i class="ti ti-plus"></i>';
     addButton.title = "Create New Product";
     addButton.setAttribute("data-bs-toggle", "modal");

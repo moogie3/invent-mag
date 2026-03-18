@@ -1096,6 +1096,7 @@ return [
     'view_sales_invoice' => 'View Sales Invoice',
     'sales_invoice' => 'Sales Invoice',
     'resend_verification_email' => 'Resend Verification Email',
+    'verification_link_sent' => 'A new verification link has been sent to your email address.',
     'email_verified_success_title' => 'Email Verified!',
     'email_verified_success_message' => 'Your email address has been successfully verified. You can now access all features of your account.',
     'go_to_dashboard' => 'Go to Dashboard',

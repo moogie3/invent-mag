@@ -36,6 +36,7 @@ export default defineConfig({
                 "resources/js/admin/warehouse.js",
                 "resources/js/admin/helpers/notification.js",
                 "resources/js/admin/layouts/page-loader.js",
+                "resources/js/admin/layouts/receipt-page.js",
                 "resources/js/admin/layouts/navbar.js",
                 "resources/js/admin/sales-pipeline.js",
                 "resources/js/admin/layouts/settings.js",

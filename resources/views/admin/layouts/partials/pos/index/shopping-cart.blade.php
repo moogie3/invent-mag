@@ -26,10 +26,10 @@
             </div>
 
             <div class="d-flex justify-content-between align-items-center mb-2">
-                <span>{{ __('messages.po_order_discount') }}:</span>
-                <div class="input-group" style="max-width: 180px;">
-                    <input type="number" id="orderDiscount" class="form-control" value="0" min="0">
-                    <select id="discountType" class="form-select" style="max-width: 70px;">
+                <span class="text-nowrap">{{ __('messages.po_order_discount') }}:</span>
+                <div class="input-group" style="max-width: 140px; flex-wrap: nowrap;">
+                    <input type="number" id="orderDiscount" class="form-control form-control-sm" value="0" min="0">
+                    <select id="discountType" class="form-select form-select-sm" style="max-width: 55px;">
                         <option value="fixed">{{ __('messages.po_fixed') }}</option>
                         <option value="percentage">%</option>
                     </select>
@@ -37,16 +37,16 @@
             </div>
 
             <div class="d-flex justify-content-between align-items-center mb-2">
-                <span>{{ __('messages.tax_rate') }}:</span>
-                <div class="input-group" style="max-width: 120px;">
-                    <input type="number" id="taxRate" class="form-control" value="0" min="0">
+                <span class="text-nowrap">{{ __('messages.tax_rate') }}:</span>
+                <div class="input-group" style="max-width: 100px; flex-wrap: nowrap;">
+                    <input type="number" id="taxRate" class="form-control form-control-sm" value="0" min="0">
                     <span class="input-group-text">%</span>
                 </div>
             </div>
 
             <hr>
 
-            <div class="d-flex justify-content-between fs-2 fw-bold text-success">
+            <div class="d-flex justify-content-between fs-5 fw-bold text-success">
                 <span>{{ __('messages.po_grand_total') }}:</span>
                 <span id="finalTotal">{{ \App\Helpers\CurrencyHelper::format(0) }}</span>
             </div>
@@ -58,7 +58,7 @@
             <input type="hidden" id="grandTotalInput" name="grand_total" value="0">
 
             <div class="mt-3">
-                <button type="button" id="processPaymentBtn" class="btn btn-primary w-100 btn-lg">
+                <button type="button" id="processPaymentBtn" class="btn btn-primary w-100">
                     <i class="ti ti-cash me-1"></i> {{ __('messages.process_payment') }}
                 </button>
             </div>

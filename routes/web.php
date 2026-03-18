@@ -56,7 +56,7 @@ Route::middleware('web')->prefix('admin')->group(function () {
     // Override Fortify's verification.send route to ensure correct middleware
     Route::post('/email/verification-notification', function (Illuminate\Http\Request $request) {
         $request->user()->sendEmailVerificationNotification();
-        return back()->with('status', 'verification-link-sent');
+        return back()->with('status', __('messages.verification_link_sent'));
     })->middleware(['auth', 'throttle:6,1'])->name('verification.send');
 
     Route::post('/logout', [LoginController::class, 'destroy'])->name('admin.logout');

@@ -16,9 +16,9 @@ function completePayment() {
     const invoiceForm = document.getElementById("invoiceForm");
     const paymentMethod = document.getElementById("paymentMethod");
     const amountReceived = document.getElementById("amountReceived");
-    
+
     if (!completePaymentBtn || !invoiceForm || !paymentMethod) return;
-    
+
     completePaymentBtn.disabled = true;
 
     const paymentMethodMap = {
@@ -51,7 +51,7 @@ function completePayment() {
         changeInput.name = "change_amount";
         changeInput.value = Math.max(
             0,
-            parseFloat(amountReceived.value || 0) - grandTotal
+            parseFloat(amountReceived.value || 0) - grandTotal,
         );
         invoiceForm.appendChild(changeInput);
     } else {
@@ -72,7 +72,7 @@ function completePayment() {
             "X-CSRF-TOKEN": document
                 .querySelector('meta[name="csrf-token"]')
                 .getAttribute("content"),
-            "Accept": "application/json", // Add this line
+            Accept: "application/json",
         },
     })
         .then((response) => {
@@ -82,7 +82,7 @@ function completePayment() {
             } else {
                 return response.text().then((text) => {
                     throw new Error(
-                        `Expected JSON, but received ${contentType || "unknown"}: ${text}`
+                        `Expected JSON, but received ${contentType || "unknown"}: ${text}`,
                     );
                 });
             }
@@ -93,12 +93,16 @@ function completePayment() {
                 const modal = getPaymentModal();
                 if (modal) modal.hide();
                 clearCart();
-                window.location.href = `/admin/pos/receipt/${data.sale_id}`;
+                // Use Turbo.visit instead of window.location.href
+                // so Turbo lifecycle events fire correctly (loader, etc.)
+                Turbo.visit(`/admin/pos/receipt/${data.sale_id}`, {
+                    action: "replace",
+                });
             } else {
                 InventMagApp.showToast(
                     "Error",
                     data.message || "Failed to process payment.",
-                    "error"
+                    "error",
                 );
                 console.error("Payment error:", data.errors);
             }
@@ -108,7 +112,7 @@ function completePayment() {
             InventMagApp.showToast(
                 "Error",
                 "An error occurred while processing payment. Please check the console for details.",
-                "error"
+                "error",
             );
         })
         .finally(() => {

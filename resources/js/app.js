@@ -14,7 +14,4 @@ window.Alpine = Alpine;
 
 Alpine.start();
 
-// Console log for debugging
-console.log('app.js loaded');
-
 // Admin-specific scripts are now conditionally loaded in script.blade.php

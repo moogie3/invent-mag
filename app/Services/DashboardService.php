@@ -133,6 +133,52 @@ class DashboardService
         ];
     }
 
+    /**
+     * Returns monthly chart data for the given date_range (same format as the full page load).
+     * Used by AJAX refresh to keep the chart consistent with the initial page view.
+     */
+    public function getChartDataByDateRange($dateRange, $type, $startDate = null, $endDate = null)
+    {
+        $dates = $this->calculateDateRange($dateRange, $startDate, $endDate);
+
+        $monthFormat    = DB::connection()->getDriverName() === 'sqlite'
+            ? "strftime('%b', order_date)"
+            : "DATE_FORMAT(order_date, '%b')";
+        $monthNumFormat = DB::connection()->getDriverName() === 'sqlite'
+            ? "strftime('%m', order_date)"
+            : "MONTH(order_date)";
+
+        if ($type === 'purchases') {
+            $rows = Purchase::selectRaw("
+                $monthFormat    as month,
+                $monthNumFormat as month_num,
+                SUM(total)      as total
+            ")
+                ->whereBetween('order_date', [$dates['start'], $dates['end']])
+                ->groupBy(DB::raw($monthNumFormat), DB::raw($monthFormat))
+                ->orderBy('month_num')
+                ->get();
+        } else {
+            $rows = Sales::selectRaw("
+                $monthFormat    as month,
+                $monthNumFormat as month_num,
+                SUM(total)      as total
+            ")
+                ->whereBetween('order_date', [$dates['start'], $dates['end']])
+                ->groupBy(DB::raw($monthNumFormat), DB::raw($monthFormat))
+                ->orderBy('month_num')
+                ->get();
+        }
+
+        return [
+            'labels'    => $rows->pluck('month')->toArray(),
+            'data'      => $rows->pluck('total')->toArray(),
+            'formatted' => $rows->pluck('total')
+                ->map(fn($val) => CurrencyHelper::format($val))
+                ->toArray(),
+        ];
+    }
+
     public function calculateDateRange($dateRange, $startDate = null, $endDate = null)
     {
         $now = Carbon::now();

@@ -1,16 +1,19 @@
-import { loadProductsFromCache, getProducts } from './partials/pos/cart/state.js';
-import { initCartActions } from './partials/pos/cart/actions.js';
-import { calculateTotals } from './partials/pos/cart/totals.js';
-import { renderList } from './partials/pos/cart/dom.js';
-import { initPaymentForm } from './partials/pos/payment/form.js';
-import { initPaymentApi } from './partials/pos/payment/api.js';
-import { populatePaymentModal } from './partials/pos/payment/modal.js';
-import { initQuickCreateCustomer } from './partials/pos/quickCreate/customer.js';
-import { initQuickCreateProduct } from './partials/pos/quickCreate/product.js';
-import { onPageLoad } from './utils/onPageLoad.js';
+import {
+    loadProductsFromCache,
+    getProducts,
+} from "./partials/pos/cart/state.js";
+import { initCartActions } from "./partials/pos/cart/actions.js";
+import { calculateTotals } from "./partials/pos/cart/totals.js";
+import { renderList } from "./partials/pos/cart/dom.js";
+import { initPaymentForm } from "./partials/pos/payment/form.js";
+import { initPaymentApi } from "./partials/pos/payment/api.js";
+import { populatePaymentModal } from "./partials/pos/payment/modal.js";
+import { initQuickCreateCustomer } from "./partials/pos/quickCreate/customer.js";
+import { initQuickCreateProduct } from "./partials/pos/quickCreate/product.js";
+import { onPageLoad } from "./utils/onPageLoad.js";
 
 onPageLoad(function () {
-    if (!window.location.pathname.includes("/admin/pos")) return;
+    if (window.location.pathname !== "/admin/pos") return;
     const urlParams = new URLSearchParams(window.location.search);
     const successParam = urlParams.get("success");
 
@@ -43,7 +46,11 @@ onPageLoad(function () {
     if (processPaymentBtn) {
         processPaymentBtn.addEventListener("click", function () {
             if (getProducts().length === 0) {
-                InventMagApp.showToast("Warning", "Please add at least one product to the cart.", "warning");
+                InventMagApp.showToast(
+                    "Warning",
+                    "Please add at least one product to the cart.",
+                    "warning",
+                );
                 return;
             }
             populatePaymentModal();
@@ -59,18 +66,28 @@ onPageLoad(function () {
                 const barcode = this.value.trim();
                 if (barcode) {
                     fetch(`/admin/product/search-by-barcode?barcode=${barcode}`)
-                        .then(response => {
+                        .then((response) => {
                             if (!response.ok) {
-                                throw new Error('Product not found');
+                                throw new Error("Product not found");
                             }
                             return response.json();
                         })
-                        .then(product => {
-                            addToProductList(product.id, product.name, product.selling_price, product.unit.symbol, product.stock_quantity);
-                            this.value = '';
+                        .then((product) => {
+                            addToProductList(
+                                product.id,
+                                product.name,
+                                product.selling_price,
+                                product.unit.symbol,
+                                product.stock_quantity,
+                            );
+                            this.value = "";
                         })
-                        .catch(error => {
-                            InventMagApp.showToast("Error", "Product not found for the given barcode.", "error");
+                        .catch((error) => {
+                            InventMagApp.showToast(
+                                "Error",
+                                "Product not found for the given barcode.",
+                                "error",
+                            );
                         });
                 }
             }
@@ -107,13 +124,19 @@ onPageLoad(function () {
         });
     }
 
-    document.addEventListener('ctrl-s-pressed', function () {
+    document.addEventListener("ctrl-s-pressed", function () {
         if (getProducts().length === 0) {
-            InventMagApp.showToast("Warning", "Please add at least one product to the cart.", "warning");
+            InventMagApp.showToast(
+                "Warning",
+                "Please add at least one product to the cart.",
+                "warning",
+            );
             return;
         }
         populatePaymentModal();
-        const paymentModal = new bootstrap.Modal(document.getElementById('paymentModal', {}));
+        const paymentModal = new bootstrap.Modal(
+            document.getElementById("paymentModal", {}),
+        );
         paymentModal.show();
     });
 });

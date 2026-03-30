@@ -1,8 +1,8 @@
 # Invent-MAG: Technical Specification Document
 
-**Document Version:** 1.3  
+**Document Version:** 1.4  
 **Last Updated:** March 2026  
-**System Version:** 1.3
+**System Version:** 1.4
 
 ---
 
@@ -37,8 +37,8 @@ Invent-MAG is a production-ready, enterprise-grade ERP system built on Laravel 1
 ┌────────────────────▼────────────────────────────────────────┐
 │                      APPLICATION                             │
 │  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐      │
-│  │ Controllers  │  │   Services   │  │   Requests   │      │
-│  │              │  │              │  │   (Form)     │      │
+│  │ Controllers  │  │   Services   │  │   Helpers    │      │
+│  │              │  │              │  │   (Calculus) │      │
 │  └──────────────┘  └──────────────┘  └──────────────┘      │
 │                                                              │
 │  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐      │
@@ -255,18 +255,29 @@ class SalesService
 
 Eloquent models act as repositories with custom scopes and methods.
 
-#### DTO Pattern
+#### Helper Layer Pattern
 
 ```php
-class TransactionDTO
+// Complex calculations centralized for consistency across POS, Sales, CRM, and Reports
+class SalesHelper
 {
-    public function __construct(
-        public string $accountCode,
-        public string $type,
-        public float $amount
-    ) {}
+    public static function calculateInvoiceSummaryWithReturns($items, $discount, $type, $tax, $returns)
+    {
+        // Subtract returned items from original totals, calculate net discount and tax
+        $netSubtotal = self::calculateNetSubtotal($items, $returns);
+        $netDiscount = self::calculateNetDiscount($netSubtotal, $discount, $type);
+        $netTax = self::calculateNetTax($netSubtotal - $netDiscount, $tax);
+        
+        return $netSubtotal - $netDiscount + $netTax;
+    }
 }
 ```
+
+**Benefits:**
+
+- Eliminates calculation discrepancies between different modules (e.g. Dashboard vs CRM vs POS)
+- Simplifies controllers and services
+- Easy to unit test mathematical operations
 
 ---
 
@@ -428,6 +439,14 @@ GET /admin/product/expiring-soon  # Expiry alerts
 GET /admin/supplier/metrics       # Supplier analytics
 GET /admin/customer/metrics       # Customer analytics
 GET /admin/api/settings           # System settings
+```
+
+#### Inventory Management
+
+```http
+GET /admin/product/{id}/main-stock                   # Check primary stock
+GET /admin/product/{id}/warehouse-stock/{warehouseId} # Check warehouse stock
+POST /admin/product/stock-check                      # Validate stock vs cart quantities
 ```
 
 ### 5.3 API Documentation
@@ -615,9 +634,9 @@ class SalesForecastService
 
 ### 8.3 Customer Lifetime Value
 
-**Formula:** Average Order Value × Purchase Frequency × Customer Lifespan
+**Formula:** Adjusted Total Purchases (Net of Returns) × Current Product Mix
 
-**Implementation:** Automated calculation per customer with historical tracking
+**Implementation:** Automated calculation per customer. `CrmService` scans all historical transactions and actively deducts returned items and refunded amounts from the LTV and product category graphs, providing the true net contribution of each customer.
 
 ---
 
@@ -687,6 +706,7 @@ class SalesForecastService
 
 | Version | Date          | Changes                                                                                                                                                                       |
 | ------- | ------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1.4     | March 2026    | Financial & CRM Integrations: Full integration of Sales and Purchase Returns into GL, Dashboards, and CRM (Adjusted LTV). Extracted `SalesHelper`, `PurchaseHelper`, and `ProductStockController` for DRY calculations. Added Opening Balance Module. Added `ACCOUNTING_SETUP_GUIDE.md`. |
 | 1.3     | March 2026    | Turbo Drive (Hotwire) integration: `onPageLoad` utility, unified `bootstrap-init.js`, `receipt-page.js`, POS discount/tax reactivity fix, `DashboardService` extraction, auth error handling fix (ValidationException bypass + session-notifications auth page detection). |
 | 1.2     | March 2026    | Full Production Architecture: Subdomain isolation (`*.invent-mag.web.id`), Resend API Email Integration, Advanced Rate Limiting, Midtrans Tenant-Aware Webhooks, CI/CD fixes. |
 | 1.2     | March 2026    | Implemented subscription & payment system with Midtrans, tiered plans (Starter/Professional/Enterprise), feature gating, usage limits, plan badges in sidebar, invoice emails |
@@ -766,6 +786,7 @@ Common extension points:
 | 1.0     | Feb 2026 | Added comprehensive test coverage stats and documented returns fixes                                                                                                          |
 | 1.0     | Mar 2026 | Full Production Architecture: Subdomain isolation (`*.invent-mag.web.id`), Resend API Email Integration, Advanced Rate Limiting, Midtrans Tenant-Aware Webhooks, CI/CD fixes. |
 | 1.0     | Mar 2026 | Documented Subscription system, Midtrans integration, and Railway deployment architecture                                                                                     |
+| 1.4     | Mar 2026 | Financial & CRM Integrations: Full integration of Returns into GL, Dashboards, and CRM (Net LTV). `SalesHelper` & `PurchaseHelper` extraction. Opening Balance Module added. |
 | 1.3     | Mar 2026 | Turbo Drive integration: `onPageLoad` utility, `bootstrap-init.js`, `receipt-page.js`, POS reactivity fix, `DashboardService` extraction, auth error handling improvements.  |
 
 ---

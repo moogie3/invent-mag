@@ -1,6 +1,6 @@
 # Invent-MAG: Enterprise Inventory & Accounting System
 
-**Version:** 1.3  
+**Version:** 1.4  
 **Author:** moogie3  
 **License:** MIT  
 **Development Time:** 1.5+ years (451+ commits)  
@@ -81,8 +81,9 @@ Experience Invent-MAG firsthand:
 
 - **Customer Database:** Full profiles with interaction history
 - **Purchase History:** Complete customer transaction records
-- **Customer Lifetime Value (LTV):** Automated calculation
+- **Customer Lifetime Value (LTV):** Net calculation subtracting returned items
 - **Customer Retention Analysis:** Loyalty tracking
+- **Accurate Product Mix:** Adjusts for returned products over lifetime
 - **Per-Customer Pricing:** Historical price tracking
 
 #### Advanced CRM Features
@@ -186,8 +187,9 @@ Experience Invent-MAG firsthand:
 
 - **Double-Entry Bookkeeping:** Strict automated journal entry creation with dynamic **FIFO (First-In, First-Out) Cost of Goods Sold (COGS)** calculation.
 - **Automated Reversals:** Deleting a Sale, Purchase, or Return automatically reverses the associated Journal Entries to maintain a perfectly balanced General Ledger.
+- **Accurate GL Summaries:** Real-time dashboards correctly deduct Sales Returns and Purchase Returns from Revenue and Expense totals.
 - **Multi-Currency Support:** Transaction recording in multiple currencies
-- **Opening Balances:** Setup wizard for new fiscal years
+- **Opening Balances Module:** Step-by-step setup wizard for initializing new fiscal year accounts.
 - **Recurring Entries:** Infrastructure for automated recurring journals
 - **Audit Logging:** Complete accounting audit trail
 

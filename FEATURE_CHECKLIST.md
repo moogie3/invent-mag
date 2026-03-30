@@ -1,7 +1,7 @@
 # Invent-MAG: Complete Feature Checklist
 
 **Last Updated:** March 2026  
-**Version:** 1.3
+**Version:** 1.4
 
 ---
 
@@ -82,7 +82,8 @@
 - [x] Customer database (CRUD)
 - [x] Customer interaction tracking
 - [x] Purchase history per customer
-- [x] Customer lifetime value (LTV)
+- [x] Adjusted Customer lifetime value (Net LTV subtracting returns)
+- [x] Accurate category and product purchased counts (deducting returned quantities)
 - [x] Customer retention analysis
 - [x] Per-customer pricing
 - [x] Historical pricing tracking
@@ -230,7 +231,8 @@
 
 - [x] Multi-currency support
 - [x] Currency configuration
-- [x] Opening balance setup
+- [x] Opening balance setup wizard (New Fiscal Year)
+- [x] General Ledger accurately factors in Sales/Purchase Returns
 - [x] Recurring journal entry infrastructure
 - [x] Journal entry approval workflow
 - [x] Comprehensive accounting audit log
@@ -421,7 +423,7 @@
 | **Controllers**      | 30        |
 | **Services**         | 34        |
 | **Models**           | 35        |
-| **Helpers**          | 6         |
+| **Helpers**          | 8         |
 | **Test Files**       | 776       |
 | **API Endpoints**    | 50+       |
 | **Database Tables**  | 38        |
@@ -448,5 +450,5 @@
 
 ---
 
-**Document Version:** 1.3  
+**Document Version:** 1.4  
 **Last Updated:** March 2026

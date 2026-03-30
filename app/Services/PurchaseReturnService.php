@@ -207,6 +207,8 @@ class PurchaseReturnService
                 ['account_name' => $purchaseAccountName, 'type' => 'debit', 'amount' => $proportionalPurchase],
                 // Reduce Inventory (items returned from stock)
                 ['account_name' => $inventoryAccountName, 'type' => 'credit', 'amount' => $proportionalPurchase],
+                // Offset the AP debit to balance the entry
+                ['account_name' => $accountsPayableAccountName, 'type' => 'credit', 'amount' => $totalReturnAmount],
             ];
 
             $this->accountingService->createJournalEntry(

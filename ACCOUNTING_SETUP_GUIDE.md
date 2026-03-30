@@ -48,7 +48,8 @@ Users need the following permissions to access accounting features:
 |------------|-------------|
 | `view-accounting` | View accounting menus and reports |
 | `view-chart-of-accounts` | View Chart of Accounts |
-| `edit-chart-of-accounts` | Edit accounts and set opening balances |
+| `edit-chart-of-accounts` | Edit Chart of Accounts |
+| `manage-opening-balance` | Set and manage opening balances |
 | `view-manual-journal` | View and create manual journal entries |
 | `view-general-ledger` | View General Ledger |
 | `view-trial-balance` | View Trial Balance |

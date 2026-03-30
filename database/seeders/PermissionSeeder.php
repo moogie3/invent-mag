@@ -50,6 +50,7 @@ class PermissionSeeder extends Seeder
             'view-journal',
             'view-general-ledger',
             'view-trial-balance',
+            'manage-opening-balance',
             
             // POS
             'access-pos',

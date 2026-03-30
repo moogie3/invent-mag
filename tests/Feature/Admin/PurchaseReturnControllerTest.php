@@ -38,6 +38,7 @@ class PurchaseReturnControllerTest extends TestCase
             'cash_account_id' => Account::where('code', '1110-' . $tenantId)->first()->id,
             'accounts_payable_account_id' => Account::where('code', '2110-' . $tenantId)->first()->id,
             'inventory_account_id' => Account::where('code', '1140-' . $tenantId)->first()->id,
+            'cost_of_goods_sold_account_id' => Account::where('code', '5100-' . $tenantId)->first()->id,
         ];
         $this->user->save();
         $this->actingAs($this->user);
@@ -72,14 +73,42 @@ class PurchaseReturnControllerTest extends TestCase
 
     public function test_it_can_store_a_new_purchase_return()
     {
+        // Set up accounting settings with all required accounts
+        $tenantId = app('currentTenant')->id;
+        
+        $cashAccount = \App\Models\Account::where('code', '1110-' . $tenantId)->first();
+        $apAccount = \App\Models\Account::where('code', '2110-' . $tenantId)->first();
+        $inventoryAccount = \App\Models\Account::where('code', '1140-' . $tenantId)->first();
+        $cogsAccount = \App\Models\Account::where('code', '5100-' . $tenantId)->first();
+        
+        $this->user->accounting_settings = [
+            'cash_account_id' => $cashAccount->id ?? null,
+            'accounts_payable_account_id' => $apAccount->id ?? null,
+            'inventory_account_id' => $inventoryAccount->id ?? null,
+            'cost_of_goods_sold_account_id' => $cogsAccount->id ?? null,
+        ];
+        $this->user->save();
+
+        // Create purchase with proper status
+        $this->purchase->update(['status' => 'Paid', 'amount_received' => 100]);
+
+        // Add product to purchase
+        \App\Models\POItem::factory()->create([
+            'po_id' => $this->purchase->id,
+            'product_id' => $this->product->id,
+            'quantity' => 2,
+            'price' => 50,
+            'total' => 100,
+        ]);
+
         $returnData = [
             'purchase_id' => $this->purchase->id,
             'return_date' => Carbon::now()->format('Y-m-d'),
             'items' => json_encode([
-                ['product_id' => $this->product->id, 'returned_quantity' => 1, 'price' => 100]
+                ['product_id' => $this->product->id, 'returned_quantity' => 1, 'price' => 50]
             ]),
-            'total_amount' => 100,
-            'status' => 'Completed',
+            'total_amount' => 50,
+            'status' => 'Completed', // This is for purchase return status
         ];
 
         $response = $this->post(route('admin.por.store'), $returnData);

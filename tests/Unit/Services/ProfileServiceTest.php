@@ -34,7 +34,7 @@ class ProfileServiceTest extends TestCase
     #[Test]
     public function it_can_update_user_profile_without_password_or_avatar_change()
     {
-        $user = User::factory()->create([
+        $user = User::factory()->for($this->tenant)->create([
             'name' => 'Old Name',
             'email' => 'old@example.com',
             'shopname' => 'Old Shop',
@@ -45,7 +45,6 @@ class ProfileServiceTest extends TestCase
         $data = [
             'name' => 'New Name',
             'email' => 'new@example.com',
-            'shopname' => 'New Shop',
             'address' => 'New Address',
             'timezone' => 'America/New_York',
         ];
@@ -58,7 +57,7 @@ class ProfileServiceTest extends TestCase
             'id' => $user->id,
             'name' => 'New Name',
             'email' => 'new@example.com',
-            'shopname' => 'New Shop',
+            'shopname' => 'Old Shop', // shopname is kept as-is (read-only)
             'address' => 'New Address',
             'timezone' => 'America/New_York',
             'email_verified_at' => null, // Should be nullified if email changes

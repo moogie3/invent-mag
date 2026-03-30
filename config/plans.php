@@ -88,6 +88,7 @@ return [
             'admin.setting.accounting',
             'admin.setting.accounting.*',
             'admin.setting.reset-coa-default',
+            'admin.accounting.opening-balance.*',
         ],
         'crm' => [
             'admin.sales_pipeline.*',

@@ -289,13 +289,18 @@ class SalesControllerTest extends TestCase
 
     public function test_it_can_bulk_mark_paid_sales()
     {
+        $product = \App\Models\Product::factory()->create();
         $sales = SalesFactory::new()->count(3)->create([
             'customer_id' => $this->customer->id,
             'user_id' => $this->user->id,
             'status' => 'Unpaid',
-            'total' => 100, // Ensure total is positive
-            'amount_received' => 0, // Ensure balance is positive
+            'total' => 100,
+            'amount_received' => 0,
         ]);
+
+        foreach ($sales as $sale) {
+            \App\Models\SalesItem::factory()->create(['sales_id' => $sale->id, 'product_id' => $product->id, 'quantity' => 1, 'total' => 100]);
+        }
 
         $idsToMarkPaid = $sales->pluck('id')->toArray();
 

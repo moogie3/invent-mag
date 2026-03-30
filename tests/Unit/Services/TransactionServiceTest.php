@@ -62,8 +62,8 @@ class TransactionServiceTest extends TestCase
     #[Test]
     public function it_can_filter_transactions_by_date_range()
     {
-        Sales::factory()->create(['order_date' => now()->subMonth()]);
-        Purchase::factory()->create(['order_date' => now()]);
+        Sales::factory()->create(['order_date' => now()->subMonth()->startOfMonth()->subDay()]);
+        Purchase::factory()->create(['order_date' => now()->startOfMonth()]);
 
         $filters = ['date_range' => 'this_month', 'start_date' => null, 'end_date' => null, 'status' => null, 'type' => null, 'search' => null, 'sort' => 'date', 'direction' => 'desc'];
         $transactions = $this->transactionService->getTransactions($filters);
@@ -129,7 +129,10 @@ class TransactionServiceTest extends TestCase
     #[Test]
     public function it_can_bulk_mark_transactions_as_paid()
     {
-        $sale = Sales::factory()->create(['status' => 'Unpaid']);
+        $product = \App\Models\Product::factory()->create();
+        $sale = Sales::factory()->create(['status' => 'Unpaid', 'amount_received' => 0, 'total' => 100]);
+        \App\Models\SalesItem::factory()->create(['sales_id' => $sale->id, 'product_id' => $product->id, 'quantity' => 1, 'total' => 100]);
+        
         $purchase = Purchase::factory()->create(['status' => 'Unpaid']);
 
         $this->transactionService->bulkMarkAsPaid([

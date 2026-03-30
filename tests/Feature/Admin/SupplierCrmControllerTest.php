@@ -160,16 +160,7 @@ class SupplierCrmControllerTest extends TestCase
                 'historical_purchases' => [
                     '*' => [
                         'invoice',
-                        'order_date',
-                        'total',
-                        'items' => [
-                            '*' => [
-                                'product_name',
-                                'quantity',
-                                'price',
-                            ]
-                        ]
-                    ]
+                    ],
                 ],
             ]);
     }

@@ -152,15 +152,18 @@ class CustomerCrmControllerTest extends TestCase
 
         $response->assertStatus(200)
             ->assertJsonStructure([
-                '*' => [
-                    'product_name',
-                    'last_price',
-                    'history' => [
-                        '*' => [
-                            'invoice',
-                            'order_date',
-                            'quantity',
-                            'price_at_purchase',
+                'success',
+                'product_history' => [
+                    '*' => [
+                        'product_name',
+                        'last_price',
+                        'history' => [
+                            '*' => [
+                                'invoice',
+                                'order_date',
+                                'quantity',
+                                'price_at_purchase',
+                            ],
                         ],
                     ],
                 ],

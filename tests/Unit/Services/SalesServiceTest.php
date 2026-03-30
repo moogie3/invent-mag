@@ -415,7 +415,13 @@ class SalesServiceTest extends TestCase
     #[Test]
     public function it_can_bulk_mark_sales_as_paid()
     {
-        $sales = Sales::factory()->count(3)->create(['total' => 100, 'status' => 'Unpaid']);
+        $product = \App\Models\Product::factory()->create();
+        $sales = Sales::factory()->count(3)->create(['total' => 100, 'status' => 'Unpaid', 'amount_received' => 0]);
+        
+        foreach ($sales as $sale) {
+            \App\Models\SalesItem::factory()->create(['sales_id' => $sale->id, 'product_id' => $product->id, 'quantity' => 1, 'total' => 100]);
+        }
+        
         $ids = $sales->pluck('id')->toArray();
 
         $this->accountingServiceMock->shouldReceive('createJournalEntry')->times(3);

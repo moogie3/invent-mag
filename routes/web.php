@@ -713,23 +713,23 @@ Route::middleware('web')->prefix('admin')->group(function () {
             // Opening Balance Setup
             Route::get('/opening-balance', [\App\Http\Controllers\Admin\OpeningBalanceController::class, 'index'])
                 ->name('admin.accounting.opening-balance.index')
-                ->middleware('can:edit-chart-of-accounts');
+                ->middleware('can:manage-opening-balance');
 
             Route::post('/opening-balance/validate', [\App\Http\Controllers\Admin\OpeningBalanceController::class, 'validate'])
                 ->name('admin.accounting.opening-balance.validate')
-                ->middleware('can:edit-chart-of-accounts');
+                ->middleware('can:manage-opening-balance');
 
             Route::post('/opening-balance', [\App\Http\Controllers\Admin\OpeningBalanceController::class, 'store'])
                 ->name('admin.accounting.opening-balance.store')
-                ->middleware('can:edit-chart-of-accounts');
+                ->middleware('can:manage-opening-balance');
 
             Route::delete('/opening-balance', [\App\Http\Controllers\Admin\OpeningBalanceController::class, 'destroy'])
                 ->name('admin.accounting.opening-balance.destroy')
-                ->middleware('can:edit-chart-of-accounts');
+                ->middleware('can:manage-opening-balance');
 
             Route::get('/opening-balance/summary', [\App\Http\Controllers\Admin\OpeningBalanceController::class, 'summary'])
                 ->name('admin.accounting.opening-balance.summary')
-                ->middleware('can:view-chart-of-accounts');
+                ->middleware('can:manage-opening-balance');
 
             // COA Management
             Route::get('/accounts', [\App\Http\Controllers\Admin\AccountingController::class, 'accountsIndex'])

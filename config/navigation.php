@@ -119,7 +119,7 @@ return [
                 [
                     'title' => 'messages.opening_balance',
                     'route' => 'admin.accounting.opening-balance.index',
-                    'permission' => 'edit-chart-of-accounts',
+                    'permission' => 'manage-opening-balance',
                     'icon' => 'ti ti-list-check',
                 ],
             ],

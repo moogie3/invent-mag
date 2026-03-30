@@ -1094,7 +1094,6 @@ return [
     'verification_link_sent' => 'Tautan verifikasi baru telah dikirim ke alamat email Anda.',
     'email_verified_success_title' => 'Email Terverifikasi!',
     'email_verified_success_message' => 'Alamat email Anda telah berhasil diverifikasi. Anda sekarang dapat mengakses semua fitur akun Anda.',
-    'go_to_dashboard' => 'Ke Dasbor',
     'accounting' => 'Akuntansi',
     'chart_of_accounts' => 'Bagan Akun',
     'chart_of_accounts_summary' => 'Daftar semua akun keuangan yang digunakan untuk mengklasifikasikan transaksi.',

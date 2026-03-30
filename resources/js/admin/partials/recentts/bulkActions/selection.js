@@ -119,12 +119,13 @@ export function bulkMarkAsPaid() {
         document.querySelectorAll(".row-checkbox:checked")
     ).map((cb) => cb.value);
 
-    document.getElementById("bulkMarkPaidCount").textContent =
-        finalSelected.length;
-
-    const modal = new bootstrap.Modal(
-        document.getElementById("bulkMarkAsPaidModal")
-    );
+    const bulkMarkPaidCount = document.getElementById("bulkMarkPaidCount");
+    const bulkMarkAsPaidModal = document.getElementById("bulkMarkAsPaidModal");
+    
+    if (bulkMarkPaidCount) bulkMarkPaidCount.textContent = finalSelected.length;
+    if (!bulkMarkAsPaidModal) return;
+    
+    const modal = new bootstrap.Modal(bulkMarkAsPaidModal);
     modal.show();
 }
 

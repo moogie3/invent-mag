@@ -161,6 +161,32 @@
     document.addEventListener('turbo:before-render', cleanupModals);
     document.addEventListener('turbo:before-frame-render', cleanupModals);
 
+    // Also clean up modal backdrops when any modal is hidden (including native ones)
+    document.addEventListener('hidden.bs.modal', function(e) {
+        // Small delay to let Bootstrap finish cleanup
+        setTimeout(function() {
+            document.querySelectorAll('.modal-backdrop').forEach(function(b) {
+                b.remove();
+            });
+            document.body.classList.remove('modal-open');
+            document.body.style.overflow = '';
+        }, 100);
+    });
+
+    // Also remove .bs-init-done markers so Bootstrap dropdowns/tooltips/popovers
+    // are properly re-initialized when Turbo restores a cached page
+    document.addEventListener('turbo:before-cache', () => {
+        document.querySelectorAll('.bs-init-done').forEach(el => {
+            el.classList.remove('bs-init-done');
+        });
+        
+        // Clear all dataset.handlerAttached flags so handlers are re-attached
+        // when Turbo restores the cached page
+        document.querySelectorAll('[data-handler-attached]').forEach(el => {
+            delete el.dataset.handlerAttached;
+        });
+    });
+
     // If script is loaded after turbo:load
     if (document.readyState === 'complete' || document.readyState === 'interactive') {
         initBootstrap();

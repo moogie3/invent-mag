@@ -87,15 +87,11 @@ onPageLoad(function () {
             return true;
         }
 
-        /**
-         * Check if passwords match
-         * Only validates if user has started typing in confirmation field
-         * 
-         * @returns {boolean} - True if passwords match or confirmation is empty
-         */
         function validatePasswordMatch() {
             const password = passwordField.value;
             const confirmPassword = confirmPasswordField.value;
+            
+            if (!mismatchError) return true;
             
             // Only validate if user has started typing in confirmation field
             if (confirmPassword.length > 0 && password !== confirmPassword) {
@@ -117,6 +113,8 @@ onPageLoad(function () {
          */
         function validateStrengthAndShowFeedback() {
             const password = passwordField.value;
+            
+            if (!strengthError) return true;
             
             // Real-time validation on password field
             if (password.length > 0 && !validatePasswordStrength(password)) {

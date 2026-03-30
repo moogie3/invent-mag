@@ -370,13 +370,6 @@
                                                             <label
                                                                 class="form-check-label">{{ __('messages.show_help_tooltips') }}</label>
                                                         </div>
-                                                        <div class="form-check form-switch mb-2">
-                                                            <input class="form-check-input" type="checkbox"
-                                                                name="compact_mode"
-                                                                {{ auth()->user()->system_settings['compact_mode'] ?? false ? 'checked' : '' }}>
-                                                            <label
-                                                                class="form-check-label">{{ __('messages.compact_view_mode') }}</label>
-                                                        </div>
                                                     </div>
                                                     <div class="col-md-6">
                                                         <button type="button" class="btn btn-info"

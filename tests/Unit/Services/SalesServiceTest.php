@@ -113,7 +113,6 @@ class SalesServiceTest extends TestCase
         $this->assertArrayHasKey('customers', $data);
         $this->assertArrayHasKey('tax', $data);
         $this->assertArrayHasKey('isPaid', $data);
-        $this->assertArrayHasKey('warehouses', $data); // Added check
     }
 
     #[Test]

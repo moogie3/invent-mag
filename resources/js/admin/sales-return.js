@@ -52,9 +52,9 @@ onPageLoad(function () {
             const status = editForm.dataset.status;
 
             if (isCompletedOrCanceled) {
-                var srStatusWarningModal = new bootstrap.Modal(
-                    document.getElementById("srStatusWarningModal"),
-                );
+                const srStatusWarningModalEl = document.getElementById("srStatusWarningModal");
+                if (!srStatusWarningModalEl) return;
+                var srStatusWarningModal = new bootstrap.Modal(srStatusWarningModalEl);
                 var message = "";
 
                 if (status === "Completed") {
@@ -69,8 +69,8 @@ onPageLoad(function () {
                         "This sales return is canceled and cannot be edited.";
                 }
 
-                document.getElementById("srStatusWarningMessage").innerHTML =
-                    message;
+                const srStatusWarningMessage = document.getElementById("srStatusWarningMessage");
+                if (srStatusWarningMessage) srStatusWarningMessage.innerHTML = message;
                 srStatusWarningModal.show();
 
                 // Make form fields readonly
@@ -243,21 +243,24 @@ window.bulkDeleteSalesReturns = function () {
         return;
     }
 
-    document.getElementById("bulkDeleteCount").textContent = selectedIds.length;
+    const bulkDeleteSRCountEl = document.getElementById("bulkDeleteCount");
+    if (bulkDeleteSRCountEl) bulkDeleteSRCountEl.textContent = selectedIds.length;
 
-    var bulkDeleteModal = new bootstrap.Modal(
-        document.getElementById("bulkDeleteSalesReturnModal"),
-    );
+    const bulkDeleteSRModalEl = document.getElementById("bulkDeleteSalesReturnModal");
+    if (!bulkDeleteSRModalEl) return;
+    var bulkDeleteModal = new bootstrap.Modal(bulkDeleteSRModalEl);
     bulkDeleteModal.show();
 
-    document.getElementById("confirmBulkDeleteBtn").onclick = function () {
+    const confirmBulkDeleteSRBtn = document.getElementById("confirmBulkDeleteBtn");
+    if (!confirmBulkDeleteSRBtn) return;
+    confirmBulkDeleteSRBtn.onclick = function () {
         fetch("/admin/sales-returns/bulk-delete", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
                 "X-CSRF-TOKEN": document
                     .querySelector('meta[name="csrf-token"]')
-                    .getAttribute("content"),
+                    ?.getAttribute("content") ?? '',
             },
             body: JSON.stringify({ ids: selectedIds }),
         })
@@ -302,22 +305,24 @@ window.bulkMarkCompletedSalesReturns = function () {
         return;
     }
 
-    document.getElementById("bulkCompletedCount").textContent =
-        selectedIds.length;
+    const bulkCompletedSRCountEl = document.getElementById("bulkCompletedCount");
+    if (bulkCompletedSRCountEl) bulkCompletedSRCountEl.textContent = selectedIds.length;
 
-    var bulkMarkCompletedModal = new bootstrap.Modal(
-        document.getElementById("bulkMarkCompletedSalesReturnModal"),
-    );
+    const bulkMarkCompletedSRModalEl = document.getElementById("bulkMarkCompletedSalesReturnModal");
+    if (!bulkMarkCompletedSRModalEl) return;
+    var bulkMarkCompletedModal = new bootstrap.Modal(bulkMarkCompletedSRModalEl);
     bulkMarkCompletedModal.show();
 
-    document.getElementById("confirmBulkCompletedBtn").onclick = function () {
+    const confirmBulkCompletedSRBtn = document.getElementById("confirmBulkCompletedBtn");
+    if (!confirmBulkCompletedSRBtn) return;
+    confirmBulkCompletedSRBtn.onclick = function () {
         fetch("/admin/sales-returns/bulk-complete", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
                 "X-CSRF-TOKEN": document
                     .querySelector('meta[name="csrf-token"]')
-                    .getAttribute("content"),
+                    ?.getAttribute("content") ?? '',
             },
             body: JSON.stringify({ ids: selectedIds }),
         })
@@ -359,22 +364,24 @@ window.bulkMarkCanceledSalesReturns = function () {
         return;
     }
 
-    document.getElementById("bulkCanceledCount").textContent =
-        selectedIds.length;
+    const bulkCanceledSRCountEl = document.getElementById("bulkCanceledCount");
+    if (bulkCanceledSRCountEl) bulkCanceledSRCountEl.textContent = selectedIds.length;
 
-    var bulkMarkCanceledModal = new bootstrap.Modal(
-        document.getElementById("bulkMarkCanceledSalesReturnModal"),
-    );
+    const bulkMarkCanceledSRModalEl = document.getElementById("bulkMarkCanceledSalesReturnModal");
+    if (!bulkMarkCanceledSRModalEl) return;
+    var bulkMarkCanceledModal = new bootstrap.Modal(bulkMarkCanceledSRModalEl);
     bulkMarkCanceledModal.show();
 
-    document.getElementById("confirmBulkCanceledBtn").onclick = function () {
+    const confirmBulkCanceledSRBtn = document.getElementById("confirmBulkCanceledBtn");
+    if (!confirmBulkCanceledSRBtn) return;
+    confirmBulkCanceledSRBtn.onclick = function () {
         fetch("/admin/sales-returns/bulk-cancel", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
                 "X-CSRF-TOKEN": document
                     .querySelector('meta[name="csrf-token"]')
-                    .getAttribute("content"),
+                    ?.getAttribute("content") ?? '',
             },
             body: JSON.stringify({ ids: selectedIds }),
         })

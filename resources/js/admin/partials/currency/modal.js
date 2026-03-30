@@ -1,9 +1,12 @@
-import * as elements from './elements.js';
 import { restoreOriginalValues } from './form.js';
 
 export function setupModalEventListeners() {
-    if (elements.showModalButton) {
-        elements.showModalButton.addEventListener("click", function () {
+    const showModalButton = document.getElementById("showModalButton");
+    const cancelButton = document.querySelector("#confirmModal .btn-secondary");
+    const modalElement = document.getElementById("confirmModal");
+    
+    if (showModalButton) {
+        showModalButton.addEventListener("click", function () {
             const confirmModal = new bootstrap.Modal(
                 document.getElementById("confirmModal")
             );
@@ -11,14 +14,14 @@ export function setupModalEventListeners() {
         });
     }
 
-    if (elements.cancelButton) {
-        elements.cancelButton.addEventListener("click", function () {
+    if (cancelButton) {
+        cancelButton.addEventListener("click", function () {
             restoreOriginalValues();
         });
     }
 
-    if (elements.modalElement) {
-        elements.modalElement.addEventListener("hidden.bs.modal", function (event) {
+    if (modalElement) {
+        modalElement.addEventListener("hidden.bs.modal", function (event) {
             if (!event.target.classList.contains("confirmed")) {
                 restoreOriginalValues();
             }

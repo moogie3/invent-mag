@@ -3,9 +3,12 @@ function setupQuickCreateCustomerButton() {
         document.getElementById("customer_id")?.parentElement;
     if (!customerSelectContainer) return;
 
+    // Prevent duplicate buttons on Turbo re-renders
+    if (customerSelectContainer.querySelector('.quick-create-customer-btn')) return;
+
     const addButton = document.createElement("button");
     addButton.type = "button";
-    addButton.className = "btn btn-sm btn-primary ms-2";
+    addButton.className = "btn btn-sm btn-primary ms-2 quick-create-customer-btn";
     addButton.innerHTML = '<i class="ti ti-plus fs-3"></i>';
     addButton.title = "Create New Customer";
     addButton.setAttribute("data-bs-toggle", "modal");

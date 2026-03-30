@@ -37,19 +37,38 @@
         </div>
     </div>
     <hr class="border-primary">
-    <div class="d-flex justify-content-between align-items-center">
-        <div class="fs-4"><strong>{{ __('messages.grand_total') }}</strong></div>
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <div class="fs-4"><strong>{{ __('messages.original_total') }}</strong></div>
         <div class="fs-3 fw-bold text-primary" id="finalTotal">
             {{ \App\Helpers\CurrencyHelper::format($summary['finalTotal']) }}
         </div>
     </div>
-    <div class="d-flex justify-content-between text-success mb-2">
-        <span>{{ __('messages.total_paid') }}</span>
+
+    @php
+        $totalReturned = $sales->getTotalReturnedAmount();
+        $adjustedBalance = $sales->balance;
+    @endphp
+
+    @if($totalReturned > 0)
+    <div class="d-flex justify-content-between text-danger mb-2 border-bottom border-light pb-2">
+        <div class="fs-5"><i class="ti ti-package-export me-1"></i>{{ __('messages.returned') }} ({{ __('messages.sales_totals_adjusted') }})</div>
+        <div class="fs-5 fw-bold">- {{ \App\Helpers\CurrencyHelper::format($totalReturned) }}</div>
+    </div>
+    @endif
+
+    <div class="d-flex justify-content-between text-success mb-1">
+        <span><i class="ti ti-wallet me-1"></i>{{ __('messages.total_paid') }}</span>
         <span id="total-paid-amount" data-total-paid="{{ $sales->total_paid }}">{{ \App\Helpers\CurrencyHelper::format($sales->total_paid) }}</span>
     </div>
     <div class="d-flex justify-content-between text-danger fw-bold">
-        <span>{{ __('messages.balance') }}</span>
-        <span id="balance-amount" data-balance="{{ $sales->balance }}">{{ \App\Helpers\CurrencyHelper::format($sales->balance) }}</span>
+        <span><i class="ti ti-wallet me-1"></i>{{ __('messages.balance') }}</span>
+        <span id="balance-amount" 
+              data-balance="{{ $adjustedBalance }}" 
+              data-returned="{{ $totalReturned }}"
+              data-original-total="{{ $sales->total }}"
+              data-total-paid="{{ $sales->total_paid }}">
+            {{ \App\Helpers\CurrencyHelper::format($adjustedBalance) }}
+        </span>
     </div>
     <input type="hidden" id="grandTotalInput" name="total" value="{{ $summary['finalTotal'] }}">
     <input type="hidden" id="taxInput" name="tax_amount" value="{{ $summary['taxAmount'] }}">

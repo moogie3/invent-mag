@@ -42,7 +42,7 @@
                                 data-product-id="{{ $product->id }}" data-product-name="{{ $product->name }}"
                                 data-product-price="{{ $product->selling_price }}"
                                 data-product-unit="{{ $product->unit->symbol }}"
-                                data-product-stock="{{ $product->stock_quantity }}">
+                                data-product-stock="{{ $product->main_warehouse_stock }}">
                                 <div class="card-img-top position-relative product-image-container d-flex align-items-center justify-content-center"
                                     style="height: 150px;">
                                     @if ($product->image == asset('img/default_placeholder.png'))
@@ -61,7 +61,7 @@
                                     </p>
                                     <p class="card-text fs-5 text-muted">
                                         {{ __('messages.in_stock') }} <span
-                                            class="product-stock-display badge text-light {{ $product->stock_quantity > 10 ? 'bg-success' : ($product->stock_quantity > 0 ? 'bg-warning' : 'bg-danger') }}">{{ $product->stock_quantity }}</span>
+                                            class="product-stock-display badge text-light {{ $product->main_warehouse_stock > 10 ? 'bg-success' : ($product->main_warehouse_stock > 0 ? 'bg-warning' : 'bg-danger') }}">{{ $product->main_warehouse_stock }}</span>
                                     </p>
                                 </div>
                             </div>

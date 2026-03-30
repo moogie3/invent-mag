@@ -21,13 +21,11 @@ class Product extends Model
         'image',
         'price',
         'selling_price',
-        // 'stock_quantity', // Removed for multi-warehouse support
         'category_id',
         'supplier_id',
         'units_id',
         'has_expiry',
         'low_stock_threshold',
-        // 'warehouse_id', // Removed for multi-warehouse support
     ];
 
     protected $guarded = [
@@ -38,13 +36,11 @@ class Product extends Model
     protected $casts = [
         'price' => 'float',
         'selling_price' => 'float',
-        // 'stock_quantity' => 'float', // Removed
         'has_expiry' => 'boolean',
         'low_stock_threshold' => 'integer',
-        // 'warehouse_id' => 'integer', // Removed
     ];
 
-    protected $appends = ['stock_quantity', 'total_stock'];
+    protected $appends = ['stock_quantity', 'total_stock', 'main_warehouse_stock', 'main_warehouse_id'];
 
     public function warehouses()
     {
@@ -65,15 +61,115 @@ class Product extends Model
 
     public function getStockQuantityAttribute()
     {
-        // Backward compatibility accessor
         return $this->total_stock;
     }
 
-    // Add this method to get the main warehouse ID or null if none set
     public static function getMainWarehouseId()
     {
         $mainWarehouse = Warehouse::where('is_main', true)->first();
         return $mainWarehouse ? $mainWarehouse->id : null;
+    }
+
+    public function getMainWarehouseIdAttribute()
+    {
+        return self::getMainWarehouseId();
+    }
+
+    public function getMainWarehouseStockAttribute()
+    {
+        $mainWarehouseId = self::getMainWarehouseId();
+        if (!$mainWarehouseId) return 0;
+        
+        $stockRecord = $this->productWarehouses()
+            ->where('warehouse_id', $mainWarehouseId)
+            ->first();
+        
+        return $stockRecord ? max(0, (float) $stockRecord->quantity) : 0;
+    }
+
+    public function getWarehouseStock($warehouseId)
+    {
+        $stockRecord = $this->productWarehouses()
+            ->where('warehouse_id', $warehouseId)
+            ->first();
+        
+        return $stockRecord ? max(0, (float) $stockRecord->quantity) : 0;
+    }
+
+    public function getMainWarehouse()
+    {
+        return Warehouse::where('is_main', true)->first();
+    }
+
+    public function getStockForWarehouse($warehouseId)
+    {
+        return $this->productWarehouses()
+            ->where('warehouse_id', $warehouseId)
+            ->first();
+    }
+
+    public function hasSufficientStock($quantity, $warehouseId = null)
+    {
+        $warehouseId = $warehouseId ?? self::getMainWarehouseId();
+        if (!$warehouseId) return false;
+        
+        $stock = $this->getWarehouseStock($warehouseId);
+        return $stock >= $quantity;
+    }
+
+    public function deductStock($quantity, $warehouseId = null)
+    {
+        $warehouseId = $warehouseId ?? self::getMainWarehouseId();
+        if (!$warehouseId) return false;
+        
+        $stockRecord = $this->getStockForWarehouse($warehouseId);
+        
+        if (!$stockRecord) {
+            throw new \Exception("No stock record found for this product in the warehouse.");
+        }
+        
+        $currentStock = (float) $stockRecord->quantity;
+        
+        if ($currentStock < $quantity) {
+            throw new \Exception("Insufficient stock. Available: {$currentStock}, Requested: {$quantity}");
+        }
+        
+        $stockRecord->decrement('quantity', $quantity);
+        
+        return true;
+    }
+
+    public function addStock($quantity, $warehouseId = null)
+    {
+        $warehouseId = $warehouseId ?? self::getMainWarehouseId();
+        if (!$warehouseId) return false;
+        
+        $stockRecord = $this->getStockForWarehouse($warehouseId);
+        
+        if ($stockRecord) {
+            $stockRecord->increment('quantity', $quantity);
+        } else {
+            ProductWarehouse::create([
+                'product_id' => $this->id,
+                'warehouse_id' => $warehouseId,
+                'quantity' => $quantity,
+                'tenant_id' => $this->tenant_id,
+            ]);
+        }
+        
+        return true;
+    }
+
+    public function isLowStock($warehouseId = null)
+    {
+        $stock = $warehouseId ? $this->getWarehouseStock($warehouseId) : $this->main_warehouse_stock;
+        return $stock <= $this->getLowStockThreshold();
+    }
+
+    public function isOutOfStock($warehouseId = null)
+    {
+        $stock = $warehouseId ? $this->getWarehouseStock($warehouseId) : $this->main_warehouse_stock;
+        return $stock <= 0;
     }
 
     // Define global default low stock threshold

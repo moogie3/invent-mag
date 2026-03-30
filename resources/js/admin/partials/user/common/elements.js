@@ -3,49 +3,92 @@ let _deleteUserModal = null;
 let _createUserModal = null;
 
 export function getEditUserModal() {
+    const el = document.getElementById("editUserModal");
+    if (!el) return null;
     if (!_editUserModal) {
-        const el = document.getElementById("editUserModal");
-        _editUserModal = el ? new bootstrap.Modal(el, {}) : null;
+        _editUserModal = new bootstrap.Modal(el, {});
     }
     return _editUserModal;
 }
 
 export function getDeleteUserModal() {
+    const el = document.getElementById("deleteUserModal");
+    if (!el) return null;
     if (!_deleteUserModal) {
-        const el = document.getElementById("deleteUserModal");
-        _deleteUserModal = el ? new bootstrap.Modal(el, {}) : null;
+        _deleteUserModal = new bootstrap.Modal(el, {});
     }
     return _deleteUserModal;
 }
 
 export function getCreateUserModal() {
+    const el = document.getElementById("createUserModal");
+    if (!el) return null;
     if (!_createUserModal) {
-        const el = document.getElementById("createUserModal");
-        _createUserModal = el ? new bootstrap.Modal(el, {}) : null;
+        _createUserModal = new bootstrap.Modal(el, {});
     }
     return _createUserModal;
 }
 
-// Backward compatibility - these will be null if elements don't exist
-export const editUserModal = document.getElementById("editUserModal") ? new bootstrap.Modal(document.getElementById("editUserModal", {})) : null;
-export const deleteUserModal = document.getElementById("deleteUserModal") ? new bootstrap.Modal(document.getElementById("deleteUserModal", {})) : null;
-export const createUserModal = document.getElementById("createUserModal") ? new bootstrap.Modal(document.getElementById("createUserModal", {})) : null;
+export function getEditUserForm() {
+    return document.getElementById("editUserForm");
+}
 
-export const editUserForm = document.getElementById("editUserForm");
-export const editUserIdInput = document.getElementById("edit_user_id");
-export const editNameInput = document.getElementById("edit_name");
-export const editEmailInput = document.getElementById("edit_email");
-export const editRolesContainer = document.getElementById("edit_roles_container");
-export const editPermissionsContainer = document.getElementById(
-    "edit_permissions_container"
-);
+export function getEditUserIdInput() {
+    return document.getElementById("edit_user_id");
+}
 
-export const createUserForm = document.querySelector("#createUserModal form");
-export const createRolesContainer = document.querySelector(
-    '#createUserModal .mb-3:has(input[name="roles[]"])'
-);
-export const createPermissionsContainer = document.querySelector(
-    '#createUserModal .mb-3:has(input[name="permissions[]"])'
-);
+export function getEditNameInput() {
+    return document.getElementById("edit_name");
+}
 
-export const confirmDeleteBtn = document.getElementById("confirmDeleteBtn");
+export function getEditEmailInput() {
+    return document.getElementById("edit_email");
+}
+
+export function getEditRolesContainer() {
+    return document.getElementById("edit_roles_container");
+}
+
+export function getEditPermissionsContainer() {
+    return document.getElementById("edit_permissions_container");
+}
+
+export function getCreateUserForm() {
+    const modal = document.getElementById("createUserModal");
+    return modal ? modal.querySelector('form') : null;
+}
+
+export function getCreateRolesContainer() {
+    const modal = document.getElementById("createUserModal");
+    return modal ? modal.querySelector('.mb-3:has(input[name="roles[]"])') : null;
+}
+
+export function getCreatePermissionsContainer() {
+    const modal = document.getElementById("createUserModal");
+    return modal ? modal.querySelector('.mb-3:has(input[name="permissions[]"])') : null;
+}
+
+export function getConfirmDeleteBtn() {
+    return document.getElementById("confirmDeleteBtn");
+}
+
+export function resetModalInstances() {
+    _editUserModal = null;
+    _deleteUserModal = null;
+    _createUserModal = null;
+}
+
+// Backward compatibility - deprecated, use getter functions instead
+export const editUserModal = null;
+export const deleteUserModal = null;
+export const createUserModal = null;
+export const editUserForm = null;
+export const editUserIdInput = null;
+export const editNameInput = null;
+export const editEmailInput = null;
+export const editRolesContainer = null;
+export const editPermissionsContainer = null;
+export const createUserForm = null;
+export const createRolesContainer = null;
+export const createPermissionsContainer = null;
+export const confirmDeleteBtn = null;

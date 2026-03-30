@@ -1,8 +1,12 @@
-import { confirmDeleteBtn, getDeleteUserModal } from '../common/elements.js';
+import { getConfirmDeleteBtn, getDeleteUserModal } from '../common/elements.js';
 import { currentUserId, setCurrentUserId } from '../common/state.js';
 
 export function initDeleteUserFormSubmission() {
+    const confirmDeleteBtn = getConfirmDeleteBtn();
     if (!confirmDeleteBtn) return;
+    
+    if (confirmDeleteBtn.dataset.listenerAttached) return;
+    confirmDeleteBtn.dataset.listenerAttached = 'true';
     
     confirmDeleteBtn.addEventListener("click", function (e) {
         e.preventDefault();

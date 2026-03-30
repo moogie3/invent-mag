@@ -99,6 +99,15 @@ class CurrencyHelper
         return $isNegative ? '-' . $result : $result;
     }
 
+    /**
+     * Format discount amount per unit with proper decimal places (not rounded)
+     * Used for displaying percentage discount converted to fixed amount
+     */
+    public static function formatDiscountPerUnit($amount)
+    {
+        return number_format((float) $amount, 1, '.', '');
+    }
+
     public static function formatDate($date)
     {
         return \Carbon\Carbon::parse($date)->format('d M Y');

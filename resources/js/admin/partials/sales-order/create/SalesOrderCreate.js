@@ -219,7 +219,7 @@ export class SalesOrderCreate extends SalesOrderModule {
             return;
         }
 
-        const totalStockQuantity = this.selectedProductData.stock_quantity;
+        const totalStockQuantity = this.selectedProductData.main_warehouse_stock;
         this.currentStock = totalStockQuantity;
 
         const orderedQuantity = this.getOrderedQuantityForProduct(
@@ -277,7 +277,7 @@ export class SalesOrderCreate extends SalesOrderModule {
         const quantity = parseInt(this.elements.quantity.value) || 0;
         const productId = this.selectedProductData.id;
 
-        const totalStockQuantity = this.selectedProductData.stock_quantity;
+        const totalStockQuantity = this.selectedProductData.main_warehouse_stock;
         const orderedQuantity = this.getOrderedQuantityForProduct(productId);
         const availableForSale = Math.max(
             0,
@@ -452,7 +452,7 @@ export class SalesOrderCreate extends SalesOrderModule {
             discount,
             discountType,
             total,
-            stock: this.selectedProductData.stock_quantity, // Use overall stock for display
+            stock: this.selectedProductData.main_warehouse_stock,
             // Removed po_items: this.selectedProductData.po_items,
         });
 

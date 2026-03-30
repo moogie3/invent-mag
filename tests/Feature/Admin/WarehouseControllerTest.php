@@ -171,7 +171,7 @@ class WarehouseControllerTest extends TestCase
         $mockService->shouldReceive('deleteWarehouse')->once()->andReturn(['success' => true]);
         $this->app->instance(\App\Services\WarehouseService::class, $mockService);
 
-        $response = $this->delete(route('admin.warehouse.destroy', $warehouse->id));
+        $response = $this->post(route('admin.warehouse.destroy', $warehouse->id));
 
         $response->assertRedirect(route('admin.warehouse'));
         $response->assertSessionHas('success', 'Warehouse deleted');
@@ -186,7 +186,7 @@ class WarehouseControllerTest extends TestCase
         $mockService->shouldReceive('deleteWarehouse')->once()->andReturn(['success' => false, 'message' => $errorMessage]);
         $this->app->instance(\App\Services\WarehouseService::class, $mockService);
 
-        $response = $this->delete(route('admin.warehouse.destroy', $warehouse->id));
+        $response = $this->post(route('admin.warehouse.destroy', $warehouse->id));
 
         $response->assertSessionHas('error', $errorMessage);
         $response->assertRedirect(route('admin.warehouse'));
@@ -201,7 +201,7 @@ class WarehouseControllerTest extends TestCase
         $mockService->shouldReceive('setMainWarehouse')->once()->andReturn(['success' => true]);
         $this->app->instance(\App\Services\WarehouseService::class, $mockService);
 
-        $response = $this->get(route('admin.warehouse.set-main', $warehouse->id));
+        $response = $this->post(route('admin.warehouse.set-main', $warehouse->id));
 
         $response->assertRedirect(route('admin.warehouse'));
         $response->assertSessionHas('success', 'Main warehouse updated successfully');
@@ -216,7 +216,7 @@ class WarehouseControllerTest extends TestCase
         $mockService->shouldReceive('unsetMainWarehouse')->once()->andReturn(['success' => true]);
         $this->app->instance(\App\Services\WarehouseService::class, $mockService);
 
-        $response = $this->get(route('admin.warehouse.unset-main', $mainWarehouse->id));
+        $response = $this->post(route('admin.warehouse.unset-main', $mainWarehouse->id));
 
         $response->assertRedirect(route('admin.warehouse'));
         $response->assertSessionHas('success', 'Main warehouse status removed');
@@ -231,7 +231,7 @@ class WarehouseControllerTest extends TestCase
         $mockService->shouldReceive('unsetMainWarehouse')->once()->andReturn(['success' => false, 'message' => $errorMessage]);
         $this->app->instance(\App\Services\WarehouseService::class, $mockService);
 
-        $response = $this->get(route('admin.warehouse.unset-main', $warehouse->id));
+        $response = $this->post(route('admin.warehouse.unset-main', $warehouse->id));
 
         $response->assertSessionHas('error', $errorMessage);
         $response->assertRedirect(route('admin.warehouse'));
@@ -330,7 +330,7 @@ class WarehouseControllerTest extends TestCase
         $this->app->instance(\App\Services\WarehouseService::class, $mockService);
 
         $response = $this->withHeaders(['X-Requested-With' => 'XMLHttpRequest'])
-            ->json('DELETE', route('admin.warehouse.destroy', $warehouse->id));
+            ->json('POST', route('admin.warehouse.destroy', $warehouse->id));
 
         $response->assertStatus(200)
             ->assertJson(['success' => true, 'message' => 'Warehouse deleted successfully.']);
@@ -346,7 +346,7 @@ class WarehouseControllerTest extends TestCase
         $this->app->instance(\App\Services\WarehouseService::class, $mockService);
 
         $response = $this->withHeaders(['X-Requested-With' => 'XMLHttpRequest'])
-            ->json('DELETE', route('admin.warehouse.destroy', $warehouse->id));
+            ->json('POST', route('admin.warehouse.destroy', $warehouse->id));
 
         $response->assertStatus(500)
             ->assertJson(['success' => false, 'message' => $errorMessage]);

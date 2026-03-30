@@ -56,14 +56,25 @@ class POSController extends Controller
             $sale = $this->posService->createSale($request->all());
 
             if ($request->wantsJson()) {
-                return response()->json(['success' => true, 'message' => 'Transaction completed successfully.', 'sale_id' => $sale->id]);
+                return response()->json([
+                    'success' => true, 
+                    'message' => 'Transaction completed successfully.', 
+                    'sale_id' => $sale->id
+                ]);
             }
 
             return redirect()->route('admin.pos.receipt', $sale->id)->with('success', 'Transaction completed successfully.');
+            
         } catch (\Illuminate\Validation\ValidationException $e) {
-            return response()->json(['success' => false, 'message' => 'Validation failed.', 'errors' => $e->errors()], 422);
-        } catch (\Throwable $e) {
-            return response()->json(['success' => false, 'message' => 'Something went wrong: ' . $e->getMessage()], 500);
+            if ($request->wantsJson()) {
+                return response()->json(['success' => false, 'message' => 'Validation failed.', 'errors' => $e->errors()], 422);
+            }
+            throw $e;
+        } catch (\Exception $e) {
+            if ($request->wantsJson()) {
+                return response()->json(['success' => false, 'message' => $e->getMessage()], 400);
+            }
+            return redirect()->back()->withInput()->with('error', $e->getMessage());
         }
     }
 
@@ -79,5 +90,29 @@ class POSController extends Controller
     {
         $sale = Sales::with(['salesItems.product', 'customer'])->findOrFail($id);
         return view('admin.pos.print', compact('sale'));
+    }
+    
+    public function validateStock(Request $request)
+    {
+        $request->validate([
+            'products' => 'required|array',
+            'products.*.id' => 'required|exists:products,id',
+            'products.*.quantity' => 'required|integer|min:1',
+        ]);
+        
+        try {
+            $insufficientProducts = $this->posService->validateStockBeforeSale($request->input('products'));
+            
+            return response()->json([
+                'success' => true,
+                'available' => empty($insufficientProducts),
+                'items' => $insufficientProducts,
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage(),
+            ], 400);
+        }
     }
 }

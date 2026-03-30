@@ -1,4 +1,7 @@
 @php
+    $returnedQty = isset($pos) ? $pos->getReturnedQuantityForProduct($item->product_id) : 0;
+    
+    // Use original quantity for editing, but show returned info
     $finalAmount = \App\Helpers\PurchaseHelper::calculateTotal(
         $item->price,
         $item->quantity,
@@ -13,20 +16,23 @@
         @if (isset($item->product->sku) && $item->product->sku)
             <small class="text-muted">{{ __('messages.sku_colon') }} {{ $item->product->sku }}</small>
         @endif
+        @if($returnedQty > 0)
+            <br><small class="text-danger"><i class="ti ti-package-import me-1"></i>(-{{ $returnedQty }} {{ __('messages.returned') }})</small>
+        @endif
     </td>
     <td>
         <input type="number" name="items[{{ $item->id }}][quantity]" value="{{ $item->quantity }}"
             class="form-control text-end quantity-input" data-item-id="{{ $item->product_id }}" min="1" />
     </td>
     <td>
-        <input type="number" name="items[{{ $item->id }}][price]" value="{{ intval($item->price) }}"
-            class="form-control text-end price-input" data-item-id="{{ $item->product_id }}" step="0"
+        <input type="number" name="items[{{ $item->id }}][price]" value="{{ rtrim(rtrim(number_format($item->price, 2, '.', ''), '0'), '.') }}"
+            class="form-control text-end price-input" data-item-id="{{ $item->product_id }}" step="0.01"
             min="0" />
     </td>
     <td>
         <div class="input-group">
-            <input type="number" name="items[{{ $item->id }}][discount]" value="{{ (float) $item->discount }}"
-                class="form-control text-end discount-input" style="min-width: 80px;" step="0" min="0"
+            <input type="number" name="items[{{ $item->id }}][discount]" value="{{ rtrim(rtrim(number_format($item->discount, 2, '.', ''), '0'), '.') }}"
+                class="form-control text-end discount-input" style="min-width: 80px;" step="0.01" min="0"
                 data-item-id="{{ $item->product_id }}" />
 
             <select name="items[{{ $item->id }}][discountType]" class="form-select discount-type-input"
@@ -39,11 +45,16 @@
         </div>
     </td>
     <td>
-        <input type="text" name="items[{{ $item->id }}][amount]" value="{{ intval($finalAmount) }}"
+        <input type="text" name="items[{{ $item->id }}][amount]" value="{{ rtrim(rtrim(number_format($finalAmount, 2, '.', ''), '0'), '.') }}"
             class="form-control text-end amount-input" data-item-id="{{ $item->product_id }}" readonly />
     </td>
     <td>
-        <input type="date" name="items[{{ $item->id }}][expiry_date]" value="{{ $item->expiry_date ? \Carbon\Carbon::parse($item->expiry_date)->format('Y-m-d') : '' }}"
-            class="form-control text-center expiry-date-input" data-item-id="{{ $item->product_id }}" />
+        @if ($item->product->has_expiry)
+            <input type="date" name="items[{{ $item->id }}][expiry_date]" value="{{ $item->expiry_date ? \Carbon\Carbon::parse($item->expiry_date)->format('Y-m-d') : '' }}"
+                class="form-control text-center expiry-date-input" data-item-id="{{ $item->product_id }}" />
+        @else
+            <div class="text-center text-muted mt-2">{{ __('messages.not_available') }}</div>
+            <input type="hidden" class="expiry-date-input" data-item-id="{{ $item->product_id }}" value="" />
+        @endif
     </td>
 </tr>

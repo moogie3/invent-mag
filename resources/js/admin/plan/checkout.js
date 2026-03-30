@@ -9,6 +9,8 @@ onPageLoad(() => {
 /**
  * Initialize the countdown timer for payment expiry.
  */
+let checkoutCountdownInterval = null;
+
 function initCountdown() {
     const countdownEl = document.getElementById('countdown');
     if (!countdownEl || !countdownEl.dataset.expires) return;
@@ -40,7 +42,8 @@ function initCountdown() {
     }
 
     update();
-    setInterval(update, 1000);
+    if (checkoutCountdownInterval) clearInterval(checkoutCountdownInterval);
+    checkoutCountdownInterval = setInterval(update, 1000);
 }
 
 /**
@@ -51,6 +54,8 @@ function initPayment() {
     if (!payButton) return;
 
     const statusDiv = document.getElementById('payment-status');
+    if (!statusDiv) return;
+    
     const snapToken = payButton.dataset.snapToken;
     const orderId = payButton.dataset.orderId;
     const successUrl = payButton.dataset.successUrl;
@@ -94,7 +99,7 @@ function initPayment() {
                             method: 'POST',
                             headers: {
                                 'Content-Type': 'application/json',
-                                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content ?? ''
                             },
                             body: JSON.stringify({
                                 order_id: orderId,

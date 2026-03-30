@@ -19,11 +19,11 @@
                     <div class="row g-2">
                         <div class="col-6">
                             <small class="text-muted d-block">{{ __('messages.tax_modal_tax_name') }}</small>
-                            <span id="previewTaxName" class="fw-medium">-</span>
+                            <span id="previewTaxName" class="fw-medium text-body">-</span>
                         </div>
                         <div class="col-6">
                             <small class="text-muted d-block">{{ __('messages.tax_modal_tax_rate') }}</small>
-                            <span id="previewTaxRate" class="fw-medium">-</span>%
+                            <span id="previewTaxRate" class="fw-medium text-body">-</span>%
                         </div>
                         <div class="col-12 mt-2">
                             <small class="text-muted d-block">{{ __('messages.tax_modal_status') }}</small>
@@ -139,15 +139,6 @@
                     const taxRate = taxRateInput ? taxRateInput.value.trim() : '';
                     const isActive = isActiveInput ? isActiveInput.checked : false;
 
-                    // console.log('Retrieved values:', {
-                        taxNameInput: !!taxNameInput,
-                        taxRateInput: !!taxRateInput,
-                        isActiveInput: !!isActiveInput,
-                        taxName: taxName,
-                        taxRate: taxRate,
-                        isActive: isActive
-                    });
-
                     // Update preview elements
                     const nameElement = document.getElementById('previewTaxName');
                     const rateElement = document.getElementById('previewTaxRate');
@@ -156,12 +147,10 @@
                     if (nameElement) {
                         nameElement.textContent = taxName ||
                             '{{ __('messages.tax_modal_not_specified') }}';
-                        nameElement.style.color = taxName ? '#000' : '#999';
                     }
 
                     if (rateElement) {
                         rateElement.textContent = taxRate || '0';
-                        rateElement.style.color = taxRate ? '#000' : '#999';
                     }
 
                     if (statusElement) {
@@ -176,14 +165,7 @@
 
                     // If no inputs were found, show debug info
                     if (!taxNameInput && !taxRateInput && !isActiveInput) {
-                        console.warn('No tax form inputs found. Available inputs:',
-                            Array.from(document.querySelectorAll('input')).map(input => ({
-                                name: input.name,
-                                id: input.id,
-                                type: input.type,
-                                className: input.className
-                            }))
-                        );
+                        // No tax form inputs found on this page
                     }
                 }, 100);
             });
@@ -194,17 +176,6 @@
         if (saveButton) {
             saveButton.addEventListener('click', function() {
                 // console.log('Save button clicked - checking form data');
-
-                // Try to get form data as backup
-                const forms = document.querySelectorAll('form');
-                forms.forEach((form, index) => {
-                    // console.log(`Form ${index}:`, form);
-                    
-                    // console.log('Form data entries:');
-                    
-                        // console.log(pair[0] + ': ' + pair[1]);
-                    }
-                });
             });
         }
     });

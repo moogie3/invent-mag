@@ -47,8 +47,12 @@ class ShortcutManager {
 
     handleKeydown(event) {
         if (window.userSettings && !window.userSettings.enable_keyboard_shortcuts) {
-            return; // Keyboard shortcuts are disabled by user setting
+            return;
         }
+
+        if (!event.key) return;
+
+        if (!event.key || !event.target) return;
 
         const key = event.key.toLowerCase();
         const ctrl = this.isMac ? event.metaKey : event.ctrlKey;

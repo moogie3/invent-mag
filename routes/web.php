@@ -5,7 +5,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Str;
-use App\Http\Controllers\Admin\{CategoryController, CustomerController, ProductController, PurchaseController, SalesPipelineController, SupplierController, UnitController, CurrencyController, SalesController, DashboardController, ProfileController, NotificationController, POSController, ReportController, WarehouseController, TaxController, UserController, CustomerCrmController, SupplierCrmController, SettingsController, PurchaseReturnController, SalesReturnController, JournalEntryController, StockTransferController, PlanController};
+use App\Http\Controllers\Admin\{CategoryController, CustomerController, ProductController, PurchaseController, SalesPipelineController, SupplierController, UnitController, CurrencyController, SalesController, DashboardController, ProfileController, NotificationController, POSController, ReportController, WarehouseController, TaxController, UserController, CustomerCrmController, SupplierCrmController, SettingsController, PurchaseReturnController, SalesReturnController, JournalEntryController, StockTransferController, PlanController, ProductStockController};
 use Laravel\Fortify\Http\Controllers\AuthenticatedSessionController;
 use Laravel\Fortify\Http\Controllers\NewPasswordController;
 use Laravel\Fortify\Http\Controllers\PasswordResetLinkController;
@@ -145,6 +145,27 @@ Route::middleware('web')->prefix('admin')->group(function () {
 
             Route::get('/expiring-soon', [ProductController::class, 'getExpiringSoonProducts'])
                 ->name('admin.product.expiring-soon')
+                ->middleware('can:view-products');
+
+            // Stock API Routes
+            Route::get('/{id}/main-stock', [ProductStockController::class, 'mainStock'])
+                ->name('admin.product.main-stock')
+                ->middleware('can:view-products');
+
+            Route::get('/{id}/warehouse-stock/{warehouseId}', [ProductStockController::class, 'warehouseStock'])
+                ->name('admin.product.warehouse-stock')
+                ->middleware('can:view-products');
+
+            Route::get('/{id}/all-warehouse-stock', [ProductStockController::class, 'allWarehouseStock'])
+                ->name('admin.product.all-warehouse-stock')
+                ->middleware('can:view-products');
+
+            Route::post('/stock-check', [ProductStockController::class, 'checkStock'])
+                ->name('admin.product.stock-check')
+                ->middleware('can:view-products');
+
+            Route::post('/bulk-main-stock', [ProductStockController::class, 'bulkMainStock'])
+                ->name('admin.product.bulk-main-stock')
                 ->middleware('can:view-products');
         });
 
@@ -429,15 +450,15 @@ Route::middleware('web')->prefix('admin')->group(function () {
                 ->name('admin.warehouse.update')
                 ->middleware('can:edit-warehouses');
 
-            Route::delete('/destroy/{id}', [WarehouseController::class, 'destroy'])
+            Route::post('/destroy/{id}', [WarehouseController::class, 'destroy'])
                 ->name('admin.warehouse.destroy')
                 ->middleware('can:delete-warehouses');
 
-            Route::get('/{id}/set-main', [WarehouseController::class, 'setMain'])
+            Route::post('/{id}/set-main', [WarehouseController::class, 'setMain'])
                 ->name('admin.warehouse.set-main')
                 ->middleware('can:edit-warehouses');
 
-            Route::get('/{id}/unset-main', [WarehouseController::class, 'unsetMain'])
+            Route::post('/{id}/unset-main', [WarehouseController::class, 'unsetMain'])
                 ->name('admin.warehouse.unset-main')
                 ->middleware('can:edit-warehouses');
 
@@ -482,6 +503,10 @@ Route::middleware('web')->prefix('admin')->group(function () {
 
             Route::get('/print-receipt/{id}', [POSController::class, 'printReceipt'])
                 ->name('admin.pos.print-receipt')
+                ->middleware('can:access-pos');
+
+            Route::post('/validate-stock', [POSController::class, 'validateStock'])
+                ->name('admin.pos.validate-stock')
                 ->middleware('can:access-pos');
         });
 
@@ -685,6 +710,27 @@ Route::middleware('web')->prefix('admin')->group(function () {
                 ->name('admin.accounting.trial_balance.export')
                 ->middleware('can:view-trial-balance');
 
+            // Opening Balance Setup
+            Route::get('/opening-balance', [\App\Http\Controllers\Admin\OpeningBalanceController::class, 'index'])
+                ->name('admin.accounting.opening-balance.index')
+                ->middleware('can:edit-chart-of-accounts');
+
+            Route::post('/opening-balance/validate', [\App\Http\Controllers\Admin\OpeningBalanceController::class, 'validate'])
+                ->name('admin.accounting.opening-balance.validate')
+                ->middleware('can:edit-chart-of-accounts');
+
+            Route::post('/opening-balance', [\App\Http\Controllers\Admin\OpeningBalanceController::class, 'store'])
+                ->name('admin.accounting.opening-balance.store')
+                ->middleware('can:edit-chart-of-accounts');
+
+            Route::delete('/opening-balance', [\App\Http\Controllers\Admin\OpeningBalanceController::class, 'destroy'])
+                ->name('admin.accounting.opening-balance.destroy')
+                ->middleware('can:edit-chart-of-accounts');
+
+            Route::get('/opening-balance/summary', [\App\Http\Controllers\Admin\OpeningBalanceController::class, 'summary'])
+                ->name('admin.accounting.opening-balance.summary')
+                ->middleware('can:view-chart-of-accounts');
+
             // COA Management
             Route::get('/accounts', [\App\Http\Controllers\Admin\AccountingController::class, 'accountsIndex'])
                 ->name('admin.accounting.accounts.index')
@@ -740,4 +786,9 @@ Route::get('/', function (\Illuminate\Http\Request $request) {
     // This route only handles requests without workspace
     $frontendUrl = config('app.frontend_url');
     return redirect()->away($frontendUrl . '/login');
+});
+
+// Fallback route for 404 - must be LAST
+Route::fallback(function (\Illuminate\Http\Request $request) {
+    return response()->view('errors.404', [], 404);
 });

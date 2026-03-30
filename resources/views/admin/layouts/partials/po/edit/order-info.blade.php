@@ -34,7 +34,7 @@
             <div class="mb-2">
                 <label class="form-label fw-bold">{{ __('messages.po_payment_type') }}</label>
                 <select class="form-select" name="payment_type" id="payment_type"
-                    {{ $pos->status == __('messages.paid') ? 'disabled' : '' }}>
+                    {{ $pos->status === 'Paid' ? 'disabled' : '' }}>
                     <option value="Cash" {{ $pos->payment_type == 'Cash' ? 'selected' : '' }}>
                         {{ __('messages.payment_method_cash') }}
                     </option>
@@ -46,10 +46,10 @@
             <div class="mb-2">
                 <label class="form-label fw-bold">{{ __('messages.payment_status') }}</label>
                 <select class="form-select" name="status" id="status">
-                    <option value="Paid" {{ $pos->status == __('messages.paid') ? 'selected' : '' }}>
+                    <option value="Paid" {{ $pos->status === 'Paid' ? 'selected' : '' }}>
                         {{ __('messages.paid') }}
                     </option>
-                    <option value="Unpaid" {{ $pos->status != __('messages.paid') ? 'selected' : '' }}>
+                    <option value="Unpaid" {{ $pos->status !== 'Paid' ? 'selected' : '' }}>
                         {{ __('messages.unpaid') }}
                     </option>
                 </select>

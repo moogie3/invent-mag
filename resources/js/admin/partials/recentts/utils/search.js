@@ -1,5 +1,7 @@
 export function searchTransactions() {
-    const searchValue = document.getElementById("searchInput").value;
+    const searchInput = document.getElementById("searchInput");
+    if (!searchInput) return;
+    const searchValue = searchInput.value;
     const url = new URL(window.location);
     if (searchValue) {
         url.searchParams.set("search", searchValue);

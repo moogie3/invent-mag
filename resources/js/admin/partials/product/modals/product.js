@@ -3,10 +3,21 @@ import { formatCurrency } from '../../../../utils/currencyFormatter.js';
 import { escapeHtml } from '../../../../utils/sanitize.js';
 
 let currentProductData = null;
+let initialized = false;
+
+document.addEventListener('turbo:before-cache', () => {
+    initialized = false;
+});
 
 export function initProductModal() {
+    if (initialized) return;
+    initialized = true;
+    
     const printBtn = document.getElementById("productModalPrint");
-    if (printBtn) printBtn.addEventListener("click", handleProductModalPrint);
+    if (printBtn && !printBtn.dataset.handlerAttached) {
+        printBtn.dataset.handlerAttached = 'true';
+        printBtn.addEventListener("click", handleProductModalPrint);
+    }
 
     window.loadProductDetails = function (id) {
         const content = document.getElementById("viewProductModalContent");
@@ -35,7 +46,8 @@ export function initProductModal() {
                 
                 // Add event listener for warehouse context change (template is now in DOM)
                 const warehouseContextSelect = document.getElementById('viewProductWarehouseContext');
-                if (warehouseContextSelect) {
+                if (warehouseContextSelect && !warehouseContextSelect.dataset.handlerAttached) {
+                    warehouseContextSelect.dataset.handlerAttached = 'true';
                     warehouseContextSelect.onchange = function() {
                         if (currentProductData) {
                             updateStockDisplay(currentProductData, this.value);
@@ -66,12 +78,16 @@ function updateStockDisplay(data, warehouseId) {
     let stockQty = 0;
     let warehouseName = "All Warehouses";
 
-    if (warehouseId) {
+    if (warehouseId === 'main') {
+        stockQty = data.main_warehouse_stock || 0;
+        const mainWarehouse = data.warehouses?.find(w => w.is_main);
+        warehouseName = mainWarehouse ? mainWarehouse.name : "Main Warehouse";
+    } else if (warehouseId) {
         const warehouse = data.warehouses.find(w => w.id == warehouseId);
         stockQty = warehouse ? (warehouse.pivot ? warehouse.pivot.quantity : 0) : 0;
         warehouseName = warehouse ? warehouse.name : "N/A";
     } else {
-        stockQty = data.total_stock || data.stock_quantity || 0;
+        stockQty = data.main_warehouse_stock || data.total_stock || data.stock_quantity || 0;
     }
 
     setText("productQuantity", stockQty);
@@ -94,9 +110,9 @@ function updateStockDisplay(data, warehouseId) {
 
 function renderProductDetails(data) {
     const content = document.getElementById("viewProductModalContent");
-    const template = document.getElementById(
-        "productModalViewTemplate"
-    ).innerHTML;
+    const templateEl = document.getElementById("productModalViewTemplate");
+    if (!content || !templateEl) return;
+    const template = templateEl.innerHTML;
     content.innerHTML = template;
 
     // Get selected warehouse from global filter to pre-set context
@@ -105,7 +121,7 @@ function renderProductDetails(data) {
     
     const warehouseContextSelect = document.getElementById('viewProductWarehouseContext');
     if (warehouseContextSelect) {
-        warehouseContextSelect.value = globalWarehouseId;
+        warehouseContextSelect.value = globalWarehouseId || 'main';
     }
 
     // Activate the first tab (Basic Info) by default
@@ -133,8 +149,8 @@ function renderProductDetails(data) {
     const warehouseEl = document.getElementById("productWarehouse");
     if (warehouseEl) warehouseEl.innerHTML = warehouseText;
 
-    // Initial stock display
-    updateStockDisplay(data, globalWarehouseId);
+    // Initial stock display - use main warehouse by default
+    updateStockDisplay(data, globalWarehouseId || 'main');
 
     const productImageContainer = document.getElementById(
         "productImageContainer"
@@ -289,20 +305,32 @@ function renderExpiryItems(data, warehouseId = null) {
 }
 
 function handleProductModalPrint() {
-    const content = document.getElementById(
-        "viewProductModalContent"
-    ).innerHTML;
-    const original = document.body.innerHTML;
+    const contentEl = document.getElementById("viewProductModalContent");
+    if (!contentEl) return;
+    const content = contentEl.innerHTML;
 
-    document.body.innerHTML = `
-        <div class="container print-container">
-            <div class="card"><div class="card-body">${content}</div></div>
-        </div>
-    `;
+    const printWindow = window.open('', '_blank', 'width=800,height=600');
+    if (!printWindow) return;
 
-    window.print();
-    document.body.innerHTML = original;
-    setTimeout(() => window.location.reload(), 100);
+    printWindow.document.write(`<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Product Details</title>
+    <link rel="stylesheet" href="/css/app.css">
+    <style>
+        body { font-family: sans-serif; padding: 20px; }
+        @media print { .no-print { display: none; } }
+    </style>
+</head>
+<body>
+    <div class="container print-container">
+        <div class="card"><div class="card-body">${content}</div></div>
+    </div>
+    <script>window.onload = function() { window.print(); window.close(); };<\/script>
+</body>
+</html>`);
+    printWindow.document.close();
 }
 
 export function loadExpiringSoonProductsModal(expiringSoonProducts) {

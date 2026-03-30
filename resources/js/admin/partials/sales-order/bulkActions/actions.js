@@ -90,13 +90,17 @@ export function bulkDeleteSales() {
         return;
     }
 
-    document.getElementById("bulkDeleteCount").textContent = selected.length;
+    const bulkDeleteSOCountEl = document.getElementById("bulkDeleteCount");
+    if (bulkDeleteSOCountEl) bulkDeleteSOCountEl.textContent = selected.length;
     const modalElement = document.getElementById("bulkDeleteModal");
+    if (!modalElement) return;
     const modal = new bootstrap.Modal(modalElement, {});
 
     modalElement.addEventListener("hidden.bs.modal", function handler() {
         const backdrops = document.querySelectorAll(".modal-backdrop");
         backdrops.forEach((backdrop) => backdrop.remove());
+        document.body.classList.remove('modal-open');
+        document.body.style.overflow = '';
 
         modalElement.removeEventListener("hidden.bs.modal", handler);
     });
@@ -104,6 +108,7 @@ export function bulkDeleteSales() {
     modal.show();
 
     const confirmBtn = document.getElementById("confirmBulkDeleteBtn");
+    if (!confirmBtn) return;
     const newBtn = confirmBtn.cloneNode(true);
     confirmBtn.parentNode.replaceChild(newBtn, confirmBtn);
 
@@ -325,9 +330,9 @@ export function bulkMarkAsPaidSales() {
         bulkPaidCount.textContent = finalSelected.length;
     }
 
-    const bulkMarkAsPaidModal = new bootstrap.Modal(
-        document.getElementById("bulkMarkAsPaidModal"),
-    );
+    const bulkMarkAsPaidSOModalEl = document.getElementById("bulkMarkAsPaidModal");
+    if (!bulkMarkAsPaidSOModalEl) return;
+    const bulkMarkAsPaidModal = new bootstrap.Modal(bulkMarkAsPaidSOModalEl);
     bulkMarkAsPaidModal.show();
 
     const confirmBtn = document.getElementById("confirmBulkPaidBtn");
@@ -461,8 +466,8 @@ function confirmBulkMarkAsPaidSales(selectedIds, confirmButton, modal) {
 }
 
 window.clearSalesSelection = function () {
-    if (salesBulkSelection) {
-        salesBulkSelection.clearSelection();
+    if (window.salesBulkSelection) {
+        window.salesBulkSelection.clearSelection();
     }
 };
 

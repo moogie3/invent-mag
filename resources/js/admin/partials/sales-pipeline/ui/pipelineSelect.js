@@ -1,9 +1,8 @@
 import { allPipelines } from '../common/state.js';
 import { loadPipelineBoard } from './pipelineBoard.js';
 
-const pipelineSelect = document.getElementById("pipelineSelect");
-
 export function renderPipelinesSelect(shouldLoadBoard = true) {
+    const pipelineSelect = document.getElementById("pipelineSelect");
     if (!pipelineSelect) return;
 
     pipelineSelect.innerHTML = '<option value="">Select Pipeline</option>';

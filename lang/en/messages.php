@@ -1099,7 +1099,6 @@ return [
     'verification_link_sent' => 'A new verification link has been sent to your email address.',
     'email_verified_success_title' => 'Email Verified!',
     'email_verified_success_message' => 'Your email address has been successfully verified. You can now access all features of your account.',
-    'go_to_dashboard' => 'Go to Dashboard',
     'accounting' => 'Accounting',
     'chart_of_accounts' => 'Chart of Accounts',
     'chart_of_accounts_summary' => 'A list of all financial accounts used to classify transactions.',

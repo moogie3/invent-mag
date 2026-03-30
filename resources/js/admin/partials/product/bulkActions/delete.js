@@ -9,13 +9,15 @@ export function bulkDeleteProducts() {
         return;
     }
 
-    document.getElementById("bulkDeleteCount").textContent = selected.length;
-    const modal = new bootstrap.Modal(
-        document.getElementById("bulkDeleteModal")
-    );
+    const countEl = document.getElementById("bulkDeleteCount");
+    if (countEl) countEl.textContent = selected.length;
+    const modalEl = document.getElementById("bulkDeleteModal");
+    if (!modalEl) return;
+    const modal = new bootstrap.Modal(modalEl);
     modal.show();
 
     const confirmBtn = document.getElementById("confirmBulkDeleteBtn");
+    if (!confirmBtn) return;
     const newBtn = confirmBtn.cloneNode(true);
     confirmBtn.parentNode.replaceChild(newBtn, confirmBtn);
 
@@ -64,9 +66,9 @@ function performBulkDelete(ids, button, modal) {
                             } products deleted successfully!`,
                             "success"
                         );
-                        const backdrops =
-                            document.querySelectorAll(".modal-backdrop");
-                        backdrops.forEach((backdrop) => backdrop.remove());
+                        document.querySelectorAll(".modal-backdrop").forEach((backdrop) => backdrop.remove());
+                        document.body.classList.remove('modal-open');
+                        document.body.style.overflow = '';
                     }
                 );
                 clearProductSelection();

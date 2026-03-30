@@ -105,21 +105,26 @@
                     </thead>
                     <tbody>
                         @php
-                            // Calculate invoice summary
-                            $summary = \App\Helpers\SalesHelper::calculateInvoiceSummary(
+                            // Calculate invoice summary accounting for returns
+                            $summary = \App\Helpers\SalesHelper::calculateInvoiceSummaryWithReturns(
                                 $sales->salesItems,
                                 $sales->order_discount ?? 0,
                                 $sales->order_discount_type ?? 'fixed',
                                 $sales->tax_rate ?? 0,
+                                $sales->relationLoaded('salesReturns') ? $sales->salesReturns : collect()
                             );
                         @endphp
 
                         @foreach ($sales->salesItems as $index => $item)
                             @php
-                                // Calculate the final amount for this item
+                                // Calculate returned quantity for this item
+                                $returnedQty = $sales->getReturnedQuantityForProduct($item->product_id);
+                                $adjustedQty = max(0, (int) $item->quantity - $returnedQty);
+                                
+                                // Calculate the final amount based on adjusted quantity
                                 $finalAmount = \App\Helpers\SalesHelper::calculateTotal(
                                     $item->customer_price,
-                                    $item->quantity,
+                                    $adjustedQty,
                                     $item->discount,
                                     $item->discount_type,
                                 );
@@ -134,7 +139,14 @@
                                             {{ $item->product->sku }}</small>
                                     @endif
                                 </td>
-                                <td class="text-center">{{ $item->quantity }}</td>
+                                <td class="text-center">
+                                    @if($returnedQty > 0)
+                                        <span class="fw-bold">{{ $adjustedQty }}</span>
+                                        <br><small class="text-danger"><i class="ti ti-package-export me-1"></i>(-{{ $returnedQty }} {{ __('messages.returned') }})</small>
+                                    @else
+                                        {{ $item->quantity }}
+                                    @endif
+                                </td>
                                 <td class="text-end">
                                     {{ \App\Helpers\CurrencyHelper::formatWithPosition($item->customer_price) }}
                                 </td>
@@ -184,6 +196,11 @@
                 <div class="card border">
                     <div class="card-body p-3">
                         <h5 class="mb-3 card-title">{{ __('messages.sales_amount_summary_title') }}</h5>
+                        @php
+                            $totalReturned = $sales->getTotalReturnedAmount();
+                            $adjustedBalance = $sales->balance;
+                        @endphp
+
                         <div class="d-flex justify-content-between mb-2">
                             <div>{{ __('messages.sales_subtotal') }}</div>
                             <div>{{ \App\Helpers\CurrencyHelper::formatWithPosition($summary['subtotal']) }}</div>
@@ -211,10 +228,35 @@
                             </div>
                         </div>
                         <hr>
-                        <div class="d-flex justify-content-between align-items-center">
+                        
+                        @php
+                            $adjustedBalance = $sales->balance;
+                        @endphp
+
+                        <div class="d-flex justify-content-between align-items-center mb-3">
                             <div><strong>{{ __('messages.sales_grand_total') }}</strong></div>
-                            <div class="fw-bold text-primary">
+                            <div class="fw-bold text-primary fs-5">
                                 {{ \App\Helpers\CurrencyHelper::formatWithPosition($summary['finalTotal']) }}</div>
+                        </div>
+
+                        @php
+                            $totalReturned = $sales->getTotalReturnedAmount();
+                        @endphp
+
+                        @if($totalReturned > 0)
+                        <div class="d-flex justify-content-between text-muted mb-2 border-bottom pb-2">
+                            <div class="fs-6"><i class="ti ti-package-export me-1"></i>{{ __('messages.returned') }} ({{ __('messages.sales_totals_adjusted') }})</div>
+                            <div class="fs-6">{{ \App\Helpers\CurrencyHelper::formatWithPosition($totalReturned) }}</div>
+                        </div>
+                        @endif
+
+                        <div class="d-flex justify-content-between text-success mb-2 mt-2">
+                            <div class="fs-6"><i class="ti ti-wallet me-1"></i>{{ __('messages.total_paid') }}</div>
+                            <div class="fs-6">{{ \App\Helpers\CurrencyHelper::formatWithPosition($sales->total_paid) }}</div>
+                        </div>
+                        <div class="d-flex justify-content-between text-danger">
+                            <div class="fs-6"><i class="ti ti-wallet me-1"></i><strong>{{ __('messages.balance') }}</strong></div>
+                            <div class="fs-6"><strong>{{ \App\Helpers\CurrencyHelper::formatWithPosition($adjustedBalance) }}</strong></div>
                         </div>
                     </div>
                 </div>

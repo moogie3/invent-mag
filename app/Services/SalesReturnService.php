@@ -14,7 +14,9 @@ use App\Models\Product;
 use App\Models\Account;
 use Dompdf\Dompdf;
 use App\Helpers\CurrencyHelper;
+use App\Models\JournalEntry;
 use App\Models\ProductWarehouse;
+use App\Models\POItem;
 
 class SalesReturnService
 {
@@ -23,6 +25,39 @@ class SalesReturnService
     public function __construct(AccountingService $accountingService)
     {
         $this->accountingService = $accountingService;
+    }
+
+    private function decrementPOItemRemaining($productId, $quantity)
+    {
+        $poItems = POItem::where('product_id', $productId)
+            ->where('remaining_quantity', '>', 0)
+            ->orderBy('expiry_date', 'asc')
+            ->orderBy('created_at', 'asc')
+            ->get();
+
+        foreach ($poItems as $poItem) {
+            if ($quantity <= 0) break;
+            $decrement = min($poItem->remaining_quantity, $quantity);
+            $poItem->decrement('remaining_quantity', $decrement);
+            $quantity -= $decrement;
+        }
+    }
+
+    private function incrementPOItemRemaining($productId, $quantity)
+    {
+        $poItems = POItem::where('product_id', $productId)
+            ->whereColumn('remaining_quantity', '<', 'quantity')
+            ->orderByDesc('expiry_date')
+            ->orderByDesc('created_at')
+            ->get();
+
+        foreach ($poItems as $poItem) {
+            if ($quantity <= 0) break;
+            $availableSpace = $poItem->quantity - $poItem->remaining_quantity;
+            $increment = min($availableSpace, $quantity);
+            $poItem->increment('remaining_quantity', $increment);
+            $quantity -= $increment;
+        }
     }
 
     public function getSalesReturnIndexData(array $filters, int $entries)
@@ -90,7 +125,7 @@ class SalesReturnService
             foreach ($returnedItems as $itemData) {
                 $price = $itemData['price'] ?? 0;
                 $returnedQuantity = $itemData['returned_quantity'];
-                
+
                 SalesReturnItem::create([
                     'sales_return_id' => $salesReturn->id,
                     'product_id' => $itemData['product_id'],
@@ -103,12 +138,15 @@ class SalesReturnService
                 if ($product) {
                     $sale = Sales::find($data['sales_id']);
                     $warehouseId = $sale->warehouse_id ?? Product::getMainWarehouseId();
-                    
+
                     $stockRecord = ProductWarehouse::firstOrCreate(
                         ['product_id' => $product->id, 'warehouse_id' => $warehouseId, 'tenant_id' => $product->tenant_id],
                         ['quantity' => 0]
                     );
                     $stockRecord->increment('quantity', $returnedQuantity);
+
+                    // Restore expiry tracking (POItem remaining_quantity)
+                    $this->incrementPOItemRemaining($product->id, $returnedQuantity);
                 }
             }
 
@@ -129,20 +167,56 @@ class SalesReturnService
                 throw new \Exception('Accounting settings for inventory or accounts receivable are not configured.');
             }
 
-            $inventoryAccount = Account::find($accountingSettings['inventory_account_id']);
+            $salesRevenueAccount = Account::find($accountingSettings['sales_revenue_account_id']);
             $accountsReceivableAccount = Account::find($accountingSettings['accounts_receivable_account_id']);
+            $costOfGoodsSoldAccount = Account::find($accountingSettings['cost_of_goods_sold_account_id']);
+            $inventoryAccount = Account::find($accountingSettings['inventory_account_id']);
 
-            if (!$inventoryAccount || !$accountsReceivableAccount) {
-                throw new \Exception('Required accounts (Inventory, AR) not found for Sales Return. Please check Accounting Settings.');
+            if (!$salesRevenueAccount || !$accountsReceivableAccount || !$costOfGoodsSoldAccount || !$inventoryAccount) {
+                throw new \Exception('Required accounts (Sales Revenue, AR, COGS, Inventory) not found for Sales Return. Please check Accounting Settings.');
             }
+
+            // Get original journal entry from the sale to calculate proportional COGS
+            $originalJournalEntries = JournalEntry::where('sourceable_type', Sales::class)
+                ->where('sourceable_id', $sale->id)
+                ->where('status', 'posted')
+                ->get();
+
+            $originalSalesRevenueAmount = 0;
+            $originalCOGSAmount = 0;
+
+            foreach ($originalJournalEntries as $journalEntry) {
+                foreach ($journalEntry->transactions as $transaction) {
+                    if ($transaction->account_name === $salesRevenueAccount->name && $transaction->type === 'credit') {
+                        $originalSalesRevenueAmount = $transaction->amount;
+                    }
+                    if ($transaction->account_name === $costOfGoodsSoldAccount->name && $transaction->type === 'debit') {
+                        $originalCOGSAmount = $transaction->amount;
+                    }
+                }
+            }
+
+            // Calculate proportional amounts based on return ratio
+            $returnRatio = $totalAmount > 0 && $originalSalesRevenueAmount > 0 ? $totalAmount / $originalSalesRevenueAmount : 0;
+            $proportionalCOGS = $originalCOGSAmount * $returnRatio;
+
+            // Create comprehensive journal entry for sales return
+            // This reverses: AR, Sales Revenue, and COGS; while recording Inventory
+            $transactions = [
+                // Reverse Accounts Receivable (customer no longer owes this much)
+                ['account_name' => $accountsReceivableAccount->name, 'type' => 'credit', 'amount' => $totalAmount],
+                // Reverse Sales Revenue (reduce income)
+                ['account_name' => $salesRevenueAccount->name, 'type' => 'debit', 'amount' => $totalAmount],
+                // Reverse COGS (reduce expense)
+                ['account_name' => $costOfGoodsSoldAccount->name, 'type' => 'credit', 'amount' => $proportionalCOGS],
+                // Add inventory back (items returned to stock)
+                ['account_name' => $inventoryAccount->name, 'type' => 'debit', 'amount' => $proportionalCOGS],
+            ];
 
             $this->accountingService->createJournalEntry(
                 "Sales Return for SO #{$sale->invoice}",
                 Carbon::parse($salesReturn->return_date),
-                [
-                    ['account_name' => $accountsReceivableAccount->name, 'type' => 'credit', 'amount' => $totalAmount],
-                    ['account_name' => $inventoryAccount->name, 'type' => 'debit', 'amount' => $totalAmount],
-                ],
+                $transactions,
                 $salesReturn
             );
 
@@ -161,18 +235,19 @@ class SalesReturnService
             }
 
             $sale = $salesReturn->sale;
-            
+
             foreach ($salesReturn->items as $oldItem) {
                 $product = Product::find($oldItem->product_id);
                 if ($product) {
                     $warehouseId = $sale->warehouse_id ?? Product::getMainWarehouseId();
-                    
+
                     $stockRecord = ProductWarehouse::where('product_id', $product->id)
                         ->where('warehouse_id', $warehouseId)
                         ->first();
                     if ($stockRecord) {
                         $stockRecord->decrement('quantity', $oldItem->quantity);
                     }
+                    $this->decrementPOItemRemaining($product->id, $oldItem->quantity);
                 }
             }
             $salesReturn->items()->delete();
@@ -209,12 +284,15 @@ class SalesReturnService
                 $product = Product::find($itemData['product_id']);
                 if ($product) {
                     $warehouseId = $sale->warehouse_id ?? Product::getMainWarehouseId();
-                    
+
                     $stockRecord = ProductWarehouse::firstOrCreate(
                         ['product_id' => $product->id, 'warehouse_id' => $warehouseId, 'tenant_id' => $product->tenant_id],
                         ['quantity' => 0]
                     );
                     $stockRecord->increment('quantity', $returnedQuantity);
+
+                    // Restore expiry tracking (POItem remaining_quantity)
+                    $this->incrementPOItemRemaining($product->id, $returnedQuantity);
                 }
             }
 
@@ -238,7 +316,7 @@ class SalesReturnService
     public function bulkExportSalesReturns(array $filters, ?array $ids, string $exportOption)
     {
         $query = SalesReturn::with(['sale', 'user']);
-        
+
         if ($ids) {
             $query->whereIn('id', $ids);
         } else {
@@ -283,7 +361,7 @@ class SalesReturnService
                 foreach ($salesReturns as $sr) {
                     fputcsv($file, [
                         $sr->sale->invoice,
-                        \Carbon\Carbon::parse($sr->return_date)->format('Y-m-d'),
+                        Carbon::parse($sr->return_date)->format('Y-m-d'),
                         CurrencyHelper::format($sr->total_amount),
                         $sr->status,
                         $sr->user->name,
@@ -303,12 +381,12 @@ class SalesReturnService
     {
         DB::transaction(function () use ($salesReturn) {
             // Reverse associated journal entries for accurate accounting
-            $journalEntries = \App\Models\JournalEntry::where('sourceable_type', get_class($salesReturn))
+            $journalEntries = JournalEntry::where('sourceable_type', get_class($salesReturn))
                 ->where('sourceable_id', $salesReturn->id)
                 ->get();
-                
+
             foreach ($journalEntries as $entry) {
-                if ($entry->status === \App\Models\JournalEntry::STATUS_POSTED && $entry->canBeReversed()) {
+                if ($entry->status === JournalEntry::STATUS_POSTED && $entry->canBeReversed()) {
                     $this->accountingService->reverseJournalEntry($entry, "Auto-reversal due to deleted Sales Return #{$salesReturn->id}");
                 }
             }
@@ -316,18 +394,19 @@ class SalesReturnService
             $sale = $salesReturn->sale;
             if ($sale) {
                 foreach ($salesReturn->items as $item) {
-                    $product = \App\Models\Product::find($item->product_id);
+                    $product = Product::find($item->product_id);
                     if ($product) {
-                        $warehouseId = $sale->warehouse_id ?? \App\Models\Product::getMainWarehouseId();
-                        
-                        $stockRecord = \App\Models\ProductWarehouse::where('product_id', $product->id)
+                        $warehouseId = $sale->warehouse_id ?? Product::getMainWarehouseId();
+
+                        $stockRecord = ProductWarehouse::where('product_id', $product->id)
                             ->where('warehouse_id', $warehouseId)
                             ->where('tenant_id', $product->tenant_id)
                             ->first();
-                            
+
                         if ($stockRecord) {
                             $stockRecord->decrement('quantity', $item->quantity);
                         }
+                        $this->decrementPOItemRemaining($product->id, $item->quantity);
                     }
                 }
             }

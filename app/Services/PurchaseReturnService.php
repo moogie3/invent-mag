@@ -14,7 +14,9 @@ use App\Models\Product;
 use App\Models\Account;
 use Dompdf\Dompdf;
 use App\Models\ProductWarehouse;
+use App\Models\POItem;
 use App\Helpers\CurrencyHelper;
+use App\Models\JournalEntry;
 
 class PurchaseReturnService
 {
@@ -23,6 +25,37 @@ class PurchaseReturnService
     public function __construct(AccountingService $accountingService)
     {
         $this->accountingService = $accountingService;
+    }
+
+    private function decrementPOItemRemaining($poId, $productId, $quantity)
+    {
+        $poItems = POItem::where('po_id', $poId)
+            ->where('product_id', $productId)
+            ->where('remaining_quantity', '>', 0)
+            ->get();
+
+        foreach ($poItems as $poItem) {
+            if ($quantity <= 0) break;
+            $decrement = min($poItem->remaining_quantity, $quantity);
+            $poItem->decrement('remaining_quantity', $decrement);
+            $quantity -= $decrement;
+        }
+    }
+
+    private function incrementPOItemRemaining($poId, $productId, $quantity)
+    {
+        $poItems = POItem::where('po_id', $poId)
+            ->where('product_id', $productId)
+            ->whereColumn('remaining_quantity', '<', 'quantity')
+            ->get();
+
+        foreach ($poItems as $poItem) {
+            if ($quantity <= 0) break;
+            $availableSpace = $poItem->quantity - $poItem->remaining_quantity;
+            $increment = min($availableSpace, $quantity);
+            $poItem->increment('remaining_quantity', $increment);
+            $quantity -= $increment;
+        }
     }
 
     public function getPurchaseReturnIndexData(array $filters, int $entries)
@@ -103,14 +136,15 @@ class PurchaseReturnService
                 $product = Product::find($itemData['product_id']);
                 if ($product) {
                     $warehouseId = $purchase->warehouse_id ?? Product::getMainWarehouseId();
-                    
+
                     $stockRecord = ProductWarehouse::where('product_id', $product->id)
                         ->where('warehouse_id', $warehouseId)
                         ->first();
-                    
+
                     if ($stockRecord) {
                         $stockRecord->decrement('quantity', $returnedQuantity);
                     }
+                    $this->decrementPOItemRemaining($data['purchase_id'], $product->id, $returnedQuantity);
                 }
             }
 
@@ -133,17 +167,46 @@ class PurchaseReturnService
 
             $inventoryAccount = Account::find($accountingSettings['inventory_account_id']);
             $accountsPayableAccount = Account::find($accountingSettings['accounts_payable_account_id']);
+            $purchaseAccount = Account::find($accountingSettings['cost_of_goods_sold_account_id']); // Use COGS account for Purchase
 
-            if (!$inventoryAccount || !$accountsPayableAccount) {
-                throw new \Exception('Required accounts (Inventory, Accounts Payable) not found for Purchase Return. Please check Accounting Settings.');
+            if (!$inventoryAccount || !$accountsPayableAccount || !$purchaseAccount) {
+                throw new \Exception('Required accounts (Inventory, Accounts Payable, Purchases) not found for Purchase Return. Please check Accounting Settings.');
             }
+
+            // Get original journal entry from the purchase to calculate proportional amounts
+            $originalJournalEntries = JournalEntry::where('sourceable_type', Purchase::class)
+                ->where('sourceable_id', $purchase->id)
+                ->where('status', 'posted')
+                ->get();
+
+            $originalPurchaseAmount = 0;
+
+            foreach ($originalJournalEntries as $journalEntry) {
+                foreach ($journalEntry->transactions as $transaction) {
+                    if ($transaction->account_name === $inventoryAccount->name && $transaction->type === 'debit') {
+                        $originalPurchaseAmount = $transaction->amount;
+                        break 2;
+                    }
+                }
+            }
+
+            // Calculate proportional amount based on return ratio
+            $returnRatio = $totalReturnAmount > 0 && $originalPurchaseAmount > 0 ? $totalReturnAmount / $originalPurchaseAmount : 0;
+            $proportionalPurchase = $originalPurchaseAmount * $returnRatio;
 
             $inventoryAccountName = $inventoryAccount->name;
             $accountsPayableAccountName = $accountsPayableAccount->name;
+            $purchaseAccountName = $purchaseAccount->name;
 
+            // Create comprehensive journal entry for purchase return
+            // This reverses: AP, Purchase (COGS); while reducing Inventory
             $transactions = [
+                // Reverse Accounts Payable (we no longer owe this much)
                 ['account_name' => $accountsPayableAccountName, 'type' => 'debit', 'amount' => $totalReturnAmount],
-                ['account_name' => $inventoryAccountName, 'type' => 'credit', 'amount' => $totalReturnAmount],
+                // Reverse Purchase/COGS (reduce expense)
+                ['account_name' => $purchaseAccountName, 'type' => 'debit', 'amount' => $proportionalPurchase],
+                // Reduce Inventory (items returned from stock)
+                ['account_name' => $inventoryAccountName, 'type' => 'credit', 'amount' => $proportionalPurchase],
             ];
 
             $this->accountingService->createJournalEntry(
@@ -171,14 +234,15 @@ class PurchaseReturnService
                 if ($product) {
                     $purchase = $purchaseReturn->purchase;
                     $warehouseId = $purchase->warehouse_id ?? Product::getMainWarehouseId();
-                    
+
                     $stockRecord = ProductWarehouse::where('product_id', $product->id)
                         ->where('warehouse_id', $warehouseId)
                         ->first();
-                    
+
                     if ($stockRecord) {
                         $stockRecord->increment('quantity', $oldItem->quantity);
                     }
+                    $this->incrementPOItemRemaining($purchase->id, $product->id, $oldItem->quantity);
                 }
             }
             $purchaseReturn->items()->delete();
@@ -199,7 +263,7 @@ class PurchaseReturnService
             // Recalculate total amount on the backend
             $totalReturnAmount = 0;
             foreach ($returnedItems as $itemData) {
-                $totalReturnAmount += ($itemData['price'] ?? 0) * $itemData['returned_quantity'];
+                $totalReturnAmount += ($itemData['return_price'] ?? $itemData['price'] ?? 0) * $itemData['returned_quantity'];
             }
 
 
@@ -214,7 +278,7 @@ class PurchaseReturnService
 
             foreach ($returnedItems as $itemData) {
                 $returnedQuantity = $itemData['returned_quantity'];
-                $price = $itemData['price'] ?? 0;
+                $price = $itemData['return_price'] ?? $itemData['price'] ?? 0;
 
                 PurchaseReturnItem::create([
                     'purchase_return_id' => $purchaseReturn->id,
@@ -229,13 +293,14 @@ class PurchaseReturnService
                 if ($product) {
                     $purchase = $purchaseReturn->purchase;
                     $warehouseId = $purchase->warehouse_id ?? Product::getMainWarehouseId();
-                    
+
                     $stockRecord = ProductWarehouse::firstOrCreate(
                         ['product_id' => $product->id, 'warehouse_id' => $warehouseId, 'tenant_id' => $product->tenant_id],
                         ['quantity' => 0]
                     );
                     $stockRecord->decrement('quantity', $returnedQuantity);
                 }
+                $this->decrementPOItemRemaining($purchase->id, $product->id, $returnedQuantity);
             }
             $purchase = $purchaseReturn->purchase;
             // Update original purchase status
@@ -264,7 +329,7 @@ class PurchaseReturnService
     public function bulkExportPurchaseReturns(array $filters, ?array $ids, string $exportOption)
     {
         $query = PurchaseReturn::with(['purchase', 'user']);
-        
+
         if ($ids) {
             $query->whereIn('id', $ids);
         } else {
@@ -309,7 +374,7 @@ class PurchaseReturnService
                 foreach ($purchaseReturns as $pr) {
                     fputcsv($file, [
                         $pr->purchase->invoice,
-                        \Carbon\Carbon::parse($pr->return_date)->format('Y-m-d'),
+                        Carbon::parse($pr->return_date)->format('Y-m-d'),
                         CurrencyHelper::format($pr->total_amount),
                         $pr->status,
                         $pr->user->name,
@@ -329,12 +394,12 @@ class PurchaseReturnService
     {
         DB::transaction(function () use ($purchaseReturn) {
             // Reverse associated journal entries for accurate accounting
-            $journalEntries = \App\Models\JournalEntry::where('sourceable_type', get_class($purchaseReturn))
+            $journalEntries = JournalEntry::where('sourceable_type', get_class($purchaseReturn))
                 ->where('sourceable_id', $purchaseReturn->id)
                 ->get();
-                
+
             foreach ($journalEntries as $entry) {
-                if ($entry->status === \App\Models\JournalEntry::STATUS_POSTED && $entry->canBeReversed()) {
+                if ($entry->status === JournalEntry::STATUS_POSTED && $entry->canBeReversed()) {
                     $this->accountingService->reverseJournalEntry($entry, "Auto-reversal due to deleted Purchase Return #{$purchaseReturn->id}");
                 }
             }
@@ -342,18 +407,19 @@ class PurchaseReturnService
             $purchase = $purchaseReturn->purchase;
             if ($purchase) {
                 foreach ($purchaseReturn->items as $item) {
-                    $product = \App\Models\Product::find($item->product_id);
+                    $product = Product::find($item->product_id);
                     if ($product) {
-                        $warehouseId = $purchase->warehouse_id ?? \App\Models\Product::getMainWarehouseId();
-                        
-                        $stockRecord = \App\Models\ProductWarehouse::where('product_id', $product->id)
+                        $warehouseId = $purchase->warehouse_id ?? Product::getMainWarehouseId();
+
+                        $stockRecord = ProductWarehouse::where('product_id', $product->id)
                             ->where('warehouse_id', $warehouseId)
                             ->where('tenant_id', $product->tenant_id)
                             ->first();
-                            
+
                         if ($stockRecord) {
                             $stockRecord->increment('quantity', $item->quantity);
                         }
+                        $this->incrementPOItemRemaining($purchaseReturn->purchase_id, $product->id, $item->quantity);
                     }
                 }
             }

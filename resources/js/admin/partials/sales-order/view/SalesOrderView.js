@@ -52,6 +52,15 @@ export class SalesOrderView extends SalesOrderModule {
                     }
                 },
             );
+
+            viewSalesModalElement.addEventListener(
+                "hidden.bs.modal",
+                (event) => {
+                    document.body.classList.remove("modal-open");
+                    const backdrops = document.querySelectorAll(".modal-backdrop.show");
+                    backdrops.forEach((backdrop) => backdrop.remove());
+                },
+            );
         }
     }
 

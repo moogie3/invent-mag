@@ -9,16 +9,19 @@ export function showMarkAsPaidModal(id, type, invoice, customerSupplier, amount)
     currentTransactionId = id;
     currentTransactionType = type;
 
-    document.getElementById("modalInvoice").textContent = invoice;
-    document.getElementById("modalCustomerSupplier").textContent =
-        customerSupplier;
-    document.getElementById("modalAmount").textContent = amount;
-    document.getElementById("modalType").textContent =
-        type === "sale" ? "Sales" : "Purchase";
+    const modalInvoice = document.getElementById("modalInvoice");
+    const modalCustomerSupplier = document.getElementById("modalCustomerSupplier");
+    const modalAmount = document.getElementById("modalAmount");
+    const modalType = document.getElementById("modalType");
+    const modalEl = document.getElementById("markAsPaidModal");
+    
+    if (modalInvoice) modalInvoice.textContent = invoice;
+    if (modalCustomerSupplier) modalCustomerSupplier.textContent = customerSupplier;
+    if (modalAmount) modalAmount.textContent = amount;
+    if (modalType) modalType.textContent = type === "sale" ? "Sales" : "Purchase";
 
-    const modal = new bootstrap.Modal(
-        document.getElementById("markAsPaidModal")
-    );
+    if (!modalEl) return;
+    const modal = new bootstrap.Modal(modalEl);
     modal.show();
 }
 
@@ -26,6 +29,7 @@ export function confirmMarkAsPaid() {
     if (!currentTransactionId || !currentTransactionType) return;
 
     const submitBtn = document.getElementById("confirmMarkPaidBtn");
+    if (!submitBtn) return;
     const originalText = submitBtn.innerHTML;
 
     submitBtn.innerHTML =
@@ -36,9 +40,7 @@ export function confirmMarkAsPaid() {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
-            "X-CSRF-TOKEN": document
-                .querySelector('meta[name="csrf-token"]')
-                .getAttribute("content"),
+            "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]')?.getAttribute("content") ?? '',
         },
         body: JSON.stringify({
             type: currentTransactionType,
@@ -47,15 +49,17 @@ export function confirmMarkAsPaid() {
         .then((response) => response.json())
         .then((data) => {
             if (data.success) {
-                const modal = bootstrap.Modal.getInstance(
-                    document.getElementById("markAsPaidModal")
-                );
-                modal.hide();
-                modal._element.addEventListener('hidden.bs.modal', function handler() {
-                    modal._element.removeEventListener('hidden.bs.modal', handler);
-                    const backdrops = document.querySelectorAll('.modal-backdrop');
-                    backdrops.forEach(backdrop => backdrop.remove());
-                });
+                const modalEl = document.getElementById("markAsPaidModal");
+                const modal = modalEl ? bootstrap.Modal.getInstance(modalEl) : null;
+                if (modal) {
+                    modal.hide();
+                    modal._element.addEventListener('hidden.bs.modal', function handler() {
+                        modal._element.removeEventListener('hidden.bs.modal', handler);
+                        document.querySelectorAll('.modal-backdrop').forEach(b => b.remove());
+                        document.body.classList.remove('modal-open');
+                        document.body.style.overflow = '';
+                    });
+                }
 
                 InventMagApp.showToast(
                     "Success",
@@ -82,7 +86,6 @@ export function confirmMarkAsPaid() {
             }
         })
         .catch((error) => {
-            // // console.error("Error:", error);
             InventMagApp.showToast(
                 "An error occurred while updating the transaction.",
                 "error"

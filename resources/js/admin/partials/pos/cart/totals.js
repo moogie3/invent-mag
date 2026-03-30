@@ -25,11 +25,11 @@ export function calculateTotals() {
     const products = getProducts();
     subtotal = products.reduce((sum, product) => sum + product.total, 0);
 
-    const discountValue = parseFloat(orderDiscountElement.value || 0);
-    const discountType = discountTypeElement.value;
-    const taxRate = parseFloat(taxRateElement.value || 0);
+    const discountValue = parseFloat(orderDiscountElement?.value || 0);
+    const discountType = discountTypeElement?.value ?? 'fixed';
+    const taxRate = parseFloat(taxRateElement?.value || 0);
 
-    if (discountType === "percent") {
+    if (discountType === "percentage") {
         orderDiscount = (subtotal * discountValue) / 100;
     } else {
         orderDiscount = discountValue;
@@ -39,14 +39,14 @@ export function calculateTotals() {
     taxAmount = taxableAmount * (taxRate / 100);
     grandTotal = taxableAmount + taxAmount;
 
-    subtotalElement.innerText = formatCurrency(subtotal);
-    finalTotalElement.innerText = formatCurrency(grandTotal);
-    cartCountElement.innerText = products.length.toString();
+    if (subtotalElement) subtotalElement.innerText = formatCurrency(subtotal);
+    if (finalTotalElement) finalTotalElement.innerText = formatCurrency(grandTotal);
+    if (cartCountElement) cartCountElement.innerText = products.length.toString();
 
-    orderDiscountInput.value = orderDiscount;
-    orderDiscountTypeInput.value = discountType;
-    taxInput.value = taxAmount;
-    grandTotalInput.value = grandTotal;
+    if (orderDiscountInput) orderDiscountInput.value = discountValue;  // raw input value (% or fixed), backend recalculates
+    if (orderDiscountTypeInput) orderDiscountTypeInput.value = discountType;
+    if (taxInput) taxInput.value = taxAmount;
+    if (grandTotalInput) grandTotalInput.value = grandTotal;
 
-    processPaymentBtn.disabled = products.length === 0;
+    if (processPaymentBtn) processPaymentBtn.disabled = products.length === 0;
 }

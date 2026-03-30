@@ -199,7 +199,10 @@ export class SalesOrderEdit extends SalesOrderModule {
         const totalPaid = parseFloat(
             this.elements.totalPaidAmount.dataset.totalPaid,
         );
-        const newBalance = grandTotal - totalPaid;
+        const returnedAmount = parseFloat(
+            this.elements.balanceAmount.dataset.returned || 0,
+        );
+        const newBalance = Math.max(0, grandTotal - totalPaid - returnedAmount);
 
         if (this.elements.balanceAmount) {
             this.elements.balanceAmount.textContent =
@@ -257,7 +260,7 @@ export class SalesOrderEdit extends SalesOrderModule {
                 quantity: quantity,
                 customer_price: price,
                 discount: discount,
-                discount_type: discountType,
+                discountType: discountType,
             });
         });
 

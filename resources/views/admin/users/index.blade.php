@@ -3,6 +3,7 @@
 @section('title', __('messages.user_page_title'))
 
 @section('content')
+    <meta name="turbo-cache-control" content="no-cache">
     <div class="page-wrapper">
         <div class="page-body">
             <div class="{{ $containerClass ?? "container-xl" }}">
@@ -219,58 +220,5 @@
         </div>
     </div>
 @endsection
-
-@push('scripts')
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const deleteUserModal = new bootstrap.Modal(document.getElementById('deleteUserModal'));
-            const deleteUserForm = document.getElementById('deleteUserForm');
-            const deleteButton = deleteUserForm.querySelector('button[type="submit"]');
-
-            document.querySelectorAll('.delete-user-btn').forEach(button => {
-                button.addEventListener('click', function() {
-                    const userId = this.getAttribute('data-user-id');
-                    let actionTemplate =
-                        "{{ route('admin.users.destroy', ['user' => 'USER_ID_PLACEHOLDER']) }}";
-                    const action = actionTemplate.replace('USER_ID_PLACEHOLDER', userId);
-                    deleteUserForm.setAttribute('action', action);
-                });
-            });
-
-            deleteButton.addEventListener('click', function(e) {
-                e.preventDefault();
-                const form = deleteUserForm;
-                const action = form.getAttribute('action');
-
-                fetch(action, {
-                        method: 'DELETE',
-                        headers: {
-                            'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                            'X-Requested-With': 'XMLHttpRequest'
-                        }
-                    })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.success) {
-                            deleteUserModal.hide();
-                            // Show success toast
-                            toastr.success(data.message);
-                            // Refresh page after a short delay
-                            setTimeout(() => {
-                                location.reload();
-                            }, 1000);
-                        } else {
-                            // Handle errors if needed
-                            toastr.error('An error occurred.');
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Error:', error);
-                        toastr.error('An error occurred.');
-                    });
-            });
-        });
-    </script>
-@endpush
 
 @include('admin.layouts.modals.users.usersmodals')

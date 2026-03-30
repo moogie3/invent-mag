@@ -55,8 +55,16 @@ function setupQuickCreateProductForm() {
             },
         })
             .then((response) => {
+                if (response.status === 422) {
+                    return response.json().then(err => {
+                        const messages = Object.values(err.errors || {}).flat();
+                        throw new Error(messages.join(', ') || 'Validation failed');
+                    });
+                }
                 if (!response.ok) {
-                    throw new Error(`HTTP error! Status: ${response.status}`);
+                    return response.json().then(err => {
+                        throw new Error(err.message || `HTTP error! Status: ${response.status}`);
+                    });
                 }
                 return response.json();
             })
@@ -85,14 +93,12 @@ function setupQuickCreateProductForm() {
                         data.message || "Failed to create product",
                         "error"
                     );
-                    // // console.error("Error response:", data);
                 }
             })
             .catch((error) => {
-                // // console.error("Error:", error);
                 InventMagApp.showToast(
                     "Error",
-                    "An error occurred while creating the product",
+                    error.message || "An error occurred while creating the product",
                     "error"
                 );
             });
@@ -103,29 +109,52 @@ function addProductToGrid(product) {
     const productGrid = document.getElementById("productGrid");
     if (!productGrid) return;
 
+    // Remove empty state if present
+    const emptyState = productGrid.querySelector(".empty");
+    if (emptyState) emptyState.remove();
+
     const productCol = document.createElement("div");
     productCol.className = "col-md-4 mb-2";
 
     const productCard = document.createElement("div");
-    productCard.className = "card product-card h-100 border hover-shadow";
-
-    const imageSrc = product.image_url || "/img/default_placeholder.png";
+    productCard.className = "card product-card border-0 shadow-sm rounded-3 hover-shadow";
+    productCard.style.cursor = "pointer";
+    productCard.setAttribute("data-product-id", product.id);
+    productCard.setAttribute("data-product-name", product.name);
+    productCard.setAttribute("data-product-price", product.selling_price);
+    productCard.setAttribute("data-product-unit", product.unit_symbol || "pcs");
+    productCard.setAttribute("data-product-stock", product.main_warehouse_stock ?? 0);
 
     const imageContainer = document.createElement("div");
-    imageContainer.className =
-        "card-img-top position-relative product-image-container";
+    imageContainer.className = "card-img-top position-relative product-image-container d-flex align-items-center justify-content-center";
+    imageContainer.style.height = "150px";
 
-    const img = document.createElement("img");
-    img.src = imageSrc;
-    img.alt = product.name;
-    img.className = "img-fluid product-image";
-    img.setAttribute("data-product-id", product.id);
-    img.setAttribute("data-product-name", product.name);
-    img.setAttribute("data-product-price", product.selling_price);
-    img.setAttribute("data-product-unit", product.unit_name || "pcs");
-    img.setAttribute("data-product-stock", product.stock_quantity);
+    const defaultPlaceholder = "/img/default_placeholder.png";
+    const imageSrc = product.image_url && product.image_url !== defaultPlaceholder ? product.image_url : null;
 
-    imageContainer.appendChild(img);
+    if (imageSrc) {
+        const img = document.createElement("img");
+        img.src = imageSrc;
+        img.alt = product.name;
+        img.className = "img-fluid product-image";
+        img.style.width = "100%";
+        img.style.height = "100%";
+        img.style.objectFit = "cover";
+        img.style.borderRadius = "4px 4px 0 0";
+        imageContainer.appendChild(img);
+    } else {
+        const icon = document.createElement("i");
+        icon.className = "ti ti-photo fs-1";
+        icon.style.width = "100%";
+        icon.style.height = "100%";
+        icon.style.display = "flex";
+        icon.style.alignItems = "center";
+        icon.style.justifyContent = "center";
+        icon.style.border = "1px solid #ccc";
+        icon.style.borderRadius = "5px";
+        icon.style.margin = "0 auto";
+        imageContainer.appendChild(icon);
+    }
 
     const cardBody = document.createElement("div");
     cardBody.className = "card-body p-2 text-center";
@@ -133,16 +162,19 @@ function addProductToGrid(product) {
     const title = document.createElement("h5");
     title.className = "card-title fs-4 mb-1";
     title.textContent = product.name;
-    title.style.maxHeight = "2.8em";
+    title.style.maxHeight = "4em";
     title.style.overflow = "hidden";
 
     const price = document.createElement("p");
     price.className = "card-text fs-4 mb-1";
     price.textContent = formatCurrency(product.selling_price);
 
+    const stock = product.main_warehouse_stock ?? 0;
+    const stockClass = stock > 10 ? "bg-success" : stock > 0 ? "bg-warning" : "bg-danger";
+
     const stockDisplay = document.createElement("p");
     stockDisplay.className = "card-text fs-5 text-muted";
-    stockDisplay.innerHTML = `In Stock: <span class="product-stock-display badge text-light ${getStockBadgeClass(product.stock_quantity)}">${product.stock_quantity}</span>`;
+    stockDisplay.innerHTML = `In Stock: <span class="product-stock-display badge text-light ${stockClass}">${stock}</span>`;
 
     cardBody.appendChild(title);
     cardBody.appendChild(price);

@@ -90,7 +90,20 @@ class PurchaseReturnController extends Controller
     }
     public function getPurchaseItems(Purchase $purchase)
     {
-        return response()->json($purchase->items()->with('product')->get());
+        $purchase->load(['items.product', 'purchaseReturns.items']);
+        
+        $items = $purchase->items->map(function ($item) use ($purchase) {
+            $returnedQuantity = $purchase->purchaseReturns
+                ->where('status', 'Completed')
+                ->flatMap(fn($pr) => $pr->items ?? collect())
+                ->where('product_id', $item->product_id)
+                ->sum('quantity');
+                
+            $item->available_quantity = max(0, $item->quantity - $returnedQuantity);
+            return $item;
+        });
+        
+        return response()->json($items);
     }
 
     public function bulkDelete(Request $request)

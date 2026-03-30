@@ -267,12 +267,12 @@
                     <h2 class="mb-0 fw-bold" id="productName"></h2>
                     <div class="text-muted" id="productCode"></div>
                 </div>
-                <div class="col-auto">
+                    <div class="col-auto">
                     <div class="d-flex align-items-center gap-3">
                         <div style="min-width: 200px;">
                             <label class="form-label small mb-1">{{ __('messages.warehouse_context') }}</label>
                             <select class="form-select form-select-sm" id="viewProductWarehouseContext">
-                                <option value="">{{ __('messages.all_warehouses') }}</option>
+                                <option value="main">{{ __('messages.main_warehouse') }}</option>
                                 @foreach($warehouses as $warehouse)
                                     <option value="{{ $warehouse->id }}">{{ $warehouse->name }}</option>
                                 @endforeach

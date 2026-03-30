@@ -5,7 +5,7 @@
                 <h3 class="modal-title fw-semibold">{{ __('messages.user_modal_create_title') }}</h3>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <form action="{{ route('admin.users.store') }}" method="POST">
+            <form action="{{ route('admin.users.store') }}" method="POST" novalidate>
                 @csrf
                 <div class="modal-body pt-2">
                     <div class="row g-3">

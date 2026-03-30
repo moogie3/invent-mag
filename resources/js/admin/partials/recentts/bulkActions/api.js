@@ -15,6 +15,7 @@ export function confirmBulkMarkAsPaid() {
     if (selected.length === 0) return;
 
     const submitBtn = document.getElementById("confirmBulkMarkPaidBtn");
+    if (!submitBtn) return;
     const originalText = submitBtn.innerHTML;
 
     submitBtn.innerHTML =
@@ -25,9 +26,7 @@ export function confirmBulkMarkAsPaid() {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
-            "X-CSRF-TOKEN": document
-                .querySelector('meta[name="csrf-token"]')
-                .getAttribute("content"),
+            "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]')?.getAttribute("content") ?? '',
         },
         body: JSON.stringify({
             transactions: selected,
@@ -36,15 +35,16 @@ export function confirmBulkMarkAsPaid() {
         .then((response) => response.json())
         .then((data) => {
             if (data.success) {
-                const modal = bootstrap.Modal.getInstance(
-                    document.getElementById("bulkMarkAsPaidModal")
-                );
-                modal.hide();
-                modal._element.addEventListener('hidden.bs.modal', function handler() {
-                    modal._element.removeEventListener('hidden.bs.modal', handler);
-                    const backdrops = document.querySelectorAll('.modal-backdrop');
-                    backdrops.forEach(backdrop => backdrop.remove());
-                });
+                const modalEl = document.getElementById("bulkMarkAsPaidModal");
+                const modal = modalEl ? bootstrap.Modal.getInstance(modalEl) : null;
+                if (modal) {
+                    modal.hide();
+                    modal._element.addEventListener('hidden.bs.modal', function handler() {
+                        modal._element.removeEventListener('hidden.bs.modal', handler);
+                        const backdrops = document.querySelectorAll('.modal-backdrop');
+                        backdrops.forEach(backdrop => backdrop.remove());
+                    });
+                }
 
                 InventMagApp.showToast(
                     "Success",
@@ -57,7 +57,7 @@ export function confirmBulkMarkAsPaid() {
                 clearSelection();
 
                 selected.forEach(item => {
-                    const row = document.querySelector(`input[value="${item.id}"]`).closest('tr');
+                    const row = document.querySelector(`input[value="${item.id}"]`)?.closest('tr');
                     if (row) {
                         const statusBadge = row.querySelector('.badge');
                         if (statusBadge) {
@@ -81,7 +81,6 @@ export function confirmBulkMarkAsPaid() {
             }
         })
         .catch((error) => {
-            // // console.error("Error:", error);
             InventMagApp.showToast(
                 "Error",
                 "An error occurred while updating the transactions.",

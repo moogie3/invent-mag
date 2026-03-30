@@ -6,9 +6,12 @@ use App\Models\Customer;
 use App\Models\Supplier;
 use App\Models\CustomerInteraction;
 use App\Models\SupplierInteraction;
-use Illuminate\Support\Facades\Auth;
-use App\Helpers\CurrencyHelper;
 use App\Models\Sales;
+use App\Models\Purchase;
+use App\Helpers\CurrencyHelper;
+use App\Helpers\PurchaseHelper;
+use App\Helpers\SalesHelper;
+use Illuminate\Support\Facades\Auth;
 
 class CrmService
 {
@@ -16,8 +19,10 @@ class CrmService
     {
         $customer = Customer::with(['interactions.user'])->findOrFail($id);
 
-        $allSales = $customer->sales()->with('salesItems.product.category')->get();
-        $lifetimeValue = $allSales->sum('total');
+        $allSales = $customer->sales()->with(['salesItems.product.category', 'salesReturns.items'])->get();
+        $lifetimeValue = $allSales->sum(function($sale) {
+            return $sale->getAdjustedTotal();
+        });
         $totalSalesCount = $allSales->count();
         $averageOrderValue = $totalSalesCount > 0 ? $lifetimeValue / $totalSalesCount : 0;
 
@@ -28,20 +33,25 @@ class CrmService
         foreach ($allSales as $sale) {
             foreach ($sale->salesItems as $item) {
                 if ($item->product) {
-                    if ($item->product->category) {
-                        $categoryName = $item->product->category->name;
-                        if (!isset($categoryCounts[$categoryName])) {
-                            $categoryCounts[$categoryName] = 0;
-                        }
-                        $categoryCounts[$categoryName]++;
-                    }
+                    $returnedQty = $sale->getReturnedQuantityForProduct($item->product_id);
+                    $adjustedQty = max(0, $item->quantity - $returnedQty);
 
-                    $productName = $item->product->name;
-                    if (!isset($productQuantities[$productName])) {
-                        $productQuantities[$productName] = 0;
+                    if ($adjustedQty > 0) {
+                        if ($item->product->category) {
+                            $categoryName = $item->product->category->name;
+                            if (!isset($categoryCounts[$categoryName])) {
+                                $categoryCounts[$categoryName] = 0;
+                            }
+                            $categoryCounts[$categoryName] += $adjustedQty;
+                        }
+
+                        $productName = $item->product->name;
+                        if (!isset($productQuantities[$productName])) {
+                            $productQuantities[$productName] = 0;
+                        }
+                        $productQuantities[$productName] += $adjustedQty;
+                        $totalProductsPurchased += $adjustedQty;
                     }
-                    $productQuantities[$productName] += $item->quantity;
-                    $totalProductsPurchased += $item->quantity;
                 }
             }
         }
@@ -53,9 +63,44 @@ class CrmService
 
         $lastInteractionDate = $customer->interactions->max('interaction_date');
 
-        $sales = $customer->sales()->with('salesItems.product')
+        $sales = $customer->sales()->with(['salesItems.product', 'salesReturns.items', 'payments'])
                         ->orderByDesc('created_at')
                         ->paginate(10, ['*'], 'page', $page);
+
+        $sales->getCollection()->transform(function ($sale) {
+            $sale->returned_amount = $sale->getTotalReturnedAmount();
+
+            $summary = SalesHelper::calculateInvoiceSummaryWithReturns(
+                $sale->salesItems,
+                $sale->order_discount ?? 0,
+                $sale->order_discount_type ?? 'fixed',
+                $sale->tax_rate ?? 0,
+                $sale->relationLoaded('salesReturns') ? $sale->salesReturns : collect(),
+            );
+
+            $paid = $sale->payments->sum('amount');
+            $sale->total_paid = $paid;
+            $sale->summary_subtotal = $summary['subtotal'];
+            $sale->summary_order_discount = $summary['orderDiscount'];
+            $sale->summary_tax_amount = $summary['taxAmount'];
+            $sale->grand_total_adjusted = $summary['finalTotal'];
+            $sale->balance = max(0, round($summary['finalTotal'] - $paid, 2));
+
+            $sale->salesItems->transform(function ($item) use ($sale) {
+                $returnedQty = $sale->getReturnedQuantityForProduct($item->product_id);
+                $adjustedQty = max(0, (int) $item->quantity - $returnedQty);
+                $item->returned_quantity = $returnedQty;
+                $item->adjusted_quantity = $adjustedQty;
+                $item->adjusted_total = SalesHelper::calculateTotal(
+                    $item->customer_price,
+                    $adjustedQty,
+                    $item->discount,
+                    $item->discount_type
+                );
+                return $item;
+            });
+            return $sale;
+        });
 
         return [
             'customer' => $customer,
@@ -76,8 +121,10 @@ class CrmService
     {
         $supplier = Supplier::with(['interactions.user'])->findOrFail($id);
 
-        $allPurchases = $supplier->purchases()->with('items.product')->get();
-        $lifetimeValue = $allPurchases->sum('total');
+        $allPurchases = $supplier->purchases()->with(['items.product', 'purchaseReturns.items'])->get();
+        $lifetimeValue = $allPurchases->sum(function($purchase) {
+            return $purchase->getAdjustedTotal();
+        });
         $totalPurchasesCount = $allPurchases->count();
         $averagePurchaseValue = $totalPurchasesCount > 0 ? $lifetimeValue / $totalPurchasesCount : 0;
 
@@ -89,20 +136,25 @@ class CrmService
             if ($purchase->items) {
                 foreach ($purchase->items as $item) {
                     if ($item->product) {
-                        if ($item->product->category) {
-                            $categoryName = $item->product->category->name;
-                            if (!isset($categoryCounts[$categoryName])) {
-                                $categoryCounts[$categoryName] = 0;
-                            }
-                            $categoryCounts[$categoryName]++;
-                        }
+                        $returnedQty = $purchase->getReturnedQuantityForProduct($item->product_id);
+                        $adjustedQty = max(0, $item->quantity - $returnedQty);
 
-                        $productName = $item->product->name;
-                        if (!isset($productQuantities[$productName])) {
-                            $productQuantities[$productName] = 0;
+                        if ($adjustedQty > 0) {
+                            if ($item->product->category) {
+                                $categoryName = $item->product->category->name;
+                                if (!isset($categoryCounts[$categoryName])) {
+                                    $categoryCounts[$categoryName] = 0;
+                                }
+                                $categoryCounts[$categoryName] += $adjustedQty;
+                            }
+
+                            $productName = $item->product->name;
+                            if (!isset($productQuantities[$productName])) {
+                                $productQuantities[$productName] = 0;
+                            }
+                            $productQuantities[$productName] += $adjustedQty;
+                            $totalProductsPurchased += $adjustedQty;
                         }
-                        $productQuantities[$productName] += $item->quantity;
-                        $totalProductsPurchased += $item->quantity;
                     }
                 }
             }
@@ -115,9 +167,42 @@ class CrmService
 
         $lastInteractionDate = $supplier->interactions->max('interaction_date');
 
-        $purchases = $supplier->purchases()->with('items.product')
+        $purchases = $supplier->purchases()->with(['items.product', 'purchaseReturns.items', 'payments'])
                         ->orderByDesc('created_at')
                         ->paginate(10, ['*'], 'page', $page);
+
+        $purchases->getCollection()->transform(function ($purchase) {
+            $purchase->returned_amount = $purchase->getTotalReturnedAmount();
+
+            $summary = PurchaseHelper::calculateInvoiceSummaryWithReturns(
+                $purchase->items,
+                $purchase->discount_total ?? 0,
+                $purchase->discount_total_type ?? 'fixed',
+                $purchase->relationLoaded('purchaseReturns') ? $purchase->purchaseReturns : collect(),
+            );
+
+            $paid = $purchase->payments->sum('amount');
+            $purchase->total_paid = $paid;
+            $purchase->summary_subtotal = $summary['subtotal'];
+            $purchase->summary_order_discount = $summary['orderDiscount'];
+            $purchase->grand_total_adjusted = $summary['finalTotal'];
+            $purchase->balance = max(0, round($summary['finalTotal'] - $paid, 2));
+
+            $purchase->items->transform(function ($item) use ($purchase) {
+                $returnedQty = $purchase->getReturnedQuantityForProduct($item->product_id);
+                $adjustedQty = max(0, (int) $item->quantity - $returnedQty);
+                $item->returned_quantity = $returnedQty;
+                $item->adjusted_quantity = $adjustedQty;
+                $item->adjusted_total = PurchaseHelper::calculateTotal(
+                    $item->price,
+                    $adjustedQty,
+                    $item->discount,
+                    $item->discount_type
+                );
+                return $item;
+            });
+            return $purchase;
+        });
 
         return [
             'supplier' => $supplier,
@@ -136,43 +221,64 @@ class CrmService
 
     public function getSupplierHistoricalPurchases($id)
     {
-        $supplier = Supplier::findOrFail($id);
+        $purchases = Purchase::where('supplier_id', $id)
+            ->with(['items.product', 'purchaseReturns.items', 'payments'])
+            ->orderBy('order_date', 'desc')
+            ->get();
 
-        $historicalPurchases = $supplier->purchases()
-            ->with(['items.product' => function ($query) {
-                $query->orderBy('id');
-            }])
-            ->orderByDesc('order_date')
-            ->get()
-            ->map(function ($purchase) {
-                return [
-                    'id' => $purchase->id,
-                    'invoice' => $purchase->invoice,
-                    'order_date' => $purchase->order_date,
-                    'due_date' => $purchase->due_date,
-                    'payment_method' => $purchase->payment_type,
-                    'status' => $purchase->status,
-                    'total' => $purchase->total,
-                    'discount_amount' => $purchase->discount_total,
-                    'items' => $purchase->items->map(function ($item) {
-                        return [
-                            'id' => $item->id,
-                            'product_name' => $item->product->name,
-                            'quantity' => $item->quantity,
-                            'price' => $item->price,
-                            'total' => $item->total,
-                        ];
-                    }),
-                ];
+        $groupedPurchases = [];
+
+        foreach ($purchases as $purchase) {
+            $returnedAmount = $purchase->getTotalReturnedAmount();
+
+            $summary = PurchaseHelper::calculateInvoiceSummaryWithReturns(
+                $purchase->items,
+                $purchase->discount_total ?? 0,
+                $purchase->discount_total_type ?? 'fixed',
+                $purchase->relationLoaded('purchaseReturns') ? $purchase->purchaseReturns : collect(),
+            );
+
+            $paid = $purchase->payments->sum('amount');
+            $balance = max(0, round($summary['finalTotal'] - $paid, 2));
+
+            $purchase->items->transform(function ($item) use ($purchase) {
+                $returnedQty = $purchase->getReturnedQuantityForProduct($item->product_id);
+                $adjustedQty = max(0, (int) $item->quantity - $returnedQty);
+                $item->returned_quantity = $returnedQty;
+                $item->adjusted_quantity = $adjustedQty;
+                $item->adjusted_total = PurchaseHelper::calculateTotal(
+                    $item->price,
+                    $adjustedQty,
+                    $item->discount,
+                    $item->discount_type
+                );
+                return $item;
             });
 
-        return $historicalPurchases;
+            $groupedPurchases[] = [
+                'id' => $purchase->id,
+                'invoice' => $purchase->invoice,
+                'order_date' => $purchase->order_date,
+                'due_date' => $purchase->due_date,
+                'status' => $purchase->status,
+                'payment_method' => $purchase->payment_method,
+                'items' => $purchase->items,
+                'summary_subtotal' => $summary['subtotal'],
+                'summary_order_discount' => $summary['orderDiscount'],
+                'grand_total_adjusted' => $summary['finalTotal'],
+                'returned_amount' => $returnedAmount,
+                'total_paid' => $paid,
+                'balance' => $balance,
+            ];
+        }
+
+        return $groupedPurchases;
     }
 
     public function getHistoricalPurchases(Customer $customer)
     {
         $sales = Sales::where('customer_id', $customer->id)
-            ->with('salesItems.product')
+            ->with(['salesItems.product', 'salesReturns.items'])
             ->orderBy('order_date', 'desc')
             ->get();
 
@@ -182,25 +288,39 @@ class CrmService
         foreach ($sales as $sale) {
             foreach ($sale->salesItems as $item) {
                 if ($item->product) {
-                    $productId = $item->product->id;
-                    $purchaseDate = $sale->order_date;
+                    $returnedQty = $sale->getReturnedQuantityForProduct($item->product_id);
+                    $adjustedQty = max(0, $item->quantity - $returnedQty);
 
-                    $historicalPurchases[] = [
-                        'sale_id' => $sale->id,
-                        'invoice' => $sale->invoice,
-                        'order_date' => $purchaseDate,
-                        'product_id' => $productId,
-                        'product_name' => $item->product->name,
-                        'quantity' => $item->quantity,
-                        'price_at_purchase' => $item->customer_price,
-                        'line_total' => $item->total,
-                    ];
+                    if ($adjustedQty > 0) {
+                        $productId = $item->product->id;
+                        $purchaseDate = $sale->order_date;
 
-                    if (!isset($latestProductPrices[$productId]) || $purchaseDate > $latestProductPrices[$productId]['date']) {
-                        $latestProductPrices[$productId] = [
-                            'price' => $item->customer_price,
-                            'date' => $purchaseDate,
+                        $adjustedTotal = SalesHelper::calculateTotal(
+                            $item->customer_price,
+                            $adjustedQty,
+                            $item->discount,
+                            $item->discount_type
+                        );
+
+                        $historicalPurchases[] = [
+                            'sale_id' => $sale->id,
+                            'invoice' => $sale->invoice,
+                            'order_date' => $purchaseDate,
+                            'product_id' => $productId,
+                            'product_name' => $item->product->name,
+                            'quantity' => $adjustedQty,
+                            'original_quantity' => $item->quantity,
+                            'returned_quantity' => $returnedQty,
+                            'price_at_purchase' => $item->customer_price,
+                            'line_total' => $adjustedTotal,
                         ];
+
+                        if (!isset($latestProductPrices[$productId]) || $purchaseDate > $latestProductPrices[$productId]['date']) {
+                            $latestProductPrices[$productId] = [
+                                'price' => $item->customer_price,
+                                'date' => $purchaseDate,
+                            ];
+                        }
                     }
                 }
             }
@@ -251,23 +371,32 @@ class CrmService
         $customer = Customer::findOrFail($id);
 
         $salesItems = \App\Models\SalesItem::whereIn('sales_id', $customer->sales()->pluck('id'))
-            ->with(['product', 'sales'])
+            ->with(['product', 'sales.salesReturns.items'])
             ->get();
 
         $productHistory = $salesItems->groupBy('product.name')
             ->map(function ($items, $productName) {
                 $history = $items->sortByDesc('sales.order_date')->map(function ($item) {
-                    // Ensure product and sales exist before accessing properties
                     if (!$item->product || !$item->sales) {
-                        return null; // Or handle this case appropriately
+                        return null;
                     }
+
+                    $returnedQty = $item->sales->getReturnedQuantityForProduct($item->product_id);
+                    $adjustedQty = max(0, $item->quantity - $returnedQty);
+
+                    if ($adjustedQty <= 0) {
+                        return null;
+                    }
+
                     return [
                         'invoice' => $item->sales->invoice,
                         'order_date' => $item->sales->order_date,
-                        'quantity' => $item->quantity,
+                        'quantity' => $adjustedQty,
+                        'original_quantity' => $item->quantity,
+                        'returned_quantity' => $returnedQty,
                         'price_at_purchase' => $item->customer_price,
                     ];
-                })->filter()->values(); // Filter out nulls if any were returned
+                })->filter()->values();
 
                 $lastPrice = $history->isNotEmpty() ? $history->first()['price_at_purchase'] : null;
 
@@ -277,7 +406,7 @@ class CrmService
                     'history' => $history,
                 ];
             })
-            ->filter(function ($item) { // Filter out products with no valid history
+            ->filter(function ($item) {
                 return $item['history']->isNotEmpty();
             })
             ->sortBy('product_name')
@@ -291,21 +420,28 @@ class CrmService
         $supplier = Supplier::findOrFail($id);
 
         return $supplier->purchases()
-            ->with('items.product')
+            ->with(['items.product', 'purchaseReturns.items'])
             ->orderByDesc('order_date')
             ->get()
             ->flatMap(function ($purchase) {
                 return $purchase->items->map(function ($item) use ($purchase) {
+                    $returnedQty = $purchase->getReturnedQuantityForProduct($item->product_id);
+                    $adjustedQty = max(0, $item->quantity - $returnedQty);
+
+                    if ($adjustedQty <= 0) return null;
+
                     return [
                         'product_id' => $item->product_id,
                         'product_name' => $item->product ? $item->product->name : 'N/A',
                         'order_date' => $purchase->order_date,
                         'invoice' => $purchase->invoice,
-                        'quantity' => $item->quantity,
+                        'quantity' => $adjustedQty,
+                        'original_quantity' => $item->quantity,
+                        'returned_quantity' => $returnedQty,
                         'price_at_purchase' => $item->price ?? 0,
-                        'line_total' => $item->total
+                        'line_total' => PurchaseHelper::calculateTotal($item->price, $adjustedQty, $item->discount, $item->discount_type)
                     ];
-                });
+                })->filter();
             })
             ->groupBy('product_name')
             ->map(function ($productPurchases, $productName) {

@@ -71,7 +71,7 @@ function loadBulkUpdateProductsFromTable(selectedIds) {
     if (!container || !template) return;
 
     container.innerHTML = "";
-    countElement.textContent = selectedIds.length;
+    if (countElement) countElement.textContent = selectedIds.length;
 
     selectedIds.forEach((id) => {
         const row = document.querySelector(`tr[data-id="${id}"]`);
@@ -113,15 +113,19 @@ function loadBulkUpdateProductsFromTable(selectedIds) {
         const decreaseBtn = clone.querySelector(".decrease-btn");
         const increaseBtn = clone.querySelector(".increase-btn");
 
-        decreaseBtn.addEventListener("click", () => {
-            input.value = Math.max(0, parseInt(input.value) - 1);
-            updateStockChangeDisplay(clone);
-        });
+        if (decreaseBtn) {
+            decreaseBtn.addEventListener("click", () => {
+                input.value = Math.max(0, parseInt(input.value) - 1);
+                updateStockChangeDisplay(clone);
+            });
+        }
 
-        increaseBtn.addEventListener("click", () => {
-            input.value = parseInt(input.value) + 1;
-            updateStockChangeDisplay(clone);
-        });
+        if (increaseBtn) {
+            increaseBtn.addEventListener("click", () => {
+                input.value = parseInt(input.value) + 1;
+                updateStockChangeDisplay(clone);
+            });
+        }
 
         input.addEventListener("input", () => {
             if (parseInt(input.value) < 0) input.value = 0;
@@ -292,6 +296,7 @@ function handleBulkStockUpdate() {
     const warehouseId = bulkUpdateWarehouseSelect ? bulkUpdateWarehouseSelect.value : null;
 
     const confirmBtn = document.getElementById("confirmBulkUpdateBtn");
+    if (!confirmBtn) return;
     const original = confirmBtn.innerHTML;
     confirmBtn.innerHTML =
         '<span class="spinner-border spinner-border-sm me-2"></span>Updating...';

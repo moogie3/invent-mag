@@ -16,11 +16,10 @@ export function initProductPage() {
         initKeyboardShortcuts();
         initExport();
 
-        // Listen for the expiringSoonModal to be shown and fetch data via AJAX
         const expiringSoonModalElement = document.getElementById('expiringSoonModal');
-        if (expiringSoonModalElement) {
+        if (expiringSoonModalElement && !expiringSoonModalElement.dataset.handlerAttached) {
+            expiringSoonModalElement.dataset.handlerAttached = 'true';
             expiringSoonModalElement.addEventListener('show.bs.modal', function () {
-                // Clear previous content and show loading indicator
                 const tableBody = document.getElementById('expiringSoonProductsTableBody');
                 if (tableBody) {
                     tableBody.innerHTML = `
@@ -35,7 +34,7 @@ export function initProductPage() {
                     `;
                 }
 
-                fetch('/admin/product/expiring-soon') // New endpoint to fetch expiring products
+                fetch('/admin/product/expiring-soon')
                     .then(response => {
                         if (!response.ok) {
                             throw new Error('Network response was not ok');
@@ -46,7 +45,6 @@ export function initProductPage() {
                         loadExpiringSoonProductsModal(data);
                     })
                     .catch(error => {
-                        // // console.error('Error fetching expiring products:', error);
                         if (tableBody) {
                             tableBody.innerHTML = `
                                 <tr>
@@ -59,8 +57,6 @@ export function initProductPage() {
                     });
             });
         }
-
-        
 
         const selectAllCheckbox = document.getElementById("selectAll");
         if (
@@ -75,7 +71,13 @@ export function initProductPage() {
             window.selectedProductIds = new Set();
         }
 
-        // Stock Adjustment Modal Logic
+        initAdjustStockModal();
+
+         window.bulkDeleteProducts = bulkDeleteProducts; // Expose globally
+         window.clearProductSelection = clearProductSelection; // Expose globally
+}
+
+function initAdjustStockModal() {
         function updateCurrentStockForWarehouse(productId, warehouseId) {
             const adjustCurrentStockInput = document.getElementById('adjustCurrentStock');
             if (!adjustCurrentStockInput) return;
@@ -96,7 +98,6 @@ export function initProductPage() {
                     }
                 })
                 .catch(error => {
-                    // // console.error('Error fetching warehouse stock:', error);
                     adjustCurrentStockInput.value = 0;
                     if (typeof updateAdjustmentPreview === 'function') {
                         updateAdjustmentPreview();
@@ -105,67 +106,74 @@ export function initProductPage() {
         }
 
         window.openAdjustStockModal = function(productId, productName, currentStock) {
-            document.getElementById('adjustProductId').value = productId;
-            document.getElementById('adjustProductName').textContent = productName;
-            document.getElementById('adjustCurrentStock').value = currentStock;
-            document.getElementById('adjustmentType').value = 'increase'; // Default to increase
-            document.getElementById('adjustmentAmount').value = 1; // Default amount
-            document.getElementById('adjustmentReason').value = ''; // Clear reason
-            document.getElementById('adjustmentAmountLabel').textContent = 'Adjustment Amount'; // Reset label
+            const adjustProductId = document.getElementById('adjustProductId');
+            const adjustProductName = document.getElementById('adjustProductName');
+            const adjustCurrentStock = document.getElementById('adjustCurrentStock');
+            const adjustmentType = document.getElementById('adjustmentType');
+            const adjustmentAmount = document.getElementById('adjustmentAmount');
+            const adjustmentReason = document.getElementById('adjustmentReason');
+            const adjustmentAmountLabel = document.getElementById('adjustmentAmountLabel');
+
+            if (adjustProductId) adjustProductId.value = productId;
+            if (adjustProductName) adjustProductName.textContent = productName;
+            if (adjustCurrentStock) adjustCurrentStock.value = currentStock;
+            if (adjustmentType) adjustmentType.value = 'increase';
+            if (adjustmentAmount) adjustmentAmount.value = 1;
+            if (adjustmentReason) adjustmentReason.value = '';
+            if (adjustmentAmountLabel) adjustmentAmountLabel.textContent = 'Adjustment Amount';
             
-            // Get selected warehouse from global filter
             const globalWarehouseSelect = document.querySelector('select[name="warehouse_id"]');
             const globalWarehouseId = globalWarehouseSelect ? globalWarehouseSelect.value : '';
             
-            // Get modal's warehouse dropdown
             const adjustmentWarehouseSelect = document.getElementById('adjustmentWarehouse');
             
             if (adjustmentWarehouseSelect) {
                 if (globalWarehouseId) {
-                    // Pre-select the filtered warehouse and disable dropdown
                     adjustmentWarehouseSelect.value = globalWarehouseId;
                     adjustmentWarehouseSelect.disabled = true;
                 } else {
-                    // Enable dropdown for selection
                     adjustmentWarehouseSelect.disabled = false;
-                    // If there's a first option (likely Main Warehouse), select it
                     if (adjustmentWarehouseSelect.options.length > 0 && !adjustmentWarehouseSelect.value) {
                         adjustmentWarehouseSelect.selectedIndex = 0;
                     }
                 }
                 
-                // Add event listener for warehouse change within the modal
-                // Use onchange to replace any previous listener and avoid multiple triggers
-                adjustmentWarehouseSelect.onchange = function() {
-                    const pid = document.getElementById('adjustProductId').value;
-                    updateCurrentStockForWarehouse(pid, this.value);
-                };
+                if (!adjustmentWarehouseSelect.dataset.handlerAttached) {
+                    adjustmentWarehouseSelect.dataset.handlerAttached = 'true';
+                    adjustmentWarehouseSelect.addEventListener('change', function() {
+                        const pid = document.getElementById('adjustProductId').value;
+                        updateCurrentStockForWarehouse(pid, this.value);
+                    });
+                }
 
-                // Trigger initial stock update for the selected warehouse
                 updateCurrentStockForWarehouse(productId, adjustmentWarehouseSelect.value);
             }
             
-            // Initialize adjustment preview
             updateAdjustmentPreview();
 
-            new bootstrap.Modal(document.getElementById('adjustStockModal', {})).show();
+            const adjustStockModalEl = document.getElementById('adjustStockModal');
+            if (adjustStockModalEl) {
+                new bootstrap.Modal(adjustStockModalEl).show();
+            }
         };
 
-        const adjustCurrentStockInput = document.getElementById('adjustCurrentStock');
-        const adjustmentTypeSelect = document.getElementById('adjustmentType');
-        const adjustmentAmountInput = document.getElementById('adjustmentAmount');
-        const correctionAmountInput = document.getElementById('correctionAmount');
-        const adjustmentPreviewBadge = document.getElementById('adjustmentPreviewBadge');
-
         function updateAdjustmentPreview() {
+            const adjustCurrentStockInput = document.getElementById('adjustCurrentStock');
+            const adjustmentTypeSelect = document.getElementById('adjustmentType');
+            const adjustmentAmountInput = document.getElementById('adjustmentAmount');
+            const correctionAmountInput = document.getElementById('correctionAmount');
+            const adjustmentPreviewBadge = document.getElementById('adjustmentPreviewBadge');
+            
+            if (!adjustCurrentStockInput || !adjustmentTypeSelect || !adjustmentPreviewBadge) return;
+            
             const currentStock = parseFloat(adjustCurrentStockInput.value) || 0;
             const adjustmentType = adjustmentTypeSelect.value;
             let adjustmentAmount = 0;
             
             if (adjustmentType === 'correction') {
-                adjustmentAmount = parseFloat(correctionAmountInput.value) || 0;
+                adjustmentAmount = parseFloat(correctionAmountInput?.value) || 0;
             } else {
-                adjustmentAmount = parseFloat(adjustmentAmountInput.value) || 0;
+                adjustmentAmount = parseFloat(adjustmentAmountInput?.value) || 0;
             }
 
             let newStock = currentStock;
@@ -182,24 +190,26 @@ export function initProductPage() {
                 change = newStock - currentStock;
             }
 
-            if (adjustmentPreviewBadge) {
-                adjustmentPreviewBadge.textContent = `New Stock: ${newStock} (${change >= 0 ? '+' : ''}${change})`;
-                adjustmentPreviewBadge.classList.remove('bg-secondary-lt', 'bg-success-lt', 'bg-danger-lt');
-                if (change === 0) {
-                    adjustmentPreviewBadge.classList.add('bg-secondary-lt');
-                } else if (change > 0) {
-                    adjustmentPreviewBadge.classList.add('bg-success-lt');
-                } else {
-                    adjustmentPreviewBadge.classList.add('bg-danger-lt');
-                }
+            adjustmentPreviewBadge.textContent = `New Stock: ${newStock} (${change >= 0 ? '+' : ''}${change})`;
+            adjustmentPreviewBadge.classList.remove('bg-secondary-lt', 'bg-success-lt', 'bg-danger-lt');
+            if (change === 0) {
+                adjustmentPreviewBadge.classList.add('bg-secondary-lt');
+            } else if (change > 0) {
+                adjustmentPreviewBadge.classList.add('bg-success-lt');
+            } else {
+                adjustmentPreviewBadge.classList.add('bg-danger-lt');
             }
         }
 
-        const adjustmentAmountContainer = document.getElementById('adjustmentAmountContainer');
-        const correctionAmountContainer = document.getElementById('correctionAmountContainer');
+        const adjustmentTypeSelect = document.getElementById('adjustmentType');
+        const adjustmentAmountInput = document.getElementById('adjustmentAmount');
+        const correctionAmountInput = document.getElementById('correctionAmount');
 
-        if (adjustmentTypeSelect) {
+        if (adjustmentTypeSelect && !adjustmentTypeSelect.dataset.handlerAttached) {
+            adjustmentTypeSelect.dataset.handlerAttached = 'true';
             adjustmentTypeSelect.addEventListener('change', function() {
+                const adjustmentAmountContainer = document.getElementById('adjustmentAmountContainer');
+                const correctionAmountContainer = document.getElementById('correctionAmountContainer');
                 const type = this.value;
                 if (type === 'correction') {
                     if (adjustmentAmountContainer) adjustmentAmountContainer.style.display = 'none';
@@ -212,111 +222,117 @@ export function initProductPage() {
             });
         }
 
-        if (adjustmentAmountInput) adjustmentAmountInput.addEventListener('input', updateAdjustmentPreview);
-        if (correctionAmountInput) correctionAmountInput.addEventListener('input', updateAdjustmentPreview);
+        if (adjustmentAmountInput && !adjustmentAmountInput.dataset.handlerAttached) {
+            adjustmentAmountInput.dataset.handlerAttached = 'true';
+            adjustmentAmountInput.addEventListener('input', updateAdjustmentPreview);
+        }
+        if (correctionAmountInput && !correctionAmountInput.dataset.handlerAttached) {
+            correctionAmountInput.dataset.handlerAttached = 'true';
+            correctionAmountInput.addEventListener('input', updateAdjustmentPreview);
+        }
 
-        document.getElementById('confirmAdjustStockBtn').addEventListener('click', function() {
-            const productId = document.getElementById('adjustProductId').value;
-            const adjustmentType = document.getElementById('adjustmentType').value;
-            const reason = document.getElementById('adjustmentReason').value;
-            
-            // Read warehouse from modal's dropdown
-            const adjustmentWarehouseSelect = document.getElementById('adjustmentWarehouse');
-            const warehouseId = adjustmentWarehouseSelect ? adjustmentWarehouseSelect.value : null;
+        const confirmAdjustStockBtn = document.getElementById('confirmAdjustStockBtn');
+        
+        if (confirmAdjustStockBtn && !confirmAdjustStockBtn.dataset.handlerAttached) {
+            confirmAdjustStockBtn.dataset.handlerAttached = 'true';
+            confirmAdjustStockBtn.addEventListener('click', function() {
+                const productId = document.getElementById('adjustProductId').value;
+                const adjustmentType = document.getElementById('adjustmentType').value;
+                const reason = document.getElementById('adjustmentReason').value;
+                
+                const adjustmentWarehouseSelect = document.getElementById('adjustmentWarehouse');
+                const warehouseId = adjustmentWarehouseSelect ? adjustmentWarehouseSelect.value : null;
 
-            let adjustmentAmount = 0;
+                let adjustmentAmount = 0;
 
-            if (adjustmentType === 'correction') {
-                adjustmentAmount = parseFloat(document.getElementById('correctionAmount').value) || 0;
-            } else {
-                adjustmentAmount = parseFloat(document.getElementById('adjustmentAmount').value) || 0;
-            }
+                if (adjustmentType === 'correction') {
+                    adjustmentAmount = parseFloat(document.getElementById('correctionAmount').value) || 0;
+                } else {
+                    adjustmentAmount = parseFloat(document.getElementById('adjustmentAmount').value) || 0;
+                }
 
-            if (!adjustmentAmount || adjustmentAmount < 0) {
-                InventMagApp.showToast("Warning", 'Please enter a valid adjustment amount.', "warning");
-                return;
-            }
+                if (!adjustmentAmount || adjustmentAmount < 0) {
+                    InventMagApp.showToast("Warning", 'Please enter a valid adjustment amount.', "warning");
+                    return;
+                }
 
-            fetch('/admin/product/adjust-stock', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-                },
-                body: JSON.stringify({
-                    product_id: productId,
-                    warehouse_id: warehouseId,
-                    adjustment_type: adjustmentType,
-                    adjustment_amount: parseFloat(adjustmentAmount),
-                    reason: reason
+                const originalText = confirmAdjustStockBtn.innerHTML;
+                confirmAdjustStockBtn.disabled = true;
+                confirmAdjustStockBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span> Saving...';
+
+                fetch('/admin/product/adjust-stock', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') ?? ''
+                    },
+                    body: JSON.stringify({
+                        product_id: productId,
+                        warehouse_id: warehouseId,
+                        adjustment_type: adjustmentType,
+                        adjustment_amount: parseFloat(adjustmentAmount),
+                        reason: reason
+                    })
                 })
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success && data.product) {
-                    const product = data.product;
-                    const row = document.querySelector(`tr[data-id="${product.id}"]`);
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success && data.product) {
+                        const product = data.product;
+                        const row = document.querySelector(`tr[data-id="${product.id}"]`);
 
-                    if (row) {
-                        const stockQuantityElement = row.querySelector(".sort-quantity .fw-bold");
-                        if (stockQuantityElement) {
-                            // Determine which stock quantity to show based on global filter
-                            const globalWarehouseSelect = document.querySelector('select[name="warehouse_id"]');
-                            const globalWarehouseId = globalWarehouseSelect ? globalWarehouseSelect.value : '';
-                            
-                            let displayStock = product.total_stock;
-                            if (globalWarehouseId && product.warehouse_id == globalWarehouseId) {
-                                displayStock = product.warehouse_stock;
-                            }
-                            
-                            stockQuantityElement.textContent = displayStock;
+                        if (row) {
+                            const stockQuantityElement = row.querySelector(".sort-quantity .fw-bold");
+                            if (stockQuantityElement) {
+                                const globalWarehouseSelect = document.querySelector('select[name="warehouse_id"]');
+                                const globalWarehouseId = globalWarehouseSelect ? globalWarehouseSelect.value : '';
+                                
+                                let displayStock = product.total_stock;
+                                if (globalWarehouseId && product.warehouse_id == globalWarehouseId) {
+                                    displayStock = product.warehouse_stock;
+                                }
+                                
+                                stockQuantityElement.textContent = displayStock;
 
-                            let badgeElement = row.querySelector(".sort-quantity .badge");
-                            if (!badgeElement) {
-                                const badgeContainer = row.querySelector(".sort-quantity");
-                                if (badgeContainer) {
-                                    badgeElement = document.createElement("span");
-                                    badgeContainer.appendChild(badgeElement);
+                                let badgeElement = row.querySelector(".sort-quantity .badge");
+                                if (!badgeElement) {
+                                    const badgeContainer = row.querySelector(".sort-quantity");
+                                    if (badgeContainer) {
+                                        badgeElement = document.createElement("span");
+                                        badgeContainer.appendChild(badgeElement);
+                                    }
+                                }
+
+                                if (badgeElement) {
+                                    const [badgeClass, badgeText] = getStockClassAndText(displayStock, product.low_stock_threshold);
+                                    badgeElement.className = `badge ${badgeClass}`;
+                                    badgeElement.textContent = badgeText;
                                 }
                             }
 
-                            if (badgeElement) {
-                                const [badgeClass, badgeText] = getStockClassAndText(displayStock, product.low_stock_threshold);
-                                badgeElement.className = `badge ${badgeClass}`;
-                                badgeElement.textContent = badgeText;
+                            const thresholdElement = row.querySelector(".sort-quantity small.text-muted");
+                            if (thresholdElement && product.low_stock_threshold !== undefined) {
+                                thresholdElement.textContent = `Threshold: ${product.low_stock_threshold}`;
                             }
                         }
 
-                        const thresholdElement = row.querySelector(".sort-quantity small.text-muted");
-                        if (thresholdElement && product.low_stock_threshold !== undefined) {
-                            thresholdElement.textContent = `Threshold: ${product.low_stock_threshold}`;
+                        const modalEl = document.getElementById('adjustStockModal');
+                        const modal = bootstrap.Modal.getInstance(modalEl);
+                        if (modal) {
+                            modal.hide();
                         }
+
+                        InventMagApp.showToast('Success', data.message, 'success');
+                    } else {
+                        InventMagApp.showToast('Error', data.message || 'Failed to update stock.', 'error');
                     }
-
-                    const modal = bootstrap.Modal.getInstance(document.getElementById('adjustStockModal'));
-                    if (modal) {
-                        modal.hide();
-                    }
-
-                    InventMagApp.showToast('Success', data.message, 'success');
-                } else {
-                    InventMagApp.showToast('Error', data.message || 'Failed to update stock.', 'error');
-                }
-            })
-            .catch(error => {
-                // // console.error('Error:', error);
-                InventMagApp.showToast('Error', 'An error occurred during stock adjustment.', 'error');
-            });
-        });
-
-        // Attach event listener for bulkUpdateStockBtn
-        const bulkUpdateStockBtn = document.getElementById('bulkUpdateStockBtn');
-        if (bulkUpdateStockBtn) {
-            bulkUpdateStockBtn.addEventListener('click', function() {
-                bulkUpdateStock(); // Call the function from stock.js
+                })
+                .catch(error => {
+                    InventMagApp.showToast('Error', 'An error occurred during stock adjustment.', 'error');
+                })
+                .finally(() => {
+                    confirmAdjustStockBtn.disabled = false;
+                    confirmAdjustStockBtn.innerHTML = originalText;
+                });
             });
         }
-
-         window.bulkDeleteProducts = bulkDeleteProducts; // Expose globally
-         window.clearProductSelection = clearProductSelection; // Expose globally
 }

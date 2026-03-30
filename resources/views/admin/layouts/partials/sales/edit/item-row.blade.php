@@ -5,6 +5,8 @@
         $item->discount,
         $item->discount_type,
     );
+    
+    $returnedQty = isset($sales) ? $sales->getReturnedQuantityForProduct($item->product_id) : 0;
 @endphp
 <tr class="product-row" data-product-id="{{ $item->product_id }}">
     <td class="text-center">{{ $index + 1 }}</td>
@@ -12,6 +14,9 @@
         <div class="strong">{{ $item->product->name }}</div>
         @if (isset($item->product->sku) && $item->product->sku)
             <small class="text-muted">{{ __('messages.sku_colon') }} {{ $item->product->sku }}</small>
+        @endif
+        @if($returnedQty > 0)
+            <br><small class="text-danger"><i class="ti ti-package-export me-1"></i>(-{{ $returnedQty }} {{ __('messages.returned') }})</small>
         @endif
     </td>
     <td>

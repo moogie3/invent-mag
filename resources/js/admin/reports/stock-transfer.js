@@ -99,10 +99,12 @@ onPageLoad(function() {
     });
 
     // Event listener for To Warehouse change
-    toWarehouseSelect.addEventListener('change', function() {
-        console.log('To warehouse changed:', this.value);
-        validateWarehouses();
-    });
+    if (toWarehouseSelect) {
+        toWarehouseSelect.addEventListener('change', function() {
+            console.log('To warehouse changed:', this.value);
+            validateWarehouses();
+        });
+    }
 
     // Event listener for Product selection
     productSelect.addEventListener('change', function() {

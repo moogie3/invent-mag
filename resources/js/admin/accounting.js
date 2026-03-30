@@ -58,12 +58,13 @@ onPageLoad(function() {
                 }
 
                 const templateSelect = document.getElementById("coaTemplateSelect");
+                if (!templateSelect) return;
                 const selectedTemplateValue = templateSelect.value;
 
                 fetch("/admin/settings/apply-coa-template", {
                     method: "POST",
                     headers: {
-                        "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').getAttribute("content"),
+                        "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]')?.getAttribute("content") ?? '',
                         Accept: "application/json",
                         "X-Requested-With": "XMLHttpRequest",
                         "Content-Type": "application/json",
@@ -101,8 +102,11 @@ onPageLoad(function() {
     if (filterForm) {
         filterForm.addEventListener('submit', function(e) {
             e.preventDefault();
-            const startDate = document.querySelector('[name="start_date"]').value;
-            const endDate = document.querySelector('[name="end_date"]').value;
+            const startDateInput = document.querySelector('[name="start_date"]');
+            const endDateInput = document.querySelector('[name="end_date"]');
+            if (!startDateInput || !endDateInput) return;
+            const startDate = startDateInput.value;
+            const endDate = endDateInput.value;
             const url = new URL(window.location.href);
             url.searchParams.set('start_date', startDate);
             url.searchParams.set('end_date', endDate);
@@ -138,8 +142,11 @@ function exportAccounts(exportOption) {
 }
 
 function exportJournal(exportOption) {
-    const startDate = document.getElementById('start_date').value;
-    const endDate = document.getElementById('end_date').value;
+    const startDateEl = document.getElementById('start_date');
+    const endDateEl = document.getElementById('end_date');
+    if (!startDateEl || !endDateEl) return;
+    const startDate = startDateEl.value;
+    const endDate = endDateEl.value;
 
     const form = document.createElement("form");
     form.method = "POST";
@@ -179,9 +186,13 @@ function exportJournal(exportOption) {
 }
 
 function exportGeneralLedger(exportOption) {
-    const accountId = document.getElementById('account_id').value;
-    const startDate = document.getElementById('start_date').value;
-    const endDate = document.getElementById('end_date').value;
+    const accountIdEl = document.getElementById('account_id');
+    const startDateEl = document.getElementById('start_date');
+    const endDateEl = document.getElementById('end_date');
+    if (!accountIdEl || !startDateEl || !endDateEl) return;
+    const accountId = accountIdEl.value;
+    const startDate = startDateEl.value;
+    const endDate = endDateEl.value;
 
     if (!accountId) {
         InventMagApp.showToast("Warning", "Please select an account to export.", "warning");
@@ -233,7 +244,9 @@ function exportGeneralLedger(exportOption) {
 
 
 function exportTrialBalance(exportOption) {
-    const endDate = document.getElementById('end_date').value;
+    const endDateEl = document.getElementById('end_date');
+    if (!endDateEl) return;
+    const endDate = endDateEl.value;
 
     const form = document.createElement("form");
     form.method = "POST";
@@ -267,8 +280,11 @@ function exportTrialBalance(exportOption) {
 }
 
 function exportIncomeStatement(exportOption) {
-    const startDate = document.getElementById('start_date').value;
-    const endDate = document.getElementById('end_date').value;
+    const startDateEl = document.getElementById('start_date');
+    const endDateEl = document.getElementById('end_date');
+    if (!startDateEl || !endDateEl) return;
+    const startDate = startDateEl.value;
+    const endDate = endDateEl.value;
 
     const form = document.createElement("form");
     form.method = "POST";
@@ -308,7 +324,9 @@ function exportIncomeStatement(exportOption) {
 }
 
 function exportBalanceSheet(exportOption) {
-    const endDate = document.getElementById('end_date').value;
+    const endDateEl = document.getElementById('end_date');
+    if (!endDateEl) return;
+    const endDate = endDateEl.value;
 
     const form = document.createElement("form");
     form.method = "POST";

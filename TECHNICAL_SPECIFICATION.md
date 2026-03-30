@@ -267,7 +267,7 @@ class SalesHelper
         $netSubtotal = self::calculateNetSubtotal($items, $returns);
         $netDiscount = self::calculateNetDiscount($netSubtotal, $discount, $type);
         $netTax = self::calculateNetTax($netSubtotal - $netDiscount, $tax);
-        
+
         return $netSubtotal - $netDiscount + $netTax;
     }
 }
@@ -522,14 +522,14 @@ php artisan backup:clean        # Clean old backups
 
 ### 7.1 Technology Stack
 
-| Layer          | Technology      | Purpose                      |
-| -------------- | --------------- | ---------------------------- |
-| **Templating** | Blade           | Server-side rendering        |
-| **Navigation** | Turbo Drive     | SPA-like page transitions    |
-| **CSS**        | Tailwind CSS    | Utility-first styling        |
-| **JavaScript** | Alpine.js       | Reactive components          |
-| **Icons**      | Tabler Icons    | Consistent iconography       |
-| **Build**      | Vite            | Asset compilation            |
+| Layer          | Technology   | Purpose                   |
+| -------------- | ------------ | ------------------------- |
+| **Templating** | Blade        | Server-side rendering     |
+| **Navigation** | Turbo Drive  | SPA-like page transitions |
+| **CSS**        | Tailwind CSS | Utility-first styling     |
+| **JavaScript** | Alpine.js    | Reactive components       |
+| **Icons**      | Tabler Icons | Consistent iconography    |
+| **Build**      | Vite         | Asset compilation         |
 
 ### 7.2 JavaScript Organization
 
@@ -704,14 +704,14 @@ class SalesForecastService
 
 ## 11. Version History
 
-| Version | Date          | Changes                                                                                                                                                                       |
-| ------- | ------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Version | Date          | Changes                                                                                                                                                                                                                                                                                  |
+| ------- | ------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | 1.4     | March 2026    | Financial & CRM Integrations: Full integration of Sales and Purchase Returns into GL, Dashboards, and CRM (Adjusted LTV). Extracted `SalesHelper`, `PurchaseHelper`, and `ProductStockController` for DRY calculations. Added Opening Balance Module. Added `ACCOUNTING_SETUP_GUIDE.md`. |
-| 1.3     | March 2026    | Turbo Drive (Hotwire) integration: `onPageLoad` utility, unified `bootstrap-init.js`, `receipt-page.js`, POS discount/tax reactivity fix, `DashboardService` extraction, auth error handling fix (ValidationException bypass + session-notifications auth page detection). |
-| 1.2     | March 2026    | Full Production Architecture: Subdomain isolation (`*.invent-mag.web.id`), Resend API Email Integration, Advanced Rate Limiting, Midtrans Tenant-Aware Webhooks, CI/CD fixes. |
-| 1.2     | March 2026    | Implemented subscription & payment system with Midtrans, tiered plans (Starter/Professional/Enterprise), feature gating, usage limits, plan badges in sidebar, invoice emails |
-| 1.2     | February 2026 | Dark theme improvements, notification system enhancements                                                                                                                     |
-| 1.2     | January 2026  | Initial release with full ERP features                                                                                                                                        |
+| 1.3     | March 2026    | Turbo Drive (Hotwire) integration: `onPageLoad` utility, unified `bootstrap-init.js`, `receipt-page.js`, POS discount/tax reactivity fix, `DashboardService` extraction, auth error handling fix (ValidationException bypass + session-notifications auth page detection).               |
+| 1.2     | March 2026    | Full Production Architecture: Subdomain isolation (`*.invent-mag.web.id`), Resend API Email Integration, Advanced Rate Limiting, Midtrans Tenant-Aware Webhooks, CI/CD fixes.                                                                                                            |
+| 1.2     | March 2026    | Implemented subscription & payment system with Midtrans, tiered plans (Starter/Professional/Enterprise), feature gating, usage limits, plan badges in sidebar, invoice emails                                                                                                            |
+| 1.2     | February 2026 | Dark theme improvements, notification system enhancements                                                                                                                                                                                                                                |
+| 1.2     | January 2026  | Initial release with full ERP features                                                                                                                                                                                                                                                   |
 
 ---
 
@@ -786,8 +786,8 @@ Common extension points:
 | 1.0     | Feb 2026 | Added comprehensive test coverage stats and documented returns fixes                                                                                                          |
 | 1.0     | Mar 2026 | Full Production Architecture: Subdomain isolation (`*.invent-mag.web.id`), Resend API Email Integration, Advanced Rate Limiting, Midtrans Tenant-Aware Webhooks, CI/CD fixes. |
 | 1.0     | Mar 2026 | Documented Subscription system, Midtrans integration, and Railway deployment architecture                                                                                     |
-| 1.4     | Mar 2026 | Financial & CRM Integrations: Full integration of Returns into GL, Dashboards, and CRM (Net LTV). `SalesHelper` & `PurchaseHelper` extraction. Opening Balance Module added. |
-| 1.3     | Mar 2026 | Turbo Drive integration: `onPageLoad` utility, `bootstrap-init.js`, `receipt-page.js`, POS reactivity fix, `DashboardService` extraction, auth error handling improvements.  |
+| 1.4     | Mar 2026 | Financial & CRM Integrations: Full integration of Returns into GL, Dashboards, and CRM (Net LTV). `SalesHelper` & `PurchaseHelper` extraction. Opening Balance Module added.  |
+| 1.3     | Mar 2026 | Turbo Drive integration: `onPageLoad` utility, `bootstrap-init.js`, `receipt-page.js`, POS reactivity fix, `DashboardService` extraction, auth error handling improvements.   |
 
 ---
 

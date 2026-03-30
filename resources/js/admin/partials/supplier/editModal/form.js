@@ -10,22 +10,26 @@ export function populateEditModalForm(button) {
         button.getAttribute("data-payment_terms") || "";
     const supplierEmail = button.getAttribute("data-email") || "";
 
-    document.getElementById("supplierId").value = supplierId;
-    if (document.getElementById("supplierCodeEdit")) {
-        document.getElementById("supplierCodeEdit").value =
-            supplierCode;
-    }
-    document.getElementById("supplierNameEdit").value = supplierName;
-    document.getElementById("supplierAddressEdit").value =
-        supplierAddress;
-    document.getElementById("supplierPhoneEdit").value = supplierPhone;
-    document.getElementById("supplierLocationEdit").value =
-        supplierLocation;
-    document.getElementById("supplierPaymentTermsEdit").value =
-        supplierPayment;
-    document.getElementById("supplierEmailEdit").value = supplierEmail;
+    const supplierIdEl = document.getElementById("supplierId");
+    if (supplierIdEl) supplierIdEl.value = supplierId;
+    const supplierCodeEl = document.getElementById("supplierCodeEdit");
+    if (supplierCodeEl) supplierCodeEl.value = supplierCode;
+    const supplierNameEl = document.getElementById("supplierNameEdit");
+    if (supplierNameEl) supplierNameEl.value = supplierName;
+    const supplierAddressEl = document.getElementById("supplierAddressEdit");
+    if (supplierAddressEl) supplierAddressEl.value = supplierAddress;
+    const supplierPhoneEl = document.getElementById("supplierPhoneEdit");
+    if (supplierPhoneEl) supplierPhoneEl.value = supplierPhone;
+    const supplierLocationEl = document.getElementById("supplierLocationEdit");
+    if (supplierLocationEl) supplierLocationEl.value = supplierLocation;
+    const supplierPaymentEl = document.getElementById("supplierPaymentTermsEdit");
+    if (supplierPaymentEl) supplierPaymentEl.value = supplierPayment;
+    const supplierEmailEl = document.getElementById("supplierEmailEdit");
+    if (supplierEmailEl) supplierEmailEl.value = supplierEmail;
 
-    const routeBase = document.getElementById("updateRouteBase").value;
-    document.getElementById("editSupplierForm").action =
-        routeBase + "/" + supplierId;
+    const routeBase = document.getElementById("updateRouteBase")?.value;
+    if (routeBase) {
+        const editFormEl = document.getElementById("editSupplierForm");
+        if (editFormEl) editFormEl.action = routeBase + "/" + supplierId;
+    }
 }

@@ -1,18 +1,21 @@
-import { originalValues } from './partials/currency/state.js';
+import { initializeOriginalValues, updateOriginalValues, originalValues } from './partials/currency/state.js';
 import { updateFormatPreview } from './partials/currency/preview.js';
 import { updateHiddenFields } from './partials/currency/form.js';
 import { setupModalEventListeners } from './partials/currency/modal.js';
 import { handleFormSubmission } from './partials/currency/api.js';
-import * as elements from './partials/currency/elements.js';
 import { onPageLoad } from './utils/onPageLoad.js';
 
 onPageLoad(function () {
     if (!window.location.pathname.includes("/admin/settings/currency")) return;
+    
+    const currentValues = initializeOriginalValues();
+    
     updateHiddenFields();
-    updateFormatPreview(originalValues);
+    updateFormatPreview(currentValues);
 
-    if (elements.selectedCurrency) {
-        elements.selectedCurrency.addEventListener("change", function () {
+    const selectedCurrency = document.getElementById("selectedCurrency");
+    if (selectedCurrency) {
+        selectedCurrency.addEventListener("change", function () {
             updateHiddenFields();
         });
     }

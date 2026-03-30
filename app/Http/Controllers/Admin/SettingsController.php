@@ -42,7 +42,6 @@ class SettingsController extends Controller
             'enable_debug_mode',
             'enable_keyboard_shortcuts',
             'show_tooltips',
-            'compact_mode',
             'sticky_navbar',
             'fluid_layout',
         ];

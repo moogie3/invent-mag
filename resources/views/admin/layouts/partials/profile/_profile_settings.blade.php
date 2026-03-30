@@ -67,7 +67,8 @@
                     <div class="col-md-4">
                         <div class="form-label">{{ __('messages.business_name') }}</div>
                         <input type="text" name="shopname" class="form-control"
-                            value="{{ auth()->user()->shopname }}" required>
+                            value="{{ auth()->user()->shopname }}"
+                            readonly>
                     </div>
                     <div class="col-md-4">
                         <div class="form-label">{{ __('messages.address') }}</div>

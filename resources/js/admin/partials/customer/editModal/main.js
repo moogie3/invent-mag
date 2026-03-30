@@ -4,13 +4,15 @@ import { handleCustomerImage } from './image.js';
 export function initEditCustomerModal() {
     const editCustomerModal = document.getElementById("editCustomerModal");
 
-    if (editCustomerModal) {
-        editCustomerModal.addEventListener("show.bs.modal", function (event) {
-            const button = event.relatedTarget;
-            if (!button) return;
+    if (!editCustomerModal) return;
+    if (editCustomerModal.dataset.initialized) return;
+    editCustomerModal.dataset.initialized = 'true';
 
-            populateEditModalForm(button);
-            handleCustomerImage(button);
-        });
-    }
+    editCustomerModal.addEventListener("show.bs.modal", function (event) {
+        const button = event.relatedTarget;
+        if (!button) return;
+
+        populateEditModalForm(button);
+        handleCustomerImage(button);
+    });
 }

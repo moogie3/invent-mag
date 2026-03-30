@@ -88,13 +88,15 @@ export function bulkDeletePO() {
         return;
     }
 
-    document.getElementById("bulkDeleteCount").textContent = selected.length;
-    const modal = new bootstrap.Modal(
-        document.getElementById("bulkDeleteModal"),
-    );
+    const bulkDeleteCountEl = document.getElementById("bulkDeleteCount");
+    if (bulkDeleteCountEl) bulkDeleteCountEl.textContent = selected.length;
+    const bulkDeleteModalEl = document.getElementById("bulkDeleteModal");
+    if (!bulkDeleteModalEl) return;
+    const modal = new bootstrap.Modal(bulkDeleteModalEl);
     modal.show();
 
     const confirmBtn = document.getElementById("confirmBulkDeleteBtn");
+    if (!confirmBtn) return;
     const newBtn = confirmBtn.cloneNode(true);
     confirmBtn.parentNode.replaceChild(newBtn, confirmBtn);
 
@@ -307,9 +309,9 @@ export function bulkMarkAsPaidPO() {
         bulkPaidCount.textContent = finalSelected.length;
     }
 
-    const bulkMarkAsPaidModal = new bootstrap.Modal(
-        document.getElementById("bulkMarkAsPaidModal"),
-    );
+    const bulkMarkAsPaidModalEl = document.getElementById("bulkMarkAsPaidModal");
+    if (!bulkMarkAsPaidModalEl) return;
+    const bulkMarkAsPaidModal = new bootstrap.Modal(bulkMarkAsPaidModalEl);
     bulkMarkAsPaidModal.show();
 
     const confirmBtn = document.getElementById("confirmBulkPaidBtn");
@@ -440,8 +442,8 @@ function confirmBulkMarkAsPaidPO(selectedIds, confirmButton, modal) {
 }
 
 window.clearPOSelection = function () {
-    if (bulkSelection) {
-        bulkSelection.clearSelection();
+    if (window.bulkSelection) {
+        window.bulkSelection.clearSelection();
     }
 };
 

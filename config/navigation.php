@@ -116,6 +116,12 @@ return [
                     'permission' => 'view-accounting',
                     'icon' => 'ti ti-scale',
                 ],
+                [
+                    'title' => 'messages.opening_balance',
+                    'route' => 'admin.accounting.opening-balance.index',
+                    'permission' => 'edit-chart-of-accounts',
+                    'icon' => 'ti ti-list-check',
+                ],
             ],
         ],
         [

@@ -1,6 +1,18 @@
+let entriesInitialized = false;
+let shortcutsInitialized = false;
+
+document.addEventListener('turbo:before-cache', () => {
+    entriesInitialized = false;
+    shortcutsInitialized = false;
+});
+
 export function initializeEntriesSelector() {
+    if (entriesInitialized) return;
+    entriesInitialized = true;
+    
     const entriesSelect = document.getElementById("entriesSelect");
-    if (entriesSelect) {
+    if (entriesSelect && !entriesSelect.dataset.handlerAttached) {
+        entriesSelect.dataset.handlerAttached = 'true';
         entriesSelect.addEventListener("change", function () {
             const currentUrl = new URL(window.location);
             currentUrl.searchParams.set("entries", this.value);
@@ -11,6 +23,9 @@ export function initializeEntriesSelector() {
 }
 
 export function initKeyboardShortcuts() {
+    if (shortcutsInitialized) return;
+    shortcutsInitialized = true;
+    
     document.addEventListener("keydown", function (e) {
         if ((e.ctrlKey || e.metaKey) && e.key === "k") {
             e.preventDefault();

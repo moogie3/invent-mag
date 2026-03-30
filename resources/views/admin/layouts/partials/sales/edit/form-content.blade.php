@@ -7,7 +7,7 @@
             $summary = \App\Helpers\SalesHelper::calculateInvoiceSummary(
                 $sales->salesItems,
                 $sales->order_discount ?? 0,
-                $sales->order_discount_type ?? 'percentage',
+                $sales->order_discount_type ?? 'fixed',
                 $sales->tax_rate ?? 0,
             );
         @endphp

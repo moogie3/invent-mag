@@ -148,9 +148,20 @@ export function updateQuantity(index, newQuantity) {
 }
 
 
+let cartActionsInitialized = false;
+
+// Reset the flag on Turbo cache so next visit re-initializes properly.
+// Registered once at module level to avoid accumulation.
+document.addEventListener("turbo:before-cache", function () {
+    cartActionsInitialized = false;
+});
+
 // --- DOM Initializer ---
 
 export function initCartActions() {
+    if (cartActionsInitialized) return;
+    cartActionsInitialized = true;
+
     const productList = document.getElementById("productList");
     const productGrid = document.getElementById("productGrid");
     const clearCartBtn = document.getElementById("clearCart");

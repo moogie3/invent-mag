@@ -3,10 +3,12 @@ import { formatCurrency } from "../../../../utils/currencyFormatter.js";
 import { calculateTotals } from "./totals.js";
 import { escapeHtml } from "../../../../utils/sanitize.js";
 
-const productList = document.getElementById("productList");
-const productsField = document.getElementById("productsField");
-
 export function renderList() {
+    const productList = document.getElementById("productList");
+    const productsField = document.getElementById("productsField");
+    
+    if (!productList || !productsField) return;
+    
     const products = getProducts();
     const emptyState = productList.querySelector(".empty"); // Get the empty state div
 

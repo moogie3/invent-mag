@@ -4,14 +4,16 @@ import { handleSupplierImage } from './image.js';
 export function initEditSupplierModal() {
     const editSupplierModal = document.getElementById("editSupplierModal");
 
-    if (editSupplierModal) {
-        editSupplierModal.addEventListener("show.bs.modal", function (event) {
-            const button = event.relatedTarget;
+    if (!editSupplierModal) return;
+    if (editSupplierModal.dataset.handlerAttached) return;
+    editSupplierModal.dataset.handlerAttached = 'true';
 
-            if (!button) return;
+    editSupplierModal.addEventListener("show.bs.modal", function (event) {
+        const button = event.relatedTarget;
 
-            populateEditModalForm(button);
-            handleSupplierImage(button);
-        });
-    }
+        if (!button) return;
+
+        populateEditModalForm(button);
+        handleSupplierImage(button);
+    });
 }

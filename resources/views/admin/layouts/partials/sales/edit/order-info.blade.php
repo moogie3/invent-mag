@@ -22,14 +22,10 @@
         <div class="col-md-6">
             <div class="mb-2">
                 <label class="form-label fw-bold">{{ __('messages.warehouse') }}</label>
-                <select class="form-select" name="warehouse_id" id="warehouse_id">
-                    @foreach ($warehouses as $warehouse)
-                        <option value="{{ $warehouse->id }}"
-                            {{ $sales->warehouse_id == $warehouse->id ? 'selected' : '' }}>
-                            {{ $warehouse->name }}
-                        </option>
-                    @endforeach
-                </select>
+                <div class="form-control-plaintext fw-semibold">
+                    {{ $sales->warehouse->name ?? 'N/A' }}
+                </div>
+                <input type="hidden" name="warehouse_id" value="{{ $sales->warehouse_id }}">
             </div>
             <div class="mb-2">
                 <label class="form-label fw-bold">{{ __('messages.po_payment_type') }}</label>

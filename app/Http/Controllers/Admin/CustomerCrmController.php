@@ -46,7 +46,10 @@ class CustomerCrmController extends Controller
     {
         try {
             $productHistory = $this->crmService->getCustomerProductHistory($id);
-            return response()->json($productHistory);
+            return response()->json([
+                'success' => true,
+                'product_history' => $productHistory,
+            ]);
         } catch (\Exception $e) {
             return response()->json(['message' => 'Failed to load product history: ' . $e->getMessage()], 500);
         }

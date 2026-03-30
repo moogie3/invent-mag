@@ -89,6 +89,10 @@ return [
         'equity' => [
             'name' => 'Ekuitas',
         ],
+        'opening_balance_equity' => [
+            'name' => 'Ekuitas Saldo Awal',
+            'description' => 'Digunakan untuk menyeimbangkan saldo awal saat pengaturan akuntansi.',
+        ],
         'owners_equity' => [
             'name' => 'Ekuitas Pemilik',
             'description' => 'Bagian pemilik dalam perusahaan.',

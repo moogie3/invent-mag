@@ -132,6 +132,18 @@
                                 </div>
                             </div>
                         </div>
+                        <div class="col-md-6">
+                            <div class="d-flex align-items-center">
+                                <div class="me-3 d-flex align-items-center justify-content-center rounded-3 badge bg-body border shadow-sm"
+                                    style="width: 40px; height: 40px;">
+                                    <i class="ti ti-alert-circle fs-3 text-danger"></i>
+                                </div>
+                                <div class="flex-grow-1">
+                                    <div class="small text-muted">{{ __('messages.overdue_invoices') }}</div>
+                                    <div class="fw-bold fs-3 text-danger" id="overdueInvoicesCount">{{ $overdueInvoices }}</div>
+                                </div>
+                            </div>
+                        </div>
                         <div class="col-md-12">
                             <div class="d-flex align-items-center pt-2 border-top">
                                 <div class="me-3 d-flex align-items-center justify-content-center rounded-3 badge bg-body border shadow-sm"

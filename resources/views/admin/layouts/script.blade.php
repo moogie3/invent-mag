@@ -115,6 +115,9 @@
 {{-- SCRIPT FOR JOURNAL ENTRIES --}}
 @vite('resources/js/admin/journal-entry.js')
 
+{{-- SCRIPT FOR OPENING BALANCE --}}
+@vite('resources/js/admin/opening-balance.js')
+
 {{-- SCRIPT FOR ADJUSTMENT LOG --}}
 @vite('resources/js/admin/adjustment-log.js')
 

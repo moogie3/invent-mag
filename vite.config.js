@@ -52,6 +52,7 @@ export default defineConfig({
                 "resources/js/admin/tax.js",
                 "resources/js/admin/reports/stock-transfer.js",
                 "resources/js/admin/plan/checkout.js",
+                "resources/js/admin/opening-balance.js",
                 "resources/css/app.css",
                 "resources/css/auth.css",
                 "resources/css/navbar.css",

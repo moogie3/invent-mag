@@ -14,7 +14,7 @@ class ProfileService
         if (isset($data['email'])) {
             $user->email = $data['email'];
         }
-        $user->shopname = $data['shopname'];
+        // shopname is kept as-is, not updated (read-only field in UI)
         $user->address = $data['address'];
         $user->timezone = $data['timezone'];
 

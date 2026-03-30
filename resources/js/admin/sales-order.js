@@ -31,6 +31,7 @@ window.exportAllSales = exportAllSales;
 onPageLoad(function () {
     const pathname = window.location.pathname;
     if (!pathname.includes("/admin/sales")) return;
+    
     if (pathname.includes("/admin/sales/edit")) {
         initSelectableTable({
             registerEditShortcut: false,
@@ -39,7 +40,7 @@ onPageLoad(function () {
         window.shortcutManager.register(
             "ctrl+s",
             () => {
-                document.getElementById("save-sales-button").click();
+                document.getElementById("save-sales-button")?.click();
             },
             "Save Sales Order",
         );
@@ -74,21 +75,21 @@ onPageLoad(function () {
                 window.shortcutManager.register(
                     "alt+n",
                     () => {
-                        document.getElementById("addProduct").click();
+                        document.getElementById("addProduct")?.click();
                     },
                     "Add Product",
                 );
                 window.shortcutManager.register(
                     "alt+c",
                     () => {
-                        document.getElementById("clearProducts").click();
+                        document.getElementById("clearProducts")?.click();
                     },
                     "Clear All Products",
                 );
                 window.shortcutManager.register(
                     "ctrl+s",
                     () => {
-                        document.getElementById("invoiceForm").submit();
+                        document.getElementById("invoiceForm")?.submit();
                     },
                     "Save Sales Order",
                 );
@@ -146,11 +147,8 @@ onPageLoad(function () {
                 );
             }
 
-            if (pathname.includes("edit") && pathname.includes("sales")) {
-                // console.log(
-                //     "Force initializing SalesOrderEdit due to edit page detection",
-                // );
-                window.salesApp = new SalesOrderEdit();
+            if (pathname.includes("edit") && pathname.includes("sales") && !window.salesApp) {
+                // Already initialized above; this block is a safety net only.
             }
         } catch (error) {
             console.error("Error initializing Sales Order App:", error);
@@ -195,6 +193,7 @@ if (typeof window.loadSalesDetails === "undefined") {
 // Sales Expiring Soon functionality
 onPageLoad(function () {
     if (!window.location.pathname.includes("/admin/sales")) return;
+    
     const expiringSalesModalElement =
         document.getElementById("expiringSalesModal");
     if (expiringSalesModalElement) {
@@ -204,6 +203,7 @@ onPageLoad(function () {
                 const tableBody = document.getElementById(
                     "expiringSalesTableBody",
                 );
+                if (!tableBody) return;
                 tableBody.innerHTML =
                     '<tr><td colspan="5" class="text-center py-4"><div class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading...</span></div><p class="mt-3 text-muted">Loading expiring sales invoices...</p></td></tr>';
 

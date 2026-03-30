@@ -16,21 +16,12 @@
     <link href="{{ asset('tabler/dist/css/tabler-vendors.min.css') }}" rel="stylesheet" />
     @vite('resources/css/error.css')
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+    @vite('resources/js/admin/layouts/page-loader.js')
 </head>
 
-<body class="error-page">
-    <div class="page-loader">
-        <div class="container-slim py-4">
-            <div class="text-center">
-                <div class="mb-3">
-                    <a class="navbar-brand navbar-brand-autodark">
-                        <i class="ti ti-brand-minecraft fs-2 me-2"></i>Invent-MAG
-                    </a>
-                </div>
-                <div class="spinner-border" role="status"></div>
-            </div>
-        </div>
-    </div>
+<body class="error-page is-loading-page">
+    @include('admin.layouts.partials.global-loader')
+
     <div class="page">
         <div class="page-wrapper">
             <div class="page-body">
@@ -40,9 +31,9 @@
             </div>
         </div>
     </div>
-    @include('admin.layouts.footer')
+
+    @include('admin.layouts.partials.session-notifications')
     @include('admin.layouts.script')
-    @vite('resources/js/admin/layouts/page-loader.js')
     @vite('resources/js/admin/layouts/theme-toggle.js')
     @vite('resources/js/admin/layouts/theme-visibility.js')
 </body>

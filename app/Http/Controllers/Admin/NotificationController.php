@@ -36,9 +36,18 @@ class NotificationController extends Controller
 
     public function count()
     {
-        $counts = $this->notificationService->getNotificationCounts();
-        $systemCount = $this->systemNotificationService->getSystemNotificationCount();
-        return response()->json(['count' => $counts['total'] + $systemCount]);
+        try {
+            if (!auth()->check()) {
+                return response()->json(['count' => 0]);
+            }
+            
+            $counts = $this->notificationService->getNotificationCounts();
+            $systemCount = $this->systemNotificationService->getSystemNotificationCount();
+            return response()->json(['count' => $counts['total'] + $systemCount]);
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error('Notification count error: ' . $e->getMessage());
+            return response()->json(['count' => 0]);
+        }
     }
 
     public function getNotifications()

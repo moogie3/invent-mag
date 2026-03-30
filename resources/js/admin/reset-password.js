@@ -23,11 +23,11 @@ onPageLoad(function () {
          * @returns {boolean} - True if password meets all requirements
          */
         function validatePasswordStrength(password) {
-            if (password.length < 8) return false; // Must be at least 8 characters
-            if (!/[a-z]/.test(password)) return false; // Must contain lowercase
-            if (!/[A-Z]/.test(password)) return false; // Must contain uppercase
-            if (!/\d/.test(password)) return false; // Must contain number
-            if (!/[!@#$%^&*()_+-=[]{}|;:,.<>?]/.test(password)) return false; // Must contain special char
+            if (password.length < 8) return false;
+            if (!/[a-z]/.test(password)) return false;
+            if (!/[A-Z]/.test(password)) return false;
+            if (!/\d/.test(password)) return false;
+            if (!/[!@#$%^&*()_+\-=\[\]{}|;:,.<>?]/.test(password)) return false;
             return true;
         }
 
@@ -42,7 +42,7 @@ onPageLoad(function () {
             const confirmPassword = confirmPasswordField.value;
             
             // Only validate if user has started typing in confirmation field
-            if (confirmPassword.length > 0 && password !== comparePassword) {
+            if (confirmPassword.length > 0 && password !== confirmPassword) {
                 confirmPasswordField.classList.add('is-invalid');
                 if (mismatchError) mismatchError.style.display = 'block';
                 return false;
@@ -62,7 +62,6 @@ onPageLoad(function () {
         function validateStrengthAndShowFeedback() {
             const password = passwordField.value;
             
-            // Real-time validation on password field
             if (password.length > 0 && !validatePasswordStrength(password)) {
                 passwordField.classList.add('is-invalid');
                 if (strengthError) strengthError.style.display = 'block';

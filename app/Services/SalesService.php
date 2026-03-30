@@ -33,7 +33,7 @@ class SalesService
 
     public function getSalesIndexData(array $filters, int $entries)
     {
-        $query = Sales::with(['product', 'customer', 'user', 'warehouse']); // Added warehouse
+        $query = Sales::with(['product', 'customer', 'user', 'warehouse', 'salesReturns']); // Added warehouse and salesReturns
 
         if (isset($filters['month']) && $filters['month']) {
             $query->whereMonth('order_date', $filters['month']);
@@ -42,20 +42,41 @@ class SalesService
             $query->whereYear('order_date', $filters['year']);
         }
 
-        $sales = $query->paginate($entries);
+        // Count total before pagination for accurate total
         $totalinvoice = $query->count();
-        $unpaidDebt = Sales::all()->where('status', 'Unpaid')->sum('total');
-        $totalMonthly = Sales::whereMonth('created_at', now()->month)->whereYear('created_at', now()->year)->sum('total');
-        $pendingOrders = Sales::where('status', 'Unpaid')->count();
-        $dueInvoices = Sales::where('status', 'Unpaid')
+        
+        // Now apply pagination
+        $sales = $query->paginate($entries);
+
+        // Calculate totals accounting for completed sales returns
+        $allSales = Sales::with('salesReturns')->get();
+        $unpaidDebt = $allSales->whereIn('status', ['Unpaid', 'Partial'])->sum(function($sale) {
+            $returned = $sale->salesReturns->where('status', 'Completed')->sum('total_amount');
+            return max(0, $sale->total - $returned);
+        });
+        $totalMonthly = Sales::whereMonth('created_at', now()->month)->whereYear('created_at', now()->year)
+            ->with('salesReturns')
+            ->get()
+            ->sum(function($sale) {
+                $returned = $sale->salesReturns->where('status', 'Completed')->sum('total_amount');
+                return $sale->total - $returned;
+            });
+        $pendingOrders = Sales::whereIn('status', ['Unpaid', 'Partial'])->count();
+        $dueInvoices = Sales::whereIn('status', ['Unpaid', 'Partial'])
             ->whereDate('due_date', '>=', now())
             ->whereDate('due_date', '<=', now()->addDays(7))
             ->count();
-        $posTotal = Sales::where('is_pos', true)->sum('total');
+        $overdueInvoices = Sales::whereIn('status', ['Unpaid', 'Partial'])
+            ->whereDate('due_date', '<', now())
+            ->count();
+        $posTotal = Sales::where('is_pos', true)->with('salesReturns')->get()->sum(function($sale) {
+            $returned = $sale->salesReturns->where('status', 'Completed')->sum('total_amount');
+            return $sale->total - $returned;
+        });
         $shopname = User::whereNotNull('shopname')->value('shopname');
         $address = User::whereNotNull('address')->value('address');
 
-        return compact('posTotal', 'dueInvoices', 'entries', 'sales', 'totalinvoice', 'shopname', 'address', 'unpaidDebt', 'pendingOrders', 'totalMonthly');
+        return compact('posTotal', 'dueInvoices', 'overdueInvoices', 'entries', 'sales', 'totalinvoice', 'shopname', 'address', 'unpaidDebt', 'pendingOrders', 'totalMonthly');
     }
 
     public function getSalesCreateData()
@@ -65,66 +86,48 @@ class SalesService
         $products = Product::all();
         $items = SalesItem::all();
         $tax = Tax::where('is_active', 1)->first();
-        $warehouses = Warehouse::all(); // Added
 
-        return compact('sales', 'customers', 'products', 'items', 'tax', 'warehouses');
+        return compact('sales', 'customers', 'products', 'items', 'tax');
     }
 
     public function getSalesEditData($id)
     {
-        $sales = Sales::with(['salesItems', 'customer', 'payments'])->find($id);
+        $sales = Sales::with(['salesItems', 'customer', 'payments', 'warehouse', 'salesReturns.items'])->find($id);
         $customers = Customer::all();
         $tax = Tax::where('is_active', 1)->first();
         $isPaid = $sales->status == 'Paid';
-        $warehouses = Warehouse::all(); // Added
 
-        return compact('sales', 'customers', 'tax', 'isPaid', 'warehouses');
+        return compact('sales', 'customers', 'tax', 'isPaid');
     }
 
     public function getSalesViewData($id)
     {
         /** @var \App\Models\Sales $sales */
-        $sales = Sales::with(['salesItems', 'customer', 'payments'])->find($id);
+        $sales = Sales::with(['salesItems', 'customer', 'payments', 'salesReturns.items'])->find($id);
 
         $customer = Customer::all();
         $tax = Tax::first();
 
         $itemCount = $sales->salesItems->count();
-        $subtotal = 0;
-        $totalItemDiscount = 0;
 
-        foreach ($sales->salesItems as $item) {
-            $itemSubtotal = $item->customer_price * $item->quantity;
-            
-            if ($item->discount_type === 'percentage') {
-                $itemDiscountAmount = ($itemSubtotal * $item->discount) / 100;
-            } else {
-                $itemDiscountAmount = $item->discount * $item->quantity;
-            }
-            $totalItemDiscount += $itemDiscountAmount;
-            $subtotal += ($itemSubtotal - $itemDiscountAmount);
-        }
+        $summary = SalesHelper::calculateInvoiceSummaryWithReturns(
+            $sales->salesItems,
+            $sales->order_discount ?? 0,
+            $sales->order_discount_type ?? 'fixed',
+            $sales->tax_rate ?? 0,
+            $sales->relationLoaded('salesReturns') ? $sales->salesReturns : collect()
+        );
 
-        $orderDiscount = 0;
-        if ($sales->order_discount > 0) {
-            if ($sales->order_discount_type === 'percentage') {
-                $orderDiscount = ($subtotal * $sales->order_discount) / 100;
-            } else {
-                $orderDiscount = $sales->order_discount;
-            }
-        }
+        $subtotal = $summary['subtotal'];
+        $totalItemDiscount = $summary['totalProductDiscount'];
+        $orderDiscount = $summary['orderDiscount'];
+        $taxAmount = $summary['taxAmount'];
+        $finalTotal = $summary['finalTotal'];
 
-        $taxAmount = $sales->total_tax;
-        $finalTotal = $sales->total;
-
-        $summary = [
+        $summary = array_merge($summary, [
             'itemCount' => $itemCount,
-            'subtotal' => $subtotal,
             'totalItemDiscount' => $totalItemDiscount,
-            'orderDiscount' => $orderDiscount,
-            'taxAmount' => $taxAmount,
-            'finalTotal' => $finalTotal
-        ];
+        ]);
 
         return compact(
             'sales',
@@ -147,6 +150,7 @@ class SalesService
         $totalMonthly = 0;
         $pendingOrders = 0;
         $dueInvoices = 0;
+        $overdueInvoices = 0;
         $posTotal = 0;
 
         $sales = Sales::with(['salesItems', 'payments'])->get();
@@ -158,10 +162,14 @@ class SalesService
                 $totalMonthly += $sale->total_amount;
             }
 
-            if ($sale->status === 'Unpaid') {
+            if (in_array($sale->status, ['Unpaid', 'Partial'])) {
                 $pendingOrders++;
-                if ($sale->due_date && $sale->due_date->isPast()) {
-                     $dueInvoices++;
+                if ($sale->due_date) {
+                    if ($sale->due_date->gte(now()) && $sale->due_date->lte(now()->addDays(7))) {
+                        $dueInvoices++;
+                    } elseif ($sale->due_date->lt(now())) {
+                        $overdueInvoices++;
+                    }
                 }
             }
 
@@ -176,6 +184,7 @@ class SalesService
             'totalMonthly' => $totalMonthly,
             'pendingOrders' => $pendingOrders,
             'dueInvoices' => $dueInvoices,
+            'overdueInvoices' => $overdueInvoices,
             'posTotal' => $posTotal,
         ];
     }
@@ -186,6 +195,10 @@ class SalesService
             $products = json_decode($data['products'], true);
             if (!$products || !is_array($products)) {
                 throw new \Exception('Invalid product data');
+            }
+            
+            if (empty($products)) {
+                throw new \Exception('No products in the order');
             }
 
             $subTotal = 0;
@@ -209,12 +222,17 @@ class SalesService
             $grandTotal = ($subTotal - $orderDiscountAmount) + $taxAmount;
 
             $invoice = $data['invoice'] ?? $this->generateInvoiceNumber();
+            
+            $warehouseId = $data['warehouse_id'] ?? Product::getMainWarehouseId();
+            if (!$warehouseId) {
+                throw new \Exception('No warehouse specified and no main warehouse configured.');
+            }
 
             $sale = Sales::create([
                 'invoice' => $invoice,
                 'customer_id' => $data['customer_id'],
                 'user_id' => Auth::id(),
-                'warehouse_id' => $data['warehouse_id'], // Added
+                'warehouse_id' => $warehouseId,
                 'order_date' => $data['order_date'],
                 'due_date' => $data['due_date'],
                 'tax_rate' => $taxRate,
@@ -228,6 +246,44 @@ class SalesService
             ]);
 
             $totalCostOfGoods = 0;
+            
+            $stockRecords = ProductWarehouse::whereIn('product_id', array_column($products, 'product_id'))
+                ->where('warehouse_id', $warehouseId)
+                ->where('tenant_id', $sale->tenant_id)
+                ->get()
+                ->keyBy('product_id');
+            
+            $insufficientProducts = [];
+            foreach ($products as $productData) {
+                $product = Product::where('id', $productData['product_id'])
+                                  ->where('tenant_id', $sale->tenant_id)
+                                  ->first();
+                if (!$product) {
+                    throw new \Exception("Product with ID {$productData['product_id']} not found in this tenant.");
+                }
+                
+                $availableStock = 0;
+                if (isset($stockRecords[$product->id])) {
+                    $availableStock = (float) $stockRecords[$product->id]->quantity;
+                }
+                
+                $requestedQty = (int) $productData['quantity'];
+                if ($availableStock < $requestedQty) {
+                    $insufficientProducts[] = [
+                        'id' => $product->id,
+                        'name' => $product->name,
+                        'requested' => $requestedQty,
+                        'available' => $availableStock,
+                        'shortage' => $requestedQty - $availableStock,
+                    ];
+                }
+            }
+            
+            if (!empty($insufficientProducts)) {
+                $sale->delete();
+                $productList = collect($insufficientProducts)->pluck('name')->implode(', ');
+                throw new \Exception('Insufficient stock for: ' . $productList . '. Please adjust quantities or restock first.');
+            }
 
             foreach ($products as $productData) {
                 $product = Product::where('id', $productData['product_id'])
@@ -248,30 +304,10 @@ class SalesService
                     'total' => SalesHelper::calculateTotal($productData['customer_price'], $productData['quantity'], $productData['discount'] ?? 0, $productData['discountType'] ?? 'fixed'),
                 ]);
 
-                // Deduct stock from specific warehouse
-                $stockRecord = ProductWarehouse::where('product_id', $product->id)
-                    ->where('warehouse_id', $sale->warehouse_id)
-                    ->where('tenant_id', $sale->tenant_id)
-                    ->first();
-
-                if (!$stockRecord || $stockRecord->quantity < $productData['quantity']) {
-                     // Optional: Throw error if strict stock checking is enabled
-                     // throw new \Exception("Insufficient stock in the selected warehouse for product {$product->name}");
+                if (isset($stockRecords[$product->id])) {
+                    $stockRecords[$product->id]->decrement('quantity', $productData['quantity']);
                 }
 
-                if ($stockRecord) {
-                    $stockRecord->decrement('quantity', $productData['quantity']);
-                } else {
-                    // Create negative stock record if allowed (backorder)
-                    ProductWarehouse::create([
-                        'product_id' => $product->id,
-                        'warehouse_id' => $sale->warehouse_id,
-                        'quantity' => -$productData['quantity'],
-                        'tenant_id' => $sale->tenant_id
-                    ]);
-                }
-
-                // FEFO Logic (Global Batch Tracking) for COGS calculation
                 $poItems = POItem::where('product_id', $product->id)
                     ->where('remaining_quantity', '>', 0)
                     ->orderBy('expiry_date', 'asc')
@@ -287,15 +323,11 @@ class SalesService
                     }
 
                     $decrement = min($poItem->remaining_quantity, $quantityToDecrement);
-                    
-                    // Calculate COGS using the specific batch price
                     $itemCOGS += $decrement * $poItem->price;
-
                     $poItem->decrement('remaining_quantity', $decrement);
                     $quantityToDecrement -= $decrement;
                 }
 
-                // Fallback to static product price if negative stock/missing PO batches
                 if ($quantityToDecrement > 0) {
                     $itemCOGS += $quantityToDecrement * $product->price;
                 }
@@ -303,11 +335,8 @@ class SalesService
                 $totalCostOfGoods += $itemCOGS;
             }
 
-            // Get accounting settings from the user
             $accountingSettings = Auth::user()->accounting_settings;
 
-            // Retrieve account names using the IDs from settings
-            // Retrieve account names using the IDs from settings
             $salesRevenueAccount = Account::find($accountingSettings['sales_revenue_account_id']);
             $accountsReceivableAccount = Account::find($accountingSettings['accounts_receivable_account_id']);
             $costOfGoodsSoldAccount = Account::find($accountingSettings['cost_of_goods_sold_account_id']);
@@ -322,7 +351,6 @@ class SalesService
             $costOfGoodsSoldAccountName = $costOfGoodsSoldAccount->name;
             $inventoryAccountName = $inventoryAccount->name;
 
-            // Create Journal Entry for the sale
             $transactions = [
                 ['account_name' => $accountsReceivableAccountName, 'type' => 'debit', 'amount' => $grandTotal],
                 ['account_name' => $salesRevenueAccountName, 'type' => 'credit', 'amount' => $grandTotal],
@@ -399,7 +427,6 @@ class SalesService
 
             $sale->update([
                 'customer_id' => $data['customer_id'],
-                'warehouse_id' => $data['warehouse_id'], // Update warehouse
                 'order_date' => $data['order_date'],
                 'due_date' => $data['due_date'],
                 'tax_rate' => $taxRate,
@@ -702,7 +729,7 @@ class SalesService
 
     public function getSalesForModal($id)
     {
-        return Sales::with(['customer', 'salesItems.product', 'payments'])->findOrFail($id);
+        return Sales::with(['customer', 'salesItems.product', 'payments', 'salesReturns.items'])->findOrFail($id);
     }
 
     public function getPastCustomerPriceForProduct(Customer $customer, Product $product)

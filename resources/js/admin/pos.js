@@ -2,7 +2,7 @@ import {
     loadProductsFromCache,
     getProducts,
 } from "./partials/pos/cart/state.js";
-import { initCartActions } from "./partials/pos/cart/actions.js";
+import { initCartActions, addToProductList } from "./partials/pos/cart/actions.js";
 import { calculateTotals } from "./partials/pos/cart/totals.js";
 import { renderList } from "./partials/pos/cart/dom.js";
 import { initPaymentForm } from "./partials/pos/payment/form.js";
@@ -14,6 +14,23 @@ import { onPageLoad } from "./utils/onPageLoad.js";
 
 onPageLoad(function () {
     if (window.location.pathname !== "/admin/pos") return;
+
+    let posBeforeCacheHandlerAttached = false;
+    if (!posBeforeCacheHandlerAttached) {
+        posBeforeCacheHandlerAttached = true;
+        document.addEventListener("turbo:before-cache", function () {
+            const processPaymentBtn = document.getElementById("processPaymentBtn");
+            const barcodeInput = document.getElementById("barcodeScannerInput");
+            const searchInput = document.getElementById("searchProduct");
+            const hasExpiryCheckbox = document.getElementById("has_expiry");
+            
+            if (processPaymentBtn) delete processPaymentBtn.dataset.handlerAttached;
+            if (barcodeInput) delete barcodeInput.dataset.handlerAttached;
+            if (searchInput) delete searchInput.dataset.handlerAttached;
+            if (hasExpiryCheckbox) delete hasExpiryCheckbox.dataset.handlerAttached;
+        });
+    }
+
     const urlParams = new URLSearchParams(window.location.search);
     const successParam = urlParams.get("success");
 
@@ -43,8 +60,9 @@ onPageLoad(function () {
     initQuickCreateProduct();
 
     const processPaymentBtn = document.getElementById("processPaymentBtn");
-    if (processPaymentBtn) {
-        processPaymentBtn.addEventListener("click", function () {
+    if (processPaymentBtn && !processPaymentBtn.dataset.handlerAttached) {
+        processPaymentBtn.dataset.handlerAttached = 'true';
+        processPaymentBtn.addEventListener("click", async function () {
             if (getProducts().length === 0) {
                 InventMagApp.showToast(
                     "Warning",
@@ -53,13 +71,14 @@ onPageLoad(function () {
                 );
                 return;
             }
-            populatePaymentModal();
+            await populatePaymentModal();
         });
     }
 
     const barcodeInput = document.getElementById("barcodeScannerInput");
 
-    if (barcodeInput) {
+    if (barcodeInput && !barcodeInput.dataset.handlerAttached) {
+        barcodeInput.dataset.handlerAttached = 'true';
         barcodeInput.addEventListener("keypress", function (event) {
             if (event.key === "Enter") {
                 event.preventDefault();
@@ -78,7 +97,7 @@ onPageLoad(function () {
                                 product.name,
                                 product.selling_price,
                                 product.unit.symbol,
-                                product.stock_quantity,
+                                product.main_warehouse_stock,
                             );
                             this.value = "";
                         })
@@ -95,11 +114,13 @@ onPageLoad(function () {
     }
 
     const searchInput = document.getElementById("searchProduct");
-    const productCards = document.querySelectorAll("#productGrid .col-md-4");
+    const productGrid = document.getElementById("productGrid");
 
-    if (searchInput) {
+    if (searchInput && productGrid && !searchInput.dataset.handlerAttached) {
+        searchInput.dataset.handlerAttached = 'true';
         searchInput.addEventListener("input", function () {
             const searchText = this.value.toLowerCase().trim();
+            const productCards = productGrid.querySelectorAll(".col-md-4");
 
             productCards.forEach((card) => {
                 const productNameElement = card.querySelector(".card-title");
@@ -118,9 +139,12 @@ onPageLoad(function () {
     const hasExpiryCheckbox = document.getElementById("has_expiry");
     const expiryDateField = document.querySelector(".expiry-date-field");
 
-    if (hasExpiryCheckbox) {
+    if (hasExpiryCheckbox && !hasExpiryCheckbox.dataset.handlerAttached) {
+        hasExpiryCheckbox.dataset.handlerAttached = 'true';
         hasExpiryCheckbox.addEventListener("change", function () {
-            expiryDateField.style.display = this.checked ? "block" : "none";
+            if (expiryDateField) {
+                expiryDateField.style.display = this.checked ? "block" : "none";
+            }
         });
     }
 

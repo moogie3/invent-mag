@@ -81,7 +81,9 @@ export class SalesReturnCreate {
         `;
 
         items.forEach(item => {
-            const unitPrice = parseFloat(item.price || 0);
+            const basePrice = parseFloat(item.price || 0);
+            const netPrice = item.quantity > 0 ? parseFloat(item.total) / item.quantity : basePrice;
+            const availableQty = item.available_quantity !== undefined ? item.available_quantity : item.quantity;
             tableHTML += `
                 <tr>
                     <td>${item.product.name}</td>
@@ -91,13 +93,18 @@ export class SalesReturnCreate {
                             class="form-control quantity-input"
                             data-item-id="${item.id}"
                             data-product-id="${item.product.id}"
-                            data-price="${unitPrice}"
+                            data-price="${netPrice}"
                             min="0"
-                            max="${item.quantity}"
+                            max="${availableQty}"
                             value="0"
+                            ${availableQty === 0 ? 'disabled' : ''}
                             style="width: 100px;">
+                        <small class="text-muted d-block mt-1">Available: ${availableQty}</small>
                     </td>
-                    <td>${formatCurrency(unitPrice)}</td>
+                    <td>
+                        <div>${formatCurrency(netPrice)}</div>
+                        ${basePrice !== netPrice ? `<small class="text-muted text-decoration-line-through">${formatCurrency(basePrice)}</small>` : ''}
+                    </td>
                     <td class="item-total text-end">${formatCurrency(0)}</td>
                 </tr>
             `;

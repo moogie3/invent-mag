@@ -79,7 +79,13 @@ class GeneralLedgerService
      */
     public function calculateOpeningBalance(int $accountId, string $startDate): float
     {
-        return Transaction::where('account_id', $accountId)
+        $account = Account::find($accountId);
+        
+        // Get the opening balance from the account record
+        $openingBalanceFromAccount = $account ? floatval($account->opening_balance) : 0;
+        
+        // Get transactions before the start date
+        $transactionsBalance = Transaction::where('account_id', $accountId)
             ->whereHas('journalEntry', function ($query) use ($startDate) {
                 $query->where('date', '<', $startDate);
             })
@@ -87,6 +93,9 @@ class GeneralLedgerService
             ->sum(function ($transaction) {
                 return $transaction->type === 'debit' ? $transaction->amount : -$transaction->amount;
             });
+        
+        // Return the opening balance from account + transactions before start date
+        return $openingBalanceFromAccount + $transactionsBalance;
     }
 
     /**

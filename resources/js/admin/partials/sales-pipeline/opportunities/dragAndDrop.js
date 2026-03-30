@@ -32,11 +32,15 @@ export async function moveOpportunity(opportunityId, newStageId, oldStageId) {
             "Failed to move opportunity. Please try again.",
             "error"
         );
-        loadPipelineBoard(pipelineSelect.value);
+        const pipelineSelectEl = document.getElementById("pipelineSelect");
+        if (pipelineBoard && pipelineSelectEl) {
+            loadPipelineBoard(pipelineSelectEl.value);
+        }
     }
 }
 
 export function updateStageCount(stageId, change) {
+    if (!pipelineBoard) return;
     const stageColumn = pipelineBoard.querySelector(
         `[data-stage-id="${stageId}"]`
     );

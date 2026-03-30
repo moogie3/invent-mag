@@ -230,13 +230,14 @@ onPageLoad(function () {
         fetch("/admin/notifications/count")
             .then((response) => {
                 if (!response.ok) {
-                    throw new Error(
-                        `Network response was not ok: ${response.status}`,
-                    );
+                    // Silently handle errors - don't break the UI
+                    return { json: () => ({ count: 0 }) };
                 }
                 return response.json();
             })
             .then((data) => {
+                if (!data || typeof data.count === 'undefined') return;
+                
                 const notificationContainer = document.querySelector(
                     ".notification-dropdown",
                 );
@@ -264,9 +265,7 @@ onPageLoad(function () {
                         fetch("/admin/notifications/list")
                             .then((response) => {
                                 if (!response.ok) {
-                                    throw new Error(
-                                        `Network response was not ok: ${response.status}`,
-                                    );
+                                    return { json: () => ({ notifications: [] }) };
                                 }
                                 return response.json();
                             })
@@ -448,7 +447,7 @@ onPageLoad(function () {
     initStaggeredDropdown();
     fixNotificationTabsDropdown();
     
-    // Global listeners should only be added once
+    // Global listeners should only be added once per page visit
     if (!window.navbarGlobalInitialized) {
         initOutsideClickHandler();
         initResponsiveBehavior();
@@ -463,7 +462,7 @@ onPageLoad(function () {
                 }
             });
         }
-        
+
         const sidebarToggle = document.getElementById("sidebar-toggle");
         if (sidebarToggle) {
             sidebarToggle.addEventListener("click", function () {
@@ -485,3 +484,7 @@ onPageLoad(function () {
         checkForNewNotifications();
     }
 });
+
+// The navbarGlobalInitialized flag is intentionally NOT reset on turbo:before-cache.
+// The document/window listeners (click outside, resize, scroll) must persist for the
+// lifetime of the JS session and must only be registered once ever.

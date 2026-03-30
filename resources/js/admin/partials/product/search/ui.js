@@ -5,6 +5,7 @@ import { escapeHtml } from '../../../../utils/sanitize.js';
 
 export function renderSearchResults(products) {
     const tableBody = document.querySelector("table tbody");
+    if (!tableBody) return;
     if (!products.length) {
         showNoResults();
         return;
@@ -22,7 +23,6 @@ export function renderSearchResults(products) {
                 product.stock_quantity <= (product.low_stock_threshold || 10);
             const isSelected = selectedProductIds.has(product.id.toString());
 
-            return `
             return `
             <tr data-id="${product.id}">
                 <td><input type="checkbox" class="form-check-input row-checkbox" value="${
@@ -97,7 +97,9 @@ export function renderSearchResults(products) {
 
 export function showNoResults(message = "No products found matching your search.") {
     const safeMessage = escapeHtml(message);
-    document.querySelector("table tbody").innerHTML = `
+    const tbody = document.querySelector("table tbody");
+    if (!tbody) return;
+    tbody.innerHTML = `
         <tr><td colspan="100%" class="text-center py-5">
             <div class="spinner-border text-primary"></div>
             <p class="mt-3 text-muted">${safeMessage}</p>
@@ -112,7 +114,9 @@ export function showNoResults(message = "No products found matching your search.
 
 export function showSearchError(errorMessage = "Search error occurred.") {
     const safeErrorMessage = escapeHtml(errorMessage);
-    document.querySelector("table tbody").innerHTML = `
+    const tbody = document.querySelector("table tbody");
+    if (!tbody) return;
+    tbody.innerHTML = `
         <tr><td colspan="100%" class="text-center py-5">
             <i class="ti ti-alert-circle fs-1 text-danger"></i>
             <p class="mt-3 text-danger">${safeErrorMessage}</p>

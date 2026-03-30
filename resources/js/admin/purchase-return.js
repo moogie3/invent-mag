@@ -49,9 +49,9 @@ onPageLoad(function () {
             const status = editForm.dataset.status;
 
             if (isCompletedOrCanceled) {
-                var prStatusWarningModal = new bootstrap.Modal(
-                    document.getElementById("prStatusWarningModal"),
-                );
+                const prStatusWarningModalEl = document.getElementById("prStatusWarningModal");
+                if (!prStatusWarningModalEl) return;
+                var prStatusWarningModal = new bootstrap.Modal(prStatusWarningModalEl);
                 var message = "";
 
                 if (status === "Completed") {
@@ -66,8 +66,8 @@ onPageLoad(function () {
                         "This purchase return is canceled and cannot be edited.";
                 }
 
-                document.getElementById("prStatusWarningMessage").innerHTML =
-                    message;
+                const prStatusWarningMessage = document.getElementById("prStatusWarningMessage");
+                if (prStatusWarningMessage) prStatusWarningMessage.innerHTML = message;
                 prStatusWarningModal.show();
 
                 // Make form fields readonly
@@ -243,23 +243,26 @@ window.bulkDeletePurchaseReturns = function () {
     }
 
     // Set the count in the modal
-    document.getElementById("bulkDeleteCount").textContent = selectedIds.length;
+    const bulkDeleteCountEl = document.getElementById("bulkDeleteCount");
+    if (bulkDeleteCountEl) bulkDeleteCountEl.textContent = selectedIds.length;
 
     // Show the modal
-    var bulkDeleteModal = new bootstrap.Modal(
-        document.getElementById("bulkDeletePurchaseReturnModal"),
-    );
+    const bulkDeletePRModalEl = document.getElementById("bulkDeletePurchaseReturnModal");
+    if (!bulkDeletePRModalEl) return;
+    var bulkDeleteModal = new bootstrap.Modal(bulkDeletePRModalEl);
     bulkDeleteModal.show();
 
     // Handle confirm button click
-    document.getElementById("confirmBulkDeleteBtn").onclick = function () {
+    const confirmBulkDeletePRBtn = document.getElementById("confirmBulkDeleteBtn");
+    if (!confirmBulkDeletePRBtn) return;
+    confirmBulkDeletePRBtn.onclick = function () {
         fetch("/admin/por/bulk-delete", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
                 "X-CSRF-TOKEN": document
                     .querySelector('meta[name="csrf-token"]')
-                    .getAttribute("content"),
+                    ?.getAttribute("content") ?? '',
             },
             body: JSON.stringify({ ids: selectedIds }),
         })
@@ -306,24 +309,26 @@ window.bulkMarkCompletedPurchaseReturns = function () {
     }
 
     // Set the count in the modal
-    document.getElementById("bulkCompletedCount").textContent =
-        selectedIds.length;
+    const bulkCompletedCountEl = document.getElementById("bulkCompletedCount");
+    if (bulkCompletedCountEl) bulkCompletedCountEl.textContent = selectedIds.length;
 
     // Show the modal
-    var bulkMarkCompletedModal = new bootstrap.Modal(
-        document.getElementById("bulkMarkCompletedPurchaseReturnModal"),
-    );
+    const bulkMarkCompletedPRModalEl = document.getElementById("bulkMarkCompletedPurchaseReturnModal");
+    if (!bulkMarkCompletedPRModalEl) return;
+    var bulkMarkCompletedModal = new bootstrap.Modal(bulkMarkCompletedPRModalEl);
     bulkMarkCompletedModal.show();
 
     // Handle confirm button click
-    document.getElementById("confirmBulkCompletedBtn").onclick = function () {
+    const confirmBulkCompletedPRBtn = document.getElementById("confirmBulkCompletedBtn");
+    if (!confirmBulkCompletedPRBtn) return;
+    confirmBulkCompletedPRBtn.onclick = function () {
         fetch("/admin/por/bulk-complete", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
                 "X-CSRF-TOKEN": document
                     .querySelector('meta[name="csrf-token"]')
-                    .getAttribute("content"),
+                    ?.getAttribute("content") ?? '',
             },
             body: JSON.stringify({ ids: selectedIds }),
         })
@@ -366,24 +371,26 @@ window.bulkMarkCanceledPurchaseReturns = function () {
     }
 
     // Set the count in the modal
-    document.getElementById("bulkCanceledCount").textContent =
-        selectedIds.length;
+    const bulkCanceledCountEl = document.getElementById("bulkCanceledCount");
+    if (bulkCanceledCountEl) bulkCanceledCountEl.textContent = selectedIds.length;
 
     // Show the modal
-    var bulkMarkCanceledModal = new bootstrap.Modal(
-        document.getElementById("bulkMarkCanceledPurchaseReturnModal"),
-    );
+    const bulkMarkCanceledPRModalEl = document.getElementById("bulkMarkCanceledPurchaseReturnModal");
+    if (!bulkMarkCanceledPRModalEl) return;
+    var bulkMarkCanceledModal = new bootstrap.Modal(bulkMarkCanceledPRModalEl);
     bulkMarkCanceledModal.show();
 
     // Handle confirm button click
-    document.getElementById("confirmBulkCanceledBtn").onclick = function () {
+    const confirmBulkCanceledPRBtn = document.getElementById("confirmBulkCanceledBtn");
+    if (!confirmBulkCanceledPRBtn) return;
+    confirmBulkCanceledPRBtn.onclick = function () {
         fetch("/admin/por/bulk-cancel", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
                 "X-CSRF-TOKEN": document
                     .querySelector('meta[name="csrf-token"]')
-                    .getAttribute("content"),
+                    ?.getAttribute("content") ?? '',
             },
             body: JSON.stringify({ ids: selectedIds }),
         })

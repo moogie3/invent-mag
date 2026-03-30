@@ -158,6 +158,7 @@ onPageLoad(function () {
 // Purchase Order Expiring Soon functionality
 onPageLoad(function () {
     if (!window.location.pathname.includes("/admin/po")) return;
+    
     const expiringPurchaseModalElement = document.getElementById(
         "expiringPurchaseModal",
     );

@@ -1,13 +1,18 @@
-import { getEditUserModal, editUserModal, editUserIdInput, editUserForm } from '../common/elements.js';
+import { getEditUserModal, getEditUserForm, getEditUserIdInput } from '../common/elements.js';
 
 export function initEditUserFormSubmission() {
+    const editUserForm = getEditUserForm();
     if (!editUserForm) return;
+    
+    if (editUserForm.dataset.listenerAttached) return;
+    editUserForm.dataset.listenerAttached = 'true';
     
     editUserForm.addEventListener("submit", function (event) {
         event.preventDefault();
 
         const formData = new FormData(this);
-        const userId = editUserIdInput.value;
+        const editUserIdInput = getEditUserIdInput();
+        const userId = editUserIdInput ? editUserIdInput.value : '';
         const submitBtn = this.querySelector('button[type="submit"]');
 
         submitBtn.disabled = true;
@@ -22,12 +27,9 @@ export function initEditUserFormSubmission() {
             },
         })
             .then((response) => {
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-                return response.json();
+                return response.json().then(data => ({ ok: response.ok, status: response.status, data }));
             })
-            .then((data) => {
+            .then(({ ok, status, data }) => {
                 if (data.success) {
                     InventMagApp.showToast("Success", data.message, "success");
 
@@ -41,9 +43,9 @@ export function initEditUserFormSubmission() {
                                     "hidden.bs.modal",
                                     handler
                                 );
-                                const backdrops =
-                                    document.querySelectorAll(".modal-backdrop");
-                                backdrops.forEach((backdrop) => backdrop.remove());
+                                document.querySelectorAll(".modal-backdrop").forEach(b => b.remove());
+                                document.body.classList.remove('modal-open');
+                                document.body.style.overflow = '';
                             }
                         );
                     }
@@ -76,34 +78,19 @@ export function initEditUserFormSubmission() {
                     }
                 } else {
                     if (data.errors) {
-                        let errorMessage = "Validation errors:\n";
+                        let errorMessage = "";
                         Object.keys(data.errors).forEach((key) => {
-                            errorMessage += `- ${data.errors[key].join(
-                                ", "
-                            )}\n`;
+                            errorMessage += `- ${data.errors[key].join(", ")}\n`;
                         });
-
                         InventMagApp.showToast("Error", errorMessage, "error");
                     } else {
-                        InventMagApp.showToast(
-                                "Error",
-                                data.message || "Failed to update user.",
-                                "error"
-                            );
+                        InventMagApp.showToast("Error", data.message || "Failed to update user.", "error");
                     }
-                    console.error(
-                        "Error updating user:",
-                        data.errors || data.message
-                    );
                 }
             })
             .catch((error) => {
                 console.error("Error updating user:", error);
-                InventMagApp.showToast(
-                        "Error",
-                        "An error occurred while updating the user. Please check the console for details.",
-                        "error"
-                    );
+                InventMagApp.showToast("Error", "An error occurred while updating the user.", "error");
             })
             .finally(() => {
                 submitBtn.disabled = false;

@@ -36,8 +36,9 @@ function completePayment() {
     invoiceForm.appendChild(paymentInfoInput);
 
     const taxRateInput = document.getElementById("taxRateInput");
-    const taxRateValue = document.getElementById("taxRate").value;
-    taxRateInput.value = taxRateValue;
+    const taxRateEl = document.getElementById("taxRate");
+    const taxRateValue = taxRateEl ? taxRateEl.value : '0';
+    if (taxRateInput) taxRateInput.value = taxRateValue;
 
     if (paymentMethod.value === "cash") {
         const amountReceivedInput = document.createElement("input");
@@ -71,7 +72,7 @@ function completePayment() {
             "X-Requested-With": "XMLHttpRequest",
             "X-CSRF-TOKEN": document
                 .querySelector('meta[name="csrf-token"]')
-                .getAttribute("content"),
+                ?.getAttribute("content") ?? '',
             Accept: "application/json",
         },
     })

@@ -69,6 +69,7 @@ class AccountSeeder extends Seeder
             [
                 'name' => 'accounting.accounts.equity.name', 'code' => '3000-' . $tenantId, 'type' => 'equity', 'level' => 0,
                 'children' => [
+                    ['name' => 'accounting.accounts.opening_balance_equity.name', 'code' => '3010-' . $tenantId, 'type' => 'equity', 'level' => 1, 'description' => 'accounting.accounts.opening_balance_equity.description'],
                     ['name' => 'accounting.accounts.owners_equity.name', 'code' => '3100-' . $tenantId, 'type' => 'equity', 'level' => 1, 'description' => 'accounting.accounts.owners_equity.description'],
                     ['name' => 'accounting.accounts.retained_earnings.name', 'code' => '3200-' . $tenantId, 'type' => 'equity', 'level' => 1, 'description' => 'accounting.accounts.retained_earnings.description'],
                 ]

@@ -121,6 +121,10 @@ if (!window.turboLoaderInitialized) {
     window.turboLoaderInitialized = true;
 }
 
+// The turboLoaderInitialized flag is intentionally NOT reset on turbo:before-cache.
+// All Turbo/document event listeners must persist for the lifetime of the JS session
+// and must only be registered once ever. Resetting causes listener accumulation.
+
 onPageLoad(function() {
     'use strict';
     

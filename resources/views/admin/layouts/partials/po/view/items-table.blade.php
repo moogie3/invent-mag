@@ -1,3 +1,15 @@
+@php
+    // Variables $subtotal, $orderDiscount, $finalTotal, $itemCount
+    // are already computed with returns in the controller via getPurchaseViewData
+    $totalReturnedQty = 0;
+    if ($pos->relationLoaded('purchaseReturns')) {
+        $totalReturnedQty = $pos->purchaseReturns
+            ->where('status', 'Completed')
+            ->flatMap(fn($pr) => $pr->items ?? collect())
+            ->sum('quantity');
+    }
+@endphp
+
 <div class="mb-4 pb-4">
     <div class="row align-items-center mb-4">
         <div class="col">
@@ -20,27 +32,16 @@
                 </tr>
             </thead>
             <tbody>
-                @php
-                    // Use the helper to calculate all invoice summary figures at once
-                    $summary = \App\Helpers\PurchaseHelper::calculateInvoiceSummary(
-                        $pos->items,
-                        $pos->discount_total,
-                        $pos->discount_total_type,
-                    );
-
-                    $subtotal = $summary['subtotal'];
-                    $itemCount = $summary['itemCount'];
-                    $totalProductDiscount = $summary['totalProductDiscount'];
-                    $orderDiscount = $summary['orderDiscount'];
-                    $finalTotal = $summary['finalTotal'];
-                @endphp
-
                 @foreach ($pos->items as $index => $item)
                     @php
-                        // Calculate the final amount for this item
+                        // Calculate returned quantity for this item
+                        $returnedQty = $pos->getReturnedQuantityForProduct($item->product_id);
+                        $adjustedQty = max(0, (int) $item->quantity - $returnedQty);
+                        
+                        // Calculate the final amount based on adjusted quantity
                         $finalAmount = \App\Helpers\PurchaseHelper::calculateTotal(
                             $item->price,
-                            $item->quantity,
+                            $adjustedQty,
                             $item->discount,
                             $item->discount_type,
                         );
@@ -51,13 +52,6 @@
                             $item->discount,
                             $item->discount_type,
                         );
-
-                        // Calculate returned quantity for this item
-                        $returnedQty = $pos->purchaseReturns
-                            ->where('status', 'Completed')
-                            ->flatMap(fn($pr) => $pr->items)
-                            ->where('product_id', $item->product_id)
-                            ->sum('quantity');
                     @endphp
 
                     <tr>
@@ -69,9 +63,11 @@
                             @endif
                         </td>
                         <td class="text-center">
-                            {{ $item->quantity }}
                             @if($returnedQty > 0)
-                                <br><small class="text-danger">(-{{ $returnedQty }} {{ __('messages.returned') }})</small>
+                                <span class="fw-bold">{{ $adjustedQty }}</span>
+                                <br><small class="text-danger"><i class="ti ti-package-import me-1"></i>(-{{ $returnedQty }} {{ __('messages.returned') }})</small>
+                            @else
+                                {{ $item->quantity }}
                             @endif
                         </td>
                         <td class="text-end">
@@ -81,7 +77,7 @@
                             @if ($item->discount > 0)
                                 @if ($item->discount_type === 'percentage')
                                     <span class="text-danger">{{ $item->discount }}%</span>
-                                    <br><small class="text-muted">({{ \App\Helpers\CurrencyHelper::formatWithPosition(($item->price * $item->discount) / 100) }} {{ __('messages.per_unit') }})</small>
+                                    <br><small class="text-muted">({{ \App\Helpers\CurrencyHelper::formatDiscountPerUnit(($item->price * $item->discount) / 100) }} {{ __('messages.per_unit') }})</small>
                                 @else
                                     <span class="text-danger">{{ \App\Helpers\CurrencyHelper::formatWithPosition($item->discount) }}</span>
                                     <br><small class="text-muted">({{ __('messages.fixed') }})</small>

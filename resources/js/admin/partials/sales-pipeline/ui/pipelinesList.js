@@ -1,10 +1,9 @@
 import { allPipelines } from '../common/state.js';
 
-const pipelinesListContainer = document.getElementById(
-    "pipelinesListContainer"
-);
-
 export function renderPipelinesList() {
+    const pipelinesListContainer = document.getElementById(
+        "pipelinesListContainer"
+    );
     if (!pipelinesListContainer) return;
 
     pipelinesListContainer.innerHTML = "";

@@ -1,4 +1,9 @@
-@extends('admin.layouts.base') @section('title', __('messages.all_transactions'))
+@extends('admin.layouts.base') 
+@section('title', __('messages.all_transactions'))
+
+@section('header')
+<meta name="turbo-cache-control" content="no-cache">
+@endsection
 
 @section('content')
     <div class="page-wrapper">

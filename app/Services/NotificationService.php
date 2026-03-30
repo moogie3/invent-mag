@@ -15,7 +15,12 @@ class NotificationService
     {
         $today = Carbon::today();
         $user = auth()->user();
-        $settings = $user ? ($user->system_settings ?? []) : [];
+        
+        if (!$user) {
+            return collect();
+        }
+        
+        $settings = $user->system_settings ?? [];
         $dismissed = $settings['dismissed_notifications'] ?? [];
 
         return collect()

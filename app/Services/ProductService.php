@@ -54,9 +54,6 @@ class ProductService
     {
         $data['has_expiry'] = !empty($data['has_expiry']);
 
-        // Remove warehouse_id from data as it's no longer on the products table
-        // We will use it to initialize stock in the pivot table if provided
-        $initialWarehouseId = $data['warehouse_id'] ?? null;
         unset($data['warehouse_id']);
 
         if (isset($data['image'])) {
@@ -68,22 +65,6 @@ class ProductService
 
         $product = Product::create($data);
 
-        // Initialize stock in the pivot table
-        if ($initialWarehouseId) {
-            $warehouse = Warehouse::find($initialWarehouseId);
-        } else {
-            $warehouse = Warehouse::where('is_main', true)->first();
-        }
-
-        if ($warehouse) {
-            ProductWarehouse::create([
-                'product_id' => $product->id,
-                'warehouse_id' => $warehouse->id,
-                'quantity' => 0, // Initial stock is 0, add via Purchase/Adjustment
-                'tenant_id' => $product->tenant_id,
-            ]);
-        }
-
         return $product;
     }
 
@@ -93,7 +74,6 @@ class ProductService
         $product->load(['unit']);
 
         $product->unit_symbol = $product->unit->symbol;
-        // Warehouse name is now ambiguous as product can be in multiple, return Main or 'Multiple'
         $mainWarehouse = $product->warehouses()->where('is_main', true)->first();
         $product->warehouse_name = $mainWarehouse ? $mainWarehouse->name : 'Multiple';
         $product->image_url = $product->image;
@@ -259,7 +239,6 @@ class ProductService
 
     public function bulkUpdateStock(array $updates, ?string $reason, ?int $adjustedBy, ?int $warehouseId = null)
     {
-        // If warehouseId is provided, use it. Otherwise default to Main Warehouse.
         if ($warehouseId) {
             $targetWarehouse = Warehouse::find($warehouseId);
         } else {
@@ -270,6 +249,19 @@ class ProductService
              throw new \Exception('Target warehouse not found for bulk update.');
         }
 
+        $insufficientProducts = [];
+        foreach ($updates as $update) {
+            $newStock = $update['stock_quantity'];
+            if ($newStock < 0) {
+                $product = Product::find($update['id']);
+                $insufficientProducts[] = $product ? $product->code : "ID: {$update['id']}";
+            }
+        }
+
+        if (!empty($insufficientProducts)) {
+            throw new \Exception('Cannot set negative stock. Products: ' . implode(', ', $insufficientProducts));
+        }
+
         $updatedCount = 0;
         $stockChanges = [];
 
@@ -277,7 +269,6 @@ class ProductService
             foreach ($updates as $update) {
                 $product = Product::findOrFail($update['id']);
                 
-                // Get stock for the target warehouse
                 $stockRecord = ProductWarehouse::firstOrCreate(
                     ['product_id' => $product->id, 'warehouse_id' => $targetWarehouse->id, 'tenant_id' => $product->tenant_id],
                     ['quantity' => 0]
@@ -304,7 +295,7 @@ class ProductService
 
                     \App\Models\StockAdjustment::create([
                         'product_id' => $product->id,
-                        'warehouse_id' => $targetWarehouse->id, // Track warehouse
+                        'warehouse_id' => $targetWarehouse->id,
                         'adjustment_type' => $adjustmentType,
                         'quantity_before' => $originalStock,
                         'quantity_after' => $newStock,
@@ -319,7 +310,7 @@ class ProductService
                         'product_code' => $product->code,
                         'original_stock' => $originalStock,
                         'new_warehouse_stock' => $newStock,
-                        'new_stock_quantity' => $product->total_stock, // Return the NEW total stock
+                        'new_stock_quantity' => $product->total_stock,
                         'change' => $newStock - $originalStock,
                         'low_stock_threshold' => $product->low_stock_threshold,
                     ];
@@ -335,7 +326,6 @@ class ProductService
 
     public function adjustProductStock(Product $product, float $adjustmentAmount, string $adjustmentType, ?string $reason, ?int $adjustedBy, int $warehouseId = null): Product
     {
-        // If no warehouse specified, use Main
         if (!$warehouseId) {
             $warehouseId = Product::getMainWarehouseId();
         }
@@ -344,7 +334,25 @@ class ProductService
              throw new \Exception('No warehouse specified and no main warehouse found.');
         }
 
-        DB::transaction(function () use ($product, $adjustmentAmount, $adjustmentType, $reason, $adjustedBy, $warehouseId) {
+        $stockRecord = ProductWarehouse::firstOrCreate(
+            ['product_id' => $product->id, 'warehouse_id' => $warehouseId, 'tenant_id' => $product->tenant_id],
+            ['quantity' => 0]
+        );
+
+        $quantityBefore = $stockRecord->quantity;
+        $quantityAfter = $quantityBefore;
+
+        if ($adjustmentType === 'correction' && $adjustmentAmount < 0) {
+            throw new \Exception("Cannot correct stock to negative value for product {$product->code}. Current stock: {$quantityBefore}");
+        }
+
+        if ($adjustmentType === 'decrease') {
+            if ($adjustmentAmount > $quantityBefore) {
+                throw new \Exception("Insufficient stock for product {$product->code}. Available: {$quantityBefore}, Requested decrease: {$adjustmentAmount}");
+            }
+        }
+
+        DB::transaction(function () use ($product, $adjustmentAmount, $adjustmentType, $reason, $adjustedBy, $warehouseId, &$quantityBefore, &$quantityAfter) {
             
             $stockRecord = ProductWarehouse::firstOrCreate(
                 ['product_id' => $product->id, 'warehouse_id' => $warehouseId, 'tenant_id' => $product->tenant_id],
@@ -352,24 +360,21 @@ class ProductService
             );
 
             $quantityBefore = $stockRecord->quantity;
-            $quantityAfter = $quantityBefore;
 
             if ($adjustmentType === 'increase') {
                 $stockRecord->increment('quantity', $adjustmentAmount);
                 $quantityAfter = $quantityBefore + $adjustmentAmount;
             } elseif ($adjustmentType === 'decrease') {
-                $newQuantity = max(0, $quantityBefore - $adjustmentAmount);
-                $stockRecord->update(['quantity' => $newQuantity]);
-                $quantityAfter = $newQuantity;
+                $stockRecord->decrement('quantity', $adjustmentAmount);
+                $quantityAfter = $quantityBefore - $adjustmentAmount;
             } elseif ($adjustmentType === 'correction') {
                 $stockRecord->update(['quantity' => $adjustmentAmount]);
                 $quantityAfter = $adjustmentAmount;
             }
 
-            // Record the adjustment
             \App\Models\StockAdjustment::create([
                 'product_id' => $product->id,
-                'warehouse_id' => $warehouseId, // Track warehouse
+                'warehouse_id' => $warehouseId,
                 'adjustment_type' => $adjustmentType,
                 'quantity_before' => $quantityBefore,
                 'quantity_after' => $quantityAfter,

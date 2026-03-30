@@ -4,9 +4,8 @@ import { formatCurrency, getStatusColor } from '../common/utils.js';
 import { createOpportunityCard } from '../opportunities/card.js';
 import { moveOpportunity } from '../opportunities/dragAndDrop.js';
 
-const pipelineBoard = document.getElementById("pipeline-board");
-
 export async function loadPipelineBoard(pipelineId) {
+    const pipelineBoard = document.getElementById("pipeline-board");
     if (!pipelineBoard) return;
 
     pipelineBoard.innerHTML = "";

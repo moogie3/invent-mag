@@ -196,10 +196,10 @@ class POSControllerTest extends TestCase
 
         $response = $this->postJson(route('admin.pos.store'), $posData);
 
-        $response->assertStatus(500);
+        $response->assertStatus(400);
         $response->assertJson([
             'success' => false,
-            'message' => 'Something went wrong: ' . $errorMessage,
+            'message' => $errorMessage,
         ]);
     }
 
@@ -248,5 +248,115 @@ class POSControllerTest extends TestCase
 
         $response->assertStatus(200);
         $response->assertSee('Print Receipt');
+    }
+
+    public function test_pos_store_fails_with_insufficient_stock()
+    {
+        $posData = [
+            'transaction_date' => Carbon::now()->format('Y-m-d'),
+            'customer_id' => $this->customer->id,
+            'products' => json_encode([
+                [
+                    'id' => $this->product->id,
+                    'quantity' => 100,
+                    'price' => $this->product->selling_price,
+                    'total' => $this->product->selling_price * 100,
+                ],
+            ]),
+            'discount_total' => 0,
+            'discount_total_type' => 'fixed',
+            'tax_rate' => 0,
+            'tax_amount' => 0,
+            'grand_total' => $this->product->selling_price * 100,
+            'payment_method' => 'Cash',
+            'amount_received' => $this->product->selling_price * 100,
+            'change_amount' => 0,
+        ];
+
+        $response = $this->postJson(route('admin.pos.store'), $posData);
+
+        $response->assertStatus(400);
+        $response->assertJson(['success' => false]);
+        $this->assertStringContainsString('Insufficient stock', $response->json('message'));
+    }
+
+    public function test_pos_store_fails_with_exact_stock_limit()
+    {
+        $mainWarehouse = Warehouse::where('is_main', true)->first();
+        
+        ProductWarehouse::updateOrCreate(
+            [
+                'product_id' => $this->product->id,
+                'warehouse_id' => $mainWarehouse->id,
+                'tenant_id' => $this->product->tenant_id
+            ],
+            ['quantity' => 5]
+        );
+
+        $posData = [
+            'transaction_date' => Carbon::now()->format('Y-m-d'),
+            'customer_id' => $this->customer->id,
+            'products' => json_encode([
+                [
+                    'id' => $this->product->id,
+                    'quantity' => 6,
+                    'price' => $this->product->selling_price,
+                    'total' => $this->product->selling_price * 6,
+                ],
+            ]),
+            'discount_total' => 0,
+            'discount_total_type' => 'fixed',
+            'tax_rate' => 0,
+            'tax_amount' => 0,
+            'grand_total' => $this->product->selling_price * 6,
+            'payment_method' => 'Cash',
+            'amount_received' => $this->product->selling_price * 6,
+            'change_amount' => 0,
+        ];
+
+        $response = $this->postJson(route('admin.pos.store'), $posData);
+
+        $response->assertStatus(400);
+        $response->assertJson(['success' => false]);
+    }
+
+    public function test_pos_store_succeeds_with_exact_available_stock()
+    {
+        $mainWarehouse = Warehouse::where('is_main', true)->first();
+        
+        ProductWarehouse::updateOrCreate(
+            [
+                'product_id' => $this->product->id,
+                'warehouse_id' => $mainWarehouse->id,
+                'tenant_id' => $this->product->tenant_id
+            ],
+            ['quantity' => 5]
+        );
+
+        $posData = [
+            'transaction_date' => Carbon::now()->format('Y-m-d'),
+            'customer_id' => $this->customer->id,
+            'products' => json_encode([
+                [
+                    'id' => $this->product->id,
+                    'quantity' => 5,
+                    'price' => $this->product->selling_price,
+                    'total' => $this->product->selling_price * 5,
+                ],
+            ]),
+            'discount_total' => 0,
+            'discount_total_type' => 'fixed',
+            'tax_rate' => 0,
+            'tax_amount' => 0,
+            'grand_total' => $this->product->selling_price * 5,
+            'payment_method' => 'Cash',
+            'amount_received' => $this->product->selling_price * 5,
+            'change_amount' => 0,
+        ];
+
+        $response = $this->postJson(route('admin.pos.store'), $posData);
+
+        $response->assertStatus(200);
+        $response->assertJson(['success' => true]);
     }
 }

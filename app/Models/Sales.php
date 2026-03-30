@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Helpers\SalesHelper;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -54,6 +55,13 @@ class Sales extends Model
         'id',
         'tenant_id',
     ];
+
+    protected $appends = ['balance', 'total_paid', 'grand_total', 'grand_total_adjusted'];
+
+    public function getGrandTotalAdjustedAttribute(): float
+    {
+        return $this->getAdjustedTotal();
+    }
 
     protected $attributes = [
         'status' => 'Unpaid',
@@ -124,7 +132,7 @@ class Sales extends Model
     {
         // If the items relationship is loaded, calculate precisely from items + order-level tax/discount.
         if ($this->relationLoaded('salesItems')) {
-            $summary = \App\Helpers\SalesHelper::calculateInvoiceSummary($this->salesItems, $this->order_discount, $this->order_discount_type, $this->tax_rate);
+            $summary = SalesHelper::calculateInvoiceSummary($this->salesItems, $this->order_discount, $this->order_discount_type, $this->tax_rate);
             return round($summary['finalTotal'], 2);
         }
 
@@ -139,7 +147,44 @@ class Sales extends Model
 
     public function getBalanceAttribute()
     {
-        return $this->total - $this->total_paid;
+        return max(0, $this->getAdjustedTotal() - $this->total_paid);
+    }
+
+    public function getTotalReturnedAmount(): float
+    {
+        if (!$this->relationLoaded('salesReturns')) {
+            return 0;
+        }
+        return (float) $this->salesReturns->where('status', 'Completed')->sum('total_amount');
+    }
+
+    public function getReturnedQuantityForProduct(int $productId): int
+    {
+        if (!$this->relationLoaded('salesReturns')) {
+            return 0;
+        }
+        return (int) $this->salesReturns
+            ->where('status', 'Completed')
+            ->flatMap(fn($sr) => $sr->items ?? collect())
+            ->where('product_id', $productId)
+            ->sum('quantity');
+    }
+
+    public function getAdjustedTotal(): float
+    {
+        if (!$this->relationLoaded('salesItems')) {
+            $this->load('salesItems');
+        }
+
+        $summary = SalesHelper::calculateInvoiceSummaryWithReturns(
+            $this->salesItems,
+            $this->order_discount ?? 0,
+            $this->order_discount_type ?? 'fixed',
+            $this->tax_rate ?? 0,
+            $this->relationLoaded('salesReturns') ? $this->salesReturns : collect(),
+        );
+
+        return $summary['finalTotal'];
     }
 
     public function salesOpportunity(): BelongsTo

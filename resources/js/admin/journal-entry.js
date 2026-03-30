@@ -200,8 +200,8 @@ window.validateAndSubmit = function (autoPost = false) {
         return Promise.reject(new Error("Entry not balanced"));
     }
 
-    document.getElementById("transactionsInput").value =
-        JSON.stringify(transactions);
+    const transactionsInputEl = document.getElementById("transactionsInput");
+    if (transactionsInputEl) transactionsInputEl.value = JSON.stringify(transactions);
 
     const form = document.getElementById("journalEntryForm");
     if (form) {
@@ -216,10 +216,10 @@ window.searchAccounts = async function (query) {
         const response = await fetch(
             `/admin/accounting/journal-entries/search/accounts?query=${encodeURIComponent(query)}`,
             {
-                headers: {
+            headers: {
                     "X-CSRF-TOKEN": document.querySelector(
                         'meta[name="csrf-token"]',
-                    ).content,
+                    )?.content ?? '',
                 },
             },
         );
@@ -237,7 +237,7 @@ window.confirmAction = function (url, title, message) {
         const form = document.createElement("form");
         form.method = "POST";
         form.action = url;
-        form.innerHTML = `<input type="hidden" name="_token" value="${document.querySelector('meta[name="csrf-token"]').content}">`;
+        form.innerHTML = `<input type="hidden" name="_token" value="${document.querySelector('meta[name="csrf-token"]')?.content ?? ''}">`;
         document.body.appendChild(form);
         form.submit();
     }
@@ -253,7 +253,7 @@ window.reverseEntry = function (url) {
         form.method = "POST";
         form.action = url;
         form.innerHTML = `
-            <input type="hidden" name="_token" value="${document.querySelector('meta[name="csrf-token"]').content}">
+            <input type="hidden" name="_token" value="${document.querySelector('meta[name="csrf-token"]')?.content ?? ''}">
             <input type="hidden" name="notes" value="${reason.replace(/"/g, "&quot;")}">
         `;
         document.body.appendChild(form);
@@ -273,49 +273,13 @@ window.voidEntry = function (url) {
         form.method = "POST";
         form.action = url;
         form.innerHTML = `
-            <input type="hidden" name="_token" value="${document.querySelector('meta[name="csrf-token"]').content}">
+            <input type="hidden" name="_token" value="${document.querySelector('meta[name="csrf-token"]')?.content ?? ''}">
             <input type="hidden" name="reason" value="${reason.replace(/"/g, "&quot;")}">
         `;
         document.body.appendChild(form);
         form.submit();
     } else if (reason !== null) {
         showNotification("Reason cannot be empty", "warning");
-    }
-};
-
-window.reverseEntry = function (url) {
-    const reason = prompt(
-        window.translations?.enter_reason ||
-            "Please enter a reason for reversing this entry:",
-    );
-    if (reason !== null && reason.trim() !== "") {
-        const form = document.createElement("form");
-        form.method = "POST";
-        form.action = url;
-        form.innerHTML = `
-            <input type="hidden" name="_token" value="${document.querySelector("meta[name=csrf-token]").content}">
-            <input type="hidden" name="notes" value="${reason.replace(/"/g, "&quot;")}">
-        `;
-        document.body.appendChild(form);
-        form.submit();
-    }
-};
-
-window.voidEntry = function (url) {
-    const reason = prompt(
-        window.translations?.enter_void_reason ||
-            "Please enter a reason for voiding this entry:",
-    );
-    if (reason !== null && reason.trim() !== "") {
-        const form = document.createElement("form");
-        form.method = "POST";
-        form.action = url;
-        form.innerHTML = `
-            <input type="hidden" name="_token" value="${document.querySelector("meta[name=csrf-token]").content}">
-            <input type="hidden" name="reason" value="${reason.replace(/"/g, "&quot;")}">
-        `;
-        document.body.appendChild(form);
-        form.submit();
     }
 };
 

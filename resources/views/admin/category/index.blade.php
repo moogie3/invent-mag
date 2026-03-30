@@ -2,6 +2,10 @@
 
 @section('title', __('messages.category_page_title'))
 
+@section('header')
+<meta name="turbo-cache-control" content="no-cache">
+@endsection
+
 @section('content')
     <div class="page-wrapper">
         <div class="page-body">

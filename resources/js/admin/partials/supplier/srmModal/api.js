@@ -40,7 +40,7 @@ export function loadSrmData(id, page, append = false) {
                 safeToggleElement("srmNoTransactionsMessage", "none");
             }
 
-            populateSrmData(data);
+            populateSrmData(data, append);
 
             srmState.lastPage = data.purchases.last_page || 1;
             const currentPageNum = data.purchases
@@ -65,94 +65,93 @@ export function loadSrmData(id, page, append = false) {
         });
 }
 
-function populateSrmData(data) {
-    safeUpdateElement(
-        "srmSupplierNameInHeader",
-        `[${data.supplier.name || "N/A"}]`
-    );
-    safeUpdateElement("srmSupplierName", data.supplier.name || "N/A");
-    safeUpdateElement("srmSupplierEmail", data.supplier.email || "N/A");
-    safeUpdateElement("srmSupplierPhone", data.supplier.phone_number || "N/A");
-    safeUpdateElement("srmSupplierAddress", data.supplier.address || "N/A");
-    safeUpdateElement(
-        "srmSupplierPaymentTerms",
-        data.supplier.payment_terms || "N/A"
-    );
+function populateSrmData(data, append = false) {
+    if (!append) {
+        safeUpdateElement(
+            "srmSupplierNameInHeader",
+            `[${data.supplier.name || "N/A"}]`
+        );
+        safeUpdateElement("srmSupplierName", data.supplier.name || "N/A");
+        safeUpdateElement("srmSupplierEmail", data.supplier.email || "N/A");
+        safeUpdateElement("srmSupplierPhone", data.supplier.phone_number || "N/A");
+        safeUpdateElement("srmSupplierAddress", data.supplier.address || "N/A");
+        safeUpdateElement(
+            "srmSupplierPaymentTerms",
+            data.supplier.payment_terms || "N/A"
+        );
 
-    const srmSupplierImageContainer = document.getElementById(
-        "srmSupplierImageContainer"
-    );
-    const defaultPlaceholderUrl =
-        window.defaultPlaceholderUrl || "/img/default_placeholder.png";
+        const srmSupplierImageContainer = document.getElementById(
+            "srmSupplierImageContainer"
+        );
+        const defaultPlaceholderUrl =
+            window.defaultPlaceholderUrl || "/img/default_placeholder.png";
 
-    if (srmSupplierImageContainer) {
-        if (
-            data.supplier.image &&
-            data.supplier.image !== defaultPlaceholderUrl
-        ) {
-            srmSupplierImageContainer.innerHTML = `
-                <img src="${data.supplier.image}" alt="${
-                data.supplier.name || "Supplier Image"
-            }"
-                     class="img-thumbnail"
-                     style="max-width: 120px; max-height: 120px; object-fit: cover;">
-            `;
-        } else {
-            srmSupplierImageContainer.innerHTML = `
-                <div class="img-thumbnail d-flex align-items-center justify-content-center"
-                     style="width: 120px; height: 120px; margin: 0 auto;">
-                    <i class="ti ti-photo fs-1 text-muted"></i>
-                </div>
-            `;
+        if (srmSupplierImageContainer) {
+            if (
+                data.supplier.image &&
+                data.supplier.image !== defaultPlaceholderUrl
+            ) {
+                srmSupplierImageContainer.innerHTML = `
+                    <img id="srmSupplierImage" src="/storage/${data.supplier.image}" alt="Supplier Image" class="rounded-circle shadow-sm" style="width: 100px; height: 100px; object-fit: cover;">
+                `;
+            } else {
+                srmSupplierImageContainer.innerHTML = `
+                    <div class="d-flex justify-content-center align-items-center rounded-circle bg-secondary text-white shadow-sm" style="width: 100px; height: 100px; font-size: 2.5rem; margin: 0 auto;">
+                        <i class="ti ti-users"></i>
+                    </div>
+                `;
+            }
         }
+
+        safeUpdateElement(
+            "srmLifetimeValue",
+            formatCurrency(data.lifetimeValue || 0)
+        );
+        safeUpdateElement("srmTotalPurchasesCount", data.totalPurchasesCount || 0);
+        safeUpdateElement(
+            "srmAverageOrderValue",
+            formatCurrency(data.averageOrderValue || 0)
+        );
+        safeUpdateElement(
+            "srmLastInteractionDate",
+            data.lastInteractionDate
+                ? new Date(data.lastInteractionDate).toLocaleDateString("id-ID")
+                : "N/A"
+        );
+        safeUpdateElement(
+            "srmMostPurchasedProduct",
+            data.mostPurchasedProduct || "N/A"
+        );
+        safeUpdateElement(
+            "srmTotalProductsPurchased",
+            data.totalProductsPurchased || 0
+        );
+        safeUpdateElement(
+            "srmMemberSince",
+            data.supplier.created_at
+                ? new Date(data.supplier.created_at).toLocaleDateString("id-ID")
+                : "N/A"
+        );
+        safeUpdateElement(
+            "srmLastPurchase",
+            data.lastPurchaseDate
+                ? new Date(data.lastPurchaseDate).toLocaleDateString("id-ID")
+                : "N/A"
+        );
     }
 
-    safeUpdateElement(
-        "srmLifetimeValue",
-        formatCurrency(data.lifetimeValue || 0)
-    );
-    safeUpdateElement("srmTotalPurchasesCount", data.totalPurchasesCount || 0);
-    safeUpdateElement(
-        "srmAverageOrderValue",
-        formatCurrency(data.averageOrderValue || 0)
-    );
-    safeUpdateElement(
-        "srmLastInteractionDate",
-        data.lastInteractionDate
-            ? new Date(data.lastInteractionDate).toLocaleDateString("id-ID")
-            : "N/A"
-    );
-    safeUpdateElement(
-        "srmMostPurchasedProduct",
-        data.mostPurchasedProduct || "N/A"
-    );
-    safeUpdateElement(
-        "srmTotalProductsPurchased",
-        data.totalProductsPurchased || 0
-    );
-    safeUpdateElement(
-        "srmMemberSince",
-        data.supplier.created_at
-            ? new Date(data.supplier.created_at).toLocaleDateString("id-ID")
-            : "N/A"
-    );
-    safeUpdateElement(
-        "srmLastPurchase",
-        data.lastPurchaseDate
-            ? new Date(data.lastPurchaseDate).toLocaleDateString("id-ID")
-            : "N/A"
-    );
-
-    populateInteractions(data.supplier.interactions);
-    populateTransactions(data.purchases.data);
+    populateInteractions(data.supplier.interactions, append);
+    populateTransactions(data.purchases.data, append);
 }
 
-function populateInteractions(interactions) {
+function populateInteractions(interactions, append = false) {
     const interactionTimeline = document.getElementById(
         "srmInteractionTimeline"
     );
     if (interactionTimeline) {
-        interactionTimeline.innerHTML = "";
+        if (!append) {
+            interactionTimeline.innerHTML = "";
+        }
 
         if (interactions && interactions.length > 0) {
             safeToggleElement("srmNoInteractionsMessage", "none");
@@ -184,10 +183,12 @@ function populateInteractions(interactions) {
     }
 }
 
-function populateTransactions(purchases) {
+function populateTransactions(purchases, append = false) {
     const transactionHistory = document.getElementById("srmTransactionHistory");
     if (transactionHistory) {
-        transactionHistory.innerHTML = "";
+        if (!append) {
+            transactionHistory.innerHTML = "";
+        }
 
         if (purchases && purchases.length > 0) {
             hideSrmNoTransactionsMessage();
@@ -196,116 +197,95 @@ function populateTransactions(purchases) {
                 const purchaseElement = document.createElement("div");
                 purchaseElement.classList.add("accordion-item");
                 purchaseElement.innerHTML = `
-                <h2 class="accordion-header" id="heading-${purchase.id}">
-                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse-${
-                        purchase.id
-                    }" aria-expanded="false" aria-controls="collapse-${
+                    <h2 class="accordion-header" id="heading-${purchase.id}">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse-${
+                            purchase.id
+                        }" aria-expanded="false" aria-controls="collapse-${
                     purchase.id
                 }">
-                        <div class="d-flex w-100 justify-content-between">
-                            <div>
-                                 Invoice #${
-                                     escapeHtml(purchase.invoice)
-                                 } - ${formatDateToCustomString(
-                     purchase.created_at
-                 )}
-                                 ${getStatusBadgeHtml(
-                                     purchase.status,
-                                     purchase.due_date
-                                 )}
-                             </div>
-                             <div class="fw-bold">${formatCurrency(
-                                 purchase.total_amount
-                             )}</div>
-                         </div>
-                     </button>
-                 </h2>
-                 <div id="collapse-${
-                     purchase.id
-                 }" class="accordion-collapse collapse" aria-labelledby="heading-${
-                     purchase.id
-                 }" data-bs-parent="#srmTransactionHistory">
-                     <div class="accordion-body">
-                         <div class="row mb-3">
-                             <div class="col-md-6">
-                                 <p class="mb-1"><strong>Order Date:</strong> ${formatDateToCustomString(
-                                     purchase.date
-                                 )}</p>
-                                 <p class="mb-1"><strong>Due Date:</strong> ${formatDateToCustomString(
-                                     purchase.due_date
-                                 )}</p>
-                             </div>
-                             <div class="col-md-6 text-end">
-                                 <p class="mb-1"><strong>Payment Type:</strong> ${
-                                     escapeHtml(purchase.payment_method) || "N/A"
-                                 }</p>
-                             </div>
-                         </div>
-                         <h6 class="fs-4">Items:</h6>
-                         <div class="table-responsive">
-                             <table class="table table-sm table-bordered">
-                                 <thead>
-                                     <tr>
-                                         <th>Product</th>
-                                         <th class="text-center">Qty</th>
-                                         <th class="text-end">Unit Price</th>
-                                         <th class="text-end">Line Total</th>
-                                     </tr>
-                                 </thead>
-                                 <tbody>
-                                     ${
-                                         purchase.purchase_items &&
-                                         purchase.purchase_items.length > 0
-                                             ? purchase.purchase_items
-                                                   .map(
-                                                       (item) => `
-                                         <tr>
-                                             <td>${
-                                                 item.product
-                                                     ? escapeHtml(item.product.name)
-                                                     : "N/A"
-                                             }</td>
-                                             <td class="text-center">${
-                                                 item.quantity || 0
-                                             }</td>
-                                             <td class="text-end">${formatCurrency(
-                                                 item.price || 0
-                                             )}</td>
-                                             <td class="text-end">${formatCurrency(
-                                                 item.total || 0
-                                             )}</td>
-                                         </tr>
-                                     `
-                                                   )
-                                                   .join("")
-                                             : '<tr><td colspan="4" class="text-center">No items found</td></tr>'
-                                     }
-                                 </tbody>
-                             </table>
-                         </div>
-                        <div class="row mt-3">
-                            <div class="col-md-12 text-end">
-                                <p class="mb-1"><strong>Subtotal:</strong> ${formatCurrency(
-                                    purchase.total_amount - purchase.tax_amount
-                                )}</p>
-                                <p class="mb-1"><strong>Discount:</strong> ${formatCurrency(
-                                    purchase.discount_amount
-                                )}</p>
-                                <p class="mb-1"><strong>Tax:</strong> ${formatCurrency(
-                                    purchase.tax_amount
-                                )}</p>
-                                <p class="mb-1"><strong>Grand Total:</strong> <span class="text-primary fw-bold">${formatCurrency(
-                                    purchase.total_amount
-                                )}</span></p>
+                            <div class="d-flex justify-content-between w-100 pe-3">
+                                <div>
+                                    Invoice #${escapeHtml(
+                                        purchase.invoice
+                                    )} - ${formatDateToCustomString(
+                    purchase.created_at
+                )}
+                                    ${getStatusBadgeHtml(purchase.status, purchase.due_date)}
+                                </div>
+                                <div class="fw-bold">${formatCurrency(
+                                    purchase.grand_total_adjusted || 0
+                                )}</div>
+                            </div>
+                        </button>
+                    </h2>
+                    <div id="collapse-${
+                        purchase.id
+                    }" class="accordion-collapse collapse" aria-labelledby="heading-${
+                    purchase.id
+                }" data-bs-parent="#srmTransactionHistory">
+                        <div class="accordion-body">
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <p class="mb-1"><strong>Due Date:</strong> ${formatDateToCustomString(
+                                        purchase.due_date
+                                    )}</p>
+                                    <p class="mb-1"><strong>Payment Type:</strong> ${
+                                        escapeHtml(purchase.payment_type) ||
+                                        "N/A"
+                                    }</p>
+                                </div>
+                            </div>
+                            <h6 class="fs-4">Items:</h6>
+                            <div class="table-responsive">
+                                <table class="table table-sm table-bordered">
+                                    <thead>
+                                        <tr>
+                                            <th>Product</th>
+                                            <th class="text-center">Qty</th>
+                                            <th class="text-end">Unit Price</th>
+                                            <th class="text-end">Line Total</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        ${
+                                            purchase.items && purchase.items.length > 0
+                                                ? purchase.items.map((item) => {
+                                                    const returnedQty = item.returned_quantity || 0;
+                                                    const adjustedQty = item.adjusted_quantity ?? item.quantity ?? 0;
+                                                    const qtyHtml = returnedQty > 0 
+                                                        ? `<span class="fw-bold">${adjustedQty}</span><br><small class="text-danger"><i class="ti ti-package-import me-1"></i>(-${returnedQty} Returned)</small>`
+                                                        : adjustedQty;
+                                                        
+                                                    return `
+                                                    <tr>
+                                                        <td>${item.product ? escapeHtml(item.product.name) : "N/A"}</td>
+                                                        <td class="text-center">${qtyHtml}</td>
+                                                        <td class="text-end">${formatCurrency(item.price || 0)}</td>
+                                                        <td class="text-end">${formatCurrency(item.adjusted_total ?? item.total ?? 0)}</td>
+                                                    </tr>
+                                                `}).join('')
+                                                : '<tr><td colspan="4" class="text-center">No items found</td></tr>'
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="row mt-3">
+                                <div class="col-md-12 text-end">
+                                    <p class="mb-1"><strong>Subtotal:</strong> ${formatCurrency(purchase.summary_subtotal || 0)}</p>
+                                    <p class="mb-1"><strong>Discount:</strong> ${formatCurrency(purchase.summary_order_discount || 0)}</p>
+                                    <p class="mb-1"><strong>Grand Total:</strong> <span class="text-primary fw-bold">${formatCurrency(purchase.grand_total_adjusted || 0)}</span></p>
+                                    ${purchase.returned_amount > 0 ? `<p class="mb-1 text-muted border-bottom border-light pb-2"><small><i class="ti ti-package-import me-1"></i>Returned (Totals Adjusted): -${formatCurrency(purchase.returned_amount)}</small></p>` : ''}
+                                    <p class="mb-1 mt-2"><strong>Total Paid:</strong> ${formatCurrency(purchase.total_paid || 0)}</p>
+                                    <p class="mb-1 text-danger"><strong>Balance Due:</strong> ${formatCurrency(purchase.balance || 0)}</p>
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
-            `;
+                `;
                 transactionHistory.appendChild(purchaseElement);
             });
         } else {
-            showSrmNoHistoricalPurchasesMessage();
+            showSrmNoTransactionsMessage();
         }
     }
 }
@@ -316,12 +296,10 @@ export function loadHistoricalPurchases(id) {
     );
 
     if (historicalPurchaseContent) {
-        historicalPurchaseContent.innerHTML = ''; // Clear content, loading state is handled by ui.js
+        historicalPurchaseContent.innerHTML = '';
         hideSrmNoHistoricalPurchasesMessage();
     } else {
-        console.error(
-            "Element with ID 'srmHistoricalPurchaseContent' not found!"
-        );
+        console.error("Element with ID 'srmHistoricalPurchaseContent' not found!");
         return;
     }
 
@@ -334,62 +312,33 @@ export function loadHistoricalPurchases(id) {
         })
         .then((data) => {
             if (historicalPurchaseContent) {
-                if (
-                    data.historical_purchases &&
-                    data.historical_purchases.length > 0
-                ) {
-                    let contentHtml = `
-                <div class="accordion" id="srmHistoricalPurchasesAccordion">
-            `;
+                if (data.historical_purchases && data.historical_purchases.length > 0) {
+                    let contentHtml = `<div class="accordion" id="srmHistoricalPurchasesAccordion">`;
 
                     data.historical_purchases.forEach((purchase) => {
+                        const purchaseId = purchase.id;
                         contentHtml += `
                     <div class="accordion-item">
-                        <h2 class="accordion-header" id="heading-${
-                            purchase.id
-                        }">
-                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse-${
-                                purchase.id
-                            }" aria-expanded="false" aria-controls="collapse-${
-                            purchase.id
-                        }">
+                        <h2 class="accordion-header" id="heading-${purchaseId}">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse-${purchaseId}" aria-expanded="false" aria-controls="collapse-${purchaseId}">
                                 <div class="d-flex justify-content-between w-100 pe-3">
                                     <div>
-                                        Invoice #${
-                                            purchase.invoice
-                                        } - ${formatDateToCustomString(
-                            purchase.order_date
-                        )}
-                                        ${getStatusBadgeHtml(
-                                            purchase.status,
-                                            purchase.due_date
-                                        )}
+                                        Invoice #${purchase.invoice} - ${formatDateToCustomString(purchase.order_date)}
+                                        ${getStatusBadgeHtml(purchase.status, purchase.due_date)}
                                     </div>
-                                    <div class="fw-bold">${formatCurrency(
-                                        purchase.total_amount
-                                    )}</div>
+                                    <div class="fw-bold">${formatCurrency(purchase.grand_total_adjusted)}</div>
                                 </div>
                             </button>
                         </h2>
-                        <div id="collapse-${
-                            purchase.id
-                        }" class="accordion-collapse collapse" aria-labelledby="heading-${
-                            purchase.id
-                        }" data-bs-parent="#srmHistoricalPurchasesAccordion">
+                        <div id="collapse-${purchaseId}" class="accordion-collapse collapse" aria-labelledby="heading-${purchaseId}" data-bs-parent="#srmHistoricalPurchasesAccordion">
                             <div class="accordion-body">
                                 <div class="row mb-3">
                                     <div class="col-md-6">
-                                        <p class="mb-1"><strong>Order Date:</strong> ${formatDateToCustomString(
-                                            purchase.order_date
-                                        )}</p>
-                                        <p class="mb-1"><strong>Due Date:</strong> ${formatDateToCustomString(
-                                            purchase.due_date
-                                        )}</p>
+                                        <p class="mb-1"><strong>Order Date:</strong> ${formatDateToCustomString(purchase.order_date)}</p>
+                                        <p class="mb-1"><strong>Due Date:</strong> ${formatDateToCustomString(purchase.due_date)}</p>
                                     </div>
                                     <div class="col-md-6 text-end">
-                                        <p class="mb-1"><strong>Payment Type:</strong> ${
-                                            purchase.payment_method || "N/A"
-                                        }</p>
+                                        <p class="mb-1"><strong>Payment Type:</strong> ${purchase.payment_method || "N/A"}</p>
                                     </div>
                                 </div>
                                 <h6 class="fs-4">Items:</h6>
@@ -405,31 +354,22 @@ export function loadHistoricalPurchases(id) {
                                         </thead>
                                         <tbody>
                                             ${
-                                                purchase.purchase_items &&
-                                                purchase.purchase_items.length >
-                                                    0
-                                                    ? purchase.purchase_items
-                                                          .map(
-                                                              (item) => `
-                                                <tr>
-                                                    <td>${
-                                                        item.product
-                                                            ? item.product.name
-                                                            : "N/A"
-                                                    }</td>
-                                                    <td class="text-center">${
-                                                        item.quantity || 0
-                                                    }</td>
-                                                    <td class="text-end">${formatCurrency(
-                                                        item.price || 0
-                                                    )}</td>
-                                                    <td class="text-end">${formatCurrency(
-                                                        item.total || 0
-                                                    )}</td>
-                                                </tr>
-                                            `
-                                                          )
-                                                          .join("")
+                                                purchase.items && purchase.items.length > 0
+                                                    ? purchase.items.map((item) => {
+                                                        const returnedQty = item.returned_quantity || 0;
+                                                        const adjustedQty = item.adjusted_quantity ?? item.quantity ?? 0;
+                                                        const qtyHtml = returnedQty > 0 
+                                                            ? `<span class="fw-bold">${adjustedQty}</span><br><small class="text-danger"><i class="ti ti-package-import me-1"></i>(-${returnedQty} Returned)</small>`
+                                                            : adjustedQty;
+                                                            
+                                                        return `
+                                                        <tr>
+                                                            <td>${item.product ? escapeHtml(item.product.name) : "N/A"}</td>
+                                                            <td class="text-center">${qtyHtml}</td>
+                                                            <td class="text-end">${formatCurrency(item.price || 0)}</td>
+                                                            <td class="text-end">${formatCurrency(item.adjusted_total ?? item.total ?? 0)}</td>
+                                                        </tr>
+                                                    `}).join('')
                                                     : '<tr><td colspan="4" class="text-center">No items found</td></tr>'
                                             }
                                         </tbody>
@@ -437,16 +377,12 @@ export function loadHistoricalPurchases(id) {
                                 </div>
                                 <div class="row mt-3">
                                     <div class="col-md-12 text-end">
-                                        <p class="mb-1"><strong>Subtotal:</strong> ${formatCurrency(
-                                            purchase.total_amount
-                                        )}</p>
-                                        <p class="mb-1"><strong>Discount:</strong> ${formatCurrency(
-                                            purchase.discount_amount
-                                        )}</p>
-                                        <p class="mb-1"><strong>Grand Total:</strong> <span class="text-primary fw-bold">${formatCurrency(
-                                            purchase.total_amount -
-                                                purchase.discount_amount
-                                        )}</span></p>
+                                        <p class="mb-1"><strong>Subtotal:</strong> ${formatCurrency(purchase.summary_subtotal || 0)}</p>
+                                        <p class="mb-1"><strong>Discount:</strong> ${formatCurrency(purchase.summary_order_discount || 0)}</p>
+                                        <p class="mb-1"><strong>Grand Total:</strong> <span class="text-primary fw-bold">${formatCurrency(purchase.grand_total_adjusted || 0)}</span></p>
+                                        ${purchase.returned_amount > 0 ? `<p class="mb-1 text-muted border-bottom border-light pb-2"><small><i class="ti ti-package-import me-1"></i>Returned (Totals Adjusted): -${formatCurrency(purchase.returned_amount)}</small></p>` : ''}
+                                        <p class="mb-1 mt-2"><strong>Total Paid:</strong> ${formatCurrency(purchase.total_paid || 0)}</p>
+                                        <p class="mb-1 text-danger"><strong>Balance Due:</strong> ${formatCurrency(purchase.balance || 0)}</p>
                                     </div>
                                 </div>
                             </div>
@@ -455,10 +391,8 @@ export function loadHistoricalPurchases(id) {
                 `;
                     });
 
-                    contentHtml += `
-                </div>
-            `;
-
+                    contentHtml += `</div>`;
+                    hideSrmNoHistoricalPurchasesMessage();
                     historicalPurchaseContent.innerHTML = contentHtml;
                 } else {
                     showSrmNoHistoricalPurchasesMessage();
@@ -468,14 +402,18 @@ export function loadHistoricalPurchases(id) {
         .catch((error) => {
             console.error("Fetch error in loadHistoricalPurchases:", error);
             if (historicalPurchaseContent) {
-                historicalPurchaseContent.innerHTML = ""; // Clear content on error
-                showSrmNoHistoricalPurchasesMessage(); // Also show empty message on error
+                historicalPurchaseContent.innerHTML = `
+                <div class="text-center py-5">
+                    <div class="mb-3">
+                        <i class="ti ti-alert-circle fs-1 text-danger"></i>
+                    </div>
+                    <h5 class="text-danger">Error Loading Data</h5>
+                    <p class="text-muted mb-0">Failed to load historical purchases: ${error.message}</p>
+                </div>
+            `;
+                showSrmNoHistoricalPurchasesMessage();
             }
-            InventMagApp.showToast(
-                "Error",
-                `{{ __('messages.failed_to_load_historical_purchases') }}: ${error.message}`,
-                "error"
-            );
+            InventMagApp.showToast("Error", `Failed to load historical purchases: ${error.message}`, "error");
         });
 }
 
@@ -569,12 +507,11 @@ export function loadProductHistory(id) {
                                                     </div>
                                                 </div>
                                             </div>
-                                            <div class="col-6 col-md-3 text-center">
-                                                <div class="text-muted small">Quantity</div>
-                                                <div class="fw-bold">${
-                                                    item.quantity
-                                                }</div>
-                                            </div>
+                                                <div class="col-6 col-md-3 text-center">
+                                                    <div class="text-muted small">Quantity</div>
+                                                    <div class="fw-bold">${item.quantity}</div>
+                                                    ${item.returned_quantity > 0 ? `<div class="text-danger small mt-1"><i class="ti ti-package-import me-1"></i>(-${item.returned_quantity} Returned)</div>` : ''}
+                                                </div>
                                             <div class="col-6 col-md-4 text-end">
                                                 <div class="text-muted small">Price</div>
                                                 <div class="fw-bold text-success">${formatCurrency(
@@ -632,89 +569,90 @@ export function loadProductHistory(id) {
 
 export function handleInteractionForm() {
     const interactionForm = document.getElementById("srmInteractionForm");
-    if (interactionForm) {
-        interactionForm.addEventListener("submit", function (event) {
-            event.preventDefault();
-            const form = event.target;
-            const formData = new FormData(form);
+    if (!interactionForm || interactionForm.dataset.handlerAttached) return;
+    interactionForm.dataset.handlerAttached = 'true';
+    
+    interactionForm.addEventListener("submit", function (event) {
+        event.preventDefault();
+        const form = event.target;
+        const formData = new FormData(form);
 
-            if (!srmState.supplierId) {
-                InventMagApp.showToast(
-                    "Error",
-                    "Supplier ID not found.",
-                    "error"
-                );
-                return;
-            }
+        if (!srmState.supplierId) {
+            InventMagApp.showToast(
+                "Error",
+                "Supplier ID not found.",
+                "error"
+            );
+            return;
+        }
 
-            fetch(`/admin/suppliers/${srmState.supplierId}/interactions`, {
-                method: "POST",
-                body: formData,
-                headers: {
-                    "X-Requested-With": "XMLHttpRequest",
-                    "X-CSRF-TOKEN": document
-                        .querySelector('meta[name="csrf-token"]')
-                        .getAttribute("content"),
-                },
-            })
-                .then((response) => response.json())
-                .then((data) => {
-                    if (data.id) {
-                        InventMagApp.showToast(
-                            "Success",
-                            "Interaction added.",
-                            "success"
+        fetch(`/admin/suppliers/${srmState.supplierId}/interactions`, {
+            method: "POST",
+            body: formData,
+            headers: {
+                "X-Requested-With": "XMLHttpRequest",
+                "X-CSRF-TOKEN": document
+                    .querySelector('meta[name="csrf-token"]')
+                    .getAttribute("content"),
+            },
+        })
+            .then(response => response.json().then(data => ({ ok: response.ok, data })))
+            .then(({ ok, data }) => {
+                if (ok && data.id) {
+                    InventMagApp.showToast(
+                        "Success",
+                        "Interaction added.",
+                        "success"
+                    );
+                    const timeline = document.getElementById(
+                        "srmInteractionTimeline"
+                    );
+                    if (timeline) {
+                        const newInteraction =
+                            document.createElement("div");
+                        newInteraction.classList.add(
+                            "list-group-item",
+                            "list-group-item-action"
                         );
-                        const timeline = document.getElementById(
-                            "srmInteractionTimeline"
-                        );
-                        if (timeline) {
-                            const newInteraction =
-                                document.createElement("div");
-                            newInteraction.classList.add(
-                                "list-group-item",
-                                "list-group-item-action"
-                            );
-                             newInteraction.innerHTML = `
-                                 <div class="d-flex w-100 justify-content-between">
-                                     <h5 class="mb-1">${
-                                         data.type.charAt(0).toUpperCase() +
-                                         data.type.slice(1)
-                                     } on ${new Date(
-                                 data.interaction_date
-                             ).toLocaleDateString("id-ID")}</h5>
-                                     <small class="text-muted">by ${
-                                         data.user ? escapeHtml(data.user.name) : "Unknown"
-                                     }</small>
-                                 </div>
-                                 <p class="mb-1">${escapeHtml(data.notes)}</p>
-                             `;
-                            timeline.prepend(newInteraction);
-                            safeToggleElement(
-                                "srmNoInteractionsMessage",
-                                "none"
-                            );
-                        }
-                        form.reset();
-                        form.querySelector(
-                            'input[name="interaction_date"]'
-                        ).value = new Date().toISOString().slice(0, 10);
-                    } else {
-                        InventMagApp.showToast(
-                            "Error",
-                            "Failed to add interaction.",
-                            "error"
+                         newInteraction.innerHTML = `
+                             <div class="d-flex w-100 justify-content-between">
+                                 <h5 class="mb-1">${
+                                     data.type.charAt(0).toUpperCase() +
+                                     data.type.slice(1)
+                                 } on ${new Date(
+                             data.interaction_date
+                         ).toLocaleDateString("id-ID")}</h5>
+                                 <small class="text-muted">by ${
+                                     data.user ? escapeHtml(data.user.name) : "Unknown"
+                                 }</small>
+                             </div>
+                             <p class="mb-1">${escapeHtml(data.notes)}</p>
+                         `;
+                        timeline.prepend(newInteraction);
+                        safeToggleElement(
+                            "srmNoInteractionsMessage",
+                            "none"
                         );
                     }
-                })
-                .catch((error) => {
-                    console.error("Error:", error);
+                    form.reset();
+                    form.querySelector(
+                        'input[name="interaction_date"]'
+                    ).value = new Date().toISOString().slice(0, 10);
+                } else {
                     InventMagApp.showToast(
                         "Error",
-                        "An error occurred.",
+                        data.message || "Failed to add interaction.",
                         "error"
                     );
-                });
-        });
-    }
+                }
+            })
+            .catch((error) => {
+                console.error("Error:", error);
+                InventMagApp.showToast(
+                    "Error",
+                    "An error occurred.",
+                    "error"
+                );
+            });
+    });
 }

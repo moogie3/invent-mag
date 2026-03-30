@@ -18,8 +18,17 @@
         @endif
     </td>
     <td class="sort-amount" data-amount="{{ $sale->total }}">
-        {{ \App\Helpers\CurrencyHelper::format($sale->total) }}
-        <span class="raw-amount" style="display: none;">{{ $sale->total }}</span>
+        @php
+            $totalReturned = $sale->getTotalReturnedAmount();
+            $adjustedTotal = $sale->getAdjustedTotal();
+        @endphp
+        {{ \App\Helpers\CurrencyHelper::format($adjustedTotal) }}
+        @if($totalReturned > 0)
+            <span class="badge bg-warning-lt ms-1" title="{{ __('messages.returned') }}: {{ \App\Helpers\CurrencyHelper::format($totalReturned) }}">
+                <i class="ti ti-package-export"></i>
+            </span>
+        @endif
+        <span class="raw-amount" style="display: none;">{{ $adjustedTotal }}</span>
     </td>
     <td class="sort-payment no-print">{{ $sale->payment_type }}</td>
     <td class="sort-status">

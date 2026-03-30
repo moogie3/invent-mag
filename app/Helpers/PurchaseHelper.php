@@ -82,6 +82,64 @@ class PurchaseHelper
     }
 
     /**
+     * Calculate invoice summary figures accounting for returns
+     * @param array $items - Collection of PO items
+     * @param float $discountTotal - Order discount value
+     * @param string $discountTotalType - Order discount type
+     * @param \Illuminate\Support\Collection|null $purchaseReturns - Collection of purchase returns
+     * @return array Summary figures with adjusted amounts based on returns
+     */
+    public static function calculateInvoiceSummaryWithReturns($items, $discountTotal, $discountTotalType, $purchaseReturns = null)
+    {
+        $subtotal = 0;
+        $totalProductDiscount = 0;
+        $itemCount = 0;
+        $totalReturnedQty = 0;
+
+        foreach ($items as $item) {
+            $price = is_object($item) ? $item->price : $item['price'];
+            $originalQty = (int) (is_object($item) ? $item->quantity : $item['quantity']);
+            $discount = is_object($item) ? $item->discount : $item['discount'];
+            $discount_type = is_object($item) ? $item->discount_type : $item['discount_type'];
+            
+            // Calculate returned quantity for this item
+            $returnedQty = 0;
+            if ($purchaseReturns && $purchaseReturns->isNotEmpty()) {
+                $productId = is_object($item) ? $item->product_id : $item['product_id'];
+                $returnedQty = $purchaseReturns
+                    ->where('status', 'Completed')
+                    ->flatMap(fn($pr) => $pr->items ?? collect())
+                    ->where('product_id', $productId)
+                    ->sum('quantity');
+            }
+            
+            $adjustedQty = max(0, $originalQty - $returnedQty);
+            $totalReturnedQty += $returnedQty;
+            
+            if ($adjustedQty > 0) {
+                $itemCount++;
+                $finalAmount = self::calculateTotal($price, $adjustedQty, $discount, $discount_type);
+                $discountPerUnit = self::calculateDiscountPerUnit($price, $discount, $discount_type);
+                
+                $subtotal += $finalAmount;
+                $totalProductDiscount += $discountPerUnit * $adjustedQty;
+            }
+        }
+
+        $orderDiscount = self::calculateDiscount($subtotal, $discountTotal, $discountTotalType);
+        $finalTotal = $subtotal - $orderDiscount;
+
+        return [
+            'subtotal' => $subtotal,
+            'itemCount' => $itemCount,
+            'totalProductDiscount' => $totalProductDiscount,
+            'orderDiscount' => $orderDiscount,
+            'finalTotal' => $finalTotal,
+            'totalReturnedQty' => $totalReturnedQty,
+        ];
+    }
+
+    /**
      * Get CSS class for status badge based on status and due date
      * @param string $status - Current status
      * @param \DateTime $dueDate - Due date
@@ -93,6 +151,10 @@ class PurchaseHelper
 
         if ($status === 'Paid') {
             return 'badge bg-green-lt';
+        } elseif ($status === 'Returned') {
+            return 'badge bg-purple-lt';
+        } elseif ($status === 'Partial') {
+            return 'badge bg-cyan-lt';
         } elseif (now()->isAfter($dueDate)) {
             return 'badge bg-red-lt';
         } elseif (now()->diffInDays($dueDate) <= 3) {
@@ -117,6 +179,10 @@ class PurchaseHelper
 
         if ($status === 'Paid') {
             return '<span class="h4"><i class="ti ti-check me-1 fs-4"></i> ' . __('messages.purchase_status_paid') . '</span>';
+        } elseif ($status === 'Returned') {
+            return '<span class="h4"><i class="ti ti-package-import me-1 fs-4"></i> ' . __('messages.purchase_status_returned') . '</span>';
+        } elseif ($status === 'Partial') {
+            return '<span class="h4"><i class="ti ti-git-branch me-1 fs-4"></i> ' . __('messages.purchase_status_partial') . '</span>';
         } elseif ($diffDays == 0) {
             return '<span class="h4"><i class="ti ti-alert-triangle me-1 fs-4"></i> ' . __('messages.purchase_status_due_today') . '</span>';
         } elseif ($diffDays > 0 && $diffDays <= 3) {

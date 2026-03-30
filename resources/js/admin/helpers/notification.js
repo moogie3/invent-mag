@@ -179,21 +179,36 @@ window.showConfirmModal = function (title, message, onConfirm) {
         existingModal.remove();
     }
 
+    // Clean up any existing backdrops first
+    document.querySelectorAll('.modal-backdrop').forEach(b => b.remove());
+
     document.body.insertAdjacentHTML("beforeend", confirmModalHtml);
 
     const confirmModalElement = document.getElementById("confirmModal");
     const confirmModal = new bootstrap.Modal(confirmModalElement, {});
 
-    confirmModalElement.addEventListener("shown.bs.modal", () => {
-        document.getElementById("confirmModalBtn").focus();
-    });
-
-    document.getElementById("confirmModalBtn").onclick = () => {
-        onConfirm();
-        confirmModal.hide();
+    const cleanupBackdrop = () => {
+        document.querySelectorAll('.modal-backdrop').forEach(b => b.remove());
+        document.body.classList.remove('modal-open');
+        document.body.style.overflow = '';
     };
 
+    confirmModalElement.addEventListener("shown.bs.modal", () => {
+        const btn = document.getElementById("confirmModalBtn");
+        if (btn) btn.focus();
+    });
+
+    const confirmBtn = document.getElementById("confirmModalBtn");
+    if (confirmBtn) {
+        confirmBtn.onclick = () => {
+            cleanupBackdrop();
+            onConfirm();
+            confirmModal.hide();
+        };
+    }
+
     confirmModalElement.addEventListener("hidden.bs.modal", () => {
+        cleanupBackdrop();
         confirmModalElement.remove();
     });
 
@@ -246,7 +261,14 @@ window.showAuthModal = function (title, message, type) {
     const statusModalElement = document.getElementById("statusModal");
     const statusModal = new bootstrap.Modal(statusModalElement, {});
 
+    const cleanupBackdrop = () => {
+        document.querySelectorAll('.modal-backdrop').forEach(b => b.remove());
+        document.body.classList.remove('modal-open');
+        document.body.style.overflow = '';
+    };
+
     statusModalElement.addEventListener("hidden.bs.modal", () => {
+        cleanupBackdrop();
         statusModalElement.remove();
     });
 

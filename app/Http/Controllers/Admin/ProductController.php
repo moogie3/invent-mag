@@ -98,14 +98,12 @@ class ProductController extends Controller
         $request->validate([
             'code' => ['required', 'string', 'max:100', \Illuminate\Validation\Rule::unique('products', 'code')->where('tenant_id', auth()->user()->tenant_id)],
             'name' => ['required', 'string', 'max:255', \Illuminate\Validation\Rule::unique('products', 'name')->where('tenant_id', auth()->user()->tenant_id)],
-            'stock_quantity' => 'nullable|integer|min:0', // Optional opening stock
             'low_stock_threshold' => 'nullable|integer|min:1',
             'price' => 'required|numeric|min:0',
             'selling_price' => 'required|numeric|min:0',
             'category_id' => 'required|integer|exists:categories,id',
             'units_id' => 'required|integer|exists:units,id',
             'supplier_id' => 'required|integer|exists:suppliers,id',
-            'warehouse_id' => 'nullable|integer|exists:warehouses,id', // For initial stock placement
             'description' => 'nullable|string|max:1000',
             'image' => 'nullable|image|mimes:jpeg,jpg,png|max:2048',
             'has_expiry' => 'sometimes|boolean',
@@ -113,9 +111,35 @@ class ProductController extends Controller
 
         try {
             $this->productService->createProduct($request->all());
+            
+            if ($request->header('X-Laravel-JSON')) {
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Product created successfully',
+                    'redirect' => route('admin.product'),
+                ]);
+            }
+            
             return redirect()->route('admin.product')->with('success', 'Product created');
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            if ($request->header('X-Laravel-JSON')) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Validation failed',
+                    'errors' => $e->errors(),
+                ], 422);
+            }
+            return redirect()->back()->withErrors($e->errors())->withInput();
         } catch (\Exception $e) {
             \Illuminate\Support\Facades\Log::error('Product creation failed: ' . $e->getMessage(), ['exception' => $e, 'input' => $request->except('image')]);
+            
+            if ($request->header('X-Laravel-JSON')) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Error creating product. Please try again.',
+                ], 500);
+            }
+            
             return redirect()->back()
                 ->withInput()
                 ->with('error', 'Error creating product. Please try again.');
@@ -140,14 +164,13 @@ class ProductController extends Controller
         $request->validate([
             'code' => ['required', 'string', \Illuminate\Validation\Rule::unique('products', 'code')->where('tenant_id', auth()->user()->tenant_id)],
             'name' => ['required', 'string', \Illuminate\Validation\Rule::unique('products', 'name')->where('tenant_id', auth()->user()->tenant_id)],
-            'stock_quantity' => 'required|integer',
+            'barcode' => 'nullable|string',
             'low_stock_threshold' => 'nullable|integer|min:1',
             'price' => 'required|numeric',
             'selling_price' => 'required|numeric',
             'category_id' => 'required|integer|exists:categories,id',
             'units_id' => 'required|integer|exists:units,id',
             'supplier_id' => 'required|integer|exists:suppliers,id',
-            'warehouse_id' => 'nullable|integer|exists:warehouses,id',
             'description' => 'nullable|string',
             'image' => 'nullable|image|mimes:jpeg,jpg,png|max:2048',
             'has_expiry' => 'nullable|sometimes|boolean',
@@ -191,22 +214,63 @@ class ProductController extends Controller
 
         try {
             $this->productService->updateProduct($product, $request->all());
+            
+            if ($request->header('X-Laravel-JSON')) {
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Product updated successfully',
+                    'redirect' => route('admin.product'),
+                ]);
+            }
+            
             return redirect()->route('admin.product')->with('success', 'Product updated successfully');
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            if ($request->header('X-Laravel-JSON')) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Validation failed',
+                    'errors' => $e->errors(),
+                ], 422);
+            }
+            return redirect()->back()->withErrors($e->errors())->withInput();
         } catch (\Exception $e) {
             \Illuminate\Support\Facades\Log::error('Product update failed for ID ' . $id . ': ' . $e->getMessage(), ['exception' => $e]);
+            
+            if ($request->header('X-Laravel-JSON')) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Error updating product. Please try again.',
+                ], 500);
+            }
+            
             return redirect()->back()
                 ->withInput()
                 ->with('error', 'Error updating product. Please try again.');
         }
     }
 
-    public function destroy($id)
+    public function destroy(Request $request, $id)
     {
         try {
             $product = Product::findOrFail($id);
             $this->productService->deleteProduct($product);
+            
+            if ($request->header('X-Laravel-JSON')) {
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Product deleted successfully',
+                ]);
+            }
+            
             return redirect()->route('admin.product')->with('success', 'Product deleted');
         } catch (\Exception $e) {
+            if ($request->header('X-Laravel-JSON')) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Error deleting product. Please try again.',
+                ], 500);
+            }
+            
             return redirect()->back()
                 ->with('error', 'Error deleting product. Please try again.');
         }

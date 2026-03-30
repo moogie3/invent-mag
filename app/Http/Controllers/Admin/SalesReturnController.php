@@ -91,7 +91,20 @@ class SalesReturnController extends Controller
 
     public function getSalesItems(Sales $sale)
     {
-        return response()->json($sale->salesItems()->with('product')->get());
+        $sale->load(['salesItems.product', 'salesReturns.items']);
+        
+        $items = $sale->salesItems->map(function ($item) use ($sale) {
+            $returnedQuantity = $sale->salesReturns
+                ->where('status', 'Completed')
+                ->flatMap(fn($sr) => $sr->items ?? collect())
+                ->where('product_id', $item->product_id)
+                ->sum('quantity');
+                
+            $item->available_quantity = max(0, $item->quantity - $returnedQuantity);
+            return $item;
+        });
+        
+        return response()->json($items);
     }
 
     public function bulkDelete(Request $request)

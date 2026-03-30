@@ -1,3 +1,15 @@
+@php
+    // Variables $subtotal, $orderDiscount, $taxAmount, $finalTotal, $itemCount
+    // are already computed with returns in the controller via getSalesViewData
+    $totalReturnedQty = 0;
+    if ($sales->relationLoaded('salesReturns')) {
+        $totalReturnedQty = $sales->salesReturns
+            ->where('status', 'Completed')
+            ->flatMap(fn($sr) => $sr->items ?? collect())
+            ->sum('quantity');
+    }
+@endphp
+
 <div class="mb-4 pb-4">
     <div class="row align-items-center mb-4">
         <div class="col">
@@ -19,29 +31,19 @@
                 </tr>
             </thead>
             <tbody>
-                @php
-                    $summary = \App\Helpers\SalesHelper::calculateInvoiceSummary(
-                        $sales->salesItems,
-                        $sales->order_discount ?? 0,
-                        $sales->order_discount_type ?? __('messages.percentage'),
-                        $sales->tax_rate ?? 0,
-                    );
-                @endphp
-
                 @foreach ($sales->salesItems as $index => $item)
                     @php
+                        $returnedQty = $sales->getReturnedQuantityForProduct($item->product_id);
+                        $adjustedQty = max(0, (int) $item->quantity - $returnedQty);
+                        
+                        $adjustedQty = max(0, (int) $item->quantity - $returnedQty);
+                        
                         $finalAmount = \App\Helpers\SalesHelper::calculateTotal(
                             $item->customer_price,
-                            $item->quantity,
+                            $adjustedQty, // Use adjusted quantity
                             $item->discount,
                             $item->discount_type,
                         );
-
-                        $returnedQty = $sales->salesReturns
-                            ->where('status', 'Completed')
-                            ->flatMap(fn($sr) => $sr->items)
-                            ->where('product_id', $item->product_id)
-                            ->sum('quantity');
                     @endphp
 
                     <tr>
@@ -53,9 +55,11 @@
                             @endif
                         </td>
                         <td class="text-center">
-                            {{ $item->quantity }}
                             @if($returnedQty > 0)
-                                <br><small class="text-danger">(-{{ $returnedQty }} {{ __('messages.returned') }})</small>
+                                <span class="fw-bold">{{ $adjustedQty }}</span>
+                                <br><small class="text-danger"><i class="ti ti-package-export me-1"></i>(-{{ $returnedQty }} {{ __('messages.returned') }})</small>
+                            @else
+                                {{ $item->quantity }}
                             @endif
                         </td>
                         <td class="text-end">
@@ -65,7 +69,7 @@
                             @if ($item->discount > 0)
                                 @if ($item->discount_type === 'percentage')
                                     <span class="text-danger">{{ $item->discount }}%</span>
-                                    <br><small class="text-muted">({{ \App\Helpers\CurrencyHelper::formatWithPosition(($item->customer_price * $item->discount) / 100) }} {{ __('messages.per_unit') }})</small>
+                                    <br><small class="text-muted">({{ \App\Helpers\CurrencyHelper::formatDiscountPerUnit(($item->customer_price * $item->discount) / 100) }} {{ __('messages.per_unit') }})</small>
                                 @else
                                     <span class="text-danger">{{ \App\Helpers\CurrencyHelper::formatWithPosition($item->discount) }}</span>
                                     <br><small class="text-muted">({{ __('messages.fixed') }})</small>

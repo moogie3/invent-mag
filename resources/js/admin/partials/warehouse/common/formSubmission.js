@@ -2,6 +2,17 @@ export function handleFormSubmission(event, modalElement, isCreate = false) {
     event.preventDefault();
 
     const form = event.target;
+    
+    if (form.dataset.submitting === 'true') return;
+    form.dataset.submitting = 'true';
+    
+    InventMagApp.toastShown = false;
+    
+    const originalButtonText = form.querySelector('button[type="submit"]')?.textContent;
+    if (form.querySelector('button[type="submit"]')) {
+        form.querySelector('button[type="submit"]').disabled = true;
+    }
+
     const formData = new FormData(form);
     const actionUrl = form.action;
     const method = form.method;
@@ -11,13 +22,17 @@ export function handleFormSubmission(event, modalElement, isCreate = false) {
         body: formData,
         headers: {
             'X-Requested-With': 'XMLHttpRequest',
-            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '',
         },
     })
     .then(response => response.json())
     .then(data => {
         if (data.success) {
-            InventMagApp.showToast('Success', data.message, 'success');
+            if (!InventMagApp.toastShown) {
+                InventMagApp.toastShown = true;
+                InventMagApp.showToast('Success', data.message, 'success');
+            }
+
             const bsModal = bootstrap.Modal.getInstance(modalElement);
             if (bsModal) {
                 bsModal._element.addEventListener('hidden.bs.modal', function handler() {
@@ -26,19 +41,32 @@ export function handleFormSubmission(event, modalElement, isCreate = false) {
                     const backdrops = document.querySelectorAll('.modal-backdrop');
                     backdrops.forEach(backdrop => backdrop.remove());
                     location.reload();
-                });
+                }, { once: true });
                 bsModal.hide();
             } else {
                 form.reset();
                 location.reload();
             }
         } else {
-            InventMagApp.showToast('Error', data.message || 'Operation failed.', 'error');
-            console.error('Form submission error:', data.errors);
+            if (!InventMagApp.toastShown) {
+                InventMagApp.toastShown = true;
+                InventMagApp.showToast('Error', data.message || 'Operation failed.', 'error');
+            }
         }
     })
     .catch(error => {
         console.error('Error during fetch:', error);
-        InventMagApp.showToast('Error', 'An error occurred. Please check the console.', 'error');
+        if (!InventMagApp.toastShown) {
+            InventMagApp.toastShown = true;
+            InventMagApp.showToast('Error', 'An error occurred.', 'error');
+        }
+    })
+    .finally(() => {
+        form.dataset.submitting = 'false';
+        if (form.querySelector('button[type="submit"]')) {
+            form.querySelector('button[type="submit"]').disabled = false;
+            form.querySelector('button[type="submit"]').textContent = originalButtonText;
+        }
+        InventMagApp.toastShown = false;
     });
 }

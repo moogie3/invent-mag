@@ -1,6 +1,14 @@
 import { onPageLoad } from '../utils/onPageLoad.js';
 
 onPageLoad(() => {
+    // Only initialize if not already done for this path
+    if (window.themeToggleInitialized && window.themeToggleLastPath === window.location.pathname) {
+        return;
+    }
+
+    window.themeToggleLastPath = window.location.pathname;
+    window.themeToggleInitialized = true;
+
     const htmlElement = document.documentElement;
     const navbarToggleContainer = document.getElementById(
         "theme-toggle-navbar-container"
@@ -12,7 +20,6 @@ onPageLoad(() => {
     const themeIcon = document.getElementById("theme-icon");
 
     function updateThemeIcons(theme) {
-        // Update navbar icons
         const navbarLightIcon = document.querySelector(
             "#theme-toggle-navbar .theme-icon-light"
         );
@@ -22,15 +29,14 @@ onPageLoad(() => {
 
         if (navbarLightIcon && navbarDarkIcon) {
             if (theme === "dark") {
-                navbarLightIcon.style.display = "inline"; // Show sun icon in dark mode
+                navbarLightIcon.style.display = "inline";
                 navbarDarkIcon.style.display = "none";
             } else {
                 navbarLightIcon.style.display = "none";
-                navbarDarkIcon.style.display = "inline"; // Show moon icon in light mode
+                navbarDarkIcon.style.display = "inline";
             }
         }
 
-        // Update sidebar icons if they exist
         const sidebarLightIcon = document.querySelector(
             "#theme-toggle-sidebar .theme-icon-light"
         );
@@ -40,15 +46,14 @@ onPageLoad(() => {
 
         if (sidebarLightIcon && sidebarDarkIcon) {
             if (theme === "dark") {
-                sidebarLightIcon.style.display = "inline"; // Show sun icon in dark mode
+                sidebarLightIcon.style.display = "inline";
                 sidebarDarkIcon.style.display = "none";
             } else {
                 sidebarLightIcon.style.display = "none";
-                sidebarDarkIcon.style.display = "inline"; // Show moon icon in light mode
+                sidebarDarkIcon.style.display = "inline";
             }
         }
 
-        // Update login page icon if it exists
         if (themeIcon) {
             if (theme === "dark") {
                 themeIcon.classList.remove("ti-moon");
@@ -61,6 +66,11 @@ onPageLoad(() => {
     }
 
     function toggleTheme() {
+        document.querySelectorAll('.modal-backdrop').forEach(backdrop => backdrop.remove());
+        document.body.classList.remove('modal-open');
+        document.body.style.overflow = '';
+        document.body.style.paddingRight = '';
+
         const csrfTokenMeta = document.querySelector('meta[name="csrf-token"]');
         const currentTheme = htmlElement.getAttribute('data-bs-theme');
         const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
@@ -70,10 +80,9 @@ onPageLoad(() => {
         updateThemeIcons(newTheme);
 
         if (!csrfTokenMeta) {
-            return; // Not logged in, no need to sync with server
+            return;
         }
 
-        // Send an AJAX request to update the user's system settings
         fetch('/admin/settings/update-theme-mode', {
             method: 'PUT',
             headers: {
@@ -86,66 +95,75 @@ onPageLoad(() => {
         })
         .then(response => {
             if (!response.ok) {
-                // console.error('Failed to save theme setting:', response.statusText);
+                return response.text().then(text => {
+                    console.error('Failed to save theme setting:', response.statusText, text);
+                });
             }
             return response.json();
         })
         .then(data => {
-            if (data.success) {
-                // console.log('Theme setting saved successfully.');
+            if (data && data.success) {
                 const event = new CustomEvent('themeModeUpdated', {
                     detail: { themeMode: newTheme }
                 });
                 document.dispatchEvent(event);
-            } else {
-                // console.error('Error saving theme setting:', data.message);
             }
         })
         .catch(error => {
-            // console.error('Error sending AJAX request for theme setting:', error);
+            console.error('Error sending AJAX request for theme setting:', error);
         });
     }
 
-    // Initialize theme icons based on the current theme
     const initialTheme = htmlElement.getAttribute('data-bs-theme');
     updateThemeIcons(initialTheme);
 
-    // Add event listeners to the toggle buttons
+    const handleThemeClick = function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+        toggleTheme();
+    };
+
+    // Remove any existing listeners first to prevent duplicates
     if (navbarToggleContainer) {
-        navbarToggleContainer.addEventListener("click", function (e) {
-            e.preventDefault();
-            toggleTheme();
-        });
+        navbarToggleContainer.replaceWith(navbarToggleContainer.cloneNode(true));
+        const newNavbarContainer = document.getElementById("theme-toggle-navbar-container");
+        if (newNavbarContainer) {
+            newNavbarContainer.addEventListener("click", handleThemeClick);
+        }
     }
     if (sidebarToggleContainer) {
-        sidebarToggleContainer.addEventListener("click", function (e) {
-            e.preventDefault();
-            toggleTheme();
-        });
+        sidebarToggleContainer.replaceWith(sidebarToggleContainer.cloneNode(true));
+        const newSidebarContainer = document.getElementById("theme-toggle-sidebar-container");
+        if (newSidebarContainer) {
+            newSidebarContainer.addEventListener("click", handleThemeClick);
+        }
     }
 
     const navbarToggleBtn = document.querySelector("#theme-toggle-navbar");
     const sidebarToggleBtn = document.querySelector("#theme-toggle-sidebar");
 
     if (navbarToggleBtn) {
-        navbarToggleBtn.addEventListener("click", function (e) {
-            e.preventDefault();
-            e.stopPropagation();
-            toggleTheme();
-        });
+        navbarToggleBtn.replaceWith(navbarToggleBtn.cloneNode(true));
+        const newNavbarBtn = document.querySelector("#theme-toggle-navbar");
+        if (newNavbarBtn) {
+            newNavbarBtn.addEventListener("click", handleThemeClick);
+        }
     }
     if (sidebarToggleBtn) {
-        sidebarToggleBtn.addEventListener("click", function (e) {
-            e.preventDefault();
-            e.stopPropagation();
-            toggleTheme();
-        });
+        sidebarToggleBtn.replaceWith(sidebarToggleBtn.cloneNode(true));
+        const newSidebarBtn = document.querySelector("#theme-toggle-sidebar");
+        if (newSidebarBtn) {
+            newSidebarBtn.addEventListener("click", handleThemeClick);
+        }
     }
 
     if (themeToggleButton) {
-        themeToggleButton.addEventListener("click", function (e) {
-            e.preventDefault();
-            toggleTheme();
-        });
+        themeToggleButton.addEventListener("click", handleThemeClick);
     }
+});
+
+// Reset the initialized flag before Turbo caches so the theme toggle
+// re-initializes properly on the next page visit
+document.addEventListener('turbo:before-cache', () => {
+    window.themeToggleInitialized = false;
 });

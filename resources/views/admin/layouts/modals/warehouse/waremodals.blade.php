@@ -138,56 +138,9 @@
 </div>
 
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        // For Edit Warehouse Modal
-        $('#editWarehouseModal').on('show.bs.modal', function(event) {
-            var button = $(event.relatedTarget);
-            var id = button.data('id');
-            var name = button.data('name');
-            var address = button.data('address');
-            var description = button.data('description');
-            var isMain = button.data('is-main');
-
-            var modal = $(this);
-            modal.find('#warehouseId').val(id);
-            modal.find('#warehouseNameEdit').val(name);
-            modal.find('#warehouseAddressEdit').val(address);
-            modal.find('#warehouseDescriptionEdit').val(description);
-            modal.find('#isMainWarehouseEdit').prop('checked', isMain == 1);
-
-            // Set form action URL
-            var updateUrl = button.data('update-url');
-            // console.log('Warehouse ID:', id);
-            // console.log('Update URL:', updateUrl);
-            modal.find('form').attr('action', updateUrl);
-        });
-
-        // For Delete Modal - check if it's main warehouse
-        $('#deleteModal').on('show.bs.modal', function(event) {
-            var button = $(event.relatedTarget);
-            var targetRow = button.closest('tr');
-            var isMainCell = targetRow.find('.sort-is-main');
-
-            // Check if the warehouse is main
-            if (isMainCell.find('.badge.bg-green-lt').length > 0) {
-                $('#mainWarehouseWarning').show();
-                $('#deleteForm button[type="submit"]').prop('disabled', true);
-            } else {
-                $('#mainWarehouseWarning').hide();
-                $('#deleteForm button[type="submit"]').prop('disabled', false);
-            }
-        });
-
-        // Search functionality
-        $('#searchInput').on('keyup', function() {
-            var value = $(this).val().toLowerCase();
-            $('#invoiceTableBody tr').filter(function() {
-                $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
-            });
-        });
-    });
-
     function setDeleteFormAction(action) {
-        document.getElementById('deleteForm').action = action;
+        var form = document.getElementById('deleteForm');
+        if (form) form.action = action;
     }
+    window.setDeleteFormAction = setDeleteFormAction;
 </script>

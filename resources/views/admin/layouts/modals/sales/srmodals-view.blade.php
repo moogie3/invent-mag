@@ -12,7 +12,7 @@
                     <div>
                         <h2 class="mb-0">{{ __('messages.sr_return_hash') }}{{ $salesReturn->id }}</h2>
                         <div class="text-muted fs-5">
-                            {{ $salesReturn->sales->customer->name ?? __('messages.not_available') }}
+                            {{ $salesReturn->sale->customer->name ?? __('messages.not_available') }}
                         </div>
                     </div>
                 </div>
@@ -31,15 +31,15 @@
                 <div class="card-body p-3">
                     <h4 class="card-title mb-3"><i
                             class="ti ti-user me-2 text-primary"></i>{{ __('messages.customer') }}</h4>
-                    <h5 class="mb-2">{{ $salesReturn->sales->customer->name ?? __('messages.not_available') }}</h5>
+                    <h5 class="mb-2">{{ $salesReturn->sale->customer->name ?? __('messages.not_available') }}</h5>
                     <div class="text-muted mb-1"><i class="ti ti-map-pin me-1"></i>
-                        {{ $salesReturn->sales->customer->address ?? __('messages.not_available') }}
+                        {{ $salesReturn->sale->customer->address ?? __('messages.not_available') }}
                     </div>
                     <div class="text-muted mb-1"><i class="ti ti-phone me-1"></i>
-                        {{ $salesReturn->sales->customer->phone_number ?? __('messages.not_available') }}
+                        {{ $salesReturn->sale->customer->phone_number ?? __('messages.not_available') }}
                     </div>
                     <div class="text-muted mb-1"><i class="ti ti-mail me-1"></i>
-                        {{ $salesReturn->sales->customer->email ?? __('messages.not_available') }}
+                        {{ $salesReturn->sale->customer->email ?? __('messages.not_available') }}
                     </div>
                 </div>
             </div>
@@ -58,7 +58,7 @@
                         <div><strong>{{ __('messages.sr_original_sale') }}</strong></div>
                         <div>
                             @if ($salesReturn->sales)
-                                <a href="{{ route('admin.sales.view', $salesReturn->sales_id) }}">#{{ $salesReturn->sales->invoice }}</a>
+                                <a href="{{ route('admin.sales.view', $salesReturn->sales_id) }}">#{{ $salesReturn->sale->invoice }}</a>
                             @else
                                 {{ __('messages.not_available') }}
                             @endif

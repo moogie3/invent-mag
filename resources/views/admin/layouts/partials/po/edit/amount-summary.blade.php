@@ -30,19 +30,37 @@
         </div>
     </div>
     <hr class="border-primary">
-    <div class="d-flex justify-content-between align-items-center">
-        <div class="fs-4"><strong>{{ __('messages.po_grand_total') }}</strong></div>
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <div class="fs-4"><strong>{{ __('messages.original_total') }}</strong></div>
         <div class="fs-3 fw-bold text-primary" id="finalTotal">
             {{ \App\Helpers\CurrencyHelper::format($summary['finalTotal']) }}
         </div>
     </div>
+    @php
+        $totalReturned = $pos->getTotalReturnedAmount();
+        $adjustedBalance = $pos->balance;
+    @endphp
+
+    @if($totalReturned > 0)
+    <div class="d-flex justify-content-between text-danger mb-2 border-bottom border-light pb-2">
+        <div class="fs-5"><i class="ti ti-package-import me-1"></i>{{ __('messages.returned') }}</div>
+        <div class="fs-5 fw-bold">- {{ \App\Helpers\CurrencyHelper::format($totalReturned) }}</div>
+    </div>
+    @endif
+
     <div class="d-flex justify-content-between text-success mb-2">
-        <span>{{ __('messages.total_paid') }}</span>
+        <span><i class="ti ti-wallet me-1"></i>{{ __('messages.total_paid') }}</span>
         <span id="total-paid-amount" data-total-paid="{{ $pos->total_paid }}">{{ \App\Helpers\CurrencyHelper::format($pos->total_paid) }}</span>
     </div>
     <div class="d-flex justify-content-between text-danger fw-bold">
-        <span>{{ __('messages.balance') }}</span>
-        <span id="balance-amount" data-balance="{{ $pos->balance }}">{{ \App\Helpers\CurrencyHelper::format($pos->balance) }}</span>
+        <span><i class="ti ti-wallet me-1"></i>{{ __('messages.balance') }}</span>
+        <span id="balance-amount" 
+              data-balance="{{ $adjustedBalance }}" 
+              data-returned="{{ $totalReturned }}"
+              data-original-total="{{ $pos->total }}"
+              data-total-paid="{{ $pos->total_paid }}">
+            {{ \App\Helpers\CurrencyHelper::format($adjustedBalance) }}
+        </span>
     </div>
     <input type="hidden" id="totalDiscountInput" name="total_discount" value="{{ $summary['orderDiscount'] }}">
 </div>

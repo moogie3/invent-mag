@@ -30,7 +30,7 @@ class PurchaseService
 
     public function getPurchaseIndexData(array $filters, int $entries)
     {
-        $query = Purchase::with(['items', 'supplier', 'user']);
+        $query = Purchase::with(['items', 'supplier', 'user', 'purchaseReturns']);
 
         if (isset($filters['month']) && $filters['month']) {
             $query->whereMonth('order_date', $filters['month']);
@@ -58,7 +58,7 @@ class PurchaseService
         $totalMonthly = 0;
         $paymentMonthly = 0;
 
-        $allPurchases = Purchase::with('items', 'supplier')->get();
+        $allPurchases = Purchase::with('items', 'supplier', 'purchaseReturns')->get();
         foreach ($allPurchases as $p) {
 
             if ($p->supplier->location === 'IN') {
@@ -102,7 +102,7 @@ class PurchaseService
 
     public function getPurchaseEditData($id)
     {
-        $pos = Purchase::with(['items', 'supplier', 'payments'])->find($id);
+        $pos = Purchase::with(['items', 'supplier', 'payments', 'purchaseReturns.items'])->find($id);
 
         if (!$pos) {
             return []; // Or throw an exception, depending on desired behavior
@@ -119,7 +119,7 @@ class PurchaseService
 
     public function getPurchaseViewData($id)
     {
-        $pos = Purchase::with(['items', 'supplier', 'payments'])->find($id);
+        $pos = Purchase::with(['items', 'supplier', 'payments', 'purchaseReturns.items'])->find($id);
 
         if (!$pos) {
             throw new \Illuminate\Database\Eloquent\ModelNotFoundException("Purchase with ID {$id} not found.");
@@ -127,7 +127,12 @@ class PurchaseService
 
         $suppliers = Supplier::all();
         $items = POItem::all();
-        $summary = PurchaseHelper::calculateInvoiceSummary($pos->items->toArray(), $pos->discount_total, $pos->discount_total_type);
+        $summary = PurchaseHelper::calculateInvoiceSummaryWithReturns(
+            $pos->items,
+            $pos->discount_total,
+            $pos->discount_total_type,
+            $pos->relationLoaded('purchaseReturns') ? $pos->purchaseReturns : collect()
+        );
         $subtotal = $summary['subtotal'];
         $itemCount = $summary['itemCount'];
         $totalProductDiscount = $summary['totalProductDiscount'];
@@ -139,7 +144,7 @@ class PurchaseService
 
     public function getPurchaseForModal($id)
     {
-        return Purchase::with(['supplier', 'items.product', 'payments'])->findOrFail($id);
+        return Purchase::with(['supplier', 'items.product', 'payments', 'purchaseReturns.items'])->findOrFail($id);
     }
 
     public function createPurchase(array $data): Purchase
@@ -188,7 +193,7 @@ class PurchaseService
                     ],
                     ['quantity' => 0]
                 );
-                
+
                 $stockRecord->increment('quantity', $productData['quantity']);
             }
 
@@ -246,7 +251,7 @@ class PurchaseService
                     ->where('warehouse_id', $purchase->warehouse_id)
                     ->where('tenant_id', $purchase->tenant_id)
                     ->first();
-                
+
                 if ($stockRecord) {
                     $stockRecord->decrement('quantity', $oldItem->quantity);
                 }
@@ -282,7 +287,7 @@ class PurchaseService
                 $totalAmount += $itemTotal;
 
                 // Add new stock to (possibly new) warehouse
-                $stockRecord = \App\Models\ProductWarehouse::firstOrCreate(
+                $stockRecord = ProductWarehouse::firstOrCreate(
                     [
                         'product_id' => $productData['product_id'],
                         'warehouse_id' => $purchase->warehouse_id, // Use updated warehouse ID
@@ -315,7 +320,7 @@ class PurchaseService
                     $purchase->save();
                 }
             }
-            
+
             // Recalculate status based on payments at the end
             $this->updatePurchaseStatus($purchase);
 
@@ -396,7 +401,7 @@ class PurchaseService
             $journalEntries = \App\Models\JournalEntry::where('sourceable_type', get_class($purchase))
                 ->where('sourceable_id', $purchase->id)
                 ->get();
-                
+
             foreach ($journalEntries as $entry) {
                 if ($entry->status === \App\Models\JournalEntry::STATUS_POSTED && $entry->canBeReversed()) {
                     $this->accountingService->reverseJournalEntry($entry, "Auto-reversal due to deleted PO #{$purchase->invoice}");
@@ -413,7 +418,7 @@ class PurchaseService
                 if ($stockRecord) {
                     $stockRecord->decrement('quantity', $item->quantity);
                 }
-                
+
                 // Delete the POItem as well
                 $item->delete();
             }
@@ -456,7 +461,7 @@ class PurchaseService
     public function bulkExportPurchases(array $filters, ?array $ids, string $exportOption)
     {
         $query = Purchase::with(['items.product', 'supplier']);
-        
+
         if ($ids) {
             $query->whereIn('id', $ids);
         } else {
@@ -521,7 +526,7 @@ class PurchaseService
 
     public function printPo($id)
     {
-        $pos = Purchase::with(['supplier', 'items.product', 'payments'])->findOrFail($id);
+        $pos = Purchase::with(['supplier', 'items.product', 'payments', 'purchaseReturns.items'])->findOrFail($id);
         $shopname = User::whereNotNull('shopname')->value('shopname');
         $address = User::whereNotNull('address')->value('address');
 
@@ -544,7 +549,7 @@ class PurchaseService
         $totalMonthly = 0;
         $paymentMonthly = 0;
 
-        $allPurchases = Purchase::with(['supplier', 'items'])->get();
+        $allPurchases = Purchase::with(['supplier', 'items', 'purchaseReturns'])->get();
         foreach ($allPurchases as $p) {
             if ($p->supplier->location === 'IN') {
                 $inCount++;

@@ -3,11 +3,12 @@
     @method('PUT')
     <div class="card-body p-4">
         @php
-            // Calculate summary info once and make it available to all partials
-            $summary = \App\Helpers\PurchaseHelper::calculateInvoiceSummary(
+            // Calculate summary info accounting for returns
+            $summary = \App\Helpers\PurchaseHelper::calculateInvoiceSummaryWithReturns(
                 $pos->items,
                 $pos->discount_total,
                 $pos->discount_total_type,
+                $pos->relationLoaded('purchaseReturns') ? $pos->purchaseReturns : collect(),
             );
         @endphp
 

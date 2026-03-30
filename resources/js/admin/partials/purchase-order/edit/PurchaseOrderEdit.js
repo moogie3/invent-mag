@@ -187,7 +187,7 @@ export class PurchaseOrderEdit extends PurchaseOrderModule {
                         quantity: quantity,
                         price: price,
                         discount: discount,
-                        discount_type: discountType,
+                        discountType: discountType,
                         expiry_date: expiryDateInput
                             ? expiryDateInput.value
                             : null,
@@ -199,7 +199,10 @@ export class PurchaseOrderEdit extends PurchaseOrderModule {
         const totalPaid = parseFloat(
             this.elements.totalPaidAmount.dataset.totalPaid,
         );
-        const newBalance = finalTotal - totalPaid;
+        const returnedAmount = parseFloat(
+            this.elements.balanceAmount.dataset.returned || 0,
+        );
+        const newBalance = Math.max(0, finalTotal - totalPaid - returnedAmount);
 
         if (this.elements.balanceAmount) {
             this.elements.balanceAmount.textContent =
@@ -255,11 +258,11 @@ export class PurchaseOrderEdit extends PurchaseOrderModule {
             const expiry_date = expiryDateInput ? expiryDateInput.value : null;
 
             products.push({
-                product_id: itemId, // Corrected key
+                product_id: itemId,
                 quantity: quantity,
                 price: price,
                 discount: discount,
-                discount_type: discountType,
+                discountType: discountType,
                 expiry_date: expiry_date,
             });
         });

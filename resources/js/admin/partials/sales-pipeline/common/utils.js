@@ -19,28 +19,37 @@ export function getStatusColor(status) {
 
 export function showConfirmationModal(actionUrl) {
     return new Promise((resolve) => {
-        const modal = new bootstrap.Modal(
-            document.getElementById("confirmationModal")
-        );
-        document.getElementById("deleteConfirmationForm").action = actionUrl;
+        const modalEl = document.getElementById("confirmationModal");
+        if (!modalEl) {
+            resolve(false);
+            return;
+        }
+        
+        const modal = new bootstrap.Modal(modalEl);
+        const deleteForm = document.getElementById("deleteConfirmationForm");
+        const confirmBtn = document.getElementById("confirmationModalConfirm");
+        
+        if (deleteForm) deleteForm.action = actionUrl;
+        
+        const cleanupBackdrop = () => {
+            document.querySelectorAll('.modal-backdrop').forEach(b => b.remove());
+            document.body.classList.remove('modal-open');
+            document.body.style.overflow = '';
+        };
 
-        // We no longer set title and body dynamically, as they are handled by Blade
-        // document.getElementById("confirmationModalTitle").textContent = title;
-        // document.getElementById("confirmationModalBody").textContent = body;
-
-        document.getElementById("confirmationModalConfirm").onclick =
-            () => {
-                // The form submission will handle the deletion and page refresh
-                // We just need to resolve true if the user confirms
+        if (confirmBtn) {
+            confirmBtn.onclick = () => {
+                cleanupBackdrop();
                 resolve(true);
             };
-        document.getElementById("confirmationModal").addEventListener(
-            "hidden.bs.modal",
-            () => {
-                resolve(false);
-            },
-            { once: true }
-        );
+        }
+        
+        modalEl.addEventListener("hidden.bs.modal", function handler() {
+            modalEl.removeEventListener("hidden.bs.modal", handler);
+            cleanupBackdrop();
+            resolve(false);
+        }, { once: true });
+        
         modal.show();
     });
 }

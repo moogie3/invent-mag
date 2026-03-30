@@ -2,6 +2,10 @@
 
 @section('title', __('messages.create_new_product'))
 
+@section('header')
+<meta name="turbo-cache-control" content="no-cache">
+@endsection
+
 @section('content')
     <div class="page-wrapper">
         @include('admin.layouts.partials.product.create.header')

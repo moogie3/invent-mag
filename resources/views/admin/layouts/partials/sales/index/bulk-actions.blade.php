@@ -1,15 +1,16 @@
-<div id="bulkActionsBar" class="bulk-actions-bar border-bottom sticky-top" style="display: none;">
+<div id="bulkActionsBar" class="bulk-actions-bar border-bottom sticky-top" style="display: none; position: sticky; top: 0; z-index: 1030; background: var(--tblr-bg-surface);">
     <div class="px-4 py-3">
         <div class="row align-items-center">
             <div class="col-lg-6 col-md-12">
                 <div class="d-flex align-items-center">
                     <div
-                        class="selection-indicator rounded-circle d-flex align-items-center justify-content-center me-3">
-                        <i class="ti ti-checklist text-white" style="font-size: 16px;"></i>
+                        class="selection-indicator rounded-circle d-flex align-items-center justify-content-center me-3"
+                        style="background: var(--tblr-primary); width: 32px; height: 32px;">
+                        <i class="ti ti-checklist" style="font-size: 16px; color: white;"></i>
                     </div>
                     <div>
                         <div class="selection-text">
-                            <span id="selectedCount" class="text-primary">0</span>
+                            <span id="selectedCount" class="fw-bold" style="color: var(--tblr-primary);">0</span>
                             <span class="text-muted">{{ __('messages.sales_orders_selected') }}</span>
                         </div>
                         <div class="selection-subtext">{{ __('messages.choose_action_apply_selected') }}</div>

@@ -11,8 +11,17 @@
         {{ $po->due_date->format('d F Y') }}
     </td>
     <td class="sort-amount" data-amount="{{ $po->total_amount }}">
-        {{ \App\Helpers\CurrencyHelper::format($po->total_amount) }}
-        <span class="raw-amount" style="display: none;">{{ $po->total_amount }}</span>
+        @php
+            $totalReturned = $po->getTotalReturnedAmount();
+            $adjustedTotal = $po->getAdjustedTotal();
+        @endphp
+        {{ \App\Helpers\CurrencyHelper::format($adjustedTotal) }}
+        @if($totalReturned > 0)
+            <span class="badge bg-warning-lt ms-1" title="{{ __('messages.returned') }}: {{ \App\Helpers\CurrencyHelper::format($totalReturned) }}">
+                <i class="ti ti-package-import"></i>
+            </span>
+        @endif
+        <span class="raw-amount" style="display: none;">{{ $adjustedTotal }}</span>
     </td>
     <td class="sort-payment no-print">{{ $po->payment_type }}</td>
     <td class="sort-status">

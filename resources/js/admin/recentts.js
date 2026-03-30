@@ -105,10 +105,12 @@ window.getSelectedTransactionIds = getSelectedTransactionIds;
 
 onPageLoad(function () {
     if (!window.location.pathname.includes("/admin/reports/recent-transactions")) return;
+    
     const dateRangeSelect = document.querySelector('select[name="date_range"]');
     const customDateRange = document.getElementById("customDateRange");
 
-    if (dateRangeSelect) {
+    if (dateRangeSelect && !dateRangeSelect.dataset.handlerAttached) {
+        dateRangeSelect.dataset.handlerAttached = 'true';
         dateRangeSelect.addEventListener("change", function () {
             customDateRange.style.display =
                 this.value === "custom" ? "block" : "none";
@@ -120,18 +122,21 @@ onPageLoad(function () {
     const confirmBulkMarkPaidBtn = document.getElementById(
         "confirmBulkMarkPaidBtn",
     );
-    if (confirmBulkMarkPaidBtn) {
+    if (confirmBulkMarkPaidBtn && !confirmBulkMarkPaidBtn.dataset.handlerAttached) {
+        confirmBulkMarkPaidBtn.dataset.handlerAttached = 'true';
         confirmBulkMarkPaidBtn.addEventListener(
             "click",
             confirmBulkMarkAsPaidApi,
         );
     }
 
-    document
-        .getElementById("searchInput")
-        ?.addEventListener("keypress", function (e) {
+    const searchInput = document.getElementById("searchInput");
+    if (searchInput && !searchInput.dataset.handlerAttached) {
+        searchInput.dataset.handlerAttached = 'true';
+        searchInput.addEventListener("keypress", function (e) {
             if (e.key === "Enter") {
                 searchTransactions();
             }
         });
+    }
 });

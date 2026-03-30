@@ -7,6 +7,7 @@ use App\Models\Sales;
 use App\Models\SalesItem;
 use App\Helpers\SalesHelper;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 use App\Models\Categories;
 use App\Models\Customer;
@@ -19,17 +20,56 @@ class PosService
 {
     public function getPosIndexData()
     {
-        $products = Product::with(['unit'])
-            ->withSum('productWarehouses', 'quantity') // Eager load stock sum
-            ->get();
+        $products = Product::with(['unit'])->get();
+        
+        $products->each(function ($product) {
+            $product->main_warehouse_stock = $product->main_warehouse_stock;
+            $product->stock_quantity = $product->main_warehouse_stock;
+        });
         
         $customers = Customer::all();
         $walkInCustomerId = $customers->where('name', 'Walk In Customer')->first()->id ?? null;
         $categories = Categories::all();
         $units = Unit::all();
         $suppliers = Supplier::all();
+        $warehouses = Warehouse::all();
+        
+        $mainWarehouse = Warehouse::where('is_main', true)->first();
 
-        return compact('products', 'customers', 'walkInCustomerId', 'categories', 'units', 'suppliers');
+        return compact('products', 'customers', 'walkInCustomerId', 'categories', 'units', 'suppliers', 'warehouses', 'mainWarehouse');
+    }
+
+    public function validateStockBeforeSale(array $products, $warehouseId = null)
+    {
+        $warehouseId = $warehouseId ?? Product::getMainWarehouseId();
+        
+        if (!$warehouseId) {
+            throw new \Exception('No main warehouse configured. Please set a main warehouse first.');
+        }
+        
+        $insufficientProducts = [];
+        
+        foreach ($products as $item) {
+            $product = Product::find($item['id']);
+            if (!$product) {
+                continue;
+            }
+            
+            $availableStock = $product->getWarehouseStock($warehouseId);
+            $requestedQty = (int) $item['quantity'];
+            
+            if ($availableStock < $requestedQty) {
+                $insufficientProducts[] = [
+                    'id' => $product->id,
+                    'name' => $product->name,
+                    'requested' => $requestedQty,
+                    'available' => $availableStock,
+                    'shortage' => $requestedQty - $availableStock,
+                ];
+            }
+        }
+        
+        return $insufficientProducts;
     }
 
     public function createSale(array $data)
@@ -38,11 +78,14 @@ class PosService
         if (!$products || !is_array($products)) {
             throw new \Exception('Invalid product data');
         }
+        
+        if (empty($products)) {
+            throw new \Exception('No products in the order');
+        }
 
-        // Fetch all products in one query
         $productIds = array_column($products, 'id');
         $dbProducts = Product::whereIn('id', $productIds)->get()->keyBy('id');
-
+        
         $subTotal = 0;
         $totalBeforeDiscounts = 0;
 
@@ -64,12 +107,6 @@ class PosService
         $taxAmount = $data['tax_amount'] ?? SalesHelper::calculateTaxAmount($taxable, $taxRate);
         $grandTotal = $data['grand_total'] ?? $taxable + $taxAmount;
 
-        $userId = Auth::id();
-        $userTimezone = Auth::user()->timezone ?? config('app.timezone');
-
-        // $transactionDate = \Carbon\Carbon::parse($data['transaction_date'], $userTimezone)->setTimezone('UTC')->format('Y-m-d');
-        $transactionDate = $data['transaction_date'];
-
         $lastPosInvoice = Sales::where('invoice', 'like', 'POS-%')
                             ->latest()
                             ->first();
@@ -81,82 +118,102 @@ class PosService
         }
         $invoice = 'POS-' . str_pad($invoiceNumber, 4, '0', STR_PAD_LEFT);
 
-        // Assign to Main Warehouse by default for POS
         $mainWarehouse = Warehouse::where('is_main', true)->first();
         if (!$mainWarehouse) {
-            // Fallback
-            $mainWarehouse = Warehouse::first();
+            throw new \Exception('No main warehouse configured. Please set a main warehouse first.');
         }
 
-        $sale = Sales::create([
-            'invoice' => $invoice,
-            'customer_id' => $data['customer_id'],
-            'user_id' => Auth::id(),
-            'warehouse_id' => $mainWarehouse ? $mainWarehouse->id : null,
-            'order_date' => $data['transaction_date'],
-            'due_date' => $data['transaction_date'],
-            'tax_rate' => $taxRate,
-            'total_tax' => $taxAmount,
-            'total' => $grandTotal,
-            'order_discount' => $orderDiscount,
-            'order_discount_type' => $orderDiscountType,
-            'status' => 'Paid',
-            'payment_type' => $data['payment_method'],
-            'amount_received' => $data['amount_received'] ?? $grandTotal,
-            'change_amount' => $data['change_amount'] ?? 0,
-            'is_pos' => true,
-        ]);
+        $stockRecords = ProductWarehouse::whereIn('product_id', $productIds)
+            ->where('warehouse_id', $mainWarehouse->id)
+            ->get()
+            ->keyBy('product_id');
 
-        $sale->payments()->create([
-            'amount' => $grandTotal,
-            'payment_date' => now(),
-            'payment_method' => $data['payment_method'],
-            'notes' => 'Payment for POS sale ' . $invoice,
-        ]);
-
-        // Eager load warehouse stock for bulk update
-        if ($mainWarehouse) {
-            $stockRecords = ProductWarehouse::whereIn('product_id', $productIds)
-                ->where('warehouse_id', $mainWarehouse->id)
-                ->get()
-                ->keyBy('product_id');
-        }
-
+        $insufficientProducts = [];
         foreach ($products as $product) {
             $productModel = $dbProducts[$product['id']] ?? null;
             if (!$productModel) {
                 continue;
             }
-            $productSubtotal = $product['price'] * $product['quantity'];
-
-            SalesItem::create([
-                'sales_id' => $sale->id,
-                'product_id' => $product['id'],
-                'name' => $productModel->name,
-                'quantity' => $product['quantity'],
-                'customer_price' => $product['price'],
-                'discount' => 0,
-                'discount_type' => 'fixed',
-                'total' => $productSubtotal,
-            ]);
-
-            // Deduct stock from Main Warehouse
-            if ($mainWarehouse) {
-                if (isset($stockRecords[$product['id']])) {
-                    $stockRecords[$product['id']]->decrement('quantity', $product['quantity']);
-                } else {
-                    // Create negative stock if allowed
-                    ProductWarehouse::create([
-                        'product_id' => $productModel->id,
-                        'warehouse_id' => $mainWarehouse->id,
-                        'quantity' => -$product['quantity'],
-                        'tenant_id' => $productModel->tenant_id
-                    ]);
-                }
+            
+            $availableStock = 0;
+            if (isset($stockRecords[$product['id']])) {
+                $availableStock = (float) $stockRecords[$product['id']]->quantity;
+            }
+            
+            $requestedQty = (int) $product['quantity'];
+            if ($availableStock < $requestedQty) {
+                $insufficientProducts[] = [
+                    'id' => $productModel->id,
+                    'name' => $productModel->name,
+                    'requested' => $requestedQty,
+                    'available' => $availableStock,
+                    'shortage' => $requestedQty - $availableStock,
+                ];
             }
         }
+        
+        if (!empty($insufficientProducts)) {
+            $productList = collect($insufficientProducts)->pluck('name')->implode(', ');
+            throw new \Exception('Insufficient stock for: ' . $productList . '. Please adjust quantities or restock.');
+        }
 
-        return $sale;
+        return DB::transaction(function () use ($data, $products, $dbProducts, $grandTotal, $orderDiscount, $orderDiscountType, $taxAmount, $taxRate, $subTotal, $mainWarehouse, $invoice) {
+            $sale = Sales::create([
+                'invoice' => $invoice,
+                'customer_id' => $data['customer_id'],
+                'user_id' => Auth::id(),
+                'warehouse_id' => $mainWarehouse->id,
+                'order_date' => $data['transaction_date'],
+                'due_date' => $data['transaction_date'],
+                'tax_rate' => $taxRate,
+                'total_tax' => $taxAmount,
+                'total' => $grandTotal,
+                'order_discount' => $orderDiscount,
+                'order_discount_type' => $orderDiscountType,
+                'status' => 'Paid',
+                'payment_type' => $data['payment_method'],
+                'amount_received' => $data['amount_received'] ?? $grandTotal,
+                'change_amount' => $data['change_amount'] ?? 0,
+                'is_pos' => true,
+            ]);
+
+            $sale->payments()->create([
+                'amount' => $grandTotal,
+                'payment_date' => now(),
+                'payment_method' => $data['payment_method'],
+                'notes' => 'Payment for POS sale ' . $invoice,
+            ]);
+
+            $stockRecords = ProductWarehouse::whereIn('product_id', array_column($products, 'id'))
+                ->where('warehouse_id', $mainWarehouse->id)
+                ->get()
+                ->keyBy('product_id');
+
+            foreach ($products as $product) {
+                $productModel = $dbProducts[$product['id']] ?? null;
+                if (!$productModel) {
+                    continue;
+                }
+                $productSubtotal = $product['price'] * $product['quantity'];
+
+                SalesItem::create([
+                    'sales_id' => $sale->id,
+                    'product_id' => $product['id'],
+                    'name' => $productModel->name,
+                    'quantity' => $product['quantity'],
+                    'customer_price' => $product['price'],
+                    'discount' => 0,
+                    'discount_type' => 'fixed',
+                    'total' => $productSubtotal,
+                ]);
+
+                if (isset($stockRecords[$product['id']])) {
+                    $stockRecords[$product['id']]->decrement('quantity', $product['quantity']);
+                }
+            }
+
+            return $sale;
+        });
     }
 
     public function getReceiptData(Sales $sale)

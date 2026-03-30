@@ -3,6 +3,7 @@
 @section('title', __('messages.customer_page_title'))
 
 @section('content')
+    <meta name="turbo-cache-control" content="no-cache">
     <div class="page-wrapper">
         <div class="page-header no-print">
             <div class="{{ $containerClass ?? "container-xl" }}">
@@ -181,12 +182,13 @@
                                                                 title="{{ __('messages.edit') }}">
                                                                 <i class="ti ti-edit"></i>
                                                             </button>
-                                                            <button type="button" class="btn btn-icon btn-ghost-danger"
-                                                                data-bs-toggle="modal" data-bs-target="#deleteModal"
-                                                                onclick="setDeleteFormAction('{{ route('admin.customer.destroy', $customer->id) }}')"
-                                                                title="{{ __('messages.delete') }}">
-                                                                <i class="ti ti-trash"></i>
-                                                            </button>
+                                                            <button type="button" class="btn btn-icon btn-ghost-danger delete-btn"
+                                                                 data-bs-toggle="modal"
+                                                                 data-bs-target="#deleteModal"
+                                                                 data-id="{{ $customer->id }}"
+                                                                 title="{{ __('messages.delete') }}">
+                                                                 <i class="ti ti-trash"></i>
+                                                             </button>
                                                         </div>
                                                     </td>
                                                 </tr>

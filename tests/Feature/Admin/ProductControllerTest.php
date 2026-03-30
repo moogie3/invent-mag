@@ -73,19 +73,16 @@ class ProductControllerTest extends TestCase
         $category = Categories::factory()->create();
         $unit = Unit::factory()->create();
         $supplier = Supplier::factory()->create();
-        $warehouse = Warehouse::factory()->create();
 
         $productData = [
             'code' => $this->faker->unique()->ean13(),
             'name' => $this->faker->word(),
-            'stock_quantity' => $this->faker->numberBetween(10, 100), // Opening stock
             'low_stock_threshold' => $this->faker->numberBetween(1, 5),
             'price' => $this->faker->randomFloat(2, 10, 100),
             'selling_price' => $this->faker->randomFloat(2, 100, 200),
             'category_id' => $category->id,
             'units_id' => $unit->id,
             'supplier_id' => $supplier->id,
-            'warehouse_id' => $warehouse->id, // Initial warehouse
             'description' => $this->faker->sentence(),
             'image' => UploadedFile::fake()->image('product.jpg'),
             'has_expiry' => true,
@@ -101,14 +98,6 @@ class ProductControllerTest extends TestCase
             'code' => $productData['code'],
             'name' => $productData['name'],
             'category_id' => $productData['category_id'],
-        ]);
-        
-        // Check pivot table
-        $product = Product::where('code', $productData['code'])->first();
-        $this->assertDatabaseHas('product_warehouse', [
-            'product_id' => $product->id,
-            'warehouse_id' => $warehouse->id,
-            'quantity' => 0 // Opening stock logic in Service creates at 0
         ]);
     }
 
@@ -164,19 +153,16 @@ class ProductControllerTest extends TestCase
         $category = Categories::factory()->create();
         $unit = Unit::factory()->create();
         $supplier = Supplier::factory()->create();
-        $warehouse = Warehouse::factory()->create();
 
         $productData = [
             'code' => $this->faker->unique()->ean13(),
             'name' => $this->faker->word(),
-            'stock_quantity' => $this->faker->numberBetween(10, 100),
             'low_stock_threshold' => $this->faker->numberBetween(1, 5),
             'price' => $this->faker->randomFloat(2, 10, 100),
             'selling_price' => $this->faker->randomFloat(2, 100, 200),
             'category_id' => $category->id,
             'units_id' => $unit->id,
             'supplier_id' => $supplier->id,
-            'warehouse_id' => $warehouse->id,
             'description' => $this->faker->sentence(),
             'has_expiry' => false,
         ];
@@ -193,14 +179,6 @@ class ProductControllerTest extends TestCase
         $this->assertDatabaseHas('products', [
             'code' => $productData['code'],
             'name' => $productData['name'],
-        ]);
-        
-        // Pivot
-        $product = Product::where('code', $productData['code'])->first();
-        $this->assertDatabaseHas('product_warehouse', [
-            'product_id' => $product->id,
-            'warehouse_id' => $warehouse->id,
-            'quantity' => 0
         ]);
     }
 
@@ -547,7 +525,6 @@ class ProductControllerTest extends TestCase
             ->assertJsonValidationErrors([
                 'code',
                 'name',
-                'stock_quantity',
                 'price',
                 'selling_price',
                 'category_id',
@@ -561,19 +538,16 @@ class ProductControllerTest extends TestCase
     {
         $unit = Unit::factory()->create();
         $supplier = Supplier::factory()->create();
-        $warehouse = Warehouse::factory()->create();
 
         $response = $this->actingAs($this->user)
             ->postJson(route('admin.product.quickCreate'), [
                 'code' => $this->faker->unique()->ean13(),
                 'name' => $this->faker->word(),
-                'stock_quantity' => 10,
-                'price' => 50.00,
-                'selling_price' => 100.00,
-                'category_id' => 99999,
+                'price' => 1000,
+                'selling_price' => 1500,
+                'category_id' => 9999,
                 'units_id' => $unit->id,
                 'supplier_id' => $supplier->id,
-                'warehouse_id' => $warehouse->id,
             ]);
 
         $response->assertStatus(422)

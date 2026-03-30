@@ -1,4 +1,6 @@
 
+import { onPageLoad } from '../utils/onPageLoad.js';
+
 async function fetchSystemSettings() {
     try {
         const response = await fetch('/admin/api/settings');
@@ -7,11 +9,8 @@ async function fetchSystemSettings() {
         }
         const settings = await response.json();
         window.userSettings = settings;
-        // console.log('System settings loaded:', window.userSettings);
         document.dispatchEvent(new Event('usersettingsloaded'));
     } catch (error) {
-        // console.error('Error fetching system settings:', error);
-        // Fallback to default settings if fetch fails
         window.userSettings = {
             enable_sound_notifications: true,
             show_success_messages: true,
@@ -19,7 +18,6 @@ async function fetchSystemSettings() {
         };
     }
 
-    // Initialize features that depend on these settings
     if (window.userSettings) {
         applyPerformanceSettings(window.userSettings);
         applyDebugSettings(window.userSettings);
@@ -27,23 +25,16 @@ async function fetchSystemSettings() {
         initAutoLogout(window.userSettings);
     }
 
-    // Initialize the settings page functionality if the form exists on the current page.
     initSettingsPage();
 }
 
-/**
- * Applies global performance settings based on user preferences.
- * @param {object} settings - The user settings object.
- */
 function applyPerformanceSettings(settings) {
-    // 1. UI Animations
     if (settings.enable_animations === false) {
         document.body.classList.add('no-animations');
     } else {
         document.body.classList.remove('no-animations');
     }
 
-    // 2. Lazy Load Images
     if (settings.lazy_load_images === true) {
         const images = document.querySelectorAll('img:not([loading])');
         if ('IntersectionObserver' in window) {
@@ -58,12 +49,10 @@ function applyPerformanceSettings(settings) {
             });
             images.forEach(img => observer.observe(img));
         } else {
-            // Fallback for older browsers
             images.forEach(img => img.setAttribute('loading', 'lazy'));
         }
     }
 
-    // 3. Data Refresh Rate
     if (window.dataRefreshInterval) {
         clearInterval(window.dataRefreshInterval);
     }
@@ -71,7 +60,6 @@ function applyPerformanceSettings(settings) {
     if (refreshRate > 0) {
         window.dataRefreshInterval = setInterval(() => {
             document.dispatchEvent(new CustomEvent('datarefresh'));
-            // console.log('Dispatched datarefresh event.');
         }, refreshRate * 1000);
     }
 }
@@ -79,20 +67,14 @@ function applyPerformanceSettings(settings) {
 function applyDebugSettings(settings) {
     if (settings.enable_debug_mode === true) {
         document.body.classList.add('debug-mode');
-        // console.log('Debug mode enabled.');
     } else {
         document.body.classList.remove('debug-mode');
     }
 }
 
-/**
- * Applies global tooltip settings based on user preferences.
- * @param {object} settings - The user settings object.
- */
 function applyTooltipSettings(settings) {
     const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
 
-    // Always destroy existing tooltips first to prevent duplicates or lingering instances
     tooltipTriggerList.forEach(tooltipTriggerEl => {
         const tooltipInstance = bootstrap.Tooltip.getInstance(tooltipTriggerEl);
         if (tooltipInstance) {
@@ -116,6 +98,7 @@ function initSettingsPage() {
 
             const formData = new FormData(systemSettingsForm);
             const saveButton = document.querySelector('button[form="systemSettingsForm"]');
+            if (!saveButton) return;
             const originalButtonText = saveButton.innerHTML;
 
             saveButton.disabled = true;
@@ -124,16 +107,15 @@ function initSettingsPage() {
             fetch(systemSettingsForm.action, {
                 method: 'POST',
                 headers: {
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') ?? '',
                     'Accept': 'application/json',
-                    'X-Requested-With': 'XMLHttpRequest', // Important for Laravel to recognize it as an AJAX request
+                    'X-Requested-With': 'XMLHttpRequest',
                 },
                 body: formData
             })
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    // Sync theme to localStorage before reload
                     const themeSelect = systemSettingsForm.querySelector('select[name="theme_mode"]');
                     if (themeSelect) {
                         localStorage.setItem('theme', themeSelect.value);
@@ -144,7 +126,6 @@ function initSettingsPage() {
                 }
             })
             .catch(error => {
-                // console.error('Error:', error);
                 InventMagApp.showToast('Error', 'An unexpected error occurred.', 'error');
             })
             .finally(() => {
@@ -153,25 +134,23 @@ function initSettingsPage() {
             });
         });
 
-        window.shortcutManager.register('ctrl+s', () => {
-            systemSettingsForm.requestSubmit();
-        }, 'Save System Settings');
+        if (window.shortcutManager) {
+            window.shortcutManager.register('ctrl+s', () => {
+                systemSettingsForm.requestSubmit();
+            }, 'Save System Settings');
+        }
     }
-
-    
 
     const navigationTypeSelect = document.querySelector('select[name="navigation_type"]');
     if (navigationTypeSelect) {
         const navbarOptionsWrapper = document.getElementById('navbar-options-wrapper');
         const navbarInputs = navbarOptionsWrapper.querySelectorAll('input, select');
-
         const sidebarOptionsWrapper = document.getElementById('sidebar-options-wrapper');
         const sidebarInputs = sidebarOptionsWrapper.querySelectorAll('input, select');
 
         function toggleNavigationOptions() {
             const selectedNavigationType = navigationTypeSelect.value;
 
-            // Handle Navbar Options
             if (selectedNavigationType === 'sidebar') {
                 navbarOptionsWrapper.classList.add('disabled-option');
                 navbarInputs.forEach(input => {
@@ -187,7 +166,6 @@ function initSettingsPage() {
                 });
             }
 
-            // Handle Sidebar Options
             if (selectedNavigationType === 'navbar') {
                 sidebarOptionsWrapper.classList.add('disabled-option');
                 sidebarInputs.forEach(input => {
@@ -204,10 +182,7 @@ function initSettingsPage() {
             }
         }
 
-        // Initial check on page load
         toggleNavigationOptions();
-
-        // Add event listener for changes
         navigationTypeSelect.addEventListener('change', toggleNavigationOptions);
     }
 
@@ -215,17 +190,25 @@ function initSettingsPage() {
     if (resetButton) {
         resetButton.addEventListener('click', resetToDefaults);
     }
+
+    const showShortcutsModalBtn = document.getElementById('showShortcutsModalBtn');
+    if (showShortcutsModalBtn) {
+        showShortcutsModalBtn.addEventListener('click', () => {
+            if (window.shortcutManager) {
+                window.shortcutManager.showShortcutsModal();
+            }
+        });
+    }
 }
 
-
-// Add a new function to initialize the auto-logout feature
 function initAutoLogout(settings) {
+    if (window.autoLogoutInitialized) return;
+    window.autoLogoutInitialized = true;
+
     let logoutTimer;
     let modalVisible = false;
-    // Convert minutes to milliseconds
     const autoLogoutTime = parseFloat(settings.auto_logout_time) * 60 * 1000;
 
-    // If logout time is 0 or not a number, disable the feature
     if (!autoLogoutTime || autoLogoutTime <= 0) {
         return;
     }
@@ -260,23 +243,29 @@ function initAutoLogout(settings) {
         const modal = new bootstrap.Modal(modalElement, {});
         modal.show();
 
-        document.getElementById('stayLoggedInBtn').addEventListener('click', () => {
-            resetLogoutTimer();
-        });
-
-        document.getElementById('logoutBtn').addEventListener('click', () => {
-            const form = document.createElement('form');
-            form.method = 'POST';
-            form.action = '/admin/logout';
-            const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
-            const csrfInput = document.createElement('input');
-            csrfInput.type = 'hidden';
-            csrfInput.name = '_token';
-            csrfInput.value = csrfToken;
-            form.appendChild(csrfInput);
-            document.body.appendChild(form);
-            form.submit();
-        });
+        const stayLoggedInBtn = document.getElementById('stayLoggedInBtn');
+        const logoutBtn = document.getElementById('logoutBtn');
+        if (stayLoggedInBtn) {
+            stayLoggedInBtn.addEventListener('click', () => {
+                resetLogoutTimer();
+            });
+        }
+        if (logoutBtn) {
+            logoutBtn.addEventListener('click', () => {
+                const form = document.createElement('form');
+                form.method = 'POST';
+                form.action = '/admin/logout';
+                const csrfMeta = document.querySelector('meta[name="csrf-token"]');
+                const csrfToken = csrfMeta ? csrfMeta.getAttribute('content') : '';
+                const csrfInput = document.createElement('input');
+                csrfInput.type = 'hidden';
+                csrfInput.name = '_token';
+                csrfInput.value = csrfToken;
+                form.appendChild(csrfInput);
+                document.body.appendChild(form);
+                form.submit();
+            });
+        }
 
         modalElement.addEventListener('hidden.bs.modal', () => {
             modalElement.remove();
@@ -289,28 +278,62 @@ function initAutoLogout(settings) {
         logoutTimer = setTimeout(showInactivityModal, autoLogoutTime);
     }
 
-    // Attach event listeners
     window.addEventListener('mousemove', resetLogoutTimer, { passive: true });
     window.addEventListener('keydown', resetLogoutTimer, { passive: true });
     window.addEventListener('click', resetLogoutTimer, { passive: true });
     window.addEventListener('scroll', resetLogoutTimer, { passive: true });
 
-    // Initial timer start
     resetLogoutTimer();
 }
 
-// Initialize settings on script load
-if (document.querySelector('meta[name="csrf-token"]')) {
-    fetchSystemSettings();
+function resetToDefaults() {
+    const form = document.getElementById('systemSettingsForm');
+    if (!form) return;
+    
+    const setValue = (selector, value) => {
+        const el = form.querySelector(selector);
+        if (el) {
+            if (el.type === 'checkbox') {
+                el.checked = value;
+            } else {
+                el.value = value;
+            }
+        }
+    };
+
+    setValue('select[name="navigation_type"]', 'sidebar');
+    setValue('input[name="sidebar_lock"]', false);
+    setValue('input[name="sticky_navbar"]', false);
+    setValue('select[name="theme_mode"]', 'light');
+    setValue('input[name="show_theme_toggle"]', true);
+    setValue('input[name="enable_sound_notifications"]', true);
+    setValue('input[name="enable_browser_notifications"]', true);
+    setValue('input[name="show_success_messages"]', true);
+    setValue('select[name="notification_duration"]', '5');
+    setValue('select[name="auto_logout_time"]', '60');
+    setValue('input[name="remember_last_page"]', true);
+    setValue('input[name="enable_animations"]', true);
+    setValue('input[name="lazy_load_images"]', true);
+    setValue('input[name="fluid_layout"]', false);
+    setValue('select[name="data_refresh_rate"]', '30');
+    setValue('select[name="system_language"]', 'en');
+    setValue('input[name="enable_debug_mode"]', false);
+    setValue('input[name="enable_keyboard_shortcuts"]', true);
+    setValue('input[name="show_tooltips"]', true);
+
+    const navigationTypeSelect = form.querySelector('select[name="navigation_type"]');
+    if (navigationTypeSelect) {
+        navigationTypeSelect.dispatchEvent(new Event('change'));
+    }
+
+    InventMagApp.showToast('Success', 'Settings have been reset to their default values.', 'success');
 }
 
-// Handle session-based notifications on DOM ready (works for both turbo and full page loads)
 function handleNotificationsOnLoad() {
     if (window.handleSessionNotifications) {
         window.handleSessionNotifications();
     }
     
-    // Also handle notifications passed via URL parameters
     const urlParams = new URLSearchParams(window.location.search);
     const status = urlParams.get('status');
     const message = urlParams.get('message');
@@ -325,72 +348,14 @@ function handleNotificationsOnLoad() {
     }
 }
 
-// Run on DOMContentLoaded for full page loads
-if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', handleNotificationsOnLoad);
-} else {
-    handleNotificationsOnLoad();
-}
-
-// Also run on turbo:load for turbo navigations
-document.addEventListener('turbo:load', handleNotificationsOnLoad);
-
-import { onPageLoad } from '../utils/onPageLoad.js';
-
 onPageLoad(() => {
-    // Additional handling if needed on turbo navigation
+    if (document.querySelector('meta[name="csrf-token"]')) {
+        fetchSystemSettings();
+    }
+    handleNotificationsOnLoad();
 });
 
-function resetToDefaults() {
-    const form = document.getElementById('systemSettingsForm');
-    if (form) {
-        // Interface Layout Settings
-        form.querySelector('select[name="navigation_type"]').value = 'sidebar';
-        form.querySelector('input[name="sidebar_lock"]').checked = false;
-        form.querySelector('input[name="sticky_navbar"]').checked = false;
-
-        // Theme Settings
-        form.querySelector('select[name="theme_mode"]').value = 'light';
-        form.querySelector('input[name="show_theme_toggle"]').checked = true;
-
-        // Notification Settings
-        form.querySelector('input[name="enable_sound_notifications"]').checked = true;
-        form.querySelector('input[name="enable_browser_notifications"]').checked = true;
-        form.querySelector('input[name="show_success_messages"]').checked = true;
-        form.querySelector('select[name="notification_duration"]').value = '5';
-
-        // Session & Security Settings
-        form.querySelector('select[name="auto_logout_time"]').value = '60';
-        form.querySelector('input[name="remember_last_page"]').checked = true;
-
-        // Performance Settings
-        form.querySelector('input[name="enable_animations"]').checked = true;
-        form.querySelector('input[name="lazy_load_images"]').checked = true;
-        form.querySelector('input[name="fluid_layout"]').checked = false;
-        form.querySelector('select[name="data_refresh_rate"]').value = '30';
-
-        // Language & Localization
-        form.querySelector('select[name="system_language"]').value = 'en';
-
-        // Advanced Settings
-        form.querySelector('input[name="enable_debug_mode"]').checked = false;
-        form.querySelector('input[name="enable_keyboard_shortcuts"]').checked = true;
-        form.querySelector('input[name="show_tooltips"]').checked = true;
-        form.querySelector('input[name="compact_mode"]').checked = false;
-
-        // After resetting, re-run the logic to toggle visibility of dependent options
-        const navigationTypeSelect = form.querySelector('select[name="navigation_type"]');
-        if (navigationTypeSelect) {
-            navigationTypeSelect.dispatchEvent(new Event('change'));
-        }
-
-        InventMagApp.showToast('Success', 'Settings have been reset to their default values.', 'success');
-    }
-}
-
-const showShortcutsModalBtn = document.getElementById('showShortcutsModalBtn');
-if (showShortcutsModalBtn) {
-    showShortcutsModalBtn.addEventListener('click', () => {
-        window.shortcutManager.showShortcutsModal();
-    });
-}
+// Reset init flags before Turbo caches so settings re-initialize properly
+document.addEventListener('turbo:before-cache', () => {
+    window.autoLogoutInitialized = false;
+});

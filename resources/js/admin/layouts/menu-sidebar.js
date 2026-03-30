@@ -7,6 +7,13 @@ document.addEventListener("turbo:load", function () {
     initSidebar();
 });
 
+document.addEventListener('turbo:before-cache', () => {
+    const sidebar = document.querySelector(".sidebar");
+    if (sidebar) {
+        sidebar.dataset.turboInitialized = "";
+    }
+});
+
 function initSidebar() {
     const sidebar = document.querySelector(".sidebar");
     const sidebarToggle = document.getElementById("sidebar-toggle");

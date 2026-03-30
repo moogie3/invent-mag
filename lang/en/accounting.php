@@ -89,6 +89,10 @@ return [
         'equity' => [
             'name' => 'Equity',
         ],
+        'opening_balance_equity' => [
+            'name' => 'Opening Balance Equity',
+            'description' => 'Used to balance opening balances when setting up accounting.',
+        ],
         'owners_equity' => [
             'name' => 'Owner\'s Equity',
             'description' => 'The owner\'s stake in the company.',

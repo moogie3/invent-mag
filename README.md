@@ -1,9 +1,9 @@
 # Invent-MAG: Enterprise Inventory & Accounting System
 
-**Version:** 1.2  
+**Version:** 1.3  
 **Author:** moogie3  
 **License:** MIT  
-**Development Time:** 1.5+ years (400+ commits)  
+**Development Time:** 1.5+ years (451+ commits)  
 **Status:** Production-Ready
 
 ---
@@ -14,7 +14,7 @@
 | -------------------- | ---------------------------------------- |
 | **🏗️ Architecture**  | Multi-tenant SaaS                        |
 | **🧪 Test Coverage** | 366 test files                           |
-| **💻 Codebase**      | 400+ commits, 1.5 years development      |
+| **💻 Codebase**      | 451+ commits, 1.5 years development      |
 | **🔐 Security**      | RBAC with 79 permissions, audit logging  |
 | **🐳 DevOps**        | Docker + GitHub Actions CI/CD            |
 | **📡 API**           | RESTful API with Sanctum authentication  |
@@ -327,8 +327,9 @@ Data:
 ### Frontend
 
 - **Template Engine:** Blade
+- **Navigation:** Turbo Drive (Hotwire) for SPA-like navigation without JS framework
 - **CSS Framework:** Tailwind CSS
-- **JavaScript:** Alpine.js
+- **JavaScript:** Alpine.js + Vanilla JS with `onPageLoad` utility
 - **Build Tool:** Vite
 - **UI Kit:** Tabler
 

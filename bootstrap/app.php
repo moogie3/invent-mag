@@ -50,12 +50,82 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
+        // Helper function to handle errors consistently with Turbo Laravel support
+        $handleError = function ($request, $code, $message) {
+            // For API requests - return JSON
+            if ($request->expectsJson() || $request->is('api/*')) {
+                return response()->json(['message' => $message], $code);
+            }
+            
+            // Always return HTML view (works with Turbo Drive)
+            return response()->view("errors.{$code}", [], $code);
+        };
+
+        // 400 - Bad Request
+        $exceptions->render(function (\BadRequestException $e, Illuminate\Http\Request $request) use ($handleError) {
+            return $handleError($request, 400, 'Bad Request');
+        });
+
+        // 401 - Unauthorized
+        $exceptions->render(function (\Illuminate\Auth\AuthenticationException $e, Illuminate\Http\Request $request) use ($handleError) {
+            return $handleError($request, 401, 'Unauthorized');
+        });
+
+        // 403 - Forbidden
+        $exceptions->render(function (\Illuminate\Auth\Access\AuthorizationException $e, Illuminate\Http\Request $request) use ($handleError) {
+            return $handleError($request, 403, 'Forbidden');
+        });
+
+        // 404 - Route Not Found
+        $exceptions->render(function (\Illuminate\Routing\Exceptions\RouteNotFoundException $e, Illuminate\Http\Request $request) use ($handleError) {
+            return $handleError($request, 404, 'Page not found');
+        });
+
+        // 404 - Not Found Http Exception
+        $exceptions->render(function (\Symfony\Component\HttpKernel\Exception\NotFoundHttpException $e, Illuminate\Http\Request $request) use ($handleError) {
+            return $handleError($request, 404, 'Page not found');
+        });
+
+        // 404 - Method Not Allowed
+        $exceptions->render(function (\Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException $e, Illuminate\Http\Request $request) use ($handleError) {
+            return $handleError($request, 404, 'Method not allowed');
+        });
+
+        // 419 - CSRF Token Expired
+        $exceptions->render(function (\Illuminate\Session\TokenMismatchException $e, Illuminate\Http\Request $request) use ($handleError) {
+            return $handleError($request, 419, 'Page expired due to inactivity');
+        });
+
+        // 429 - Too Many Requests
+        $exceptions->render(function (\Illuminate\Http\Exceptions\ThrottleRequestsException $e, Illuminate\Http\Request $request) use ($handleError) {
+            return $handleError($request, 429, 'Too many requests');
+        });
+
+        // 500 - Server Error (catch-all)
+        $exceptions->render(function (\Throwable $e, Illuminate\Http\Request $request) use ($handleError) {
+            // Let Laravel handle ValidationException natively (redirects back with errors)
+            if ($e instanceof \Illuminate\Validation\ValidationException) {
+                return null;
+            }
+            // Don't handle TokenMismatch here (handled above)
+            if ($e instanceof \Illuminate\Session\TokenMismatchException) {
+                return $handleError($request, 419, 'Page expired due to inactivity');
+            }
+            return $handleError($request, 500, 'Internal server error');
+        });
+
+        // Model Not Found
+        $exceptions->render(function (\Illuminate\Database\Eloquent\ModelNotFoundException $e, Illuminate\Http\Request $request) use ($handleError) {
+            return $handleError($request, 404, 'Resource not found');
+        });
+
+        // NoCurrentTenant - Multitenancy
         $exceptions->render(function (\Spatie\Multitenancy\Exceptions\NoCurrentTenant $e, Illuminate\Http\Request $request) {
             if ($request->expectsJson() || $request->is('api/*')) {
                 return response()->json(['message' => 'Workspace not found or no tenant specified.'], 404);
             }
             
-            // Redirect to frontend login - stop the local loop
+            // Redirect to frontend login
             $frontendUrl = config('app.frontend_url');
             return redirect()->away($frontendUrl . '/login');
         });

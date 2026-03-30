@@ -2,11 +2,10 @@
     $isAuthPage = request()->is(
         'admin/login',
         'admin/register',
-        'forgot-password',
-        'admin/login/post',
-        'admin/register/post',
-        'password/email',
+        'admin/forgot-password',
+        'admin/reset-password/*',
         'admin/email/verify',
+        'admin/email/verified',
     );
 
     // Map known status keys to their translation keys for proper multilingual support
@@ -16,7 +15,7 @@
 
     $sessionStatus = session('status');
     $translatedStatus = $statusTranslations[$sessionStatus] ?? $sessionStatus;
-    
+
     // Use session('success') if set, otherwise use translated status
     $successMessage = session('success');
     if (empty($successMessage)) {

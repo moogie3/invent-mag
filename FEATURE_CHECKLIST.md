@@ -1,7 +1,7 @@
 # Invent-MAG: Complete Feature Checklist
 
 **Last Updated:** March 2026  
-**Version:** 1.2
+**Version:** 1.3
 
 ---
 
@@ -113,6 +113,7 @@
 - [x] Touch-friendly design
 - [x] Multiple payment methods
 - [x] Payment calculation
+- [x] Real-time discount and tax recalculation
 - [x] Receipt generation
 - [x] Receipt printing
 - [x] Quick product search
@@ -364,20 +365,24 @@
 - [x] Input sanitization
 - [x] XSS protection
 - [x] Custom error pages (403, 404, 419, 429, 500, 503)
+- [x] Auth-specific ValidationException handling bypassing global 500 error
 
 ---
 
 ### 🎨 UI/UX Features
 
 - [x] Responsive design (Tailwind CSS)
+- [x] Turbo Drive (Hotwire) SPA-like navigation
+- [x] Dedicated `onPageLoad` utility for Turbo-compatible initialization
+- [x] Unified `bootstrap-init.js` for dynamic DOM component reattachment
 - [x] Dark/Light theme toggle
 - [x] Theme persistence
 - [x] Alpine.js interactions
 - [x] Tabler UI components
-- [x] Icon system (Tabler Icons)
 - [x] Modal dialogs
 - [x] Form validation
 - [x] Toast notifications
+- [x] Auth-specific session error/success modals
 - [x] Loading states
 - [x] Global keyboard shortcuts
 - [x] Sound notifications (optional)
@@ -427,7 +432,7 @@
 | **JavaScript Files** | 161       |
 | **Languages**        | 2 (EN/ID) |
 | **Development Time** | 1.5 years |
-| **Total Commits**    | 371+      |
+| **Total Commits**    | 451+      |
 
 ---
 
@@ -443,5 +448,5 @@
 
 ---
 
-**Document Version:** 1.1  
-**Last Updated:** February 2026
+**Document Version:** 1.3  
+**Last Updated:** March 2026

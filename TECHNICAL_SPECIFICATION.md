@@ -1,8 +1,8 @@
 # Invent-MAG: Technical Specification Document
 
-**Document Version:** 1.2  
+**Document Version:** 1.3  
 **Last Updated:** March 2026  
-**System Version:** 1.2
+**System Version:** 1.3
 
 ---
 
@@ -14,9 +14,10 @@ Invent-MAG is a production-ready, enterprise-grade ERP system built on Laravel 1
 
 - **Multi-tenant SaaS architecture** with row-level database isolation
 - **776 test files** ensuring code reliability
-- **371+ commits** demonstrating sustained development
+- **451+ commits** demonstrating sustained development
 - **Docker + CI/CD** for modern DevOps practices
 - **Service-oriented architecture** with clean separation of concerns
+- **Turbo Drive (Hotwire)** for SPA-like navigation without a frontend framework
 
 ---
 
@@ -502,13 +503,14 @@ php artisan backup:clean        # Clean old backups
 
 ### 7.1 Technology Stack
 
-| Layer          | Technology   | Purpose                |
-| -------------- | ------------ | ---------------------- |
-| **Templating** | Blade        | Server-side rendering  |
-| **CSS**        | Tailwind CSS | Utility-first styling  |
-| **JavaScript** | Alpine.js    | Reactive components    |
-| **Icons**      | Tabler Icons | Consistent iconography |
-| **Build**      | Vite         | Asset compilation      |
+| Layer          | Technology      | Purpose                      |
+| -------------- | --------------- | ---------------------------- |
+| **Templating** | Blade           | Server-side rendering        |
+| **Navigation** | Turbo Drive     | SPA-like page transitions    |
+| **CSS**        | Tailwind CSS    | Utility-first styling        |
+| **JavaScript** | Alpine.js       | Reactive components          |
+| **Icons**      | Tabler Icons    | Consistent iconography       |
+| **Build**      | Vite            | Asset compilation            |
 
 ### 7.2 JavaScript Organization
 
@@ -516,18 +518,38 @@ php artisan backup:clean        # Clean old backups
 resources/js/
 ├── admin/
 │   ├── accounting.js           # Accounting UI
+│   ├── bootstrap-init.js       # Unified Bootstrap init (Turbo-compatible)
 │   ├── journal-entry.js        # Manual JE validation
 │   ├── pos.js                  # POS functionality
 │   ├── sales-pipeline.js       # Drag-drop kanban
 │   ├── sales-order.js          # Dynamic line items
 │   └── layouts/                # Layout components
+│       ├── receipt-page.js     # Receipt page loader handling
+│       └── settings.js         # User settings & notifications
+├── partials/
+│   └── pos/
+│       └── cart/
+│           └── actions.js      # POS cart discount/tax reactivity
 ├── utils/
 │   ├── currencyFormatter.js    # Currency formatting
+│   ├── onPageLoad.js           # Turbo-compatible init helper
 │   └── sanitize.js            # Input sanitization
 └── app.js                      # Entry point
 ```
 
-### 7.3 Key Frontend Features
+### 7.3 Turbo Drive Integration
+
+Invent-MAG uses **Hotwire Turbo Drive** (`@hotwired/turbo-rails`) to deliver SPA-like navigation without the complexity of a JavaScript framework. All page-to-page navigations are handled via fetch, with the DOM updated in place.
+
+**Key implementation details:**
+
+- **`onPageLoad(callback)` utility** — a purpose-built helper (`resources/js/admin/utils/onPageLoad.js`) that fires on both the initial `DOMContentLoaded` and every subsequent `turbo:load` event, without double-firing. All page-specific JS modules use this instead of bare `DOMContentLoaded` listeners.
+- **`bootstrap-init.js`** — unified Bootstrap component initializer that re-runs on every `turbo:load` to reattach tooltips, dropdowns, and popovers on freshly rendered DOM nodes.
+- **`receipt-page.js`** — dedicated script for the POS receipt page that immediately dismisses the global page loader, which otherwise persists during Turbo navigations.
+- **Turbo Frames** — used on the main content area (`<turbo-frame id="main-content">`) to scope navigation updates; settings and user management pages opt out to avoid modal conflicts.
+- **Session notifications** — the `session-notifications` partial and `handleSessionNotifications()` JS function are re-triggered on every `turbo:load` to display flashed success/error modals after Turbo navigations.
+
+### 7.4 Key Frontend Features
 
 **Sales Forecasting Chart:**
 
@@ -541,6 +563,8 @@ resources/js/
 - Touch-friendly
 - Receipt printing
 - Payment calculation
+- Real-time discount and tax recalculation on input change
+- Turbo-compatible receipt page (dedicated `receipt-page.js` loader handling)
 
 **Sales Pipeline:**
 
@@ -663,6 +687,7 @@ class SalesForecastService
 
 | Version | Date          | Changes                                                                                                                                                                       |
 | ------- | ------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1.3     | March 2026    | Turbo Drive (Hotwire) integration: `onPageLoad` utility, unified `bootstrap-init.js`, `receipt-page.js`, POS discount/tax reactivity fix, `DashboardService` extraction, auth error handling fix (ValidationException bypass + session-notifications auth page detection). |
 | 1.2     | March 2026    | Full Production Architecture: Subdomain isolation (`*.invent-mag.web.id`), Resend API Email Integration, Advanced Rate Limiting, Midtrans Tenant-Aware Webhooks, CI/CD fixes. |
 | 1.2     | March 2026    | Implemented subscription & payment system with Midtrans, tiered plans (Starter/Professional/Enterprise), feature gating, usage limits, plan badges in sidebar, invoice emails |
 | 1.2     | February 2026 | Dark theme improvements, notification system enhancements                                                                                                                     |
@@ -741,6 +766,7 @@ Common extension points:
 | 1.0     | Feb 2026 | Added comprehensive test coverage stats and documented returns fixes                                                                                                          |
 | 1.0     | Mar 2026 | Full Production Architecture: Subdomain isolation (`*.invent-mag.web.id`), Resend API Email Integration, Advanced Rate Limiting, Midtrans Tenant-Aware Webhooks, CI/CD fixes. |
 | 1.0     | Mar 2026 | Documented Subscription system, Midtrans integration, and Railway deployment architecture                                                                                     |
+| 1.3     | Mar 2026 | Turbo Drive integration: `onPageLoad` utility, `bootstrap-init.js`, `receipt-page.js`, POS reactivity fix, `DashboardService` extraction, auth error handling improvements.  |
 
 ---
 

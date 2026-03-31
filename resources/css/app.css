@@ -62,6 +62,91 @@
     opacity: 0.3;
 }
 
+/* Disable animations when user preference is off - ALL animations */
+body.no-animations,
+body.no-animations * {
+    transition: none !important;
+    animation: none !important;
+}
+
+/* Exception: navbar-brand needs transform for layout positioning */
+body.no-animations .navbar-brand {
+    transform: translate(-50%, -50%) !important;
+}
+
+/* Page loader - hide completely when animations disabled */
+body.no-animations .page-loader,
+body.no-animations #global-loader {
+    display: none !important;
+}
+
+/* Hide sidebar header completely when animations disabled - avoid layout issues */
+body.no-animations .sidebar-header {
+    display: none !important;
+}
+
+/* Allow navbar dropdown to work - remove transition but keep visibility control */
+body.no-animations .nav-dropdown {
+    transition: none !important;
+}
+
+body.no-animations .nav-container.active .nav-dropdown {
+    opacity: 1 !important;
+    visibility: visible !important;
+}
+
+/* Disable Bootstrap dropdown animations */
+body.no-animations .nav-dropdown .dropdown-menu {
+    transition: none !important;
+    display: none !important;
+}
+
+body.no-animations .nav-dropdown .dropdown-menu.show {
+    display: block !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+}
+
+body.no-animations .nav-dropdown .nav-item.dropdown:hover > .dropdown-menu,
+body.no-animations .nav-dropdown li.nav-item.dropdown:hover > .dropdown-menu {
+    display: block !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+}
+
+/* Fix text color in navbar dropdown when animations disabled */
+body.no-animations .nav-dropdown .dropdown-menu {
+    background-color: rgba(20, 20, 20, 0.98) !important;
+    border: 1px solid rgba(255, 255, 255, 0.15) !important;
+}
+
+body.no-animations .nav-dropdown .dropdown-menu .dropdown-item {
+    color: #ffffff !important;
+    font-size: 0.8125rem !important;
+}
+
+body.no-animations .nav-dropdown .dropdown-menu .dropdown-item:hover,
+body.no-animations .nav-dropdown .dropdown-menu .dropdown-item:focus {
+    color: #ffffff !important;
+    background-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+/* Exception: navbar-brand needs transform for layout positioning */
+body.no-animations .navbar-brand {
+    transform: translate(-50%, -50%) !important;
+}
+
+/* Page loader - hide completely when animations disabled */
+body.no-animations .page-loader,
+body.no-animations #global-loader {
+    display: none !important;
+}
+
+/* Hide sidebar brand completely when animations disabled - avoid layout issues */
+body.no-animations .sidebar-header {
+    display: none !important;
+}
+
 .page-wrapper {
     flex: 1;
     display: flex;

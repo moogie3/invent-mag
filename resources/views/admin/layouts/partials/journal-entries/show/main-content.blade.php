@@ -3,11 +3,11 @@
         <h3 class="card-title">{{ $entry->description }}</h3>
         <div class="card-actions">
             @if($entry->status === 'draft')
-                <span class="badge bg-warning text-body">{{ __('messages.draft') }}</span>
+                <span class="badge bg-warning text-white">{{ __('messages.draft') }}</span>
             @elseif($entry->status === 'posted')
-                <span class="badge bg-success">{{ __('messages.posted') }}</span>
+                <span class="badge bg-success text-white">{{ __('messages.posted') }}</span>
             @else
-                <span class="badge bg-danger">{{ __('messages.void') }}</span>
+                <span class="badge bg-danger text-white">{{ __('messages.void') }}</span>
             @endif
         </div>
     </div>

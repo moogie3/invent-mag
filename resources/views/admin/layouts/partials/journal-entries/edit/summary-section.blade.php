@@ -24,7 +24,7 @@
                     @php
                         $isBalanced = abs($entry->total_debit - $entry->total_credit) < 0.01;
                     @endphp
-                    <span id="balanceStatus" class="badge bg-{{ $isBalanced ? 'success' : 'danger' }}">
+                    <span id="balanceStatus" class="badge bg-{{ $isBalanced ? 'success' : 'danger' }} text-white">
                         {{ $isBalanced ? __('messages.balanced') : __('messages.not_balanced') }}
                     </span>
                 </div>

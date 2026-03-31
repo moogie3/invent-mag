@@ -31,9 +31,42 @@
     <div class="card-footer bg-transparent">
         <div class="d-flex justify-content-between">
             <a href="{{ route('admin.accounting.journal-entries.show', $entry) }}" class="btn btn-secondary">{{ __('messages.cancel') }}</a>
-            <button type="button" class="btn btn-primary" onclick="validateAndSubmit()">
+            <button type="button" class="btn btn-primary" id="updateEntryBtn">
                 <i class="ti ti-check me-2"></i>{{ __('messages.update_entry') }}
             </button>
         </div>
     </div>
 </div>
+
+<script>
+(function() {
+    if (typeof window.updateTotals !== 'function') {
+        window.updateTotals = function() {
+            return { totalDebit: 0, totalCredit: 0, isBalanced: true };
+        };
+    }
+    
+    if (typeof window.validateAndSubmit !== 'function') {
+        window.validateAndSubmit = function() {};
+    }
+    
+    if (typeof window.handleAccountChange !== 'function') {
+        window.handleAccountChange = function(event) {};
+    }
+    
+    if (typeof window.handleInput !== 'function') {
+        window.handleInput = function(event) {};
+    }
+    
+    document.addEventListener('DOMContentLoaded', function() {
+        var updateBtn = document.getElementById('updateEntryBtn');
+        if (updateBtn) {
+            updateBtn.addEventListener('click', function() {
+                if (typeof window.validateAndSubmit === 'function') {
+                    window.validateAndSubmit();
+                }
+            });
+        }
+    });
+})();
+</script>

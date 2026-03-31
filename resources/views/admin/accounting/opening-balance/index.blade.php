@@ -25,28 +25,22 @@
 
         <div class="page-body mt-4">
             @if(session('success'))
-                <div class="alert alert-success" role="alert">
+                <div class="alert alert-success alert-dismissible" role="alert">
                     <div class="d-flex">
-                        <div>
-                            <i class="ti ti-check icon"></i>
-                        </div>
-                        <div>
-                            {{ session('success') }}
-                        </div>
+                        <div><i class="ti ti-check icon"></i></div>
+                        <div>{{ session('success') }}</div>
                     </div>
+                    <a class="btn-close" data-bs-dismiss="alert" aria-label="close"></a>
                 </div>
             @endif
 
             @if(session('error'))
-                <div class="alert alert-danger" role="alert">
+                <div class="alert alert-danger alert-dismissible" role="alert">
                     <div class="d-flex">
-                        <div>
-                            <i class="ti ti-alert-circle icon"></i>
-                        </div>
-                        <div>
-                            {{ session('error') }}
-                        </div>
+                        <div><i class="ti ti-alert-circle icon"></i></div>
+                        <div>{{ session('error') }}</div>
                     </div>
+                    <a class="btn-close" data-bs-dismiss="alert" aria-label="close"></a>
                 </div>
             @endif
 

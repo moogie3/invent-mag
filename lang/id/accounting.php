@@ -119,7 +119,7 @@ return [
         ],
 
         'cost_of_goods_sold_group' => [
-            'name' => 'Harga Pokok Penjualan',
+            'name' => 'Harga Pokok Penjualan (HPP)',
         ],
         'purchases' => [
             'name' => 'Pembelian',

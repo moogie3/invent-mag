@@ -188,10 +188,26 @@ class JournalEntryController extends Controller
     {
         try {
             $this->manualJournalService->delete($journalEntry);
+            
+            if (request()->ajax() || request()->wantsJson()) {
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Journal entry deleted successfully.',
+                ]);
+            }
+            
             return redirect()->route('admin.accounting.journal-entries.index')
                 ->with('success', 'Journal entry deleted successfully.');
         } catch (\Exception $e) {
             Log::error('Failed to delete journal entry: ' . $e->getMessage());
+            
+            if (request()->ajax() || request()->wantsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Error deleting journal entry: ' . $e->getMessage(),
+                ]);
+            }
+            
             return redirect()->back()
                 ->with('error', 'Error deleting journal entry: ' . $e->getMessage());
         }

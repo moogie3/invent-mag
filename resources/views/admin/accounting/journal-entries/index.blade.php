@@ -7,4 +7,6 @@
         @include('admin.layouts.partials.journal-entries.index.header')
         @include('admin.layouts.partials.journal-entries.index.page-body')
     </div>
+    
+    @include('admin.layouts.modals.journal-entries.jemodals')
 @endsection

@@ -1,10 +1,21 @@
 import { SALES_PIPELINE_ROUTES, CSRF_TOKEN } from '../common/constants.js';
 import { fetchData } from '../data/init.js';
 
-const newPipelineForm = document.getElementById("newPipelineForm");
+let newPipelineFormListenerAttached = false;
 
 export function initNewPipelineForm() {
-    newPipelineForm?.addEventListener("submit", async function (e) {
+    if (newPipelineFormListenerAttached) {
+        return;
+    }
+    
+    const newPipelineForm = document.getElementById("newPipelineForm");
+    if (!newPipelineForm) {
+        return;
+    }
+    
+    newPipelineFormListenerAttached = true;
+
+    newPipelineForm.addEventListener("submit", async function (e) {
         e.preventDefault();
 
         const formData = new FormData(this);

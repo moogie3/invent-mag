@@ -10,9 +10,24 @@ const editOpportunityItemsContainer = document.getElementById(
 const pipelineSelect = document.getElementById("pipelineSelect");
 
 let editOpportunityExpectedCloseDateFlatpickr;
+let editOpportunityFormListenerAttached = false;
 
 export function initEditOpportunityForm() {
-    editOpportunityForm?.addEventListener("submit", async function (e) {
+    if (editOpportunityFormListenerAttached) {
+        return;
+    }
+    
+    const editOpportunityForm = document.getElementById("editOpportunityForm");
+    const editOpportunityItemsContainer = document.getElementById("editOpportunityItemsContainer");
+    const pipelineSelect = document.getElementById("pipelineSelect");
+    
+    if (!editOpportunityForm || !editOpportunityItemsContainer || !pipelineSelect) {
+        return;
+    }
+    
+    editOpportunityFormListenerAttached = true;
+
+    editOpportunityForm.addEventListener("submit", async function (e) {
         e.preventDefault();
 
         const opportunityId =

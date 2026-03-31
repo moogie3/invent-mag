@@ -109,6 +109,24 @@
 {{-- SCRIPT FOR CURRENCY settings --}}
 @vite('resources/js/admin/currency.js')
 
+{{-- GLOBAL FALLBACK FUNCTIONS FOR JOURNAL ENTRIES - Load before journal-entry.js --}}
+<script>
+// These fallbacks ensure functions exist before journal-entry.js loads
+// They will be overwritten by the actual functions when the page has the journal form
+(function() {
+    var funcs = [
+        'updateTotals', 'validateAndSubmit', 'handleAccountChange', 
+        'handleInput', 'addTransactionRow', 'removeTransactionRow',
+        'searchAccounts', 'confirmAction', 'reverseEntry', 'voidEntry'
+    ];
+    funcs.forEach(function(name) {
+        if (typeof window[name] !== 'function') {
+            window[name] = function() {};
+        }
+    });
+})();
+</script>
+
 {{-- SCRIPT FOR ACCOUNTING settings --}}
 @vite('resources/js/admin/accounting.js')
 

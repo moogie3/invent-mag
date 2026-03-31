@@ -771,7 +771,9 @@ Route::middleware('web')->prefix('admin')->group(function () {
                 Route::post('/{journalEntry}/post', [JournalEntryController::class, 'post'])->name('admin.accounting.journal-entries.post');
                 Route::post('/{journalEntry}/void', [JournalEntryController::class, 'void'])->name('admin.accounting.journal-entries.void');
                 Route::post('/{journalEntry}/reverse', [JournalEntryController::class, 'reverse'])->name('admin.accounting.journal-entries.reverse');
-                Route::delete('/{journalEntry}', [JournalEntryController::class, 'destroy'])->name('admin.accounting.journal-entries.destroy');
+                Route::delete('/{journalEntry}', [JournalEntryController::class, 'destroy'])
+                ->name('admin.accounting.journal-entries.destroy')
+                ->middleware('can:delete-manual-journal');
                 Route::post('/{journalEntry}/duplicate', [JournalEntryController::class, 'duplicate'])->name('admin.accounting.journal-entries.duplicate');
                 Route::get('/search/accounts', [JournalEntryController::class, 'searchAccounts'])->name('admin.accounting.journal-entries.search-accounts');
                 Route::post('/validate', [JournalEntryController::class, 'validateEntry'])->name('admin.accounting.journal-entries.validate');

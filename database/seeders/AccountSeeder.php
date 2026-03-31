@@ -5,6 +5,7 @@ namespace Database\Seeders;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use App\Models\Account;
+use Illuminate\Support\Facades\App;
 
 class AccountSeeder extends Seeder
 {
@@ -19,6 +20,8 @@ class AccountSeeder extends Seeder
         if (isset($this->command)) {
             $this->command->info("Seeding Chart of Accounts for tenant: {$tenantName} (ID: {$tenantId})");
         }
+
+        $locale = App::getLocale() ?: 'en';
         
         $accountsData = [
             // Group 1: Assets
@@ -145,6 +148,17 @@ class AccountSeeder extends Seeder
         foreach ($accounts as $accountData) {
             $children = $accountData['children'] ?? [];
             unset($accountData['children']);
+
+            $nameKey = $accountData['name'];
+            $accountData['name'] = trans($nameKey);
+            if (isset($accountData['description'])) {
+                $descKey = $accountData['description'];
+                $accountData['description'] = trans($descKey);
+            }
+
+            // Allow manual entries for all account types
+            // Manual journal entries can be used for adjustments, corrections, accruals, etc.
+            $accountData['allow_manual_entry'] = true;
 
             $account = Account::updateOrCreate(
                 [

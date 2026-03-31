@@ -3,10 +3,15 @@ import { SALES_PIPELINE_ROUTES } from '../common/constants.js';
 const convertOpportunityForm = document.getElementById(
     "convertOpportunityForm"
 );
+let convertOpportunityFormListenerAttached = false;
 
 export function initConvertOpportunityForm() {
-    if (convertOpportunityForm) {
-        convertOpportunityForm.addEventListener("submit", function (e) {
+    if (convertOpportunityFormListenerAttached || !convertOpportunityForm) {
+        return;
+    }
+    convertOpportunityFormListenerAttached = true;
+
+    convertOpportunityForm.addEventListener("submit", function (e) {
             e.preventDefault();
             const form = e.target;
             const url = form.action;
@@ -73,5 +78,4 @@ export function initConvertOpportunityForm() {
                     );
                 });
         });
-    }
 }

@@ -3,21 +3,27 @@ import { allPipelines } from "../common/state.js";
 import { formatCurrency } from "../common/utils.js";
 import { loadPipelineBoard } from "../ui/pipelineBoard.js";
 
-const newOpportunityForm = document.getElementById("newOpportunityForm");
-const newOpportunityPipelineId = document.getElementById(
-    "newOpportunityPipelineId"
-);
-const newOpportunityStageId = document.getElementById("newOpportunityStageId");
-const newOpportunityItemsContainer = document.getElementById(
-    "newOpportunityItemsContainer"
-);
-const newOpportunityTotalAmountInput = document.getElementById(
-    "newOpportunityTotalAmount"
-);
-const pipelineSelect = document.getElementById("pipelineSelect");
+let newOpportunityFormListenerAttached = false;
 
 export function initNewOpportunityForm() {
-    newOpportunityForm?.addEventListener("submit", async function (e) {
+    if (newOpportunityFormListenerAttached) {
+        return;
+    }
+    
+    const newOpportunityForm = document.getElementById("newOpportunityForm");
+    const pipelineSelect = document.getElementById("pipelineSelect");
+    const newOpportunityPipelineId = document.getElementById("newOpportunityPipelineId");
+    const newOpportunityStageId = document.getElementById("newOpportunityStageId");
+    const newOpportunityItemsContainer = document.getElementById("newOpportunityItemsContainer");
+    const newOpportunityTotalAmountInput = document.getElementById("newOpportunityTotalAmount");
+    
+    if (!newOpportunityForm || !pipelineSelect || !newOpportunityPipelineId || !newOpportunityStageId || !newOpportunityItemsContainer || !newOpportunityTotalAmountInput) {
+        return;
+    }
+    
+    newOpportunityFormListenerAttached = true;
+
+    newOpportunityForm.addEventListener("submit", async function (e) {
         e.preventDefault();
 
         const selectedPipelineId = pipelineSelect.value;

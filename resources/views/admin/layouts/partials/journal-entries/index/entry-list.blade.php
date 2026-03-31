@@ -33,7 +33,7 @@
                                 {{ Str::limit($entry->description, 50) }}
                             </a>
                             @if($entry->reversingEntry || $entry->reversedEntry)
-                                <span class="badge bg-warning text-body ms-1" title="{{ __('messages.reversed') }}">
+                                <span class="badge bg-warning text-white ms-1" title="{{ __('messages.reversed') }}">
                                     <i class="ti ti-arrows-left-right"></i>
                                 </span>
                             @endif
@@ -42,11 +42,11 @@
                         <td class="text-end">{{ $entry->total_credit ? \App\Helpers\CurrencyHelper::format($entry->total_credit) : 'Rp 0,00' }}</td>
                         <td>
                             @if($entry->status == 'draft')
-                                <span class="badge bg-warning text-body">{{ __('messages.draft') }}</span>
+                                <span class="badge bg-warning text-white">{{ __('messages.draft') }}</span>
                             @elseif($entry->status == 'posted')
-                                <span class="badge bg-success">{{ __('messages.posted') }}</span>
+                                <span class="badge bg-success text-white">{{ __('messages.posted') }}</span>
                             @else
-                                <span class="badge bg-danger">{{ __('messages.voided') }}</span>
+                                <span class="badge bg-danger text-white">{{ __('messages.voided') }}</span>
                             @endif
                         </td>
                         <td>
@@ -62,6 +62,14 @@
                                         title="{{ __('messages.edit') }}">
                                         <i class="ti ti-edit"></i>
                                     </a>
+                                    <button type="button" 
+                                        class="btn btn-icon btn-ghost-danger delete-btn"
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#deleteModal"
+                                        data-id="{{ $entry->id }}"
+                                        title="{{ __('messages.delete') }}">
+                                        <i class="ti ti-trash"></i>
+                                    </button>
                                 @endif
                                 @if($entry->status == 'posted')
                                     <button type="button" 

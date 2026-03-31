@@ -119,7 +119,7 @@ return [
         ],
 
         'cost_of_goods_sold_group' => [
-            'name' => 'Cost of Goods Sold',
+            'name' => 'Cost of Goods Sold (COGS)',
         ],
         'purchases' => [
             'name' => 'Purchases',

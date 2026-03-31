@@ -2,69 +2,36 @@ import { onPageLoad } from './utils/onPageLoad.js';
 
 let rowCounter = null;
 
-onPageLoad(function () {
-    if (!window.location.pathname.includes("/admin/accounting/journal-entries")) return;
-    initializeJournalEntry();
-});
-
-function initializeJournalEntry() {
-    const form = document.getElementById("journalEntryForm");
-    if (form) {
-        rowCounter = parseInt(form.dataset.rowCounter) || 2;
-        setupEventListeners();
+// Define functions before they're used
+function formatCurrency(amount) {
+    if (typeof window.currencySettings !== "undefined") {
+        return new Intl.NumberFormat(window.currencySettings.locale, {
+            style: "currency",
+            currency: window.currencySettings.currency_code,
+            minimumFractionDigits: window.currencySettings.decimal_places,
+            maximumFractionDigits: window.currencySettings.decimal_places,
+        }).format(amount);
     }
-    updateTotals();
+    return new Intl.NumberFormat("id-ID", {
+        style: "currency",
+        currency: "IDR",
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+    }).format(amount);
 }
 
-function setupEventListeners() {
-    const container = document.getElementById("transactionsContainer");
-    if (container) {
-        container.addEventListener("input", handleInput);
-        container.addEventListener("change", handleAccountChange);
+function showNotification(message, type = "info") {
+    const title = type.charAt(0).toUpperCase() + type.slice(1);
+    if (typeof window.InventMagApp !== "undefined" && typeof window.InventMagApp.showToast === "function") {
+        window.InventMagApp.showToast(title, message, type);
+    } else if (typeof toastr !== "undefined") {
+        toastr[type](message);
+    } else if (typeof showToast !== "undefined") {
+        showToast(message, type);
+    } else {
+        console.log(`[${type}] ${message}`);
     }
 }
-
-function handleInput(event) {
-    if (event.target.classList.contains("amount-input") || event.target.classList.contains("transaction-type")) {
-        updateTotals();
-    }
-}
-
-function handleAccountChange(event) {
-    if (event.target.classList.contains("account-select")) {
-        const row = event.target.closest(".transaction-row");
-        updateAccountSelect(row);
-    }
-    if (event.target.classList.contains("transaction-type")) {
-        updateTotals();
-    }
-}
-
-window.addTransactionRow = function () {
-    const container = document.getElementById("transactionsContainer");
-    const template = document.getElementById("transactionRowTemplate");
-    if (template && container) {
-        const newRow = template.content.cloneNode(true);
-        const rowElement = newRow.querySelector(".transaction-row");
-        rowElement.dataset.rowId = rowCounter;
-        rowElement.innerHTML = rowElement.innerHTML.replace(/::ROW_ID::/g, rowCounter);
-        container.appendChild(rowElement);
-        rowCounter++;
-        updateTotals();
-    }
-};
-
-window.removeTransactionRow = function (button) {
-    const rows = document.querySelectorAll(
-        ".transaction-row:not(.header-row):not(.template-row)",
-    );
-    if (rows.length <= 2) {
-        showNotification("Minimum two transactions are required", "warning");
-        return;
-    }
-    button.closest(".transaction-row").remove();
-    updateTotals();
-};
 
 function updateAccountSelect(row) {
     const select = row.querySelector(".account-select");
@@ -88,6 +55,178 @@ function updateAccountSelect(row) {
         }
     });
 }
+
+function handleInput(event) {
+    if (event.target.classList.contains("amount-input") || event.target.classList.contains("transaction-type")) {
+        window.updateTotals();
+    }
+}
+
+function handleAccountChange(event) {
+    if (event.target.classList.contains("account-select")) {
+        const row = event.target.closest(".transaction-row");
+        updateAccountSelect(row);
+    }
+    if (event.target.classList.contains("transaction-type")) {
+        window.updateTotals();
+    }
+}
+
+function setupEventListeners() {
+    const container = document.getElementById("transactionsContainer");
+    if (container) {
+        container.addEventListener("input", handleInput);
+        container.addEventListener("change", handleAccountChange);
+    }
+}
+
+function initializeJournalEntry() {
+    const form = document.getElementById("journalEntryForm");
+    if (form) {
+        rowCounter = parseInt(form.dataset.rowCounter) || 2;
+        setupEventListeners();
+    }
+    window.updateTotals();
+}
+
+onPageLoad(function () {
+    if (!window.location.pathname.includes("/admin/accounting/journal-entries")) return;
+    initializeJournalEntry();
+    initDeleteModal();
+});
+
+// Delete modal initialization
+function initDeleteModal() {
+    const deleteModal = document.getElementById("deleteModal");
+    
+    if (!deleteModal) return;
+    if (deleteModal.dataset.initialized) return;
+    deleteModal.dataset.initialized = 'true';
+    
+    deleteModal.addEventListener("show.bs.modal", function(event) {
+        const button = event.relatedTarget;
+        if (!button) return;
+        
+        const entryId = button.dataset.id;
+        const deleteForm = document.getElementById("deleteForm");
+        if (deleteForm && entryId) {
+            deleteForm.action = `/admin/accounting/journal-entries/${entryId}`;
+        }
+    });
+    
+    const deleteForm = document.getElementById("deleteForm");
+    if (deleteForm && !deleteForm.dataset.handlerAttached) {
+        deleteForm.dataset.handlerAttached = 'true';
+        deleteForm.addEventListener("submit", function(e) {
+            e.preventDefault();
+            handleDeleteSubmit(this);
+        });
+    }
+}
+
+function handleDeleteSubmit(form) {
+    if (form.dataset.submitting === 'true') return;
+    form.dataset.submitting = 'true';
+    
+    const submitBtn = form.querySelector('button[type="submit"]');
+    if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span> Deleting...';
+    }
+
+    fetch(form.action, {
+        method: 'POST',
+        body: new FormData(form),
+        headers: {
+            'X-Requested-With': 'XMLHttpRequest',
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '',
+        },
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            if (typeof window.InventMagApp !== 'undefined' && typeof window.InventMagApp.showToast === 'function') {
+                window.InventMagApp.showToast('Success', data.message || 'Deleted successfully', 'success');
+            }
+            const deleteModal = bootstrap.Modal.getInstance(document.getElementById("deleteModal"));
+            if (deleteModal) {
+                deleteModal._element.addEventListener('hidden.bs.modal', function handler() {
+                    deleteModal._element.removeEventListener('hidden.bs.modal', handler);
+                    document.querySelectorAll('.modal-backdrop').forEach(b => b.remove());
+                    document.body.classList.remove('modal-open');
+                    document.body.style.overflow = '';
+                    location.reload();
+                }, { once: true });
+                deleteModal.hide();
+            } else {
+                location.reload();
+            }
+        } else {
+            if (typeof window.InventMagApp !== 'undefined' && typeof window.InventMagApp.showToast === 'function') {
+                window.InventMagApp.showToast('Error', data.message || 'Failed to delete', 'error');
+            }
+            if (submitBtn) {
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Delete';
+            }
+            form.dataset.submitting = 'false';
+        }
+    })
+    .catch(error => {
+        console.error('Delete error:', error);
+        if (typeof window.InventMagApp !== 'undefined' && typeof window.InventMagApp.showToast === 'function') {
+            window.InventMagApp.showToast('Error', 'Failed to delete. Please try again.', 'error');
+        }
+        if (submitBtn) {
+            submitBtn.disabled = false;
+            submitBtn.textContent = 'Delete';
+        }
+        form.dataset.submitting = 'false';
+    });
+}
+
+// Expose functions to window
+window.handleInput = function(event) {
+    if (event.target.classList.contains("amount-input") || event.target.classList.contains("transaction-type")) {
+        window.updateTotals();
+    }
+};
+
+window.handleAccountChange = function(event) {
+    if (event.target.classList.contains("account-select")) {
+        const row = event.target.closest(".transaction-row");
+        updateAccountSelect(row);
+    }
+    if (event.target.classList.contains("transaction-type")) {
+        window.updateTotals();
+    }
+};
+
+window.addTransactionRow = function () {
+    const container = document.getElementById("transactionsContainer");
+    const template = document.getElementById("transactionRowTemplate");
+    if (template && container) {
+        const newRow = template.content.cloneNode(true);
+        const rowElement = newRow.querySelector(".transaction-row");
+        rowElement.dataset.rowId = rowCounter;
+        rowElement.innerHTML = rowElement.innerHTML.replace(/::ROW_ID::/g, rowCounter);
+        container.appendChild(rowElement);
+        rowCounter++;
+        window.updateTotals();
+    }
+};
+
+window.removeTransactionRow = function (button) {
+    const rows = document.querySelectorAll(
+        ".transaction-row:not(.header-row):not(.template-row)",
+    );
+    if (rows.length <= 2) {
+        showNotification("Minimum two transactions are required", "warning");
+        return;
+    }
+    button.closest(".transaction-row").remove();
+    window.updateTotals();
+};
 
 window.updateTotals = function () {
     let totalDebit = 0;
@@ -125,11 +264,11 @@ window.updateTotals = function () {
         if (Math.abs(totalDebit - totalCredit) < 0.01) {
             balanceStatusEl.textContent =
                 window.translations?.balanced || "Balanced";
-            balanceStatusEl.className = "badge bg-success";
+            balanceStatusEl.className = "badge bg-success text-white";
         } else {
             balanceStatusEl.textContent =
                 window.translations?.not_balanced || "Not Balanced";
-            balanceStatusEl.className = "badge bg-danger";
+            balanceStatusEl.className = "badge bg-danger text-white";
         }
     }
 
@@ -139,23 +278,6 @@ window.updateTotals = function () {
         isBalanced: Math.abs(totalDebit - totalCredit) < 0.01,
     };
 };
-
-function formatCurrency(amount) {
-    if (typeof window.currencySettings !== "undefined") {
-        return new Intl.NumberFormat(window.currencySettings.locale, {
-            style: "currency",
-            currency: window.currencySettings.currency_code,
-            minimumFractionDigits: window.currencySettings.decimal_places,
-            maximumFractionDigits: window.currencySettings.decimal_places,
-        }).format(amount);
-    }
-    return new Intl.NumberFormat("id-ID", {
-        style: "currency",
-        currency: "IDR",
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2,
-    }).format(amount);
-}
 
 window.validateAndSubmit = function (autoPost = false) {
     const rows = document.querySelectorAll(
@@ -188,7 +310,7 @@ window.validateAndSubmit = function (autoPost = false) {
         return Promise.reject(new Error("Minimum two transactions required"));
     }
 
-    const { totalDebit, totalCredit, isBalanced } = updateTotals();
+    const { totalDebit, totalCredit, isBalanced } = window.updateTotals();
     if (!isBalanced) {
         showNotification(
             "Journal entry must be balanced. Debits: " +
@@ -237,61 +359,37 @@ window.confirmAction = function (url, title, message) {
         const form = document.createElement("form");
         form.method = "POST";
         form.action = url;
-        form.innerHTML = `<input type="hidden" name="_token" value="${document.querySelector('meta[name="csrf-token"]')?.content ?? ''}">`;
+        form.innerHTML = `
+            <input type="hidden" name="_token" value="${document.querySelector('meta[name="csrf-token"]')?.content ?? ''}">
+            <input type="hidden" name="_method" value="DELETE">
+        `;
         document.body.appendChild(form);
         form.submit();
     }
 };
 
 window.reverseEntry = function (url) {
-    const reason = prompt(
-        window.translations?.enter_reason ||
-            "Please enter a reason for reversing this entry:"
-    );
-    if (reason !== null && reason.trim() !== "") {
-        const form = document.createElement("form");
-        form.method = "POST";
-        form.action = url;
-        form.innerHTML = `
-            <input type="hidden" name="_token" value="${document.querySelector('meta[name="csrf-token"]')?.content ?? ''}">
-            <input type="hidden" name="notes" value="${reason.replace(/"/g, "&quot;")}">
-        `;
-        document.body.appendChild(form);
-        form.submit();
-    } else if (reason !== null) {
-        showNotification("Reason cannot be empty", "warning");
+    const reverseModal = document.getElementById('reverseModal');
+    const reverseForm = document.getElementById('reverseForm');
+    if (reverseForm && reverseModal) {
+        reverseForm.action = url;
+        reverseModal.addEventListener('shown.bs.modal', function () {
+            reverseForm.querySelector('textarea')?.focus();
+        }, { once: true });
+        const modal = new bootstrap.Modal(reverseModal);
+        modal.show();
     }
 };
 
 window.voidEntry = function (url) {
-    const reason = prompt(
-        window.translations?.enter_void_reason ||
-            "Please enter a reason for voiding this entry:"
-    );
-    if (reason !== null && reason.trim() !== "") {
-        const form = document.createElement("form");
-        form.method = "POST";
-        form.action = url;
-        form.innerHTML = `
-            <input type="hidden" name="_token" value="${document.querySelector('meta[name="csrf-token"]')?.content ?? ''}">
-            <input type="hidden" name="reason" value="${reason.replace(/"/g, "&quot;")}">
-        `;
-        document.body.appendChild(form);
-        form.submit();
-    } else if (reason !== null) {
-        showNotification("Reason cannot be empty", "warning");
+    const voidModal = document.getElementById('voidModal');
+    const voidForm = document.getElementById('voidForm');
+    if (voidForm && voidModal) {
+        voidForm.action = url;
+        voidModal.addEventListener('shown.bs.modal', function () {
+            voidForm.querySelector('textarea')?.focus();
+        }, { once: true });
+        const modal = new bootstrap.Modal(voidModal);
+        modal.show();
     }
 };
-
-function showNotification(message, type = "info") {
-    const title = type.charAt(0).toUpperCase() + type.slice(1);
-    if (typeof InventMagApp !== "undefined" && typeof InventMagApp.showToast === "function") {
-        InventMagApp.showToast(title, message, type);
-    } else if (typeof toastr !== "undefined") {
-        toastr[type](message);
-    } else if (typeof showToast !== "undefined") {
-        showToast(message, type);
-    } else {
-        console.log(`[${type}] ${message}`);
-    }
-}

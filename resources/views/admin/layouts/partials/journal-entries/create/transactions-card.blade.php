@@ -28,15 +28,59 @@
     </div>
     <div class="card-footer bg-transparent">
         <div class="d-flex justify-content-between">
-            <a href="{{ route('admin.accounting.journal-entries.index') }}" class="btn btn-secondary">{{ __('messages.cancel') }}</a>
-            <div class="btn-group">
-                <button type="button" class="btn btn-outline-secondary" onclick="validateAndSubmit(false)">
+            <a href="{{ route('admin.accounting.journal-entries.index') }}" class="btn btn-secondary rounded-2">{{ __('messages.cancel') }}</a>
+            <div>
+                <button type="button" class="btn btn-outline-secondary me-2 rounded-2" id="saveDraftBtn">
                     <i class="ti ti-device-floppy me-2"></i>{{ __('messages.save_as_draft') }}
                 </button>
-                <button type="button" class="btn btn-primary" onclick="validateAndSubmit(true)">
+                <button type="button" class="btn btn-primary rounded-2" id="savePostBtn">
                     <i class="ti ti-check me-2"></i>{{ __('messages.save_and_post') }}
                 </button>
             </div>
+
+<script>
+(function() {
+    if (typeof window.updateTotals !== 'function') {
+        window.updateTotals = function() {
+            return { totalDebit: 0, totalCredit: 0, isBalanced: true };
+        };
+    }
+    
+    if (typeof window.validateAndSubmit !== 'function') {
+        window.validateAndSubmit = function(autoPost) {};
+    }
+    
+    if (typeof window.handleAccountChange !== 'function') {
+        window.handleAccountChange = function(event) {};
+    }
+    
+    if (typeof window.handleInput !== 'function') {
+        window.handleInput = function(event) {};
+    }
+    
+    // Attach click handlers for save buttons
+    document.addEventListener('DOMContentLoaded', function() {
+        var saveDraftBtn = document.getElementById('saveDraftBtn');
+        var savePostBtn = document.getElementById('savePostBtn');
+        
+        if (saveDraftBtn) {
+            saveDraftBtn.addEventListener('click', function() {
+                if (typeof window.validateAndSubmit === 'function') {
+                    window.validateAndSubmit(false);
+                }
+            });
+        }
+        
+        if (savePostBtn) {
+            savePostBtn.addEventListener('click', function() {
+                if (typeof window.validateAndSubmit === 'function') {
+                    window.validateAndSubmit(true);
+                }
+            });
+        }
+    });
+})();
+</script>
         </div>
     </div>
 </div>

@@ -21,7 +21,7 @@
                     <strong id="difference">Rp 0,00</strong>
                 </div>
                 <div class="mt-2">
-                    <span id="balanceStatus" class="badge bg-danger">{{ __('messages.not_balanced') }}</span>
+                    <span id="balanceStatus" class="badge bg-danger text-white">{{ __('messages.not_balanced') }}</span>
                 </div>
             </div>
         </div>

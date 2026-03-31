@@ -1,11 +1,28 @@
 import { SALES_PIPELINE_ROUTES, CSRF_TOKEN } from '../common/constants.js';
 import { fetchData } from '../data/init.js';
 
-const editPipelineForm = document.getElementById("editPipelineForm");
+let isEditPipelineSubmitting = false;
+let editPipelineFormListenerAttached = false;
 
 export function initEditPipelineForm() {
-    editPipelineForm?.addEventListener("submit", async function (e) {
+    if (editPipelineFormListenerAttached) {
+        return;
+    }
+    
+    const editPipelineForm = document.getElementById("editPipelineForm");
+    if (!editPipelineForm) {
+        return;
+    }
+    
+    editPipelineFormListenerAttached = true;
+
+    editPipelineForm.addEventListener("submit", async function (e) {
         e.preventDefault();
+
+        if (isEditPipelineSubmitting) {
+            return;
+        }
+        isEditPipelineSubmitting = true;
 
         const pipelineId = document.getElementById("editPipelineId").value;
         const formData = new FormData(this);
@@ -46,6 +63,8 @@ export function initEditPipelineForm() {
                 "Failed to update pipeline. Please try again.",
                 "error"
             );
+        } finally {
+            isEditPipelineSubmitting = false;
         }
     });
 }

@@ -4,11 +4,22 @@ import { allPipelines } from '../common/state.js';
 import { renderPipelineStages } from '../ui/stagesList.js';
 import { loadPipelineBoard } from '../ui/pipelineBoard.js';
 
-const newStageForm = document.getElementById("newStageForm");
-const newStagePipelineId = document.getElementById("newStagePipelineId");
+let newStageFormListenerAttached = false;
 
 export function initNewStageForm() {
-    newStageForm?.addEventListener("submit", async function (e) {
+    if (newStageFormListenerAttached) {
+        return;
+    }
+    
+    const newStageForm = document.getElementById("newStageForm");
+    const newStagePipelineId = document.getElementById("newStagePipelineId");
+    if (!newStageForm || !newStagePipelineId) {
+        return;
+    }
+    
+    newStageFormListenerAttached = true;
+
+    newStageForm.addEventListener("submit", async function (e) {
         e.preventDefault();
 
         const pipelineId = newStagePipelineId.value;

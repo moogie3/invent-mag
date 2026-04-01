@@ -24,15 +24,23 @@ class PlanController extends Controller
      */
     public function index(Request $request)
     {
+        try {
+            // Try to get fresh tenant from database
+            $tenant = app('currentTenant');
+            $tenant->refresh();
+        } catch (\Exception $e) {
+            // If tenant binding doesn't exist, continue without it
+            $tenant = null;
+        }
+        
         $usageStats = $this->planService->getUsageStats();
         $currentPlan = $this->planService->getCurrentPlan();
         $plans = $this->planService->getAvailablePlans();
         $features = config('plans.features');
 
         // Handle success redirect from checkout
-        if ($request->query('success') == 1) {
+        if ($request->query('success') == 1 && $tenant) {
             // Check for recent paid order
-            $tenant = app('currentTenant');
             $recentOrder = \App\Models\SubscriptionOrder::where('tenant_id', $tenant->id)
                 ->where('status', 'paid')
                 ->latest('paid_at')
@@ -40,7 +48,8 @@ class PlanController extends Controller
 
             if ($recentOrder && $recentOrder->paid_at > now()->subMinutes(5)) {
                 // Refresh the plan data after upgrade
-                $currentPlan = $this->planService->getCurrentPlan();
+                $tenant->refresh();
+                $currentPlan = $tenant->getEffectivePlan();
                 $usageStats = $this->planService->getUsageStats();
                 
                 // Clear the query string to prevent re-submission
@@ -137,11 +146,112 @@ class PlanController extends Controller
 
             // 5. Return view with Snap Token to render popup
             $currentPlan = $tenant->plan;
-            return view('admin.plan.checkout', compact('order', 'snapToken', 'newPlan', 'currentPlan', 'priceIdr'));
+
+            // Turbo Drive handling - return redirect response
+            if ($request->header('X-Laravel-JSON') || $request->expectsJson()) {
+                return response()->json([
+                    'redirect' => route('admin.setting.plan.checkout', ['order' => $order->id])
+                ]);
+            }
+
+            // For Turbo Drive form submissions, return redirect (Turbo will follow)
+            return redirect()->route('admin.setting.plan.checkout', ['order' => $order->id]);
 
         } catch (\Exception $e) {
             \Illuminate\Support\Facades\Log::error('Midtrans Error: ' . $e->getMessage());
+            
+            if ($request->header('X-Laravel-JSON') || $request->expectsJson()) {
+                return response()->json(['error' => 'Payment gateway error. Please try again later.'], 500);
+            }
+            
             return back()->with('error', 'Payment gateway error. Please try again later. ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Show the checkout page with Midtrans Snap token.
+     */
+    public function checkout(Request $request, $order)
+    {
+        $order = \App\Models\SubscriptionOrder::findOrFail($order);
+        $newPlan = $order->plan;
+        $currentPlan = app('currentTenant')->plan;
+        $snapToken = $order->snap_token;
+        $priceIdr = $order->amount;
+
+        return view('admin.plan.checkout', compact('order', 'snapToken', 'newPlan', 'currentPlan', 'priceIdr'));
+    }
+
+    /**
+     * Confirm payment from frontend after successful Midtrans transaction.
+     */
+    public function confirmPayment(Request $request)
+    {
+        $request->validate([
+            'order_id' => 'required|string',
+            'transaction_result' => 'required|array',
+        ]);
+
+        $orderId = $request->input('order_id');
+        $transactionResult = $request->input('transaction_result');
+
+        // Get current tenant
+        $tenant = app('currentTenant');
+        
+        // Find order and verify it belongs to current tenant
+        $order = \App\Models\SubscriptionOrder::where('order_number', $orderId)
+            ->where('tenant_id', $tenant->id)
+            ->first();
+
+        if (!$order) {
+            \Illuminate\Support\Facades\Log::warning("Payment confirm: Order not found or not owned by tenant. Order: {$orderId}, Tenant: {$tenant->id}");
+            return response()->json(['message' => 'Order not found'], 404);
+        }
+
+        // Check if already processed
+        if ($order->status === 'paid') {
+            return response()->json(['message' => 'Order already processed', 'plan' => $order->plan->name]);
+        }
+
+        // Verify the transaction status with Midtrans API
+        try {
+            \Midtrans\Config::$isProduction = env('MIDTRANS_IS_PRODUCTION', false);
+            \Midtrans\Config::$serverKey = env('MIDTRANS_SERVER_KEY');
+            
+            $status = \Midtrans\Transaction::status($orderId);
+            
+            // Only process if payment is successful
+            if ($status->transaction_status === 'settlement' || $status->transaction_status === 'capture') {
+                // Update order status
+                $order->update([
+                    'status' => 'paid',
+                    'paid_at' => now(),
+                    'payment_info' => (array) $status
+                ]);
+
+                // Update tenant's plan
+                $newPlan = $order->plan;
+                $tenant->plan_id = $newPlan->id;
+                $tenant->plan_status = 'active';
+                $tenant->plan_changed_at = now();
+                $tenant->save();
+
+                \Illuminate\Support\Facades\Log::info("Payment confirmed for order {$order->order_number}. Tenant {$tenant->name} changed to {$newPlan->name}.");
+                
+                return response()->json([
+                    'message' => 'Payment confirmed successfully',
+                    'plan' => $newPlan->name
+                ]);
+            } else {
+                return response()->json([
+                    'message' => 'Payment not completed',
+                    'status' => $status->transaction_status
+                ], 400);
+            }
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error('Payment confirmation error: ' . $e->getMessage());
+            
+            return response()->json(['message' => 'Payment verification failed. Please try again later.'], 500);
         }
     }
 }

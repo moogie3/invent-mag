@@ -682,6 +682,10 @@ Route::middleware('web')->prefix('admin')->group(function () {
                 Route::get('/', [PlanController::class, 'index'])->name('admin.setting.plan');
                 Route::get('/upgrade', [PlanController::class, 'upgrade'])->name('admin.setting.plan.upgrade');
                 Route::post('/change', [PlanController::class, 'change'])->name('admin.setting.plan.change');
+                Route::get('/checkout/{order}', [PlanController::class, 'checkout'])->name('admin.setting.plan.checkout');
+                
+                // Payment confirmation via web route (AJAX with CSRF)
+                Route::post('/confirm-payment', [PlanController::class, 'confirmPayment'])->name('admin.setting.plan.confirm-payment');
             });
         });
 

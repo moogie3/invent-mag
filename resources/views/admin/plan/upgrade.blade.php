@@ -126,7 +126,7 @@
                 <div class="text-muted">{{ __('plan.upgrade_amount') }}: <strong>$<span id="modalPlanPrice"></span></strong></div>
             </div>
             <div class="modal-footer">
-                <form method="POST" action="{{ route('admin.setting.plan.change') }}" id="upgradeForm">
+                <form method="POST" action="{{ route('admin.setting.plan.change') }}" id="upgradeForm" data-turbo="true">
                     @csrf
                     <input type="hidden" name="plan" id="modalPlanSlug">
                     <button type="submit" class="btn btn-primary w-100">
@@ -139,6 +139,67 @@
 </div>
 
 <script>
+document.addEventListener('turbo:load', function() {
+    var upgradeModal = document.getElementById('upgradeModal');
+    if (upgradeModal) {
+        upgradeModal.addEventListener('show.bs.modal', function(event) {
+            var button = event.relatedTarget;
+            var planName = button.getAttribute('data-plan-name');
+            var planPrice = button.getAttribute('data-plan-price');
+            var planSlug = button.getAttribute('data-plan-slug');
+
+            document.getElementById('modalPlanName').textContent = planName;
+            document.getElementById('modalPlanPrice').textContent = planPrice;
+            document.getElementById('modalPlanSlug').value = planSlug;
+        });
+
+        // Handle form submission for Turbo
+        var upgradeForm = document.getElementById('upgradeForm');
+        if (upgradeForm) {
+            upgradeForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                var formData = new FormData(upgradeForm);
+                var submitBtn = upgradeForm.querySelector('button[type="submit"]');
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" style="width: 1rem; height: 1rem;" role="status" aria-hidden="true"></span>Processing...';
+
+                // Get CSRF token
+                var csrfToken = document.querySelector('meta[name="csrf-token"]')?.content || 
+                               document.querySelector('input[name="_token"]')?.value;
+
+                fetch(upgradeForm.action, {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'Accept': 'application/json',
+                        'X-CSRF-TOKEN': csrfToken || ''
+                    }
+                })
+                .then(function(response) {
+                    return response.json();
+                })
+                .then(function(data) {
+                    if (data.redirect) {
+                        window.location.href = data.redirect;
+                    } else if (data.error) {
+                        alert(data.error);
+                        submitBtn.disabled = false;
+                        submitBtn.innerHTML = '<i class="ti ti-check me-2"></i>{{ __("plan.confirm_upgrade") }}';
+                    }
+                })
+                .catch(function(error) {
+                    console.error('Error:', error);
+                    alert('An error occurred. Please try again.');
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = '<i class="ti ti-check me-2"></i>{{ __("plan.confirm_upgrade") }}';
+                });
+            });
+        }
+    }
+});
+
+// Fallback for non-Turbo navigation
 document.addEventListener('DOMContentLoaded', function() {
     var upgradeModal = document.getElementById('upgradeModal');
     if (upgradeModal) {

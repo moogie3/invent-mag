@@ -10,9 +10,9 @@
                 <div class="col-lg-8">
                     <div class="card shadow-sm border-0 rounded-4">
                         <div class="card-header bg-body border-0 pb-0">
-                            <div class="row align-items-center">
+                            <div class="row align-items-center w-100">
                                 <div class="col">
-                                    <h3 class="mb-0">
+                                    <h3 class="mb-2">
                                         <i class="ti ti-file-invoice text-primary me-2"></i>
                                         {{ __('plan.invoice') }}
                                     </h3>
@@ -119,7 +119,7 @@
                                         <h5 class="mb-3">{{ __('plan.select_payment_method') }}</h5>
                                     </div>
                                     <div class="col-md-6">
-                                        <button id="pay-button" 
+                                        <button id="pay-button"
                                                 class="btn btn-primary w-100 rounded-3 py-3"
                                                 data-snap-token="{{ $snapToken }}"
                                                 data-order-id="{{ $order->order_number }}"

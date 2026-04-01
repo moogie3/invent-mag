@@ -21,13 +21,16 @@ class CheckSubscriptionStatus
             'admin.setting.plan',
             'admin.setting.plan.upgrade',
             'admin.setting.plan.change',
+            'admin.setting.plan.checkout',
             'admin.logout',
             // Allow API endpoints needed for the upgrade page
             'api.plan.current',
             'api.plans'
         ];
 
-        if (in_array($request->route()->getName(), $allowedRoutes)) {
+        // Check if route has a name before checking
+        $routeName = $request->route()->getName() ?? '';
+        if (in_array($routeName, $allowedRoutes)) {
             return $next($request);
         }
 

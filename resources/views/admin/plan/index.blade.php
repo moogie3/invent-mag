@@ -2,6 +2,10 @@
 
 @section('title', __('plan.title'))
 
+@section('header')
+<meta name="turbo-cache-control" content="no-cache">
+@endsection
+
 @section('content')
     <div class="page-wrapper">
         <div class="page-body">
@@ -39,8 +43,13 @@
 
                                 {{-- Current Plan Section --}}
                                 @php
-                                    $tenant = app('currentTenant');
-                                    $isDemo = $tenant && str_starts_with($tenant->name, 'Demo ');
+                                    try {
+                                        $tenant = app('currentTenant');
+                                        $isDemo = $tenant && str_starts_with($tenant->name, 'Demo ');
+                                    } catch (\Exception $e) {
+                                        $tenant = null;
+                                        $isDemo = false;
+                                    }
                                 @endphp
 
                                 @if($isDemo)

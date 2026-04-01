@@ -103,8 +103,14 @@ class PaymentController extends Controller
         $tenant = $order->tenant;
         $plan = $order->plan;
         
+        Log::info("Processing payment for order {$order->order_number}. Current plan_id: {$tenant->plan_id}, New plan_id: {$plan->id}");
+        
         // False for trial because they actually paid
         $this->planService->assignPlanToTenant($tenant, $plan->slug, false);
+
+        // Refresh tenant to verify plan was changed
+        $tenant->refresh();
+        Log::info("After payment, tenant {$tenant->name} now has plan_id: {$tenant->plan_id}, plan_name: {$tenant->plan?->name}");
 
         // Send invoice email
         $order->refresh();

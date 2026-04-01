@@ -28,6 +28,9 @@ class ActivityObserver
     public function created($model): void
     {
         try {
+            if (empty($this->module)) {
+                return;
+            }
             $label = $this->guessLabel($model);
             $this->logService->logCreate(
                 $this->module,
@@ -43,6 +46,9 @@ class ActivityObserver
     public function updated($model): void
     {
         try {
+            if (empty($this->module)) {
+                return;
+            }
             $label    = $this->guessLabel($model);
             $oldValues = $model->getOriginal();
             $newValues = $model->getChanges();
@@ -66,6 +72,9 @@ class ActivityObserver
     public function deleted($model): void
     {
         try {
+            if (empty($this->module)) {
+                return;
+            }
             $label = $this->guessLabel($model);
             $this->logService->logDelete(
                 $this->module,

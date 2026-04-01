@@ -10,7 +10,7 @@
     ],
     "info": {
         "name": "INVENT-MAG API Documentation",
-        "_postman_id": "90734dec-ff30-4c96-8825-a529260c876e",
+        "_postman_id": "b4be471b-6625-4ff5-b25b-d1bb93b4133f",
         "description": "",
         "schema": "https:\/\/schema.getpostman.com\/json\/collection\/v2.1.0\/collection.json"
     },
@@ -62,12 +62,8 @@
                                     "value": "59"
                                 },
                                 {
-                                    "key": "access-control-allow-origin",
-                                    "value": "http:\/\/localhost:4321"
-                                },
-                                {
-                                    "key": "access-control-allow-credentials",
-                                    "value": "true"
+                                    "key": "vary",
+                                    "value": "Origin"
                                 }
                             ],
                             "code": 400,
@@ -114,16 +110,12 @@
                                     "value": "application\/json"
                                 },
                                 {
-                                    "key": "access-control-allow-origin",
-                                    "value": "http:\/\/localhost:4321"
-                                },
-                                {
-                                    "key": "access-control-allow-credentials",
-                                    "value": "true"
+                                    "key": "vary",
+                                    "value": "Origin"
                                 }
                             ],
                             "code": 401,
-                            "body": "{\"message\":\"Unauthenticated.\"}",
+                            "body": "{\"message\":\"Unauthorized\"}",
                             "name": ""
                         }
                     ]
@@ -171,12 +163,8 @@
                                     "value": "4"
                                 },
                                 {
-                                    "key": "access-control-allow-origin",
-                                    "value": "http:\/\/localhost:4321"
-                                },
-                                {
-                                    "key": "access-control-allow-credentials",
-                                    "value": "true"
+                                    "key": "vary",
+                                    "value": "Origin"
                                 }
                             ],
                             "code": 401,
@@ -207,7 +195,7 @@
                         ],
                         "body": {
                             "mode": "raw",
-                            "raw": "{\"name\":\"vmqeopfuudtdsufvyvddq\",\"shopname\":\"amniihfqcoynlazghdtqt\",\"email\":\"andreanne00@example.org\",\"password\":\"O[2UZ5ij-e\\\/dl4m{o,\",\"plan\":\"starter\"}"
+                            "raw": "{\"name\":\"vmqeopfuudtdsufvyvddq\",\"shopname\":\"amniihfqcoynlazghdtqt\",\"email\":\"andreanne00@example.org\",\"password\":\"O[2UZ5ij-e\\\/dl4m{o,\",\"plan\":\"professional\"}"
                         },
                         "description": ""
                     },
@@ -231,12 +219,8 @@
                                     "value": "2"
                                 },
                                 {
-                                    "key": "access-control-allow-origin",
-                                    "value": "http:\/\/localhost:4321"
-                                },
-                                {
-                                    "key": "access-control-allow-credentials",
-                                    "value": "true"
+                                    "key": "vary",
+                                    "value": "Origin"
                                 }
                             ],
                             "code": 422,
@@ -291,12 +275,8 @@
                                     "value": "8"
                                 },
                                 {
-                                    "key": "access-control-allow-origin",
-                                    "value": "http:\/\/localhost:4321"
-                                },
-                                {
-                                    "key": "access-control-allow-credentials",
-                                    "value": "true"
+                                    "key": "vary",
+                                    "value": "Origin"
                                 }
                             ],
                             "code": 404,
@@ -340,16 +320,12 @@
                                     "value": "application\/json"
                                 },
                                 {
-                                    "key": "access-control-allow-origin",
-                                    "value": "http:\/\/localhost:4321"
-                                },
-                                {
-                                    "key": "access-control-allow-credentials",
-                                    "value": "true"
+                                    "key": "vary",
+                                    "value": "Origin"
                                 }
                             ],
                             "code": 401,
-                            "body": "{\"message\":\"Unauthenticated.\"}",
+                            "body": "{\"message\":\"Unauthorized\"}",
                             "name": ""
                         }
                     ]
@@ -389,16 +365,12 @@
                                     "value": "application\/json"
                                 },
                                 {
-                                    "key": "access-control-allow-origin",
-                                    "value": "http:\/\/localhost:4321"
-                                },
-                                {
-                                    "key": "access-control-allow-credentials",
-                                    "value": "true"
+                                    "key": "vary",
+                                    "value": "Origin"
                                 }
                             ],
                             "code": 401,
-                            "body": "{\"message\":\"Unauthenticated.\"}",
+                            "body": "{\"message\":\"Unauthorized\"}",
                             "name": ""
                         }
                     ]
@@ -438,16 +410,12 @@
                                     "value": "application\/json"
                                 },
                                 {
-                                    "key": "access-control-allow-origin",
-                                    "value": "http:\/\/localhost:4321"
-                                },
-                                {
-                                    "key": "access-control-allow-credentials",
-                                    "value": "true"
+                                    "key": "vary",
+                                    "value": "Origin"
                                 }
                             ],
                             "code": 401,
-                            "body": "{\"message\":\"Unauthenticated.\"}",
+                            "body": "{\"message\":\"Unauthorized\"}",
                             "name": ""
                         }
                     ]
@@ -494,10 +462,10 @@
                                     "description": "The product name."
                                 },
                                 {
-                                    "key": "stock_quantity",
-                                    "value": "100",
+                                    "key": "barcode",
+                                    "value": "consequatur",
                                     "type": "text",
-                                    "description": "The initial stock quantity."
+                                    "description": ""
                                 },
                                 {
                                     "key": "low_stock_threshold",
@@ -536,12 +504,6 @@
                                     "description": "The ID of the product supplier."
                                 },
                                 {
-                                    "key": "warehouse_id",
-                                    "value": "17",
-                                    "type": "text",
-                                    "description": "The <code>id<\/code> of an existing record in the warehouses table."
-                                },
-                                {
                                     "key": "description",
                                     "value": "Dolores dolorum amet iste laborum eius est dolor.",
                                     "type": "text",
@@ -549,9 +511,15 @@
                                 },
                                 {
                                     "key": "has_expiry",
-                                    "value": "",
+                                    "value": "1",
                                     "type": "text",
                                     "description": ""
+                                },
+                                {
+                                    "key": "stock_quantity",
+                                    "value": "100",
+                                    "type": "text",
+                                    "description": "The initial stock quantity."
                                 },
                                 {
                                     "key": "image",

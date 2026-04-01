@@ -12,7 +12,6 @@ use Illuminate\Support\Facades\Auth;
 class AuthenticationTest extends TestCase
 {
     use RefreshDatabase, CreatesTenant;
-    use RefreshDatabase, CreatesTenant;
 
     public function setUp(): void
     {

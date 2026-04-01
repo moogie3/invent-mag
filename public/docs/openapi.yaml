@@ -61,11 +61,11 @@ paths:
               schema:
                 type: object
                 example:
-                  message: Unauthenticated.
+                  message: Unauthorized
                 properties:
                   message:
                     type: string
-                    example: Unauthenticated.
+                    example: Unauthorized
       tags:
         - Endpoints
       requestBody:
@@ -167,7 +167,7 @@ paths:
                 plan:
                   type: string
                   description: ''
-                  example: starter
+                  example: professional
                   enum:
                     - starter
                     - professional
@@ -226,11 +226,11 @@ paths:
               schema:
                 type: object
                 example:
-                  message: Unauthenticated.
+                  message: Unauthorized
                 properties:
                   message:
                     type: string
-                    example: Unauthenticated.
+                    example: Unauthorized
       tags:
         - Endpoints
   /api/v1/plans:
@@ -247,11 +247,11 @@ paths:
               schema:
                 type: object
                 example:
-                  message: Unauthenticated.
+                  message: Unauthorized
                 properties:
                   message:
                     type: string
-                    example: Unauthenticated.
+                    example: Unauthorized
       tags:
         - Endpoints
   /api/v1/plan/current:
@@ -268,11 +268,11 @@ paths:
               schema:
                 type: object
                 example:
-                  message: Unauthenticated.
+                  message: Unauthorized
                 properties:
                   message:
                     type: string
-                    example: Unauthenticated.
+                    example: Unauthorized
       tags:
         - Endpoints
   /admin/product/quick-create:
@@ -327,10 +327,11 @@ paths:
                   type: string
                   description: 'The product name.'
                   example: '"New Product"'
-                stock_quantity:
-                  type: integer
-                  description: 'The initial stock quantity.'
-                  example: 100
+                barcode:
+                  type: string
+                  description: ''
+                  example: consequatur
+                  nullable: true
                 low_stock_threshold:
                   type: integer
                   description: 'Must be at least 1.'
@@ -356,11 +357,6 @@ paths:
                   type: integer
                   description: 'The ID of the product supplier.'
                   example: 1
-                warehouse_id:
-                  type: integer
-                  description: 'The <code>id</code> of an existing record in the warehouses table.'
-                  example: 17
-                  nullable: true
                 description:
                   type: string
                   description: ''
@@ -374,17 +370,21 @@ paths:
                 has_expiry:
                   type: boolean
                   description: ''
-                  example: false
+                  example: true
                   nullable: true
+                stock_quantity:
+                  type: integer
+                  description: 'The initial stock quantity.'
+                  example: 100
               required:
                 - code
                 - name
-                - stock_quantity
                 - price
                 - selling_price
                 - category_id
                 - units_id
                 - supplier_id
+                - stock_quantity
   /admin/product/bulk-delete:
     post:
       summary: ''

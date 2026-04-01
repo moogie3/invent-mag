@@ -3,8 +3,10 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Models\ActivityLog;
 use App\Models\User;
 use App\Scopes\TenantScope;
+use App\Services\ActivityLogService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Responses\LogoutResponse;
@@ -48,6 +50,17 @@ class LoginController extends Controller
         if (Auth::attempt($request->only('email', 'password'), $request->boolean('remember'))) {
             $request->session()->regenerate();
 
+            // Log successful login
+            try {
+                app(ActivityLogService::class)->log(
+                    ActivityLog::MODULE_DASHBOARD,
+                    ActivityLog::ACTION_LOGIN,
+                    'User logged in: ' . Auth::user()->name . ' (' . Auth::user()->email . ')',
+                );
+            } catch (\Throwable $e) {
+                // never block login because of logging failure
+            }
+
             return redirect()->intended(config('fortify.home'));
         }
 
@@ -76,6 +89,19 @@ class LoginController extends Controller
      */
     public function destroy(Request $request)
     {
+        // Log logout before the session is invalidated
+        try {
+            if (Auth::check()) {
+                app(ActivityLogService::class)->log(
+                    ActivityLog::MODULE_DASHBOARD,
+                    ActivityLog::ACTION_LOGOUT,
+                    'User logged out: ' . Auth::user()->name . ' (' . Auth::user()->email . ')',
+                );
+            }
+        } catch (\Throwable $e) {
+            // never block logout because of logging failure
+        }
+
         Auth::guard('web')->logout();
 
         $request->session()->invalidate();

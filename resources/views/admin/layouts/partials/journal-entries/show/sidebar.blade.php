@@ -13,7 +13,23 @@
                         <div class="timeline-content">
                             <div class="text-muted small">{{ $log->created_at->format('d/m/Y H:i') }}</div>
                             <div>{{ $log->description }}</div>
-                            <div class="text-muted small">by {{ $log->user_name }}</div>
+                            <div class="d-flex align-items-center gap-2 mt-1">
+                                <span class="text-muted small">by</span>
+                                <span class="text-body fw-medium">{{ $log->user_name }}</span>
+                                @if($log->user && $log->user->roles->isNotEmpty())
+                                    @foreach($log->user->roles as $role)
+                                        @if($role->name === 'superuser')
+                                            <span class="badge bg-purple-lt">{{ $role->name }}</span>
+                                        @elseif($role->name === 'staff')
+                                            <span class="badge bg-blue-lt">{{ $role->name }}</span>
+                                        @else
+                                            <span class="badge bg-green-lt">{{ $role->name }}</span>
+                                        @endif
+                                    @endforeach
+                                @else
+                                    <span class="badge bg-secondary">{{ __('messages.no_role') }}</span>
+                                @endif
+                            </div>
                         </div>
                     </div>
                 @endforeach

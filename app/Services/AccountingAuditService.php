@@ -133,6 +133,7 @@ class AccountingAuditService
     {
         return AccountingAuditLog::where('entity_type', get_class($journalEntry))
             ->where('entity_id', $journalEntry->id)
+            ->with('user.roles')
             ->orderBy('created_at', 'desc')
             ->get();
     }

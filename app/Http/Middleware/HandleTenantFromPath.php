@@ -12,12 +12,19 @@ class HandleTenantFromPath
     /**
      * Handle an incoming request.
      * Supports tenant identification via path: /{tenant-slug}/admin/...
+     * This runs AFTER NeedsTenant middleware to handle cases where subdomain-based
+     * tenant resolution fails (e.g., accessing via localhost or IP-based URLs).
      */
     public function handle(Request $request, Closure $next): Response
     {
+        // Skip if tenant is already set (subdomain-based resolution worked)
+        if (app()->has('currentTenant') && app('currentTenant')) {
+            return $next($request);
+        }
+        
         $path = $request->path();
         
-        // Check if the first path segment matches a tenant domain (without TLD)
+        // Check if the first path segment matches a tenant domain prefix
         // Example: demo-starter, demo-pro, my-shop
         $segments = explode('/', $path);
         

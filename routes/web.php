@@ -5,7 +5,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Str;
-use App\Http\Controllers\Admin\{CategoryController, CustomerController, ProductController, PurchaseController, SalesPipelineController, SupplierController, UnitController, CurrencyController, SalesController, DashboardController, ProfileController, NotificationController, POSController, ReportController, WarehouseController, TaxController, UserController, CustomerCrmController, SupplierCrmController, SettingsController, PurchaseReturnController, SalesReturnController, JournalEntryController, StockTransferController, PlanController, ProductStockController};
+use App\Http\Controllers\Admin\{CategoryController, CustomerController, ProductController, PurchaseController, SalesPipelineController, SupplierController, UnitController, CurrencyController, SalesController, DashboardController, ProfileController, NotificationController, POSController, ReportController, WarehouseController, TaxController, UserController, CustomerCrmController, SupplierCrmController, SettingsController, PurchaseReturnController, SalesReturnController, JournalEntryController, StockTransferController, PlanController, ProductStockController, AuditLogController};
 use Laravel\Fortify\Http\Controllers\AuthenticatedSessionController;
 use Laravel\Fortify\Http\Controllers\NewPasswordController;
 use Laravel\Fortify\Http\Controllers\PasswordResetLinkController;
@@ -66,8 +66,10 @@ Route::middleware('web')->prefix('admin')->group(function () {
         // Dashboard
         Route::get('/dashboard', [DashboardController::class, 'index'])->name('admin.dashboard');
 
-        // MOVED: Role-permissions route - accessible to authenticated users
-        Route::get('/roles-permissions', [UserController::class, 'getRolePermissions'])->name('admin.roles-permissions');
+        // MOVED: Role-permissions route - accessible only to superuser
+        Route::get('/roles-permissions', [UserController::class, 'getRolePermissions'])
+            ->name('admin.roles-permissions')
+            ->middleware('role:superuser');
 
         // Product Routes
         Route::prefix('product')->group(function () {
@@ -605,6 +607,12 @@ Route::middleware('web')->prefix('admin')->group(function () {
         // User Management Routes - with plan limit on user creation
         Route::middleware(['role:superuser', 'plan.limit:users'])->group(function () {
             Route::resource('users', UserController::class)->names('admin.users');
+        });
+
+        // Audit Log - superuser only
+        Route::middleware('role:superuser')->group(function () {
+            Route::get('/audit-log', [AuditLogController::class, 'index'])->name('admin.audit-log.index');
+            Route::get('/audit-log/{auditLog}', [AuditLogController::class, 'show'])->name('admin.audit-log.show');
         });
 
         Route::get('api/settings', [SettingsController::class, 'getSettings'])->name('admin.api.settings');

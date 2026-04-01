@@ -39,8 +39,7 @@ endpoints:
           content-type: application/json
           x-ratelimit-limit: '60'
           x-ratelimit-remaining: '59'
-          access-control-allow-origin: 'http://localhost:4321'
-          access-control-allow-credentials: 'true'
+          vary: Origin
         description: null
     responseFields: []
     auth:
@@ -107,12 +106,11 @@ endpoints:
       -
         custom: []
         status: 401
-        content: '{"message":"Unauthenticated."}'
+        content: '{"message":"Unauthorized"}'
         headers:
           cache-control: 'no-cache, private'
           content-type: application/json
-          access-control-allow-origin: 'http://localhost:4321'
-          access-control-allow-credentials: 'true'
+          vary: Origin
         description: null
     responseFields: []
     auth:
@@ -158,8 +156,7 @@ endpoints:
           content-type: application/json
           x-ratelimit-limit: '5'
           x-ratelimit-remaining: '4'
-          access-control-allow-origin: 'http://localhost:4321'
-          access-control-allow-credentials: 'true'
+          vary: Origin
         description: null
     responseFields: []
     auth:
@@ -242,7 +239,7 @@ endpoints:
         name: plan
         description: ''
         required: false
-        example: starter
+        example: professional
         type: string
         enumValues:
           - starter
@@ -256,7 +253,7 @@ endpoints:
       shopname: amniihfqcoynlazghdtqt
       email: andreanne00@example.org
       password: 'O[2UZ5ij-e/dl4m{o,'
-      plan: starter
+      plan: professional
     fileParameters: []
     responses:
       -
@@ -268,8 +265,7 @@ endpoints:
           content-type: application/json
           x-ratelimit-limit: '3'
           x-ratelimit-remaining: '2'
-          access-control-allow-origin: 'http://localhost:4321'
-          access-control-allow-credentials: 'true'
+          vary: Origin
         description: null
     responseFields: []
     auth:
@@ -327,8 +323,7 @@ endpoints:
           content-type: application/json
           x-ratelimit-limit: '10'
           x-ratelimit-remaining: '8'
-          access-control-allow-origin: 'http://localhost:4321'
-          access-control-allow-credentials: 'true'
+          vary: Origin
         description: null
     responseFields: []
     auth:
@@ -368,12 +363,11 @@ endpoints:
       -
         custom: []
         status: 401
-        content: '{"message":"Unauthenticated."}'
+        content: '{"message":"Unauthorized"}'
         headers:
           cache-control: 'no-cache, private'
           content-type: application/json
-          access-control-allow-origin: 'http://localhost:4321'
-          access-control-allow-credentials: 'true'
+          vary: Origin
         description: null
     responseFields: []
     auth:
@@ -413,12 +407,11 @@ endpoints:
       -
         custom: []
         status: 401
-        content: '{"message":"Unauthenticated."}'
+        content: '{"message":"Unauthorized"}'
         headers:
           cache-control: 'no-cache, private'
           content-type: application/json
-          access-control-allow-origin: 'http://localhost:4321'
-          access-control-allow-credentials: 'true'
+          vary: Origin
         description: null
     responseFields: []
     auth:
@@ -458,12 +451,11 @@ endpoints:
       -
         custom: []
         status: 401
-        content: '{"message":"Unauthenticated."}'
+        content: '{"message":"Unauthorized"}'
         headers:
           cache-control: 'no-cache, private'
           content-type: application/json
-          access-control-allow-origin: 'http://localhost:4321'
-          access-control-allow-credentials: 'true'
+          vary: Origin
         description: null
     responseFields: []
     auth:

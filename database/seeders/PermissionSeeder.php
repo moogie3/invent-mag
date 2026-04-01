@@ -132,6 +132,9 @@ class PermissionSeeder extends Seeder
             'post-manual-journal',
             'void-manual-journal',
             'reverse-manual-journal',
+
+            // Audit Log (superuser only - no plan restriction)
+            'view-audit-log',
         ];
 
         $this->command->info("Creating " . count($permissions) . " permissions...");

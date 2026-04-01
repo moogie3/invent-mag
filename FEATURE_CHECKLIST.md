@@ -1,7 +1,7 @@
 # Invent-MAG: Complete Feature Checklist
 
-**Last Updated:** March 2026  
-**Version:** 1.4
+**Last Updated:** April 2026  
+**Version:** 1.5
 
 ---
 
@@ -26,6 +26,13 @@
 - [x] Rate limiting (custom thresholds)
 - [x] Security audit logging
 - [x] Comprehensive audit trail
+- [x] **Audit Log UI** - Dedicated audit log page with:
+  - [x] Filterable by user, module, action, date range, search
+  - [x] Summary cards (today, this week, this month, total events)
+  - [x] Detail modal showing old/new values for changes
+  - [x] Superuser-only access (bypasses plan limits)
+  - [x] Multi-tenant isolation with tenant-specific data
+  - [x] Module-specific actions (create, update, delete, view, post, void, reverse, etc.)
 
 ---
 
@@ -313,7 +320,7 @@
 ### 🧪 Testing
 
 - [x] PHPUnit 10+ configured
-- [x] 776 test files (33 Feature + 35 Unit PHP, 168 JS)
+- [x] 776 test files (40 Feature + 45 Unit PHP, 171 JS)
 - [x] Feature tests (controllers, routes)
 - [x] Unit tests (services, helpers)
 - [x] Multi-tenancy tests
@@ -424,7 +431,7 @@
 | **Services**         | 34        |
 | **Models**           | 35        |
 | **Helpers**          | 8         |
-| **Test Files**       | 776       |
+| **Test Files**       | 786       |
 | **API Endpoints**    | 50+       |
 | **Database Tables**  | 38        |
 | **Migrations**       | 44        |
@@ -450,5 +457,5 @@
 
 ---
 
-**Document Version:** 1.4  
-**Last Updated:** March 2026
+**Document Version:** 1.5  
+**Last Updated:** April 2026

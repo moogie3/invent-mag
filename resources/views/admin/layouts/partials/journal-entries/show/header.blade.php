@@ -21,12 +21,14 @@
                         </form>
                     @endif
                     @if($entry->status === 'posted')
-                        <button type="button" class="btn btn-warning" onclick="reverseEntry('{{ route('admin.accounting.journal-entries.reverse', $entry) }}')">
-                            <i class="ti ti-arrow-back-up me-2"></i>{{ __('messages.reverse') }}
-                        </button>
-                        <button type="button" class="btn btn-danger" onclick="voidEntry('{{ route('admin.accounting.journal-entries.void', $entry) }}')">
-                            <i class="ti ti-x me-2"></i>{{ __('messages.void') }}
-                        </button>
+                        @if(!$entry->reversingEntry)
+                            <button type="button" class="btn btn-warning" onclick="reverseEntry('{{ route('admin.accounting.journal-entries.reverse', $entry) }}')">
+                                <i class="ti ti-arrow-back-up me-2"></i>{{ __('messages.reverse') }}
+                            </button>
+                            <button type="button" class="btn btn-danger" onclick="voidEntry('{{ route('admin.accounting.journal-entries.void', $entry) }}')">
+                                <i class="ti ti-x me-2"></i>{{ __('messages.void') }}
+                            </button>
+                        @endif
                     @endif
                     <a href="{{ route('admin.accounting.journal-entries.index') }}" class="btn btn-secondary">
                         <i class="ti ti-arrow-left me-2"></i>{{ __('messages.back') }}

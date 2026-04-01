@@ -105,6 +105,7 @@ class DatabaseSeeder extends Seeder
                 PipelineStageSeeder::class,
                 SalesOpportunitySeeder::class,
                 ManualJournalEntrySeeder::class,
+                ActivityLogSeeder::class,
             ]);
         }
 

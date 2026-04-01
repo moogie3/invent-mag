@@ -139,6 +139,9 @@
 {{-- SCRIPT FOR ADJUSTMENT LOG --}}
 @vite('resources/js/admin/adjustment-log.js')
 
+{{-- SCRIPT FOR AUDIT LOG --}}
+@vite('resources/js/admin/audit-log.js')
+
 {{-- SCRIPT FOR STOCK TRANSFER --}}
 @vite('resources/js/admin/reports/stock-transfer.js')
 

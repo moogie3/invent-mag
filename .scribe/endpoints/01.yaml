@@ -47,16 +47,16 @@ endpoints:
         exampleWasSpecified: true
         nullable: false
         deprecated: false
-      stock_quantity:
+      barcode:
         custom: []
-        name: stock_quantity
-        description: 'The initial stock quantity.'
-        required: true
-        example: 100
-        type: integer
+        name: barcode
+        description: ''
+        required: false
+        example: consequatur
+        type: string
         enumValues: []
-        exampleWasSpecified: true
-        nullable: false
+        exampleWasSpecified: false
+        nullable: true
         deprecated: false
       low_stock_threshold:
         custom: []
@@ -124,17 +124,6 @@ endpoints:
         exampleWasSpecified: true
         nullable: false
         deprecated: false
-      warehouse_id:
-        custom: []
-        name: warehouse_id
-        description: 'The <code>id</code> of an existing record in the warehouses table.'
-        required: false
-        example: 17
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: true
-        deprecated: false
       description:
         custom: []
         name: description
@@ -162,25 +151,36 @@ endpoints:
         name: has_expiry
         description: ''
         required: false
-        example: false
+        example: true
         type: boolean
         enumValues: []
         exampleWasSpecified: false
         nullable: true
         deprecated: false
+      stock_quantity:
+        custom: []
+        name: stock_quantity
+        description: 'The initial stock quantity.'
+        required: true
+        example: 100
+        type: integer
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
     cleanBodyParameters:
       code: '"PROD-001"'
       name: '"New Product"'
-      stock_quantity: 100
+      barcode: consequatur
       low_stock_threshold: 45
       price: 99.99
       selling_price: 149.99
       category_id: 1
       units_id: 1
       supplier_id: 1
-      warehouse_id: 17
       description: 'Dolores dolorum amet iste laborum eius est dolor.'
-      has_expiry: false
+      has_expiry: true
+      stock_quantity: 100
     fileParameters:
       image: null
     responses:

@@ -3,8 +3,10 @@
 namespace App\Providers;
 
 use App\Helpers\CurrencyHelper;
+use App\Services\ActivityLogService;
 use App\Services\NotificationService;
 use App\Services\SystemNotificationService;
+use App\Observers\ActivityObserver;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\View;
@@ -155,6 +157,11 @@ class AppServiceProvider extends ServiceProvider
             });
         }
 
+        // ---------------------------------------------------------------
+        // Activity Log Observers — register for all auditable models
+        // ---------------------------------------------------------------
+        $this->registerActivityObservers();
+
         if ($this->app->environment('production')) {
             URL::forceScheme('https');
         }
@@ -169,5 +176,43 @@ class AppServiceProvider extends ServiceProvider
                     ], 429);
                 });
         });
+    }
+
+    /**
+     * Register Eloquent model observers for the activity audit log.
+     * Each observer is a lightweight wrapper around ActivityLogService.
+     */
+    protected function registerActivityObservers(): void
+    {
+        // Skip observers in console/queue context where there's no auth user
+        // (seeders, migrations, scheduled jobs). They still fire but the service
+        // handles null users gracefully.
+
+        $map = [
+            \App\Models\Product::class          => \App\Models\ActivityLog::MODULE_PRODUCT,
+            \App\Models\Sales::class            => \App\Models\ActivityLog::MODULE_SALES,
+            \App\Models\Purchase::class         => \App\Models\ActivityLog::MODULE_PURCHASE_ORDER,
+            \App\Models\SalesReturn::class      => \App\Models\ActivityLog::MODULE_SALES_RETURN,
+            \App\Models\PurchaseReturn::class   => \App\Models\ActivityLog::MODULE_PURCHASE_RETURN,
+            \App\Models\Customer::class         => \App\Models\ActivityLog::MODULE_CUSTOMER,
+            \App\Models\Supplier::class         => \App\Models\ActivityLog::MODULE_SUPPLIER,
+            \App\Models\Warehouse::class        => \App\Models\ActivityLog::MODULE_WAREHOUSE,
+            \App\Models\Categories::class       => \App\Models\ActivityLog::MODULE_CATEGORY,
+            \App\Models\Unit::class             => \App\Models\ActivityLog::MODULE_UNIT,
+            \App\Models\Tax::class              => \App\Models\ActivityLog::MODULE_TAX,
+            \App\Models\CurrencySetting::class  => \App\Models\ActivityLog::MODULE_CURRENCY,
+            \App\Models\User::class             => \App\Models\ActivityLog::MODULE_USER,
+            \App\Models\JournalEntry::class     => \App\Models\ActivityLog::MODULE_JOURNAL_ENTRY,
+            \App\Models\StockAdjustment::class  => \App\Models\ActivityLog::MODULE_STOCK_ADJUSTMENT,
+            \App\Models\Payment::class          => \App\Models\ActivityLog::MODULE_PAYMENT,
+        ];
+
+        $logService = $this->app->make(ActivityLogService::class);
+
+        foreach ($map as $modelClass => $module) {
+            $observer = new ActivityObserver($logService);
+            $observer->setModule($module);
+            $modelClass::observe($observer);
+        }
     }
 }

@@ -38,11 +38,11 @@
             class="list-group-item list-group-item-action d-flex align-items-center {{ request()->routeIs('admin.setting.plan') || request()->routeIs('admin.setting.plan.*') ? 'active' : '' }}">
             <i class="ti ti-crown fs-2 me-2"></i> {{ __('plan.title') }}
         </a>
-        @can('view-users')
+        @role('superuser')
             <a href="{{ route('admin.users.index') }}"
                 class="list-group-item list-group-item-action d-flex align-items-center {{ request()->routeIs('admin.users.index') || request()->routeIs('admin.users.create') || request()->routeIs('admin.users.edit') ? 'active' : '' }}">
                 <i class="ti ti-users fs-2 me-2"></i> {{ __('messages.user_management') }}
             </a>
-        @endcan
+        @endrole
     </div>
 </div>

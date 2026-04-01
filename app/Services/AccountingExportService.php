@@ -6,6 +6,7 @@ use App\Helpers\CurrencyHelper;
 use Dompdf\Dompdf;
 use Illuminate\Http\Response;
 use Illuminate\Support\Collection;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class AccountingExportService
 {
@@ -26,7 +27,12 @@ class AccountingExportService
         $dompdf->setPaper('A4', $orientation);
         $dompdf->render();
 
-        return $dompdf->stream($filename);
+        $output = $dompdf->output();
+        
+        return response($output, 200, [
+            'Content-Type' => 'application/pdf',
+            'Content-Disposition' => 'inline; filename="' . $filename . '"',
+        ]);
     }
 
     /**
@@ -34,9 +40,9 @@ class AccountingExportService
      *
      * @param callable $callback
      * @param string $filename
-     * @return Response
+     * @return StreamedResponse
      */
-    public function exportToCsv(callable $callback, string $filename): Response
+    public function exportToCsv(callable $callback, string $filename): StreamedResponse
     {
         $headers = [
             'Content-type' => 'text/csv',

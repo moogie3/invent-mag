@@ -30,9 +30,9 @@
         var useCsrf = Boolean();
         var csrfUrl = "/sanctum/csrf-cookie";
     </script>
-    <script src="../docs/js/tryitout-5.7.0.js"></script>
+    <script src="../docs/js/tryitout-5.8.0.js"></script>
 
-    <script src="../docs/js/theme-default-5.7.0.js"></script>
+    <script src="../docs/js/theme-default-5.8.0.js"></script>
 
 </head>
 
@@ -132,7 +132,7 @@
     </ul>
 
     <ul class="toc-footer" id="last-updated">
-        <li>Last updated: March 4, 2026</li>
+        <li>Last updated: April 1, 2026</li>
     </ul>
 </div>
 
@@ -188,6 +188,7 @@ const headers = {
     "Accept": "application/json",
 };
 
+
 fetch(url, {
     method: "POST",
     headers,
@@ -207,8 +208,7 @@ fetch(url, {
 content-type: application/json
 x-ratelimit-limit: 60
 x-ratelimit-remaining: 59
-access-control-allow-origin: http://localhost:4321
-access-control-allow-credentials: true
+vary: Origin
  </code></pre></details>         <pre>
 
 <code class="language-json" style="max-height: 300px;">{
@@ -361,12 +361,11 @@ fetch(url, {
             </summary>
             <pre><code class="language-http">cache-control: no-cache, private
 content-type: application/json
-access-control-allow-origin: http://localhost:4321
-access-control-allow-credentials: true
+vary: Origin
  </code></pre></details>         <pre>
 
 <code class="language-json" style="max-height: 300px;">{
-    &quot;message&quot;: &quot;Unauthenticated.&quot;
+    &quot;message&quot;: &quot;Unauthorized&quot;
 }</code>
  </pre>
     </span>
@@ -511,6 +510,7 @@ const headers = {
     "Accept": "application/json",
 };
 
+
 fetch(url, {
     method: "POST",
     headers,
@@ -530,8 +530,7 @@ fetch(url, {
 content-type: application/json
 x-ratelimit-limit: 5
 x-ratelimit-remaining: 4
-access-control-allow-origin: http://localhost:4321
-access-control-allow-credentials: true
+vary: Origin
  </code></pre></details>         <pre>
 
 <code class="language-json" style="max-height: 300px;">{
@@ -647,7 +646,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
     \"shopname\": \"amniihfqcoynlazghdtqt\",
     \"email\": \"andreanne00@example.org\",
     \"password\": \"O[2UZ5ij-e\\/dl4m{o,\",
-    \"plan\": \"starter\"
+    \"plan\": \"professional\"
 }"
 </code></pre></div>
 
@@ -668,7 +667,7 @@ let body = {
     "shopname": "amniihfqcoynlazghdtqt",
     "email": "andreanne00@example.org",
     "password": "O[2UZ5ij-e\/dl4m{o,",
-    "plan": "starter"
+    "plan": "professional"
 };
 
 fetch(url, {
@@ -691,8 +690,7 @@ fetch(url, {
 content-type: application/json
 x-ratelimit-limit: 3
 x-ratelimit-remaining: 2
-access-control-allow-origin: http://localhost:4321
-access-control-allow-credentials: true
+vary: Origin
  </code></pre></details>         <pre>
 
 <code class="language-json" style="max-height: 300px;">{
@@ -844,10 +842,10 @@ You can check the Dev Tools console for debugging information.</code></pre>
  &nbsp;
                 <input type="text" style="display: none"
                               name="plan"                data-endpoint="POSTapi-register"
-               value="starter"
+               value="professional"
                data-component="body">
     <br>
-<p>Example: <code>starter</code></p>
+<p>Example: <code>professional</code></p>
 Must be one of:
 <ul style="list-style-type: square;"><li><code>starter</code></li> <li><code>professional</code></li> <li><code>enterprise</code></li></ul>
         </div>
@@ -912,8 +910,7 @@ fetch(url, {
 content-type: application/json
 x-ratelimit-limit: 10
 x-ratelimit-remaining: 8
-access-control-allow-origin: http://localhost:4321
-access-control-allow-credentials: true
+vary: Origin
  </code></pre></details>         <pre>
 
 <code class="language-json" style="max-height: 300px;">{
@@ -1050,6 +1047,7 @@ const headers = {
     "Accept": "application/json",
 };
 
+
 fetch(url, {
     method: "POST",
     headers,
@@ -1067,12 +1065,11 @@ fetch(url, {
             </summary>
             <pre><code class="language-http">cache-control: no-cache, private
 content-type: application/json
-access-control-allow-origin: http://localhost:4321
-access-control-allow-credentials: true
+vary: Origin
  </code></pre></details>         <pre>
 
 <code class="language-json" style="max-height: 300px;">{
-    &quot;message&quot;: &quot;Unauthenticated.&quot;
+    &quot;message&quot;: &quot;Unauthorized&quot;
 }</code>
  </pre>
     </span>
@@ -1192,6 +1189,7 @@ const headers = {
     "Accept": "application/json",
 };
 
+
 fetch(url, {
     method: "GET",
     headers,
@@ -1209,12 +1207,11 @@ fetch(url, {
             </summary>
             <pre><code class="language-http">cache-control: no-cache, private
 content-type: application/json
-access-control-allow-origin: http://localhost:4321
-access-control-allow-credentials: true
+vary: Origin
  </code></pre></details>         <pre>
 
 <code class="language-json" style="max-height: 300px;">{
-    &quot;message&quot;: &quot;Unauthenticated.&quot;
+    &quot;message&quot;: &quot;Unauthorized&quot;
 }</code>
  </pre>
     </span>
@@ -1334,6 +1331,7 @@ const headers = {
     "Accept": "application/json",
 };
 
+
 fetch(url, {
     method: "GET",
     headers,
@@ -1351,12 +1349,11 @@ fetch(url, {
             </summary>
             <pre><code class="language-http">cache-control: no-cache, private
 content-type: application/json
-access-control-allow-origin: http://localhost:4321
-access-control-allow-credentials: true
+vary: Origin
  </code></pre></details>         <pre>
 
 <code class="language-json" style="max-height: 300px;">{
-    &quot;message&quot;: &quot;Unauthenticated.&quot;
+    &quot;message&quot;: &quot;Unauthorized&quot;
 }</code>
  </pre>
     </span>
@@ -1469,17 +1466,17 @@ You can check the Dev Tools console for debugging information.</code></pre>
     --header "Accept: application/json" \
     --form "code="PROD-001""\
     --form "name="New Product""\
-    --form "stock_quantity=100"\
+    --form "barcode=consequatur"\
     --form "low_stock_threshold=45"\
     --form "price=99.99"\
     --form "selling_price=149.99"\
     --form "category_id=1"\
     --form "units_id=1"\
     --form "supplier_id=1"\
-    --form "warehouse_id=17"\
     --form "description=Dolores dolorum amet iste laborum eius est dolor."\
-    --form "has_expiry="\
-    --form "image=@C:\Users\123\AppData\Local\Temp\phpDB6C.tmp" </code></pre></div>
+    --form "has_expiry=1"\
+    --form "stock_quantity=100"\
+    --form "image=@C:\Users\123\AppData\Local\Temp\phpF9E5.tmp" </code></pre></div>
 
 
 <div class="javascript-example">
@@ -1496,16 +1493,16 @@ const headers = {
 const body = new FormData();
 body.append('code', '"PROD-001"');
 body.append('name', '"New Product"');
-body.append('stock_quantity', '100');
+body.append('barcode', 'consequatur');
 body.append('low_stock_threshold', '45');
 body.append('price', '99.99');
 body.append('selling_price', '149.99');
 body.append('category_id', '1');
 body.append('units_id', '1');
 body.append('supplier_id', '1');
-body.append('warehouse_id', '17');
 body.append('description', 'Dolores dolorum amet iste laborum eius est dolor.');
-body.append('has_expiry', '');
+body.append('has_expiry', '1');
+body.append('stock_quantity', '100');
 body.append('image', document.querySelector('input[name="image"]').files[0]);
 
 fetch(url, {
@@ -1641,16 +1638,16 @@ You can check the Dev Tools console for debugging information.</code></pre>
 <p>The product name. Example: <code>"New Product"</code></p>
         </div>
                 <div style=" padding-left: 28px;  clear: unset;">
-            <b style="line-height: 2;"><code>stock_quantity</code></b>&nbsp;&nbsp;
-<small>integer</small>&nbsp;
+            <b style="line-height: 2;"><code>barcode</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+<i>optional</i> &nbsp;
  &nbsp;
- &nbsp;
-                <input type="number" style="display: none"
-               step="any"               name="stock_quantity"                data-endpoint="POSTadmin-product-quick-create"
-               value="100"
+                <input type="text" style="display: none"
+                              name="barcode"                data-endpoint="POSTadmin-product-quick-create"
+               value="consequatur"
                data-component="body">
     <br>
-<p>The initial stock quantity. Example: <code>100</code></p>
+<p>Example: <code>consequatur</code></p>
         </div>
                 <div style=" padding-left: 28px;  clear: unset;">
             <b style="line-height: 2;"><code>low_stock_threshold</code></b>&nbsp;&nbsp;
@@ -1725,18 +1722,6 @@ You can check the Dev Tools console for debugging information.</code></pre>
 <p>The ID of the product supplier. Example: <code>1</code></p>
         </div>
                 <div style=" padding-left: 28px;  clear: unset;">
-            <b style="line-height: 2;"><code>warehouse_id</code></b>&nbsp;&nbsp;
-<small>integer</small>&nbsp;
-<i>optional</i> &nbsp;
- &nbsp;
-                <input type="number" style="display: none"
-               step="any"               name="warehouse_id"                data-endpoint="POSTadmin-product-quick-create"
-               value="17"
-               data-component="body">
-    <br>
-<p>The <code>id</code> of an existing record in the warehouses table. Example: <code>17</code></p>
-        </div>
-                <div style=" padding-left: 28px;  clear: unset;">
             <b style="line-height: 2;"><code>description</code></b>&nbsp;&nbsp;
 <small>string</small>&nbsp;
 <i>optional</i> &nbsp;
@@ -1758,7 +1743,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
                value=""
                data-component="body">
     <br>
-<p>Must be an image. Must not be greater than 2048 kilobytes. Example: <code>C:\Users\123\AppData\Local\Temp\phpDB6C.tmp</code></p>
+<p>Must be an image. Must not be greater than 2048 kilobytes. Example: <code>C:\Users\123\AppData\Local\Temp\phpF9E5.tmp</code></p>
         </div>
                 <div style=" padding-left: 28px;  clear: unset;">
             <b style="line-height: 2;"><code>has_expiry</code></b>&nbsp;&nbsp;
@@ -1780,7 +1765,19 @@ You can check the Dev Tools console for debugging information.</code></pre>
             <code>false</code>
         </label>
     <br>
-<p>Example: <code>false</code></p>
+<p>Example: <code>true</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>stock_quantity</code></b>&nbsp;&nbsp;
+<small>integer</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="number" style="display: none"
+               step="any"               name="stock_quantity"                data-endpoint="POSTadmin-product-quick-create"
+               value="100"
+               data-component="body">
+    <br>
+<p>The initial stock quantity. Example: <code>100</code></p>
         </div>
         </form>
 

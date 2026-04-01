@@ -10,14 +10,14 @@
 
 ## 📊 Project Statistics
 
-| Metric               | Value                                    |
-| -------------------- | ---------------------------------------- |
-| **🏗️ Architecture**  | Multi-tenant SaaS                        |
-| **🧪 Test Coverage** | 366 test files                           |
-| **💻 Codebase**      | 451+ commits, 1.5 years development      |
-| **🔐 Security**      | RBAC with 79 permissions, audit logging  |
-| **🐳 DevOps**        | Docker + GitHub Actions CI/CD            |
-| **📡 API**           | RESTful API with Sanctum authentication  |
+| Metric               | Value                                        |
+| -------------------- | -------------------------------------------- |
+| **🏗️ Architecture**  | Multi-tenant SaaS                            |
+| **🧪 Test Coverage** | 786 test files                               |
+| **💻 Codebase**      | 451+ commits, 1.5 years development          |
+| **🔐 Security**      | RBAC with 79 permissions, audit logging      |
+| **🐳 DevOps**        | Docker + GitHub Actions CI/CD                |
+| **📡 API**           | RESTful API with Sanctum authentication      |
 | **🌍 Multi-tenancy** | Subdomain-based SaaS (`*.invent-mag.web.id`) |
 
 ---
@@ -229,6 +229,7 @@ Experience Invent-MAG firsthand:
     - Successful logins
     - Permission denials
     - Suspicious activity
+- **Audit Log UI:** Dedicated page with filters, summary cards, and detail modals
 - **Rate Limiting:** Custom throttling (5 login attempts, 3 reg/hour)
 - **Input Sanitization:** XSS protection
 - **Custom Error Pages:** 403, 404, 419, 429, 500, 503
@@ -277,7 +278,7 @@ Data:
 
 #### Testing
 
-- **236 Test Files:** PHP Feature/Unit and JS Vitest tests
+- **786 Test Files:** 40 Feature + 45 Unit PHP + 171 JS Vitest
 - **PHPUnit 11+:** Modern PHP testing
 - **Parallel Testing:** `php artisan test --parallel`
 - **Multi-tenancy Tests:** Tenant isolation testing
@@ -300,18 +301,18 @@ Data:
 
 ## 🔐 Security Architecture
 
-| Layer                 | Implementation                       |
-| --------------------- | ------------------------------------ |
-| **Authentication**    | Laravel Fortify + Email Verification |
-| **API Security**      | Laravel Sanctum (Token-based)        |
-| **Authorization**     | Spatie Permission (79 permissions)    |
-| **Tenant Isolation**  | Spatie Multitenancy (Row-level isolation) |
-| **Password Security** | Bcrypt hashing                       |
-| **CSRF Protection**   | Built-in token validation            |
-| **XSS Prevention**    | Blade auto-escaping + sanitize.js    |
-| **SQL Injection**     | Query Builder/Eloquent ORM           |
-| **Rate Limiting**     | Custom throttling per endpoint       |
-| **Audit Trail**       | SecurityLogger + AccountingAuditLog  |
+| Layer                 | Implementation                                        |
+| --------------------- | ----------------------------------------------------- |
+| **Authentication**    | Laravel Fortify + Email Verification                  |
+| **API Security**      | Laravel Sanctum (Token-based)                         |
+| **Authorization**     | Spatie Permission (79 permissions)                    |
+| **Tenant Isolation**  | Spatie Multitenancy (Row-level isolation)             |
+| **Password Security** | Bcrypt hashing                                        |
+| **CSRF Protection**   | Built-in token validation                             |
+| **XSS Prevention**    | Blade auto-escaping + sanitize.js                     |
+| **SQL Injection**     | Query Builder/Eloquent ORM                            |
+| **Rate Limiting**     | Custom throttling per endpoint                        |
+| **Audit Trail**       | SecurityLogger + AccountingAuditLog + Activity Log UI |
 
 ---
 
@@ -354,11 +355,11 @@ Data:
 
 ## 🧪 Test Coverage
 
-**236 Test Files Covering:**
+**786 Test Files Covering:**
 
-### Feature Tests
+### Feature Tests (40)
 
-- Authentication & Authorization
+- Authentication & Authorization (5 tests)
 - Product Management (CRUD, bulk operations)
 - Sales & Purchase Orders
 - POS System
@@ -369,7 +370,7 @@ Data:
 - Sales Pipeline
 - Multi-tenancy
 
-### Unit Tests
+### Unit Tests (45)
 
 - Service Layer (Dashboard, Sales, POS, Accounting, etc.)
 - Helper Classes (Currency, Sales, Product)
@@ -378,16 +379,12 @@ Data:
 
 ### Running Tests
 
-```bash
+````bash
 # All tests
 php artisan test
 
 # Parallel testing (faster)
 php artisan test --parallel
-
-# Frontend tests
-npm run test:js
-```
 
 ---
 
@@ -406,7 +403,7 @@ docker-compose exec app php artisan migrate --seed
 
 # Access app
 http://localhost
-```
+````
 
 ### Docker Includes:
 

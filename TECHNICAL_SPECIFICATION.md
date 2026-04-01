@@ -13,7 +13,7 @@ Invent-MAG is a production-ready, enterprise-grade ERP system built on Laravel 1
 ### Key Technical Highlights
 
 - **Multi-tenant SaaS architecture** with row-level database isolation
-- **776 test files** ensuring code reliability
+- **786 test files** ensuring code reliability
 - **451+ commits** demonstrating sustained development
 - **Docker + CI/CD** for modern DevOps practices
 - **Service-oriented architecture** with clean separation of concerns
@@ -179,7 +179,7 @@ Internet → [DNS: invent-mag.web.id]
 | ----------------- | ----- | ------------------------------- |
 | **Feature Tests** | 40+   | Controllers, Routes, End-to-end |
 | **Unit Tests**    | 40+   | Services, Helpers, DTOs         |
-| **Total Tests**   | 776   | test files                      |
+| **Total Tests**   | 786   | test files                      |
 
 ### 2.2 Test Structure
 
@@ -193,26 +193,33 @@ tests/
 │   │   ├── PurchaseControllerTest.php
 │   │   ├── POSControllerTest.php
 │   │   ├── DashboardControllerTest.php
-│   │   └── ... (20+ more)
+│   │   ├── AuditLogControllerTest.php
+│   │   └── ... (30+ more)
 │   ├── Auth/
 │   │   ├── AuthenticationTest.php
 │   │   ├── PasswordResetTest.php
-│   │   └── EmailVerificationTest.php
-│   └── Api/
-│       ├── TenantLookupControllerTest.php
-│       └── MultiTenancyTest.php
+│   │   ├── EmailVerificationTest.php
+│   │   └── PasswordUpdateTest.php
+│   ├── Api/
+│   │   ├── TenantLookupControllerTest.php
+│   │   └── MultiTenancyTest.php
+│   └── MidtransWebhookTest.php
 └── Unit/
     ├── Services/
     │   ├── AccountingServiceTest.php
     │   ├── SalesServiceTest.php
     │   ├── DashboardServiceTest.php
-    │   └── ... (15+ more)
+    │   ├── ActivityLogServiceTest.php
+    │   ├── SecurityLoggerTest.php
+    │   └── ... (40+ more)
     ├── Helpers/
     │   ├── CurrencyHelperTest.php
     │   ├── SalesHelperTest.php
     │   └── ProductHelperTest.php
-    └── Http/
-        └── Requests/
+    ├── Http/
+    │   └── Requests/
+    └── Models/
+        └── ProductStockTest.php
 ```
 
 ### 2.3 Code Architecture Patterns
@@ -342,6 +349,20 @@ public function store(Request $request)
 - Transaction changes
 - Account modifications
 - User actions on financial data
+
+**Audit Log UI (Activity Logs):**
+
+- Dedicated audit log page (`/admin/audit-log`)
+- Filterable by user, module, action, date range, search
+- Summary cards (today, this week, this month, total events)
+- Detail modal showing old/new values for changes
+- Superuser-only access (bypasses plan limits)
+- Multi-tenant isolation with tenant-specific data
+- Module-specific actions based on navigation menu:
+  - Product, Sales, Sales Return, Purchase Order, Purchase Return
+  - Customer, Supplier, Warehouse, Category, Unit, Tax, User
+  - Manual Journal Entry (create, update, delete, post, void, reverse, view)
+  - POS (create, update, payment, view)
 
 ---
 

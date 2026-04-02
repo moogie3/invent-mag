@@ -20,8 +20,8 @@ class PaymentController extends Controller
     public function __construct(PlanService $planService)
     {
         $this->planService = $planService;
-        \Midtrans\Config::$isProduction = env('MIDTRANS_IS_PRODUCTION', false);
-        \Midtrans\Config::$serverKey = env('MIDTRANS_SERVER_KEY');
+        \Midtrans\Config::$isProduction = config('midtrans.is_production', false);
+        \Midtrans\Config::$serverKey = config('midtrans.server_key');
     }
 
     /**

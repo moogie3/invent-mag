@@ -42,7 +42,7 @@
                 <div class="nav-item me-2" id="theme-toggle-sidebar-container">
                     <a href="#" class="nav-link px-0" id="theme-toggle-sidebar">
                         <i class="ti ti-sun fs-2 theme-icon-light"></i>
-                        <i class="ti ti-moon fs-2 theme-icon-dark" style="display: none;"></i>
+                        <i class="ti ti-moon fs-2 theme-icon-dark"></i>
                     </a>
                 </div>
 
@@ -65,7 +65,7 @@
             @foreach ($navigationItems as $item)
                 @can($item['permission'] ?? null)
                     <li class="nav-item @if(isset($item['children'])) dropdown @endif">
-                        <a class="nav-link" href="{{ isset($item['route']) ? route($item['route']) : '#' }}" data-turbo="true" @if(isset($item['children'])) data-bs-toggle="collapse" data-bs-target="#submenu-{{ $loop->index }}" role="button" aria-expanded="false" aria-controls="submenu-{{ $loop->index }}" @endif>
+                        <a class="nav-link {{ isset($item['route']) && request()->routeIs($item['route']) ? 'active' : '' }}" href="{{ isset($item['route']) ? route($item['route']) : '#' }}" data-turbo="true" data-turbo-cache="false" @if(isset($item['children'])) data-bs-toggle="collapse" data-bs-target="#submenu-{{ $loop->index }}" role="button" aria-expanded="false" aria-controls="submenu-{{ $loop->index }}" @endif>
                             @if(isset($item['icon']))
                             <div class="nav-link-icon">
                                 <i class="{{ $item['icon'] }}"></i>
@@ -84,7 +84,7 @@
                                     @foreach ($item['children'] as $child)
                                         @can($child['permission'] ?? null)
                                             <li class="nav-item">
-                                                <a class="nav-link" href="{{ isset($child['route']) ? route($child['route']) : '#' }}" data-turbo="true">
+                                                <a class="nav-link {{ isset($child['route']) && request()->routeIs($child['route']) ? 'active' : '' }}" href="{{ isset($child['route']) ? route($child['route']) : '#' }}" data-turbo="true" data-turbo-cache="false">
                                                     @if(isset($child['icon']))
                                                     <div class="nav-link-icon">
                                                         <i class="{{ $child['icon'] }}"></i>
@@ -109,7 +109,7 @@
         <ul class="navbar-nav">
 
             <li class="nav-item">
-                <a class="nav-link" href="{{ route('admin.setting.profile.edit') }}" data-turbo="true" data-bs-toggle="tooltip"
+                <a class="nav-link" href="{{ route('admin.setting.profile.edit') }}" data-turbo="true" data-turbo-cache="false" data-bs-toggle="tooltip"
                     data-bs-placement="top">
                     <div class="nav-link-icon">
                         <i class="ti ti-settings"></i>
@@ -122,7 +122,7 @@
             @role('superuser')
                 <li class="nav-item">
                     <a class="nav-link {{ request()->routeIs('admin.users.index') || request()->routeIs('admin.users.create') || request()->routeIs('admin.users.edit') ? 'active' : '' }}"
-                        href="{{ route('admin.users.index') }}" data-turbo="true" data-bs-toggle="tooltip" data-bs-placement="top">
+                        href="{{ route('admin.users.index') }}" data-turbo="true" data-turbo-cache="false" data-bs-toggle="tooltip" data-bs-placement="top">
                         <div class="nav-link-icon">
                             <i class="ti ti-users"></i>
                         </div>
@@ -133,7 +133,7 @@
                 <!-- Audit Log Link -->
                 <li class="nav-item">
                     <a class="nav-link {{ request()->routeIs('admin.audit-log.*') ? 'active' : '' }}"
-                        href="{{ route('admin.audit-log.index') }}" data-turbo="true" data-bs-toggle="tooltip" data-bs-placement="top">
+                        href="{{ route('admin.audit-log.index') }}" data-turbo="true" data-turbo-cache="false" data-bs-toggle="tooltip" data-bs-placement="top">
                         <div class="nav-link-icon">
                             <i class="ti ti-shield-check"></i>
                         </div>
@@ -143,7 +143,7 @@
             @endrole
 
             <li class="nav-item">
-                <a class="nav-link" href="#" data-bs-toggle="tooltip" data-bs-placement="top"
+                <a class="nav-link" href="#" data-turbo-cache="false" data-bs-toggle="tooltip" data-bs-placement="top"
                     onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
                     <div class="nav-link-icon">
                         <i class="ti ti-logout"></i>

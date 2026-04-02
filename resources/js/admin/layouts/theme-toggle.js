@@ -1,14 +1,6 @@
 import { onPageLoad } from '../utils/onPageLoad.js';
 
 onPageLoad(() => {
-    // Only initialize if not already done for this path
-    if (window.themeToggleInitialized && window.themeToggleLastPath === window.location.pathname) {
-        return;
-    }
-
-    window.themeToggleLastPath = window.location.pathname;
-    window.themeToggleInitialized = true;
-
     const htmlElement = document.documentElement;
     const navbarToggleContainer = document.getElementById(
         "theme-toggle-navbar-container"
@@ -71,7 +63,6 @@ onPageLoad(() => {
         document.body.style.overflow = '';
         document.body.style.paddingRight = '';
 
-        const csrfTokenMeta = document.querySelector('meta[name="csrf-token"]');
         const currentTheme = htmlElement.getAttribute('data-bs-theme');
         const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
 
@@ -79,6 +70,7 @@ onPageLoad(() => {
         localStorage.setItem('theme', newTheme);
         updateThemeIcons(newTheme);
 
+        const csrfTokenMeta = document.querySelector('meta[name="csrf-token"]');
         if (!csrfTokenMeta) {
             return;
         }
@@ -114,8 +106,9 @@ onPageLoad(() => {
         });
     }
 
-    const initialTheme = htmlElement.getAttribute('data-bs-theme');
-    updateThemeIcons(initialTheme);
+    // Always update icons to match current theme on every page load
+    const currentTheme = htmlElement.getAttribute('data-bs-theme') || 'light';
+    updateThemeIcons(currentTheme);
 
     const handleThemeClick = function (e) {
         e.preventDefault();
@@ -123,47 +116,44 @@ onPageLoad(() => {
         toggleTheme();
     };
 
-    // Remove any existing listeners first to prevent duplicates
+    // Attach click handlers - remove old ones first
     if (navbarToggleContainer) {
-        navbarToggleContainer.replaceWith(navbarToggleContainer.cloneNode(true));
-        const newNavbarContainer = document.getElementById("theme-toggle-navbar-container");
-        if (newNavbarContainer) {
-            newNavbarContainer.addEventListener("click", handleThemeClick);
-        }
+        const newNavbarContainer = navbarToggleContainer.cloneNode(true);
+        navbarToggleContainer.parentNode.replaceChild(newNavbarContainer, navbarToggleContainer);
+        newNavbarContainer.addEventListener("click", handleThemeClick);
     }
     if (sidebarToggleContainer) {
-        sidebarToggleContainer.replaceWith(sidebarToggleContainer.cloneNode(true));
-        const newSidebarContainer = document.getElementById("theme-toggle-sidebar-container");
-        if (newSidebarContainer) {
-            newSidebarContainer.addEventListener("click", handleThemeClick);
-        }
+        const newSidebarContainer = sidebarToggleContainer.cloneNode(true);
+        sidebarToggleContainer.parentNode.replaceChild(newSidebarContainer, sidebarToggleContainer);
+        newSidebarContainer.addEventListener("click", handleThemeClick);
     }
 
     const navbarToggleBtn = document.querySelector("#theme-toggle-navbar");
     const sidebarToggleBtn = document.querySelector("#theme-toggle-sidebar");
 
     if (navbarToggleBtn) {
-        navbarToggleBtn.replaceWith(navbarToggleBtn.cloneNode(true));
-        const newNavbarBtn = document.querySelector("#theme-toggle-navbar");
-        if (newNavbarBtn) {
-            newNavbarBtn.addEventListener("click", handleThemeClick);
-        }
+        const newNavbarBtn = navbarToggleBtn.cloneNode(true);
+        navbarToggleBtn.parentNode.replaceChild(newNavbarBtn, navbarToggleBtn);
+        newNavbarBtn.addEventListener("click", handleThemeClick);
     }
     if (sidebarToggleBtn) {
-        sidebarToggleBtn.replaceWith(sidebarToggleBtn.cloneNode(true));
-        const newSidebarBtn = document.querySelector("#theme-toggle-sidebar");
-        if (newSidebarBtn) {
-            newSidebarBtn.addEventListener("click", handleThemeClick);
-        }
+        const newSidebarBtn = sidebarToggleBtn.cloneNode(true);
+        sidebarToggleBtn.parentNode.replaceChild(newSidebarBtn, sidebarToggleBtn);
+        newSidebarBtn.addEventListener("click", handleThemeClick);
     }
 
     if (themeToggleButton) {
-        themeToggleButton.addEventListener("click", handleThemeClick);
+        const newThemeToggleBtn = themeToggleButton.cloneNode(true);
+        themeToggleButton.parentNode.replaceChild(newThemeToggleBtn, themeToggleButton);
+        newThemeToggleBtn.addEventListener("click", handleThemeClick);
     }
-});
 
-// Reset the initialized flag before Turbo caches so the theme toggle
-// re-initializes properly on the next page visit
-document.addEventListener('turbo:before-cache', () => {
-    window.themeToggleInitialized = false;
+    const authThemeToggle = document.querySelector("#theme-toggle");
+    if (authThemeToggle) {
+        authThemeToggle.replaceWith(authThemeToggle.cloneNode(true));
+        const newAuthThemeToggle = document.querySelector("#theme-toggle");
+        if (newAuthThemeToggle) {
+            newAuthThemeToggle.addEventListener("click", handleThemeClick);
+        }
+    }
 });

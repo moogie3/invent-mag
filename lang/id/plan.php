@@ -115,6 +115,13 @@ return [
     'notif_field_address' => 'alamat',
     'notif_field_avatar' => 'foto profil',
 
+    // Notifikasi Sistem - Perubahan Paket
+    'notif_scheduled_downgrade_title' => 'Penurunan Paket Terjadwal',
+    'notif_scheduled_downgrade_desc' => 'Paket Anda akan diturunkan dari :from_plan ke :to_plan pada :date.',
+    'notif_upgrade_success_title' => 'Paket Dinaikkan',
+    'notif_upgrade_success_desc' => 'Anda telah berhasil meningkatkan ke paket :plan.',
+    'view_plan_details' => 'Lihat Detail Paket',
+
     // UI Dropdown Notifikasi
     'notif_header' => 'Notifikasi',
     'notif_tab_orders' => 'PO & Penjualan',

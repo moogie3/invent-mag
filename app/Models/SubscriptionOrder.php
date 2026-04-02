@@ -16,6 +16,18 @@ class SubscriptionOrder extends Model
         'paid_at' => 'datetime',
     ];
 
+    protected $fillable = [
+        'tenant_id',
+        'plan_id',
+        'order_number',
+        'amount',
+        'status',
+        'snap_token',
+        'paid_at',
+        'payment_info',
+        'change_type',
+    ];
+
     public function tenant()
     {
         return $this->belongsTo(Tenant::class);

@@ -85,6 +85,24 @@ body.no-animations .sidebar-header {
     display: none !important;
 }
 
+/* But keep sidebar user section (which contains theme toggle and bell) visible */
+body.no-animations .sidebar-user {
+    display: flex !important;
+    padding: 0.75rem;
+    justify-content: center;
+    align-items: center;
+}
+
+/* Ensure sidebar actions are visible when animations disabled */
+body.no-animations .sidebar-actions {
+    display: flex !important;
+    opacity: 1 !important;
+    width: auto !important;
+    max-width: none !important;
+    pointer-events: auto !important;
+    transform: none !important;
+}
+
 /* Allow navbar dropdown to work - remove transition but keep visibility control */
 body.no-animations .nav-dropdown {
     transition: none !important;
@@ -139,11 +157,6 @@ body.no-animations .navbar-brand {
 /* Page loader - hide completely when animations disabled */
 body.no-animations .page-loader,
 body.no-animations #global-loader {
-    display: none !important;
-}
-
-/* Hide sidebar brand completely when animations disabled - avoid layout issues */
-body.no-animations .sidebar-header {
     display: none !important;
 }
 

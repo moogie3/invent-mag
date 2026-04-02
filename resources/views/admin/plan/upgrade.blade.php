@@ -183,14 +183,22 @@ document.addEventListener('turbo:load', function() {
                     if (data.redirect) {
                         window.location.href = data.redirect;
                     } else if (data.error) {
-                        alert(data.error);
+                        if (window.InventMagApp && window.InventMagApp.showToast) {
+                            window.InventMagApp.showToast('Error', data.error, 'error');
+                        } else {
+                            alert(data.error);
+                        }
                         submitBtn.disabled = false;
                         submitBtn.innerHTML = '<i class="ti ti-check me-2"></i>{{ __("plan.confirm_upgrade") }}';
                     }
                 })
                 .catch(function(error) {
                     console.error('Error:', error);
-                    alert('An error occurred. Please try again.');
+                    if (window.InventMagApp && window.InventMagApp.showToast) {
+                        window.InventMagApp.showToast('Error', 'An error occurred. Please try again.', 'error');
+                    } else {
+                        alert('An error occurred. Please try again.');
+                    }
                     submitBtn.disabled = false;
                     submitBtn.innerHTML = '<i class="ti ti-check me-2"></i>{{ __("plan.confirm_upgrade") }}';
                 });

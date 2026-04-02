@@ -25,6 +25,8 @@ class SystemNotificationService
             ->concat($this->getUsageLimitNotifications())
             ->concat($this->getAccountingSetupNotifications())
             ->concat($this->getWelcomeNotifications())
+            ->concat($this->getScheduledPlanChangeNotifications())
+            ->concat($this->getRecentPlanUpgradeNotifications())
             ->filter(fn($item) => !in_array($item['id'], $dismissed))
             ->values();
     }
@@ -333,6 +335,107 @@ class SystemNotificationService
                 'category' => 'setup',
                 'action_label' => __('plan.notif_complete_profile'),
                 'action_route' => route('admin.setting.profile.edit'),
+                'type' => 'system',
+                'show_notification' => true,
+            ],
+        ]);
+    }
+
+    // -------------------------------------------------------------------------
+    // Scheduled Plan Change Notification
+    // Shows when there's a scheduled downgrade waiting to be applied
+    // -------------------------------------------------------------------------
+
+    protected function getScheduledPlanChangeNotifications(): Collection
+    {
+        $tenant = $this->getCurrentTenant();
+
+        if ($tenant === null) {
+            return collect();
+        }
+
+        if (!$tenant->hasScheduledDowngrade()) {
+            return collect();
+        }
+
+        $scheduledPlan = $tenant->getScheduledPlan();
+        $effectiveDate = $tenant->pending_plan_effective_at;
+        $prorationCredit = $tenant->proration_credit ?? 0;
+
+        if (!$scheduledPlan || !$effectiveDate) {
+            return collect();
+        }
+
+        $currentPlan = $tenant->getCurrentPlan();
+        $currentPlanName = $currentPlan ? $currentPlan->name : 'current';
+
+        return collect([
+            [
+                'id' => 'system::scheduled_downgrade',
+                'title' => __('plan.notif_scheduled_downgrade_title'),
+                'description' => __('plan.notif_scheduled_downgrade_desc', [
+                    'from_plan' => $currentPlanName,
+                    'to_plan' => $scheduledPlan->name,
+                    'date' => $effectiveDate->format('F d, Y'),
+                ]),
+                'icon' => 'ti ti-arrow-down-circle',
+                'color' => 'warning',
+                'urgency' => 'medium',
+                'category' => 'plan_change',
+                'action_label' => __('plan.view_plan_details'),
+                'action_route' => route('admin.setting.plan'),
+                'type' => 'system',
+                'show_notification' => true,
+            ],
+        ]);
+    }
+
+    // -------------------------------------------------------------------------
+    // Recent Plan Upgrade Notification
+    // Shows when user has recently upgraded (within last 24 hours)
+    // -------------------------------------------------------------------------
+
+    protected function getRecentPlanUpgradeNotifications(): Collection
+    {
+        $tenant = $this->getCurrentTenant();
+
+        if ($tenant === null) {
+            return collect();
+        }
+
+        if ($tenant->hasScheduledDowngrade()) {
+            return collect();
+        }
+
+        if (!$tenant->plan_changed_at) {
+            return collect();
+        }
+
+        $hoursSinceChange = now()->diffInHours($tenant->plan_changed_at, false);
+
+        if ($hoursSinceChange < 0 || $hoursSinceChange > 24) {
+            return collect();
+        }
+
+        $currentPlan = $tenant->getEffectivePlan();
+
+        if (!$currentPlan) {
+            return collect();
+        }
+
+        return collect([
+            [
+                'id' => 'system::recent_upgrade',
+                'title' => __('plan.notif_upgrade_success_title'),
+                'description' => __('plan.notif_upgrade_success_desc', [
+                    'plan' => $currentPlan->name,
+                ]),
+                'icon' => 'ti ti-rocket',
+                'color' => 'success',
+                'urgency' => 'low',
+                'category' => 'plan_change',
+                'action_label' => __('plan.view_plan_details'),
+                'action_route' => route('admin.setting.plan'),
                 'type' => 'system',
                 'show_notification' => true,
             ],

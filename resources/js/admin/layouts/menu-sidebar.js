@@ -1,11 +1,38 @@
 document.addEventListener("usersettingsloaded", function () {
     initSidebar();
+    syncActiveState();
 });
 
 // Also re-init after Turbo navigation
 document.addEventListener("turbo:load", function () {
     initSidebar();
+    syncActiveState();
 });
+
+function syncActiveState() {
+    const currentPath = window.location.pathname;
+    const sidebar = document.querySelector(".sidebar");
+    if (!sidebar) return;
+
+    sidebar.querySelectorAll(".nav-link").forEach(link => {
+        const href = link.getAttribute("href");
+        if (href && href !== "#" && href !== currentPath + "/" && href !== currentPath) {
+            link.classList.remove("active");
+        }
+    });
+
+    setTimeout(() => {
+        sidebar.querySelectorAll(".nav-link").forEach(link => {
+            const href = link.getAttribute("href");
+            if (href && href !== "#") {
+                const linkPath = new URL(href, window.location.origin).pathname;
+                if (linkPath === currentPath || currentPath.startsWith(linkPath + "/")) {
+                    link.classList.add("active");
+                }
+            }
+        });
+    }, 50);
+}
 
 document.addEventListener('turbo:before-cache', () => {
     const sidebar = document.querySelector(".sidebar");

@@ -44,6 +44,7 @@ return [
     'upgrade_amount' => 'Amount',
     'confirm_upgrade' => 'Yes, Upgrade Now',
     'free_trial' => ':days-day free trial',
+    'scheduled_downgrade' => 'Scheduled Downgrade',
 
     // Checkout
     'checkout' => 'Checkout',
@@ -114,6 +115,13 @@ return [
     'notif_field_shopname' => 'shop name',
     'notif_field_address' => 'address',
     'notif_field_avatar' => 'profile photo',
+
+    // System Notification - Scheduled Plan Change
+    'notif_scheduled_downgrade_title' => 'Scheduled Plan Downgrade',
+    'notif_scheduled_downgrade_desc' => 'Your plan will be downgraded from :from_plan to :to_plan on :date.',
+    'notif_upgrade_success_title' => 'Plan Upgraded',
+    'notif_upgrade_success_desc' => 'You have successfully upgraded to the :plan plan.',
+    'view_plan_details' => 'View Plan Details',
 
     // Notification Dropdown UI
     'notif_header' => 'Notifications',

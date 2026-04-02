@@ -2,6 +2,10 @@
 
 @section('title', __('plan.checkout'))
 
+@section('header')
+<meta name="turbo-cache-control" content="no-cache">
+@endsection
+
 @section('content')
 <div class="page-wrapper">
     <div class="page-body">
@@ -52,29 +56,35 @@
                                         </tr>
                                     </thead>
                                     <tbody>
+                                        @php
+                                            $showProration = isset($changeType) && $changeType === 'upgrade' && isset($priceUsd, $taxAmount);
+                                        @endphp
                                         <tr>
                                             <td>
                                                 <div class="fw-bold">{{ $newPlan->name }} {{ __('plan.subscription_plan') }}</div>
                                                 <div class="text-muted small">{{ __('plan.monthly_billing') }}</div>
+                                                @if($showProration)
+                                                    <div class="text-success small mt-1">(Upgrade - Prorated)</div>
+                                                @endif
                                             </td>
                                             <td class="text-center">1</td>
-                                            <td class="text-end">${{ number_format($newPlan->price, 0) }}</td>
-                                            <td class="text-end fw-bold">${{ number_format($newPlan->price, 0) }}</td>
+                                            <td class="text-end">${{ number_format($priceUsd ?? $newPlan->price, 2) }}</td>
+                                            <td class="text-end fw-bold">${{ number_format($priceUsd ?? $newPlan->price, 2) }}</td>
                                         </tr>
                                     </tbody>
                                     <tfoot>
                                         <tr>
                                             <td colspan="3" class="text-end">{{ __('plan.subtotal') }}:</td>
-                                            <td class="text-end">${{ number_format($newPlan->price, 0) }}</td>
+                                            <td class="text-end">${{ number_format($priceUsd ?? $newPlan->price, 2) }}</td>
                                         </tr>
                                         <tr>
-                                            <td colspan="3" class="text-end">{{ __('plan.tax') }} (0%):</td>
-                                            <td class="text-end">$0</td>
+                                            <td colspan="3" class="text-end">{{ __('plan.tax') }} (12%):</td>
+                                            <td class="text-end">${{ number_format($taxAmount ?? 0, 2) }}</td>
                                         </tr>
                                         <tr class="border-top">
                                             <td colspan="3" class="text-end fw-bold">{{ __('plan.grand_total') }}:</td>
                                             <td class="text-end">
-                                                <div class="fw-bold text-primary fs-5">${{ number_format($newPlan->price, 0) }}</div>
+                                                <div class="fw-bold text-primary fs-5">${{ number_format($totalUsd ?? $newPlan->price, 2) }}</div>
                                                 <div class="text-muted small">~ Rp {{ number_format($priceIdr, 0, ',', '.') }}</div>
                                             </td>
                                         </tr>
@@ -125,7 +135,7 @@
                                                 data-order-id="{{ $order->order_number }}"
                                                 data-client-key="{{ config('midtrans.client_key') }}"
                                                 data-is-production="{{ config('midtrans.is_production') ? 'true' : 'false' }}"
-                                                data-success-url="{{ route('admin.setting.plan') }}?success=1">
+                                                data-success-url="{{ route('admin.setting.plan') }}">
                                             <div class="d-flex align-items-center justify-content-center">
                                                 <i class="ti ti-credit-card me-2 fs-5"></i>
                                                 <div class="text-start">

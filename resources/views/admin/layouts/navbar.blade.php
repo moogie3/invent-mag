@@ -88,7 +88,7 @@
             <div class="nav-item me-2" id="theme-toggle-navbar-container">
                 <a href="#" class="nav-link px-0" id="theme-toggle-navbar">
                     <i class="ti ti-sun fs-2 theme-icon-light"></i>
-                    <i class="ti ti-moon fs-2 theme-icon-dark" style="display: none;"></i>
+                    <i class="ti ti-moon fs-2 theme-icon-dark"></i>
                 </a>
             </div>
 

@@ -18,6 +18,9 @@ class Tenant extends BaseTenant
             'trial_ends_at' => 'datetime',
             'plan_expires_at' => 'datetime',
             'plan_changed_at' => 'datetime',
+            'pending_plan_effective_at' => 'datetime',
+            'billing_period_start' => 'date',
+            'billing_period_end' => 'date',
         ];
     }
 
@@ -31,6 +34,14 @@ class Tenant extends BaseTenant
     public function plan()
     {
         return $this->belongsTo(Plan::class);
+    }
+
+    /**
+     * Get the pending plan (for scheduled downgrades).
+     */
+    public function pendingPlan()
+    {
+        return $this->belongsTo(Plan::class, 'pending_plan_id');
     }
 
     // -------------------------------------------------------------------------
@@ -57,9 +68,16 @@ class Tenant extends BaseTenant
             return $this->plan;
         }
 
-        // Backward compatibility: existing tenants without a plan
-        // get enterprise-level access (all features, no limits)
         return Plan::findBySlug('enterprise');
+    }
+
+    /**
+     * Get the actual current plan (ignores scheduled downgrades).
+     * Used for feature checks and billing.
+     */
+    public function getCurrentPlan(): ?Plan
+    {
+        return $this->getEffectivePlan();
     }
 
     /**
@@ -206,6 +224,141 @@ class Tenant extends BaseTenant
         $this->trial_ends_at = null;
         $this->plan_changed_at = now();
         $this->save();
+
+        return $this;
+    }
+
+    // -------------------------------------------------------------------------
+    // Billing Period Management
+    // -------------------------------------------------------------------------
+
+    /**
+     * Initialize billing period (calendar-based: 1st to last day of month).
+     */
+    public function initializeBillingPeriod(): self
+    {
+        $now = now();
+        $this->billing_period_start = $now->startOfMonth()->toDateString();
+        $this->billing_period_end = $now->endOfMonth()->toDateString();
+        $this->save();
+
+        return $this;
+    }
+
+    /**
+     * Get the next billing period dates.
+     */
+    public function getNextBillingPeriod(): array
+    {
+        $now = now();
+        $nextMonth = $now->copy()->addMonth()->startOfMonth();
+
+        return [
+            'start' => $nextMonth->toDateString(),
+            'end' => $nextMonth->endOfMonth()->toDateString(),
+        ];
+    }
+
+    /**
+     * Get the current billing period info.
+     */
+    public function getCurrentBillingPeriod(): ?array
+    {
+        if (!$this->billing_period_start || !$this->billing_period_end) {
+            return null;
+        }
+
+        $end = Carbon::parse($this->billing_period_end);
+        $daysRemaining = max(0, now()->diffInDays($end, false));
+
+        return [
+            'start' => $this->billing_period_start,
+            'end' => $this->billing_period_end,
+            'days_remaining' => $daysRemaining,
+        ];
+    }
+
+    /**
+     * Check if there's a scheduled downgrade pending.
+     */
+    public function hasScheduledDowngrade(): bool
+    {
+        return $this->pending_plan_id !== null 
+            && $this->pending_plan_effective_at !== null
+            && $this->pending_plan_effective_at->isFuture();
+    }
+
+    /**
+     * Get the scheduled plan (for downgrades).
+     */
+    public function getScheduledPlan(): ?Plan
+    {
+        if (!$this->hasScheduledDowngrade()) {
+            return null;
+        }
+
+        return $this->pendingPlan;
+    }
+
+    /**
+     * Get the effective plan (considering scheduled changes).
+     * If there's a scheduled downgrade, show that plan.
+     */
+    public function getEffectivePlanForDisplay(): ?Plan
+    {
+        if ($this->hasScheduledDowngrade()) {
+            return $this->pendingPlan;
+        }
+
+        return $this->getEffectivePlan();
+    }
+
+    /**
+     * Schedule a downgrade to take effect at next billing period.
+     */
+    public function scheduleDowngrade(Plan $plan, string $effectiveAt): self
+    {
+        $this->pending_plan_id = $plan->id;
+        $this->pending_plan_effective_at = $effectiveAt;
+        $this->save();
+
+        return $this;
+    }
+
+    /**
+     * Cancel a scheduled downgrade.
+     */
+    public function cancelScheduledDowngrade(): self
+    {
+        $this->pending_plan_id = null;
+        $this->pending_plan_effective_at = null;
+        $this->proration_credit = null;
+        $this->save();
+
+        return $this;
+    }
+
+    /**
+     * Apply a scheduled downgrade (called by cron job).
+     */
+    public function applyScheduledDowngrade(): self
+    {
+        if (!$this->hasScheduledDowngrade()) {
+            return $this;
+        }
+
+        $oldPlan = $this->plan;
+        $newPlan = $this->pendingPlan;
+
+        $this->plan_id = $this->pending_plan_id;
+        $this->plan_changed_at = now();
+        
+        $this->pending_plan_id = null;
+        $this->pending_plan_effective_at = null;
+        
+        $this->save();
+
+        \Illuminate\Support\Facades\Log::info("Scheduled downgrade applied for tenant {$this->name}: {$oldPlan?->name} -> {$newPlan->name}");
 
         return $this;
     }

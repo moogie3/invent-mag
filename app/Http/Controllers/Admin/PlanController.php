@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Services\BillingService;
 use App\Services\PlanService;
 use Illuminate\Http\Request;
 
@@ -12,10 +13,12 @@ require_once base_path('vendor/midtrans/midtrans-php/Midtrans.php');
 class PlanController extends Controller
 {
     protected PlanService $planService;
+    protected BillingService $billingService;
 
-    public function __construct(PlanService $planService)
+    public function __construct(PlanService $planService, BillingService $billingService)
     {
         $this->planService = $planService;
+        $this->billingService = $billingService;
     }
 
     /**
@@ -25,11 +28,9 @@ class PlanController extends Controller
     public function index(Request $request)
     {
         try {
-            // Try to get fresh tenant from database
             $tenant = app('currentTenant');
             $tenant->refresh();
         } catch (\Exception $e) {
-            // If tenant binding doesn't exist, continue without it
             $tenant = null;
         }
         
@@ -38,22 +39,34 @@ class PlanController extends Controller
         $plans = $this->planService->getAvailablePlans();
         $features = config('plans.features');
 
-        // Handle success redirect from checkout
         if ($request->query('success') == 1 && $tenant) {
-            // Check for recent paid order
             $recentOrder = \App\Models\SubscriptionOrder::where('tenant_id', $tenant->id)
                 ->where('status', 'paid')
                 ->latest('paid_at')
                 ->first();
 
             if ($recentOrder && $recentOrder->paid_at > now()->subMinutes(5)) {
-                // Refresh the plan data after upgrade
                 $tenant->refresh();
+                
                 $currentPlan = $tenant->getEffectivePlan();
                 $usageStats = $this->planService->getUsageStats();
                 
-                // Clear the query string to prevent re-submission
-                return redirect()->route('admin.setting.plan')->with('success', 'Payment successful! You are now on the ' . $currentPlan->name . ' plan.');
+                $newPlan = $recentOrder->plan;
+                $oldPlan = $tenant->getCurrentPlan();
+                
+                $message = '';
+                
+                if ($tenant->hasScheduledDowngrade()) {
+                    $scheduledPlan = $tenant->getScheduledPlan();
+                    $effectiveDate = $tenant->pending_plan_effective_at->format('F d, Y');
+                    $credit = $tenant->proration_credit ?? 0;
+                    
+                    $message = "Payment successful! Your downgrade to {$scheduledPlan->name} will take effect on {$effectiveDate}. You will keep your current {$oldPlan->name} plan until then. A credit of $" . number_format($credit, 2) . " will be applied to your next bill.";
+                } else {
+                    $message = "Payment successful! You are now on the {$currentPlan->name} plan.";
+                }
+                
+                return redirect()->route('admin.setting.plan')->with('success', $message);
             }
         }
 
@@ -93,13 +106,25 @@ class PlanController extends Controller
 
         $tenant = app('currentTenant');
         $newPlan = \App\Models\Plan::where('slug', $request->input('plan'))->first();
+        
+        $currentPlan = $tenant->getCurrentPlan();
+        $changeType = $this->billingService->getPlanChangeType($currentPlan, $newPlan);
 
-        // 1. Create a Pending Subscription Order
         $orderNumber = 'INV-' . strtoupper(uniqid()) . '-' . time();
         
-        // Convert USD to IDR for Midtrans (minimum 10,000 IDR required)
         $exchangeRate = 16000;
-        $priceIdr = (int) round($newPlan->price * $exchangeRate);
+        $taxRate = 0.12;
+        
+        if ($changeType === 'upgrade') {
+            $daysRemaining = $this->billingService->getDaysRemainingInPeriod($tenant);
+            $prorationAmount = $this->billingService->calculateUpgradeProration($currentPlan, $newPlan, $daysRemaining);
+            $subtotalIdr = (int) round(($newPlan->price + $prorationAmount) * $exchangeRate);
+        } else {
+            $subtotalIdr = (int) round($newPlan->price * $exchangeRate);
+        }
+        
+        $taxIdr = (int) round($subtotalIdr * $taxRate);
+        $priceIdr = $subtotalIdr + $taxIdr;
         
         $order = \App\Models\SubscriptionOrder::create([
             'tenant_id' => $tenant->id,
@@ -107,16 +132,13 @@ class PlanController extends Controller
             'order_number' => $orderNumber,
             'amount' => $priceIdr,
             'status' => 'pending',
+            'change_type' => $changeType,
         ]);
 
-        // 2. Configure Midtrans
-        \Midtrans\Config::$serverKey = env('MIDTRANS_SERVER_KEY');
-        \Midtrans\Config::$isProduction = env('MIDTRANS_IS_PRODUCTION', false);
+        \Midtrans\Config::$serverKey = config('midtrans.server_key');
+        \Midtrans\Config::$isProduction = config('midtrans.is_production', false);
         \Midtrans\Config::$isSanitized = true;
         \Midtrans\Config::$is3ds = true;
-
-        // 3. Build Midtrans Payload
-        // Use $priceIdr which is already calculated above
         
         $params = [
             'transaction_details' => [
@@ -133,28 +155,22 @@ class PlanController extends Controller
                     'id' => $newPlan->slug,
                     'price' => $priceIdr,
                     'quantity' => 1,
-                    'name' => $newPlan->name . ' Subscription',
+                    'name' => $newPlan->name . ' Subscription' . ($changeType === 'upgrade' ? ' (including prorated upgrade)' : ''),
                 ]
             ]
         ];
 
         try {
-            // 4. Get Snap Token
             $snapToken = \Midtrans\Snap::getSnapToken($params);
             
             $order->update(['snap_token' => $snapToken]);
 
-            // 5. Return view with Snap Token to render popup
-            $currentPlan = $tenant->plan;
-
-            // Turbo Drive handling - return redirect response
             if ($request->header('X-Laravel-JSON') || $request->expectsJson()) {
                 return response()->json([
                     'redirect' => route('admin.setting.plan.checkout', ['order' => $order->id])
                 ]);
             }
 
-            // For Turbo Drive form submissions, return redirect (Turbo will follow)
             return redirect()->route('admin.setting.plan.checkout', ['order' => $order->id]);
 
         } catch (\Exception $e) {
@@ -178,8 +194,15 @@ class PlanController extends Controller
         $currentPlan = app('currentTenant')->plan;
         $snapToken = $order->snap_token;
         $priceIdr = $order->amount;
+        $changeType = $order->change_type;
+        
+        $exchangeRate = 16000;
+        $priceUsd = $priceIdr / $exchangeRate;
+        $taxRate = 0.12;
+        $taxAmount = $priceUsd * $taxRate;
+        $totalUsd = $priceUsd + $taxAmount;
 
-        return view('admin.plan.checkout', compact('order', 'snapToken', 'newPlan', 'currentPlan', 'priceIdr'));
+        return view('admin.plan.checkout', compact('order', 'snapToken', 'newPlan', 'currentPlan', 'priceIdr', 'priceUsd', 'taxAmount', 'totalUsd', 'changeType'));
     }
 
     /**
@@ -195,10 +218,8 @@ class PlanController extends Controller
         $orderId = $request->input('order_id');
         $transactionResult = $request->input('transaction_result');
 
-        // Get current tenant
         $tenant = app('currentTenant');
         
-        // Find order and verify it belongs to current tenant
         $order = \App\Models\SubscriptionOrder::where('order_number', $orderId)
             ->where('tenant_id', $tenant->id)
             ->first();
@@ -208,40 +229,70 @@ class PlanController extends Controller
             return response()->json(['message' => 'Order not found'], 404);
         }
 
-        // Check if already processed
         if ($order->status === 'paid') {
             return response()->json(['message' => 'Order already processed', 'plan' => $order->plan->name]);
         }
 
-        // Verify the transaction status with Midtrans API
         try {
-            \Midtrans\Config::$isProduction = env('MIDTRANS_IS_PRODUCTION', false);
-            \Midtrans\Config::$serverKey = env('MIDTRANS_SERVER_KEY');
+            \Midtrans\Config::$isProduction = config('midtrans.is_production', false);
+            \Midtrans\Config::$serverKey = config('midtrans.server_key');
             
             $status = \Midtrans\Transaction::status($orderId);
             
-            // Only process if payment is successful
             if ($status->transaction_status === 'settlement' || $status->transaction_status === 'capture') {
-                // Update order status
                 $order->update([
                     'status' => 'paid',
                     'paid_at' => now(),
                     'payment_info' => (array) $status
                 ]);
 
-                // Update tenant's plan
                 $newPlan = $order->plan;
-                $tenant->plan_id = $newPlan->id;
-                $tenant->plan_status = 'active';
-                $tenant->plan_changed_at = now();
-                $tenant->save();
+                $currentPlan = $tenant->getCurrentPlan();
+                $changeType = $order->change_type ?? $this->billingService->getPlanChangeType($currentPlan, $newPlan);
 
-                \Illuminate\Support\Facades\Log::info("Payment confirmed for order {$order->order_number}. Tenant {$tenant->name} changed to {$newPlan->name}.");
-                
-                return response()->json([
-                    'message' => 'Payment confirmed successfully',
-                    'plan' => $newPlan->name
-                ]);
+                if (!$tenant->billing_period_start) {
+                    $period = $this->billingService->getCurrentBillingPeriod();
+                    $tenant->billing_period_start = $period['start'];
+                    $tenant->billing_period_end = $period['end'];
+                }
+
+                if ($changeType === 'upgrade') {
+                    $daysRemaining = $this->billingService->getDaysRemainingInPeriod($tenant);
+                    $prorationAmount = $this->billingService->calculateUpgradeProration($currentPlan, $newPlan, $daysRemaining);
+                    
+                    $tenant->plan_id = $newPlan->id;
+                    $tenant->plan_status = 'active';
+                    $tenant->plan_changed_at = now();
+                    $tenant->save();
+
+                    \Illuminate\Support\Facades\Log::info("Payment confirmed for order {$order->order_number}. Upgrade: {$currentPlan?->name} -> {$newPlan->name}. Proration: \${$prorationAmount}");
+                    
+                    return response()->json([
+                        'message' => 'Payment confirmed successfully',
+                        'plan' => $newPlan->name,
+                        'type' => 'upgrade',
+                        'proration_amount' => $prorationAmount,
+                    ]);
+                } else {
+                    $nextPeriod = $this->billingService->getNextBillingPeriod();
+                    $daysRemaining = $this->billingService->getDaysRemainingInPeriod($tenant);
+                    $creditAmount = $this->billingService->calculateDowngradeCredit($currentPlan, $newPlan, $daysRemaining);
+                    
+                    $tenant->pending_plan_id = $newPlan->id;
+                    $tenant->pending_plan_effective_at = $nextPeriod['start'] . ' 00:00:00';
+                    $tenant->proration_credit = $creditAmount;
+                    $tenant->save();
+
+                    \Illuminate\Support\Facades\Log::info("Payment confirmed for order {$order->order_number}. Downgrade scheduled: {$currentPlan?->name} -> {$newPlan->name}. Effective: {$nextPeriod['start']}. Credit: \${$creditAmount}");
+                    
+                    return response()->json([
+                        'message' => 'Payment confirmed successfully',
+                        'plan' => $newPlan->name,
+                        'type' => 'downgrade',
+                        'effective_date' => $nextPeriod['start'],
+                        'credit_amount' => $creditAmount,
+                    ]);
+                }
             } else {
                 return response()->json([
                     'message' => 'Payment not completed',

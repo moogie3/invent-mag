@@ -21,21 +21,37 @@
                         </div>
                         <div class="col-12 col-md-9 d-flex flex-column">
                             <div class="card-body">
-                                @if(session('success'))
-                                    <div class="alert alert-success alert-dismissible" role="alert">
-                                        <div class="d-flex">
-                                            <div><i class="ti ti-check me-2"></i></div>
-                                            <div>{{ session('success') }}</div>
-                                        </div>
-                                        <a class="btn-close" data-bs-dismiss="alert" aria-label="close"></a>
-                                    </div>
-                                @endif
+                                {{-- Scheduled Downgrade Notice --}}
+                                @php
+                                    try {
+                                        $tenant = app('currentTenant');
+                                        $hasScheduledDowngrade = $tenant && $tenant->hasScheduledDowngrade();
+                                        $scheduledPlan = $hasScheduledDowngrade ? $tenant->getScheduledPlan() : null;
+                                        $effectiveDate = $hasScheduledDowngrade ? $tenant->pending_plan_effective_at : null;
+                                        $prorationCredit = $hasScheduledDowngrade ? $tenant->proration_credit : 0;
+                                    } catch (\Exception $e) {
+                                        $hasScheduledDowngrade = false;
+                                        $scheduledPlan = null;
+                                        $effectiveDate = null;
+                                        $prorationCredit = 0;
+                                    }
+                                @endphp
 
-                                @if(session('error'))
-                                    <div class="alert alert-danger alert-dismissible" role="alert">
+                                @if($hasScheduledDowngrade && $scheduledPlan && $effectiveDate)
+                                    <div class="alert alert-warning alert-dismissible" role="alert">
                                         <div class="d-flex">
-                                            <div><i class="ti ti-alert-circle me-2"></i></div>
-                                            <div>{{ session('error') }}</div>
+                                            <div><i class="ti ti-clock me-2"></i></div>
+                                            <div>
+                                                <strong>{{ __('plan.scheduled_downgrade') }}</strong>
+                                                <p class="mb-0 mt-1">
+                                                    Your plan will be downgraded to <strong>{{ $scheduledPlan->name }}</strong> 
+                                                    on <strong>{{ $effectiveDate->format('F d, Y') }}</strong>. 
+                                                    You will keep your current plan benefits until then.
+                                                    @if($prorationCredit > 0)
+                                                        <br>A credit of <strong>${{ number_format($prorationCredit, 2) }}</strong> will be applied to your next bill.
+                                                    @endif
+                                                </p>
+                                            </div>
                                         </div>
                                         <a class="btn-close" data-bs-dismiss="alert" aria-label="close"></a>
                                     </div>

@@ -786,6 +786,11 @@ body[data-bs-theme="dark"] .sidebar-actions .nav-link:hover,
 }
 
 /* Custom: Make theme toggle and bell icons white in dark mode */
+#theme-toggle-sidebar i,
+#notification-bell-sidebar i {
+    color: #495057 !important;
+}
+
 [data-bs-theme="dark"] #theme-toggle-sidebar i,
 [data-bs-theme="dark"] #notification-bell-sidebar i {
     color: #ffffff !important;
@@ -834,7 +839,17 @@ body[data-bs-theme="dark"] .sidebar.collapsed .navbar-nav .nav-link:hover,
 html[data-bs-theme="dark"] .sidebar .navbar-nav .nav-link.active,
 body[data-bs-theme="dark"] .sidebar .navbar-nav .nav-link.active,
 .dark .sidebar .navbar-nav .nav-link.active,
-[data-theme="dark"] .sidebar .navbar-nav .nav-link.active {
+[data-theme="dark"] .sidebar .navbar-nav .nav-link.active,
+[data-bs-theme="dark"] .sidebar .navbar-nav .nav-link.active:focus,
+[data-bs-theme="dark"] .sidebar .navbar-nav .nav-link.active:hover,
+html[data-bs-theme="dark"] .sidebar .navbar-nav .nav-link.active:focus,
+html[data-bs-theme="dark"] .sidebar .navbar-nav .nav-link.active:hover,
+body[data-bs-theme="dark"] .sidebar .navbar-nav .nav-link.active:focus,
+body[data-bs-theme="dark"] .sidebar .navbar-nav .nav-link.active:hover,
+.dark .sidebar .navbar-nav .nav-link.active:focus,
+.dark .sidebar .navbar-nav .nav-link.active:hover,
+[data-theme="dark"] .sidebar .navbar-nav .nav-link.active:focus,
+[data-theme="dark"] .sidebar .navbar-nav .nav-link.active:hover {
     background-color: #e9ecef !important;
     color: #343a40 !important;
 }

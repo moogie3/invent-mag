@@ -9,6 +9,9 @@ class Plan extends Model
 {
     use HasFactory;
 
+    public const BILLING_MONTHLY = 'monthly';
+    public const BILLING_YEARLY = 'yearly';
+
     protected $fillable = [
         'slug',
         'name',
@@ -34,6 +37,70 @@ class Plan extends Model
             'trial_days' => 'integer',
             'sort_order' => 'integer',
         ];
+    }
+
+    // -------------------------------------------------------------------------
+    // Billing
+    // -------------------------------------------------------------------------
+
+    /**
+     * Get the number of days in the billing period.
+     */
+    public function getBillingPeriodDays(): int
+    {
+        return match ($this->billing_cycle) {
+            self::BILLING_YEARLY => 365,
+            self::BILLING_MONTHLY => 30,
+            default => 30,
+        };
+    }
+
+    /**
+     * Get the daily price (prorated).
+     */
+    public function getDailyPrice(): float
+    {
+        return match ($this->billing_cycle) {
+            self::BILLING_YEARLY => (float) ($this->price / 365),
+            self::BILLING_MONTHLY => (float) ($this->price / 30),
+            default => (float) ($this->price / 30),
+        };
+    }
+
+    /**
+     * Check if this plan is an upgrade from another plan.
+     */
+    public function isUpgradeFrom(?Plan $otherPlan): bool
+    {
+        if ($otherPlan === null) {
+            return true;
+        }
+
+        return $this->price > $otherPlan->price;
+    }
+
+    /**
+     * Check if this plan is a downgrade from another plan.
+     */
+    public function isDowngradeFrom(?Plan $otherPlan): bool
+    {
+        if ($otherPlan === null) {
+            return false;
+        }
+
+        return $this->price < $otherPlan->price;
+    }
+
+    /**
+     * Check if this plan has the same price as another plan.
+     */
+    public function isSamePriceAs(?Plan $otherPlan): bool
+    {
+        if ($otherPlan === null) {
+            return false;
+        }
+
+        return $this->price === $otherPlan->price;
     }
 
     // -------------------------------------------------------------------------

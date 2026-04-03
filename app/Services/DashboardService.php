@@ -27,8 +27,8 @@ class DashboardService
         $monthlySales = Sales::where('status', 'Paid')->whereMonth('created_at', now()->month)->whereYear('created_at', now()->year)->sum('total');
         $outCountUnpaid = $this->getPurchaseCountByLocation('OUT', 'Unpaid');
         $inCountUnpaid = $this->getPurchaseCountbyLocation('IN', 'Unpaid');
-        $recentSales = Sales::with('customer')->orderBy('created_at', 'desc')->limit(3)->get();
-        $recentPurchases = Purchase::with('supplier')->orderBy('created_at', 'desc')->limit(3)->get();
+        $recentSales = Sales::with('customer:id,name')->select('id', 'customer_id', 'invoice', 'total', 'status', 'created_at')->orderBy('created_at', 'desc')->limit(3)->get()->each->setAppends([]);
+        $recentPurchases = Purchase::with('supplier:id,name')->select('id', 'supplier_id', 'invoice', 'total', 'status', 'created_at')->orderBy('created_at', 'desc')->limit(3)->get()->each->setAppends([]);
         
         // New aging calculations
         $arAging = $this->getAccountsReceivableAging();
@@ -90,7 +90,7 @@ class DashboardService
             'customerAnalytics' => $customerAnalytics,
             'supplierAnalytics' => $supplierAnalytics,
             'recentTransactions' => $recentTransactions,
-            'topSellingProducts' => $this->getTopSellingProducts(),
+            'topSellingProducts' => $this->getTopSellingProducts($dates),
             'recentSales' => $recentSales,
             'recentPurchases' => $recentPurchases,
             'lowStockCount' => $lowStockProducts->count(),
@@ -723,10 +723,14 @@ class DashboardService
         return $query->count();
     }
 
-    private function getTopSellingProducts()
+    private function getTopSellingProducts($dates)
     {
         $tenantId = app('currentTenant')->id;
-        return SalesItem::select(
+        return DB::table('sales_items')
+            ->join('sales', 'sales_items.sales_id', '=', 'sales.id')
+            ->join('products', 'sales_items.product_id', '=', 'products.id')
+            ->leftJoin('categories', 'products.category_id', '=', 'categories.id')
+            ->select(
                 'sales_items.product_id', 
                 DB::raw('SUM(sales_items.quantity) as units_sold'), 
                 DB::raw('SUM(sales_items.total) as revenue'),
@@ -735,9 +739,8 @@ class DashboardService
                 'products.image as product_image',
                 'categories.name as category_name'
             )
-            ->join('products', 'sales_items.product_id', '=', 'products.id')
-            ->leftJoin('categories', 'products.category_id', '=', 'categories.id')
             ->where('sales_items.tenant_id', $tenantId)
+            ->whereBetween('sales.order_date', [$dates['start'], $dates['end']])
             ->groupBy('sales_items.product_id', 'products.name', 'products.code', 'products.image', 'categories.name')
             ->orderByDesc('units_sold')
             ->limit(5)
@@ -896,20 +899,24 @@ class DashboardService
     private function getRecentTransactions($dates, $reportType = 'all')
     {
         $transactions = collect();
+        $tenantId = app('currentTenant')->id;
 
         if ($reportType === 'all' || $reportType === 'sales') {
-            $sales = Sales::with('customer')
-                ->whereBetween('order_date', [$dates['start'], $dates['end']])
-                ->orderBy('order_date', 'desc')
+            $sales = DB::table('sales')
+                ->leftJoin('customers', 'sales.customer_id', '=', 'customers.id')
+                ->where('sales.tenant_id', $tenantId)
+                ->whereBetween('sales.order_date', [$dates['start'], $dates['end']])
+                ->orderBy('sales.order_date', 'desc')
                 ->limit(10)
+                ->select('sales.invoice', 'sales.order_date', 'sales.total', 'sales.status', 'customers.name as customer_name')
                 ->get()
                 ->map(function ($sale) {
                     return [
                         'type' => 'sale',
                         'invoice' => $sale->invoice,
-                        'customer_supplier' => $sale->customer->name ?? 'Walk-in Customer',
+                        'customer_supplier' => $sale->customer_name ?? 'Walk-in Customer',
                         'date' => $sale->order_date,
-                        'amount' => $sale->total,
+                        'amount' => (float)$sale->total,
                         'status' => $sale->status,
                     ];
                 });
@@ -918,18 +925,21 @@ class DashboardService
         }
 
         if ($reportType === 'all' || $reportType === 'purchases') {
-            $purchases = Purchase::with('supplier')
-                ->whereBetween('order_date', [$dates['start'], $dates['end']])
-                ->orderBy('order_date', 'desc')
+            $purchases = DB::table('po')
+                ->leftJoin('suppliers', 'po.supplier_id', '=', 'suppliers.id')
+                ->where('po.tenant_id', $tenantId)
+                ->whereBetween('po.order_date', [$dates['start'], $dates['end']])
+                ->orderBy('po.order_date', 'desc')
                 ->limit(10)
+                ->select('po.invoice', 'po.order_date', 'po.total', 'po.status', 'suppliers.name as supplier_name')
                 ->get()
                 ->map(function ($purchase) {
                     return [
                         'type' => 'Purchase',
                         'invoice' => $purchase->invoice,
-                        'customer_supplier' => $purchase->supplier->name ?? 'Unknown Supplier',
+                        'customer_supplier' => $purchase->supplier_name ?? 'Unknown Supplier',
                         'date' => $purchase->order_date,
-                        'amount' => $purchase->total,
+                        'amount' => (float)$purchase->total,
                         'status' => $purchase->status,
                     ];
                 });

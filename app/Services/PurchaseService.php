@@ -30,12 +30,17 @@ class PurchaseService
 
     public function getPurchaseIndexData(array $filters, int $entries)
     {
+        $tenantId = app('currentTenant')->id ?? null;
         $query = Purchase::with(['items', 'supplier', 'user', 'purchaseReturns']);
+
+        if ($tenantId) {
+            $query->where('tenant_id', $tenantId);
+        }
 
         if (isset($filters['month']) && $filters['month']) {
             $query->whereMonth('order_date', $filters['month']);
             if (!isset($filters['year'])) { // If year is not specified, default to current year
-                $query->whereYear('order_date', Carbon::now()->year);
+                $query->whereYear('order_date', \Carbon\Carbon::now()->year);
             }
         }
 
@@ -44,58 +49,75 @@ class PurchaseService
         }
 
         $pos = $query->paginate($entries);
+        $pos->getCollection()->each->setAppends([]);
 
         // Load warehouse for filtering/display
         $pos->load('warehouse');
 
         $totalinvoice = $pos->total();
-        $items = POItem::all();
 
-        $inCount = 0;
-        $inCountamount = 0;
-        $outCount = 0;
-        $outCountamount = 0;
-        $totalMonthly = 0;
-        $paymentMonthly = 0;
+        // Use efficient DB queries to avoid loading all rows and relationships
+        $monthStart = now()->startOfMonth()->toDateString();
+        $monthEnd = now()->endOfMonth()->toDateString();
 
-        $allPurchases = Purchase::with('items', 'supplier', 'purchaseReturns')->get();
-        foreach ($allPurchases as $p) {
+        $aggQuery = DB::table('po')
+            ->join('suppliers', 'po.supplier_id', '=', 'suppliers.id')
+            ->selectRaw("
+                SUM(CASE WHEN suppliers.location = 'IN' THEN 1 ELSE 0 END) as in_count,
+                SUM(CASE WHEN suppliers.location = 'IN' AND po.status = 'Unpaid' THEN po.total ELSE 0 END) as in_unpaid_amount,
+                SUM(CASE WHEN suppliers.location = 'OUT' THEN 1 ELSE 0 END) as out_count,
+                SUM(CASE WHEN suppliers.location = 'OUT' AND po.status = 'Unpaid' THEN po.total ELSE 0 END) as out_unpaid_amount,
+                SUM(CASE WHEN po.order_date >= ? AND po.order_date <= ? THEN po.total ELSE 0 END) as total_monthly,
+                SUM(CASE WHEN po.status = 'Paid' AND po.order_date >= ? AND po.order_date <= ? THEN po.total ELSE 0 END) as payment_monthly
+            ", [$monthStart, $monthEnd, $monthStart, $monthEnd]);
+            
+        if ($tenantId) {
+            $aggQuery->where('po.tenant_id', $tenantId);
+        }
+        
+        $aggregates = $aggQuery->first();
 
-            if ($p->supplier->location === 'IN') {
-                $inCount++;
-                if ($p->status === 'Unpaid') {
-                    $inCountamount += $p->total_amount;
-                }
-            }
+        $inCount = (int) ($aggregates->in_count ?? 0);
+        $inCountamount = (float) ($aggregates->in_unpaid_amount ?? 0);
+        $outCount = (int) ($aggregates->out_count ?? 0);
+        $outCountamount = (float) ($aggregates->out_unpaid_amount ?? 0);
+        $totalMonthly = (float) ($aggregates->total_monthly ?? 0);
+        $paymentMonthly = (float) ($aggregates->payment_monthly ?? 0);
 
-            if ($p->supplier->location === 'OUT') {
-                $outCount++;
-                if ($p->status === 'Unpaid') {
-                    $outCountamount += $p->total_amount;
-                }
-            }
-
-            if ($p->order_date->isCurrentMonth()) {
-                $totalMonthly += $p->total_amount;
-            }
-
-            if ($p->status === 'Paid' && $p->order_date->isCurrentMonth()) {
-                $paymentMonthly += $p->total_amount;
-            }
+        // Fetch total payments made against unpaid/partial invoices to calculate true balance
+        $paidAgainstIn = DB::table('payments')
+            ->join('po', 'payments.paymentable_id', '=', 'po.id')
+            ->join('suppliers', 'po.supplier_id', '=', 'suppliers.id')
+            ->where('payments.paymentable_type', Purchase::class)
+            ->whereIn('po.status', ['Unpaid', 'Partial'])
+            ->where('suppliers.location', 'IN');
+            
+        $paidAgainstOut = clone $paidAgainstIn;
+        $paidAgainstOut->where('suppliers.location', 'OUT');
+        
+        if ($tenantId) {
+            $paidAgainstIn->where('po.tenant_id', $tenantId);
+            $paidAgainstOut->where('po.tenant_id', $tenantId);
         }
 
-        $shopname = User::whereNotNull('shopname')->value('shopname');
-        $address = User::whereNotNull('address')->value('address');
+        $inCountamount = max(0, $inCountamount - $paidAgainstIn->sum('payments.amount'));
+        $outCountamount = max(0, $outCountamount - $paidAgainstOut->sum('payments.amount'));
+        
+        $shopname = User::where('tenant_id', $tenantId)->whereNotNull('shopname')->value('shopname');
+        $address = User::where('tenant_id', $tenantId)->whereNotNull('address')->value('address');
+
+        // Do not fetch POItem::all() just for frontend rendering; pass empty array if unused
+        $items = [];
 
         return compact('inCountamount', 'outCountamount', 'pos', 'inCount', 'outCount', 'shopname', 'address', 'entries', 'totalinvoice', 'totalMonthly', 'paymentMonthly', 'items');
     }
 
     public function getPurchaseCreateData()
     {
-        $pos = Purchase::all();
-        $suppliers = Supplier::all();
-        $products = Product::all();
-        $warehouses = Warehouse::all(); // Added
+        $suppliers = Supplier::select('id', 'name', 'email', 'phone', 'location')->get();
+        $products = Product::select('id', 'name', 'code', 'price', 'quantity')->get()->each->setAppends([]);
+        $warehouses = Warehouse::all();
+        $pos = []; // Don't load all purchases
 
         return compact('pos', 'suppliers', 'products', 'warehouses');
     }

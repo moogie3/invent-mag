@@ -120,7 +120,13 @@ function initSettingsPage() {
                     if (themeSelect) {
                         localStorage.setItem('theme', themeSelect.value);
                     }
-                    window.location.href = window.location.pathname + '?status=success&message=' + encodeURIComponent(data.message);
+                    
+                    // Store success message in sessionStorage to display after reload
+                    sessionStorage.setItem('settingsSaved', 'true');
+                    sessionStorage.setItem('settingsMessage', data.message);
+                    
+                    // Full reload to ensure all layout classes are properly applied
+                    window.location.reload();
                 } else {
                     InventMagApp.showToast('Error', data.message || 'An error occurred.', 'error');
                 }
@@ -332,6 +338,16 @@ function resetToDefaults() {
 function handleNotificationsOnLoad() {
     if (window.handleSessionNotifications) {
         window.handleSessionNotifications();
+    }
+    
+    // Check for settings saved message from sessionStorage (after page reload)
+    const settingsSaved = sessionStorage.getItem('settingsSaved');
+    const settingsMessage = sessionStorage.getItem('settingsMessage');
+    
+    if (settingsSaved === 'true') {
+        InventMagApp.showToast('Success', settingsMessage || 'Settings saved successfully.', 'success');
+        sessionStorage.removeItem('settingsSaved');
+        sessionStorage.removeItem('settingsMessage');
     }
     
     const urlParams = new URLSearchParams(window.location.search);

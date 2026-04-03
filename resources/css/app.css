@@ -1,4 +1,9 @@
 /* Turbo Progress Bar Styling */
+/* Theme toggle icon visibility - JS controls display after load.
+   Default matches JS convention: light mode shows moon (click to go dark), dark mode shows sun (click to go light) */
+.theme-icon-dark { display: inline; }
+.theme-icon-light { display: none; }
+
 .turbo-progress-bar {
     height: 4px; /* Slightly taller for better visibility */
     background-color: #007bff; /* Bright blue for light mode */
@@ -80,29 +85,6 @@ body.no-animations #global-loader {
     display: none !important;
 }
 
-/* Hide sidebar header completely when animations disabled - avoid layout issues */
-body.no-animations .sidebar-header {
-    display: none !important;
-}
-
-/* But keep sidebar user section (which contains theme toggle and bell) visible */
-body.no-animations .sidebar-user {
-    display: flex !important;
-    padding: 0.75rem;
-    justify-content: center;
-    align-items: center;
-}
-
-/* Ensure sidebar actions are visible when animations disabled */
-body.no-animations .sidebar-actions {
-    display: flex !important;
-    opacity: 1 !important;
-    width: auto !important;
-    max-width: none !important;
-    pointer-events: auto !important;
-    transform: none !important;
-}
-
 /* Allow navbar dropdown to work - remove transition but keep visibility control */
 body.no-animations .nav-dropdown {
     transition: none !important;
@@ -152,6 +134,13 @@ body.no-animations .nav-dropdown .dropdown-menu .dropdown-item:focus {
 /* Exception: navbar-brand needs transform for layout positioning */
 body.no-animations .navbar-brand {
     transform: translate(-50%, -50%) !important;
+}
+
+/* Fix collapsed sidebar layout when animations disabled */
+/* Hide entire header when animations disabled - always */
+body.no-animations .sidebar .sidebar-header,
+body.no-animations .sidebar-header {
+    display: none !important;
 }
 
 /* Page loader - hide completely when animations disabled */

@@ -470,6 +470,19 @@ onPageLoad(function () {
             });
         }
 
+        // Handle navbar sidebar toggle for layout-navbar mode
+        const navbarSidebarToggle = document.getElementById("navbar-sidebar-toggle");
+        if (navbarSidebarToggle) {
+            navbarSidebarToggle.addEventListener("click", function () {
+                const sidebar = document.querySelector('.sidebar');
+                if (sidebar) {
+                    sidebar.classList.toggle('sidebar-toggled');
+                    document.body.classList.toggle('sidebar-open');
+                    document.body.classList.toggle('sidebar-toggled-open');
+                }
+            });
+        }
+
         // Only start the notification interval if the bell exists
         if (!window.notificationIntervalStarted && document.getElementById('notification-bell')) {
             setInterval(checkForNewNotifications, 5 * 60 * 1000);

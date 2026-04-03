@@ -33,7 +33,12 @@ class SalesService
 
     public function getSalesIndexData(array $filters, int $entries)
     {
+        $tenantId = app('currentTenant')->id ?? null;
         $query = Sales::with(['product', 'customer', 'user', 'warehouse', 'salesReturns']); // Added warehouse and salesReturns
+
+        if ($tenantId) {
+            $query->where('tenant_id', $tenantId);
+        }
 
         if (isset($filters['month']) && $filters['month']) {
             $query->whereMonth('order_date', $filters['month']);
@@ -47,45 +52,91 @@ class SalesService
         
         // Now apply pagination
         $sales = $query->paginate($entries);
+        $sales->getCollection()->each->setAppends([]); // Prevent N+1
 
-        // Calculate totals accounting for completed sales returns
-        $allSales = Sales::with('salesReturns')->get();
-        $unpaidDebt = $allSales->whereIn('status', ['Unpaid', 'Partial'])->sum(function($sale) {
-            $returned = $sale->salesReturns->where('status', 'Completed')->sum('total_amount');
-            return max(0, $sale->total - $returned);
-        });
-        $totalMonthly = Sales::whereMonth('created_at', now()->month)->whereYear('created_at', now()->year)
-            ->with('salesReturns')
-            ->get()
-            ->sum(function($sale) {
-                $returned = $sale->salesReturns->where('status', 'Completed')->sum('total_amount');
-                return $sale->total - $returned;
-            });
-        $pendingOrders = Sales::whereIn('status', ['Unpaid', 'Partial'])->count();
-        $dueInvoices = Sales::whereIn('status', ['Unpaid', 'Partial'])
+        // Use DB to efficiently calculate totals without loading all rows into memory
+        // Calculate total unpaid debt minus completed returns
+        $unpaidSales = DB::table('sales')
+            ->where('tenant_id', $tenantId)
+            ->whereIn('status', ['Unpaid', 'Partial'])
+            ->selectRaw('SUM(total) as unpaid_total')
+            ->first();
+            
+        $unpaidReturns = DB::table('sales_returns')
+            ->join('sales', 'sales_returns.sales_id', '=', 'sales.id')
+            ->where('sales_returns.tenant_id', $tenantId)
+            ->whereIn('sales.status', ['Unpaid', 'Partial'])
+            ->where('sales_returns.status', 'Completed')
+            ->selectRaw('SUM(sales_returns.total_amount) as returned_total')
+            ->first();
+            
+        $unpaidDebt = max(0, ($unpaidSales->unpaid_total ?? 0) - ($unpaidReturns->returned_total ?? 0));
+
+        // Calculate total monthly minus returns
+        $monthStart = now()->startOfMonth()->toDateString();
+        $monthEnd = now()->endOfMonth()->toDateString();
+
+        $monthlySales = DB::table('sales')
+            ->where('tenant_id', $tenantId)
+            ->whereBetween('created_at', [$monthStart . ' 00:00:00', $monthEnd . ' 23:59:59'])
+            ->selectRaw('SUM(total) as monthly_total')
+            ->first();
+            
+        $monthlyReturns = DB::table('sales_returns')
+            ->join('sales', 'sales_returns.sales_id', '=', 'sales.id')
+            ->where('sales_returns.tenant_id', $tenantId)
+            ->whereBetween('sales.created_at', [$monthStart . ' 00:00:00', $monthEnd . ' 23:59:59'])
+            ->where('sales_returns.status', 'Completed')
+            ->selectRaw('SUM(sales_returns.total_amount) as returned_total')
+            ->first();
+
+        $totalMonthly = ($monthlySales->monthly_total ?? 0) - ($monthlyReturns->returned_total ?? 0);
+
+        // Calculate POS Total minus returns
+        $posSales = DB::table('sales')
+            ->where('tenant_id', $tenantId)
+            ->where('is_pos', true)
+            ->selectRaw('SUM(total) as pos_total')
+            ->first();
+            
+        $posReturns = DB::table('sales_returns')
+            ->join('sales', 'sales_returns.sales_id', '=', 'sales.id')
+            ->where('sales_returns.tenant_id', $tenantId)
+            ->where('sales.is_pos', true)
+            ->where('sales_returns.status', 'Completed')
+            ->selectRaw('SUM(sales_returns.total_amount) as returned_total')
+            ->first();
+
+        $posTotal = ($posSales->pos_total ?? 0) - ($posReturns->returned_total ?? 0);
+
+        $pendingOrders = Sales::where('tenant_id', $tenantId)->whereIn('status', ['Unpaid', 'Partial'])->count();
+        
+        $dueInvoices = Sales::where('tenant_id', $tenantId)
+            ->whereIn('status', ['Unpaid', 'Partial'])
             ->whereDate('due_date', '>=', now())
             ->whereDate('due_date', '<=', now()->addDays(7))
             ->count();
-        $overdueInvoices = Sales::whereIn('status', ['Unpaid', 'Partial'])
+            
+        $overdueInvoices = Sales::where('tenant_id', $tenantId)
+            ->whereIn('status', ['Unpaid', 'Partial'])
             ->whereDate('due_date', '<', now())
             ->count();
-        $posTotal = Sales::where('is_pos', true)->with('salesReturns')->get()->sum(function($sale) {
-            $returned = $sale->salesReturns->where('status', 'Completed')->sum('total_amount');
-            return $sale->total - $returned;
-        });
-        $shopname = User::whereNotNull('shopname')->value('shopname');
-        $address = User::whereNotNull('address')->value('address');
+            
+        $shopname = User::where('tenant_id', $tenantId)->whereNotNull('shopname')->value('shopname');
+        $address = User::where('tenant_id', $tenantId)->whereNotNull('address')->value('address');
 
         return compact('posTotal', 'dueInvoices', 'overdueInvoices', 'entries', 'sales', 'totalinvoice', 'shopname', 'address', 'unpaidDebt', 'pendingOrders', 'totalMonthly');
     }
 
     public function getSalesCreateData()
     {
-        $sales = Sales::all();
-        $customers = Customer::all();
-        $products = Product::all();
-        $items = SalesItem::all();
+        // Don't load ALL sales, products, and items into memory!
+        $customers = Customer::select('id', 'name', 'email', 'phone')->get();
+        $products = Product::select('id', 'name', 'code', 'price', 'quantity')->get()->each->setAppends([]);
         $tax = Tax::where('is_active', 1)->first();
+        // Remove empty items and all sales memory footprint
+        $sales = [];
+        $items = [];
 
         return compact('sales', 'customers', 'products', 'items', 'tax');
     }

@@ -34,6 +34,32 @@ class DashboardController extends Controller
         if ($request->ajax()) {
             $type = $request->get('type', 'sales');
 
+            // Defer heavy sales forecasting to an AJAX call after page load
+            if ($request->get('action') === 'forecast') {
+                $tenant = app('currentTenant');
+                if (!$tenant || !$tenant->hasFeature('sales_forecasting')) {
+                    return response()->json(['labels' => [], 'historical' => [], 'forecast' => []]);
+                }
+
+                $forecastData = $this->salesForecastService->generateForecast();
+
+                if (!empty($forecastData['labels'])) {
+                    $historicalCount = count($forecastData['historical']);
+                    $labelsCount = count($forecastData['labels']);
+
+                    $historicalSeries = array_pad($forecastData['historical'], $labelsCount, null);
+                    $forecastSeries = array_merge(array_fill(0, $historicalCount, null), $forecastData['forecast']);
+
+                    return response()->json([
+                        'labels' => $forecastData['labels'],
+                        'historical' => $historicalSeries,
+                        'forecast' => $forecastSeries,
+                    ]);
+                }
+                
+                return response()->json(['labels' => [], 'historical' => [], 'forecast' => []]);
+            }
+
             // If the caller passes date_range (same parameter as the full page load),
             // use the monthly aggregation so the refreshed chart matches the initial view.
             if ($request->has('date_range')) {
@@ -52,32 +78,16 @@ class DashboardController extends Controller
 
         $data = $this->dashboardService->getDashboardData($dates, $reportType, $categoryId);
 
-        // Check if the tenant's plan has the sales forecasting feature
+        // Sales Forecast is deferred via AJAX, so pass a dummy initial structure to trigger the loader
         $tenant = app('currentTenant');
         if ($tenant && $tenant->hasFeature('sales_forecasting')) {
-            $forecastData = $this->salesForecastService->generateForecast();
-
-            if (!empty($forecastData['labels'])) {
-                $historicalCount = count($forecastData['historical']);
-                $labelsCount = count($forecastData['labels']);
-
-                $historicalSeries = array_pad($forecastData['historical'], $labelsCount, null);
-                $forecastSeries = array_merge(array_fill(0, $historicalCount, null), $forecastData['forecast']);
-
-                $data['salesForecast'] = [
-                    'labels' => $forecastData['labels'],
-                    'historical' => $historicalSeries,
-                    'forecast' => $forecastSeries,
-                ];
-            } else {
-                $data['salesForecast'] = [
-                    'labels' => [],
-                    'historical' => [],
-                    'forecast' => [],
-                ];
-            }
+            $data['salesForecast'] = [
+                'labels' => [],
+                'historical' => [],
+                'forecast' => [],
+                'deferred' => true
+            ];
         } else {
-            // Feature not available for this plan
             $data['salesForecast'] = null;
         }
 

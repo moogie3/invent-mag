@@ -62,7 +62,6 @@ return [
     'subtotal' => 'Subtotal',
     'tax' => 'Tax',
     'grand_total' => 'Grand Total',
-    'current_plan' => 'Current Plan',
     'new_plan' => 'New Plan',
     'no_plan' => 'No Plan',
     'select_payment_method' => 'Select Payment Method',

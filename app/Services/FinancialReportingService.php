@@ -101,22 +101,39 @@ class FinancialReportingService
      */
     protected function calculateRevenueAccounts(string $startDate, string $endDate): array
     {
-        $accounts = Account::where('type', 'revenue')
-            ->with(['transactions' => function ($query) use ($startDate, $endDate) {
-                $query->select('account_id', 'type', 'amount')
-                    ->whereHas('journalEntry', function ($q) use ($startDate, $endDate) {
-                        $q->whereBetween('date', [$startDate, $endDate])
-                          ->where('status', JournalEntry::STATUS_POSTED);
-                    });
-            }])
+        $tenantId = app('currentTenant')->id ?? null;
+
+        $accountsQuery = Account::where('type', 'revenue');
+        if ($tenantId) {
+            $accountsQuery->where('tenant_id', $tenantId);
+        }
+
+        $accounts = $accountsQuery->withSum(['transactions as total_credits' => function ($query) use ($startDate, $endDate, $tenantId) {
+                $query->where('type', 'credit')
+                      ->whereHas('journalEntry', function ($q) use ($startDate, $endDate, $tenantId) {
+                          if ($tenantId) $q->where('tenant_id', $tenantId);
+                          $q->whereBetween('date', [$startDate, $endDate])
+                            ->where('status', JournalEntry::STATUS_POSTED);
+                      });
+            }], 'amount')
+            ->withSum(['transactions as total_debits' => function ($query) use ($startDate, $endDate, $tenantId) {
+                $query->where('type', 'debit')
+                      ->whereHas('journalEntry', function ($q) use ($startDate, $endDate, $tenantId) {
+                          if ($tenantId) $q->where('tenant_id', $tenantId);
+                          $q->whereBetween('date', [$startDate, $endDate])
+                            ->where('status', JournalEntry::STATUS_POSTED);
+                      });
+            }], 'amount')
             ->get();
 
         $totalRevenue = 0;
 
         foreach ($accounts as $account) {
-            $balance = $account->transactions->sum(function ($transaction) {
-                return $transaction->type === 'credit' ? $transaction->amount : -$transaction->amount;
-            });
+            $credits = (float) ($account->total_credits ?? 0);
+            $debits = (float) ($account->total_debits ?? 0);
+            // Revenue accounts normally have credit balances
+            $balance = $credits - $debits;
+            
             $account->calculated_balance = $balance;
             $totalRevenue += $balance;
         }
@@ -136,22 +153,39 @@ class FinancialReportingService
      */
     protected function calculateExpenseAccounts(string $startDate, string $endDate): array
     {
-        $accounts = Account::where('type', 'expense')
-            ->with(['transactions' => function ($query) use ($startDate, $endDate) {
-                $query->select('account_id', 'type', 'amount')
-                    ->whereHas('journalEntry', function ($q) use ($startDate, $endDate) {
-                        $q->whereBetween('date', [$startDate, $endDate])
-                          ->where('status', JournalEntry::STATUS_POSTED);
-                    });
-            }])
+        $tenantId = app('currentTenant')->id ?? null;
+
+        $accountsQuery = Account::where('type', 'expense');
+        if ($tenantId) {
+            $accountsQuery->where('tenant_id', $tenantId);
+        }
+
+        $accounts = $accountsQuery->withSum(['transactions as total_debits' => function ($query) use ($startDate, $endDate, $tenantId) {
+                $query->where('type', 'debit')
+                      ->whereHas('journalEntry', function ($q) use ($startDate, $endDate, $tenantId) {
+                          if ($tenantId) $q->where('tenant_id', $tenantId);
+                          $q->whereBetween('date', [$startDate, $endDate])
+                            ->where('status', JournalEntry::STATUS_POSTED);
+                      });
+            }], 'amount')
+            ->withSum(['transactions as total_credits' => function ($query) use ($startDate, $endDate, $tenantId) {
+                $query->where('type', 'credit')
+                      ->whereHas('journalEntry', function ($q) use ($startDate, $endDate, $tenantId) {
+                          if ($tenantId) $q->where('tenant_id', $tenantId);
+                          $q->whereBetween('date', [$startDate, $endDate])
+                            ->where('status', JournalEntry::STATUS_POSTED);
+                      });
+            }], 'amount')
             ->get();
 
         $totalExpenses = 0;
 
         foreach ($accounts as $account) {
-            $balance = $account->transactions->sum(function ($transaction) {
-                return $transaction->type === 'debit' ? $transaction->amount : -$transaction->amount;
-            });
+            $debits = (float) ($account->total_debits ?? 0);
+            $credits = (float) ($account->total_credits ?? 0);
+            // Expense accounts normally have debit balances
+            $balance = $debits - $credits;
+
             $account->calculated_balance = $balance;
             $totalExpenses += $balance;
         }
@@ -170,13 +204,30 @@ class FinancialReportingService
      */
     protected function getAccountsWithBalances(string $endDate): Collection
     {
-        return Account::with(['transactions' => function ($query) use ($endDate) {
-            $query->select('account_id', 'type', 'amount')
-                ->whereHas('journalEntry', function ($q) use ($endDate) {
-                    $q->where('date', '<=', $endDate)
-                      ->where('status', JournalEntry::STATUS_POSTED);
-                });
-        }])->get();
+        $tenantId = app('currentTenant')->id ?? null;
+        
+        $accountsQuery = Account::query();
+        if ($tenantId) {
+            $accountsQuery->where('tenant_id', $tenantId);
+        }
+
+        return $accountsQuery->withSum(['transactions as total_debits' => function ($query) use ($endDate, $tenantId) {
+                $query->where('type', 'debit')
+                      ->whereHas('journalEntry', function ($q) use ($endDate, $tenantId) {
+                          if ($tenantId) $q->where('tenant_id', $tenantId);
+                          $q->where('date', '<=', $endDate)
+                            ->where('status', JournalEntry::STATUS_POSTED);
+                      });
+            }], 'amount')
+            ->withSum(['transactions as total_credits' => function ($query) use ($endDate, $tenantId) {
+                $query->where('type', 'credit')
+                      ->whereHas('journalEntry', function ($q) use ($endDate, $tenantId) {
+                          if ($tenantId) $q->where('tenant_id', $tenantId);
+                          $q->where('date', '<=', $endDate)
+                            ->where('status', JournalEntry::STATUS_POSTED);
+                      });
+            }], 'amount')
+            ->get();
     }
 
     /**
@@ -187,13 +238,15 @@ class FinancialReportingService
      */
     protected function calculateAccountBalance(Account $account): float
     {
-        $debits = $account->transactions->sum(fn($t) => $t->type === 'debit' ? $t->amount : 0);
-        $credits = $account->transactions->sum(fn($t) => $t->type === 'credit' ? $t->amount : 0);
+        $debits = (float) ($account->total_debits ?? 0);
+        $credits = (float) ($account->total_credits ?? 0);
 
+        // Assets and Expenses have normal debit balances
         if (in_array($account->type, ['asset', 'expense'])) {
             return $debits - $credits;
         }
 
+        // Liabilities, Equity, and Revenue have normal credit balances
         return $credits - $debits;
     }
 }

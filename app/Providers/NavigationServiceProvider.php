@@ -23,7 +23,9 @@ class NavigationServiceProvider extends ServiceProvider
     {
         View::composer(['admin.layouts.navbar', 'admin.layouts.menu-sidebar'], function ($view) {
             $menu = $this->filterMenuByPlan(config('navigation.menu'));
-            $view->with('navigationItems', $menu);
+            $navigationType = auth()->user()->system_settings['navigation_type'] ?? 'sidebar';
+            $view->with('navigationItems', $menu)
+                 ->with('navigationType', $navigationType);
         });
     }
 

@@ -21,6 +21,9 @@ class ProductService
     {
         $query = Product::with(['category', 'supplier', 'unit']);
 
+        // Eager load product_warehouses to prevent N+1 in stock calculations
+        $query->with('productWarehouses');
+
         // Constrain the eager loaded warehouses if a filter is applied
         $query->with(['warehouses' => function ($q) use ($filters) {
             if (isset($filters['warehouse_id']) && $filters['warehouse_id']) {
@@ -34,7 +37,27 @@ class ProductService
             });
         }
 
-        return $query->paginate($entries);
+        $paginator = $query->paginate($entries);
+        
+        // Remove expensive appends for the listing
+        $paginator->getCollection()->each->setAppends([]);
+        
+        // Pre-fetch the main warehouse to avoid doing it N times per product in the loop
+        $mainWarehouseId = \App\Models\Warehouse::where('is_main', true)->value('id');
+
+        // Manually assign total_stock to avoid hitting the accessors and DB
+        $paginator->getCollection()->each(function ($product) use ($mainWarehouseId) {
+            $product->total_stock = $product->productWarehouses->sum('quantity');
+            $product->stock_quantity = $product->total_stock;
+            if ($mainWarehouseId) {
+                $mainStock = $product->productWarehouses->where('warehouse_id', $mainWarehouseId)->first();
+                $product->main_warehouse_stock = $mainStock ? $mainStock->quantity : 0;
+            } else {
+                $product->main_warehouse_stock = 0;
+            }
+        });
+
+        return $paginator;
     }
 
     public function getProductFormData()
@@ -45,8 +68,7 @@ class ProductService
             'suppliers' => Supplier::all(),
             'warehouses' => Warehouse::all(),
             'mainWarehouse' => Warehouse::where('is_main', true)->first(),
-            // 'lowStockProducts' => Product::getLowStockProducts(), // This static method on model is broken, logic moved to service
-            'lowStockProducts' => Product::getLowStockProducts(),
+            'lowStockProducts' => Product::getLowStockProducts(), 
         ];
     }
 

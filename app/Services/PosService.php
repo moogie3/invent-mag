@@ -20,11 +20,24 @@ class PosService
 {
     public function getPosIndexData()
     {
-        $products = Product::with(['unit'])->get();
+        $products = Product::with(['unit', 'productWarehouses'])->get();
         
-        $products->each(function ($product) {
-            $product->main_warehouse_stock = $product->main_warehouse_stock;
-            $product->stock_quantity = $product->main_warehouse_stock;
+        $mainWarehouse = Warehouse::where('is_main', true)->first();
+        $mainWarehouseId = $mainWarehouse ? $mainWarehouse->id : null;
+
+        $products->each(function ($product) use ($mainWarehouseId) {
+            $product->setAppends([]); // Prevent heavy default accessors
+            
+            if ($mainWarehouseId) {
+                $mainStock = $product->productWarehouses->where('warehouse_id', $mainWarehouseId)->first();
+                $stockQty = $mainStock ? max(0, (float) $mainStock->quantity) : 0;
+            } else {
+                $stockQty = 0;
+            }
+            
+            $product->main_warehouse_stock = $stockQty;
+            $product->stock_quantity = $stockQty;
+            $product->total_stock = $product->productWarehouses->sum('quantity');
         });
         
         $customers = Customer::all();
@@ -33,8 +46,6 @@ class PosService
         $units = Unit::all();
         $suppliers = Supplier::all();
         $warehouses = Warehouse::all();
-        
-        $mainWarehouse = Warehouse::where('is_main', true)->first();
 
         return compact('products', 'customers', 'walkInCustomerId', 'categories', 'units', 'suppliers', 'warehouses', 'mainWarehouse');
     }

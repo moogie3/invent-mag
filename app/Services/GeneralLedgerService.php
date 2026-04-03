@@ -84,15 +84,25 @@ class GeneralLedgerService
         // Get the opening balance from the account record
         $openingBalanceFromAccount = $account ? floatval($account->opening_balance) : 0;
         
-        // Get transactions before the start date
-        $transactionsBalance = Transaction::where('account_id', $accountId)
-            ->whereHas('journalEntry', function ($query) use ($startDate) {
-                $query->where('date', '<', $startDate);
-            })
-            ->get()
-            ->sum(function ($transaction) {
-                return $transaction->type === 'debit' ? $transaction->amount : -$transaction->amount;
-            });
+        // Use DB query aggregate to sum directly instead of hydrating all historical models into RAM
+        $tenantId = app('currentTenant')->id ?? null;
+
+        $aggQuery = \Illuminate\Support\Facades\DB::table('transactions')
+            ->join('journal_entries', 'transactions.journal_entry_id', '=', 'journal_entries.id')
+            ->where('transactions.account_id', $accountId)
+            ->where('journal_entries.date', '<', $startDate);
+
+        if ($tenantId) {
+            $aggQuery->where('transactions.tenant_id', $tenantId)
+                     ->where('journal_entries.tenant_id', $tenantId);
+        }
+
+        $aggregates = $aggQuery->selectRaw("
+            SUM(CASE WHEN transactions.type = 'debit' THEN transactions.amount ELSE 0 END) as total_debit,
+            SUM(CASE WHEN transactions.type = 'credit' THEN transactions.amount ELSE 0 END) as total_credit
+        ")->first();
+        
+        $transactionsBalance = ($aggregates->total_debit ?? 0) - ($aggregates->total_credit ?? 0);
         
         // Return the opening balance from account + transactions before start date
         return $openingBalanceFromAccount + $transactionsBalance;

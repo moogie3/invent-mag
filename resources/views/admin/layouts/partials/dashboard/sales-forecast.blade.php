@@ -4,8 +4,10 @@
             <h3 class="card-title"><i class="ti ti-chart-line me-2"></i>{{ __('messages.sales_forecast') }}</h3>
         </div>
         <div class="card-body">
-            @if(isset($salesForecast) && is_array($salesForecast) && count($salesForecast['labels'] ?? []) > 0)
-                <canvas id="sales-forecast-chart"></canvas>
+            @if(isset($salesForecast) && is_array($salesForecast) && (count($salesForecast['labels'] ?? []) > 0 || ($salesForecast['deferred'] ?? false)))
+                <div style="position: relative; min-height: 300px;">
+                    <canvas id="sales-forecast-chart"></canvas>
+                </div>
             @else
                 <div class="empty">
                     <div class="empty-icon">

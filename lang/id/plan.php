@@ -61,7 +61,6 @@ return [
     'subtotal' => 'Subtotal',
     'tax' => 'Pajak',
     'grand_total' => 'Total',
-    'current_plan' => 'Paket Saat Ini',
     'new_plan' => 'Paket Baru',
     'no_plan' => 'Tidak Ada Paket',
     'select_payment_method' => 'Pilih Metode Pembayaran',

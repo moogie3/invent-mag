@@ -17,23 +17,42 @@ class AccountingReportService
      */
     public function generateTrialBalance(string $endDate): array
     {
-        $accounts = Account::with(['transactions' => function ($query) use ($endDate) {
-            $query->whereHas('journalEntry', function ($q) use ($endDate) {
-                $q->where('date', '<=', $endDate)
-                  ->where('status', JournalEntry::STATUS_POSTED);
-            });
-        }])->orderBy('code')->get();
+        $tenantId = app('currentTenant')->id ?? null;
+
+        $accountsQuery = Account::orderBy('code');
+        
+        if ($tenantId) {
+            $accountsQuery->where('tenant_id', $tenantId);
+        }
+        
+        $accounts = $accountsQuery->withSum(['transactions as total_debits' => function ($query) use ($endDate, $tenantId) {
+                $query->where('type', 'debit')
+                      ->whereHas('journalEntry', function ($q) use ($endDate, $tenantId) {
+                          if ($tenantId) $q->where('tenant_id', $tenantId);
+                          $q->where('date', '<=', $endDate)
+                            ->where('status', JournalEntry::STATUS_POSTED);
+                      });
+            }], 'amount')
+            ->withSum(['transactions as total_credits' => function ($query) use ($endDate, $tenantId) {
+                $query->where('type', 'credit')
+                      ->whereHas('journalEntry', function ($q) use ($endDate, $tenantId) {
+                          if ($tenantId) $q->where('tenant_id', $tenantId);
+                          $q->where('date', '<=', $endDate)
+                            ->where('status', JournalEntry::STATUS_POSTED);
+                      });
+            }], 'amount')
+            ->get();
 
         $reportData = [];
         $totalDebits = 0;
         $totalCredits = 0;
 
         foreach ($accounts as $account) {
-            $debits = $account->transactions->where('type', 'debit')->sum('amount');
-            $credits = $account->transactions->where('type', 'credit')->sum('amount');
+            $debits = (float) ($account->total_debits ?? 0);
+            $credits = (float) ($account->total_credits ?? 0);
             $balance = $debits - $credits;
 
-            if ($balance == 0 && $account->transactions->isEmpty()) {
+            if ($balance == 0 && $debits == 0 && $credits == 0) {
                 continue;
             }
 

@@ -28,7 +28,8 @@
     window.salesForecastData = {
         labels: @json($salesForecast['labels'] ?? []),
         historical: @json($salesForecast['historical'] ?? []),
-        forecast: @json($salesForecast['forecast'] ?? [])
+        forecast: @json($salesForecast['forecast'] ?? []),
+        deferred: @json($salesForecast['deferred'] ?? false)
     };
     @else
     window.salesForecastData = null;
@@ -122,10 +123,55 @@
 
     function createSalesForecastChart() {
         if (typeof Chart === 'undefined') return null;
-        if (!window.salesForecastData || window.salesForecastData.labels.length === 0) return;
+        if (!window.salesForecastData) return null;
 
         var el = document.getElementById('sales-forecast-chart');
-        if (!el) return;
+        if (!el) return null;
+
+        var container = el.parentElement;
+
+        // If data is deferred (async), show a loader and fetch it
+        if (window.salesForecastData.deferred) {
+            container.innerHTML = '<div class="d-flex justify-content-center align-items-center h-100"><div class="spinner-border text-primary" role="status"></div></div>';
+            
+            fetch("{{ route('admin.dashboard') }}?action=forecast", {
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || ''
+                }
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.labels.length === 0) {
+                    container.innerHTML = `
+                        <div class="empty">
+                            <div class="empty-icon">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none" /><path d="M8 9l4 -4l4 4" /><path d="M16 15l-4 4l-4 -4" /><path d="M3 9h18" /><path d="M3 15h18" /></svg>
+                            </div>
+                            <p class="empty-title">{{ __('messages.no_forecast_data') }}</p>
+                            <p class="empty-subtitle text-muted">{{ __('messages.forecast_description') }}</p>
+                        </div>
+                    `;
+                    return;
+                }
+                
+                window.salesForecastData = {
+                    labels: data.labels,
+                    historical: data.historical,
+                    forecast: data.forecast,
+                    deferred: false // Unmark deferred once loaded
+                };
+                container.innerHTML = '<canvas id="sales-forecast-chart"></canvas>';
+                createSalesForecastChart(); // Re-run now with data
+            })
+            .catch(err => {
+                console.error("Failed to load forecast", err);
+                container.innerHTML = '<div class="text-muted p-3">Failed to load sales forecast.</div>';
+            });
+            return null;
+        }
+
+        if (window.salesForecastData.labels.length === 0) return null;
 
         var existingChart = Chart.getChart(el);
         if (existingChart) existingChart.destroy();

@@ -73,9 +73,13 @@
     @include('admin.layouts.partials.global-loader')
 
     <div class="wrapper">
-        @include('admin.layouts.menu-sidebar')
+        @if($navigationType !== 'navbar')
+            @include('admin.layouts.menu-sidebar')
+        @endif
         <div class="main-content">
-            @include('admin.layouts.navbar')
+            @if(in_array($navigationType, ['navbar', 'both']))
+                @include('admin.layouts.navbar')
+            @endif
             @include('admin.layouts.partials.trial-banner')
             @if(request()->routeIs('admin.setting.*') || request()->routeIs('admin.users.*'))
                 {{-- Disable turbo-frame for settings and user management pages to fix modal issues --}}

@@ -226,13 +226,21 @@ class Product extends Model
     {
         $tenantId = app('currentTenant')->id ?? null;
         
-        return \App\Models\ProductWarehouse::with(['product', 'warehouse'])
+        $items = \App\Models\ProductWarehouse::with(['product', 'warehouse'])
             ->where('product_warehouse.tenant_id', $tenantId)
             ->whereHas('product', function ($query) use ($tenantId) {
                 $query->where('tenant_id', $tenantId)
                     ->whereRaw('products.low_stock_threshold >= product_warehouse.quantity');
             })
             ->get();
+
+        $items->each(function ($item) {
+            if ($item->product) {
+                $item->product->setAppends([]);
+            }
+        });
+
+        return $items;
     }
 
     /**

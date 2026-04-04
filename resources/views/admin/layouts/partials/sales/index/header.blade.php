@@ -2,7 +2,12 @@
     <div class="{{ $containerClass ?? "container-xl" }}">
         <div class="row align-items-center">
             <div class="col">
-                <div class="page-pretitle">{{ __('messages.overview') }}</div>
+                <div class="page-pretitle d-flex align-items-center">
+                    {{ __('messages.overview') }}
+                    <a href="#" class="ms-2 text-muted trigger-tutorial-modal" data-bs-toggle="tooltip" title="{{ __('Tutorial') }}">
+                        <i class="ti ti-help-circle fs-3"></i>
+                    </a>
+                </div>
                 <h2 class="page-title"><i class="ti ti-report-money me-2"></i> {{ __('messages.model_sales') }}</h2>
             </div>
             <div class="col-auto ms-auto">

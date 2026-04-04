@@ -1,0 +1,62 @@
+.tutorial-modal-dialog {
+    transform: scale(0.9);
+    opacity: 0;
+    transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.4s ease;
+}
+.modal.show .tutorial-modal-dialog {
+    transform: scale(1);
+    opacity: 1;
+}
+.tutorial-step {
+    transition: opacity 0.3s ease, transform 0.3s ease;
+    opacity: 1;
+    transform: translateY(0);
+}
+.tutorial-step.fade-out {
+    opacity: 0;
+    transform: translateY(-10px);
+}
+.tutorial-icon-box {
+    width: 56px;
+    height: 56px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 14px;
+    font-size: 28px;
+    flex-shrink: 0;
+}
+.tutorial-list-item {
+    display: flex;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    padding: 12px;
+    border-radius: 12px;
+    transition: background-color 0.2s ease;
+}
+.tutorial-list-item:hover {
+    background-color: rgba(32, 107, 196, 0.04);
+}
+.topic-card {
+    transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.2s ease;
+    border-radius: 16px;
+    border: 1px solid rgba(0,0,0,0.05);
+}
+.topic-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 24px rgba(0,0,0,0.08) !important;
+    border-color: rgba(32, 107, 196, 0.2);
+}
+.topic-card .icon-wrapper {
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 12px;
+    font-size: 24px;
+    margin-bottom: 16px;
+}
+.context-list li {
+    margin-bottom: 10px;
+}

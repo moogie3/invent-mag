@@ -45,6 +45,7 @@
     @vite('resources/css/app.css')
     @vite('resources/css/menu-sidebar.css')
     @vite('resources/css/settings.css')
+    @vite('resources/css/tutorial-modal.css')
     @vite('resources/js/app.js')
     @vite('resources/js/admin/layouts/menu-sidebar.js')
 
@@ -95,6 +96,7 @@
     @include('admin.layouts.footer')
     @include('admin.layouts.partials.session-notifications')
     @include('admin.layouts.modals.general.keyboard-shortcuts-modal')
+    @include('admin.layouts.modals.general.tutorial-modal')
 
     @turbo
 

@@ -66,6 +66,12 @@ Route::middleware('web')->prefix('admin')->group(function () {
         // Dashboard
         Route::get('/dashboard', [DashboardController::class, 'index'])->name('admin.dashboard');
 
+        // Tutorial Skip
+        Route::post('/tutorial/skip', function (\Illuminate\Http\Request $request) {
+            $request->user()->update(['tutorial_completed' => true]);
+            return response()->json(['success' => true]);
+        })->name('admin.tutorial.skip');
+
         // MOVED: Role-permissions route - accessible only to superuser
         Route::get('/roles-permissions', [UserController::class, 'getRolePermissions'])
             ->name('admin.roles-permissions')

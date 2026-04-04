@@ -109,6 +109,15 @@
         <ul class="navbar-nav">
 
             <li class="nav-item">
+                <a class="nav-link trigger-tutorial-modal-general" href="#">
+                    <div class="nav-link-icon">
+                        <i class="ti ti-help"></i>
+                    </div>
+                    <span class="nav-link-title">{{ __('Tutorial') }}</span>
+                </a>
+            </li>
+
+            <li class="nav-item">
                 <a class="nav-link" href="{{ route('admin.setting.profile.edit') }}" data-turbo="true" data-turbo-cache="false" data-bs-toggle="tooltip"
                     data-bs-placement="top">
                     <div class="nav-link-icon">

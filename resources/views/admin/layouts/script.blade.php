@@ -181,6 +181,9 @@
 {{-- SCRIPT FOR PLAN CHECKOUT --}}
 @vite('resources/js/admin/plan/checkout.js')
 
+{{-- SCRIPT FOR TUTORIAL MODAL --}}
+@vite('resources/js/admin/layouts/tutorial-modal.js')
+
 {{-- SCRIPT FOR ADMIN DASHBOARD (ApexCharts lazy-loaded) --}}
 <script>
     document.addEventListener('turbo:load', function () {

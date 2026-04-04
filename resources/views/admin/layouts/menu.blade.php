@@ -44,5 +44,8 @@
                 <i class="ti ti-users fs-2 me-2"></i> {{ __('messages.user_management') }}
             </a>
         @endrole
+        <a href="#" class="list-group-item list-group-item-action d-flex align-items-center trigger-tutorial-modal-general">
+            <i class="ti ti-help fs-2 me-2"></i> {{ __('Tutorial') }}
+        </a>
     </div>
 </div>

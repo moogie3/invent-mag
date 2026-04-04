@@ -11,10 +11,13 @@
         <div class="page-body">
             <div class="{{ $containerClass ?? "container-xl" }}">
                 <div class="card border-0 shadow-sm rounded-3">
-                    <div class="card-body">
-                            <h2><i class="ti ti-ruler me-2"></i>{{ __('messages.unit_settings_title') }}</h2>
-                        </div>
-                        <hr class="my-0">
+                    <div class="card-body d-flex justify-content-between align-items-center py-3">
+                        <h2 class="mb-0"><i class="ti ti-ruler me-2"></i>{{ __('messages.unit_settings_title') }}</h2>
+                        <a href="#" class="text-muted trigger-tutorial-modal" data-bs-toggle="tooltip" title="{{ __('Tutorial') }}">
+                            <i class="ti ti-help-circle fs-3"></i>
+                        </a>
+                    </div>
+                    <hr class="my-0">
                         <div class="row g-0">
                             <div class="col-12 col-md-3 border-end">
                                 @include('admin.layouts.menu')

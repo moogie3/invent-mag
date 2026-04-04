@@ -11,8 +11,11 @@
         <div class="page-body">
             <div class="{{ $containerClass ?? "container-xl" }}">
                 <div class="card border-0 shadow-sm rounded-4">
-                    <div class="card-body">
-                        <h2><i class="ti ti-crown me-2"></i>{{ __('plan.title') }}</h2>
+                    <div class="card-body d-flex justify-content-between align-items-center py-3">
+                        <h2 class="mb-0"><i class="ti ti-crown me-2"></i>{{ __('plan.title') }}</h2>
+                        <a href="#" class="text-muted trigger-tutorial-modal" data-bs-toggle="tooltip" title="{{ __('Tutorial') }}">
+                            <i class="ti ti-help-circle fs-3"></i>
+                        </a>
                     </div>
                     <hr class="my-0">
                     <div class="row g-0">

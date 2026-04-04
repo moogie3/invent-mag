@@ -421,6 +421,9 @@
                     @endif
                 </a>
                 <div class="dropdown-menu dropdown-menu-arrow">
+                    <a href="#" class="dropdown-item trigger-tutorial-modal-general">
+                        <i class="ti ti-help me-2"></i>{{ __('Tutorial') }}
+                    </a>
                     <a href="{{ route('admin.setting.profile.edit') }}" class="dropdown-item" data-turbo="true">
                         <i class="ti ti-settings me-2"></i>{{ __('messages.settings') }}
                     </a>

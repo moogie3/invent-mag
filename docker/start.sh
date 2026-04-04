@@ -55,7 +55,12 @@ php-fpm -D
 
 # // NOTE: Start a queue worker in the background
 # // The queue handles asynchronous tasks like sending emails
-php artisan queue:work --daemon --tries=3 &
+# Start queue worker in background
+php artisan queue:work --daemon --tries=3 > /var/www/storage/logs/queue.log 2>&1 &
 
-# // NOTE: Start Nginx in the foreground so the container doesn't exit
+# Give queue worker a moment to start
+sleep 1
+
+# Start Nginx in foreground
+echo "Starting Nginx..."
 nginx -g "daemon off;"

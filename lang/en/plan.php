@@ -13,6 +13,7 @@ return [
     'upgrade_plan' => 'Upgrade Plan',
     'users' => 'Users',
     'warehouses' => 'Warehouses',
+    'products' => 'Products',
     'unlimited' => 'Unlimited',
     'of' => 'of',
     'used' => 'used',
@@ -101,6 +102,8 @@ return [
     'notif_user_limit_desc' => 'You have used :current of :limit users. Upgrade to add more team members.',
     'notif_warehouse_limit_title' => 'Warehouse Limit Reached',
     'notif_warehouse_limit_desc' => 'You have used :current of :limit warehouses. Upgrade for unlimited warehouses.',
+    'notif_product_limit_title' => 'Product Limit Reached',
+    'notif_product_limit_desc' => 'You have used :current of :limit products. Upgrade for unlimited products.',
 
     // System Notification - Accounting Setup
     'notif_accounting_setup_title' => 'Accounting Setup Incomplete',

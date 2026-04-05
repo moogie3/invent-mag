@@ -20,6 +20,7 @@ class Plan extends Model
         'description',
         'max_users',
         'max_warehouses',
+        'max_products',
         'features',
         'trial_days',
         'is_active',
@@ -34,6 +35,7 @@ class Plan extends Model
             'is_active' => 'boolean',
             'max_users' => 'integer',
             'max_warehouses' => 'integer',
+            'max_products' => 'integer',
             'trial_days' => 'integer',
             'sort_order' => 'integer',
         ];
@@ -151,6 +153,19 @@ class Plan extends Model
         }
 
         return $count <= $this->max_warehouses;
+    }
+
+    /**
+     * Check if this plan allows a given number of products.
+     * Returns true if unlimited (-1) or count is within limit.
+     */
+    public function allowsProducts(int $count): bool
+    {
+        if ($this->max_products === -1) {
+            return true;
+        }
+
+        return $count <= $this->max_products;
     }
 
     /**

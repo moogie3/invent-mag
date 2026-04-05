@@ -189,6 +189,21 @@ class Tenant extends BaseTenant
         return $plan->allowsWarehouses($currentCount + 1);
     }
 
+    /**
+     * Check if the tenant can add more products based on plan limits.
+     * Backward compatible: tenants without a plan have no limits.
+     */
+    public function canAddProducts(int $currentCount): bool
+    {
+        $plan = $this->getEffectivePlan();
+
+        if ($plan === null) {
+            return true;
+        }
+
+        return $plan->allowsProducts($currentCount + 1);
+    }
+
     // -------------------------------------------------------------------------
     // Plan Management
     // -------------------------------------------------------------------------

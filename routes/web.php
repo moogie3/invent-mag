@@ -89,7 +89,7 @@ Route::middleware('web')->prefix('admin')->group(function () {
 
             Route::post('/store', [ProductController::class, 'store'])
                 ->name('admin.product.store')
-                ->middleware('can:create-products');
+                ->middleware('can:create-products', 'plan.limit:products');
 
             Route::get('/edit/{id}', [ProductController::class, 'edit'])
                 ->name('admin.product.edit')
@@ -117,7 +117,7 @@ Route::middleware('web')->prefix('admin')->group(function () {
 
             Route::post('/quick-create', [ProductController::class, 'quickCreate'])
                 ->name('admin.product.quickCreate')
-                ->middleware('can:create-products');
+                ->middleware('can:create-products', 'plan.limit:products');
 
             Route::post('/bulk-delete', [ProductController::class, 'bulkDelete'])
                 ->name('product.bulk-delete')
@@ -615,8 +615,8 @@ Route::middleware('web')->prefix('admin')->group(function () {
             Route::resource('users', UserController::class)->names('admin.users');
         });
 
-        // Audit Log - superuser only
-        Route::middleware('role:superuser')->group(function () {
+        // Audit Log - superuser only + Enterprise plan required
+        Route::middleware('role:superuser', 'plan.feature:audit_compliance')->group(function () {
             Route::get('/audit-log', [AuditLogController::class, 'index'])->name('admin.audit-log.index');
             Route::get('/audit-log/{auditLog}', [AuditLogController::class, 'show'])->name('admin.audit-log.show');
         });

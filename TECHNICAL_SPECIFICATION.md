@@ -94,11 +94,11 @@ class Product extends Model
 
 #### Subscription Tiers
 
-| Tier         | Users     | Warehouses | Products  | Features           |
-| ------------ | --------- | ---------- | --------- | ------------------ |
-| Starter      | 3         | 2          | 50        | Basic              |
-| Professional | 10        | 5          | 500       | Advanced + CRM     |
-| Enterprise   | Unlimited | Unlimited  | Unlimited | Full + Forecasting |
+| Tier         | Users     | Warehouses | Products  | Features                              |
+| ------------ | --------- | ---------- | --------- | -------------------------------------- |
+| Starter      | 3         | 1          | 100       | Basic (Products, Sales, Purchases)    |
+| Professional | 10        | Unlimited  | 500       | + POS, Accounting, CRM, Pipeline     |
+| Enterprise   | Unlimited | Unlimited  | Unlimited | + Forecasting, API, Audit Trail       |
 
 #### Payment Flow
 

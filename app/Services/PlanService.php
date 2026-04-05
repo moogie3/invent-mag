@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\Plan;
+use App\Models\Product;
 use App\Models\Tenant;
 use App\Models\User;
 use App\Models\Warehouse;
@@ -88,6 +89,21 @@ class PlanService
     }
 
     /**
+     * Check if the current tenant can add more products.
+     */
+    public function canAddProduct(): bool
+    {
+        $tenant = $this->getCurrentTenant();
+
+        if ($tenant === null) {
+            return true;
+        }
+
+        $currentCount = Product::count();
+        return $tenant->canAddProducts($currentCount);
+    }
+
+    /**
      * Get the user limit for the current tenant.
      * Returns -1 for unlimited.
      */
@@ -117,6 +133,22 @@ class PlanService
 
         $plan = $tenant->getEffectivePlan();
         return $plan ? $plan->max_warehouses : -1;
+    }
+
+    /**
+     * Get the product limit for the current tenant.
+     * Returns -1 for unlimited.
+     */
+    public function getProductLimit(): int
+    {
+        $tenant = $this->getCurrentTenant();
+
+        if ($tenant === null) {
+            return -1;
+        }
+
+        $plan = $tenant->getEffectivePlan();
+        return $plan ? $plan->max_products : -1;
     }
 
     // -------------------------------------------------------------------------
@@ -236,6 +268,7 @@ class PlanService
         $plan = $tenant->getEffectivePlan();
         $userCount = User::count();
         $warehouseCount = Warehouse::count();
+        $productCount = Product::count();
 
         return [
             'plan' => $plan,
@@ -254,6 +287,14 @@ class PlanService
                 'unlimited' => $plan ? $plan->max_warehouses === -1 : true,
                 'percentage' => ($plan && $plan->max_warehouses > 0)
                     ? round(($warehouseCount / $plan->max_warehouses) * 100)
+                    : 0,
+            ],
+            'products' => [
+                'current' => $productCount,
+                'limit' => $plan ? $plan->max_products : -1,
+                'unlimited' => $plan ? $plan->max_products === -1 : true,
+                'percentage' => ($plan && $plan->max_products > 0)
+                    ? round(($productCount / $plan->max_products) * 100)
                     : 0,
             ],
             'trial' => [

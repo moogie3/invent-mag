@@ -193,6 +193,29 @@
                                                     </div>
                                                 @endif
                                             </div>
+
+                                            {{-- Products --}}
+                                            <div class="col-md-6">
+                                                <div class="form-label mb-2 fw-medium">{{ __('plan.products') }}</div>
+                                                <div class="d-flex justify-content-between mb-1">
+                                                    <span class="text-secondary small">{{ __('plan.used') }}</span>
+                                                    <span class="small fw-bold">
+                                                        {{ $usageStats['products']['current'] ?? 0 }}
+                                                        <span class="text-muted fw-normal">{{ __('plan.of') }}</span> {{ ($usageStats['products']['unlimited'] ?? true) ? __('plan.unlimited') : $usageStats['products']['limit'] }}
+                                                    </span>
+                                                </div>
+                                                @if(!($usageStats['products']['unlimited'] ?? true))
+                                                    <div class="progress progress-sm rounded-pill">
+                                                        <div class="progress-bar rounded-pill {{ ($usageStats['products']['percentage'] ?? 0) > 80 ? 'bg-danger' : 'bg-primary' }}"
+                                                             style="width: {{ $usageStats['products']['percentage'] ?? 0 }}%">
+                                                        </div>
+                                                    </div>
+                                                @else
+                                                    <div class="progress progress-sm rounded-pill">
+                                                        <div class="progress-bar bg-success rounded-pill" style="width: 100%"></div>
+                                                    </div>
+                                                @endif
+                                            </div>
                                         </div>
                                     </div>
                                 </div>

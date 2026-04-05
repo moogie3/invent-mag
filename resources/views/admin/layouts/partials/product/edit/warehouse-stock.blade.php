@@ -27,7 +27,7 @@
                         $quantity = $pw ? $pw->quantity : 0;
                         $threshold = $products->low_stock_threshold ?? 10;
                         $statusClass = $quantity <= 0 ? 'text-danger' : ($quantity <= $threshold ? 'text-warning' : 'text-success');
-                        $statusText = $quantity <= 0 ? __('messages.out_of_stock') : ($quantity <= $threshold ? __('messages.low_stock') : __('messages.in_stock'));
+                        $statusText = $quantity <= 0 ? __('messages.out_of_stock') : ($quantity <= $threshold ? __('messages.low_stock') : __('messages.in_stock_label'));
                     @endphp
                     <tr>
                         <td>

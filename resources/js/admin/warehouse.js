@@ -13,6 +13,7 @@ onPageLoad(function () {
     initWarehouseSearch();
     initSetMainLinks();
     initUnsetMainLinks();
+    initViewWarehouseButtons();
 
     if (window.shortcutManager) {
         window.shortcutManager.register('ctrl+s', () => {
@@ -173,6 +174,108 @@ function initWarehouseSearch() {
 function setDeleteFormAction(action) {
     const deleteForm = document.getElementById('deleteForm');
     if (deleteForm) deleteForm.action = action;
+}
+
+function initViewWarehouseButtons() {
+    document.querySelectorAll('.view-warehouse-btn').forEach(btn => {
+        if (btn.dataset.listenerAttached) return;
+        btn.dataset.listenerAttached = 'true';
+        
+        btn.addEventListener('click', function(e) {
+            e.preventDefault();
+            const url = this.dataset.url;
+            const modal = document.getElementById('viewWarehouseModal');
+            const modalInstance = bootstrap.Modal.getOrCreateInstance(modal);
+            
+            // Reset modal content
+            document.getElementById('viewWarehouseProductsList').innerHTML = '<tr><td colspan="5" class="text-center text-muted py-4 fs-4"><i class="ti ti-loader me-2 fs-4"></i>Loading products...</td></tr>';
+            
+            modalInstance.show();
+            
+            fetch(url, {
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                },
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    const warehouse = data.warehouse;
+                    
+                    // Set warehouse details
+                    const nameEl = document.getElementById('viewWarehouseName');
+                    const addressEl = document.getElementById('viewWarehouseAddress');
+                    const descEl = document.getElementById('viewWarehouseDescription');
+                    const totalProductsEl = document.getElementById('viewWarehouseTotalProducts');
+                    const totalStockEl = document.getElementById('viewWarehouseTotalStock');
+                    
+                    if (nameEl) nameEl.textContent = warehouse.name || '';
+                    if (addressEl) addressEl.textContent = warehouse.address || '-';
+                    if (descEl) descEl.textContent = warehouse.description || '-';
+                    if (totalProductsEl) totalProductsEl.textContent = warehouse.total_products || 0;
+                    if (totalStockEl) totalStockEl.textContent = warehouse.total_stock || 0;
+                    
+                    // Populate products table - now showing each PO item as separate row (per batch)
+                    const productsList = document.getElementById('viewWarehouseProductsList');
+                    if (productsList) {
+                        // Check if using old products array or new po_items array
+                        const items = warehouse.po_items || warehouse.products || [];
+                        
+                        if (items && items.length > 0) {
+                            productsList.innerHTML = items.map(item => {
+                                let expiryBadge = '<span class="text-muted">-</span>';
+                                if (item.expiry_date && item.expiry_date !== 'null' && item.expiry_date !== null && item.expiry_date !== '') {
+                                    const dateParts = item.expiry_date.split('-');
+                                    if (dateParts.length === 3) {
+                                        const expiryDate = new Date(dateParts[0], dateParts[1] - 1, dateParts[2]);
+                                        if (!isNaN(expiryDate.getTime())) {
+                                            const formattedDate = expiryDate.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+                                            const today = new Date();
+                                            today.setHours(0, 0, 0, 0);
+                                            const diffTime = expiryDate - today;
+                                            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                                            
+                                            if (diffDays < 0) {
+                                                expiryBadge = '<span class="badge bg-danger text-white">Expired</span>';
+                                            } else if (diffDays <= 7) {
+                                                expiryBadge = '<span class="badge bg-danger text-white">' + formattedDate + '</span>';
+                                            } else if (diffDays <= 30) {
+                                                expiryBadge = '<span class="badge bg-warning text-dark">' + formattedDate + '</span>';
+                                            } else {
+                                                expiryBadge = '<span class="badge bg-success text-white">' + formattedDate + '</span>';
+                                            }
+                                        }
+                                    }
+                                }
+                                
+                                return `
+                                    <tr>
+                                        <td class="fw-medium fs-4">${item.name}</td>
+                                        <td class="fs-4">${item.code || '-'}</td>
+                                        <td class="fs-4"><a href="/admin/po/edit/${item.po_id}" class="text-decoration-none">#${item.po_id}</a></td>
+                                        <td class="text-center">
+                                            <span class="badge ${item.quantity > 10 ? 'bg-success' : (item.quantity > 0 ? 'bg-warning' : 'bg-danger')} text-white fs-5">
+                                                ${item.quantity}
+                                            </span>
+                                        </td>
+                                        <td class="text-center fs-4">${expiryBadge}</td>
+                                    </tr>
+                                `;
+                            }).join('');
+                        } else {
+                            productsList.innerHTML = '<tr><td colspan="5" class="text-center text-muted py-4 fs-4">No products in this warehouse</td></tr>';
+                        }
+                    }
+                } else {
+                    InventMagApp.showToast('Error', data.message || 'Failed to load warehouse details.', 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                InventMagApp.showToast('Error', 'An error occurred while loading warehouse details.', 'error');
+            });
+        });
+    });
 }
 
 window.setDeleteFormAction = setDeleteFormAction;

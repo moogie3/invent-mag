@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Models\Tenant;
 use App\Models\User;
 use App\Models\Warehouse;
+use App\Models\Product;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 
@@ -223,6 +224,29 @@ class SystemNotificationService
                         'limit' => $plan->max_warehouses,
                     ]),
                     'icon' => 'ti ti-building-warehouse',
+                    'color' => 'warning',
+                    'urgency' => 'high',
+                    'category' => 'usage_limit',
+                    'action_label' => __('plan.upgrade_plan'),
+                    'action_route' => route('admin.setting.plan.upgrade'),
+                    'type' => 'system',
+                    'show_notification' => true,
+                ]);
+            }
+        }
+
+        // Product limit reached
+        if ($plan->max_products > 0) {
+            $currentProducts = Product::count();
+            if ($currentProducts >= $plan->max_products) {
+                $notifications->push([
+                    'id' => 'system::product_limit_reached',
+                    'title' => __('plan.notif_product_limit_title'),
+                    'description' => __('plan.notif_product_limit_desc', [
+                        'current' => $currentProducts,
+                        'limit' => $plan->max_products,
+                    ]),
+                    'icon' => 'ti ti-package',
                     'color' => 'warning',
                     'urgency' => 'high',
                     'category' => 'usage_limit',

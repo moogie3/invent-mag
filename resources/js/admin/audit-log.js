@@ -33,21 +33,21 @@ var actionBadgeClasses = {
     'reverse': 'bg-lime text-dark'
 };
 
-function initAuditLog() {
-    var translations = {
-        timestamp: '{{ __("messages.timestamp") }}',
-        user: '{{ __("messages.user") }}',
-        module: '{{ __("messages.module") }}',
-        action: '{{ __("messages.action") }}',
-        description: '{{ __("messages.description") }}',
-        ip_address: '{{ __("messages.ip_address") }}',
-        user_agent: '{{ __("messages.user_agent") }}',
-        before: '{{ __("messages.before") }}',
-        after: '{{ __("messages.after") }}',
-        error_loading_details: '{{ __("messages.error_loading_details") }}',
-        close: '{{ __("messages.close") }}'
-    };
+var auditLogTranslations = window.auditLogTranslations || {
+    timestamp: 'Timestamp',
+    user: 'User',
+    module: 'Module',
+    action: 'Action',
+    description: 'Description',
+    ip_address: 'IP Address',
+    user_agent: 'User Agent',
+    before: 'Before',
+    after: 'After',
+    error_loading_details: 'Error loading details',
+    close: 'Close'
+};
 
+function initAuditLog() {
     document.querySelectorAll('.btn-view-detail').forEach(function (btn) {
         btn.addEventListener('click', function () {
             var logId = this.dataset.logId;
@@ -68,7 +68,7 @@ function initAuditLog() {
                 body.innerHTML = buildDetailHtml(data);
             })
             .catch(function () {
-                body.innerHTML = '<div class="alert alert-danger mb-0">' + translations.error_loading_details + '</div>';
+                body.innerHTML = '<div class="alert alert-danger mb-0">' + auditLogTranslations.error_loading_details + '</div>';
             });
         });
     });
@@ -79,21 +79,21 @@ function buildDetailHtml(data) {
 
     var html = '<div class="table-responsive">';
     html += '<table class="table table-bordered table-sm mb-0">';
-    html += '<tr><td class="fw-bold" style="width:150px;">' + translations.timestamp + '</td><td>' + escHtml(data.created_at) + '</td></tr>';
-    html += '<tr><td class="fw-bold">' + translations.user + '</td><td>' + escHtml(data.user_name) + (data.user_role ? ' <span class="badge bg-secondary-lt">' + escHtml(data.user_role) + '</span>' : '') + '</td></tr>';
-    html += '<tr><td class="fw-bold">' + translations.module + '</td><td><span class="badge bg-azure-lt">' + escHtml(data.module) + '</span></td></tr>';
-    html += '<tr><td class="fw-bold">' + translations.action + '</td><td><span class="badge ' + actionBadgeClass + '">' + escHtml(ucFirst(data.action)) + '</span></td></tr>';
-    html += '<tr><td class="fw-bold">' + translations.description + '</td><td>' + escHtml(data.description) + '</td></tr>';
-    html += '<tr><td class="fw-bold">' + translations.ip_address + '</td><td>' + escHtml(data.ip_address || '-') + '</td></tr>';
-    html += '<tr><td class="fw-bold">' + translations.user_agent + '</td><td class="text-wrap" style="font-size:0.75rem;">' + escHtml(data.user_agent || '-') + '</td></tr>';
+    html += '<tr><td class="fw-bold" style="width:150px;">' + auditLogTranslations.timestamp + '</td><td>' + escHtml(data.created_at) + '</td></tr>';
+    html += '<tr><td class="fw-bold">' + auditLogTranslations.user + '</td><td>' + escHtml(data.user_name) + (data.user_role ? ' <span class="badge bg-secondary-lt">' + escHtml(data.user_role) + '</span>' : '') + '</td></tr>';
+    html += '<tr><td class="fw-bold">' + auditLogTranslations.module + '</td><td><span class="badge bg-azure-lt">' + escHtml(data.module) + '</span></td></tr>';
+    html += '<tr><td class="fw-bold">' + auditLogTranslations.action + '</td><td><span class="badge ' + actionBadgeClass + '">' + escHtml(ucFirst(data.action)) + '</span></td></tr>';
+    html += '<tr><td class="fw-bold">' + auditLogTranslations.description + '</td><td>' + escHtml(data.description) + '</td></tr>';
+    html += '<tr><td class="fw-bold">' + auditLogTranslations.ip_address + '</td><td>' + escHtml(data.ip_address || '-') + '</td></tr>';
+    html += '<tr><td class="fw-bold">' + auditLogTranslations.user_agent + '</td><td class="text-wrap" style="font-size:0.75rem;">' + escHtml(data.user_agent || '-') + '</td></tr>';
     html += '</table></div>';
 
     if (data.old_values && Object.keys(data.old_values).length > 0) {
-        html += '<div class="mt-3"><h6 class="fw-bold">' + translations.before + '</h6>';
+        html += '<div class="mt-3"><h6 class="fw-bold">' + auditLogTranslations.before + '</h6>';
         html += '<pre class="bg-red-lt p-3 rounded mb-0" style="max-height:200px;overflow:auto;font-size:0.8rem;">' + escHtml(JSON.stringify(data.old_values, null, 2)) + '</pre></div>';
     }
     if (data.new_values && Object.keys(data.new_values).length > 0) {
-        html += '<div class="mt-3"><h6 class="fw-bold">' + translations.after + '</h6>';
+        html += '<div class="mt-3"><h6 class="fw-bold">' + auditLogTranslations.after + '</h6>';
         html += '<pre class="bg-green-lt p-3 rounded mb-0" style="max-height:200px;overflow:auto;font-size:0.8rem;">' + escHtml(JSON.stringify(data.new_values, null, 2)) + '</pre></div>';
     }
 

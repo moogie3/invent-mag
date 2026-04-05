@@ -1,8 +1,11 @@
 <div class="modal modal-blur fade" id="paymentModal" tabindex="-1" role="dialog" aria-hidden="true">
     <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
         <div class="modal-content border-0 shadow-lg rounded-3">
-            <div class="modal-header bg-primary text-white">
+            <div class="modal-header bg-primary text-white d-flex justify-content-between align-items-center">
                 <h5 class="modal-title"><i class="ti ti-receipt me-2"></i>{{ __('messages.pos_order_summary_title') }}
+                    <a href="#" class="ms-2 text-white opacity-75 trigger-tutorial-modal" data-bs-toggle="tooltip" title="{{ __('Tutorial') }}">
+                        <i class="ti ti-help-circle"></i>
+                    </a>
                 </h5>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
                     aria-label="Close"></button>

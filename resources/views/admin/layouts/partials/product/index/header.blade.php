@@ -12,7 +12,7 @@
                     </a>
                 </h2>
             </div>
-            <div class="col-auto ms-auto d-flex gap-2">
+            <div class="col-auto ms-auto d-flex gap-2 align-items-center">
                 <form action="{{ route('admin.product') }}" method="GET" class="d-inline-flex gap-2">
                     <select name="warehouse_id" class="form-select" style="min-width: 200px;">
                         <option value="">{{ __('messages.all_warehouses') }}</option>

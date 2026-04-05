@@ -6,7 +6,20 @@
     $contextSteps = [];
 
     // Contextual logic
-    if (Str::startsWith($routeName, 'admin.product')) {
+    if ($routeName === 'admin.product.create') {
+        $contextTitle = __('Create Product');
+        $contextIcon = 'ti-plus';
+        $contextDesc = __('Add a new product to your inventory with basic information and pricing.');
+        $contextSteps = [
+            __('<b>Basic Information:</b> Enter the product code, barcode (optional), name, and description. The product code is required and must be unique.'),
+            __('<b>Category & Supplier:</b> Select a category and supplier from the dropdown lists. These help organize your products and track supply sources.'),
+            __('<b>Unit of Measure:</b> Choose the base unit for this product (e.g., Pieces, kg, Liters). This is required for inventory tracking.'),
+            __('<b>Pricing:</b> Set the buying price (cost) and selling price (retail). The system will calculate your profit margin automatically.'),
+            __('<b>Stock Information:</b> Note: Do NOT set opening stock here. After creating the product, use "Adjust Stock" or "Bulk Update" to add quantity. The product will automatically use the Main Warehouse.'),
+            __('<b>Has Expiry:</b> Enable this option if the product has an expiration date. The actual expiry date will be set when receiving goods through a Purchase Order, not here.'),
+            __('<b>Additional Details:</b> Optionally add product image, SKU, minimum stock alerts, and other optional information.')
+        ];
+    } elseif (Str::startsWith($routeName, 'admin.product')) {
         $contextTitle = __('Products Master Data');
         $contextIcon = 'ti-packages';
         $contextDesc = __('Manage all your sellable and purchasable items, including tracking stock levels across multiple warehouses.');
@@ -24,9 +37,62 @@
         $contextIcon = 'ti-building-warehouse';
         $contextDesc = __('Configure physical or logical locations for storing and tracking inventory across your business operations.');
         $contextSteps = [
-            __('<b>Create Warehouses:</b> Multiple warehouses can be established to represent various physical locations (e.g., Main Store, Warehouse A, Branch Office) or logical divisions (e.g., Online Inventory, Consignment Stock).'),
-            __('<b>Main Warehouse:</b> Designate one warehouse as the "Main" option, which serves as the default for new products and stock adjustments when no specific warehouse is selected.'),
+            __('<b>Create Warehouse:</b> Click "Create Warehouse" to add a new warehouse with a name, address, and description. Use the "Set as Main Warehouse" checkbox to designate it as your default warehouse.'),
+            __('<b>Main Warehouse:</b> Only ONE warehouse can be the main warehouse. It serves as the default for new products and stock adjustments. You must unset the current main warehouse before setting a new one.'),
+            __('<b>Warehouse List:</b> View all warehouses in a table with their details. The main warehouse is clearly marked.'),
+            __('<b>View Details:</b> Click the View button to see warehouse details including all products stored there, with PO reference, quantity per batch, and expiry dates for tracking.'),
+            __('<b>Export:</b> Use the export dropdown to download warehouse data as CSV or PDF for external use or reporting.'),
+            __('<b>Table Actions:</b> Each warehouse row has an action menu to View details (stock info), Edit information, or Delete. Note: The main warehouse cannot be deleted until another warehouse is set as main.'),
             __('<b>Stock Tracking:</b> Each warehouse maintains independent stock levels. Product views can be filtered by warehouse to display availability at each location.')
+        ];
+    } elseif (Str::startsWith($routeName, 'admin.customer')) {
+        $contextTitle = __('Customer Management');
+        $contextIcon = 'ti-users';
+        $contextDesc = __('Manage your customers for sales orders, invoicing, and tracking customer history.');
+        $contextSteps = [
+            __('<b>Create Customer:</b> Click "Create Customer" to add a new customer with their name, email, phone, address, and optional image. Also set the payment terms (e.g., Net 30, Net 60) to define when payment is due.'),
+            __('<b>Customer CRM:</b> Use the CRM features to track customer interactions, purchase history, and payment status. Access detailed analytics from the View option.'),
+            __('<b>Customer List:</b> View all customers in a table with their details. Use the search box to find specific customers quickly.'),
+            __('<b>Export:</b> Use the export dropdown to download customer data as CSV or PDF for external use or reporting.'),
+            __('<b>Table Actions:</b> Each customer row has an action menu to View CRM details, Edit information, or Delete the customer.')
+        ];
+    } elseif (Str::startsWith($routeName, 'admin.supplier')) {
+        $contextTitle = __('Supplier Management');
+        $contextIcon = 'ti-truck';
+        $contextDesc = __('Manage your suppliers for purchase orders and tracking supply relationships.');
+        $contextSteps = [
+            __('<b>Create Supplier:</b> Click "Create Supplier" to add a new supplier with their code, name, email, phone, address, and optional image. Also set the payment terms (e.g., Net 30, Net 60) and location (IN for local, OUT for international).'),
+            __('<b>Supplier SRM:</b> Use the SRM (Supplier Relationship Management) features to track supplier performance, purchase history, and payment status. Access detailed analytics from the View option.'),
+            __('<b>Supplier List:</b> View all suppliers in a table with their details. Use the search box to find specific suppliers quickly.'),
+            __('<b>Export:</b> Use the export dropdown to download supplier data as CSV or PDF for external use or reporting.'),
+            __('<b>Table Actions:</b> Each supplier row has an action menu to View SRM details, Edit information, or Delete the supplier.')
+        ];
+    } elseif (Str::startsWith($routeName, 'admin.sales') && !Str::startsWith($routeName, 'admin.sales_pipeline')) {
+        $contextTitle = __('Sales Orders');
+        $contextIcon = 'ti-shopping-cart';
+        $contextDesc = __('Manage customer orders, invoicing, payments, and tracking of sales transactions.');
+        $contextSteps = [
+            __('<b>Create Sales Order:</b> Click "Create Sales Order" to start a new sale. Select a customer, add products from inventory, specify quantities, and the system calculates totals automatically.'),
+            __('<b>View Details:</b> Click the View button to open a detailed modal showing the full sales order including customer info, items, totals, payment status, and payment history.'),
+            __('<b>Payment Status:</b> Sales orders show status as Paid, Partial (partial payment), Unpaid (Pending, Due Today, Due in X Days, Overdue). The status updates based on payment records and due date.'),
+            __('<b>Add Payment:</b> Click the payment button to record customer payments. You can record full payments or partial payments against the sales order.'),
+            __('<b>Sales Returns:</b> For returned items, create a sales return order which automatically adjusts inventory and issues customer credits.'),
+            __('<b>Bulk Actions:</b> Select multiple sales orders to perform bulk delete, bulk export (PDF/CSV), or bulk mark as completed.'),
+            __('<b>Export:</b> Use the export dropdown to download sales data as CSV or PDF for external use or reporting.')
+        ];
+    } elseif (Str::startsWith($routeName, 'admin.sales_pipeline')) {
+        $contextTitle = __('Sales Pipeline');
+        $contextIcon = 'ti-chart-line';
+        $contextDesc = __('Track and manage sales opportunities through customizable pipeline stages for revenue forecasting.');
+        $contextSteps = [
+            __('Invent-MAG is using the Kanban methodology to help you visualize and manage your sales pipeline. <b>What is Kanban?</b> Kanban is a visual method for managing work across different stages. Think of it like a whiteboard with sticky notes - each note represents an opportunity, and you move it from one column to another as progress is made.'),
+            __('<b>Step 1 - Create Pipeline:</b> Click "Manage Pipelines" → "Add New Pipeline" tab to create your first pipeline. Give it a name (e.g., "Sales Pipeline 2024"), description, and optionally set it as default.'),
+            __('<b>Step 2 - Configure Stages:</b> In the "Manage Pipelines" modal, go to the "Pipelines" tab and click the edit button on your pipeline. Use the stage form to add stages (e.g., Lead, Contacted, Quoted, Won, Lost). Mark stages as "Closed" if they are final stages like Won or Lost.'),
+            __('<b>Step 3 - Create Opportunities:</b> Once your pipeline has stages, click the "+" button to create new opportunities. Select the customer, add products, set estimated value, expected close date, and notes.'),
+            __('<b>Kanban Board:</b> View opportunities as cards organized by pipeline stages. Drag and drop cards to move them between stages to update their progress.'),
+            __('<b>Edit Pipeline Info:</b> Click the edit button on a pipeline card in the "Pipelines" tab to modify its name, description, or default status.'),
+            __('<b>Edit & Delete:</b> Choose the edit button or delete button on each opportunity card to edit details or delete the opportunity from the pipeline.'),
+            __('<b>Convert to Sales:</b> Click the convert button on Won opportunities to transform them into actual sales orders for fulfillment.')
         ];
     } elseif (Str::startsWith($routeName, 'admin.sales')) {
         $contextTitle = __('Sales Operations');
@@ -39,35 +105,42 @@
             __('<b>Sales Returns:</b> Process customer returns through dedicated return orders, which automatically adjust inventory and issue customer credits.'),
             __('<b>Invoices:</b> Generate professional invoices for printing or PDF export, customizable with business logo and terms.')
         ];
+} elseif (Str::startsWith($routeName, 'admin.pos')) {
+        $contextTitle = __('Point of Sales (POS)');
+        $contextIcon = 'ti-cash-register';
+        $contextDesc = __('Process retail sales transactions with product selection, cart management, and multiple payment options.');
+        $contextSteps = [
+            __('<b>Product Catalog:</b> Browse products by category in the left panel. Use the search bar to quickly find products by name or code. Click on a product to add it to the cart.'),
+            __('<b>Shopping Cart:</b> The right panel shows your current cart with product details, quantities, and running total. Adjust quantities directly in the cart or remove items.'),
+            __('<b>Customer Selection:</b> Select an existing customer or create a new customer on-the-fly for the transaction. This links the sale to the customer for CRM tracking.'),
+            __('<b>Sale Summary:</b> Click "Pay" to open the payment modal showing full sale details, subtotal, discount, tax (PPN), and grand total.'),
+            __('<b>Payment Methods:</b> Choose from Cash, Card, Transfer, or E-Wallet. For cash payments, enter the amount received and the system calculates change automatically.'),
+            __('<b>Complete Sale:</b> Use the exact amount button to auto-fill the received amount with the grand total. The complete transaction button processes the sale and generates a receipt.')
+        ];
     } elseif (Str::startsWith($routeName, 'admin.po')) {
-        $contextTitle = __('Purchase Orders');
+        $contextTitle = __('Purchase Orders (PO)');
         $contextIcon = 'ti-truck-delivery';
         $contextDesc = __('Manage stock replenishment from suppliers through purchase order creation and tracking.');
         $contextSteps = [
-            __('<b>Create Purchase Order:</b> Initiate a purchase order by selecting a supplier, adding products, specifying quantities, and reviewing the total cost.'),
+            __('<b>Create Purchase Order:</b> Initiate a purchase order by selecting a supplier, adding products, specifying quantities with pricing, and reviewing the total cost.'),
+            __('<b>View Details:</b> Click the View button to open a detailed modal showing the full PO including supplier info, order details, items with prices, totals, and payment status.'),
+            __('<b>Bulk Actions:</b> Select multiple POs using checkboxes to perform Bulk Delete (removes all selected) or Bulk Mark as Paid (updates payment status for all). Note: Deleting unpaid POs restores stock, while paid POs do not.'),
             __('<b>Supplier Association:</b> Each purchase order is linked to a specific supplier, enabling tracking of purchasing history and maintenance of supplier relationships.'),
             __('<b>Goods Receipt:</b> When orders arrive, goods are received into the selected warehouse, automatically updating stock levels.'),
-            __('<b>Budget Management:</b> Review total costs against budget before order confirmation and monitor spending patterns per supplier.')
-        ];
-    } elseif (Str::startsWith($routeName, 'admin.accounting')) {
-        $contextTitle = __('Accounting Module');
-        $contextIcon = 'ti-calculator';
-        $contextDesc = __('Monitor financial health through journals, the chart of accounts, and financial reports.');
-        $contextSteps = [
-            __('<b>Chart of Accounts (COA):</b> The foundational structure for categorizing all financial transactions into accounts such as Sales Revenue, Inventory, Cash, and Expenses.'),
-            __('<b>Manual Journal Entries:</b> Record adjustments, corrections, or expenses outside regular sales or purchases. Each entry debits and credits accounts to maintain balanced books.'),
-            __('<b>Trial Balance:</b> View a summary of all accounts and their balances to verify debits equal credits, identifying errors before report generation.'),
-            __('<b>General Ledger:</b> Access detailed transaction history for any account, providing a comprehensive audit trail of all financial activities.'),
-            __('<b>Financial Reports:</b> Generate reports including Income Statements (Profit & Loss) and Balance Sheets to analyze business profitability and financial position.')
+            __('<b>Export:</b> Use the export dropdown to download PO data as CSV or PDF for external use or reporting.')
         ];
     } elseif (Str::startsWith($routeName, 'admin.setting.index')) {
         $contextTitle = __('System Settings');
         $contextIcon = 'ti-settings';
         $contextDesc = __('Configure global preferences that determine workspace appearance and behavior.');
         $contextSteps = [
-            __('<b>Layout Options:</b> Switch between Sidebar and Navbar layouts. The sidebar presents all modules in a collapsible menu, while the navbar displays them in a top menu bar.'),
-            __('<b>Notification Settings:</b> Configure notification display duration and enable or disable visual animation effects throughout the application.'),
-            __('<b>Language & Security:</b> Set the preferred system language for translations. Configure auto-logout timers to automatically sign out inactive users after a specified period.')
+            __('<b>Interface Layout:</b> Choose between Sidebar (collapsible left menu), Navbar (top menu bar), or Both layouts. Additional options include Sidebar Lock (keeps sidebar fixed) and Sticky Navbar (keeps top bar visible while scrolling).'),
+            __('<b>Theme Configuration:</b> Select Light or Dark theme mode. Toggle the theme switch button visibility to allow quick theme changes from any page.'),
+            __('<b>Notifications:</b> Enable sound alerts and browser push notifications. Toggle success message display and set notification duration (3, 5, 10 seconds, or manual dismiss).'),
+            __('<b>Session & Security:</b> Configure auto-logout after inactivity (15 min, 30 min, 1 hour, 2 hours, or disabled). Enable "Remember Last Page" to return to your previous location after login.'),
+            __('<b>Performance:</b> Toggle UI animations, lazy loading for images, and fluid layout. Set automatic data refresh rate (15s, 30s, 1min, 5min, or manual only).'),
+            __('<b>Language & Localization:</b> Set the system language for translations (English or Bahasa Indonesia).'),
+            __('<b>Advanced Options:</b> Enable debug mode for development information, keyboard shortcuts for power users, and help tooltips throughout the interface. Click "View Shortcuts" to see available keyboard commands.')
         ];
     } elseif (Str::startsWith($routeName, 'admin.setting.unit')) {
         $contextTitle = __('Unit Management');
@@ -90,11 +163,10 @@
     } elseif (Str::startsWith($routeName, 'admin.setting.tax')) {
         $contextTitle = __('Tax Configuration');
         $contextIcon = 'ti-receipt-tax';
-        $contextDesc = __('Configure global tax rules and rates applied to all sales and purchases.');
+        $contextDesc = __('Configure global tax rules and rates applied to sales orders and invoices.');
         $contextSteps = [
-            __('<b>Define Tax Rates:</b> Create primary tax types (e.g., VAT, GST, Sales Tax) and set percentage rates (such as 10%, 15%, or 20%).'),
-            __('<b>Global Application:</b> Enable or disable tax calculations system-wide. When enabled, tax is automatically applied to invoices and purchase orders.'),
-            __('<b>Multiple Taxes:</b> Configure multiple tax rates for different product types or regions as required by your business.')
+            __('<b>Define Tax Rates:</b> Create a primary tax type (e.g., VAT, GST, Sales Tax) and set the percentage rate (such as 10%, 15%, or 20%). Only one tax rate can be configured at a time.'),
+            __('<b>Sales Application:</b> Enable or disable tax calculations for sales orders. When enabled, tax is automatically calculated on sales invoices. Note: Tax is not applied to purchase orders.')
         ];
     } elseif (Str::startsWith($routeName, 'admin.setting.currency')) {
         $contextTitle = __('Currency Settings');
@@ -119,9 +191,9 @@
         $contextIcon = 'ti-crown';
         $contextDesc = __('Monitor workspace plan limits, billing status, and available premium features.');
         $contextSteps = [
-            __('<b>Current Usage:</b> Review plan limit consumption (e.g., number of products, users, warehouses) to avoid reaching limits.'),
-            __('<b>Upgrade Options:</b> Explore available plans with expanded features for business growth and increased capacity needs.'),
-            __('<b>Active Features:</b> View currently enabled premium modules and features based on the subscription tier.')
+            __('<b>Current Plan:</b> View your current subscription tier, monthly price, and status (Active, Trial, or Demo). Click "Upgrade Plan" to change your subscription.'),
+            __('<b>Usage Statistics:</b> Monitor your current usage against plan limits for Users and Warehouses. Progress bars show how close you are to reaching limits (turns red when above 80%).'),
+            __('<b>Plan Features:</b> See which premium features are included in your plan. Green checkmarks indicate enabled features, while gray X indicates features not available on your current tier.')
         ];
     } elseif (Str::startsWith($routeName, 'admin.setting.accounting')) {
         $contextTitle = __('Accounting Setup');
@@ -137,8 +209,10 @@
         $contextIcon = 'ti-shield-lock';
         $contextDesc = __('Monitor system changes and user activity for security and compliance purposes.');
         $contextSteps = [
+            __('<b>Activity Overview:</b> View statistics showing events logged today, this week, this month, and total count for quick monitoring.'),
+            __('<b>Search & Filter:</b> Use the search box to find logs by description. Filter by User, Module (e.g., Product, Warehouse), Action (Created, Updated, Deleted, Login), or Date Range.'),
             __('<b>Activity Timeline:</b> View a chronological record of all system actions, including who performed each action, when, and what was affected.'),
-            __('<b>Filter by Type:</b> Filter logs by action type (e.g., Created, Updated, Deleted, Login) to locate specific activity categories.'),
+            __('<b>Filter by Action Type:</b> Filter logs by action type (e.g., Created, Updated, Deleted, Login) to locate specific activity categories.'),
             __('<b>Filter by User:</b> View all activities performed by a specific user for individual behavior monitoring.'),
             __('<b>Security & Compliance:</b> Utilize audit logs for issue investigation, unauthorized change detection, and compliance demonstration during audits.')
         ];
@@ -147,20 +221,23 @@
         $contextIcon = 'ti-users';
         $contextDesc = __('Control workspace access and manage user permission levels.');
         $contextSteps = [
-            __('<b>Invite Users:</b> Add new staff members through email invitations to join the workspace.'),
-            __('<b>Assign Roles:</b> Assign specific roles: POS (retail staff), Staff (general access), Superuser (full admin access). Each role carries different permissions.'),
-            __('<b>Permissions:</b> Manage granular permissions to restrict access to sensitive areas including accounting settings, user management, or critical data deletion.'),
-            __('<b>Deactivate Users:</b> Deactivate accounts when staff leave to revoke access while preserving historical activity in audit logs.')
+            __('<b>User Statistics:</b> View the total number of users and a breakdown by role: Superuser (full admin access), Staff (general access), and POS (retail staff). Each role has different permission levels.'),
+            __('<b>Create New User:</b> Click the "New User" button to add a new user. Enter their name, email, and assign a role to determine their access level.'),
+            __('<b>User Table:</b> The table displays all users with their Name, Email, assigned Roles, and individual Permissions. Click column headers to sort the list.'),
+            __('<b>Edit User:</b> Use the edit icon to modify a user\'s details or change their role and permissions.'),
+            __('<b>Delete User:</b> Use the delete icon to remove a user from the system. This action cannot be undone.')
         ];
     } elseif ($routeName === 'admin.notifications' || $routeName === 'admin.setting.notifications') {
         $contextTitle = __('My Notifications');
         $contextIcon = 'ti-bell';
         $contextDesc = __('Stay informed about system alerts, important updates, and recent activity.');
         $contextSteps = [
-            __('<b>All Notifications:</b> Access all notifications in one location, including low stock alerts, order updates, system announcements, and user activity.'),
-            __('<b>Read Details:</b> Click on any notification to view full details and any required actions.'),
-            __('<b>Mark as Read:</b> Use the checkmark button to mark individual notifications as read, or "Clear All" to remove all notifications.'),
-            __('<b>Notification Settings:</b> Configure notification types and delivery preferences (in-app, email).')
+            __('<b>Purchase Order & Sales:</b> Displays notifications related to purchase orders and sales activities, including order confirmations, payment updates, and delivery notifications.'),
+            __('<b>Low Stock:</b> Shows alerts for products that are running low on inventory. Click to view which items need restocking and take action to replenish stock.'),
+            __('<b>Expiring:</b> Notifies about products approaching or past their expiration date. Essential for managing perishable inventory and preventing waste.'),
+            __('<b>System:</b> Contains general system notifications such as user activity, security alerts, and platform announcements.'),
+            __('<b>Clear All:</b> Use the "Clear All Notifications" button at the top to remove all notifications in the current tab at once.'),
+            __('<b>Clear Individual:</b> Each notification has a clear/checkmark button on the right side to mark it as read and remove it individually.')
         ];
     } else {
         // Generic Help
@@ -287,7 +364,7 @@
                             </div>
                         </a>
                     </div>
-                    
+
                     <div class="col-md-4">
                         <a href="{{ route('admin.sales') }}" class="text-decoration-none">
                             <div class="card topic-card h-100 shadow-sm bg-warning-lt">
@@ -301,7 +378,7 @@
                             </div>
                         </a>
                     </div>
-                    
+
                     <div class="col-md-4">
                         <a href="{{ route('admin.accounting.chart') }}" class="text-decoration-none">
                             <div class="card topic-card h-100 shadow-sm bg-info-lt">
@@ -329,7 +406,7 @@
                             </div>
                         </a>
                     </div>
-                    
+
                     <div class="col-md-4">
                         <a href="{{ route('admin.audit-log.index') }}" class="text-decoration-none">
                             <div class="card topic-card h-100 shadow-sm bg-purple-lt">

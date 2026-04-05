@@ -146,7 +146,7 @@
                             <th class="fs-5 py-3">{{ __('messages.action') }}</th>
                             <th class="fs-5 py-3">{{ __('messages.description') }}</th>
                             <th class="fs-5 py-3">{{ __('messages.ip_address') }}</th>
-                            <th class="fs-5 py-3">{{ __('messages.details') }}</th>
+                            <th class="fs-5 py-3">{{ __('messages.table_details') }}</th>
                         </tr>
                     </thead>
                     <tbody class="table-tbody">

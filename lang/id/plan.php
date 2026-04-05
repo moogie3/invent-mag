@@ -13,6 +13,7 @@ return [
     'upgrade_plan' => 'Tingkatkan Paket',
     'users' => 'Pengguna',
     'warehouses' => 'Gudang',
+    'products' => 'Produk',
     'unlimited' => 'Tanpa Batas',
     'of' => 'dari',
     'used' => 'digunakan',
@@ -100,6 +101,8 @@ return [
     'notif_user_limit_desc' => 'Anda telah menggunakan :current dari :limit pengguna. Tingkatkan untuk menambah anggota tim.',
     'notif_warehouse_limit_title' => 'Batas Gudang Tercapai',
     'notif_warehouse_limit_desc' => 'Anda telah menggunakan :current dari :limit gudang. Tingkatkan untuk gudang tanpa batas.',
+    'notif_product_limit_title' => 'Batas Produk Tercapai',
+    'notif_product_limit_desc' => 'Anda telah menggunakan :current dari :limit produk. Tingkatkan untuk produk tanpa batas.',
 
     // Notifikasi Sistem - Pengaturan Akuntansi
     'notif_accounting_setup_title' => 'Pengaturan Akuntansi Belum Lengkap',

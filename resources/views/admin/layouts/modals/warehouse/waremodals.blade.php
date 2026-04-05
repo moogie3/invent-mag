@@ -37,6 +37,79 @@
     </div>
 </div>
 
+<!-- View Warehouse Modal -->
+<div class="modal fade" id="viewWarehouseModal" tabindex="-1" aria-labelledby="viewWarehouseModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content border-0 shadow-lg rounded-3">
+            <div class="modal-header">
+                <h5 class="modal-title fs-3" id="viewWarehouseModalLabel">
+                    <i class="ti ti-building-warehouse me-2"></i>{{ __('messages.warehouse_details') }}
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row g-4 mb-4">
+                    <div class="col-md-6">
+                        <div class="bg-body-secondary rounded-3 p-4">
+                            <div class="text-muted mb-2">{{ __('messages.table_name') }}</div>
+                            <div class="fw-bold fs-4" id="viewWarehouseName"></div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="bg-body-secondary rounded-3 p-4">
+                            <div class="text-muted mb-2">{{ __('messages.table_address') }}</div>
+                            <div class="fs-4" id="viewWarehouseAddress"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mb-4">
+                    <div class="text-muted mb-2">{{ __('messages.table_description') }}</div>
+                    <div class="text-secondary fs-4" id="viewWarehouseDescription"></div>
+                </div>
+
+                <div class="border-top pt-4 mt-4">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <div class="d-flex align-items-center">
+                            <i class="ti ti-packages text-muted me-3 fs-3"></i>
+                            <h6 class="mb-0 fw-bold fs-3">{{ __('messages.product_title') }}</h6>
+                            <span class="badge bg-primary-lt text-primary ms-3 fs-4" id="viewWarehouseTotalProducts">0</span>
+                        </div>
+                        <div class="text-muted fs-4">
+                            {{ __('messages.total_stock') }}: <span class="fw-bold text-dark" id="viewWarehouseTotalStock">0</span>
+                        </div>
+                    </div>
+                    
+                    <div class="table-responsive" style="max-height: 400px; overflow-y: auto;">
+                        <table class="table table-sm table-hover mb-0">
+                            <thead class="table-light sticky-top">
+                                <tr>
+                                    <th class="fs-4">{{ __('messages.table_product') }}</th>
+                                    <th class="fs-4">{{ __('messages.table_code') }}</th>
+                                    <th class="fs-4">PO</th>
+                                    <th class="text-center fs-4">{{ __('messages.table_qty') }}</th>
+                                    <th class="text-center fs-4">Expiry</th>
+                                </tr>
+                            </thead>
+                            <tbody id="viewWarehouseProductsList">
+                                <tr>
+                                    <td colspan="5" class="text-center text-muted py-4 fs-4">
+                                        <i class="ti ti-loader me-2 fs-4"></i>Loading products...
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary btn-lg" data-bs-dismiss="modal">{{ __('messages.close') }}</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <div class="modal fade" id="mainWarehouseErrorModal" tabindex="-1" aria-labelledby="mainWarehouseErrorModalLabel"
     aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">

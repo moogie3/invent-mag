@@ -128,14 +128,14 @@ Experience Invent-MAG firsthand:
 
 #### Subscription Tiers
 
-- **Starter Plan:** Basic features, limited users/warehouses/products
-- **Professional Plan:** Advanced features, higher limits
-- **Enterprise Plan:** Full access, unlimited users/warehouses/products
+- **Starter Plan:** Basic features, limited users (3), warehouses (1), products (100)
+- **Professional Plan:** Advanced features, higher limits (10 users, unlimited warehouses, 500 products), includes POS, Accounting, CRM
+- **Enterprise Plan:** Full access, unlimited users, warehouses, products, plus sales forecasting, RESTful API, and audit trail
 
 #### Features
 
 - **Feature-Gated Access:** Route middleware blocks features not in user's plan
-- **Usage Limits:** Enforced per-plan limits for users, warehouses, products
+- **Usage Limits:** Enforced per-plan limits for users (3/10/Unlimited), warehouses (1/5/Unlimited), products (100/500/Unlimited)
 - **Midtrans Integration:** Secure payment processing
 - **Dynamic Pricing:** USD displayed, IDR charged (Indonesian market)
 - **Invoice Emails:** Automatic receipt sent on successful payment

@@ -22,11 +22,12 @@ class CheckPlanLimit
      * Checks whether the current tenant has reached a resource limit.
      * Usage in routes: ->middleware('plan.limit:users')
      *                  ->middleware('plan.limit:warehouses')
+     *                  ->middleware('plan.limit:products')
      *
      * This middleware only blocks creation (POST/store) requests.
      * View/edit/delete operations are always allowed regardless of limits.
      *
-     * @param  string  $resource  The resource type to check ('users' or 'warehouses')
+     * @param  string  $resource  The resource type to check ('users', 'warehouses', or 'products')
      */
     public function handle(Request $request, Closure $next, string $resource): Response
     {
@@ -71,6 +72,14 @@ class CheckPlanLimit
                 }
                 break;
 
+            case 'products':
+                if (! $this->planService->canAddProduct()) {
+                    $limit = $this->planService->getProductLimit();
+                    $limitReached = true;
+                    $message = "You have reached the maximum number of products ({$limit}) allowed on your current plan. Please upgrade to add more products.";
+                }
+                break;
+
             default:
                 // Unknown resource type, allow through
                 return $next($request);
@@ -83,9 +92,12 @@ class CheckPlanLimit
                     'message' => $message,
                     'error' => 'plan_limit_reached',
                     'resource' => $resource,
-                    'limit' => $resource === 'users'
-                        ? $this->planService->getUserLimit()
-                        : $this->planService->getWarehouseLimit(),
+                    'limit' => match ($resource) {
+                        'users' => $this->planService->getUserLimit(),
+                        'warehouses' => $this->planService->getWarehouseLimit(),
+                        'products' => $this->planService->getProductLimit(),
+                        default => 0,
+                    },
                 ], 403);
             }
 

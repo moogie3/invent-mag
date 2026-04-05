@@ -11,8 +11,11 @@
                         <div class="page-pretitle">
                             {{ __('messages.sales_management') }}
                         </div>
-                        <h2 class="page-title">
-                            {{ __('messages.sales_pipeline') }}
+                        <h2 class="page-title d-flex align-items-center">
+                            <i class="ti ti-chart-line me-2"></i>{{ __('messages.sales_pipeline') }}
+                            <a href="#" class="ms-3 text-muted trigger-tutorial-modal" data-bs-toggle="tooltip" title="{{ __('Tutorial') }}">
+                                <i class="ti ti-help-circle fs-3"></i>
+                            </a>
                         </h2>
                     </div>
                 </div>
@@ -180,9 +183,9 @@
                                 </select>
                             </div>
                             <div class="mb-3">
-                                <label class="form-label">
+                                <span class="form-label d-block">
                                     <i class="ti ti-package me-1"></i>{{ __('messages.products') }}
-                                </label>
+                                </span>
                                 <div id="newOpportunityItemsContainer">
                                     <!-- Product items will be added here dynamically -->
                                 </div>
@@ -341,7 +344,7 @@
                             <!-- Stages will be loaded here -->
                         </div>
                         <form id="newStageForm" class="row g-2 align-items-end">
-                            <input type="hidden" id="newStagePipelineId">
+                            <input type="hidden" id="newStagePipelineId" name="pipeline_id">
                             <div class="col-md-5">
                                 <label for="newStageName" class="form-label">
                                     <i class="ti ti-flag me-1"></i>{{ __('messages.stage_name') }}
@@ -403,9 +406,9 @@
                                 </select>
                             </div>
                             <div class="mb-3">
-                                <label class="form-label">
+                                <span class="form-label d-block">
                                     <i class="ti ti-package me-1"></i>{{ __('messages.products') }}
-                                </label>
+                                </span>
                                 <div id="editOpportunityItemsContainer">
                                     <!-- Product items will be added here dynamically -->
                                 </div>

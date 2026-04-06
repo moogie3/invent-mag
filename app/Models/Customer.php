@@ -48,4 +48,21 @@ class Customer extends Model
     {
         return $this->hasMany(CustomerInteraction::class);
     }
+
+    public function credits()
+    {
+        return $this->hasMany(CustomerCredit::class);
+    }
+
+    public function activeCredits()
+    {
+        return $this->hasMany(CustomerCredit::class)->active();
+    }
+
+    public function getTotalAvailableCreditsAttribute(): float
+    {
+        return $this->credits()
+            ->active()
+            ->sum(\DB::raw('amount - used_amount'));
+    }
 }

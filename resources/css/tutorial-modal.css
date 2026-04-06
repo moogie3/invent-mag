@@ -60,3 +60,35 @@
 .context-list li {
     margin-bottom: 10px;
 }
+
+/* Dark mode support */
+[data-bs-theme="dark"] .tutorial-modal-dialog .modal-content {
+    background-color: #1a1c28 !important;
+}
+[data-bs-theme="dark"] .tutorial-modal-dialog .modal-footer {
+    background-color: #1a1c28 !important;
+    border-top-color: rgba(255,255,255,0.08) !important;
+}
+:not([data-bs-theme="dark"]) .tutorial-modal-dialog .modal-footer {
+    background-color: #f8f9fa;
+}
+[data-bs-theme="dark"] .tutorial-modal-dialog .modal-footer .btn-ghost-secondary {
+    color: #94a3b8;
+}
+[data-bs-theme="dark"] .tutorial-modal-dialog .text-dark {
+    color: #e2e8f0 !important;
+}
+[data-bs-theme="dark"] .tutorial-modal-dialog .text-secondary {
+    color: #94a3b8 !important;
+}
+[data-bs-theme="dark"] .tutorial-modal-dialog .topic-card h4,
+[data-bs-theme="dark"] .tutorial-modal-dialog .topic-card p {
+    color: #e2e8f0 !important;
+}
+[data-bs-theme="dark"] .tutorial-modal-dialog .card {
+    background-color: #273449;
+    border-color: rgba(255,255,255,0.08);
+}
+[data-bs-theme="dark"] .tutorial-modal-dialog .tutorial-list-item:hover {
+    background-color: rgba(32, 107, 196, 0.1);
+}

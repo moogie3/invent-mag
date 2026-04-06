@@ -51,6 +51,13 @@
     </div>
     @endif
 
+    @if($sales->customer_credit_used > 0)
+    <div class="d-flex justify-content-between text-info mb-1">
+        <div class="fs-5"><i class="ti ti-credit-card me-1"></i>{{ __('messages.credit_used') }}</div>
+        <div class="fs-5">{{ \App\Helpers\CurrencyHelper::format($sales->customer_credit_used) }}</div>
+    </div>
+    @endif
+
     <div class="d-flex justify-content-between text-success mb-1">
         <div class="fs-4"><i class="ti ti-wallet me-1"></i>{{ __('messages.total_paid') }}</div>
         <div class="fs-4">{{ \App\Helpers\CurrencyHelper::format($sales->total_paid) }}</div>

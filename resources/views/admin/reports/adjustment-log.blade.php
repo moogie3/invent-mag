@@ -12,8 +12,11 @@
                         <div class="page-pretitle">
                             {{ __('messages.reports') }}
                         </div>
-                        <h2 class="page-title">
+                        <h2 class="page-title d-flex align-items-center">
                             <i class="ti ti-file-text me-2"></i> {{ __('messages.adjustment_log') }}
+                            <a href="#" class="ms-3 text-muted trigger-tutorial-modal" data-bs-toggle="tooltip" title="{{ __('Tutorial') }}">
+                                <i class="ti ti-help-circle fs-3"></i>
+                            </a>
                         </h2>
                     </div>
                     <div class="col-auto ms-auto d-print-none">
@@ -132,7 +135,20 @@
                                                 class="{{ $changeClass }}">{{ $changeSign }}{{ $change }}</span>
                                         </td>
                                         <td class="text-wrap" style="min-width: 250px;">{{ $log->reason ?: 'N/A' }}</td>
-                                        <td>{{ $log->adjustedBy ? $log->adjustedBy->name : __('messages.system') }}</td>
+                                        <td>
+                                            @if ($log->adjustedBy)
+                                                <div class="d-flex align-items-center gap-2">
+                                                    <span class="avatar avatar-xs"
+                                                        style="background-image: url('https://ui-avatars.com/api/?name={{ urlencode($log->adjustedBy->name) }}&background=random&size=32');"></span>
+                                                    <span>{{ $log->adjustedBy->name }}</span>
+                                                </div>
+                                                @if ($log->adjustedBy->role)
+                                                    <span class="badge bg-secondary-lt">{{ $log->adjustedBy->role }}</span>
+                                                @endif
+                                            @else
+                                                {{ __('messages.system') }}
+                                            @endif
+                                        </td>
                                     </tr>
                                 @empty
                                     <tr>

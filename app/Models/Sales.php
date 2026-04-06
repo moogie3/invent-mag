@@ -128,6 +128,11 @@ class Sales extends Model
         return $this->payments->sum('amount');
     }
 
+    public function getCustomerCreditUsedAttribute(): float
+    {
+        return (float) ($this->attributes['customer_credit_used'] ?? 0);
+    }
+
     public function getGrandTotalAttribute()
     {
         // If the items relationship is loaded, calculate precisely from items + order-level tax/discount.
@@ -147,7 +152,7 @@ class Sales extends Model
 
     public function getBalanceAttribute()
     {
-        return max(0, $this->getAdjustedTotal() - $this->total_paid);
+        return max(0, $this->getAdjustedTotal() - $this->total_paid - $this->customer_credit_used);
     }
 
     public function getTotalReturnedAmount(): float

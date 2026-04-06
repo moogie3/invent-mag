@@ -125,6 +125,49 @@
                                 </div>
                             </div>
                         </div>
+
+                        {{-- Credit Note Section --}}
+                        @if ($salesReturn->customer_credit_id && $salesReturn->credit)
+                        <div class="card border-0 shadow-sm rounded-3 mb-4">
+                            <div class="card-header bg-body-secondary py-2">
+                                <h4 class="card-title mb-0"><i class="ti ti-credit-card me-2 text-success"></i>{{ __('messages.credit_note') }}</h4>
+                            </div>
+                            <div class="card-body">
+                                <div class="row g-3">
+                                    <div class="col-md-3">
+                                        <div class="text-muted small">{{ __('messages.credit_amount') }}</div>
+                                        <div class="fs-5 fw-bold text-success">
+                                            {{ \App\Helpers\CurrencyHelper::formatWithPosition($salesReturn->credit->amount) }}
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="text-muted small">{{ __('messages.credit_used') }}</div>
+                                        <div class="fs-5">
+                                            {{ \App\Helpers\CurrencyHelper::formatWithPosition($salesReturn->credit->used_amount) }}
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="text-muted small">{{ __('messages.credit_available') }}</div>
+                                        <div class="fs-5 fw-bold text-primary">
+                                            {{ \App\Helpers\CurrencyHelper::formatWithPosition($salesReturn->credit->available_amount) }}
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="text-muted small">{{ __('messages.credit_status') }}</div>
+                                        <div>
+                                            @if ($salesReturn->credit->status === 'active')
+                                                <span class="badge bg-success">{{ __('messages.credit_active') }}</span>
+                                            @elseif ($salesReturn->credit->status === 'used')
+                                                <span class="badge bg-secondary">{{ __('messages.credit_used_status') }}</span>
+                                            @else
+                                                <span class="badge bg-warning">{{ __('messages.credit_expired_status') }}</span>
+                                            @endif
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        @endif
                     </div>
                 </div>
             </div>

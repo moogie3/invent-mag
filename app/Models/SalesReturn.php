@@ -20,6 +20,7 @@ class SalesReturn extends Model
         'reason',
         'total_amount',
         'status',
+        'customer_credit_id',
     ];
 
     protected $guarded = [
@@ -71,6 +72,11 @@ class SalesReturn extends Model
     public function journalEntries(): MorphMany
     {
         return $this->morphMany(JournalEntry::class, 'transactionable');
+    }
+
+    public function credit(): BelongsTo
+    {
+        return $this->belongsTo(CustomerCredit::class, 'customer_credit_id');
     }
 
     protected $casts = [

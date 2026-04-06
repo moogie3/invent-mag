@@ -3,12 +3,13 @@
     @method('PUT')
     <div class="card-body p-4">
         @php
-            // Use the helper to calculate summary info
-            $summary = \App\Helpers\SalesHelper::calculateInvoiceSummary(
+            // Use the helper to calculate summary info accounting for returns
+            $summary = \App\Helpers\SalesHelper::calculateInvoiceSummaryWithReturns(
                 $sales->salesItems,
                 $sales->order_discount ?? 0,
                 $sales->order_discount_type ?? 'fixed',
                 $sales->tax_rate ?? 0,
+                $sales->relationLoaded('salesReturns') ? $sales->salesReturns : collect()
             );
         @endphp
 

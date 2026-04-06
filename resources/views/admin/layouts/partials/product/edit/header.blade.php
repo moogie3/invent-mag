@@ -5,6 +5,9 @@
                 <div class="page-pretitle">{{ __('messages.product_management') }}</div>
                 <h2 class="page-title d-flex align-items-center">
                     <i class="ti ti-edit me-2"></i>{{ __('messages.edit_product') }}
+                    <a href="#" class="ms-3 text-muted trigger-tutorial-modal" data-bs-toggle="tooltip" title="{{ __('Tutorial') }}">
+                        <i class="ti ti-help-circle fs-3"></i>
+                    </a>
                 </h2>
             </div>
         </div>

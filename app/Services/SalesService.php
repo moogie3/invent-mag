@@ -8,6 +8,7 @@ use App\Models\Product;
 use App\Models\POItem;
 use App\Models\Tax;
 use App\Models\User;
+use App\Models\CustomerCredit;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -131,14 +132,46 @@ class SalesService
     public function getSalesCreateData()
     {
         // Don't load ALL sales, products, and items into memory!
-        $customers = Customer::select('id', 'name', 'email', 'phone')->get();
-        $products = Product::select('id', 'name', 'code', 'price', 'quantity')->get()->each->setAppends([]);
+        $customers = Customer::select('id', 'name', 'email', 'phone_number')->get();
+        $products = Product::select('id', 'name', 'code', 'selling_price')->get()->each->setAppends(['main_warehouse_stock']);
         $tax = Tax::where('is_active', 1)->first();
         // Remove empty items and all sales memory footprint
         $sales = [];
         $items = [];
 
         return compact('sales', 'customers', 'products', 'items', 'tax');
+    }
+
+    public function getActiveCustomerCredits(int $customerId)
+    {
+        return CustomerCredit::forCustomer($customerId)->active()->get();
+    }
+
+    public function applyCustomerCredit(Sales $sale, float $creditAmount): void
+    {
+        $availableCredits = $this->getActiveCustomerCredits($sale->customer_id);
+        
+        $remainingCredit = $creditAmount;
+        
+        foreach ($availableCredits as $credit) {
+            if ($remainingCredit <= 0) break;
+            
+            $availableOnThisCredit = $credit->available_amount;
+            $creditToUse = min($availableOnThisCredit, $remainingCredit);
+            
+            if ($creditToUse > 0) {
+                $credit->increment('used_amount', $creditToUse);
+                $remainingCredit -= $creditToUse;
+                
+                // Check if credit is fully used
+                if ($credit->used_amount >= $credit->amount) {
+                    $credit->update(['status' => 'used']);
+                }
+            }
+        }
+        
+        // Update sale with credit used amount
+        $sale->update(['customer_credit_used' => $creditAmount - $remainingCredit]);
     }
 
     public function getSalesEditData($id)
@@ -294,7 +327,18 @@ class SalesService
                 'status' => 'Unpaid',
                 'payment_type' => '-',
                 'is_pos' => false,
+                'customer_credit_used' => 0,
             ]);
+
+            // Apply customer credit if provided
+            $creditAmount = floatval($data['customer_credit_amount'] ?? 0);
+            if ($creditAmount > 0) {
+                $this->applyCustomerCredit($sale, $creditAmount);
+                $sale->refresh();
+                
+                // Update status based on credit usage
+                $this->updateSaleStatus($sale);
+            }
 
             $totalCostOfGoods = 0;
             
@@ -415,6 +459,30 @@ class SalesService
                 $transactions,
                 $sale
             );
+
+            // Create customer credit usage journal entry if credit was applied
+            $creditUsed = $sale->customer_credit_used;
+            if ($creditUsed > 0) {
+                // Check if a customer credit account exists, otherwise use a discount account
+                $customerCreditAccountId = $accountingSettings['customer_credit_account_id'] ?? null;
+                
+                if ($customerCreditAccountId) {
+                    $customerCreditAccount = Account::find($customerCreditAccountId);
+                    if ($customerCreditAccount) {
+                        $creditTransactions = [
+                            ['account_name' => $customerCreditAccount->name, 'type' => 'debit', 'amount' => $creditUsed],
+                            ['account_name' => $accountsReceivableAccountName, 'type' => 'credit', 'amount' => $creditUsed],
+                        ];
+
+                        $this->accountingService->createJournalEntry(
+                            "Credit Applied to Invoice #{$sale->invoice}",
+                            Carbon::parse($data['order_date']),
+                            $creditTransactions,
+                            $sale
+                        );
+                    }
+                }
+            }
 
             return $sale;
         });
@@ -606,11 +674,14 @@ class SalesService
     public function updateSaleStatus(Sales $sale)
     {
         $totalPaid = $sale->total_paid;
+        $creditUsed = $sale->customer_credit_used;
         $grandTotal = $sale->total;
 
-        if ($totalPaid >= $grandTotal) {
+        $totalPaidWithCredit = $totalPaid + $creditUsed;
+
+        if ($totalPaidWithCredit >= $grandTotal) {
             $sale->status = 'Paid';
-        } elseif ($totalPaid > 0 && $totalPaid < $grandTotal) {
+        } elseif ($totalPaidWithCredit > 0 && $totalPaidWithCredit < $grandTotal) {
             $sale->status = 'Partial';
         } else {
             $sale->status = 'Unpaid';
@@ -806,12 +877,22 @@ class SalesService
 
     private function generateInvoiceNumber(): string
     {
-        $lastSalesInvoice = Sales::latest()->first();
+        $tenantId = auth()->user()->tenant_id ?? null;
+        
+        $query = Sales::query();
+        
+        if ($tenantId) {
+            $query->where('tenant_id', $tenantId);
+        }
+        
+        $lastSalesInvoice = $query->orderBy('id', 'desc')->first();
+        
         $invoiceNumber = 1;
-        if ($lastSalesInvoice) {
-            $lastNumber = (int) substr($lastSalesInvoice->invoice, 4);
+        if ($lastSalesInvoice && preg_match('/INV-(\d+)/', $lastSalesInvoice->invoice, $matches)) {
+            $lastNumber = (int) $matches[1];
             $invoiceNumber = $lastNumber + 1;
         }
+        
         return 'INV-' . str_pad($invoiceNumber, 4, '0', STR_PAD_LEFT);
     }
 

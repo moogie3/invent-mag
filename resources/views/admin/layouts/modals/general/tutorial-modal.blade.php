@@ -19,6 +19,18 @@
             __('<b>Has Expiry:</b> Enable this option if the product has an expiration date. The actual expiry date will be set when receiving goods through a Purchase Order, not here.'),
             __('<b>Additional Details:</b> Optionally add product image, SKU, minimum stock alerts, and other optional information.')
         ];
+    } elseif ($routeName === 'admin.product.edit') {
+        $contextTitle = __('Edit Product');
+        $contextIcon = 'ti-edit';
+        $contextDesc = __('Modify product information, manage stock levels, and update pricing details.');
+        $contextSteps = [
+            __('<b>Basic Information:</b> Edit the product name, code, barcode, and description in the first section.'),
+            __('<b>Category & Supplier:</b> Update the assigned category and supplier from the dropdown menus.'),
+            __('<b>Unit:</b> Change the measurement unit if needed (e.g., from pcs to box).'),
+            __('<b>Pricing:</b> Modify the buying price and selling price. The selling price is what customers pay.'),
+            __('<b>Stock by Warehouse:</b> View current stock levels across all warehouses. Stock is adjusted through "Adjust Stock" (for individual products) or "Bulk Update" (for multiple products) from the product list page, not here.'),
+            __('<b>Stock Transfer:</b> Click "Transfer Stock" to open the stock transfer page. Select source warehouse, destination warehouse, enter quantity, and submit to move stock between warehouses.')
+        ];
     } elseif (Str::startsWith($routeName, 'admin.product')) {
         $contextTitle = __('Products Master Data');
         $contextIcon = 'ti-packages';
@@ -31,6 +43,32 @@
             __('<b>Bulk Actions:</b> Select multiple products using the checkboxes to perform Bulk Update (adjust quantities), Bulk Export (PDF/CSV), or Bulk Delete operations.'),
             __('<b>Table Actions:</b> Each row includes an action menu with the following options: View (product details and stock history), Edit (modify basic information), Adjust Stock (modify quantity for a specific warehouse), and Delete (remove the product).'),
             __('<b>Multi-Warehouse Flow:</b> Newly created products are automatically assigned to the Main Warehouse. In this multi-warehouse system, quantity is added through "Adjust Stock" for individual products or "Bulk Update" for multiple products. This applies regardless of the number of warehouses configured.')
+        ];
+    } elseif ($routeName === 'admin.reports.stock-transfer.page') {
+        $contextTitle = __('Stock Transfer');
+        $contextIcon = 'ti-forklift';
+        $contextDesc = __('Move stock between warehouses to manage inventory distribution across locations.');
+        $contextSteps = [
+            __('<b>Select Source Warehouse:</b> Choose the warehouse where the stock will be taken from. Available products will be loaded based on this selection.'),
+            __('<b>Select Destination Warehouse:</b> Choose the warehouse where the stock will be transferred to. Source and destination must be different.'),
+            __('<b>Select Product:</b> Choose the product to transfer. The available quantity from the source warehouse will be displayed automatically.'),
+            __('<b>Enter Quantity:</b> Specify how many units to transfer. The quantity cannot exceed the available stock in the source warehouse.'),
+            __('<b>Add Reason:</b> Optionally add a reason for the transfer for better tracking and audit purposes.'),
+            __('<b>Submit Transfer:</b> Click Transfer to complete the process. Stock will be deducted from source and added to destination warehouse.'),
+            __('<b>View History:</b> Click "View Adjustment Log" to see all stock transfers and adjustments made in the system.')
+        ];
+    } elseif ($routeName === 'admin.reports.adjustment-log') {
+        $contextTitle = __('Adjustment Log');
+        $contextIcon = 'ti-file-text';
+        $contextDesc = __('View history of all stock adjustments and transfers for audit and tracking purposes.');
+        $contextSteps = [
+            __('<b>View All Adjustments:</b> The table shows a complete history of all stock changes including adjustments and transfers. Each row shows the date, type (Adjustment or Transfer), product, warehouse changes, user who made the change, and reason.'),
+            __('<b>Filter by Type:</b> Use the Type dropdown to filter between "Adjustment" (stock changes from Adjust Stock or Bulk Update) and "Transfer" (stock moved between warehouses).'),
+            __('<b>Filter by Product:</b> Use the Product dropdown to see all adjustments for a specific product across all warehouses.'),
+            __('<b>Filter by User:</b> Use the User dropdown to see all changes made by a specific user.'),
+            __('<b>Filter by Date:</b> Use the Date From and Date To fields to narrow down the adjustment history to a specific period.'),
+            __('<b>Export:</b> Use the Export button to download the adjustment log as PDF or CSV for external reporting or auditing.'),
+            __('<b>Quick Actions:</b> Click the eye icon on any row to view detailed information about that specific adjustment or transfer.')
         ];
     } elseif (Str::startsWith($routeName, 'admin.warehouse')) {
         $contextTitle = __('Warehouse Management');
@@ -67,6 +105,61 @@
             __('<b>Export:</b> Use the export dropdown to download supplier data as CSV or PDF for external use or reporting.'),
             __('<b>Table Actions:</b> Each supplier row has an action menu to View SRM details, Edit information, or Delete the supplier.')
         ];
+    } elseif ($routeName === 'admin.sales.create') {
+        $contextTitle = __('Create Sales Order');
+        $contextIcon = 'ti-plus';
+        $contextDesc = __('Create a new sales order by selecting a customer, adding products, and setting payment terms.');
+        $contextSteps = [
+            __('<b>Sales Information:</b> Enter invoice number (optional, auto-generated if empty), select a customer and set the order date. The due date auto-fills based on the customer payment terms.'),
+            __('<b>Product Selection:</b> Search and select products from the dropdown. The product icon shows the current remaining stock. Click "Add Product" to add multiple products.'),
+            __('<b>Auto-Pricing:</b> When you select a product, the system auto-fills prices based on the customer name. It shows the last purchase price and your selling price. You can manually adjust the price if needed.'),
+            __('<b>Quantity & Discount:</b> Enter quantity for each product. The system calculates line totals automatically. You can add per-item discounts as percentage or fixed amount.'),
+            __('<b>Invoice Discount:</b> Apply a global discount to the entire order at the bottom (percentage or fixed amount) in addition to per-item discounts.'),
+            __('<b>Order Summary:</b> View subtotal, tax (PPN), discount, and grand total. Tax rate is pulled from your tax settings.'),
+            __('<b>Submit:</b> Click "Create Sales Order" to save. The order will be created as "Unpaid" and you can record payments later on the Sales Order Edit page.')
+        ];
+    } elseif ($routeName === 'admin.sales.edit') {
+        $contextTitle = __('Edit Sales Order');
+        $contextIcon = 'ti-edit';
+        $contextDesc = __('View and edit sales order details, adjust items, record payments, and manage returns.');
+        $contextSteps = [
+            __('<b>Sales Information:</b> The invoice number, order date, and due date are read-only. You can change the warehouse and payment type (if not yet paid).'),
+            __('<b>Customer Info:</b> View customer details and payment terms. Customer cannot be changed once the order has payments.'),
+            __('<b>Fully Paid Warning:</b> If the invoice is already fully paid, you will see a warning modal immediately when you open the page. Most fields become read-only and cannot be edited.'),
+            __('<b>Edit Items:</b> You can adjust quantities and prices for each item. Use the discount column for per-item discounts (percentage or fixed amount).'),
+            __('<b>Invoice Discount:</b> Apply a global discount to the entire order at the bottom in addition to per-item discounts.'),
+            __('<b>Record Payment:</b> If the order is not fully paid, click "Add Payment" to record customer payments. You can record partial or full payments.'),
+            __('<b>Payment Info:</b> Total Paid shows the amount the customer has already paid. Balance shows the remaining amount the customer needs to pay.'),
+            __('<b>Track Returns:</b> The quantity field shows the final quantity (original minus returned). A returned badge shows how much was returned (e.g., "-3 Returned"). At the bottom, the "Returned (Adjusted)" row shows only the returned amount, not the original total. To create a new return, go to the Sales Order Returns menu.'),
+            __('<b>Save:</b> Click "Save Changes" to update the sales order. Note: You cannot change customer if payments have already been recorded.')
+        ];
+    } elseif ($routeName === 'admin.sales-returns.create') {
+        $contextTitle = __('Create Sales Return');
+        $contextIcon = 'ti-plus';
+        $contextDesc = __('Create a new sales return for customer returns, specifying items and quantities.');
+        $contextSteps = [
+            __('<b>Select Invoice:</b> Choose the sales invoice to return items from. Only invoices without existing returns are shown.'),
+            __('<b>Return Date:</b> Set the date when the return was processed.'),
+            __('<b>Reason:</b> Optionally add a reason for the return for tracking and audit purposes.'),
+            __('<b>Select Items:</b> After selecting an invoice, choose which items to return. Each product shows the quantity originally sold.'),
+            __('<b>Return Quantity:</b> Enter the quantity to return for each item. You cannot return more than what was originally sold.'),
+            __('<b>Status:</b> The return is created as "Pending" by default. Once reviewed and processed, change it to "Completed" to apply inventory and accounting changes.'),
+            __('<b>Save:</b> Click "Create Sales Return" to save. You can edit the return later while it is still in Pending status.')
+        ];
+    } elseif (Str::startsWith($routeName, 'admin.sales-returns')) {
+        $contextTitle = __('Sales Order Returns');
+        $contextIcon = 'ti-receipt-refund';
+        $contextDesc = __('Process customer returns, track returned items, and manage refund or credit operations.');
+        $contextSteps = [
+            __('<b>Create Return:</b> Click "New Sales Return" to create a return. Select the sales invoice, add items to return, specify quantities, and set return date.'),
+            __('<b>Return Status:</b> Returns have three statuses: Pending (awaiting review), Completed (processed), and Canceled (rejected).'),
+            __('<b>Completed Returns:</b> When a return is marked Completed, inventory is added back to stock, accounting journal entries are reversed, and sales order status updates to Returned or Partial.'),
+            __('<b>Inventory Impact:</b> Completed returns increase the product stock in the warehouse. The original quantity is restored and expiry tracking is updated.'),
+            __('<b>Accounting:</b> Completed returns automatically create journal entries to reverse Accounts Receivable, Sales Revenue, and COGS; while recording Inventory increase.'),
+            __('<b>Edit Before Complete:</b> You can edit a return while it is Pending. Once Completed or Canceled, the return cannot be modified.'),
+            __('<b>Bulk Actions:</b> Select multiple returns to perform bulk Complete, bulk Cancel, or bulk Delete operations.'),
+            __('<b>Export:</b> Use the export dropdown to download return data as CSV or PDF for external use or reporting.')
+        ];
     } elseif (Str::startsWith($routeName, 'admin.sales') && !Str::startsWith($routeName, 'admin.sales_pipeline')) {
         $contextTitle = __('Sales Orders');
         $contextIcon = 'ti-shopping-cart';
@@ -75,8 +168,9 @@
             __('<b>Create Sales Order:</b> Click "Create Sales Order" to start a new sale. Select a customer, add products from inventory, specify quantities, and the system calculates totals automatically.'),
             __('<b>View Details:</b> Click the View button to open a detailed modal showing the full sales order including customer info, items, totals, payment status, and payment history.'),
             __('<b>Payment Status:</b> Sales orders show status as Paid, Partial (partial payment), Unpaid (Pending, Due Today, Due in X Days, Overdue). The status updates based on payment records and due date.'),
-            __('<b>Add Payment:</b> Click the payment button to record customer payments. You can record full payments or partial payments against the sales order.'),
-            __('<b>Sales Returns:</b> For returned items, create a sales return order which automatically adjusts inventory and issues customer credits.'),
+            __('<b>Returned Indicator:</b> If an invoice has any returned items, a returned icon appears in the Amount column. The amount shown is already adjusted (original total minus returns).'),
+            __('<b>Sales Returns:</b> For returned items, create a sales return order which automatically adjusts inventory and issues customer credits. Returns are linked to the original sales order for tracking. You can access the Sales Order Return menu to manage returns.'),
+            __('<b>Accounting:</b> When a sales order is created, journal entries are automatically generated: Accounts Receivable (debit), Sales Revenue (credit), COGS (debit), and Inventory (credit).'),
             __('<b>Bulk Actions:</b> Select multiple sales orders to perform bulk delete, bulk export (PDF/CSV), or bulk mark as completed.'),
             __('<b>Export:</b> Use the export dropdown to download sales data as CSV or PDF for external use or reporting.')
         ];
@@ -94,6 +188,32 @@
             __('<b>Edit & Delete:</b> Choose the edit button or delete button on each opportunity card to edit details or delete the opportunity from the pipeline.'),
             __('<b>Convert to Sales:</b> Click the convert button on Won opportunities to transform them into actual sales orders for fulfillment.')
         ];
+    } elseif (Str::startsWith($routeName, 'admin.sales-returns')) {
+        $contextTitle = __('Sales Order Returns');
+        $contextIcon = 'ti-receipt-refund';
+        $contextDesc = __('Process customer returns, track returned items, and manage refund or credit operations.');
+        $contextSteps = [
+            __('<b>Create Return:</b> Click "New Sales Return" to create a return. Select the sales invoice, add items to return, specify quantities, and set return date.'),
+            __('<b>Return Status:</b> Returns have three statuses: Pending (awaiting review), Completed (processed), and Canceled (rejected).'),
+            __('<b>Completed Returns:</b> When a return is marked Completed, inventory is added back to stock, accounting journal entries are reversed, and sales order status updates to Returned or Partial.'),
+            __('<b>Inventory Impact:</b> Completed returns increase the product stock in the warehouse. The original quantity is restored and expiry tracking is updated.'),
+            __('<b>Accounting:</b> Completed returns automatically create journal entries to reverse Accounts Receivable, Sales Revenue, and COGS; while recording Inventory increase.'),
+            __('<b>Edit Before Complete:</b> You can edit a return while it is Pending. Once Completed or Canceled, the return cannot be modified.'),
+            __('<b>Bulk Actions:</b> Select multiple returns to perform bulk Complete, bulk Cancel, or bulk Delete operations.'),
+            __('<b>Export:</b> Use the export dropdown to download return data as CSV or PDF for external use or reporting.')
+        ];
+    } elseif ($routeName === 'admin.sales.create') {
+        $contextTitle = __('Create Sales Order');
+        $contextIcon = 'ti-plus';
+        $contextDesc = __('Create a new sales order by selecting a customer, adding products, and setting payment terms.');
+        $contextSteps = [
+            __('<b>Sales Information:</b> Enter invoice number (optional, auto-generated if empty), select a customer, set order date, and due date (auto-fills based on customer payment terms).'),
+            __('<b>Product Selection:</b> Search and select products from the dropdown. Click "Add Product" to add multiple products. Each product shows available stock in the main warehouse.'),
+            __('<b>Quantity & Pricing:</b> Enter quantity for each product. The system calculates line totals automatically. You can also add per-item discounts.'),
+            __('<b>Order Discount:</b> Apply a global discount to the entire order (percentage or fixed amount).'),
+            __('<b>Order Summary:</b> View subtotal, tax (PPN), discount, and grand total. Tax rate is pulled from your tax settings.'),
+            __('<b>Submit:</b> Click "Create Sales Order" to save. The order will be created as "Unpaid" and you can record payments later.')
+        ];
     } elseif (Str::startsWith($routeName, 'admin.sales')) {
         $contextTitle = __('Sales Operations');
         $contextIcon = 'ti-shopping-cart';
@@ -107,12 +227,13 @@
         ];
 } elseif (Str::startsWith($routeName, 'admin.pos')) {
         $contextTitle = __('Point of Sales (POS)');
-        $contextIcon = 'ti-cash-register';
+        $contextIcon = 'ti-cash';
         $contextDesc = __('Process retail sales transactions with product selection, cart management, and multiple payment options.');
         $contextSteps = [
             __('<b>Product Catalog:</b> Browse products by category in the left panel. Use the search bar to quickly find products by name or code. Click on a product to add it to the cart.'),
+            __('<b>Quick Create Product:</b> Need a new product? Click "Create Product" in the product selection area to add it on-the-fly without leaving the POS.'),
             __('<b>Shopping Cart:</b> The right panel shows your current cart with product details, quantities, and running total. Adjust quantities directly in the cart or remove items.'),
-            __('<b>Customer Selection:</b> Select an existing customer or create a new customer on-the-fly for the transaction. This links the sale to the customer for CRM tracking.'),
+            __('<b>Customer Selection:</b> Select an existing customer or create a new customer on-the-fly for the transaction. Click "Create Customer" to add new customers without leaving the POS. Every transaction links the sale to the customer for CRM tracking.'),
             __('<b>Sale Summary:</b> Click "Pay" to open the payment modal showing full sale details, subtotal, discount, tax (PPN), and grand total.'),
             __('<b>Payment Methods:</b> Choose from Cash, Card, Transfer, or E-Wallet. For cash payments, enter the amount received and the system calculates change automatically.'),
             __('<b>Complete Sale:</b> Use the exact amount button to auto-fill the received amount with the grand total. The complete transaction button processes the sale and generates a receipt.')
@@ -450,7 +571,7 @@
             </div>
 
             <!-- Footer -->
-            <div class="modal-footer bg-light" style="border-top: 1px solid rgba(0,0,0,0.05); padding: 16px 24px;">
+            <div class="modal-footer" style="border-top: 1px solid rgba(0,0,0,0.05); padding: 16px 24px;">
                 <button type="button" class="btn btn-ghost-secondary me-auto" onclick="closeTutorialExplicitly()">
                     <i class="ti ti-x me-2"></i>{{ __('Skip / Close') }}
                 </button>

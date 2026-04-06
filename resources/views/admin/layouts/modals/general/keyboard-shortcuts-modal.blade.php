@@ -2,7 +2,7 @@
     <div class="modal-dialog modal-dialog-centered" role="document">
         <div class="modal-content border-0 shadow-lg rounded-3">
             <div class="modal-header">
-                <h5 class="modal-title">{{ __('messages.keyboard_shortcuts_title') }}</h5>
+                <h5 class="modal-title"><i class="ti ti-keyboard me-1"></i> {{ __('messages.keyboard_shortcuts_title') }}</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">

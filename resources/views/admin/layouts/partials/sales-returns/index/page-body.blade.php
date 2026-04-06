@@ -28,6 +28,9 @@
                                         <th class="sticky-top bg-body fs-4 py-3 text-center" style="z-index: 1020;">
                                             {{ __('messages.status') }}
                                         </th>
+                                        <th class="sticky-top bg-body fs-4 py-3 text-center" style="z-index: 1020;">
+                                            {{ __('messages.credit_note') }}
+                                        </th>
                                         <th class="sticky-top bg-body fs-4 py-3 no-print" style="z-index: 1020; width: 120px;">
                                             {{ __('messages.table_action') }}
                                         </th>
@@ -64,7 +67,15 @@
                                                 </span>
                                             </td>
                                             <td class="text-center py-3">
-                                                <div class="btn-list flex-nowrap justify-content-center">
+                                                @if ($return->customer_credit_id)
+                                                    <span class="badge bg-info" title="{{ __('messages.credit_note_created') }}">
+                                                        <i class="ti ti-credit-card"></i>
+                                                    </span>
+                                                @else
+                                                    <span class="text-muted">-</span>
+                                                @endif
+                                            </td>
+                                            <td class="text-center py-3">
                                                     <button type="button" class="btn btn-icon btn-ghost-secondary view-sales-return-btn"
                                                         data-bs-toggle="modal" data-bs-target="#salesReturnDetailModal"
                                                         data-sr-id="{{ $return->id }}"
@@ -87,7 +98,7 @@
                                         </tr>
                                     @empty
                                         <tr>
-                                            <td colspan="7" class="text-center py-5">
+                                            <td colspan="8" class="text-center py-5">
                                                 <div class="empty-state">
                                                     <i class="ti ti-receipt-refund fs-1 text-muted mb-3 d-block"></i>
                                                     <h4 class="text-muted">{{ __('messages.no_sales_returns_found') }}</h4>

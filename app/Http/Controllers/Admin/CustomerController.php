@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Customer;
+use App\Models\CustomerCredit;
 use App\Services\CustomerService;
 use Illuminate\Http\Request;
 
@@ -146,5 +147,27 @@ class CustomerController extends Controller
                 'error_details' => config('app.debug') ? $e->getMessage() : 'Internal server error',
             ], 500);
         }
+    }
+
+    public function getCredits(Customer $customer)
+    {
+        $credits = $customer->activeCredits()->get();
+        
+        $creditsData = $credits->map(function ($credit) {
+            return [
+                'id' => $credit->id,
+                'amount' => $credit->amount,
+                'available_amount' => $credit->available_amount,
+                'reason' => $credit->reason,
+                'status' => $credit->status,
+                'expires_at' => $credit->expires_at ? $credit->expires_at->format('Y-m-d') : null,
+                'created_at' => $credit->created_at->format('Y-m-d'),
+            ];
+        });
+
+        return response()->json([
+            'credits' => $creditsData,
+            'total_available' => $credits->sum('available_amount'),
+        ]);
     }
 }

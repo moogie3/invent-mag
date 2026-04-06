@@ -134,7 +134,7 @@
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content border-0 shadow-lg rounded-3">
             <div class="modal-header">
-                <h5 class="modal-title" id="createWarehouseModalLabel">{{ __('messages.warehouse_create_warehouse') }}</h5>
+                <h5 class="modal-title" id="createWarehouseModalLabel"><i class="ti ti-plus me-1"></i> {{ __('messages.warehouse_create_warehouse') }}</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <form id="createWarehouseForm" action="{{ route('admin.warehouse.store') }}" method="POST">
@@ -173,7 +173,7 @@
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content border-0 shadow-lg rounded-3">
             <div class="modal-header">
-                <h5 class="modal-title" id="editWarehouseModalLabel">{{ __('messages.warehouse_modal_edit_title') }}</h5>
+                <h5 class="modal-title" id="editWarehouseModalLabel"><i class="ti ti-edit me-1"></i> {{ __('messages.warehouse_modal_edit_title') }}</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <form id="editWarehouseForm" method="POST">

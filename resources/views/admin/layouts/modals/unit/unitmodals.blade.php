@@ -39,7 +39,7 @@
         <div class="modal-content border-0 shadow-lg rounded-3">
             <div class="modal-header">
                 <h5 class="modal-title" id="createUnitModalLabel">
-                    {{ __('messages.unit_modal_create_title') }}</h5>
+                    <i class="ti ti-plus me-1"></i>{{ __('messages.unit_modal_create_title') }}</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <form id="createUnitForm" action="{{ route('admin.setting.unit.store') }}" method="POST">
@@ -68,7 +68,7 @@
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content border-0 shadow-lg rounded-3">
             <div class="modal-header">
-                <h5 class="modal-title" id="editUnitModalLabel">{{ __('messages.unit_modal_edit_title') }}
+                <h5 class="modal-title" id="editUnitModalLabel"><i class="ti ti-edit me-1"></i> {{ __('messages.unit_modal_edit_title') }}
                 </h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>

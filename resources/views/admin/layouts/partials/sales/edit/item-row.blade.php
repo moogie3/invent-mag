@@ -1,12 +1,13 @@
 @php
+    $returnedQty = isset($sales) ? $sales->getReturnedQuantityForProduct($item->product_id) : 0;
+    $adjustedQty = max(0, (int) $item->quantity - $returnedQty);
+    
     $finalAmount = \App\Helpers\SalesHelper::calculateTotal(
         $item->customer_price,
-        $item->quantity,
+        $adjustedQty,
         $item->discount,
         $item->discount_type,
     );
-    
-    $returnedQty = isset($sales) ? $sales->getReturnedQuantityForProduct($item->product_id) : 0;
 @endphp
 <tr class="product-row" data-product-id="{{ $item->product_id }}">
     <td class="text-center">{{ $index + 1 }}</td>
@@ -20,8 +21,8 @@
         @endif
     </td>
     <td>
-        <input type="number" name="items[{{ $item->id }}][quantity]" value="{{ $item->quantity }}"
-            class="form-control text-end quantity-input" data-item-id="{{ $item->product_id }}" min="1" />
+        <input type="number" name="items[{{ $item->id }}][quantity]" value="{{ $adjustedQty }}"
+            class="form-control text-end quantity-input" data-item-id="{{ $item->product_id }}" min="0" />
     </td>
     <td>
         <input type="number" name="items[{{ $item->id }}][price]" value="{{ intval($item->customer_price) }}"

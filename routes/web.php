@@ -204,6 +204,7 @@ Route::middleware('web')->prefix('admin')->group(function () {
             Route::post('/quick-create', [CustomerController::class, 'quickCreate'])->name('admin.customer.quickCreate')->middleware('can:create-customer');
             Route::get('/metrics', [CustomerController::class, 'getMetrics'])->name('admin.customer.metrics')->middleware('can:view-customer');
             Route::get('/{customer}/historical-purchases', [CustomerCrmController::class, 'getHistoricalPurchases'])->name('admin.customer.historical-purchases')->middleware('can:view-customer');
+            Route::get('/{customer}/credits', [CustomerController::class, 'getCredits'])->name('admin.customer.credits')->middleware('can:view-customer');
             Route::post('/export', [CustomerController::class, 'exportAll'])
                 ->name('admin.customer.export')
                 ->middleware('can:view-customer');

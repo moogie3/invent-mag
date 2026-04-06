@@ -3,7 +3,9 @@
         <div class="row align-items-center">
             <div class="col">
                 <div class="page-pretitle">{{ __('messages.overview') }}</div>
-                <h2 class="page-title no-print fw-bold">{{ __('messages.view_sales_invoice') }}</h2>
+                <h2 class="page-title no-print fw-bold d-flex align-items-center">
+                    <i class="ti ti-eye me-2"></i>{{ __('messages.view_sales_invoice') }}
+                </h2>
             </div>
             <div class="col text-end">
                 <a href="{{ route('admin.sales') }}" class="btn btn-outline-primary d-none d-sm-inline-block me-2">

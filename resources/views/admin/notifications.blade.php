@@ -67,6 +67,14 @@
         [data-bs-theme="dark"] .bg-warning-lt { background-color: rgba(245, 159, 0, 0.15) !important; color: #f7b740 !important; }
         [data-bs-theme="dark"] .bg-info-lt { background-color: rgba(13, 202, 240, 0.15) !important; color: #5bcaf0 !important; }
         [data-bs-theme="dark"] .bg-success-lt { background-color: rgba(47, 179, 68, 0.15) !important; color: #5cc86e !important; }
+
+        /* Status icon colors in avatar */
+        .notification-item .avatar i {
+            color: #333 !important;
+        }
+        [data-bs-theme="dark"] .notification-item .avatar i {
+            color: #fff !important;
+        }
     </style>
 
     <script>

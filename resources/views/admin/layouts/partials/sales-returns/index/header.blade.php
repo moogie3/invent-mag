@@ -3,7 +3,11 @@
         <div class="row align-items-center">
             <div class="col">
                 <div class="page-pretitle">{{ __('messages.overview') }}</div>
-                <h2 class="page-title"><i class="ti ti-receipt-refund me-2"></i> {{ __('messages.model_sales_return') }}</h2>
+                <h2 class="page-title d-flex align-items-center"><i class="ti ti-receipt-refund me-2"></i> {{ __('messages.model_sales_return') }}
+                    <a href="#" class="ms-3 text-muted trigger-tutorial-modal" data-bs-toggle="tooltip" title="{{ __('Tutorial') }}">
+                        <i class="ti ti-help-circle fs-3"></i>
+                    </a>
+                </h2>
             </div>
             <div class="col-auto ms-auto d-flex gap-2">
                 <div class="dropdown d-inline-block">

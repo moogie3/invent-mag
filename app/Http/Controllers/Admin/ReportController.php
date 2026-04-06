@@ -52,6 +52,14 @@ class ReportController extends Controller
         $warehouses = \App\Models\Warehouse::all();
         $types = ['adjustment', 'increase', 'decrease', 'correction', 'transfer'];
 
+        // Eager load user roles
+        $adjustments->getCollection()->transform(function ($adj) {
+            if ($adj->adjustedBy) {
+                $adj->adjustedBy->role = $adj->adjustedBy->getRoleNames()->first() ?? null;
+            }
+            return $adj;
+        });
+
         return view('admin.reports.adjustment-log', compact('adjustments', 'warehouses', 'types'));
     }
 

@@ -17,6 +17,7 @@ use App\Helpers\CurrencyHelper;
 use App\Models\JournalEntry;
 use App\Models\ProductWarehouse;
 use App\Models\POItem;
+use App\Models\CustomerCredit;
 
 class SalesReturnService
 {
@@ -220,6 +221,20 @@ class SalesReturnService
                 $salesReturn
             );
 
+            // Create customer credit if return is completed and original sale was paid
+            if ($data['status'] === 'Completed' && $sale->status === 'Paid') {
+                $credit = CustomerCredit::create([
+                    'tenant_id' => $sale->tenant_id,
+                    'customer_id' => $sale->customer_id,
+                    'sales_return_id' => $salesReturn->id,
+                    'amount' => $totalAmount,
+                    'reason' => 'Sales Return for Invoice #' . $sale->invoice,
+                    'status' => 'active',
+                ]);
+
+                $salesReturn->update(['customer_credit_id' => $credit->id]);
+            }
+
             return $salesReturn;
         });
     }
@@ -307,6 +322,29 @@ class SalesReturnService
                 $sale->update(['status' => 'Partial']);
             } else {
                 // Do nothing, leave the status as is
+            }
+
+            // Handle customer credit for update - check if status changed to Completed and sale was Paid
+            $oldStatus = $salesReturn->getOriginal('status');
+            $oldTotalAmount = $salesReturn->getOriginal('total_amount');
+            
+            if ($data['status'] === 'Completed' && $sale->status === 'Paid' && !$salesReturn->customer_credit_id) {
+                $credit = CustomerCredit::create([
+                    'tenant_id' => $sale->tenant_id,
+                    'customer_id' => $sale->customer_id,
+                    'sales_return_id' => $salesReturn->id,
+                    'amount' => $totalReturnAmount,
+                    'reason' => 'Sales Return for Invoice #' . $sale->invoice,
+                    'status' => 'active',
+                ]);
+
+                $salesReturn->update(['customer_credit_id' => $credit->id]);
+            } elseif ($salesReturn->customer_credit_id && $totalReturnAmount != $oldTotalAmount) {
+                // Update credit amount if it already exists
+                $credit = CustomerCredit::find($salesReturn->customer_credit_id);
+                if ($credit) {
+                    $credit->update(['amount' => $totalReturnAmount]);
+                }
             }
 
             return $salesReturn->fresh();

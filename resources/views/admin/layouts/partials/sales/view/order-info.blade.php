@@ -22,6 +22,12 @@
             </div>
         </div>
     @endif
+    @if ($sales->customer_credit_used > 0)
+        <div class="d-flex justify-content-between mb-2">
+            <div><strong>{{ __('messages.credit_used') }}</strong></div>
+            <div class="text-info">{{ \App\Helpers\CurrencyHelper::formatWithPosition($sales->customer_credit_used) }}</div>
+        </div>
+    @endif
     <div class="d-flex justify-content-between mb-2">
         <div><strong>{{ __('messages.total_paid') }}</strong></div>
         <div>{{ \App\Helpers\CurrencyHelper::formatWithPosition($sales->total_paid) }}</div>

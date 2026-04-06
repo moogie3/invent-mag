@@ -12,6 +12,7 @@ export class SalesOrderCreate extends SalesOrderModule {
         this.orderDiscountType = "fixed";
         this.sessionJustSubmitted = false;
         this.currentStock = 0;
+        this.customerCreditUsed = 0;
 
         this.checkSessionState();
 
@@ -44,6 +45,8 @@ export class SalesOrderCreate extends SalesOrderModule {
             "applyTotalDiscount",
             "stock_available",
             "quantity_warning",
+            "customerCreditAmount",
+            "customerCreditInput",
         ];
 
         const elements = {};
@@ -118,6 +121,30 @@ export class SalesOrderCreate extends SalesOrderModule {
         this.elements.applyTotalDiscount.addEventListener("click", () =>
             this.applyOrderDiscount(),
         );
+
+        // Listen for customer credit input changes
+        if (this.elements.customerCreditAmount) {
+            this.elements.customerCreditAmount.addEventListener("input", () => {
+                const maxCredit = parseFloat(this.elements.customerCreditAmount.max) || 0;
+                let creditValue = parseFloat(this.elements.customerCreditAmount.value) || 0;
+                
+                // Ensure credit doesn't exceed available or grand total
+                if (creditValue > maxCredit) {
+                    creditValue = maxCredit;
+                    this.elements.customerCreditAmount.value = creditValue;
+                }
+                
+                if (this.elements.customerCreditInput) {
+                    this.elements.customerCreditInput.value = creditValue;
+                }
+                
+                this.updateTotalPrice();
+            });
+            
+            this.elements.customerCreditAmount.addEventListener("change", () => {
+                this.updateTotalPrice();
+            });
+        }
 
         this.elements.form.addEventListener("submit", (e) =>
             this.handleSubmit(e),
@@ -382,7 +409,12 @@ export class SalesOrderCreate extends SalesOrderModule {
         const totalDiscount = itemDiscount + orderDiscountAmount;
         const taxableAmount = subtotal - orderDiscountAmount;
         const taxAmount = taxableAmount * (this.taxRate / 100);
-        const finalTotal = taxableAmount + taxAmount;
+        const grandTotal = taxableAmount + taxAmount;
+        
+        // Apply customer credit
+        const creditAmount = parseFloat(this.elements.customerCreditInput?.value) || 0;
+        this.customerCreditUsed = creditAmount;
+        const finalTotal = Math.max(0, grandTotal - creditAmount);
 
         document.getElementById("subtotal").innerText =
             formatCurrency(subtotal);
@@ -399,6 +431,12 @@ export class SalesOrderCreate extends SalesOrderModule {
         document.getElementById("orderDiscountTypeInput").value =
             this.orderDiscountType;
         document.getElementById("taxInput").value = taxAmount;
+        
+        // Store credit amount in hidden field for form submission
+        if (this.elements.customerCreditInput) {
+            this.elements.customerCreditInput.value = creditAmount;
+        }
+        
         this.elements.productsField.value = JSON.stringify(this.products);
     }
 

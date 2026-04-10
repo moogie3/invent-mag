@@ -21,7 +21,7 @@
             </div>
             <input type="number" min="1" class="form-control" name="quantity" id="quantity" placeholder="0" />
         </div>
-        <small id="quantity_warning" class="text-danger d-none mt-1">
+        <small id="quantity_warning" class="text-danger mt-1">
             <i class="ti ti-alert-triangle"></i> {{ __('messages.exceeds_available_stock') }}
         </small>
     </div>
@@ -32,7 +32,7 @@
     </div>
     <div class="col-md-2">
         <label class="form-label fw-bold">{{ __('messages.new_price') }}</label>
-        <input type="text" class="form-control" name="customer_price" id="customer_price" placeholder="0" />
+        <input type="number" min="0" step="1" class="form-control" name="customer_price" id="customer_price" placeholder="0" />
     </div>
     <div class="col-md-2">
         <label class="form-label fw-bold">{{ __('messages.discount') }}</label>

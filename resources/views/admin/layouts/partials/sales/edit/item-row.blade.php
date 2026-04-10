@@ -1,5 +1,5 @@
 @php
-    $returnedQty = isset($sales) ? $sales->getReturnedQuantityForProduct($item->product_id) : 0;
+    $returnedQty = isset($sales) ? $sales->getReturnedQuantityForSalesItem($item->id) : 0;
     $adjustedQty = max(0, (int) $item->quantity - $returnedQty);
     
     $finalAmount = \App\Helpers\SalesHelper::calculateTotal(

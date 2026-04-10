@@ -14,10 +14,15 @@
         <span class="text-muted">{{ __('messages.tax') }} ({{ $tax->rate ?? 0 }}%)</span>
         <span id="taxTotal" class="fw-bold">Rp 0</span>
     </div>
+    <div class="d-flex justify-content-between mb-2 text-info" id="creditUsedRow" style="display: none;">
+        <span><i class="ti ti-credit-card me-1"></i>{{ __('messages.credit_used') }}</span>
+        <span id="creditUsedAmount" class="fw-bold">Rp 0</span>
+    </div>
     <hr class="my-2 border-primary">
     <div class="d-flex justify-content-between">
         <span class="fs-4 fw-bold">{{ __('messages.sales_grand_total') }}</span>
         <span id="finalTotal" class="fs-4 fw-bold text-primary">Rp 0</span>
     </div>
     <input type="hidden" id="taxInput" name="tax_amount" value="0">
+    <input type="hidden" id="creditUsedInput" name="credit_used" value="0">
 </div>

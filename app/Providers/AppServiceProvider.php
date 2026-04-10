@@ -7,6 +7,7 @@ use App\Services\ActivityLogService;
 use App\Services\NotificationService;
 use App\Services\SystemNotificationService;
 use App\Observers\ActivityObserver;
+use App\Observers\CustomerCreditObserver;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\View;
@@ -30,6 +31,9 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        // Register CustomerCredit observer
+        \App\Models\CustomerCredit::observe(CustomerCreditObserver::class);
+
         VerifyEmail::createUrlUsing(function ($notifiable) {
             $tenantDomain = $notifiable->tenant->domain;
             

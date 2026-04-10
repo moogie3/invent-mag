@@ -33,7 +33,7 @@
             <tbody>
                 @foreach ($sales->salesItems as $index => $item)
                     @php
-                        $returnedQty = $sales->getReturnedQuantityForProduct($item->product_id);
+                        $returnedQty = $sales->getReturnedQuantityForSalesItem($item->id);
                         $adjustedQty = max(0, (int) $item->quantity - $returnedQty);
                         
                         $adjustedQty = max(0, (int) $item->quantity - $returnedQty);

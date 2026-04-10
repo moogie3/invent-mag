@@ -21,3 +21,11 @@
         </div>
     </div>
 </div>
+@if($sales->customer_credit_used > 0)
+<div class="card-body border-bottom py-2">
+    <div class="alert alert-info mb-0">
+        <i class="ti ti-credit-card me-2"></i>
+        {{ __('messages.credit_applied') }}: {{ \App\Helpers\CurrencyHelper::format($sales->customer_credit_used) }}
+    </div>
+</div>
+@endif

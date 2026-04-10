@@ -48,7 +48,8 @@ class Sales extends Model
         'change_amount',
         'is_pos',
         'sales_opportunity_id',
-        'warehouse_id', // Added
+        'warehouse_id',
+        'customer_credit_used',
     ];
 
     protected $guarded = [
@@ -175,6 +176,18 @@ class Sales extends Model
             ->sum('quantity');
     }
 
+    public function getReturnedQuantityForSalesItem(int $salesItemId): int
+    {
+        if (!$this->relationLoaded('salesReturns')) {
+            return 0;
+        }
+        return (int) $this->salesReturns
+            ->where('status', 'Completed')
+            ->flatMap(fn($sr) => $sr->items ?? collect())
+            ->where('sales_item_id', $salesItemId)
+            ->sum('quantity');
+    }
+
     public function getAdjustedTotal(): float
     {
         if (!$this->relationLoaded('salesItems')) {
@@ -205,6 +218,7 @@ class Sales extends Model
         'amount_received' => 'float',
         'change_amount' => 'float',
         'is_pos' => 'boolean',
+        'customer_credit_used' => 'float',
     ];
 
     // Explicitly define the factory for the model

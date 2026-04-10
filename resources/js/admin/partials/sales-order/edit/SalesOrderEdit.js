@@ -202,7 +202,10 @@ export class SalesOrderEdit extends SalesOrderModule {
         const returnedAmount = parseFloat(
             this.elements.balanceAmount.dataset.returned || 0,
         );
-        const newBalance = Math.max(0, grandTotal - totalPaid - returnedAmount);
+        const creditUsed = parseFloat(
+            this.elements.balanceAmount.dataset.creditUsed || 0,
+        );
+        const newBalance = Math.max(0, grandTotal - totalPaid - returnedAmount - creditUsed);
 
         if (this.elements.balanceAmount) {
             this.elements.balanceAmount.textContent =

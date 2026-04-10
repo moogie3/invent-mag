@@ -95,6 +95,10 @@ function populateCrmData(data, append = false) {
         populateInteractions(data.customer.interactions, append);
     }
     
+    if (data.customerCredits) {
+        populateCustomerCredits(data.customerCredits, data.totalAvailableCredits);
+    }
+    
     if (data.sales) {
         populateTransactions(data.sales.data, append);
     }
@@ -123,6 +127,53 @@ function populateInteractions(interactions, append = false) {
             });
         } else {
             safeToggleElement("noInteractionsMessage", "block");
+        }
+    }
+}
+
+function populateCustomerCredits(credits, totalAvailable) {
+    const totalAvailableCreditsEl = document.getElementById("totalAvailableCredits");
+    const creditsTableBody = document.getElementById("customerCreditsTableBody");
+    
+    if (totalAvailableCreditsEl) {
+        totalAvailableCreditsEl.textContent = formatCurrency(totalAvailable || 0);
+    }
+    
+    if (creditsTableBody) {
+        if (credits && credits.length > 0) {
+            creditsTableBody.innerHTML = "";
+            credits.forEach((credit, index) => {
+                const statusBadge = credit.status === 'active' 
+                    ? '<span class="badge bg-success text-white">Active</span>'
+                    : credit.status === 'used'
+                        ? '<span class="badge bg-secondary text-white">Used</span>'
+                        : '<span class="badge bg-warning text-white">Expired</span>';
+                
+                const row = document.createElement("tr");
+                row.innerHTML = `
+                    <td>${index + 1}</td>
+                    <td class="fw-bold">${formatCurrency(credit.amount)}</td>
+                    <td>${formatCurrency(credit.used_amount)}</td>
+                    <td class="fw-bold text-success">${formatCurrency(credit.available_amount)}</td>
+                    <td>${statusBadge}</td>
+                    <td>${credit.expires_at ? credit.expires_at : '-'}</td>
+                    <td>${credit.reason || '-'}</td>
+                `;
+                creditsTableBody.appendChild(row);
+            });
+        } else {
+            creditsTableBody.innerHTML = `
+                <tr>
+                    <td colspan="7" class="text-center py-4">
+                        <div class="empty">
+                            <div class="empty-img">
+                                <i class="ti ti-credit-card-off fs-1 text-muted"></i>
+                            </div>
+                            <p class="empty-title">No credits available</p>
+                        </div>
+                    </td>
+                </tr>
+            `;
         }
     }
 }

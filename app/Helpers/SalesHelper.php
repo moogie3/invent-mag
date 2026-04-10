@@ -110,18 +110,34 @@ class SalesHelper
         $itemCount = 0;
         $totalReturnedQty = 0;
 
+        // Group sales items by product_id to handle multiple line items of same product
+        $itemsByProduct = $items->groupBy('product_id');
+        
+        // Calculate total returned quantity per product
+        $totalReturnedByProduct = [];
+        if ($salesReturns && $salesReturns->isNotEmpty()) {
+            $totalReturnedByProduct = $salesReturns
+                ->where('status', 'Completed')
+                ->flatMap(fn($sr) => $sr->items ?? collect())
+                ->groupBy('product_id')
+                ->map(fn($returnItems) => $returnItems->sum('quantity'))
+                ->toArray();
+        }
+
         foreach ($items as $item) {
             $price = $item->customer_price ?? $item->price;
             $originalQty = (int) $item->quantity;
+            $productId = $item->product_id;
             
-            // Calculate returned quantity for this item
+            // Calculate adjusted qty proportionally for this specific sales item line
             $returnedQty = 0;
-            if ($salesReturns && $salesReturns->isNotEmpty()) {
-                $returnedQty = $salesReturns
-                    ->where('status', 'Completed')
-                    ->flatMap(fn($sr) => $sr->items ?? collect())
-                    ->where('product_id', $item->product_id)
-                    ->sum('quantity');
+            $totalOriginalForProduct = $itemsByProduct[$productId]->sum('quantity');
+            $totalReturnedForProduct = $totalReturnedByProduct[$productId] ?? 0;
+            
+            if ($totalOriginalForProduct > 0 && $totalReturnedForProduct > 0) {
+                // Distribute returns proportionally based on this item's ratio of the total
+                $ratio = $originalQty / $totalOriginalForProduct;
+                $returnedQty = round($totalReturnedForProduct * $ratio);
             }
             
             $adjustedQty = max(0, $originalQty - $returnedQty);
@@ -209,5 +225,15 @@ class SalesHelper
         } else {
             return '<span class="h4"><i class="ti ti-clock me-1 fs-4"></i> ' . __('messages.sales_status_pending') . '</span>';
         }
+    }
+
+    /**
+     * Get total available credit for a customer
+     * @param int $customerId - Customer ID
+     * @return float Total available credit amount
+     */
+    public static function getCustomerAvailableCredit(int $customerId): float
+    {
+        return \App\Models\CustomerCredit::forCustomer($customerId)->active()->sum('available_amount');
     }
 }

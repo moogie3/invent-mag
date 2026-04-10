@@ -92,6 +92,7 @@ export class SalesReturnCreate {
                         <input type="number"
                             class="form-control quantity-input"
                             data-item-id="${item.id}"
+                            data-sales-item-id="${item.id}"
                             data-product-id="${item.product.id}"
                             data-price="${netPrice}"
                             min="0"
@@ -124,6 +125,7 @@ export class SalesReturnCreate {
         if (!input.classList.contains('quantity-input')) return;
 
         const itemId = input.dataset.itemId;
+        const salesItemId = input.dataset.salesItemId;
         const productId = input.dataset.productId;
         const price = parseFloat(input.dataset.price);
         let quantity = parseInt(input.value, 10) || 0;
@@ -145,6 +147,7 @@ export class SalesReturnCreate {
 
         if (quantity > 0) {
             this.returnedItems[itemId] = {
+                sales_item_id: salesItemId,
                 product_id: productId,
                 returned_quantity: quantity,
                 price: price

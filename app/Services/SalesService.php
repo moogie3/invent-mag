@@ -56,22 +56,25 @@ class SalesService
         $sales->getCollection()->each->setAppends([]); // Prevent N+1
 
         // Use DB to efficiently calculate totals without loading all rows into memory
-        // Calculate total unpaid debt minus completed returns
-        $unpaidSales = DB::table('sales')
+        // Calculate total unpaid debt minus completed returns and credit used
+        $unpaidSalesTotal = DB::table('sales')
             ->where('tenant_id', $tenantId)
             ->whereIn('status', ['Unpaid', 'Partial'])
-            ->selectRaw('SUM(total) as unpaid_total')
-            ->first();
+            ->sum('total');
+            
+        $unpaidCreditUsed = DB::table('sales')
+            ->where('tenant_id', $tenantId)
+            ->whereIn('status', ['Unpaid', 'Partial'])
+            ->sum('customer_credit_used');
             
         $unpaidReturns = DB::table('sales_returns')
             ->join('sales', 'sales_returns.sales_id', '=', 'sales.id')
             ->where('sales_returns.tenant_id', $tenantId)
             ->whereIn('sales.status', ['Unpaid', 'Partial'])
             ->where('sales_returns.status', 'Completed')
-            ->selectRaw('SUM(sales_returns.total_amount) as returned_total')
-            ->first();
+            ->sum('sales_returns.total_amount');
             
-        $unpaidDebt = max(0, ($unpaidSales->unpaid_total ?? 0) - ($unpaidReturns->returned_total ?? 0));
+        $unpaidDebt = max(0, $unpaidSalesTotal - $unpaidCreditUsed - $unpaidReturns);
 
         // Calculate total monthly minus returns
         $monthStart = now()->startOfMonth()->toDateString();
@@ -132,7 +135,7 @@ class SalesService
     public function getSalesCreateData()
     {
         // Don't load ALL sales, products, and items into memory!
-        $customers = Customer::select('id', 'name', 'email', 'phone_number')->get();
+        $customers = Customer::select('id', 'name', 'email', 'phone_number', 'payment_terms')->get();
         $products = Product::select('id', 'name', 'code', 'selling_price')->get()->each->setAppends(['main_warehouse_stock']);
         $tax = Tax::where('is_active', 1)->first();
         // Remove empty items and all sales memory footprint
@@ -161,6 +164,7 @@ class SalesService
             
             if ($creditToUse > 0) {
                 $credit->increment('used_amount', $creditToUse);
+                $credit->decrement('available_amount', $creditToUse);
                 $remainingCredit -= $creditToUse;
                 
                 // Check if credit is fully used
@@ -172,6 +176,36 @@ class SalesService
         
         // Update sale with credit used amount
         $sale->update(['customer_credit_used' => $creditAmount - $remainingCredit]);
+    }
+
+    public function getCustomerTotalAvailableCredit(int $customerId): float
+    {
+        return CustomerCredit::forCustomer($customerId)->active()->sum('available_amount');
+    }
+
+    public function useCustomerCredit(int $customerId, float $amount, ?int $saleId = null): void
+    {
+        $credits = CustomerCredit::forCustomer($customerId)->active()->orderBy('created_at', 'asc')->get();
+        
+        $remainingAmount = $amount;
+        
+        foreach ($credits as $credit) {
+            if ($remainingAmount <= 0) break;
+            
+            $availableOnThisCredit = $credit->available_amount;
+            $creditToUse = min($availableOnThisCredit, $remainingAmount);
+            
+            if ($creditToUse > 0) {
+                $credit->increment('used_amount', $creditToUse);
+                $credit->decrement('available_amount', $creditToUse);
+                $remainingAmount -= $creditToUse;
+                
+                // Check if credit is fully used
+                if ($credit->used_amount >= $credit->amount) {
+                    $credit->update(['status' => 'used']);
+                }
+            }
+        }
     }
 
     public function getSalesEditData($id)
@@ -624,12 +658,53 @@ class SalesService
     public function addPayment(Sales $sale, array $data): \App\Models\Payment
     {
         return DB::transaction(function () use ($sale, $data) {
-            $payment = $sale->payments()->create([
-                'amount' => $data['amount'],
-                'payment_date' => $data['payment_date'],
-                'payment_method' => $data['payment_method'],
-                'notes' => $data['notes'] ?? null,
-            ]);
+            $cashAmount = $data['amount'] ?? 0;
+            $creditAmount = $data['credit_amount'] ?? 0;
+            $totalPaymentAmount = $cashAmount + $creditAmount;
+            
+            if ($totalPaymentAmount <= 0) {
+                throw new \Exception('Payment amount must be greater than zero.');
+            }
+            
+            // Validate credit usage if provided
+            if ($creditAmount > 0) {
+                $availableCredit = $this->getCustomerTotalAvailableCredit($sale->customer_id);
+                if ($creditAmount > $availableCredit) {
+                    throw new \Exception('Insufficient customer credit. Available: ' . number_format($availableCredit, 2));
+                }
+                
+                // Calculate remaining balance after credit
+                $balanceAfterCredit = $sale->balance - $creditAmount;
+                if ($balanceAfterCredit < 0) {
+                    $creditAmount = $sale->balance; // Cap credit to remaining balance
+                    $totalPaymentAmount = $cashAmount + $creditAmount;
+                }
+                
+                // Use credits (FIFO - oldest first)
+                $this->useCustomerCredit($sale->customer_id, $creditAmount, $sale->id);
+                
+                // Update sale's credit used
+                $newCreditUsed = ($sale->customer_credit_used ?? 0) + $creditAmount;
+                $sale->update(['customer_credit_used' => $newCreditUsed]);
+            }
+            
+            // Create cash payment record
+            if ($cashAmount > 0) {
+                $payment = $sale->payments()->create([
+                    'amount' => $cashAmount,
+                    'payment_date' => $data['payment_date'],
+                    'payment_method' => $data['payment_method'],
+                    'notes' => $data['notes'] ?? null,
+                ]);
+            } else {
+                // Create a dummy payment for credit-only transactions
+                $payment = $sale->payments()->create([
+                    'amount' => 0,
+                    'payment_date' => $data['payment_date'],
+                    'payment_method' => 'Credit',
+                    'notes' => 'Paid via customer credit: ' . number_format($creditAmount, 2),
+                ]);
+            }
 
             $sale->load('payments'); // Refresh the payments relationship
             $this->updateSaleStatus($sale);
@@ -638,34 +713,30 @@ class SalesService
             // Get accounting settings from the user
             $accountingSettings = Auth::user()->accounting_settings;
 
-            if (!$accountingSettings || !isset($accountingSettings['cash_account_id']) || !isset($accountingSettings['accounts_receivable_account_id'])) {
-                throw new \Exception('Accounting settings for cash or accounts receivable are not configured.');
+            // Only create journal entry for actual cash payments
+            if ($cashAmount > 0 && $accountingSettings && isset($accountingSettings['cash_account_id']) && isset($accountingSettings['accounts_receivable_account_id'])) {
+                // Retrieve account names using the IDs from settings
+                $cashAccount = Account::find($accountingSettings['cash_account_id']);
+                $accountsReceivableAccount = Account::find($accountingSettings['accounts_receivable_account_id']);
+
+                if ($cashAccount && $accountsReceivableAccount) {
+                    $cashAccountName = $cashAccount->name;
+                    $accountsReceivableAccountName = $accountsReceivableAccount->name;
+
+                    // Create Journal Entry for the payment
+                    $transactions = [
+                        ['account_name' => $cashAccountName, 'type' => 'debit', 'amount' => $cashAmount],
+                        ['account_name' => $accountsReceivableAccountName, 'type' => 'credit', 'amount' => $cashAmount],
+                    ];
+
+                    $this->accountingService->createJournalEntry(
+                        "Payment for Sale #{$sale->invoice}",
+                        Carbon::parse($data['payment_date']),
+                        $transactions,
+                        $payment
+                    );
+                }
             }
-
-            // Retrieve account names using the IDs from settings
-            // Retrieve account names using the IDs from settings
-            $cashAccount = Account::find($accountingSettings['cash_account_id']);
-            $accountsReceivableAccount = Account::find($accountingSettings['accounts_receivable_account_id']);
-
-            if (!$cashAccount || !$accountsReceivableAccount) {
-                throw new \Exception('Required accounts (Cash, AR) not found. Please check Accounting Settings.');
-            }
-
-            $cashAccountName = $cashAccount->name;
-            $accountsReceivableAccountName = $accountsReceivableAccount->name;
-
-            // Create Journal Entry for the payment
-            $transactions = [
-                ['account_name' => $cashAccountName, 'type' => 'debit', 'amount' => $data['amount']],
-                ['account_name' => $accountsReceivableAccountName, 'type' => 'credit', 'amount' => $data['amount']],
-            ];
-
-            $this->accountingService->createJournalEntry(
-                "Payment for Sale #{$sale->invoice}",
-                Carbon::parse($data['payment_date']),
-                $transactions,
-                $payment
-            );
 
             return $payment;
         });
@@ -922,6 +993,11 @@ class SalesService
         });
     }
 
+    /**
+     * @deprecated Use SalesReturnService::createSalesReturn() instead.
+     *             This legacy method lacks customer credit creation, proper
+     *             payment-aware status logic, and full journal entries.
+     */
     public function createSalesReturn(array $data): SalesReturn
     {
         return DB::transaction(function () use ($data) {

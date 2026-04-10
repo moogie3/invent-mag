@@ -2,6 +2,13 @@ import { SalesOrderModule } from "../common/SalesOrderModule.js";
 import { formatCurrency } from "../../../../utils/currencyFormatter.js";
 
 export class SalesOrderCreate extends SalesOrderModule {
+    formatPrice(amount) {
+        const num = parseFloat(amount) || 0;
+        return 'Rp ' + num.toLocaleString('id-ID', {
+            minimumFractionDigits: 0,
+            maximumFractionDigits: 0
+        });
+    }
     constructor(config = {}) {
         super(config);
 
@@ -66,6 +73,11 @@ export class SalesOrderCreate extends SalesOrderModule {
         elements.clearProductsBtn = elements.clearProducts;
         elements.form = document.querySelector("form");
 
+        // Ensure form exists before returning
+        if (!elements.form) {
+            console.warn("Form element not found in Sales Order Create page");
+        }
+
         return elements;
     }
 
@@ -79,79 +91,147 @@ export class SalesOrderCreate extends SalesOrderModule {
     }
 
     initEventListeners() {
-        this.elements.customerSelect.addEventListener("change", () =>
-            this.calculateDueDate(),
-        );
-
-        if (this.elements.orderDate && this.elements.orderDate._flatpickr) {
-            this.elements.orderDate._flatpickr.config.onChange.push(() =>
-                this.calculateDueDate(),
-            );
-        } else {
-            this.elements.orderDate.addEventListener("change", () =>
+        if (this.elements.customerSelect) {
+            this.elements.customerSelect.addEventListener("change", () =>
                 this.calculateDueDate(),
             );
         }
 
-        this.elements.productSelect.addEventListener("change", () => {
-            this.updateProductPrices();
-            this.updateStockDisplay();
-        });
-        this.elements.customerSelect.addEventListener("change", () =>
-            this.fetchCustomerPastPrice(),
-        );
+        if (this.elements.orderDate) {
+            if (this.elements.orderDate._flatpickr) {
+                this.elements.orderDate._flatpickr.config.onChange.push(() =>
+                    this.calculateDueDate(),
+                );
+            } else {
+                this.elements.orderDate.addEventListener("change", () =>
+                    this.calculateDueDate(),
+                );
+            }
+        }
+
+        if (this.elements.productSelect) {
+            this.elements.productSelect.addEventListener("change", () => {
+                this.updateProductPrices();
+                this.updateStockDisplay();
+            });
+        }
+
+        if (this.elements.customerSelect) {
+            this.elements.customerSelect.addEventListener("change", () =>
+                this.fetchCustomerPastPrice(),
+            );
+        }
 
         if (this.elements.quantity) {
-            this.elements.quantity.addEventListener("input", () =>
-                this.validateQuantity(),
-            );
+            this.elements.quantity.addEventListener("input", (e) => {
+                const max = parseInt(this.elements.quantity.max) || 0;
+                let value = parseInt(this.elements.quantity.value) || 0;
+                const originalValue = value;
+
+                if (value > max && max > 0) {
+                    this.elements.quantity.value = max;
+                    value = max;
+                }
+
+                if (max > 0 && originalValue > max) {
+                    this.elements.quantity.classList.add("is-invalid");
+                    const warningEl = document.getElementById("quantity_warning");
+                    if (warningEl) {
+                        warningEl.style.display = "block";
+                    }
+                    this.disableAddButton();
+                } else {
+                    this.elements.quantity.classList.remove("is-invalid");
+                    const warningEl = document.getElementById("quantity_warning");
+                    if (warningEl) {
+                        warningEl.style.display = "none";
+                    }
+                    this.enableAddButton();
+                }
+            });
             this.elements.quantity.addEventListener("change", () =>
                 this.validateQuantity(),
             );
+            this.elements.quantity.addEventListener("blur", () => {
+                const max = parseInt(this.elements.quantity.max) || 0;
+                let value = parseInt(this.elements.quantity.value) || 0;
+                if (value > max && max > 0) {
+                    this.elements.quantity.value = max;
+                    this.elements.quantity.classList.add("is-invalid");
+                    const warningEl = document.getElementById("quantity_warning");
+                    if (warningEl) {
+                        warningEl.style.display = "block";
+                    }
+                } else if (value > 0 && max > 0 && value > max) {
+                    this.elements.quantity.classList.add("is-invalid");
+                    const warningEl = document.getElementById("quantity_warning");
+                    if (warningEl) {
+                        warningEl.style.display = "block";
+                    }
+                } else if (value > 0) {
+                    this.elements.quantity.classList.remove("is-invalid");
+                    const warningEl = document.getElementById("quantity_warning");
+                    if (warningEl) {
+                        warningEl.style.display = "none";
+                    }
+                }
+            });
         }
 
-        this.elements.addProductBtn.addEventListener("click", () =>
-            this.addProduct(),
-        );
+        if (this.elements.addProductBtn) {
+            this.elements.addProductBtn.addEventListener("click", () =>
+                this.addProduct(),
+            );
+        }
 
-        this.elements.clearProductsBtn.addEventListener("click", () =>
-            this.clearProducts(),
-        );
+        if (this.elements.clearProductsBtn) {
+            this.elements.clearProductsBtn.addEventListener("click", () =>
+                this.clearProducts(),
+            );
+        }
 
-        this.elements.applyTotalDiscount.addEventListener("click", () =>
-            this.applyOrderDiscount(),
-        );
+        if (this.elements.applyTotalDiscount) {
+            this.elements.applyTotalDiscount.addEventListener("click", () =>
+                this.applyOrderDiscount(),
+            );
+        }
 
         // Listen for customer credit input changes
         if (this.elements.customerCreditAmount) {
             this.elements.customerCreditAmount.addEventListener("input", () => {
                 const maxCredit = parseFloat(this.elements.customerCreditAmount.max) || 0;
                 let creditValue = parseFloat(this.elements.customerCreditAmount.value) || 0;
-                
+
                 // Ensure credit doesn't exceed available or grand total
                 if (creditValue > maxCredit) {
                     creditValue = maxCredit;
                     this.elements.customerCreditAmount.value = creditValue;
                 }
-                
+
                 if (this.elements.customerCreditInput) {
                     this.elements.customerCreditInput.value = creditValue;
                 }
-                
+
                 this.updateTotalPrice();
             });
-            
+
             this.elements.customerCreditAmount.addEventListener("change", () => {
                 this.updateTotalPrice();
             });
         }
 
-        this.elements.form.addEventListener("submit", (e) =>
-            this.handleSubmit(e),
-        );
+        if (this.elements.form) {
+            this.elements.form.addEventListener("submit", (e) =>
+                this.handleSubmit(e),
+            );
+        }
     }
 
     calculateDueDate() {
+        if (!this.elements.orderDate || !this.elements.customerSelect || !this.elements.dueDate) {
+            return;
+        }
+
         let orderDateValue;
         if (this.elements.orderDate._flatpickr) {
             const selectedDates =
@@ -213,8 +293,8 @@ export class SalesOrderCreate extends SalesOrderModule {
             })
             .then((data) => {
                 this.selectedProductData = data; // Store the full product data
-                this.elements.priceField.value = data.price;
-                this.elements.sellingPriceField.value = data.selling_price;
+                this.elements.priceField.value = Math.round(data.price);
+                this.elements.sellingPriceField.value = Math.round(data.selling_price);
                 this.fetchCustomerPastPrice();
                 this.updateStockDisplay(); // Update stock display after data is fetched
             })
@@ -270,7 +350,7 @@ export class SalesOrderCreate extends SalesOrderModule {
 
     getOrderedQuantityForProduct(productId) {
         return this.products
-            .filter((product) => product.id === productId)
+            .filter((product) => product.product_id === productId)
             .reduce((total, product) => total + product.quantity, 0);
     }
 
@@ -301,7 +381,7 @@ export class SalesOrderCreate extends SalesOrderModule {
             return true;
         }
 
-        const quantity = parseInt(this.elements.quantity.value) || 0;
+        let quantity = parseInt(this.elements.quantity.value) || 0;
         const productId = this.selectedProductData.id;
 
         const totalStockQuantity = this.selectedProductData.main_warehouse_stock;
@@ -309,14 +389,23 @@ export class SalesOrderCreate extends SalesOrderModule {
         const availableForSale = Math.max(
             0,
             totalStockQuantity - orderedQuantity,
-        ); // Changed from totalRemainingQuantity
+        );
 
         if (quantity > availableForSale) {
-            this.showQuantityWarning();
+            this.elements.quantity.value = availableForSale;
+            this.elements.quantity.classList.add("is-invalid");
+            const warningEl = document.getElementById("quantity_warning");
+            if (warningEl) {
+                warningEl.style.display = "block";
+            }
             this.disableAddButton();
             return false;
         } else {
-            this.hideQuantityWarning();
+            this.elements.quantity.classList.remove("is-invalid");
+            const warningEl = document.getElementById("quantity_warning");
+            if (warningEl) {
+                warningEl.style.display = "none";
+            }
             this.enableAddButton();
             return true;
         }
@@ -324,7 +413,7 @@ export class SalesOrderCreate extends SalesOrderModule {
 
     showQuantityWarning() {
         if (this.elements.quantity_warning) {
-            this.elements.quantity_warning.classList.remove("d-none");
+            this.elements.quantity_warning.style.display = "block";
         }
         if (this.elements.quantity) {
             this.elements.quantity.classList.add("is-invalid");
@@ -333,10 +422,32 @@ export class SalesOrderCreate extends SalesOrderModule {
 
     hideQuantityWarning() {
         if (this.elements.quantity_warning) {
-            this.elements.quantity_warning.classList.add("d-none");
+            this.elements.quantity_warning.style.display = "none";
         }
         if (this.elements.quantity) {
             this.elements.quantity.classList.remove("is-invalid");
+        }
+    }
+
+    showCreditWarning() {
+        const creditInput = document.getElementById("customerCreditAmount");
+        if (creditInput) {
+            creditInput.classList.add("is-invalid");
+        }
+        const warningEl = document.getElementById("credit_warning");
+        if (warningEl) {
+            warningEl.style.display = "block";
+        }
+    }
+
+    hideCreditWarning() {
+        const creditInput = document.getElementById("customerCreditAmount");
+        if (creditInput) {
+            creditInput.classList.remove("is-invalid");
+        }
+        const warningEl = document.getElementById("credit_warning");
+        if (warningEl) {
+            warningEl.style.display = "none";
         }
     }
 
@@ -367,8 +478,9 @@ export class SalesOrderCreate extends SalesOrderModule {
             .then((response) => response.json())
             .then((data) => {
                 if (data.past_price) {
-                    this.elements.pastPriceField.value = data.past_price;
-                    this.elements.customerPriceField.value = data.past_price;
+                    const roundedPrice = Math.round(data.past_price);
+                    this.elements.pastPriceField.value = roundedPrice;
+                    this.elements.customerPriceField.value = roundedPrice;
                 } else {
                     this.elements.pastPriceField.value = "0";
                 }
@@ -380,15 +492,45 @@ export class SalesOrderCreate extends SalesOrderModule {
     }
 
     updateTotalPrice() {
+        // Try to get products from class property first, fallback to hidden field
+        let products = this.products;
+
+        // If products is empty, try reading from hidden field
+        if (!products || products.length === 0) {
+            const productsField = document.getElementById("productsField");
+            if (productsField && productsField.value) {
+                try {
+                    products = JSON.parse(productsField.value);
+                } catch (e) {
+                    products = [];
+                }
+            }
+        }
+
+        // Handle empty or no products state
+        if (!products || products.length === 0) {
+            if (document.getElementById("subtotal")) {
+                document.getElementById("subtotal").innerText = this.formatPrice(0);
+            }
+            if (document.getElementById("orderDiscountTotal")) {
+                document.getElementById("orderDiscountTotal").innerText = this.formatPrice(0);
+            }
+            if (document.getElementById("taxTotal")) {
+                document.getElementById("taxTotal").innerText = this.formatPrice(0);
+            }
+            if (document.getElementById("finalTotal")) {
+                document.getElementById("finalTotal").innerText = this.formatPrice(0);
+            }
+            // Hide credit row when empty
+            const creditRow = document.getElementById("creditUsedRow");
+            if (creditRow) creditRow.style.display = "none";
+            return;
+        }
+
         let subtotal = 0;
-        let totalBeforeDiscounts = 0;
         let itemDiscount = 0;
 
-        this.products.forEach((product) => {
-            const priceInCents = Math.round(product.customer_price * 100);
-            const productSubtotal = (priceInCents * product.quantity) / 100;
-            totalBeforeDiscounts += productSubtotal;
-
+        products.forEach((product) => {
             subtotal += product.total;
 
             const productDiscount = this.calculateDiscountAmount(
@@ -410,76 +552,119 @@ export class SalesOrderCreate extends SalesOrderModule {
         const taxableAmount = subtotal - orderDiscountAmount;
         const taxAmount = taxableAmount * (this.taxRate / 100);
         const grandTotal = taxableAmount + taxAmount;
-        
-        // Apply customer credit
-        const creditAmount = parseFloat(this.elements.customerCreditInput?.value) || 0;
+
+        // Get credit amount directly from DOM (not from cached elements)
+        const creditInputEl = document.getElementById("customerCreditAmount");
+        const creditInputValue = parseFloat(creditInputEl?.value) || 0;
+
+        // Get available credit max from the input's max attribute
+        const availableCredit = parseFloat(creditInputEl?.max) || 0;
+
+        // Validate credit input - cap at max available if exceeded (backup validation)
+        let creditAmount = creditInputValue;
+        if (creditAmount > availableCredit && availableCredit > 0) {
+            creditAmount = availableCredit;
+            if (creditInputEl) {
+                creditInputEl.value = availableCredit;
+            }
+        }
+
         this.customerCreditUsed = creditAmount;
         const finalTotal = Math.max(0, grandTotal - creditAmount);
 
-        document.getElementById("subtotal").innerText =
-            formatCurrency(subtotal);
-        document.getElementById("orderDiscountTotal").innerText =
-            formatCurrency(orderDiscountAmount);
-        document.getElementById("taxTotal").innerText =
-            formatCurrency(taxAmount);
-        document.getElementById("finalTotal").innerText =
-            formatCurrency(finalTotal);
+        // Update credit display in summary
+        const creditRow = document.getElementById("creditUsedRow");
+        const creditAmountEl = document.getElementById("creditUsedAmount");
+        const creditUsedInput = document.getElementById("creditUsedInput");
 
-        document.getElementById("totalDiscountInput").value = itemDiscount;
-        document.getElementById("orderDiscountInput").value =
-            this.orderDiscount;
-        document.getElementById("orderDiscountTypeInput").value =
-            this.orderDiscountType;
-        document.getElementById("taxInput").value = taxAmount;
-        
-        // Store credit amount in hidden field for form submission
-        if (this.elements.customerCreditInput) {
-            this.elements.customerCreditInput.value = creditAmount;
+        if (creditAmount > 0 && creditRow && creditAmountEl) {
+            creditRow.style.display = "flex";
+            creditAmountEl.innerText = this.formatPrice(creditAmount);
+        } else if (creditRow) {
+            creditRow.style.display = "none";
         }
-        
-        this.elements.productsField.value = JSON.stringify(this.products);
+        if (creditUsedInput) {
+            creditUsedInput.value = creditAmount;
+        }
+
+        // Update all summary amounts
+        if (document.getElementById("subtotal")) {
+            document.getElementById("subtotal").innerText = this.formatPrice(subtotal);
+        }
+        if (document.getElementById("orderDiscountTotal")) {
+            document.getElementById("orderDiscountTotal").innerText = this.formatPrice(orderDiscountAmount);
+        }
+        if (document.getElementById("taxTotal")) {
+            document.getElementById("taxTotal").innerText = this.formatPrice(taxAmount);
+        }
+        if (document.getElementById("finalTotal")) {
+            document.getElementById("finalTotal").innerText = this.formatPrice(finalTotal);
+        }
+
+        const totalDiscountInput = document.getElementById("totalDiscountInput");
+        const orderDiscountInput = document.getElementById("orderDiscountInput");
+        const orderDiscountTypeInput = document.getElementById("orderDiscountTypeInput");
+        const taxInput = document.getElementById("taxInput");
+
+        if (totalDiscountInput) totalDiscountInput.value = itemDiscount;
+        if (orderDiscountInput) orderDiscountInput.value = this.orderDiscount;
+        if (orderDiscountTypeInput) orderDiscountTypeInput.value = this.orderDiscountType;
+        if (taxInput) taxInput.value = taxAmount;
+
+        // Store credit amount in hidden field for form submission
+        const creditHiddenInput = document.getElementById("customerCreditInput");
+        if (creditHiddenInput) {
+            creditHiddenInput.value = creditAmount;
+        }
+
+        if (this.elements.productsField) {
+            this.elements.productsField.value = JSON.stringify(products);
+        }
     }
 
     addProduct() {
-        if (
-            !this.elements.productSelect ||
-            !this.elements.quantity ||
-            !this.elements.customerPriceField
-        ) {
-            // console.warn("Required form elements not found for adding product");
+        // Get values directly from DOM, not from stored elements
+        const quantityInput = document.getElementById("quantity");
+        const priceInput = document.getElementById("customer_price");
+
+        const quantity = parseInt(quantityInput?.value) || 0;
+        const price = parseFloat(priceInput?.value) || 0;
+
+        // Early return if no product selected
+        const productSelect = document.getElementById("product_id");
+        if (!productSelect || !productSelect.value) {
             return;
         }
 
-        if (!this.validateQuantity()) {
+        // Early return if no quantity or price
+        if (quantity === 0 || price === 0) {
             return;
         }
 
-        const productId = this.elements.productSelect.value;
-        const productName =
-            this.elements.productSelect.options[
-                this.elements.productSelect.selectedIndex
-            ].text;
-        const quantity = parseInt(this.elements.quantity.value) || 0;
-        const price = parseFloat(this.elements.customerPriceField.value) || 0;
-        const discount = parseFloat(this.elements.discount?.value) || 0;
-        const discountType = this.elements.discount_type?.value || "fixed";
+        // Validate quantity against stock
+        if (this.selectedProductData) {
+            const totalStockQuantity = this.selectedProductData.main_warehouse_stock || 0;
+            const orderedQuantity = this.getOrderedQuantityForProduct(this.selectedProductData.id);
+            const availableForSale = Math.max(0, totalStockQuantity - orderedQuantity);
 
-        const selectedOption =
-            this.elements.productSelect.options[
-                this.elements.productSelect.selectedIndex
-            ];
+            if (quantity > availableForSale) {
+                this.showQuantityWarning();
+                this.disableAddButton();
+                return;
+            }
+        }
+
+        const productId = productSelect.value;
+        const productName = productSelect.options[productSelect.selectedIndex].text;
+        const discount = parseFloat(document.getElementById("discount")?.value) || 0;
+        const discountType = document.getElementById("discount_type")?.value || "fixed";
+
+        const selectedOption = productSelect.options[productSelect.selectedIndex];
         const stock = parseInt(selectedOption.getAttribute("data-stock")) || 0;
 
-        const uniqueId = `${Date.now()}-${Math.random()
-            .toString(36)
-            .substring(2, 7)}`;
+        const uniqueId = `${Date.now()}-${Math.random().toString(36).substring(2, 7)}`;
 
-        const total = this.calculateTotal(
-            price,
-            quantity,
-            discount,
-            discountType,
-        );
+        const total = this.calculateTotal(price, quantity, discount, discountType);
 
         this.products.push({
             product_id: productId,
@@ -491,11 +676,22 @@ export class SalesOrderCreate extends SalesOrderModule {
             discountType,
             total,
             stock: this.selectedProductData.main_warehouse_stock,
-            // Removed po_items: this.selectedProductData.po_items,
         });
 
+        // Update hidden field immediately
+        const productsField = document.getElementById("productsField");
+        if (productsField) {
+            productsField.value = JSON.stringify(this.products);
+        }
+
         this.renderTable();
-        this.clearProductForm();
+
+        // Clear form without triggering events
+        if (quantityInput) quantityInput.value = "";
+        if (priceInput) priceInput.value = "";
+        const discountInput = document.getElementById("discount");
+        if (discountInput) discountInput.value = "";
+
         this.updateStockDisplay();
     }
 
@@ -559,7 +755,13 @@ export class SalesOrderCreate extends SalesOrderModule {
     }
 
     renderTable() {
-        this.elements.productTableBody.innerHTML = "";
+        let tableBody = document.getElementById("productTableBody");
+
+        if (!tableBody) {
+            return;
+        }
+
+        tableBody.innerHTML = "";
 
         if (this.products.length === 0) {
             const row = document.createElement("tr");
@@ -572,7 +774,8 @@ export class SalesOrderCreate extends SalesOrderModule {
                     </div>
                 </td>
             `;
-            this.elements.productTableBody.appendChild(row);
+            tableBody.appendChild(row);
+            this.elements.productTableBody = tableBody;
             this.updateTotalPrice();
             return;
         }
@@ -651,30 +854,34 @@ export class SalesOrderCreate extends SalesOrderModule {
                     </button>
                 </td>
             `;
-            this.elements.productTableBody.appendChild(row);
+            tableBody.appendChild(row);
         });
+
+        this.elements.productTableBody = tableBody;
 
         this.updateTotalPrice();
         this.attachTableEventListeners();
     }
 
     attachTableEventListeners() {
-        const newTableBody = this.elements.productTableBody.cloneNode(true);
-        this.elements.productTableBody.parentNode.replaceChild(
-            newTableBody,
-            this.elements.productTableBody,
-        );
-        this.elements.productTableBody = newTableBody;
+        let tableBody = document.getElementById("productTableBody");
 
-        this.elements.productTableBody.addEventListener("input", (event) => {
+        if (!tableBody) {
+            return;
+        }
+
+        this.elements.productTableBody = tableBody;
+
+        // Add event listeners directly to the table body (event delegation)
+        tableBody.addEventListener("input", (event) => {
             this.handleTableInput(event);
         });
 
-        this.elements.productTableBody.addEventListener("change", (event) => {
+        tableBody.addEventListener("change", (event) => {
             this.handleTableChange(event);
         });
 
-        this.elements.productTableBody.addEventListener("click", (event) => {
+        tableBody.addEventListener("click", (event) => {
             this.handleTableClick(event);
         });
     }

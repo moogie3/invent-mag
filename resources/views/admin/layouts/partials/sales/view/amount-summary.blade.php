@@ -51,10 +51,10 @@
     </div>
     @endif
 
-    @if($sales->customer_credit_used > 0)
+    @if(($sales['customer_credit_used'] ?? 0) > 0)
     <div class="d-flex justify-content-between text-info mb-1">
         <div class="fs-5"><i class="ti ti-credit-card me-1"></i>{{ __('messages.credit_used') }}</div>
-        <div class="fs-5">{{ \App\Helpers\CurrencyHelper::format($sales->customer_credit_used) }}</div>
+        <div class="fs-5">{{ \App\Helpers\CurrencyHelper::format($sales['customer_credit_used'] ?? 0) }}</div>
     </div>
     @endif
 

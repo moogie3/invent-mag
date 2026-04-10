@@ -17,7 +17,13 @@ class CustomerService
     {
         $customers = Customer::paginate($entries);
         $totalcustomer = Customer::count();
-        return compact('customers', 'entries', 'totalcustomer');
+        
+        $customerCredits = [];
+        foreach ($customers as $customer) {
+            $customerCredits[$customer->id] = $customer->activeCredits()->sum('available_amount');
+        }
+        
+        return compact('customers', 'entries', 'totalcustomer', 'customerCredits');
     }
 
     public function createCustomer(array $data)

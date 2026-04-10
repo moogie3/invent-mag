@@ -106,6 +106,7 @@ class DatabaseSeeder extends Seeder
                 SalesOpportunitySeeder::class,
                 ManualJournalEntrySeeder::class,
                 ActivityLogSeeder::class,
+                CreditFeatureSeeder::class,
             ]);
         }
 

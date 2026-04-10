@@ -11,6 +11,7 @@ onPageLoad(function () {
     const pathname = window.location.pathname;
     if (!pathname.includes("/admin/sales-returns")) return;
 
+    // Handle sales return bulk actions with sessionStorage
     if (sessionStorage.getItem("salesReturnBulkDeleteSuccess")) {
         InventMagApp.showToast(
             "Success",

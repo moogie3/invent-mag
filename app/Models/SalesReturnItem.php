@@ -13,6 +13,7 @@ class SalesReturnItem extends Model
 
     protected $fillable = [
         'sales_return_id',
+        'sales_item_id',
         'product_id',
         'quantity',
         'price',
@@ -30,6 +31,14 @@ class SalesReturnItem extends Model
     public function salesReturn(): BelongsTo
     {
         return $this->belongsTo(SalesReturn::class);
+    }
+
+    /**
+     * Get the original sales line item that this return item belongs to.
+     */
+    public function salesItem(): BelongsTo
+    {
+        return $this->belongsTo(SalesItem::class, 'sales_item_id');
     }
 
     /**

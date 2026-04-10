@@ -118,7 +118,7 @@
                         @foreach ($sales->salesItems as $index => $item)
                             @php
                                 // Calculate returned quantity for this item
-                                $returnedQty = $sales->getReturnedQuantityForProduct($item->product_id);
+                                $returnedQty = $sales->getReturnedQuantityForSalesItem($item->id);
                                 $adjustedQty = max(0, (int) $item->quantity - $returnedQty);
                                 
                                 // Calculate the final amount based on adjusted quantity
@@ -247,6 +247,13 @@
                         <div class="d-flex justify-content-between text-muted mb-2 border-bottom pb-2">
                             <div class="fs-6"><i class="ti ti-package-export me-1"></i>{{ __('messages.returned') }} ({{ __('messages.sales_totals_adjusted') }})</div>
                             <div class="fs-6">{{ \App\Helpers\CurrencyHelper::formatWithPosition($totalReturned) }}</div>
+                        </div>
+                        @endif
+
+                        @if(($sales['customer_credit_used'] ?? 0) > 0)
+                        <div class="d-flex justify-content-between text-info mb-2">
+                            <div class="fs-6"><i class="ti ti-credit-card me-1"></i>{{ __('messages.credit_used') }}</div>
+                            <div class="fs-6">{{ \App\Helpers\CurrencyHelper::formatWithPosition($sales['customer_credit_used'] ?? 0) }}</div>
                         </div>
                         @endif
 

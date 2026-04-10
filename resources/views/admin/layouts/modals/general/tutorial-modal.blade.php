@@ -111,11 +111,13 @@
         $contextDesc = __('Create a new sales order by selecting a customer, adding products, and setting payment terms.');
         $contextSteps = [
             __('<b>Sales Information:</b> Enter invoice number (optional, auto-generated if empty), select a customer and set the order date. The due date auto-fills based on the customer payment terms.'),
+            __('<b>Customer Credit:</b> When you select a customer, any available customer credits from previous returns will be displayed. You can apply credit to reduce the order total.'),
             __('<b>Product Selection:</b> Search and select products from the dropdown. The product icon shows the current remaining stock. Click "Add Product" to add multiple products.'),
             __('<b>Auto-Pricing:</b> When you select a product, the system auto-fills prices based on the customer name. It shows the last purchase price and your selling price. You can manually adjust the price if needed.'),
             __('<b>Quantity & Discount:</b> Enter quantity for each product. The system calculates line totals automatically. You can add per-item discounts as percentage or fixed amount.'),
             __('<b>Invoice Discount:</b> Apply a global discount to the entire order at the bottom (percentage or fixed amount) in addition to per-item discounts.'),
             __('<b>Order Summary:</b> View subtotal, tax (PPN), discount, and grand total. Tax rate is pulled from your tax settings.'),
+            __('<b>Credit Applied:</b> If you applied customer credit, it will reduce the final balance. The invoice status will update to "Paid" if credit covers the full amount.'),
             __('<b>Submit:</b> Click "Create Sales Order" to save. The order will be created as "Unpaid" and you can record payments later on the Sales Order Edit page.')
         ];
     } elseif ($routeName === 'admin.sales.edit') {
@@ -125,13 +127,43 @@
         $contextSteps = [
             __('<b>Sales Information:</b> The invoice number, order date, and due date are read-only. You can change the warehouse and payment type (if not yet paid).'),
             __('<b>Customer Info:</b> View customer details and payment terms. Customer cannot be changed once the order has payments.'),
+            __('<b>Customer Credit:</b> If this invoice used customer credits from previous returns, it will be shown in the header. Credits reduce the balance due.'),
             __('<b>Fully Paid Warning:</b> If the invoice is already fully paid, you will see a warning modal immediately when you open the page. Most fields become read-only and cannot be edited.'),
             __('<b>Edit Items:</b> You can adjust quantities and prices for each item. Use the discount column for per-item discounts (percentage or fixed amount).'),
             __('<b>Invoice Discount:</b> Apply a global discount to the entire order at the bottom in addition to per-item discounts.'),
             __('<b>Record Payment:</b> If the order is not fully paid, click "Add Payment" to record customer payments. You can record partial or full payments.'),
-            __('<b>Payment Info:</b> Total Paid shows the amount the customer has already paid. Balance shows the remaining amount the customer needs to pay.'),
-            __('<b>Track Returns:</b> The quantity field shows the final quantity (original minus returned). A returned badge shows how much was returned (e.g., "-3 Returned"). At the bottom, the "Returned (Adjusted)" row shows only the returned amount, not the original total. To create a new return, go to the Sales Order Returns menu.'),
+            __('<b>Payment Info:</b> Total Paid shows the amount the customer has already paid. Balance shows the remaining amount the customer needs to pay (after credit applied).'),
+            __('<b>Track Returns:</b> The quantity field shows the FINAL quantity (original quantity minus returned items). A "Returned" badge shows how many items were returned per product (e.g., "-3 Returned"). The amounts shown are already ADJUSTED to reflect the final quantity after returns. At the bottom, the "Returned (Adjusted)" row shows only the returned amount, not the original total. To create a new return, go to the Sales Order Returns menu.'),
             __('<b>Save:</b> Click "Save Changes" to update the sales order. Note: You cannot change customer if payments have already been recorded.')
+        ];
+    } elseif ($routeName === 'admin.sales.view') {
+        $contextTitle = __('messages.view_sales_order');
+        $contextIcon = 'ti-eye';
+        $contextDesc = __('messages.view_sales_order_desc');
+        $contextSteps = [
+            __('<b>Order Information:</b> View the invoice number, customer, order date, and due date. The status badge shows the current payment status (Unpaid, Partial, Paid, Returned).'),
+            __('<b>Customer Credit Applied:</b> If this invoice used customer credits from previous returns, it will be shown in the header.'),
+            __('<b>Items Table:</b> Shows all products sold in this order. The quantity shown is the FINAL quantity (original quantity minus any returned items).'),
+            __('<b>Returned Items:</b> If items have been returned, a "Returned" badge shows how many items were returned per product (e.g., "-3 Returned").'),
+            __('<b>Amount Display:</b> The amounts shown are already ADJUSTED - they reflect the final quantity after returns. The original total is not shown here.'),
+            __('<b>Returned (Adjusted):</b> At the bottom in the amount summary, the "Returned" row shows only the returned amount, not the original total. The adjusted subtotal shows the final total after deducting returns.'),
+            __('<b>To Create Return:</b> To process a new return for this invoice, go to the Sales Order Returns menu and create a new return for this invoice.'),
+            __('<b>Actions:</b> Use the "Print Invoice" button to print or download PDF. Click "Edit Invoice" to modify the order.')
+        ];
+    } elseif ($routeName === 'admin.sales-returns.index') {
+        $contextTitle = __('Sales Returns List');
+        $contextIcon = 'ti-receipt-refund';
+        $contextDesc = __('View and manage all sales returns, track returned items, and handle refund or credit operations.');
+        $contextSteps = [
+            __('<b>View Returns:</b> View all sales returns in the table. Use filters to find specific returns by status or date.'),
+            __('<b>Create Return:</b> Click "New Sales Return" to create a return. Select the sales invoice, add items to return, specify quantities, and set return date.'),
+            __('<b>Return Status:</b> Returns have three statuses: Pending (awaiting review), Completed (processed), and Canceled (rejected).'),
+            __('<b>Credit Note:</b> When a return is marked "Completed" AND the original invoice is fully paid, a customer credit note is automatically created. The Credit column shows a credit card icon when credit was created.'),
+            __('<b>Completed Returns:</b> When a return is marked Completed, inventory is added back to stock, accounting journal entries are reversed, and if paid, a credit note is created for the customer.'),
+            __('<b>Customer Credit:</b> The created credit note is tied to the customer (not the invoice). The customer can use it to pay for future sales orders.'),
+            __('<b>View Credit:</b> Click on the customer name in CRM to see all their credits in the "Customer Credits" tab.'),
+            __('<b>Bulk Actions:</b> Select multiple returns to perform bulk Complete, bulk Cancel, or bulk Delete operations.'),
+            __('<b>Export:</b> Use the export dropdown to download return data as CSV or PDF for external use or reporting.')
         ];
     } elseif ($routeName === 'admin.sales-returns.create') {
         $contextTitle = __('Create Sales Return');
@@ -143,22 +175,34 @@
             __('<b>Reason:</b> Optionally add a reason for the return for tracking and audit purposes.'),
             __('<b>Select Items:</b> After selecting an invoice, choose which items to return. Each product shows the quantity originally sold.'),
             __('<b>Return Quantity:</b> Enter the quantity to return for each item. You cannot return more than what was originally sold.'),
-            __('<b>Status:</b> The return is created as "Pending" by default. Once reviewed and processed, change it to "Completed" to apply inventory and accounting changes.'),
+            __('<b>IMPORTANT - Credit Note Condition:</b> A customer credit note is ONLY created when BOTH conditions are met: (1) Return status is "Completed" AND (2) Original invoice status is "Paid". If the invoice is Unpaid or Partial, no credit is created.'),
+            __('<b>Status:</b> The return is created as "Pending" by default. Once reviewed and processed, change it to "Completed" to apply inventory, accounting changes, and create credit note (if applicable).'),
             __('<b>Save:</b> Click "Create Sales Return" to save. You can edit the return later while it is still in Pending status.')
         ];
-    } elseif (Str::startsWith($routeName, 'admin.sales-returns')) {
-        $contextTitle = __('Sales Order Returns');
-        $contextIcon = 'ti-receipt-refund';
-        $contextDesc = __('Process customer returns, track returned items, and manage refund or credit operations.');
+    } elseif ($routeName === 'admin.sales-returns.edit') {
+        $contextTitle = __('Edit Sales Return');
+        $contextIcon = 'ti-edit';
+        $contextDesc = __('Modify an existing sales return, update items, quantities, or status.');
         $contextSteps = [
-            __('<b>Create Return:</b> Click "New Sales Return" to create a return. Select the sales invoice, add items to return, specify quantities, and set return date.'),
-            __('<b>Return Status:</b> Returns have three statuses: Pending (awaiting review), Completed (processed), and Canceled (rejected).'),
-            __('<b>Completed Returns:</b> When a return is marked Completed, inventory is added back to stock, accounting journal entries are reversed, and sales order status updates to Returned or Partial.'),
-            __('<b>Inventory Impact:</b> Completed returns increase the product stock in the warehouse. The original quantity is restored and expiry tracking is updated.'),
-            __('<b>Accounting:</b> Completed returns automatically create journal entries to reverse Accounts Receivable, Sales Revenue, and COGS; while recording Inventory increase.'),
-            __('<b>Edit Before Complete:</b> You can edit a return while it is Pending. Once Completed or Canceled, the return cannot be modified.'),
-            __('<b>Bulk Actions:</b> Select multiple returns to perform bulk Complete, bulk Cancel, or bulk Delete operations.'),
-            __('<b>Export:</b> Use the export dropdown to download return data as CSV or PDF for external use or reporting.')
+            __('<b>Return Information:</b> View the linked sales invoice in the first section. Click the invoice number to view the original sales order.'),
+            __('<b>Return Date:</b> Modify the return date if needed.'),
+            __('<b>Reason:</b> Update the reason for the return for tracking and audit purposes.'),
+            __('<b>Edit Items:</b> You can modify the quantities of items to return. Available quantity shows how much can still be returned.'),
+            __('<b>Return Quantity:</b> Adjust the quantity for each item. You cannot return more than the available quantity.'),
+            __('<b>Status:</b> Change the status to "Completed" to process the return, or "Canceled" to reject it. Once Completed or Canceled, edits are no longer allowed.'),
+            __('<b>IMPORTANT - Credit Note Condition:</b> A customer credit note is ONLY created when BOTH conditions are met: (1) Return status is "Completed" AND (2) Original invoice status is "Paid". If the invoice is Unpaid or Partial, no credit is created.'),
+            __('<b>Save:</b> Click "Update Sales Return" to save your changes.')
+        ];
+    } elseif ($routeName === 'admin.sales-returns.show') {
+        $contextTitle = __('Sales Return Details');
+        $contextIcon = 'ti-eye';
+        $contextDesc = __('View detailed information about a sales return.');
+        $contextSteps = [
+            __('<b>Return Details:</b> View the full return information including linked sales invoice, return date, and reason.'),
+            __('<b>Items:</b> View all items being returned with their quantities and prices.'),
+            __('<b>Status:</b> View the current status of the return (Pending, Completed, or Canceled).'),
+            __('<b>Credit Information:</b> If a credit note was created, view the credit details.'),
+            __('<b>Print:</b> Use the Print button to generate a PDF of the return slip.')
         ];
     } elseif (Str::startsWith($routeName, 'admin.sales') && !Str::startsWith($routeName, 'admin.sales_pipeline')) {
         $contextTitle = __('Sales Orders');
@@ -188,41 +232,17 @@
             __('<b>Edit & Delete:</b> Choose the edit button or delete button on each opportunity card to edit details or delete the opportunity from the pipeline.'),
             __('<b>Convert to Sales:</b> Click the convert button on Won opportunities to transform them into actual sales orders for fulfillment.')
         ];
-    } elseif (Str::startsWith($routeName, 'admin.sales-returns')) {
-        $contextTitle = __('Sales Order Returns');
-        $contextIcon = 'ti-receipt-refund';
-        $contextDesc = __('Process customer returns, track returned items, and manage refund or credit operations.');
-        $contextSteps = [
-            __('<b>Create Return:</b> Click "New Sales Return" to create a return. Select the sales invoice, add items to return, specify quantities, and set return date.'),
-            __('<b>Return Status:</b> Returns have three statuses: Pending (awaiting review), Completed (processed), and Canceled (rejected).'),
-            __('<b>Completed Returns:</b> When a return is marked Completed, inventory is added back to stock, accounting journal entries are reversed, and sales order status updates to Returned or Partial.'),
-            __('<b>Inventory Impact:</b> Completed returns increase the product stock in the warehouse. The original quantity is restored and expiry tracking is updated.'),
-            __('<b>Accounting:</b> Completed returns automatically create journal entries to reverse Accounts Receivable, Sales Revenue, and COGS; while recording Inventory increase.'),
-            __('<b>Edit Before Complete:</b> You can edit a return while it is Pending. Once Completed or Canceled, the return cannot be modified.'),
-            __('<b>Bulk Actions:</b> Select multiple returns to perform bulk Complete, bulk Cancel, or bulk Delete operations.'),
-            __('<b>Export:</b> Use the export dropdown to download return data as CSV or PDF for external use or reporting.')
-        ];
-    } elseif ($routeName === 'admin.sales.create') {
-        $contextTitle = __('Create Sales Order');
-        $contextIcon = 'ti-plus';
-        $contextDesc = __('Create a new sales order by selecting a customer, adding products, and setting payment terms.');
-        $contextSteps = [
-            __('<b>Sales Information:</b> Enter invoice number (optional, auto-generated if empty), select a customer, set order date, and due date (auto-fills based on customer payment terms).'),
-            __('<b>Product Selection:</b> Search and select products from the dropdown. Click "Add Product" to add multiple products. Each product shows available stock in the main warehouse.'),
-            __('<b>Quantity & Pricing:</b> Enter quantity for each product. The system calculates line totals automatically. You can also add per-item discounts.'),
-            __('<b>Order Discount:</b> Apply a global discount to the entire order (percentage or fixed amount).'),
-            __('<b>Order Summary:</b> View subtotal, tax (PPN), discount, and grand total. Tax rate is pulled from your tax settings.'),
-            __('<b>Submit:</b> Click "Create Sales Order" to save. The order will be created as "Unpaid" and you can record payments later.')
-        ];
     } elseif (Str::startsWith($routeName, 'admin.sales')) {
         $contextTitle = __('Sales Operations');
         $contextIcon = 'ti-shopping-cart';
         $contextDesc = __('Manage customer orders, invoicing, payments, returns, and the sales pipeline for business growth.');
         $contextSteps = [
             __('<b>Sales Orders:</b> Create new sales orders by selecting a customer, adding products from inventory, and specifying quantities. The system automatically calculates totals.'),
+            __('<b>Customer Credit:</b> When a customer has available credits from previous returns, you can apply them to reduce the order balance in the Create Sales Order page.'),
             __('<b>Sales Pipeline:</b> Track prospects and opportunities through customizable stages (Lead, Quoted, Won, Lost) to visualize the sales funnel and forecast revenue.'),
             __('<b>Payments:</b> Record customer payments against generated invoices, including partial payments, full payments, and payment due date tracking.'),
-            __('<b>Sales Returns:</b> Process customer returns through dedicated return orders, which automatically adjust inventory and issue customer credits.'),
+            __('<b>Sales Returns:</b> Process customer returns through dedicated return orders. When a return is completed on a paid invoice, a customer credit note is automatically created.'),
+            __('<b>Customer Credits:</b> View all customer credits in the CRM modal (click customer name → Customer Credits tab). Credits can be used on future purchases.'),
             __('<b>Invoices:</b> Generate professional invoices for printing or PDF export, customizable with business logo and terms.')
         ];
 } elseif (Str::startsWith($routeName, 'admin.pos')) {

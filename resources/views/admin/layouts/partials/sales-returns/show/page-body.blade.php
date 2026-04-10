@@ -71,6 +71,22 @@
                                                 <div>{{ $salesReturn->reason }}</div>
                                             </div>
                                         @endif
+                                        <div class="d-flex justify-content-between mb-2">
+                                            <div><strong>{{ __('messages.status') }}</strong></div>
+                                            <div>
+                                                @if ($salesReturn->status === 'Completed' && $salesReturn->sale && $salesReturn->sale->status === 'Paid')
+                                                    <span class="badge bg-success text-white">{{ __('messages.credit_note_created') }}</span>
+                                                @else
+                                                    <span class="badge bg-secondary text-white">
+                                                        @if ($salesReturn->status !== 'Completed')
+                                                            {{ __('messages.pending') }}
+                                                        @elseif (!$salesReturn->sale || $salesReturn->sale->status !== 'Paid')
+                                                            {{ __('messages.no_credit_unpaid') }}
+                                                        @endif
+                                                    </span>
+                                                @endif
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -156,11 +172,11 @@
                                         <div class="text-muted small">{{ __('messages.credit_status') }}</div>
                                         <div>
                                             @if ($salesReturn->credit->status === 'active')
-                                                <span class="badge bg-success">{{ __('messages.credit_active') }}</span>
+                                                <span class="badge bg-success text-white">{{ __('messages.credit_active') }}</span>
                                             @elseif ($salesReturn->credit->status === 'used')
-                                                <span class="badge bg-secondary">{{ __('messages.credit_used_status') }}</span>
+                                                <span class="badge bg-secondary text-white">{{ __('messages.credit_used_status') }}</span>
                                             @else
-                                                <span class="badge bg-warning">{{ __('messages.credit_expired_status') }}</span>
+                                                <span class="badge bg-warning text-white">{{ __('messages.credit_expired_status') }}</span>
                                             @endif
                                         </div>
                                     </div>

@@ -19,6 +19,7 @@ class CustomerCredit extends Model
         'sales_return_id',
         'amount',
         'used_amount',
+        'available_amount',
         'reason',
         'status',
         'expires_at',
@@ -31,6 +32,7 @@ class CustomerCredit extends Model
     protected $casts = [
         'amount' => 'float',
         'used_amount' => 'float',
+        'available_amount' => 'float',
         'expires_at' => 'date',
     ];
 
@@ -46,6 +48,10 @@ class CustomerCredit extends Model
 
     public function getAvailableAmountAttribute(): float
     {
+        // Use database column if available (faster for aggregations), otherwise compute
+        if (array_key_exists('available_amount', $this->attributes) && $this->attributes['available_amount'] !== null) {
+            return (float) $this->attributes['available_amount'];
+        }
         return $this->amount - $this->used_amount;
     }
 

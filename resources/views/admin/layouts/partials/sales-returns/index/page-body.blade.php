@@ -68,7 +68,7 @@
                                             </td>
                                             <td class="text-center py-3">
                                                 @if ($return->customer_credit_id)
-                                                    <span class="badge bg-info" title="{{ __('messages.credit_note_created') }}">
+                                                    <span class="badge bg-info text-white" title="{{ __('messages.credit_note_created') }}">
                                                         <i class="ti ti-credit-card"></i>
                                                     </span>
                                                 @else

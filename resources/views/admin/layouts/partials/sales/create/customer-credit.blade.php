@@ -1,11 +1,11 @@
-<div class="h-100 p-4 bg-body-secondary rounded-3" id="customer-credit-section" style="display: none;">
+<div class="h-100 p-4 bg-body-secondary rounded-3" id="customer-credit-section">
     <h4 class="card-title mb-4">
         <i class="ti ti-credit-card me-2 text-primary"></i> {{ __('messages.customer_credit') }}
     </h4>
     <div class="mb-3">
         <label class="form-label fw-bold">{{ __('messages.available_credits') }}</label>
         <div id="available-credits-display" class="fs-5 fw-bold text-success">
-            {{ __('messages.select_customer_to_see_credits') }}
+            {{ __('messages.no_credit_available') }}
         </div>
     </div>
     <div class="mb-3">
@@ -14,13 +14,16 @@
             <span class="input-group-text">
                 <i class="ti ti-currency"></i>
             </span>
-            <input type="number" min="0" step="0.01" class="form-control" id="customerCreditAmount" 
-                name="customer_credit_amount" placeholder="0" value="0" />
-            <button type="button" id="applyCustomerCredit" class="btn btn-secondary d-none d-sm-inline-block">
-                <i class="ti ti-check"></i> {{ __('messages.apply') }}
+            <input type="number" min="0" step="1" class="form-control" id="customerCreditAmount" 
+                name="customer_credit_amount" placeholder="0" value="0" disabled />
+            <button type="button" id="applyCreditBtn" class="btn btn-secondary d-none">
+                <i class="ti ti-check"></i>
             </button>
         </div>
-        <small class="text-muted">{{ __('messages.use_credit_towards_order') }}</small>
+        <small id="credit_warning" class="text-danger mt-1">
+            <i class="ti ti-alert-triangle"></i> {{ __('messages.credit_exceeds_available') }}
+        </small>
+        <small class="text-muted d-block">{{ __('messages.use_credit_towards_order') }}</small>
     </div>
     <input type="hidden" id="customerCreditInput" name="customer_credit_amount" value="0">
 </div>
@@ -32,21 +35,23 @@ document.addEventListener('DOMContentLoaded', function() {
     const creditDisplay = document.getElementById('available-credits-display');
     const creditInput = document.getElementById('customerCreditAmount');
     const creditHiddenInput = document.getElementById('customerCreditInput');
-    const applyButton = document.getElementById('applyCustomerCredit');
     
     if (!customerSelect || !creditSection) return;
     
     function fetchCustomerCredits(customerId) {
         if (!customerId) {
-            creditSection.style.display = 'none';
+            creditDisplay.innerHTML = '{{ __('messages.select_customer_to_see_credits') }}';
+            creditInput.value = 0;
+            creditInput.disabled = true;
+            creditInput.max = 0;
+            creditHiddenInput.value = 0;
             return;
         }
         
-        fetch(`/admin/customers/${customerId}/credits`)
+        fetch(`/admin/customer/${customerId}/credits`)
             .then(response => response.json())
             .then(data => {
                 if (data.credits && data.credits.length > 0) {
-                    creditSection.style.display = 'block';
                     let totalAvailable = 0;
                     let creditHtml = '';
                     
@@ -67,13 +72,26 @@ document.addEventListener('DOMContentLoaded', function() {
                     `;
                     
                     creditInput.max = totalAvailable;
+                    creditInput.disabled = false;
+                    creditInput.value = 0;
+                    creditHiddenInput.value = 0;
                 } else {
-                    creditSection.style.display = 'none';
+                    creditDisplay.innerHTML = `
+                        <div class="text-muted fs-5">{{ __('messages.no_credit_available') }}</div>
+                        <div class="text-muted small">{{ __('messages.customer_has_no_credits') }}</div>
+                    `;
+                    creditInput.value = 0;
+                    creditInput.disabled = true;
+                    creditInput.max = 0;
+                    creditHiddenInput.value = 0;
                 }
             })
             .catch(error => {
                 console.error('Error fetching credits:', error);
-                creditSection.style.display = 'none';
+                creditDisplay.innerHTML = `
+                    <div class="text-danger fs-5">{{ __('messages.error_loading_credits') }}</div>
+                `;
+                creditInput.disabled = true;
             });
     }
     
@@ -81,20 +99,52 @@ document.addEventListener('DOMContentLoaded', function() {
         fetchCustomerCredits(this.value);
     });
     
-    if (applyButton) {
-        applyButton.addEventListener('click', function() {
-            const amount = parseFloat(creditInput.value) || 0;
-            creditHiddenInput.value = amount;
-            updateOrderTotals();
-        });
-    }
-    
     creditInput.addEventListener('change', function() {
         const max = parseFloat(this.max) || 0;
-        if (parseFloat(this.value) > max) {
+        let value = parseFloat(this.value) || 0;
+        
+        if (value > max && max > 0) {
+            value = max;
             this.value = max;
+            this.classList.add("is-invalid");
+            const warningEl = document.getElementById("credit_warning");
+            if (warningEl) {
+                warningEl.style.display = "block";
+            }
+        } else {
+            this.classList.remove("is-invalid");
+            const warningEl = document.getElementById("credit_warning");
+            if (warningEl) {
+                warningEl.style.display = "none";
+            }
         }
-        // Trigger the SalesOrderCreate updateTotalPrice if it exists
+        
+        creditHiddenInput.value = value;
+        
+        if (window.salesApp && typeof window.salesApp.updateTotalPrice === 'function') {
+            window.salesApp.updateTotalPrice();
+        }
+    });
+    
+    creditInput.addEventListener('input', function() {
+        const max = parseFloat(this.max) || 0;
+        let value = parseFloat(this.value) || 0;
+        
+        if (value > max && max > 0) {
+            this.classList.add("is-invalid");
+            const warningEl = document.getElementById("credit_warning");
+            if (warningEl) {
+                warningEl.style.display = "block";
+            }
+        } else {
+            this.classList.remove("is-invalid");
+            const warningEl = document.getElementById("credit_warning");
+            if (warningEl) {
+                warningEl.style.display = "none";
+            }
+        }
+        
+        creditHiddenInput.value = value;
         if (window.salesApp && typeof window.salesApp.updateTotalPrice === 'function') {
             window.salesApp.updateTotalPrice();
         }

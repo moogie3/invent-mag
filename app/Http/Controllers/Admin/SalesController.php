@@ -132,6 +132,7 @@ class SalesController extends Controller
     {
         $request->validate([
             'amount' => 'required|numeric|min:0.01',
+            'credit_amount' => 'nullable|numeric|min:0',
             'payment_date' => 'required|date',
             'payment_method' => 'required|string',
             'notes' => 'nullable|string',

@@ -18,14 +18,17 @@ use App\Models\JournalEntry;
 use App\Models\ProductWarehouse;
 use App\Models\POItem;
 use App\Models\CustomerCredit;
+use App\Services\SalesService;
 
 class SalesReturnService
 {
     protected AccountingService $accountingService;
+    protected SalesService $salesService;
 
-    public function __construct(AccountingService $accountingService)
+    public function __construct(AccountingService $accountingService, SalesService $salesService)
     {
         $this->accountingService = $accountingService;
+        $this->salesService = $salesService;
     }
 
     private function decrementPOItemRemaining($productId, $quantity)
@@ -114,6 +117,34 @@ class SalesReturnService
                 $totalAmount += ($item['price'] ?? 0) * $item['returned_quantity'];
             }
 
+            // Get original sale status BEFORE creating return and modifying it
+            $sale = Sales::find($data['sales_id']);
+            $sale->load('payments');
+            $originalSaleStatus = $sale->status;
+            $wasPaid = $sale->total_paid >= $sale->grand_total;
+            
+            // Calculate return quantities
+            $totalOriginalQuantitySold = $sale->salesItems()->sum('quantity');
+            $totalQuantityReturnedSoFar = $sale->salesReturns()->with('items')->get()->flatMap(function ($sr) {
+                return $sr->items;
+            })->sum('quantity');
+
+            // Update sale status based on return quantity
+            // Only change status for Unpaid invoices
+            // For Paid invoices, keep as Paid (return creates credit, not refund)
+            // Note: We check $wasPaid (actual payment status) not stored status
+            if ($totalQuantityReturnedSoFar >= $totalOriginalQuantitySold) {
+                // Only change to Returned if was NOT paid
+                if (!$wasPaid) {
+                    $sale->update(['status' => 'Returned']);
+                }
+            } elseif ($totalQuantityReturnedSoFar > 0) {
+                // Only change to Partial if was NOT paid
+                if (!$wasPaid) {
+                    $sale->update(['status' => 'Partial']);
+                }
+            }
+
             $salesReturn = SalesReturn::create([
                 'sales_id' => $data['sales_id'],
                 'return_date' => $data['return_date'],
@@ -123,16 +154,20 @@ class SalesReturnService
                 'user_id' => Auth::id(),
             ]);
 
+            // Create return items - each item tracks which sales line item it came from
+            // via sales_item_id. This maintains the exact price and quantity context.
             foreach ($returnedItems as $itemData) {
+                $salesItemId = $itemData['sales_item_id'] ?? null;
                 $price = $itemData['price'] ?? 0;
                 $returnedQuantity = $itemData['returned_quantity'];
 
                 SalesReturnItem::create([
                     'sales_return_id' => $salesReturn->id,
-                    'product_id' => $itemData['product_id'],
-                    'quantity' => $returnedQuantity,
-                    'price' => $price,
-                    'total' => $price * $returnedQuantity,
+                    'sales_item_id'   => $salesItemId,
+                    'product_id'      => $itemData['product_id'],
+                    'quantity'        => $returnedQuantity,
+                    'price'           => $price,
+                    'total'           => $price * $returnedQuantity,
                 ]);
 
                 $product = Product::find($itemData['product_id']);
@@ -152,16 +187,8 @@ class SalesReturnService
             }
 
             $sale = Sales::find($data['sales_id']);
-            $totalOriginalQuantitySold = $sale->salesItems()->sum('quantity');
-            $totalQuantityReturnedSoFar = $sale->salesReturns()->with('items')->get()->flatMap(function ($sr) {
-                return $sr->items;
-            })->sum('quantity');
-
-            if ($totalQuantityReturnedSoFar >= $totalOriginalQuantitySold) {
-                $sale->update(['status' => 'Returned']);
-            } elseif ($totalQuantityReturnedSoFar > 0) {
-                $sale->update(['status' => 'Partial']);
-            }
+            // Note: Sale status update moved to BEFORE return creation (see above)
+            // This duplicate code is kept for backward compatibility but should be cleaned up later
 
             $accountingSettings = Auth::user()->accounting_settings;
             if (!$accountingSettings || !isset($accountingSettings['inventory_account_id']) || !isset($accountingSettings['accounts_receivable_account_id'])) {
@@ -222,18 +249,25 @@ class SalesReturnService
             );
 
             // Create customer credit if return is completed and original sale was paid
-            if ($data['status'] === 'Completed' && $sale->status === 'Paid') {
+            // Use actual payment status (wasPaid) instead of stored status
+            if ($data['status'] === 'Completed' && $wasPaid) {
                 $credit = CustomerCredit::create([
                     'tenant_id' => $sale->tenant_id,
                     'customer_id' => $sale->customer_id,
                     'sales_return_id' => $salesReturn->id,
                     'amount' => $totalAmount,
+                    'used_amount' => 0,
+                    'available_amount' => $totalAmount,
                     'reason' => 'Sales Return for Invoice #' . $sale->invoice,
                     'status' => 'active',
                 ]);
 
                 $salesReturn->update(['customer_credit_id' => $credit->id]);
             }
+
+            // Recalculate sale status using SalesService to ensure consistency
+            $sale->load('payments');
+            $this->salesService->updateSaleStatus($sale);
 
             return $salesReturn;
         });
@@ -284,16 +318,20 @@ class SalesReturnService
                 'user_id' => Auth::id(),
             ]);
 
+            // Update return items - each item tracks which sales line item it came from
+            // via sales_item_id. This maintains the exact price and quantity context.
             foreach ($returnedItems as $itemData) {
-                $returnedQuantity = $itemData['returned_quantity'];
+                $salesItemId = $itemData['sales_item_id'] ?? null;
                 $price = $itemData['price'] ?? 0;
+                $returnedQuantity = $itemData['returned_quantity'];
 
                 SalesReturnItem::create([
                     'sales_return_id' => $salesReturn->id,
-                    'product_id' => $itemData['product_id'],
-                    'quantity' => $returnedQuantity,
-                    'price' => $price,
-                    'total' => $price * $returnedQuantity,
+                    'sales_item_id'   => $salesItemId,
+                    'product_id'      => $itemData['product_id'],
+                    'quantity'        => $returnedQuantity,
+                    'price'           => $price,
+                    'total'           => $price * $returnedQuantity,
                 ]);
 
                 $product = Product::find($itemData['product_id']);
@@ -316,24 +354,40 @@ class SalesReturnService
                 return $sr->items;
             })->sum('quantity');
 
+            // Capture original sale status BEFORE any modifications
+            // Important: Load payments first to determine if sale was truly paid
+            $sale->load('payments');
+            $originalSaleStatus = $sale->status;
+            $wasPaid = $sale->total_paid >= $sale->grand_total;
+
+            // Update sale status only for Unpaid invoices
+            // For Paid invoices, keep as Paid (return creates credit, not refund)
+            // Note: We check $wasPaid (actual payment status) not stored status
             if ($totalQuantityReturnedSoFar >= $totalOriginalQuantitySold) {
-                $sale->update(['status' => 'Returned']);
+                // Only change to Returned if was NOT paid
+                if (!$wasPaid) {
+                    $sale->update(['status' => 'Returned']);
+                }
             } elseif ($totalQuantityReturnedSoFar > 0) {
-                $sale->update(['status' => 'Partial']);
-            } else {
-                // Do nothing, leave the status as is
+                // Only change to Partial if was NOT paid
+                if (!$wasPaid) {
+                    $sale->update(['status' => 'Partial']);
+                }
             }
 
-            // Handle customer credit for update - check if status changed to Completed and sale was Paid
+            // Handle customer credit for update - check if status changed to Completed and sale was originally Paid
+            // Use actual payment status (wasPaid) instead of stored status
             $oldStatus = $salesReturn->getOriginal('status');
             $oldTotalAmount = $salesReturn->getOriginal('total_amount');
             
-            if ($data['status'] === 'Completed' && $sale->status === 'Paid' && !$salesReturn->customer_credit_id) {
+            if ($data['status'] === 'Completed' && $wasPaid && !$salesReturn->customer_credit_id) {
                 $credit = CustomerCredit::create([
                     'tenant_id' => $sale->tenant_id,
                     'customer_id' => $sale->customer_id,
                     'sales_return_id' => $salesReturn->id,
                     'amount' => $totalReturnAmount,
+                    'used_amount' => 0,
+                    'available_amount' => $totalReturnAmount,
                     'reason' => 'Sales Return for Invoice #' . $sale->invoice,
                     'status' => 'active',
                 ]);
@@ -343,9 +397,18 @@ class SalesReturnService
                 // Update credit amount if it already exists
                 $credit = CustomerCredit::find($salesReturn->customer_credit_id);
                 if ($credit) {
-                    $credit->update(['amount' => $totalReturnAmount]);
+                    $credit->update([
+                        'amount' => $totalReturnAmount,
+                        'available_amount' => $totalReturnAmount - $credit->used_amount
+                    ]);
                 }
             }
+
+            // Recalculate sale status using SalesService to ensure consistency
+            // This ensures the status reflects actual payments vs total
+            // Load payments first to ensure accurate calculation
+            $sale->load('payments');
+            $this->salesService->updateSaleStatus($sale);
 
             return $salesReturn->fresh();
         });

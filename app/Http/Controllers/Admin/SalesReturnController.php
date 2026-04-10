@@ -46,26 +46,9 @@ class SalesReturnController extends Controller
             'status' => 'required|string',
         ]);
 
-        $this->salesService->createSalesReturn($request->all());
+        $this->salesReturnService->createSalesReturn($request->all());
 
-        return redirect()->route('admin.sales-returns.index')->with('success', 'Sales return created successfully.');
-    }
-
-    public function show(SalesReturn $salesReturn)
-    {
-        $salesReturn->load(['sale.customer', 'items.product', 'credit']); // Corrected relationship name
-
-        $statusClass = SalesReturnHelper::getStatusClass($salesReturn->status);
-        $statusText = SalesReturnHelper::getStatusText($salesReturn->status);
-
-        return view('admin.sales-returns.show', compact('salesReturn', 'statusClass', 'statusText'));
-    }
-
-    public function edit(SalesReturn $salesReturn)
-    {
-        $sales = Sales::all();
-        $isCompletedOrCanceled = in_array($salesReturn->status, ['Completed', 'Canceled']);
-        return view('admin.sales-returns.edit', compact('salesReturn', 'sales', 'isCompletedOrCanceled'));
+        return redirect()->route('admin.sales-returns.index', ['status' => 'success', 'message' => 'Sales return created successfully.']);
     }
 
     public function update(Request $request, SalesReturn $salesReturn)
@@ -80,30 +63,68 @@ class SalesReturnController extends Controller
 
         $this->salesReturnService->updateSalesReturn($salesReturn, $request->all());
 
-        return redirect()->route('admin.sales-returns.index')->with('success', 'Sales return updated successfully.');
+        return redirect()->route('admin.sales-returns.index', ['status' => 'success', 'message' => 'Sales return updated successfully.']);
     }
 
     public function destroy(SalesReturn $salesReturn)
     {
         $this->salesReturnService->deleteSalesReturn($salesReturn);
-        return redirect()->route('admin.sales-returns.index')->with('success', 'Sales return deleted successfully.');
+        return redirect()->route('admin.sales-returns.index', ['status' => 'success', 'message' => 'Sales return deleted successfully.']);
     }
 
-    public function getSalesItems(Sales $sale)
+    public function show(SalesReturn $salesReturn)
     {
-        $sale->load(['salesItems.product', 'salesReturns.items']);
-        
-        $items = $sale->salesItems->map(function ($item) use ($sale) {
-            $returnedQuantity = $sale->salesReturns
-                ->where('status', 'Completed')
-                ->flatMap(fn($sr) => $sr->items ?? collect())
-                ->where('product_id', $item->product_id)
-                ->sum('quantity');
-                
-            $item->available_quantity = max(0, $item->quantity - $returnedQuantity);
+        $salesReturn->load(['sale.customer', 'items.product', 'credit']); // Corrected relationship name
+
+        $statusClass = SalesReturnHelper::getStatusClass($salesReturn->status);
+        $statusText = SalesReturnHelper::getStatusText($salesReturn->status);
+
+        return view('admin.sales-returns.show', compact('salesReturn', 'statusClass', 'statusText'));
+    }
+
+    public function edit(SalesReturn $salesReturn)
+    {
+        $salesReturn->load('items.salesItem');
+        $sales = Sales::all();
+        $isCompletedOrCanceled = in_array($salesReturn->status, ['Completed', 'Canceled']);
+        return view('admin.sales-returns.edit', compact('salesReturn', 'sales', 'isCompletedOrCanceled'));
+    }
+
+    public function getSalesItems(Sales $sale, Request $request)
+    {
+        $sale->load(['salesItems.product', 'salesReturns.items.salesItem']);
+
+        // Optional: when editing an existing return, exclude its items from the
+        // "already returned" count so the user sees the correct available qty.
+        $excludeReturnId = $request->query('exclude_return_id');
+
+        // Build a map of sales_item_id -> total returned qty from COMPLETED returns
+        // (excluding current return being edited, if any).
+        $completedReturns = $sale->salesReturns->where('status', 'Completed');
+        if ($excludeReturnId) {
+            $completedReturns = $completedReturns->where('id', '!=', (int) $excludeReturnId);
+        }
+
+        // Group return items by their sales_item_id to get returned qty per line item
+        $returnedBySalesItem = [];
+        foreach ($completedReturns as $sr) {
+            foreach ($sr->items as $item) {
+                if ($item->sales_item_id) {
+                    if (!isset($returnedBySalesItem[$item->sales_item_id])) {
+                        $returnedBySalesItem[$item->sales_item_id] = 0;
+                    }
+                    $returnedBySalesItem[$item->sales_item_id] += $item->quantity;
+                }
+            }
+        }
+
+        // Now compute available_quantity for each sales item
+        $items = $sale->salesItems->map(function ($item) use ($returnedBySalesItem) {
+            $returnedQty = $returnedBySalesItem[$item->id] ?? 0;
+            $item->available_quantity = max(0, $item->quantity - $returnedQty);
             return $item;
         });
-        
+
         return response()->json($items);
     }
 
@@ -130,6 +151,7 @@ class SalesReturnController extends Controller
 
     public function modalView(SalesReturn $salesReturn)
     {
+        $salesReturn->load('sale');
         $statusClass = SalesReturnHelper::getStatusClass($salesReturn->status);
         $statusText = SalesReturnHelper::getStatusText($salesReturn->status);
 

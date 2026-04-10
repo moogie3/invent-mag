@@ -19,6 +19,13 @@
                         </button>
                     </li>
                     <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="customer-credits-tab" data-bs-toggle="tab"
+                            data-bs-target="#customer-credits" type="button" role="tab"
+                            aria-controls="customer-credits" aria-selected="false">
+                            <i class="ti ti-credit-card me-2"></i>{{ __('messages.customer_credits') }}
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
                         <button class="nav-link" id="historical-sales-tab" data-bs-toggle="tab"
                             data-bs-target="#historical-sales" type="button" role="tab"
                             aria-controls="historical-sales" aria-selected="false">
@@ -223,6 +230,56 @@
                                             {{ __('messages.supplier_srm_interaction_history_no_interactions') }}</p>
                                     </div>
                                 </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="tab-pane fade" id="customer-credits" role="tabpanel"
+                        aria-labelledby="customer-credits-tab">
+                        <div class="p-3">
+                            <div class="alert alert-info mb-3">
+                                <i class="ti ti-info-circle me-2"></i>
+                                {{ __('messages.credit_info') }}
+                            </div>
+                            <div class="card shadow-sm mb-3">
+                                <div class="card-header">
+                                    <h3 class="card-title">
+                                        <i class="ti ti-credit-card me-2 text-success"></i>
+                                        {{ __('messages.available_credits') }}
+                                    </h3>
+                                </div>
+                                <div class="card-body">
+                                    <div class="fs-3 fw-bold text-success mb-3" id="totalAvailableCredits">
+                                        {{ \App\Helpers\CurrencyHelper::format(0) }}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="table-responsive">
+                                <table class="table table-hover card-table" id="customerCreditsTable">
+                                    <thead class="bg-body-secondary">
+                                        <tr>
+                                            <th>{{ __('messages.table_no') }}</th>
+                                            <th>{{ __('messages.credit_amount') }}</th>
+                                            <th>{{ __('messages.credit_used') }}</th>
+                                            <th>{{ __('messages.credit_available') }}</th>
+                                            <th>{{ __('messages.credit_status') }}</th>
+                                            <th>{{ __('messages.expire') }}</th>
+                                            <th>{{ __('messages.credit_reason') }}</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="customerCreditsTableBody">
+                                        <tr>
+                                            <td colspan="7" class="text-center py-4">
+                                                <div class="empty">
+                                                    <div class="empty-img">
+                                                        <i class="ti ti-credit-card-off fs-1 text-muted"></i>
+                                                    </div>
+                                                    <p class="empty-title">{{ __('messages.no_credits_available') }}</p>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
                             </div>
                         </div>
                     </div>

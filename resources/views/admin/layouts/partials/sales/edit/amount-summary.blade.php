@@ -56,10 +56,10 @@
     </div>
     @endif
 
-    @if($sales->customer_credit_used > 0)
+    @if(($sales['customer_credit_used'] ?? 0) > 0)
     <div class="d-flex justify-content-between text-info mb-1">
         <span><i class="ti ti-credit-card me-1"></i>{{ __('messages.credit_used') }}</span>
-        <span>{{ \App\Helpers\CurrencyHelper::format($sales->customer_credit_used) }}</span>
+        <span>{{ \App\Helpers\CurrencyHelper::format($sales['customer_credit_used'] ?? 0) }}</span>
     </div>
     @endif
 
@@ -74,7 +74,7 @@
               data-returned="{{ $totalReturned }}"
               data-original-total="{{ $sales->total }}"
               data-total-paid="{{ $sales->total_paid }}"
-              data-credit-used="{{ $sales->customer_credit_used }}">
+              data-credit-used="{{ $sales['customer_credit_used'] ?? 0 }}">
             {{ \App\Helpers\CurrencyHelper::format($adjustedBalance) }}
         </span>
     </div>

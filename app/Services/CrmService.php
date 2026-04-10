@@ -8,6 +8,7 @@ use App\Models\CustomerInteraction;
 use App\Models\SupplierInteraction;
 use App\Models\Sales;
 use App\Models\Purchase;
+use App\Models\CustomerCredit;
 use App\Helpers\CurrencyHelper;
 use App\Helpers\PurchaseHelper;
 use App\Helpers\SalesHelper;
@@ -63,6 +64,27 @@ class CrmService
 
         $lastInteractionDate = $customer->interactions->max('interaction_date');
 
+        $customerCredits = $customer->credits()
+            ->orderByDesc('created_at')
+            ->limit(20)
+            ->get()
+            ->map(function ($credit) {
+                return [
+                    'id' => $credit->id,
+                    'amount' => $credit->amount,
+                    'used_amount' => $credit->used_amount,
+                    'available_amount' => $credit->available_amount,
+                    'reason' => $credit->reason,
+                    'status' => $credit->status,
+                    'expires_at' => $credit->expires_at?->format('Y-m-d'),
+                    'created_at' => $credit->created_at->format('Y-m-d'),
+                ];
+            });
+
+        $totalAvailableCredits = $customer->credits()
+            ->active()
+            ->sum('available_amount');
+
         $sales = $customer->sales()->with(['salesItems.product', 'salesReturns.items', 'payments'])
                         ->orderByDesc('created_at')
                         ->paginate(10, ['*'], 'page', $page);
@@ -113,6 +135,8 @@ class CrmService
             'mostPurchasedProduct' => $mostPurchasedProduct,
             'totalProductsPurchased' => $totalProductsPurchased,
             'sales' => $sales,
+            'customerCredits' => $customerCredits,
+            'totalAvailableCredits' => $totalAvailableCredits,
             'currencySettings' => CurrencyHelper::getSettings(),
         ];
     }

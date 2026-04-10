@@ -61,9 +61,31 @@
             <form action="{{ route('admin.sales.add-payment', $sales->id) }}" method="POST" id="add-payment-form">
                 @csrf
                 <div class="mb-3">
-                    <label for="amount" class="form-label fw-bold">{{ __('messages.amount') }}</label>
-                    <input type="number" class="form-control" id="amount" name="amount" step="0.01" min="0.01" max="{{ $sales->balance }}" required>
+                    <label class="form-label fw-bold">{{ __('messages.cash_amount') }}</label>
+                    <input type="number" class="form-control" id="amount" name="amount" step="0.01" min="0" value="0">
+                    <small class="text-muted">{{ __('messages.balance') }}: {{ \App\Helpers\CurrencyHelper::format($sales->balance) }}</small>
                 </div>
+                
+                @php
+                    $availableCredit = \App\Helpers\SalesHelper::getCustomerAvailableCredit($sales->customer_id);
+                @endphp
+                
+                @if($availableCredit > 0)
+                <div class="mb-3 p-3 bg-info-lt rounded">
+                    <label class="form-label fw-bold">
+                        <i class="ti ti-credit-card me-1"></i>{{ __('messages.use_credit') }}
+                    </label>
+                    <div class="d-flex align-items-center mb-2">
+                        <span class="text-success fw-bold fs-5">{{ \App\Helpers\CurrencyHelper::format($availableCredit) }}</span>
+                        <span class="text-muted ms-2">{{ __('messages.available_credits') }}</span>
+                    </div>
+                    <input type="number" class="form-control" id="credit_amount" name="credit_amount" 
+                           step="0.01" min="0" max="{{ min($availableCredit, $sales->balance) }}" 
+                           placeholder="0" value="0">
+                    <small class="text-muted">{{ __('messages.credit_will_be_applied_to_balance') }}</small>
+                </div>
+                @endif
+                
                 <div class="mb-3">
                     <label for="payment_date" class="form-label fw-bold">{{ __('messages.payment_date') }}</label>
                     <input type="date" class="form-control" id="payment_date" name="payment_date" value="{{ date('Y-m-d') }}" required>

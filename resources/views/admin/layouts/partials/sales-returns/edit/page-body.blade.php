@@ -6,7 +6,8 @@
                     <div class="card-body">
                         <form id="sales-return-edit-form" action="{{ route('admin.sales-returns.update', $salesReturn) }}" method="POST"
                             data-is-completed-or-canceled="{{ $isCompletedOrCanceled ? 'true' : 'false' }}"
-                            data-status="{{ $salesReturn->status }}">
+                            data-status="{{ $salesReturn->status }}"
+                            data-return-id="{{ $salesReturn->id }}">
                             @csrf
                             @method('PUT')
 

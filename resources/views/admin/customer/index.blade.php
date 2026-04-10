@@ -138,6 +138,9 @@
                                                         data-sort="sort-phonenumber">{{ __('messages.table_payment_terms') }}
                                                 </th>
                                                 <th><button class="table-sort fs-4 py-3"
+                                                        data-sort="sort-credits">{{ __('messages.customer_credits') }}
+                                                </th>
+                                                <th><button class="table-sort fs-4 py-3"
                                                         data-sort="sort-email">{{ __('messages.table_email') }}</th>
                                                 <th style="width:180px;text-align:center" class="fs-4 py-3 no-print">
                                                     {{ __('messages.table_action') }}
@@ -162,6 +165,13 @@
                                                     <td class="sort-address">{{ $customer->address }}</td>
                                                     <td class="sort-phonenumber">{{ $customer->phone_number }}</td>
                                                     <td class="sort-paymentterms">{{ $customer->payment_terms }}</td>
+                                                    <td class="sort-credits">
+                                                        @if(isset($customerCredits[$customer->id]) && $customerCredits[$customer->id] > 0)
+                                                            <span class="badge bg-success text-white">{{ \App\Helpers\CurrencyHelper::format($customerCredits[$customer->id]) }}</span>
+                                                        @else
+                                                            <span class="text-muted">-</span>
+                                                        @endif
+                                                    </td>
                                                     <td class="sort-email">{{ $customer->email }}</td>
                                                     <td class="no-print" style="text-align:center">
                                                         <div class="btn-list flex-nowrap justify-content-center">
@@ -197,7 +207,7 @@
                                                 </tr>
                                             @empty
                                                 <tr>
-                                                    <td colspan="8">
+                                                    <td colspan="9">
                                                         <div class="empty">
                                                             <div class="empty-img">
                                                                 <i class="ti ti-mood-sad"

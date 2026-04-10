@@ -37,27 +37,64 @@ export class SalesReturnEdit {
         const existingItemsJson = this.existingItemsInput.value;
         const existingItems = existingItemsJson ? JSON.parse(existingItemsJson) : [];
 
+        // Pass the current return ID so the API excludes it from "already returned"
+        // counts, giving the correct available qty for editing.
+        const returnId = this.form.dataset.returnId || '';
+
         if (salesId) {
             try {
-                const response = await fetch(`/admin/sales-returns/sale/${salesId}`);
+                const url = returnId
+                    ? `/admin/sales-returns/sale/${salesId}?exclude_return_id=${returnId}`
+                    : `/admin/sales-returns/sale/${salesId}`;
+                const response = await fetch(url);
                 if (!response.ok) {
                     throw new Error('Network response was not ok');
                 }
                 this.allSalesItems = await response.json();
 
-                // Match existing return items to Sales items (best effort due to schema limitation)
-                const tempExisting = [...existingItems];
+                // Build a map of sales_item_id -> existing return item qty
+                // This ensures we correctly match return items to their source sales line items
+                const existingBySalesItemId = {};
+                existingItems.forEach(exItem => {
+                    const siId = exItem.sales_item_id || exItem.product_id + '_' + exItem.price;
+                    if (!existingBySalesItemId[siId]) {
+                        existingBySalesItemId[siId] = {
+                            sales_item_id: exItem.sales_item_id,
+                            product_id: exItem.product_id,
+                            returned_quantity: 0,
+                            price: exItem.price,
+                        };
+                    }
+                    existingBySalesItemId[siId].returned_quantity += exItem.quantity;
+                });
+
+                // Now map each sales item to its existing return qty
                 this.allSalesItems.forEach(salesItem => {
-                    const matchIndex = tempExisting.findIndex(exItem => exItem.product_id === salesItem.product_id);
-                    if (matchIndex > -1) {
-                        const matchedItem = tempExisting[matchIndex];
-                        this.returnedItems[salesItem.id] = { // Key by sales_item_id
+                    const siId = salesItem.id;
+                    
+                    // Try to find by exact sales_item_id first
+                    let matchedItem = null;
+                    for (const key in existingBySalesItemId) {
+                        if (existingBySalesItemId[key].sales_item_id == siId) {
+                            matchedItem = existingBySalesItemId[key];
+                            break;
+                        }
+                    }
+
+                    if (matchedItem) {
+                        const maxReturn = salesItem.available_quantity !== undefined 
+                            ? salesItem.available_quantity 
+                            : salesItem.quantity;
+                        
+                        // Use the matched item's qty, capped at available
+                        const allocatedQty = Math.min(matchedItem.returned_quantity, maxReturn + matchedItem.returned_quantity);
+                        
+                        this.returnedItems[salesItem.id] = {
+                            sales_item_id: salesItem.id,
                             product_id: salesItem.product_id,
-                            returned_quantity: matchedItem.quantity,
+                            returned_quantity: allocatedQty,
                             price: matchedItem.price,
                         };
-                        // Remove the matched item so it's not used again for another sales line
-                        tempExisting.splice(matchIndex, 1);
                     }
                 });
 
@@ -108,6 +145,7 @@ export class SalesReturnEdit {
                         <input type="number"
                             class="form-control quantity-input"
                             data-item-id="${item.id}"
+                            data-sales-item-id="${item.id}"
                             data-product-id="${item.product.id}"
                             data-price="${netPrice}"
                             min="0"
@@ -141,6 +179,7 @@ export class SalesReturnEdit {
         if (!input.classList.contains('quantity-input')) return;
 
         const itemId = input.dataset.itemId;
+        const salesItemId = input.dataset.salesItemId;
         const productId = input.dataset.productId;
         const price = parseFloat(input.dataset.price);
         let quantity = parseInt(input.value, 10) || 0;
@@ -162,6 +201,7 @@ export class SalesReturnEdit {
 
         if (quantity > 0) {
             this.returnedItems[itemId] = {
+                sales_item_id: salesItemId,
                 product_id: productId,
                 returned_quantity: quantity,
                 price: price,

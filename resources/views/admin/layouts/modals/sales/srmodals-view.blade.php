@@ -57,7 +57,7 @@
                     <div class="d-flex justify-content-between mb-2">
                         <div><strong>{{ __('messages.sr_original_sale') }}</strong></div>
                         <div>
-                            @if ($salesReturn->sales)
+                            @if ($salesReturn->sale)
                                 <a href="{{ route('admin.sales.view', $salesReturn->sales_id) }}">#{{ $salesReturn->sale->invoice }}</a>
                             @else
                                 {{ __('messages.not_available') }}

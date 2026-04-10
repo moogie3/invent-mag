@@ -68,5 +68,14 @@ class CustomerSeeder extends Seeder
                 'payment_terms' => '45',
             ]
         );
+        Customer::updateOrCreate(
+            ['email' => 'majujaya@example.com', 'tenant_id' => $tenantId],
+            [
+                'name' => 'Toko Maju Jaya',
+                'address' => 'Jl. Sudirman No. 123, Jakarta',
+                'phone_number' => '081234567890',
+                'payment_terms' => '30',
+            ]
+        );
     }
 }

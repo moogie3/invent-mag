@@ -21,14 +21,21 @@
         @php
             $totalReturned = $sale->getTotalReturnedAmount();
             $adjustedTotal = $sale->getAdjustedTotal();
+            $creditUsed = (float) ($sale['customer_credit_used'] ?? 0);
+            $amountAfterCredit = max(0, $adjustedTotal - $creditUsed);
         @endphp
-        {{ \App\Helpers\CurrencyHelper::format($adjustedTotal) }}
+        {{ \App\Helpers\CurrencyHelper::format($amountAfterCredit) }}
+        @if($creditUsed > 0)
+            <span class="badge bg-info-lt ms-1" title="{{ __('messages.credit_used') }}: {{ \App\Helpers\CurrencyHelper::format($creditUsed) }}">
+                <i class="ti ti-credit-card"></i>
+            </span>
+        @endif
         @if($totalReturned > 0)
             <span class="badge bg-warning-lt ms-1" title="{{ __('messages.returned') }}: {{ \App\Helpers\CurrencyHelper::format($totalReturned) }}">
                 <i class="ti ti-package-export"></i>
             </span>
         @endif
-        <span class="raw-amount" style="display: none;">{{ $adjustedTotal }}</span>
+        <span class="raw-amount" style="display: none;">{{ $amountAfterCredit }}</span>
     </td>
     <td class="sort-payment no-print">{{ $sale->payment_type }}</td>
     <td class="sort-status">

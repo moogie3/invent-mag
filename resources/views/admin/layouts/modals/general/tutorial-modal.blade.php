@@ -136,18 +136,47 @@
             __('<b>Track Returns:</b> The quantity field shows the FINAL quantity (original quantity minus returned items). A "Returned" badge shows how many items were returned per product (e.g., "-3 Returned"). The amounts shown are already ADJUSTED to reflect the final quantity after returns. At the bottom, the "Returned (Adjusted)" row shows only the returned amount, not the original total. To create a new return, go to the Sales Order Returns menu.'),
             __('<b>Save:</b> Click "Save Changes" to update the sales order. Note: You cannot change customer if payments have already been recorded.')
         ];
+    } elseif ($routeName === 'admin.po.edit') {
+        $contextTitle = __('Edit Purchase Order');
+        $contextIcon = 'ti-edit';
+        $contextDesc = __('View and edit purchase order details, adjust items, record payments, and manage returns.');
+        $contextSteps = [
+            __('<b>Purchase Information:</b> The invoice number, order date, and due date are read-only. You can change the warehouse and payment type (if not yet paid).'),
+            __('<b>Supplier Info:</b> View supplier details and payment terms.'),
+            __('<b>Fully Paid Warning:</b> If the invoice is already fully paid, you will see a warning modal immediately when you open the page. Most fields become read-only and cannot be edited.'),
+            __('<b>Edit Items:</b> You can adjust quantities and prices for each item. Use the discount column for per-item discounts (percentage or fixed amount).'),
+            __('<b>Invoice Discount:</b> Apply a global discount to the entire order at the bottom in addition to per-item discounts.'),
+            __('<b>Record Payment:</b> If the order is not fully paid, click "Add Payment" to record supplier payments. You can record partial or full payments.'),
+            __('<b>Payment Info:</b> Total Paid shows the amount that has already been paid. Balance shows the remaining amount to be paid.'),
+            __('<b>Track Returns:</b> The quantity field shows the FINAL quantity (original quantity minus returned items). A returned icon shows when items have been returned. The amounts shown are already ADJUSTED to reflect the final quantity after returns. At the bottom, the "Returned" row shows only the returned amount, not the original total. To create a new return, go to the Purchase Order Returns menu.'),
+            __('<b>Save:</b> Click "Save Changes" to update the purchase order.')
+        ];
     } elseif ($routeName === 'admin.sales.view') {
         $contextTitle = __('messages.view_sales_order');
         $contextIcon = 'ti-eye';
         $contextDesc = __('messages.view_sales_order_desc');
         $contextSteps = [
-            __('<b>Order Information:</b> View the invoice number, customer, order date, and due date. The status badge shows the current payment status (Unpaid, Partial, Paid, Returned).'),
+            __('<b>Order Information:</b> View the invoice number, customer, order date, and due date. Sales order status shows Paid (fully paid), Partially Paid (partial payment made), Unpaid (awaiting payment, shows as Pending, Due Today, Due in X Days, or Overdue based on due date), or Returned (items returned). Status is updated based on payment records and due date.'),
             __('<b>Customer Credit Applied:</b> If this invoice used customer credits from previous returns, it will be shown in the header.'),
             __('<b>Items Table:</b> Shows all products sold in this order. The quantity shown is the FINAL quantity (original quantity minus any returned items).'),
             __('<b>Returned Items:</b> If items have been returned, a "Returned" badge shows how many items were returned per product (e.g., "-3 Returned").'),
             __('<b>Amount Display:</b> The amounts shown are already ADJUSTED - they reflect the final quantity after returns. The original total is not shown here.'),
             __('<b>Returned (Adjusted):</b> At the bottom in the amount summary, the "Returned" row shows only the returned amount, not the original total. The adjusted subtotal shows the final total after deducting returns.'),
             __('<b>To Create Return:</b> To process a new return for this invoice, go to the Sales Order Returns menu and create a new return for this invoice.'),
+            __('<b>Actions:</b> Use the "Print Invoice" button to print or download PDF. Click "Edit Invoice" to modify the order.')
+        ];
+    } elseif ($routeName === 'admin.po.view') {
+        $contextTitle = __('View Purchase Order');
+        $contextIcon = 'ti-eye';
+        $contextDesc = __('View detailed purchase order information including items, payment status, and history.');
+        $contextSteps = [
+            __('<b>Order Information:</b> View the invoice number, supplier, order date, and due date. Purchase order status shows Paid (fully paid), Partially Paid (partial payment made), Pending (awaiting payment, shows as Due Today, Due in X Days, or Overdue based on due date), or Returned (items returned to supplier). Status is updated based on payment records and due date.'),
+            __('<b>Supplier Info:</b> View supplier details including name, address, and contact information.'),
+            __('<b>Items Table:</b> Shows all products purchased in this order. The quantity shown is the FINAL quantity (original quantity minus any returned items).'),
+            __('<b>Returned Items:</b> If items have been returned, a returned icon appears in the items list. The quantity reflects the adjusted amount after returns.'),
+            __('<b>Amount Display:</b> The amounts shown are already ADJUSTED - they reflect the final quantity after returns. The original total is not shown here.'),
+            __('<b>Returned (Adjusted):</b> At the bottom in the amount summary, the "Returned" row shows only the returned amount, not the original total. The adjusted subtotal shows the final total after deducting returns.'),
+            __('<b>To Create Return:</b> To process a new return for this purchase order, go to the Purchase Order Returns menu and create a new return for this invoice.'),
             __('<b>Actions:</b> Use the "Print Invoice" button to print or download PDF. Click "Edit Invoice" to modify the order.')
         ];
     } elseif ($routeName === 'admin.sales-returns.index') {
@@ -175,7 +204,7 @@
             __('<b>Reason:</b> Optionally add a reason for the return for tracking and audit purposes.'),
             __('<b>Select Items:</b> After selecting an invoice, choose which items to return. Each product shows the quantity originally sold.'),
             __('<b>Return Quantity:</b> Enter the quantity to return for each item. You cannot return more than what was originally sold.'),
-            __('<b>IMPORTANT - Credit Note Condition:</b> A customer credit note is ONLY created when BOTH conditions are met: (1) Return status is "Completed" AND (2) Original invoice status is "Paid". If the invoice is Unpaid or Partial, no credit is created.'),
+            __('<b>IMPORTANT - Credit Note Condition:</b> A customer credit note is ONLY created when BOTH conditions are met: (1) Return status is "Completed" AND (2) Original invoice status is "Paid". If the invoice is Unpaid or Partially Paid, no credit is created.'),
             __('<b>Status:</b> The return is created as "Pending" by default. Once reviewed and processed, change it to "Completed" to apply inventory, accounting changes, and create credit note (if applicable).'),
             __('<b>Save:</b> Click "Create Sales Return" to save. You can edit the return later while it is still in Pending status.')
         ];
@@ -190,7 +219,7 @@
             __('<b>Edit Items:</b> You can modify the quantities of items to return. Available quantity shows how much can still be returned.'),
             __('<b>Return Quantity:</b> Adjust the quantity for each item. You cannot return more than the available quantity.'),
             __('<b>Status:</b> Change the status to "Completed" to process the return, or "Canceled" to reject it. Once Completed or Canceled, edits are no longer allowed.'),
-            __('<b>IMPORTANT - Credit Note Condition:</b> A customer credit note is ONLY created when BOTH conditions are met: (1) Return status is "Completed" AND (2) Original invoice status is "Paid". If the invoice is Unpaid or Partial, no credit is created.'),
+            __('<b>IMPORTANT - Credit Note Condition:</b> A customer credit note is ONLY created when BOTH conditions are met: (1) Return status is "Completed" AND (2) Original invoice status is "Paid". If the invoice is Unpaid or Partially Paid, no credit is created.'),
             __('<b>Save:</b> Click "Update Sales Return" to save your changes.')
         ];
     } elseif ($routeName === 'admin.sales-returns.show') {
@@ -211,7 +240,7 @@
         $contextSteps = [
             __('<b>Create Sales Order:</b> Click "Create Sales Order" to start a new sale. Select a customer, add products from inventory, specify quantities, and the system calculates totals automatically.'),
             __('<b>View Details:</b> Click the View button to open a detailed modal showing the full sales order including customer info, items, totals, payment status, and payment history.'),
-            __('<b>Payment Status:</b> Sales orders show status as Paid, Partial (partial payment), Unpaid (Pending, Due Today, Due in X Days, Overdue). The status updates based on payment records and due date.'),
+            __('<b>Payment Status:</b> Sales order status shows Paid (fully paid), Partially Paid (partial payment made), Unpaid (awaiting payment, shows as Pending, Due Today, Due in X Days, or Overdue based on due date), or Returned (items returned). Status is updated based on payment records and due date.'),
             __('<b>Returned Indicator:</b> If an invoice has any returned items, a returned icon appears in the Amount column. The amount shown is already adjusted (original total minus returns).'),
             __('<b>Sales Returns:</b> For returned items, create a sales return order which automatically adjusts inventory and issues customer credits. Returns are linked to the original sales order for tracking. You can access the Sales Order Return menu to manage returns.'),
             __('<b>Accounting:</b> When a sales order is created, journal entries are automatically generated: Accounts Receivable (debit), Sales Revenue (credit), COGS (debit), and Inventory (credit).'),
@@ -258,6 +287,20 @@
             __('<b>Payment Methods:</b> Choose from Cash, Card, Transfer, or E-Wallet. For cash payments, enter the amount received and the system calculates change automatically.'),
             __('<b>Complete Sale:</b> Use the exact amount button to auto-fill the received amount with the grand total. The complete transaction button processes the sale and generates a receipt.')
         ];
+    } elseif ($routeName === 'admin.po.create') {
+        $contextTitle = __('Create Purchase Order');
+        $contextIcon = 'ti-plus';
+        $contextDesc = __('Create a new purchase order to record stock purchases from suppliers.');
+        $contextSteps = [
+            __('<b>Purchase Information:</b> Enter invoice number (optional, auto-generated if empty), select a supplier and warehouse, set the order date. The due date auto-fills based on the supplier payment terms.'),
+            __('<b>Product Selection:</b> Search and select products from the dropdown. The product icon shows the current available stock in the selected warehouse. Click "Add Product" to add multiple products.'),
+            __('<b>Supplier Price & New Price:</b> When you select a product, the Supplier Price (past price from this supplier) auto-fills. You can adjust the New Price if needed.'),
+            __('<b>Autofill Info:</b> Past price & due date are based on supplier. The Supplier Price field shows the last price from this supplier.'),
+            __('<b>Quantity:</b> Enter quantity for each product. The system calculates line totals automatically. Quantity cannot exceed available stock.'),
+            __('<b>Invoice Discount:</b> Apply a global discount to the entire order (percentage or fixed amount) at the bottom.'),
+            __('<b>Order Summary:</b> View subtotal, discount, and grand total.'),
+            __('<b>Submit:</b> Click "Create Purchase Order" to save. The order will be created as "Unpaid/Pending" and you can record payments later on the Purchase Order Edit page.')
+        ];
     } elseif (Str::startsWith($routeName, 'admin.po')) {
         $contextTitle = __('Purchase Orders (PO)');
         $contextIcon = 'ti-truck-delivery';
@@ -265,7 +308,11 @@
         $contextSteps = [
             __('<b>Create Purchase Order:</b> Initiate a purchase order by selecting a supplier, adding products, specifying quantities with pricing, and reviewing the total cost.'),
             __('<b>View Details:</b> Click the View button to open a detailed modal showing the full PO including supplier info, order details, items with prices, totals, and payment status.'),
-            __('<b>Bulk Actions:</b> Select multiple POs using checkboxes to perform Bulk Delete (removes all selected) or Bulk Mark as Paid (updates payment status for all). Note: Deleting unpaid POs restores stock, while paid POs do not.'),
+            __('<b>Payment Status:</b> Purchase order status shows Paid (fully paid), Partially Paid (partial payment made), Pending (awaiting payment, shows as Due Today, Due in X Days, or Overdue based on due date), or Returned (items returned to supplier). Status is updated based on payment records and due date.'),
+            __('<b>Returned Indicator:</b> If a PO has any returned items, a returned icon appears in the Amount column. The amount shown is already adjusted (original total minus returns).'),
+            __('<b>Purchase Returns:</b> For returned items, create a purchase return order which automatically adjusts inventory. Returns are linked to the original purchase order for tracking. You can access the Purchase Order Return menu to manage returns.'),
+            __('<b>Accounting:</b> When a purchase order is created, journal entries are automatically generated: Accounts Payable (credit), Purchases (debit), COGS (credit), and Inventory (debit).'),
+            __('<b>Bulk Actions:</b> Select multiple POs using checkboxes to perform Bulk Delete, Bulk Mark as Paid, or Bulk Export (PDF/CSV). Note: Deleting unpaid POs restores stock, while paid POs do not.'),
             __('<b>Supplier Association:</b> Each purchase order is linked to a specific supplier, enabling tracking of purchasing history and maintenance of supplier relationships.'),
             __('<b>Goods Receipt:</b> When orders arrive, goods are received into the selected warehouse, automatically updating stock levels.'),
             __('<b>Export:</b> Use the export dropdown to download PO data as CSV or PDF for external use or reporting.')
@@ -344,6 +391,88 @@
             __('<b>Default Accounts:</b> Link key accounts for Sales Revenue, Cost of Goods Sold (COGS), and other essential transaction types.'),
             __('<b>Cash & Receivables:</b> Configure primary Cash account and Accounts Receivable ledger to track customer payments.'),
             __('<b>Reset Option:</b> The danger zone allows resetting the Chart of Accounts to system defaults. Note: This removes all custom account mappings.')
+        ];
+    } elseif ($routeName === 'admin.accounting.ledger') {
+        $contextTitle = __('General Ledger');
+        $contextIcon = 'ti-book';
+        $contextDesc = __('View detailed transaction history for each account, track debits and credits, and monitor account balances.');
+        $contextSteps = [
+            __('<b>Account Selection:</b> Select an account from the dropdown to view its transaction history. The dropdown shows all available accounts with their codes.'),
+            __('<b>Date Range:</b> Set the start date and end date to filter transactions within a specific period.'),
+            __('<b>Filter:</b> Click the filter button to load transactions for the selected account and date range.'),
+            __('<b>Opening Balance:</b> The first row shows the opening balance at the start of the selected period.'),
+            __('<b>Transactions:</b> Each transaction shows the date, description, debit amount, credit amount, and running balance.'),
+            __('<b>View Source:</b> For transactions linked to source documents (sales, purchases, payments), a "View Source" link appears. Click to open the related document.'),
+            __('<b>Closing Balance:</b> The last row shows the closing balance at the end of the selected period.'),
+            __('<b>Export:</b> Use the export dropdown to download the ledger as PDF or CSV for external reporting.')
+        ];
+    } elseif ($routeName === 'admin.accounting.journal') {
+        $contextTitle = __('General Journal');
+        $contextIcon = 'ti-notebook';
+        $contextDesc = __('View all journal entries, both system-generated and manual, for comprehensive accounting records.');
+        $contextSteps = [
+            __('<b>Date Filter:</b> Set the start date and end date to filter journal entries within a specific period.'),
+            __('<b>Filter:</b> Click the filter button to load journal entries for the selected date range.'),
+            __('<b>Entry List:</b> View all journal entries in the table. Each entry shows the date, description, accounts, debit and credit amounts.'),
+            __('<b>View Source:</b> For system-generated entries (from sales, purchases, etc.), a "View Source" link appears. Click to open the related document.'),
+            __('<b>Manual Entries:</b> To create new manual journal entries, use the Journal Entries menu (separate from General Journal).'),
+            __('<b>Export:</b> Use the export dropdown to download journal entries as PDF or CSV for external reporting.')
+        ];
+    } elseif ($routeName === 'admin.accounting.journal-entries.index') {
+        $contextTitle = __('Manual Journal Entries');
+        $contextIcon = 'ti-notebook';
+        $contextDesc = __('Create and manage manual journal entries for adjusting entries, accruals, and other accounting adjustments.');
+        $contextSteps = [
+            __('<b>Entry List:</b> View all manual journal entries in the table. Each entry shows the date, description, debit, credit, and status.'),
+            __('<b>Status:</b> Entries can be Draft (not yet posted), Posted (confirmed and recorded), or Voided (canceled).'),
+            __('<b>Reversed Entries:</b> A reversed entry icon appears if an entry has been reversed.'),
+            __('<b>Create Entry:</b> Click the "Create Journal Entry" button to create a new manual entry.'),
+            __('<b>View:</b> Click the eye icon to view full entry details including all debit and credit line items.'),
+            __('<b>Edit:</b> Only draft entries can be edited. Click the edit icon to modify.'),
+            __('<b>Delete:</b> Only draft entries can be deleted. Click the trash icon to remove.'),
+            __('<b>Reverse:</b> Only posted entries can be reversed. Click the reverse icon to create a reversing entry.')
+        ];
+    } elseif ($routeName === 'admin.accounting.journal-entries.create') {
+        $contextTitle = __('Create Journal Entry');
+        $contextIcon = 'ti-journal-plus';
+        $contextDesc = __('Create a new manual journal entry with debit and credit transactions.');
+        $contextSteps = [
+            __('<b>Date:</b> Set the transaction date for the journal entry.'),
+            __('<b>Description:</b> Enter a description for the journal entry.'),
+            __('<b>Notes:</b> Optionally add notes for additional context.'),
+            __('<b>Add Transaction:</b> Click "Add Row" to add more transaction lines. Each line requires an account, debit amount, or credit amount.'),
+            __('<b>Account Selection:</b> Select an account from the dropdown. Use the search to find accounts by name or code.'),
+            __('<b>Debit & Credit:</b> Enter either a debit or credit amount for each line. Amounts must be balanced (total debits must equal total credits).'),
+            __('<b>Balance Check:</b> The summary section shows total debits, total credits, and the difference. The entry can only be saved when debits equal credits.'),
+            __('<b>Save:</b> Click "Create Journal Entry" to save as draft. You can post the entry later from the entry list.')
+        ];
+    } elseif ($routeName === 'admin.accounting.journal-entries.edit') {
+        $contextTitle = __('Edit Journal Entry');
+        $contextIcon = 'ti-edit';
+        $contextDesc = __('Edit an existing draft journal entry, modify transactions, and save changes.');
+        $contextSteps = [
+            __('<b>Date:</b> Modify the transaction date for the journal entry if needed.'),
+            __('<b>Description:</b> Update the description for the journal entry.'),
+            __('<b>Notes:</b> Add or modify notes for additional context.'),
+            __('<b>Edit Transactions:</b> Modify existing transaction lines. You can change account, debit, or credit amounts.'),
+            __('<b>Add/Remove Rows:</b> Use "Add Row" to add new transactions or remove existing ones.'),
+            __('<b>Balance Check:</b> Ensure total debits equal total credits before saving.'),
+            __('<b>Save:</b> Click "Update Journal Entry" to save changes. The entry remains in Draft status.')
+        ];
+    } elseif ($routeName === 'admin.accounting.journal-entries.show') {
+        $contextTitle = __('Journal Entry Details');
+        $contextIcon = 'ti-eye';
+        $contextDesc = __('View full details of a journal entry, including all transactions and audit history.');
+        $contextSteps = [
+            __('<b>Entry Overview:</b> View the date, description, and status of the journal entry.'),
+            __('<b>Transaction Lines:</b> See all debit and credit line items with their account names and amounts.'),
+            __('<b>Balance:</b> Total debits and credits are shown at the bottom.'),
+            __('<b>Audit Log:</b> View the history of changes made to this entry, including who made changes and when.'),
+            __('<b>Related Entries:</b> If this entry was reversed, see links to the reversed and reversing entries.'),
+            __('<b>Actions:</b> Draft entries can be edited or posted. Posted entries can be reversed or voided.'),
+            __('<b>Post:</b> Click "Post Entry" to confirm the entry and record it in the general ledger.'),
+            __('<b>Reverse:</b> Create a reversing entry to undo a posted entry.'),
+            __('<b>Void:</b> Cancel a posted entry completely.')
         ];
     } elseif (Str::startsWith($routeName, 'admin.audit-log')) {
         $contextTitle = __('Audit Logs');

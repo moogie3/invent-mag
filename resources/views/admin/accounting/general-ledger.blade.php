@@ -10,11 +10,11 @@
                     <div class="page-pretitle">
                         {{ __('messages.accounting') }}
                     </div>
-                    <h2 class="page-title">
-                        <span class="nav-link-icon d-md-none d-lg-inline-block">
-                            <i class="ti ti-book"></i>
-                        </span>
-                        {{ __('messages.general_ledger') }}
+                    <h2 class="page-title d-flex align-items-center">
+                        <i class="ti ti-book me-2"></i>{{ __('messages.general_ledger') }}
+                        <a href="#" class="ms-3 text-muted trigger-tutorial-modal" data-bs-toggle="tooltip" title="{{ __('Tutorial') }}">
+                            <i class="ti ti-help-circle fs-3"></i>
+                        </a>
                     </h2>
                     <div class="text-muted mt-1">
                         {{ __('messages.general_ledger_summary') }}

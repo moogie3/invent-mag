@@ -114,8 +114,8 @@ class PurchaseService
 
     public function getPurchaseCreateData()
     {
-        $suppliers = Supplier::select('id', 'name', 'email', 'phone', 'location')->get();
-        $products = Product::select('id', 'name', 'code', 'price', 'quantity')->get()->each->setAppends([]);
+        $suppliers = Supplier::select('id', 'name', 'email', 'phone_number', 'location')->get();
+        $products = Product::select('id', 'name', 'code', 'price')->get()->each->setAppends(['main_warehouse_stock']);
         $warehouses = Warehouse::all();
         $pos = []; // Don't load all purchases
 

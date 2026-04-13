@@ -2,13 +2,12 @@
     <div class="{{ $containerClass ?? "container-xl" }}">
         <div class="row align-items-center">
             <div class="col">
-                <div class="page-pretitle d-flex align-items-center">
-                    {{ __('messages.overview') }}
-                    <a href="#" class="ms-2 text-muted trigger-tutorial-modal" data-bs-toggle="tooltip" title="{{ __('Tutorial') }}">
+                <div class="page-pretitle">{{ __('messages.overview') }}</div>
+                <h2 class="page-title d-flex align-items-center"><i class="ti ti-shopping-cart me-2"></i> {{ __('messages.purchase_order') }}
+                    <a href="#" class="ms-3 text-muted trigger-tutorial-modal" data-bs-toggle="tooltip" title="{{ __('Tutorial') }}">
                         <i class="ti ti-help-circle fs-3"></i>
                     </a>
-                </div>
-                <h2 class="page-title"><i class="ti ti-shopping-cart me-2"></i> {{ __('messages.purchase_order') }}</h2>
+                </h2>
             </div>
             <div class="col-auto ms-auto">
                 <div class="dropdown d-inline-block me-2">

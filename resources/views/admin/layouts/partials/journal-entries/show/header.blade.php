@@ -3,8 +3,11 @@
         <div class="row g-2 align-items-center">
             <div class="col">
                 <div class="page-pretitle">{{ __('messages.accounting') }}</div>
-                <h2 class="page-title">
-                    <i class="ti ti-journal me-2"></i>{{ __('messages.journal_entry_details') }}
+                <h2 class="page-title d-flex align-items-center">
+                    <i class="ti ti-eye me-2"></i>{{ __('messages.journal_entry_details') }}
+                    <a href="#" class="ms-3 text-muted trigger-tutorial-modal" data-bs-toggle="tooltip" title="{{ __('Tutorial') }}">
+                        <i class="ti ti-help-circle fs-3"></i>
+                    </a>
                 </h2>
             </div>
             <div class="col-auto ms-auto d-print-none">

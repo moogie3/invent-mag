@@ -19,15 +19,13 @@
                                 @if($log->user && $log->user->roles->isNotEmpty())
                                     @foreach($log->user->roles as $role)
                                         @if($role->name === 'superuser')
-                                            <span class="badge bg-purple-lt">{{ $role->name }}</span>
+                                            <span class="badge bg-purple text-white">{{ $role->name }}</span>
                                         @elseif($role->name === 'staff')
-                                            <span class="badge bg-blue-lt">{{ $role->name }}</span>
+                                            <span class="badge bg-blue text-white">{{ $role->name }}</span>
                                         @else
-                                            <span class="badge bg-green-lt">{{ $role->name }}</span>
+                                            <span class="badge bg-green text-white">{{ $role->name }}</span>
                                         @endif
                                     @endforeach
-                                @else
-                                    <span class="badge bg-secondary">{{ __('messages.no_role') }}</span>
                                 @endif
                             </div>
                         </div>

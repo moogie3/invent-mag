@@ -4,21 +4,21 @@
 
 @section('content')
     <div class="{{ $containerClass ?? "container-xl" }}">
-        <div class="page-header d-print-none mt-4">
-            <div class="row g-2 align-items-center">
-                <div class="col">
-                    <div class="page-pretitle">
-                        {{ __('messages.accounting') }}
-                    </div>
-                    <h2 class="page-title">
-                        <span class="nav-link-icon d-md-none d-lg-inline-block">
-                            <i class="ti ti-plus"></i>
-                        </span>
-                        {{ __('messages.add_account') }}
-                    </h2>
-                </div>
+<div class="page-header d-print-none mt-4">
+    <div class="row g-2 align-items-center">
+        <div class="col">
+            <div class="page-pretitle">
+                {{ __('messages.accounting') }}
             </div>
+            <h2 class="page-title d-flex align-items-center">
+                <i class="ti ti-plus me-2"></i>{{ __('messages.add_account') }}
+                <a href="#" class="ms-3 text-muted trigger-tutorial-modal" data-bs-toggle="tooltip" title="{{ __('Tutorial') }}">
+                    <i class="ti ti-help-circle fs-3"></i>
+                </a>
+            </h2>
         </div>
+    </div>
+</div>
 
         <div class="page-body mt-4">
             <div class="card">

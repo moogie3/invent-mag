@@ -434,7 +434,7 @@
         ];
     } elseif ($routeName === 'admin.accounting.journal-entries.create') {
         $contextTitle = __('Create Journal Entry');
-        $contextIcon = 'ti-journal-plus';
+        $contextIcon = 'ti-plus';
         $contextDesc = __('Create a new manual journal entry with debit and credit transactions.');
         $contextSteps = [
             __('<b>Date:</b> Set the transaction date for the journal entry.'),
@@ -473,6 +473,152 @@
             __('<b>Post:</b> Click "Post Entry" to confirm the entry and record it in the general ledger.'),
             __('<b>Reverse:</b> Create a reversing entry to undo a posted entry.'),
             __('<b>Void:</b> Cancel a posted entry completely.')
+        ];
+    } elseif ($routeName === 'admin.accounting.chart') {
+        $contextTitle = __('Chart of Accounts');
+        $contextIcon = 'ti-list-details';
+        $contextDesc = __('View all accounts in the chart of accounts, organized by account type for financial tracking.');
+        $contextSteps = [
+            __('<b>Account List:</b> View all accounts organized by type (Asset, Liability, Equity, Revenue, Cost of Sales, Expense).'),
+            __('<b>Account Code:</b> Each account has a unique code for identification.'),
+            __('<b>Account Name:</b> The official name of the account used in transactions.'),
+            __('<b>Account Type:</b> Categories include Asset, Liability, Equity, Revenue, Cost of Sales, and Expense.'),
+            __('<b>Description:</b> A brief explanation of what the account is used for.'),
+            __('<b>System Accounts:</b> These are system-defined accounts used by the application for automatic journal entries.'),
+            __('<b>Account Setup:</b> To modify default accounts for sales, purchases, and payments, go to Accounting Setup in System Settings.')
+        ];
+    } elseif ($routeName === 'admin.accounting.accounts.index') {
+        $contextTitle = __('Chart of Accounts');
+        $contextIcon = 'ti-building-bank';
+        $contextDesc = __('View and manage all accounts in the chart of accounts for financial tracking.');
+        $contextSteps = [
+            __('<b>Account List:</b> View all accounts in a hierarchical tree structure. Sub-accounts are indented under their parent accounts.'),
+            __('<b>Search:</b> Use the search box to find accounts by name or code.'),
+            __('<b>Account Details:</b> Each account shows name, code, type, and active status.'),
+            __('<b>Active Status:</b> Green badge shows active accounts, red badge shows inactive accounts.'),
+            __('<b>Actions:</b> Use the edit icon to modify or trash icon to delete an account.'),
+            __('<b>Add Account:</b> Click "Add Account" to create a new account in the chart.'),
+            __('<b>Export:</b> Use the export dropdown to download accounts as PDF or CSV.')
+        ];
+    } elseif ($routeName === 'admin.accounting.accounts.create') {
+        $contextTitle = __('Add Account');
+        $contextIcon = 'ti-plus';
+        $contextDesc = __('Create a new account in the chart of accounts.');
+        $contextSteps = [
+            __('<b>Name:</b> Enter the official name of the account.'),
+            __('<b>Code:</b> Enter a unique code for the account. Use a numbering system that matches your accounting standards.'),
+            __('<b>Type:</b> Select the account type: Asset, Liability, Equity, Revenue, Cost of Sales, or Expense.'),
+            __('<b>Parent Account:</b> Optionally select a parent account to create a sub-account under an existing account. Leave empty for a main account.'),
+            __('<b>Description:</b> Optionally add a description explaining the account purpose.'),
+            __('<b>Active:</b> The account is active by default. Uncheck to disable the account.'),
+            __('<b>Save:</b> Click "Add Account" to save the new account to the chart.')
+        ];
+    } elseif ($routeName === 'admin.accounting.accounts.edit') {
+        $contextTitle = __('Edit Account');
+        $contextIcon = 'ti-edit';
+        $contextDesc = __('Modify an existing account in the chart of accounts.');
+        $contextSteps = [
+            __('<b>Name:</b> Modify the account name if needed.'),
+            __('<b>Code:</b> The account code cannot be changed after creation.'),
+            __('<b>Type:</b> Select the account type: Asset, Liability, Equity, Revenue, Cost of Sales, or Expense.'),
+            __('<b>Parent Account:</b> Optionally change the parent account to create a sub-account under a different account.'),
+            __('<b>Description:</b> Update the description if needed.'),
+            __('<b>Active:</b> Toggle to enable or disable the account.'),
+            __('<b>Save:</b> Click "Update Account" to save changes.')
+        ];
+    } elseif ($routeName === 'admin.accounting.trial_balance') {
+        $contextTitle = __('Trial Balance');
+        $contextIcon = 'ti-scale';
+        $contextDesc = __('View the trial balance report to verify that debits equal credits across all accounts.');
+        $contextSteps = [
+            __('<b>Date Filter:</b> Set the "As of Date" to determine which transactions to include in the report.'),
+            __('<b>Filter:</b> Click the filter button to load the trial balance for the selected date.'),
+            __('<b>Account List:</b> View all accounts with their balances. Each account shows code, name, debit balance, and credit balance.'),
+            __('<b>Balance Display:</b> Active accounts with transactions show their balances. Empty accounts are not displayed.'),
+            __('<b>Debit & Credit:</b> Asset and Expense accounts normally have debit balances. Liability, Equity, and Revenue accounts normally have credit balances.'),
+            __('<b>Totals:</b> The last row shows the total debits and total credits. For the trial balance to be correct, these should be equal.'),
+            __('<b>Export:</b> Use the export dropdown to print or download as PDF or CSV.')
+        ];
+    } elseif ($routeName === 'admin.accounting.opening-balance.index') {
+        $contextTitle = __('Opening Balance Setup');
+        $contextIcon = 'ti-scale';
+        $contextDesc = __('Set initial account balances for starting to use the accounting system.');
+        $contextSteps = [
+            __('<b>Balance Date:</b> Set the date for the opening balances. This is typically the first day of your fiscal year or when you started using the system.'),
+            __('<b>Notes:</b> Optionally add notes to describe the opening balance setup.'),
+            __('<b>Account List:</b> All accounts are shown grouped by type (Asset, Liability, Equity, Revenue, Expense).'),
+            __('<b>Set Balances:</b> For each account, select the balance type (Debit/Credit) and enter the amount. Leave as 0 if no balance.'),
+            __('<b>Balance Field:</b> The balance field automatically calculates based on the selected type and debit/credit amounts.'),
+            __('<b>Balance Check:</b> Total Debits must equal Total Credits for the opening balances to be valid. The system validates this when saving.'),
+            __('<b>Reset All:</b> Use "Reset All" to clear all entered balances and start fresh.'),
+            __('<b>Save:</b> Click "Save Opening Balances" to save all entered balances. Existing balances will be updated.'),
+            __('<b>Delete:</b> Use "Delete Opening Balances" to remove all saved opening balances.'),
+            __('<b>Summary:</b> The bottom section shows the current saved opening balances with total debits and credits.')
+        ];
+    } elseif ($routeName === 'admin.reports.income-statement') {
+        $contextTitle = __('Income Statement');
+        $contextIcon = 'ti-file-analytics';
+        $contextDesc = __('View the income statement (profit & loss report) showing revenue, expenses, and net income.');
+        $contextSteps = [
+            __('<b>Date Range:</b> Set the start date and end date to define the report period.'),
+            __('<b>Generate Report:</b> Click "Generate Report" to load the income statement for the selected period.'),
+            __('<b>Revenue Section:</b> Shows all revenue accounts with their amounts for the period, plus total revenue.'),
+            __('<b>Expenses Section:</b> Shows all expense accounts with their amounts for the period, plus total expenses.'),
+            __('<b>Net Income:</b> The bottom section shows Net Income (Revenue minus Expenses). Positive means profit, negative means loss.'),
+            __('<b>Export:</b> Use the export dropdown to print or download the report as PDF or CSV.')
+        ];
+    } elseif ($routeName === 'admin.reports.balance-sheet') {
+        $contextTitle = __('Balance Sheet');
+        $contextIcon = 'ti-file-text';
+        $contextDesc = __('View the balance sheet showing assets, liabilities, and equity at a specific point in time.');
+        $contextSteps = [
+            __('<b>As of Date:</b> Set the end date to show account balances as of that specific date.'),
+            __('<b>Generate Report:</b> Click "Generate Report" to load the balance sheet for the selected date.'),
+            __('<b>Assets Section:</b> Shows all asset accounts with their balances (debit balances). Includes total assets.'),
+            __('<b>Liabilities Section:</b> Shows all liability accounts with their balances (credit balances). Includes total liabilities.'),
+            __('<b>Equity Section:</b> Shows all equity accounts with their balances. Includes total equity.'),
+            __('<b>Accounting Equation:</b> Total Liabilities + Total Equity should equal Total Assets. This verifies the balance sheet is correct.'),
+            __('<b>Export:</b> Use the export dropdown to print or download the report as PDF or CSV.')
+        ];
+    } elseif ($routeName === 'admin.reports.aged-receivables') {
+        $contextTitle = __('Aged Receivables');
+        $contextIcon = 'ti-receipt-2';
+        $contextDesc = __('View unpaid customer invoices grouped by how long they have been overdue.');
+        $contextSteps = [
+            __('<b>Aging Period:</b> Invoices are grouped by days overdue: Current (0-30 days), 31-60 days, 61-90 days, and 91+ days.'),
+            __('<b>Customer List:</b> Each aging bucket shows invoices from customers with their invoice number, due date, days overdue, and amount.'),
+            __('<b>Days Overdue:</b> Shows how many days each invoice is past its due date.'),
+            __('<b>Totals:</b> Each bucket shows the total amount for that period.'),
+            __('<b>Total Outstanding:</b> The total of all unpaid invoices across all aging buckets.'),
+            __('<b>Collection Priority:</b> Focus on older buckets (61-90 days and 91+ days) for collection efforts as these are more likely to be problematic.'),
+            __('<b>Export:</b> Use the export dropdown to print or download the report as PDF or CSV.')
+        ];
+    } elseif ($routeName === 'admin.reports.aged-payables') {
+        $contextTitle = __('Aged Payables');
+        $contextIcon = 'ti-receipt-tax';
+        $contextDesc = __('View unpaid supplier bills grouped by how long they have been overdue.');
+        $contextSteps = [
+            __('<b>Aging Period:</b> Bills are grouped by days overdue: Current (0-30 days), 31-60 days, 61-90 days, and 91+ days.'),
+            __('<b>Supplier List:</b> Each aging bucket shows bills from suppliers with their invoice number, due date, days overdue, and amount.'),
+            __('<b>Days Overdue:</b> Shows how many days each bill is past its due date.'),
+            __('<b>Totals:</b> Each bucket shows the total amount for that period.'),
+            __('<b>Total Outstanding:</b> The total of all unpaid bills across all aging buckets.'),
+            __('<b>Payment Priority:</b> Focus on older buckets (61-90 days and 91+ days) to maintain good supplier relationships.'),
+            __('<b>Export:</b> Use the export dropdown to print or download the report as PDF or CSV.')
+        ];
+    } elseif ($routeName === 'admin.reports.recent-transactions') {
+        $contextTitle = __('Recent Transactions');
+        $contextIcon = 'ti-history';
+        $contextDesc = __('View all recent sales and purchase transactions with filtering and bulk actions.');
+        $contextSteps = [
+            __('<b>Date Range:</b> Filter by time period: All Time, Today, This Week, This Month, Last Month, or Custom Range.'),
+            __('<b>Transaction Type:</b> Filter by Sales or Purchases, or view All types.'),
+            __('<b>Payment Status:</b> Filter by Paid, Partially Paid, or Unpaid status.'),
+            __('<b>Apply Filters:</b> Click "Apply" to load transactions matching your filters, or "Clear" to reset.'),
+            __('<b>Summary Cards:</b> View summary cards showing Total Transactions, Total Amount, Paid Transactions, and Outstanding.'),
+            __('<b>Transactions Table:</b> View all transactions with invoice number, date, type, customer/supplier, amount, status, and actions.'),
+            __('<b>Bulk Actions:</b> Select multiple transactions to perform bulk delete or export.'),
+            __('<b>Export:</b> Use the export dropdown to download as PDF or CSV.')
         ];
     } elseif (Str::startsWith($routeName, 'admin.audit-log')) {
         $contextTitle = __('Audit Logs');

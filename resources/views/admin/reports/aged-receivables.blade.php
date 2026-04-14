@@ -11,11 +11,11 @@
                         <div class="page-pretitle">
                             {{ __('messages.reports') }}
                         </div>
-                        <h2 class="page-title">
-                            <span class="nav-link-icon d-md-none d-lg-inline-block">
-                                <i class="ti ti-receipt-2"></i>
-                            </span>
-                            {{ __('messages.aged_receivables_report') }}
+                        <h2 class="page-title d-flex align-items-center">
+                            <i class="ti ti-receipt-2 me-2"></i>{{ __('messages.aged_receivables_report') }}
+                            <a href="#" class="ms-3 text-muted trigger-tutorial-modal" data-bs-toggle="tooltip" title="{{ __('Tutorial') }}">
+                                <i class="ti ti-help-circle fs-3"></i>
+                            </a>
                         </h2>
                         <div class="text-muted mt-1">
                             {{ __('messages.aged_receivables_report_summary') }}

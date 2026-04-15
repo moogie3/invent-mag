@@ -1,3 +1,8 @@
+// Track when the last Turbo navigation completed (performance.now() timestamp).
+// Used by handleClickOutside to ignore the stale click that triggered the navigation —
+// without this, the nav-link click bleeds into the new page and immediately closes the sidebar.
+let lastTurboLoadTime = 0;
+
 document.addEventListener("usersettingsloaded", function () {
     initSidebar();
     syncActiveState();
@@ -5,6 +10,7 @@ document.addEventListener("usersettingsloaded", function () {
 
 // Also re-init after Turbo navigation
 document.addEventListener("turbo:load", function () {
+    lastTurboLoadTime = performance.now();
     initSidebar();
     syncActiveState();
 });
@@ -305,6 +311,12 @@ function initSidebar() {
 
     // Click outside to close sidebar (respects lock and persistence)
     const handleClickOutside = function (e) {
+        // Ignore clicks that happened at or before the most recent turbo:load completed.
+        // The click that triggered a Turbo navigation fires on the old page but its event
+        // can bleed into the newly loaded page, causing the sidebar to snap shut immediately
+        // after a nav-link click opens it. A 150ms buffer covers the transition time.
+        if (e.timeStamp <= lastTurboLoadTime + 150) return;
+
         const isOpen = !sidebar.classList.contains("collapsed");
 
         if (

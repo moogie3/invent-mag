@@ -17,6 +17,7 @@ function openTutorialModal(isManual = false, forceTopics = false) {
 
     var step1 = document.getElementById('tutorial-step-1');
     var stepTopics = document.getElementById('tutorial-step-topics');
+    var stepSubTopics = document.getElementById('tutorial-step-subtopics');
     var stepContext = document.getElementById('tutorial-step-context');
     
     var btnNext = document.getElementById('btn-next-tutorial');
@@ -31,6 +32,10 @@ function openTutorialModal(isManual = false, forceTopics = false) {
     if (stepTopics) {
         stepTopics.classList.add('d-none');
         stepTopics.classList.remove('fade-out');
+    }
+    if (stepSubTopics) {
+        stepSubTopics.classList.add('d-none');
+        stepSubTopics.classList.remove('fade-out');
     }
     if (stepContext) {
         stepContext.classList.add('d-none');
@@ -81,7 +86,7 @@ function initAutoTutorial() {
         if(!currentRoute) return;
 
         // Only auto-show for main modules, not every single subpage
-        var majorRoutes = ['admin.product', 'admin.product.create', 'admin.warehouse', 'admin.customer', 'admin.supplier', 'admin.sales', 'admin.po', 'admin.accounting.chart', 'admin.setting.index', 'admin.setting.unit', 'admin.setting.category', 'admin.setting.tax'];
+        var majorRoutes = ['admin.dashboard', 'admin.product', 'admin.product.create', 'admin.warehouse', 'admin.customer', 'admin.supplier', 'admin.sales', 'admin.po', 'admin.accounting.chart', 'admin.setting.index', 'admin.setting.unit', 'admin.setting.category', 'admin.setting.tax'];
         
         // Allow exact match or if current route starts with one of the major routes (like edit, view)
         var isMajorRoute = majorRoutes.some(r => currentRoute === r || (currentRoute.startsWith(r) && r !== 'admin.setting.index'));
@@ -108,21 +113,8 @@ function initAutoTutorial() {
 
 function closeTutorialExplicitly() {
     var modalElement = document.getElementById('tutorial-modal');
-    var isGlobalCompleted = modalElement ? modalElement.getAttribute('data-completed') === 'true' : true;
-    
-    if (!isGlobalCompleted) {
-        var csrfToken = document.querySelector('meta[name="csrf-token"]');
-        if (csrfToken) {
-            fetch('/admin/tutorial/skip', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': csrfToken.getAttribute('content')
-                }
-            });
-        }
-    }
-    
+    // The 'hide.bs.modal' event listener (wired in DOMContentLoaded) handles
+    // the tutorial/skip fetch centrally — no need to duplicate it here.
     var modalInstance = getTutorialModalInstance();
     if (modalInstance) {
         modalInstance.hide();
@@ -144,6 +136,7 @@ function closeTutorialExplicitly() {
 window.showTopics = function() {
     var step1 = document.getElementById('tutorial-step-1');
     var stepTopics = document.getElementById('tutorial-step-topics');
+    var stepSubTopics = document.getElementById('tutorial-step-subtopics');
     var stepContext = document.getElementById('tutorial-step-context');
     var modalTitle = document.getElementById('tutorial-modal-title');
     
@@ -151,13 +144,15 @@ window.showTopics = function() {
     var activeStep = null;
     if (step1 && !step1.classList.contains('d-none')) activeStep = step1;
     else if (stepContext && !stepContext.classList.contains('d-none')) activeStep = stepContext;
+    else if (stepSubTopics && !stepSubTopics.classList.contains('d-none')) activeStep = stepSubTopics;
     
     if (activeStep) {
         activeStep.classList.add('fade-out');
         setTimeout(function() {
             activeStep.classList.add('d-none');
+            if (stepSubTopics) stepSubTopics.classList.add('d-none');
             
-            // Prepare Step 2
+            // Prepare Topics grid
             if (stepTopics) {
                 stepTopics.classList.remove('d-none');
                 void stepTopics.offsetWidth; // Reflow
@@ -173,6 +168,7 @@ window.showTopics = function() {
         }, 300);
     } else {
         // Fallback if none active
+        if (stepSubTopics) stepSubTopics.classList.add('d-none');
         if (stepTopics) {
             stepTopics.classList.remove('d-none');
             stepTopics.style.opacity = '1';
@@ -189,27 +185,192 @@ window.showTopics = function() {
     var modalElement = document.getElementById('tutorial-modal');
     var isGlobalCompleted = modalElement ? modalElement.getAttribute('data-completed') === 'true' : true;
 
-    // Mark as completed behind the scenes so it doesn't auto-popup again
-    if (!isGlobalCompleted) {
-        var csrfToken = document.querySelector('meta[name="csrf-token"]');
-        if (csrfToken) {
-            fetch('/admin/tutorial/skip', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': csrfToken.getAttribute('content')
-                }
-            });
-        }
+    // Mark as completed behind the scenes so it doesn't auto-popup again.
+    // The hide.bs.modal listener handles the actual fetch — just update the attribute here
+    // so initAutoTutorial won't try to show the welcome screen again on this page.
+    if (!isGlobalCompleted && modalElement) {
+        modalElement.setAttribute('data-completed', 'true');
     }
+};
+
+// Sub-topics drill-down: show a category's page list
+window.showSubTopics = function(topicKey) {
+    var data = (window.tutorialSubTopics || {})[topicKey];
+    if (!data) return;
+
+    var stepTopics = document.getElementById('tutorial-step-topics');
+    var stepSubTopics = document.getElementById('tutorial-step-subtopics');
+    var titleEl = document.getElementById('subtopics-title');
+    var subtitleEl = document.getElementById('subtopics-subtitle');
+    var listEl = document.getElementById('subtopics-list');
+    var modalTitle = document.getElementById('tutorial-modal-title');
+
+    if (!stepSubTopics || !listEl) return;
+
+    // Build the sub-items list HTML
+    var colorClass = 'bg-' + data.color + '-lt';
+    var iconColorClass = 'text-' + data.color;
+    var html = '';
+    data.items.forEach(function(item) {
+        html += '<a href="' + item.url + '" class="subtopic-item" data-turbo="true" data-turbo-cache="false">' +
+            '<span class="subtopic-icon ' + colorClass + ' ' + iconColorClass + '">' +
+            '<i class="ti ' + item.icon + '"></i></span>' +
+            '<span class="subtopic-label">' + item.label + '</span>' +
+            '<i class="ti ti-chevron-right subtopic-arrow"></i>' +
+            '</a>';
+    });
+    listEl.innerHTML = html;
+
+    // When any sub-topic link is clicked, set a sessionStorage flag before Turbo
+    // navigates away. onTurboLoad() reads this flag on the destination page and
+    // auto-opens the contextual tutorial modal for that page.
+    listEl.addEventListener('click', function handleSubtopicClick(e) {
+        var item = e.target.closest('.subtopic-item');
+        if (item) {
+            sessionStorage.setItem('tutorial_from_subtopic', '1');
+        }
+        // One-time: remove itself so re-renders don't stack listeners
+        listEl.removeEventListener('click', handleSubtopicClick);
+    });
+
+    if (titleEl) titleEl.textContent = data.label;
+    if (subtitleEl) subtitleEl.textContent = data.subtitle;
+    if (modalTitle) modalTitle.innerHTML = '<i class="ti ' + data.icon + ' me-2"></i>' + data.label;
+
+    // Fade topics out, show subtopics
+    if (stepTopics && !stepTopics.classList.contains('d-none')) {
+        stepTopics.classList.add('fade-out');
+        setTimeout(function() {
+            stepTopics.classList.add('d-none');
+            stepSubTopics.classList.remove('d-none');
+            void stepSubTopics.offsetWidth;
+            stepSubTopics.style.opacity = '1';
+        }, 250);
+    } else {
+        stepSubTopics.classList.remove('d-none');
+        stepSubTopics.style.opacity = '1';
+    }
+
+    // Footer: hide Next button, show Back button
+    var btnNext = document.getElementById('btn-next-tutorial');
+    var btnBack = document.getElementById('btn-back-topics');
+    if (btnNext) btnNext.style.display = 'none';
+    if (btnBack) btnBack.classList.remove('d-none');
+};
+
+// Back from sub-topics to the topics grid
+window.backToTopics = function() {
+    window.showTopics();
 };
 
 window.closeTutorialExplicitly = closeTutorialExplicitly;
 
+// --- Turbo-aware route syncing ---
+// The tutorial modal is rendered once in the layout (outside the Turbo frame).
+// On every Turbo navigation the <turbo-frame> content is swapped, which includes
+// a fresh #page-route-indicator element with the new route in data-route.
+// We read that indicator on turbo:load and:
+//  1. Update the modal's own data-route attribute
+//  2. Fetch the new contextual step HTML from the server and swap it in
+//     so the ? button always shows the correct guide for the current page.
+
+function syncTutorialContextFromRoute(newRoute) {
+    var modalElement = document.getElementById('tutorial-modal');
+    if (!modalElement) return Promise.resolve();
+
+    // Update the stored route so openTutorialModal reads the correct one
+    modalElement.setAttribute('data-route', newRoute);
+
+    // Fetch fresh context HTML for the new route
+    var csrfToken = document.querySelector('meta[name="csrf-token"]');
+    if (!csrfToken) return Promise.resolve();
+
+    return fetch('/admin/tutorial/context?route=' + encodeURIComponent(newRoute), {
+        headers: {
+            'X-Requested-With': 'XMLHttpRequest',
+            'X-CSRF-TOKEN': csrfToken.getAttribute('content'),
+            'Accept': 'text/html'
+        }
+    })
+    .then(function(res) { return res.text(); })
+    .then(function(html) {
+        var stepContext = document.getElementById('tutorial-step-context');
+        if (stepContext) {
+            stepContext.innerHTML = html;
+        }
+    })
+    .catch(function() {
+        // Silently fail — old content stays
+    });
+}
+
+function onTurboLoad() {
+    // Read the route from the indicator that lives inside the turbo frame
+    var indicator = document.getElementById('page-route-indicator');
+    var freshRoute = indicator ? (indicator.getAttribute('data-route') || '') : '';
+
+    // Check if we arrived here from a sub-topic link click before navigating
+    var fromSubtopic = sessionStorage.getItem('tutorial_from_subtopic');
+    if (fromSubtopic) {
+        sessionStorage.removeItem('tutorial_from_subtopic');
+
+        // If freshRoute is empty (e.g. settings pages outside turbo frame), fall back to
+        // reading the current modal data-route which was set by the server render.
+        if (!freshRoute) {
+            var modalEl = document.getElementById('tutorial-modal');
+            freshRoute = modalEl ? (modalEl.getAttribute('data-route') || '') : '';
+        }
+
+        // Sync context first (returns a Promise), then open the modal once the
+        // correct contextual HTML is loaded into #tutorial-step-context.
+        syncTutorialContextFromRoute(freshRoute).then(function() {
+            // Use isManual=true so openTutorialModal shows the contextual step,
+            // regardless of whether the global tutorial is completed or not.
+            openTutorialModal(true, false);
+        });
+
+        // Skip initAutoTutorial — we're handling the open manually above
+        return;
+    }
+
+    // Normal navigation: sync context and check auto-show as usual
+    if (freshRoute) {
+        syncTutorialContextFromRoute(freshRoute);
+    }
+    initAutoTutorial();
+}
+
 // Handle normal load
-document.addEventListener('DOMContentLoaded', initAutoTutorial);
-// Handle Turbo frame load
-document.addEventListener('turbo:load', initAutoTutorial);
+document.addEventListener('DOMContentLoaded', function() {
+    initAutoTutorial();
+
+    // Wire up backdrop-click (and any other native Bootstrap hide) to run the skip logic.
+    // This fires when the user clicks outside the modal (backdrop) since we removed data-bs-backdrop="static".
+    // We use 'hide.bs.modal' so the fetch runs before the modal disappears.
+    var modalElement = document.getElementById('tutorial-modal');
+    if (modalElement) {
+        modalElement.addEventListener('hide.bs.modal', function () {
+            var isGlobalCompleted = modalElement.getAttribute('data-completed') === 'true';
+            if (!isGlobalCompleted) {
+                var csrfToken = document.querySelector('meta[name="csrf-token"]');
+                if (csrfToken) {
+                    fetch('/admin/tutorial/skip', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': csrfToken.getAttribute('content')
+                        }
+                    }).then(function() {
+                        // Mark locally so subsequent hide events don't re-fire the fetch
+                        modalElement.setAttribute('data-completed', 'true');
+                    });
+                }
+            }
+        });
+    }
+});
+// Handle Turbo frame load — sync route first, then check auto-show
+document.addEventListener('turbo:load', onTurboLoad);
 
 // Global click listener for the tutorial buttons
 // This avoids inline onclick handlers which cause Bootstrap event conflicts in Tabler

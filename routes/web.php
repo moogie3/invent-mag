@@ -72,6 +72,14 @@ Route::middleware('web')->prefix('admin')->group(function () {
             return response()->json(['success' => true]);
         })->name('admin.tutorial.skip');
 
+        // Tutorial context endpoint - returns rendered context step HTML for a given route name
+        Route::get('/tutorial/context', function (\Illuminate\Http\Request $request) {
+            $routeName = $request->query('route', '');
+            return response()->view('admin.layouts.modals.general.tutorial-context', [
+                'routeName' => $routeName,
+            ]);
+        })->name('admin.tutorial.context');
+
         // MOVED: Role-permissions route - accessible only to superuser
         Route::get('/roles-permissions', [UserController::class, 'getRolePermissions'])
             ->name('admin.roles-permissions')

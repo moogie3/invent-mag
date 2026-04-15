@@ -1,7 +1,8 @@
 # Invent-MAG: Complete Feature Checklist
 
 **Last Updated:** April 2026  
-**Version:** 1.5
+**Version:** 1.6  
+**System Version:** 1.6
 
 ---
 
@@ -86,6 +87,8 @@
 - [x] Invoice generation (PDF)
 - [x] Sales returns processing (with configurable accounting entries)
 - [x] Refund handling
+- [x] **Consistent payment status labels** - Paid, Partially Paid, Unpaid (with sub-states: Pending, Due Today, Due in X Days, Overdue), Returned
+- [x] Customer credit notes (auto-created when return is Completed AND invoice is Paid)
 - [x] Customer database (CRUD)
 - [x] Customer interaction tracking
 - [x] Purchase history per customer
@@ -104,6 +107,8 @@
 - [x] PO workflow
 - [x] Multi-warehouse receiving
 - [x] Payment tracking for POs
+- [x] **Consistent payment status labels** - Paid, Partially Paid, Pending (with sub-states: Due Today, Due in X Days, Overdue), Returned
+- [x] **Autofill info label on create** - past price & due date based on supplier; supplier price based on supplier
 - [x] Purchase returns processing (with stock adjustment and accounting entries)
 - [x] Supplier database (CRUD)
 - [x] Supplier interaction tracking
@@ -223,6 +228,7 @@
 - [x] Duplicate entries
 - [x] Audit trail for all changes
 - [x] Dependent entry validation before unposting
+- [x] **Audit log sidebar badges** - Role badges on journal entry show page use correct styling (`bg-purple text-white`)
 
 #### Core Accounting
 
@@ -395,6 +401,11 @@
 - [x] Loading states
 - [x] Global keyboard shortcuts
 - [x] Sound notifications (optional)
+- [x] **Contextual tutorial button system** - Every page has a tutorial (?) button in the page title that opens a contextual help modal specific to that page
+- [x] **Consistent page title iconography** - All pages use `ti-*` icons before the title text (`ti-plus` for create, `ti-edit` for edit, `ti-eye` for view)
+- [x] **Tutorial modal** - Multi-step modal covering setup workflow, topic grid, and page-specific quick guide with 30+ page contexts covered
+- [x] **Sub-topic drill-down navigation** - Topics grid drills into category-specific page lists (Configuration → System Settings, Units, Categories...), clicking navigates to that page and auto-shows its contextual tutorial
+- [x] **Click-outside to close** - Clicking the modal backdrop now closes the tutorial modal (was static before)
 
 ---
 
@@ -454,8 +465,9 @@
 5. **776 Test Files** - Enterprise-grade testing (PHP + JS)
 6. **Docker + CI/CD** - Modern DevOps ready
 7. **Comprehensive Audit Trail** - Security and accounting
+8. **Contextual Tutorial System** - 30+ page-specific help guides with drill-down navigation - users click a topic category, see all pages in that category, click one to navigate there with its contextual tutorial auto-opened
 
 ---
 
-**Document Version:** 1.5  
+**Document Version:** 1.6  
 **Last Updated:** April 2026

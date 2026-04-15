@@ -62,14 +62,62 @@
 
                                 {{-- Current Plan Section --}}
                                 @php
-                                    try {
-                                        $tenant = app('currentTenant');
-                                        $isDemo = $tenant && str_starts_with($tenant->name, 'Demo ');
-                                    } catch (\Exception $e) {
-                                        $tenant = null;
-                                        $isDemo = false;
+                                    $isDemo = $tenant && str_starts_with($tenant->name, 'Demo ');
+                                    $isEnterprise = $currentPlan && $currentPlan->slug === 'enterprise';
+                                    
+                                    // Calculate expiry based on billing cycle
+                                    $expiryDate = null;
+                                    $daysRemaining = null;
+                                    if ($tenant && $currentPlan && !$isDemo) {
+                                        // Get last billing date (billing_period_start or plan_changed_at)
+                                        $lastBilling = $tenant->billing_period_start 
+                                            ? \Carbon\Carbon::parse($tenant->billing_period_start) 
+                                            : ($tenant->plan_changed_at ? \Carbon\Carbon::parse($tenant->plan_changed_at) : null);
+                                            
+                                        // If no last billing date, use creation date
+                                        if (!$lastBilling) {
+                                            $lastBilling = $tenant->created_at ? \Carbon\Carbon::parse($tenant->created_at) : now();
+                                        }
+                                        
+                                        // Add billing cycle days (default 30 for monthly)
+                                        $billingDays = $currentPlan->getBillingPeriodDays() ?? 30;
+                                        $expiryDate = $lastBilling->addDays($billingDays);
+                                        $daysRemaining = now()->diffInDays($expiryDate, false);
                                     }
                                 @endphp
+
+                                @if($expiryDate && $daysRemaining !== null)
+                                    @php
+                                        // Determine alert color based on days remaining
+                                        if ($daysRemaining <= 3) {
+                                            $alertClass = 'alert-danger';
+                                            $iconClass = 'ti-alert-triangle';
+                                            $iconColor = 'text-danger';
+                                        } elseif ($daysRemaining <= 7) {
+                                            $alertClass = 'alert-warning';
+                                            $iconClass = 'ti-alert-triangle';
+                                            $iconColor = 'text-warning';
+                                        } else {
+                                            $alertClass = 'alert-info';
+                                            $iconClass = 'ti-calendar';
+                                            $iconColor = 'text-info';
+                                        }
+                                    @endphp
+                                    
+                                    <div class="alert mb-3 {{ $alertClass }} border-0 shadow-sm" style="border-radius: 8px;">
+                                        <div class="d-flex align-items-center">
+                                            <i class="ti {{ $iconClass }} {{ $iconColor }} fs-4 me-3"></i>
+                                            <div>
+                                                <strong>Your subscription ends on {{ $expiryDate->format('d F Y') }}</strong>
+                                                @if($daysRemaining <= 7)
+                                                    <div class="small mb-0">{{ $daysRemaining }} {{ $daysRemaining == 1 ? 'day' : 'days' }} remaining</div>
+                                                @else
+                                                    <div class="small text-muted mb-0">Renew before this date to avoid service interruption</div>
+                                                @endif
+                                            </div>
+                                        </div>
+                                    </div>
+                                @endif
 
                                 @if($isDemo)
                                     <div class="alert alert-info border-0 rounded-4 shadow-sm mb-4">
@@ -128,7 +176,7 @@
                                                     </a>
                                                 @else
                                                     <a href="{{ route('admin.setting.plan.upgrade') }}" class="btn btn-primary rounded-pill px-4 shadow-sm">
-                                                        <i class="ti ti-arrow-up-circle me-2"></i>{{ __('plan.upgrade_plan') }}
+                                                        <i class="ti ti-{{ $isEnterprise ? 'switch-horizontal' : 'arrow-up-circle' }} me-2"></i>{{ $isEnterprise ? __('plan.change_plan') : __('plan.upgrade_plan') }}
                                                     </a>
                                                 @endif
                                             </div>

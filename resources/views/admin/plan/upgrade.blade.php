@@ -13,7 +13,13 @@
                     </a>
                 </div>
                 <div class="col">
-                    <h2 class="page-title">{{ __('plan.choose_your_plan') }}</h2>
+                    <h2 class="page-title">
+                        @if($currentPlan && $currentPlan->slug === 'enterprise')
+                            {{ __('plan.change_your_plan') }}
+                        @else
+                            {{ __('plan.choose_your_plan') }}
+                        @endif
+                    </h2>
                 </div>
             </div>
         </div>
@@ -27,18 +33,37 @@
             </div>
         @endif
 
+        @if($expiringSoon && $expiryDays !== null)
+            <div class="alert alert-warning mb-4 border-0 shadow-sm rounded-4">
+                <div class="d-flex align-items-center">
+                    <div><i class="ti ti-alert-triangle text-warning fs-2 me-3"></i></div>
+                    <div>
+                        @if($expiryDays == 0)
+                            {{ __('plan.expiring_today') }}
+                        @elseif($expiryDays == 1)
+                            {{ __('plan.expiring_tomorrow') }}
+                        @else
+                            {{ __('plan.expiring_in_days', ['days' => $expiryDays]) }}
+                        @endif
+                    </div>
+                </div>
+            </div>
+        @endif
+
         <div class="row row-cards justify-content-center">
             @foreach($plans as $plan)
                 @php
                     $isCurrent = $currentPlan && $currentPlan->id === $plan->id;
                     $isSuggested = $suggestedPlan && $suggestedPlan->id === $plan->id;
+                    // Allow renewing expired/inactive plans, but keep showing current for active plans
+                    $canRenew = $isCurrent && $planInactive;
                 @endphp
                 <div class="col-md-6 col-lg-4 mb-4">
-                    <div class="card h-100 rounded-4 shadow-sm border-0 {{ $isSuggested ? 'border border-2 border-primary' : '' }} {{ $isCurrent ? 'border border-2 border-success' : '' }}" style="transition: transform 0.2s;">
-                        @if($isSuggested && !$isCurrent)
+                    <div class="card h-100 rounded-4 shadow-sm border-0 {{ $isSuggested ? 'border border-2 border-primary' : '' }} {{ $isCurrent && !$planInactive ? 'border border-2 border-success' : '' }}" style="transition: transform 0.2s;">
+                        @if($isSuggested && !$canRenew)
                             <div class="card-status-top bg-primary rounded-top-4"></div>
                         @elseif($isCurrent)
-                            <div class="card-status-top bg-success rounded-top-4"></div>
+                            <div class="card-status-top {{ $planInactive ? 'bg-warning' : 'bg-success' }} rounded-top-4"></div>
                         @endif
 
                         <div class="card-body text-center py-5">
@@ -88,9 +113,17 @@
                         </div>
 
                         <div class="card-footer bg-body border-0 text-center pb-4 pt-3 rounded-bottom-4">
-                            @if($isCurrent)
+                            @if($isCurrent && !$canRenew)
                                 <button class="btn btn-success w-100 rounded-pill py-2" disabled>
                                     <i class="ti ti-check me-2"></i>{{ __('plan.current_plan') }}
+                                </button>
+                            @elseif($canRenew)
+                                <button type="button" class="btn btn-warning w-100 rounded-pill py-2 shadow-sm"
+                                        data-bs-toggle="modal" data-bs-target="#upgradeModal"
+                                        data-plan-name="{{ $plan->name }}"
+                                        data-plan-price="{{ $plan->price }}"
+                                        data-plan-slug="{{ $plan->slug }}">
+                                    <i class="ti ti-refresh me-2"></i>{{ __('plan.renew_plan') }}
                                 </button>
                             @else
                                 <button type="button" class="btn {{ $isSuggested ? 'btn-primary' : 'btn-outline-primary' }} w-100 rounded-pill py-2 shadow-sm"

@@ -70,7 +70,7 @@ class PlanController extends Controller
             }
         }
 
-        return view('admin.plan.index', compact('usageStats', 'currentPlan', 'plans', 'features'));
+        return view('admin.plan.index', compact('usageStats', 'currentPlan', 'plans', 'features', 'tenant'));
     }
 
     /**
@@ -78,12 +78,30 @@ class PlanController extends Controller
      */
     public function upgrade(Request $request)
     {
+        $tenant = app('currentTenant');
         $currentPlan = $this->planService->getCurrentPlan();
         $plans = $this->planService->getAvailablePlans();
         $features = config('plans.features');
         $feature = $request->query('feature');
         $suggestedPlan = $feature ? $this->planService->getSuggestedUpgrade($feature) : null;
         $upgradeMessage = $feature ? (config("plans.upgrade_messages.{$feature}") ?? null) : null;
+        
+        // Check if current plan is expired/inactive (allows renewal of same tier)
+        $planInactive = $tenant ? $tenant->planInactive() : false;
+        
+        // Check if plan is expiring soon (within 7 days)
+        $expiringSoon = false;
+        $expiryDays = null;
+        if ($tenant && $currentPlan) {
+            $endsAt = $tenant->subscription_ends_at;
+            if ($endsAt && $endsAt instanceof \Carbon\Carbon) {
+                $daysRemaining = now()->diffInDays($endsAt, false);
+                if ($daysRemaining !== null && $daysRemaining >= 0 && $daysRemaining <= 7) {
+                    $expiringSoon = true;
+                    $expiryDays = $daysRemaining;
+                }
+            }
+        }
 
         return view('admin.plan.upgrade', compact(
             'currentPlan',
@@ -91,7 +109,10 @@ class PlanController extends Controller
             'features',
             'feature',
             'suggestedPlan',
-            'upgradeMessage'
+            'upgradeMessage',
+            'planInactive',
+            'expiringSoon',
+            'expiryDays'
         ));
     }
 
@@ -256,7 +277,7 @@ class PlanController extends Controller
                     $tenant->billing_period_end = $period['end'];
                 }
 
-                if ($changeType === 'upgrade') {
+if ($changeType === 'upgrade') {
                     $daysRemaining = $this->billingService->getDaysRemainingInPeriod($tenant);
                     $prorationAmount = $this->billingService->calculateUpgradeProration($currentPlan, $newPlan, $daysRemaining);
                     
@@ -266,12 +287,29 @@ class PlanController extends Controller
                     $tenant->save();
 
                     \Illuminate\Support\Facades\Log::info("Payment confirmed for order {$order->order_number}. Upgrade: {$currentPlan?->name} -> {$newPlan->name}. Proration: \${$prorationAmount}");
-                    
+
                     return response()->json([
                         'message' => 'Payment confirmed successfully',
                         'plan' => $newPlan->name,
                         'type' => 'upgrade',
                         'proration_amount' => $prorationAmount,
+                    ]);
+                } elseif ($changeType === 'same') {
+                    // Same tier renewal - extend the subscription
+                    $period = $this->billingService->getCurrentBillingPeriod();
+                    $tenant->plan_status = 'active';
+                    $tenant->billing_period_start = $period['start'];
+                    $tenant->billing_period_end = $period['end'];
+                    $tenant->trial_ends_at = null; // Clear trial since we're now on a paid plan
+                    $tenant->plan_changed_at = now();
+                    $tenant->save();
+
+                    \Illuminate\Support\Facades\Log::info("Payment confirmed for order {$order->order_number}. Renewal: {$newPlan->name}. Period: {$period['start']} to {$period['end']}");
+
+                    return response()->json([
+                        'message' => 'Payment confirmed successfully',
+                        'plan' => $newPlan->name,
+                        'type' => 'renewal',
                     ]);
                 } else {
                     $nextPeriod = $this->billingService->getNextBillingPeriod();

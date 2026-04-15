@@ -4,6 +4,9 @@
             <div class="col">
                 <h2 class="page-title d-flex align-items-center">
                     <i class="ti ti-dashboard fs-2 me-2"></i> {{ __('messages.dashboard') }}
+                    <a href="#" class="ms-3 text-muted trigger-tutorial-modal" title="{{ __('Page Tutorial') }}">
+                        <i class="ti ti-help-circle fs-3"></i>
+                    </a>
                 </h2>
                 <div class="text-muted mt-1">{{ __('messages.business_overview_performance_metrics') }}</div>
             </div>

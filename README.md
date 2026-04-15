@@ -1,6 +1,6 @@
 # Invent-MAG: Enterprise Inventory & Accounting System
 
-**Version:** 1.4  
+**Version:** 1.6  
 **Author:** moogie3  
 **License:** MIT  
 **Development Time:** 1.5+ years (451+ commits)  
@@ -76,6 +76,8 @@ Experience Invent-MAG firsthand:
 - **Multiple Payment Methods:** Cash, card, transfer per transaction
 - **Sales Returns:** Complete returns workflow with configurable accounting entries
 - **Invoice Generation:** PDF invoice creation
+- **Consistent Payment Status Labels:** Paid, Partially Paid, Unpaid (Pending / Due Today / Due in X Days / Overdue), Returned
+- **Customer Credit Notes:** Auto-created when return is Completed AND original invoice is Paid
 
 #### Customer Intelligence
 
@@ -114,6 +116,8 @@ Experience Invent-MAG firsthand:
 - **Multi-warehouse Receiving:** Receive to specific warehouses
 - **Purchase Returns:** Complete returns to suppliers with stock and accounting adjustments
 - **Expiry Date Tracking:** Monitor product expiration dates
+- **Consistent Payment Status Labels:** Paid, Partially Paid, Pending (Due Today / Due in X Days / Overdue), Returned
+- **Autofill Info:** Past price & due date auto-filled from supplier history on PO creation
 
 #### Supplier Intelligence
 
@@ -160,7 +164,7 @@ Experience Invent-MAG firsthand:
 - **Contra Accounts:** Support for accumulated depreciation, allowances
 - **Manual Entry Control:** Per-account permissions
 
-#### Journal Entry System ⭐ **NEW**
+#### Journal Entry System ⭐
 
 - **Manual Journal Entries:** Full CRUD with multi-line support
 - **Status Workflow:** Draft → Posted → Void
@@ -168,6 +172,7 @@ Experience Invent-MAG firsthand:
 - **Journal Reversal:** One-click reversal with automatic entries
 - **Voiding:** Soft delete with audit trail
 - **Audit Trail:** Complete change history for compliance
+- **Audit Log Sidebar:** Role badges correctly styled per user role
 
 #### Core Accounting
 
@@ -204,6 +209,16 @@ Experience Invent-MAG firsthand:
 - **Financial Health:** Cash position, AR/AP summaries
 - **Alerts:** Low stock, expiring products, due dates
 - **Sales Forecast:** Visual forecast with confidence intervals
+
+#### Contextual Tutorial System
+
+- **Tutorial Button:** Every page title includes a `?` help button (dashboard included)
+- **30+ Page-Specific Guides:** From Products to all Accounting and Reports pages
+- **Multi-Step Modal:** Setup workflow overview → topic grid → page-specific quick guide
+- **Topic Drill-Down:** Topics grid (6 categories) → click category → sub-topic list (e.g., Accounting → Chart of Accounts, Ledger, Trial Balance...) → click to navigate with contextual tutorial auto-opened
+- **Click-Outside to Close:** Modal backdrop click now closes the tutorial modal
+- **Auto-Show on Sub-Topic Navigation:** Clicking a sub-topic link and navigating triggers the contextual tutorial modal for the destination page
+- **First-Login Experience:** Setup workflow shown only on first login; direct to contextual guide on return visits
 
 #### User Management
 
@@ -479,7 +494,24 @@ docker-compose exec app php artisan migrate --seed
 
 ## 🗺️ Roadmap
 
-### Recently Added (v1.2)
+### Recently Added (v1.6)
+
+- ✅ Tutorial Topics Sub-Topic Drill-Down Navigation
+- ✅ Click-Outside Closes Tutorial Modal
+- ✅ Sub-Topic Navigation Auto-Shows Contextual Tutorial
+- ✅ Fixed Sidebar Stale Click Closing Bug
+- ✅ Dashboard Tutorial Button & Context
+
+### Previously Added (v1.5)
+
+- ✅ Contextual Tutorial Button System (30+ page-specific help guides)
+- ✅ Consistent "Partially Paid" status across Sales & Purchase Orders
+- ✅ Sales Return credit note conditions documented and enforced
+- ✅ Purchase Order autofill info label
+- ✅ Consistent `ti-*` icon system across all page headers
+- ✅ Journal Entry audit log sidebar badge fix
+
+### Previously Added (v1.4)
 
 - ✅ Manual Journal Entry System
 - ✅ Journal Entry Approval Workflow

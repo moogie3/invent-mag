@@ -87,6 +87,8 @@
                 @yield('content')
             @else
                 <turbo-frame id="main-content" data-turbo-action="advance">
+                    {{-- Route indicator: updated on every Turbo navigation so tutorial-modal.js knows the current page --}}
+                    <span id="page-route-indicator" data-route="{{ Route::currentRouteName() }}" class="d-none" aria-hidden="true"></span>
                     @yield('content')
                 </turbo-frame>
             @endif

@@ -401,7 +401,7 @@ TOTAL                      | 80,000,000  | 80,000,000 ✓
 **Use when:**
 - At the end of each accounting period
 - Before closing the books
-- Troubleshooting不平衡 issues
+- Troubleshooting imbalance issues
 
 **What it shows:** All accounts with their debit or credit balances
 
@@ -419,6 +419,32 @@ TOTAL                      | 80,000,000  | 80,000,000 ✓
 - Migrating from another system
 
 **Navigation:** `Accounting → Opening Balance`
+
+---
+
+## Payment Status Reference
+
+Understanding payment statuses helps you read the General Ledger and financial reports accurately.
+
+### Sales Order Statuses
+
+| Status | Meaning |
+|--------|---------|
+| **Paid** | Invoice is fully paid |
+| **Partially Paid** | At least one payment recorded, but balance still outstanding |
+| **Unpaid** | No payments recorded. Sub-states: **Pending** (not yet due), **Due Today**, **Due in X Days**, or **Overdue** |
+| **Returned** | All items in the order have been returned |
+
+### Purchase Order Statuses
+
+| Status | Meaning |
+|--------|---------|
+| **Paid** | PO is fully paid to supplier |
+| **Partially Paid** | At least one payment recorded, but balance still outstanding |
+| **Pending** | No payments recorded. Sub-states: **Due Today**, **Due in X Days**, or **Overdue** |
+| **Returned** | All items in the PO have been returned to supplier |
+
+> **Note:** The `partial` key in language files maps to "Partially Paid" (EN) and "Dibayar Sebagian" (ID) for both Sales and Purchase orders.
 
 ---
 
@@ -493,6 +519,46 @@ Journal Entry:
 │   Cash/Bank (1110/1120)             │          │ 550,000  │
 └─────────────────────────────────────┴──────────┴──────────┘
 ```
+
+### 5. Sales Return (Completed)
+
+When a sales return is marked **Completed**:
+
+```
+Transaction: Customer returns Rp 200,000 worth of goods
+
+Journal Entry:
+┌─────────────────────────────────────┬──────────┬──────────┐
+│ Account                             │ Debit    │ Credit   │
+├─────────────────────────────────────┼──────────┼──────────┤
+│ Sales Returns (4110)               │  200,000 │          │
+│   Accounts Receivable (1130)        │          │  200,000 │
+└─────────────────────────────────────┴──────────┴──────────┘
+```
+
+Additionally:
+- Inventory is restocked (COGS reversed)
+- If the original invoice was **Paid**, a **Customer Credit Note** is automatically created for future purchases
+
+### 6. Purchase Return (Completed)
+
+When a purchase return is marked **Completed**:
+
+```
+Transaction: Return Rp 100,000 worth of goods to supplier
+
+Journal Entry:
+┌─────────────────────────────────────┬──────────┬──────────┐
+│ Account                             │ Debit    │ Credit   │
+├─────────────────────────────────────┼──────────┼──────────┤
+│ Accounts Payable (2110)            │  100,000 │          │
+│   Purchase Returns (5120)           │          │  100,000 │
+└─────────────────────────────────────┴──────────┴──────────┘
+```
+
+Additionally:
+- Inventory is deducted from the warehouse
+- The purchase order amount is adjusted accordingly
 
 ---
 
@@ -599,5 +665,5 @@ If you encounter issues:
 
 ---
 
-*Document Version: 1.0*
-*Last Updated: 2026*
+*Document Version: 1.1*  
+*Last Updated: April 2026*

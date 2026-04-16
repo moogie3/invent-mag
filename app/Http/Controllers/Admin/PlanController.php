@@ -283,6 +283,7 @@ if ($changeType === 'upgrade') {
                     
                     $tenant->plan_id = $newPlan->id;
                     $tenant->plan_status = 'active';
+                    $tenant->trial_ends_at = null; // Clear any remaining trial when upgrading to paid plan
                     $tenant->plan_changed_at = now();
                     $tenant->save();
 
@@ -319,6 +320,7 @@ if ($changeType === 'upgrade') {
                     $tenant->pending_plan_id = $newPlan->id;
                     $tenant->pending_plan_effective_at = $nextPeriod['start'] . ' 00:00:00';
                     $tenant->proration_credit = $creditAmount;
+                    $tenant->trial_ends_at = null; // Clear trial - downgrade will take effect in next period
                     $tenant->save();
 
                     \Illuminate\Support\Facades\Log::info("Payment confirmed for order {$order->order_number}. Downgrade scheduled: {$currentPlan?->name} -> {$newPlan->name}. Effective: {$nextPeriod['start']}. Credit: \${$creditAmount}");

@@ -136,6 +136,7 @@ class BillingService
 
             $tenant->plan_id = $newPlan->id;
             $tenant->plan_status = 'active';
+            $tenant->trial_ends_at = null; // Clear any remaining trial when upgrading to paid plan
             $tenant->plan_changed_at = now();
             
             if (!$tenant->billing_period_start) {

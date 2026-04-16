@@ -9,7 +9,7 @@
                             <i class="ti ti-checks me-2"></i> Clear All Notifications
                         </button>
                     @endif
-                    <a href="#" class="ms-2 text-muted trigger-tutorial-modal" data-bs-toggle="tooltip" title="{{ __('Tutorial') }}">
+                    <a href="#" class="ms-2 text-muted trigger-tutorial-modal" data-bs-toggle="tooltip" title="{{ __('messages.tutorial') }}">
                         <i class="ti ti-help-circle fs-2"></i>
                     </a>
                 </div>

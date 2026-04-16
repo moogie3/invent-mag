@@ -13,6 +13,7 @@ return [
     'customer' => 'Pelanggan',
     'supplier' => 'Pemasok',
     'warehouse' => 'Gudang',
+    'tutorial' => 'Tutorial',
 
     // MESSAGES.ACCOUNTING
     'coa' => 'Bagan Akun',

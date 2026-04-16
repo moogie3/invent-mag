@@ -113,7 +113,7 @@
                     <div class="nav-link-icon">
                         <i class="ti ti-help"></i>
                     </div>
-                    <span class="nav-link-title">{{ __('Tutorial') }}</span>
+                    <span class="nav-link-title">{{ __('messages.tutorial') }}</span>
                 </a>
             </li>
 

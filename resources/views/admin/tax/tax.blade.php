@@ -9,7 +9,7 @@
                 <div class="card border-0 shadow-sm rounded-3">
                     <div class="card-body d-flex justify-content-between align-items-center py-3">
                         <h2 class="mb-0"><i class="ti ti-receipt-tax me-2"></i>{{ __('messages.tax_settings_title') }}</h2>
-                        <a href="#" class="text-muted trigger-tutorial-modal" data-bs-toggle="tooltip" title="{{ __('Tutorial') }}">
+                        <a href="#" class="text-muted trigger-tutorial-modal" data-bs-toggle="tooltip" title="{{ __('messages.tutorial') }}">
                             <i class="ti ti-help-circle fs-3"></i>
                         </a>
                     </div>

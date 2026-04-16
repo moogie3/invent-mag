@@ -13,6 +13,7 @@ return [
     'customer' => 'Customer',
     'supplier' => 'Supplier',
     'warehouse' => 'Warehouse',
+    'tutorial' => 'Tutorial',
 
     // MESSAGES.ACCOUNTING
     'coa' => 'Chart of Accounts',

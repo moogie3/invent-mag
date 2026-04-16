@@ -4,6 +4,7 @@ namespace App\Http\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 use Symfony\Component\HttpFoundation\Response;
 
 class CheckSubscriptionStatus
@@ -22,7 +23,9 @@ class CheckSubscriptionStatus
             'admin.setting.plan.upgrade',
             'admin.setting.plan.change',
             'admin.setting.plan.checkout',
+            'admin.login',
             'admin.logout',
+            'admin.login.post',
             // Allow API endpoints needed for the upgrade page
             'api.plan.current',
             'api.plans'
@@ -30,10 +33,22 @@ class CheckSubscriptionStatus
 
         // Check if route has a name before checking
         $routeName = $request->route()->getName() ?? '';
+        
+        // Allow unauthenticated users to access login and related auth routes
+        if (!auth()->check() && Str::startsWith($routeName, 'admin.login')) {
+            return $next($request);
+        }
+        
         if (in_array($routeName, $allowedRoutes)) {
             return $next($request);
         }
 
+        // If user is not authenticated, let them through (auth middleware will handle it)
+        if (!auth()->check()) {
+            return $next($request);
+        }
+
+        // Get the tenant - skip check if no tenant context
         try {
             $tenant = app('currentTenant');
         } catch (\Exception $e) {

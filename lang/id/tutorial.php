@@ -17,7 +17,7 @@ return [
     
     // Dashboard
     'dashboard' => 'Dasbor',
-    'dashboard_desc' => 'Gambaran bisnis Anda一目了然 — metrik, grafik, dan tindakan cepat.',
+    'dashboard_desc' => 'Gambaran bisnis Anda secara sekilas — metrik, grafik, dan tindakan cepat.',
     'key_metrics' => 'Metrik Utama: Kartu teratas menunjukkan penjualan, pembelian, dan keuntungan hari ini serta piutang dan hutang outstanding yang diperbarui secara real-time.',
     'sales_purchase_chart' => 'Grafik Penjualan & Pembelian: Beralih antara Penjualan dan Pembelian menggunakan tab. Filter berdasarkan rentang tanggal menggunakan dropdown di atas grafik.',
     'sales_forecast' => 'Prediksi Penjualan: Jika diaktifkan di paket Anda, grafik prediksi ditampilkan di bawah grafik utama.',

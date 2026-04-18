@@ -774,7 +774,7 @@ window.tutorialSubTopics = {
             <!-- Header with Gradient -->
             <div class="modal-header text-white" style="background: linear-gradient(135deg, #1e40af, #3b82f6); border-bottom: none; padding: 20px 24px;">
                 <h5 class="modal-title fw-bold fs-3" id="tutorial-modal-title">
-                    <i class="ti ti-rocket me-2"></i> {{ __('Welcome to Invent-MAG') }}
+                    <i class="ti ti-rocket me-2"></i> {{ __('tutorial.welcome_title') }}
                 </h5>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close" onclick="closeTutorialExplicitly()"></button>
             </div>
@@ -782,9 +782,9 @@ window.tutorialSubTopics = {
             <!-- STEP 1: Workflow Overview (For First Time Login) -->
             <div class="modal-body py-5 px-4 px-md-5 tutorial-step" id="tutorial-step-1">
                 <div class="text-center mb-5">
-                    <h2 class="fw-bold text-dark mb-3">{{ __('Your Complete Inventory & Accounting Solution') }}</h2>
+                    <h2 class="fw-bold text-dark mb-3">{{ __('tutorial.welcome_subtitle') }}</h2>
                     <p class="text-secondary fs-4">
-                        {{ __('To unlock the full potential of the app, follow this recommended setup flow:') }}
+                        {{ __('tutorial.welcome_description') }}
                     </p>
                 </div>
 
@@ -848,8 +848,8 @@ window.tutorialSubTopics = {
             <!-- STEP 2: Topics Grid -->
             <div class="modal-body py-5 px-4 px-md-5 d-none tutorial-step" id="tutorial-step-topics">
                 <div class="text-center mb-5">
-                    <h2 class="fw-bold text-dark mb-2">{{ __('What would you like to explore?') }}</h2>
-                    <p class="text-secondary">{{ __('Select a category to see available pages.') }}</p>
+                    <h2 class="fw-bold text-dark mb-2">{{ __('tutorial.what_to_explore') }}</h2>
+                    <p class="text-secondary">{{ __('tutorial.select_category') }}</p>
                 </div>
 
                 <div class="row g-4">
@@ -957,7 +957,7 @@ window.tutorialSubTopics = {
                     <div class="col-md-10 offset-md-1">
                         <div class="card shadow-sm border-0 bg-blue-lt">
                             <div class="card-body p-4">
-                                <h4 class="fw-bold mb-3"><i class="ti ti-bulb text-warning me-2"></i>{{ __('Quick Guide:') }}</h4>
+                                <h4 class="fw-bold mb-3"><i class="ti ti-bulb text-warning me-2"></i>{{ __('tutorial.quick_guide') }}</h4>
                                 <ul class="text-secondary fs-4 context-list ps-3 mb-0">
                                     @foreach($contextSteps as $step)
                                         <li>{!! $step !!}</li>
@@ -972,13 +972,13 @@ window.tutorialSubTopics = {
             <!-- Footer -->
             <div class="modal-footer" style="border-top: 1px solid rgba(0,0,0,0.05); padding: 16px 24px;">
                 <button type="button" class="btn btn-ghost-secondary me-auto" onclick="closeTutorialExplicitly()">
-                    <i class="ti ti-x me-2"></i>{{ __('Skip / Close') }}
+                    <i class="ti ti-x me-2"></i>{{ __('tutorial.skip_close') }}
                 </button>
                 <button type="button" class="btn btn-outline-primary shadow-sm px-4 me-2 d-none" id="btn-back-topics" onclick="showTopics()">
-                    <i class="ti ti-grid-dots me-2"></i> {{ __('View All Topics') }}
+                    <i class="ti ti-grid-dots me-2"></i> {{ __('tutorial.view_all_topics') }}
                 </button>
                 <button type="button" class="btn btn-primary btn-pill shadow-sm px-4" id="btn-next-tutorial" onclick="showTopics()">
-                    {{ __('Next: View Topics') }} <i class="ti ti-arrow-right ms-2"></i>
+                    {{ __('tutorial.next_view_topics') }} <i class="ti ti-arrow-right ms-2"></i>
                 </button>
             </div>
         </div>

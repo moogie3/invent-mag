@@ -51,6 +51,7 @@ return [
 
         // Professional features
         'pos'               => 'Point of Sale (POS)',
+        'stock_opname'      => 'Stock Opname (Physical Count)',
         'accounting'        => 'Full Accounting Suite',
         'crm'               => 'CRM & Sales Pipeline',
         'sales_pipeline'    => 'Sales Pipeline (Kanban)',
@@ -79,6 +80,9 @@ return [
     */
 
     'feature_routes' => [
+        'stock_opname' => [
+            'admin.stock-opname.*',
+        ],
         'pos' => [
             'admin.pos',
             'admin.pos.*',
@@ -131,6 +135,7 @@ return [
     */
 
     'upgrade_messages' => [
+        'stock_opname'      => 'Stock Opname is available on the Professional plan and above.',
         'pos'               => 'Point of Sale (POS) is available on the Professional plan and above.',
         'accounting'        => 'The full Accounting Suite is available on the Professional plan and above.',
         'crm'               => 'CRM & Sales Pipeline is available on the Professional plan and above.',

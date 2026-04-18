@@ -12,6 +12,7 @@ return [
     'product' => 'Produk',
     'customer' => 'Pelanggan',
     'supplier' => 'Pemasok',
+    'stock_opname' => 'Stock Opname',
     'warehouse' => 'Gudang',
     'tutorial' => 'Tutorial',
 

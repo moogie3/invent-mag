@@ -80,6 +80,13 @@ return [
             // No plan_feature: available on all plans (limit enforced on create)
         ],
         [
+            'title' => 'Stock Opname',
+            'route' => 'admin.stock-opname.index',
+            'icon' => 'ti ti-clipboard-check',
+            'permission' => 'view-stock-opname',
+            'plan_feature' => 'stock_opname',
+        ],
+        [
             'title' => 'messages.accounting',
             'icon' => 'ti ti-calculator',
             'permission' => 'view-accounting',

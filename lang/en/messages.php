@@ -12,6 +12,7 @@ return [
     'product' => 'Product',
     'customer' => 'Customer',
     'supplier' => 'Supplier',
+    'stock_opname' => 'Stock Opname',
     'warehouse' => 'Warehouse',
     'tutorial' => 'Tutorial',
 

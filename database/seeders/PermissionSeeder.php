@@ -41,6 +41,9 @@ class PermissionSeeder extends Seeder
             'view-financial-reports',
             'edit-transactions',
             'adjust-stock',
+            'view-stock-opname',
+            'manage-stock-opname',
+
             
             // Accounting
             'view-accounting',
@@ -188,6 +191,9 @@ class PermissionSeeder extends Seeder
             'view-sales', 'create-sales', 'edit-sales', 'delete-sales',
             'view-warehouses', 'create-warehouses', 'edit-warehouses', 'delete-warehouses',
             'view-reports', 'view-financial-reports', 'edit-transactions', 'adjust-stock',
+            'view-stock-opname',
+            'manage-stock-opname',
+
             'view-accounting', 'view-chart-of-accounts', 'edit-chart-of-accounts', 'delete-chart-of-accounts',
             'view-journal', 'view-general-ledger', 'view-trial-balance',
             'view-manual-journal', 'create-manual-journal', 'edit-manual-journal', 'delete-manual-journal',

@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Str;
 use App\Http\Controllers\Admin\{CategoryController, CustomerController, ProductController, PurchaseController, SalesPipelineController, SupplierController, UnitController, CurrencyController, SalesController, DashboardController, ProfileController, NotificationController, POSController, ReportController, WarehouseController, TaxController, UserController, CustomerCrmController, SupplierCrmController, SettingsController, PurchaseReturnController, SalesReturnController, JournalEntryController, StockTransferController, PlanController, ProductStockController, AuditLogController};
 use Laravel\Fortify\Http\Controllers\AuthenticatedSessionController;
+use App\Http\Controllers\Admin\StockOpnameController;
 use Laravel\Fortify\Http\Controllers\NewPasswordController;
 use Laravel\Fortify\Http\Controllers\PasswordResetLinkController;
 use Laravel\Fortify\Http\Controllers\RegisteredUserController;
@@ -442,6 +443,17 @@ Route::middleware('web')->prefix('admin')->group(function () {
         });
 
         // Warehouse Routes
+        // Stock Opname
+        Route::prefix('stock-opname')->middleware('plan.feature:stock_opname')->group(function () {
+            Route::get('/', [StockOpnameController::class, 'index'])->name('admin.stock-opname.index')->middleware('can:view-stock-opname');
+            Route::post('/', [StockOpnameController::class, 'store'])->name('admin.stock-opname.store')->middleware('can:manage-stock-opname');
+            Route::get('/create', [StockOpnameController::class, 'create'])->name('admin.stock-opname.create')->middleware('can:manage-stock-opname');
+            Route::get('/{stockOpname}', [StockOpnameController::class, 'show'])->name('admin.stock-opname.show')->middleware('can:view-stock-opname');
+            Route::post('/{stockOpname}/counts', [StockOpnameController::class, 'updateCounts'])->name('admin.stock-opname.update-counts')->middleware('can:manage-stock-opname');
+            Route::post('/{stockOpname}/complete', [StockOpnameController::class, 'complete'])->name('admin.stock-opname.complete')->middleware('can:manage-stock-opname');
+            Route::post('/{stockOpname}/cancel', [StockOpnameController::class, 'cancel'])->name('admin.stock-opname.cancel')->middleware('can:manage-stock-opname');
+        });
+
         Route::prefix('warehouses')->group(function () {
             Route::get('/', [WarehouseController::class, 'index'])
                 ->name('admin.warehouse')

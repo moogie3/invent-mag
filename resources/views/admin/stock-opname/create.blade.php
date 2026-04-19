@@ -1,6 +1,6 @@
 @extends('admin.layouts.base')
 
-@section('title', 'New Stock Opname')
+@section('title', '{{ __('''messages.plan_stock_opname''') }}')
 
 @section('content')
     <div class="page-wrapper">
@@ -72,7 +72,7 @@
                                     </div>
 
                                     <div class="form-footer text-end mt-4">
-                                        <a href="{{ route('admin.stock-opname.index') }}" class="btn btn-link">Cancel</a>
+                                        <a href="{{ route('admin.stock-opname.index') }}" class="btn btn-link">'{{ __('''messages.cancel''') }}'</a>
                                         <button type="submit" class="btn btn-primary">
                                             <i class="ti ti-device-floppy me-2"></i> Save & Generate Count Sheet
                                         </button>

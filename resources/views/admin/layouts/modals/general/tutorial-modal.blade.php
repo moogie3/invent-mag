@@ -83,6 +83,35 @@
             __('tutorial.export'),
             __('tutorial.quick_actions_adj')
         ];
+    } elseif ($routeName === 'admin.stock-opname.index') {
+        $contextTitle = __('messages.stock_opname');
+        $contextIcon = 'ti-clipboard-check';
+        $contextDesc = __('tutorial.stock_opname_desc');
+        $contextSteps = [
+            __('tutorial.stock_opname_step_1'),
+            __('tutorial.stock_opname_step_2'),
+            __('tutorial.stock_opname_step_3'),
+            __('tutorial.stock_opname_step_4'),
+        ];
+    } elseif ($routeName === 'admin.stock-opname.create') {
+        $contextTitle = __('tutorial.plan_stock_opname');
+        $contextIcon = 'ti-plus';
+        $contextDesc = __('tutorial.plan_stock_opname_desc');
+        $contextSteps = [
+            __('tutorial.plan_stock_opname_step_1'),
+            __('tutorial.plan_stock_opname_step_2'),
+            __('tutorial.plan_stock_opname_step_3'),
+        ];
+    } elseif ($routeName === 'admin.stock-opname.show') {
+        $contextTitle = __('tutorial.execute_stock_opname');
+        $contextIcon = 'ti-check';
+        $contextDesc = __('tutorial.execute_stock_opname_desc');
+        $contextSteps = [
+            __('tutorial.execute_stock_opname_step_1'),
+            __('tutorial.execute_stock_opname_step_2'),
+            __('tutorial.execute_stock_opname_step_3'),
+            __('tutorial.execute_stock_opname_step_4'),
+        ];
     } elseif (Str::startsWith($routeName, 'admin.warehouse')) {
         $contextTitle = __('tutorial.warehouse_management');
         $contextIcon = 'ti-building-warehouse';
@@ -726,6 +755,7 @@ window.tutorialSubTopics = {
             { icon: 'ti-receipt-refund', label: 'Sales Returns', url: '{{ route('admin.sales-returns.index') }}' },
             { icon: 'ti-arrow-back-up', label: 'Purchase Returns', url: '{{ route('admin.por.index') }}' },
             { icon: 'ti-chart-line', label: 'Sales Pipeline', url: '{{ route('admin.sales_pipeline.index') }}' },
+            { icon: 'ti-clipboard-check', label: 'Stock Opname', url: '{{ route('admin.stock-opname.index') }}' },
         ]
     },
     accounting: {

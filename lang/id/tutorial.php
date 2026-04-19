@@ -27,6 +27,25 @@ return [
     'system_alerts' => 'Peringatan Sistem: Peringatan stok rendah dan peringatan kedaluwarsa produk ditampilkan di sini.',
     
     // Product
+    // Stock Opname
+    'stock_opname_desc' => 'Kelola dan tinjau penghitungan inventaris fisik Anda (Stock Opname).',
+    'stock_opname_step_1' => 'Lihat Riwayat: Lihat log semua stock opname yang berstatus Draf, Sedang Berjalan, Selesai, dan Dibatalkan.',
+    'stock_opname_step_2' => 'Buat Baru: Klik tombol "Stock Opname Baru" untuk merencanakan penghitungan fisik untuk gudang tertentu.',
+    'stock_opname_step_3' => 'Periksa Status: Pantau penghitungan mana yang masih tertunda vs yang sudah selesai dan diposting ke akuntansi.',
+    'stock_opname_step_4' => 'Lihat Detail: Klik "Lihat" pada baris mana pun untuk melihat selisih produk yang tepat dan lembar penghitungan.',
+    
+    'plan_stock_opname' => 'Rencanakan Stock Opname',
+    'plan_stock_opname_desc' => 'Mulai penghitungan inventaris fisik baru untuk lokasi tertentu.',
+    'plan_stock_opname_step_1' => 'Pilih Gudang: Pilih lokasi yang ingin Anda audit. Sistem akan segera mengambil cuplikan kuantitas sistem yang diharapkan.',
+    'plan_stock_opname_step_2' => 'Tetapkan Tanggal: Pilih tanggal penghitungan fisik dijadwalkan berlangsung.',
+    'plan_stock_opname_step_3' => 'Tambahkan Catatan: Berikan instruksi spesifik apa pun untuk staf gudang yang melakukan penghitungan.',
+    
+    'execute_stock_opname' => 'Jalankan Stock Opname',
+    'execute_stock_opname_desc' => 'Masukkan jumlah fisik dan cocokkan selisih terhadap catatan sistem.',
+    'execute_stock_opname_step_1' => 'Masukkan Jumlah: Di kolom "Jumlah Fisik", masukkan jumlah persis yang ditemukan di lantai gudang.',
+    'execute_stock_opname_step_2' => 'Simpan Kemajuan: Klik "Simpan Jumlah" untuk menyimpan pekerjaan Anda. Anda dapat melakukan ini beberapa kali sebelum menyelesaikan opname.',
+    'execute_stock_opname_step_3' => 'Tinjau Selisih: Kolom "Selisih" secara otomatis akan menghitung kekurangan (merah) atau kelebihan (hijau).',
+    'execute_stock_opname_step_4' => 'Selesaikan & Posting: Klik "Selesaikan & Posting Penyesuaian" untuk menyelesaikan penghitungan. Ini akan memperbarui tingkat inventaris secara permanen dan secara otomatis menghasilkan entri jurnal akuntansi untuk setiap penyusutan atau kelebihan.',
     'create_product' => 'Buat Produk',
     'edit_product' => 'Edit Produk',
     'products' => 'Produk',
@@ -56,7 +75,6 @@ return [
     'stock_transfer_edit' => 'Transfer Stok: Klik "Transfer Stok" untuk membuka halaman transfer stok.',
     
     // Products list
-    'create_product_btn' => 'Buat Produk: Gunakan tombol "Buat Produk" untuk menambahkan informasi dasar.',
     'warehouse_filter' => 'Filter Gudang: Dropdown filter di samping tombol Buat Produk untuk melihat produk spesifik gudang tertentu.',
     'stock_status' => 'Status Stok: Fitur "Status Stok" menampilkan semua produk dengan tingkat stok rendah.',
     'expiry_status' => 'Status Kedaluwarsa: Fitur "Status Kedaluwarsa" memberikan visibilitas ke produk kedaluwarsa atau segera kedaluwarsa.',

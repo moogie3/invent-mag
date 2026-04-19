@@ -35,12 +35,12 @@
                             @if($stockOpname->status !== 'Completed' && $stockOpname->status !== 'Canceled')
                                 <form action="{{ route('admin.stock-opname.cancel', $stockOpname->id) }}" method="POST" class="d-inline" onsubmit="return confirm('Are you sure you want to cancel this Stock Opname?');">
                                     @csrf
-                                    <button type="submit" class="btn btn-outline-danger">Cancel Opname</button>
+                                    <button type="submit" class="btn btn-outline-danger">{{ __('messages.cancel_opname') }}</button>
                                 </form>
                                 <form action="{{ route('admin.stock-opname.complete', $stockOpname->id) }}" method="POST" class="d-inline" onsubmit="return confirm('Are you sure you want to complete this Stock Opname? This will automatically post all variance adjustments to inventory and accounting.');">
                                     @csrf
                                     <button type="submit" class="btn btn-success">
-                                        <i class="ti ti-check me-2"></i> Complete & Post Adjustments
+                                        <i class="ti ti-check me-2"></i> {{ __('messages.complete_post_adjustments') }}
                                     </button>
                                 </form>
                             @endif
@@ -53,10 +53,10 @@
             <div class="{{ ($containerClass ?? 'container-xl') === 'container-xl' ? 'container-fluid' : $containerClass }}" 
                  style="{{ ($containerClass ?? 'container-xl') === 'container-xl' ? 'max-width: 90%;' : '' }}">
                 <div class="row row-cards">
-                    <div class="col-md-3">
+                    <div class="col-md-3 order-2">
                         <div class="card border-0 shadow-sm rounded-3">
                             <div class="card-header">
-                                <h3 class="card-title">Opname Details</h3>
+                                <h3 class="card-title">{{ __('messages.stock_opname_details') }}</h3>
                             </div>
                             <div class="card-body">
                                 <div class="mb-3">
@@ -71,7 +71,7 @@
                                     <div class="text-muted">Created By</div>
                                     <div class="fw-bold">
                                         {{ $stockOpname->createdBy->name }}
-                                        <span class="text-muted fw-normal ms-1">({{ $stockOpname->createdBy->getRoleNames()->first() ?? 'User' }})</span>
+                                        <span class="badge bg-blue-lt ms-2">{{ $stockOpname->createdBy->getRoleNames()->first() ?? 'User' }}</span>
                                     </div>
                                 </div>
                                 @if($stockOpname->completed_at)
@@ -90,10 +90,10 @@
                         </div>
                     </div>
                     
-                    <div class="col-md-9">
+                    <div class="col-md-9 order-1">
                         <div class="card border-0 shadow-sm rounded-3">
                             <div class="card-header d-flex justify-content-between align-items-center">
-                                <h3 class="card-title">Counting Sheet</h3>
+                                <h3 class="card-title">{{ __('messages.counting_sheet') }}</h3>
                                 @if($stockOpname->status !== 'Completed' && $stockOpname->status !== 'Canceled')
                                     <button type="submit" form="countsForm" class="btn btn-primary btn-sm">
                                         <i class="ti ti-device-floppy me-2"></i> Save Counts

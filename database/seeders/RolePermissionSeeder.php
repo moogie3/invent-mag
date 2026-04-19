@@ -35,6 +35,9 @@ class RolePermissionSeeder extends Seeder
             'edit-products',
             'view-warehouses',
             'create-warehouses',
+            'view-stock-opname',
+            'manage-stock-opname',
+
             'edit-warehouses',
         ]);
 

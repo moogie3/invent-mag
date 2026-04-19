@@ -27,6 +27,25 @@ return [
     'system_alerts' => 'System Alerts: Low stock warnings and product expiry alerts are surfaced here so you can take action immediately.',
     
     // Product
+    // Stock Opname
+    'stock_opname_desc' => 'Manage and review your physical inventory counts (Stock Opnames).',
+    'stock_opname_step_1' => 'View History: See a log of all Draft, In Progress, Completed, and Canceled stock opnames.',
+    'stock_opname_step_2' => 'Create New: Click the "New Stock Opname" button to plan a physical count for a specific warehouse.',
+    'stock_opname_step_3' => 'Check Status: Monitor which counts are still pending vs already completed and posted to accounting.',
+    'stock_opname_step_4' => 'View Details: Click "View" on any row to see the exact product variances and count sheets.',
+    
+    'plan_stock_opname' => 'Plan Stock Opname',
+    'plan_stock_opname_desc' => 'Initiate a new physical inventory count for a specific location.',
+    'plan_stock_opname_step_1' => 'Select Warehouse: Choose the location you want to audit. The system will immediately take a snapshot of the expected system quantities.',
+    'plan_stock_opname_step_2' => 'Set Date: Select the date the physical count is scheduled to take place.',
+    'plan_stock_opname_step_3' => 'Add Notes: Provide any specific instructions for the warehouse staff performing the count.',
+    
+    'execute_stock_opname' => 'Execute Stock Opname',
+    'execute_stock_opname_desc' => 'Input physical counts and reconcile variances against system records.',
+    'execute_stock_opname_step_1' => 'Input Counts: In the "Physical Count" column, enter the exact quantity found on the warehouse floor.',
+    'execute_stock_opname_step_2' => 'Save Progress: Click "Save Counts" to save your work. You can do this multiple times before completing the opname.',
+    'execute_stock_opname_step_3' => 'Review Variances: The "Variance" column will automatically calculate shortages (red) or excesses (green).',
+    'execute_stock_opname_step_4' => 'Complete & Post: Click "Complete & Post Adjustments" to finalize the count. This will permanently update inventory levels and automatically generate accounting journal entries for any shrinkage or excess.',
     'create_product' => 'Create Product',
     'edit_product' => 'Edit Product',
     'products' => 'Products',
@@ -56,7 +75,6 @@ return [
     'stock_transfer_edit' => 'Stock Transfer: Click "Transfer Stock" to open the stock transfer page. Select source warehouse, destination warehouse, enter quantity, and submit to move stock between warehouses.',
     
     // Products list
-    'create_product_btn' => 'Create Product: Use the "Create Product" button to add basic information such as name, code, supplier, category, unit, buying price, and selling price. Warehouse and quantity are assigned separately through stock adjustment features.',
     'warehouse_filter' => 'Warehouse Filter: The dropdown filter adjacent to the Create Product button allows you to view products specific to a particular warehouse location.',
     'stock_status' => 'Stock Status: The "Stock Status" feature displays all products with low stock levels, enabling timely replenishment.',
     'expiry_status' => 'Expiry Status: The "Expiry Status" feature provides visibility into expired or soon-to-expire products, essential for managing perishable inventory.',

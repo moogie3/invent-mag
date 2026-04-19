@@ -23,7 +23,7 @@
                         <div class="btn-list">
                             <a href="{{ route('admin.stock-opname.create') }}" class="btn btn-primary d-none d-sm-inline-block">
                                 <i class="ti ti-plus me-2"></i>
-                                New Stock Opname
+                                {{ __('messages.new_stock_opname') }}
                             </a>
                         </div>
                     </div>
@@ -41,12 +41,12 @@
                         <table class="table table-vcenter card-table table-striped table-hover">
                             <thead>
                                 <tr>
-                                    <th>Reference</th>
-                                    <th>Warehouse</th>
-                                    <th>Status</th>
-                                    <th>Scheduled Date</th>
-                                    <th>Created By</th>
-                                    <th class="w-1"></th>
+                                    <th>{{ __('messages.stock_opname_ref') }}</th>
+                                    <th>{{ __('messages.stock_opname_warehouse') }}</th>
+                                    <th>{{ __('messages.stock_opname_status') }}</th>
+                                    <th>{{ __('messages.stock_opname_scheduled_date') }}</th>
+                                    <th>{{ __('messages.stock_opname_created_by') }}</th>
+                                    <th class="w-1">{{ __('messages.action') ?? 'Action' }}</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -68,18 +68,18 @@
                                         <td>{{ $opname->scheduled_date->format('d M Y') }}</td>
                                         <td>
                                             {{ $opname->createdBy->name }}<br>
-                                            <small class="text-muted">{{ $opname->createdBy->getRoleNames()->first() ?? 'User' }}</small>
+                                            <span class="badge bg-blue-lt mt-1">{{ $opname->createdBy->getRoleNames()->first() ?? 'User' }}</span>
                                         </td>
                                         <td>
-                                            <a href="{{ route('admin.stock-opname.show', $opname->id) }}" class="btn btn-sm btn-outline-primary">
-                                                View
+                                            <a href="{{ route('admin.stock-opname.show', $opname->id) }}" class="btn btn-icon btn-ghost-primary" title="{{ __('messages.view') ?? 'View' }}">
+                                                <i class="ti ti-eye"></i>
                                             </a>
                                         </td>
                                     </tr>
                                 @empty
                                     <tr>
                                         <td colspan="6" class="text-center py-4 text-muted">
-                                            No stock opnames found. Click "New Stock Opname" to create one.
+                                            No stock opnames found. Click "{{ __('messages.new_stock_opname') }}" to create one.
                                         </td>
                                     </tr>
                                 @endforelse

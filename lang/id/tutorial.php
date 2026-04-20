@@ -5,16 +5,16 @@ return [
     'welcome_title' => 'Selamat Datang di Invent-MAG',
     'welcome_subtitle' => 'Solusi Inventory & Akuntansi Lengkap Anda',
     'welcome_description' => 'Untuk membuka potensi penuh aplikasi, ikuti alur pengaturan yang disarankan:',
-    
+
     // Step titles
     'help_tutorial' => 'Bantuan & Tutorial',
     'need_help_navigating' => 'Butuh bantuan menavigasi halaman ini? Berikut yang bisa Anda lakukan.',
-    
+
     // Topics grid
     'what_to_explore' => 'Apa yang ingin Anda jelajahi?',
     'select_category' => 'Pilih kategori untuk melihat halaman yang tersedia.',
     'topics_title' => 'Semua Topik',
-    
+
     // Dashboard
     'dashboard' => 'Dasbor',
     'dashboard_desc' => 'Gambaran bisnis Anda secara sekilas — metrik, grafik, dan tindakan cepat.',
@@ -25,7 +25,7 @@ return [
     'recent_transactions' => 'Transaksi Terbaru: Bagian konten utama menunjukkan pesanan penjualan dan pembelian terbaru.',
     'quick_actions' => 'Tindakan Cepat: Tombol "Invoice Baru" (kanan atas) untuk membuat Pesanan Penjualan atau Pembelian dengan cepat.',
     'system_alerts' => 'Peringatan Sistem: Peringatan stok rendah dan peringatan kedaluwarsa produk ditampilkan di sini.',
-    
+
     // Product
     // Stock Opname
     'stock_opname_desc' => 'Kelola dan tinjau penghitungan inventaris fisik Anda (Stock Opname).',
@@ -33,13 +33,13 @@ return [
     'stock_opname_step_2' => 'Buat Baru: Klik tombol "Stock Opname Baru" untuk merencanakan penghitungan fisik untuk gudang tertentu.',
     'stock_opname_step_3' => 'Periksa Status: Pantau penghitungan mana yang masih tertunda vs yang sudah selesai dan diposting ke akuntansi.',
     'stock_opname_step_4' => 'Lihat Detail: Klik "Lihat" pada baris mana pun untuk melihat selisih produk yang tepat dan lembar penghitungan.',
-    
+
     'plan_stock_opname' => 'Rencanakan Stock Opname',
     'plan_stock_opname_desc' => 'Mulai penghitungan inventaris fisik baru untuk lokasi tertentu.',
     'plan_stock_opname_step_1' => 'Pilih Gudang: Pilih lokasi yang ingin Anda audit. Sistem akan segera mengambil cuplikan kuantitas sistem yang diharapkan.',
     'plan_stock_opname_step_2' => 'Tetapkan Tanggal: Pilih tanggal penghitungan fisik dijadwalkan berlangsung.',
     'plan_stock_opname_step_3' => 'Tambahkan Catatan: Berikan instruksi spesifik apa pun untuk staf gudang yang melakukan penghitungan.',
-    
+
     'execute_stock_opname' => 'Jalankan Stock Opname',
     'execute_stock_opname_desc' => 'Masukkan jumlah fisik dan cocokkan selisih terhadap catatan sistem.',
     'execute_stock_opname_step_1' => 'Masukkan Jumlah: Di kolom "Jumlah Fisik", masukkan jumlah persis yang ditemukan di lantai gudang.',
@@ -73,7 +73,7 @@ return [
     'pricing_edit' => 'Harga: Modifikasi harga beli dan harga jual.',
     'stock_warehouse_edit' => 'Stok per Gudang: Lihat tingkat stok saat ini di semua gudang.',
     'stock_transfer_edit' => 'Transfer Stok: Klik "Transfer Stok" untuk membuka halaman transfer stok.',
-    
+
     // Products list
     'warehouse_filter' => 'Filter Gudang: Dropdown filter di samping tombol Buat Produk untuk melihat produk spesifik gudang tertentu.',
     'stock_status' => 'Status Stok: Fitur "Status Stok" menampilkan semua produk dengan tingkat stok rendah.',
@@ -81,7 +81,7 @@ return [
     'bulk_actions' => 'Tindakan Massal: Pilih beberapa produk menggunakan checkbox untuk melakukan Pembaruan Massal, Ekspor Massal, atau Hapus Massal.',
     'table_actions' => 'Tindakan Tabel: Setiap baris menyertakan menu tindakan dengan opsi Lihat, Edit, Sesuaikan Stok, dan Hapus.',
     'multi_warehouse_flow' => 'Alur Multi-Gudang: Produk baru secara otomatis ditetapkan ke Gudang Utama.',
-    
+
     // Stock Transfer
     'stock_transfer' => 'Transfer Stok',
     'stock_transfer_desc' => 'Pindahkan stok antar gudang untuk mengelola distribusi inventori.',
@@ -92,7 +92,7 @@ return [
     'add_reason' => 'Tambahkan Alasan: Tambahkan alasan untuk transfer.',
     'submit_transfer' => 'Kirim Transfer: Klik Transfer untuk menyelesaikan proses.',
     'view_history' => 'Lihat Riwayat: Klik "Riwayat Penyesuaian" untuk melihat semua transfer dan penyesuaian stok.',
-    
+
     // Adjustment Log
     'adjustment_log' => 'Riwayat Penyesuaian',
     'adjustment_log_desc' => 'Lihat riwayat semua penyesuaian dan transfer stok.',
@@ -103,7 +103,7 @@ return [
     'filter_by_date' => 'Filter berdasarkan Tanggal: Gunakan kolom Tanggal Dari dan Tanggal Untuk mempersempit riwayat.',
     'export' => 'Ekspor: Gunakan tombol Ekspor untuk mengunduh log penyesuaian sebagai PDF atau CSV.',
     'quick_actions_adj' => 'Tindakan Cepat: Klik ikon mata pada baris mana pun untuk melihat informasi detail.',
-    
+
     // Warehouse
     'warehouse_management' => 'Manajemen Gudang',
     'warehouse_management_desc' => 'Konfigurasi lokasi fisik atau logis untuk menyimpan dan melacak inventori.',
@@ -114,7 +114,7 @@ return [
     'export_warehouse' => 'Ekspor: Gunakan dropdown ekspor untuk mengunduh data gudang sebagai CSV atau PDF.',
     'table_actions_warehouse' => 'Tindakan Tabel: Setiap baris gudang memiliki menu tindakan untuk Lihat, Edit, atau Hapus.',
     'stock_tracking' => 'Pelacakan Stok: Setiap gudang mempertahankan tingkat stok independen.',
-    
+
     // Customer
     'customer_management' => 'Manajemen Pelanggan',
     'customer_management_desc' => 'Kelola pelanggan Anda untuk pesanan penjualan, faktur, dan pelacakan riwayat pelanggan.',
@@ -122,7 +122,7 @@ return [
     'customer_crm' => 'CRM Pelanggan: Gunakan fitur CRM untuk melacak interaksi pelanggan, riwayat pembelian, dan status pembayaran.',
     'customer_list' => 'Daftar Pelanggan: Lihat semua pelanggan dalam tabel dengan detailnya.',
     'table_actions_customer' => 'Tindakan Tabel: Setiap baris pelanggan memiliki menu tindakan untuk Lihat CRM, Edit, atau Hapus.',
-    
+
     // Supplier
     'supplier_management' => 'Manajemen Supplier',
     'supplier_management_desc' => 'Kelola supplier Anda untuk pesanan pembelian dan pelacakan hubungan pasokan.',
@@ -130,7 +130,7 @@ return [
     'supplier_srm' => 'SRM Supplier: Gunakan fitur SRM untuk melacak kinerja supplier, riwayat pembelian, dan status pembayaran.',
     'supplier_list' => 'Daftar Supplier: Lihat semua supplier dalam tabel dengan detailnya.',
     'table_actions_supplier' => 'Tindakan Tabel: Setiap baris supplier memiliki menu tindakan untuk Lihat SRM, Edit, atau Hapus.',
-    
+
     // Sales Orders
     'create_sales_order' => 'Buat Pesanan Penjualan',
     'create_sales_order_desc' => 'Buat pesanan penjualan baru dengan memilih pelanggan, menambahkan produk, dan mengatur ketentuan pembayaran.',
@@ -143,7 +143,7 @@ return [
     'order_summary' => 'Ringkasan Pesanan: Lihat subtotal, pajak, diskon, dan total kotor.',
     'credit_applied' => 'Kredit Diterapkan: Jika Anda menerapkan kredit pelanggan, itu akan mengurangi saldo akhir.',
     'submit_sales' => 'Kirim: Klik "Buat Pesanan Penjualan" untuk menyimpan.',
-    
+
     // Edit Sales Order
     'edit_sales_order' => 'Edit Pesanan Penjualan',
     'edit_sales_order_desc' => 'Lihat dan edit detail pesanan penjualan, sesuaikan item, catat pembayaran, dan kelola pengembalian.',
@@ -155,7 +155,7 @@ return [
     'payment_info' => 'Info Pembayaran: Total Dibayar menunjukkan jumlah yang sudah dibayar pelanggan.',
     'track_returns_sales' => 'Lacak Pengembalian: Kolom jumlah menunjukkan JUMLAH AKHIR (jumlah asli dikurangi item yang dikembalikan).',
     'save_sales' => 'Simpan: Klik "Simpan Perubahan" untuk memperbarui pesanan penjualan.',
-    
+
     // View Sales Order
     'view_sales_order' => 'Lihat Pesanan Penjualan',
     'view_sales_order_desc' => 'Lihat informasi detail pesanan penjualan termasuk item, status pembayaran, dan riwayat.',
@@ -166,10 +166,10 @@ return [
     'amount_display' => 'Tampilan Jumlah: Jumlah yang ditampilkan sudah Disesuaikan.',
     'create_return_link' => 'Untuk Membuat Pengembalian: Untuk memproses pengembalian baru, buka menu Pengembalian Pesanan Penjualan.',
     'actions_sales' => 'Aksi: Gunakan tombol "Cetak Faktur" untuk mencetak atau mengunduh PDF.',
-    
+
     // Quick guide
     'quick_guide' => 'Panduan Cepat:',
-    
+
     // Buttons
     'skip_close' => 'Lewati / Tutup',
     'view_all_topics' => 'Lihat Semua Topik',
@@ -457,7 +457,6 @@ return [
     'export_coa' => 'Ekspor: Gunakan dropdown ekspor untuk mengunduh.',
 
     // Add Account
-    'add_account' => 'Tambah Akun',
     'add_account_desc' => 'Buat akun baru dalam chart of accounts.',
     'name_acc' => 'Nama: Masukkan nama resmi akun.',
     'code_acc' => 'Kode: Masukkan kode unik untuk akun.',
@@ -565,7 +564,6 @@ return [
     'search_filter_al' => 'Cari & Filter: Gunakan kotak pencarian untuk menemukan log.',
     'activity_timeline' => 'Linimasa Aktivitas: Lihat catatan kronologis.',
     'filter_action_type' => 'Filter berdasarkan Tipe Aksi: Filter log berdasarkan tipe aksi.',
-    'filter_by_user' => 'Filter berdasarkan Pengguna: Lihat semua aktivitas oleh pengguna tertentu.',
     'security_compliance' => 'Keamanan & Kepatuhan: Manfaatkan log audit.',
 
     // Users
@@ -578,7 +576,6 @@ return [
     'delete_user' => 'Hapus Pengguna: Gunakan ikon hapus.',
 
     // Notifications
-    'notifications' => 'Notifikasi',
     'notifications_desc' => 'Lihat dan kelola notifikasi sistem.',
     'po_sales_notif' => 'Pesanan Pembelian & Penjualan: Menampilkan notifikasi terkait pesanan.',
     'low_stock_notif' => 'Stok Rendah: Menampilkan peringatan untuk produk dengan stok rendah.',

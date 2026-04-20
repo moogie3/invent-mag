@@ -13,8 +13,10 @@ class PlanSeeder extends Seeder
      * Feature slugs correspond to config/plans.php feature definitions.
      * Limits match the pricing page exactly:
      *   Starter:      $19/mo, 3 users, 1 warehouse, 100 products, 7-day trial
-     *   Professional:  $49/mo, 10 users, unlimited warehouses, 500 products, 7-day trial
-     *   Enterprise:    $89/mo, unlimited users, unlimited warehouses, unlimited products, 7-day trial
+     *   Professional:  $59/mo, 10 users, unlimited warehouses, 500 products, 7-day trial
+     *   Enterprise:    $109/mo, unlimited users, unlimited warehouses, unlimited products, 7-day trial
+     *
+     * Pricing Updated: April 2026 (Stock Opname feature added to Professional)
      */
     public function run(): void
     {
@@ -46,7 +48,7 @@ class PlanSeeder extends Seeder
             [
                 'slug' => 'professional',
                 'name' => 'Professional',
-                'price' => 49.00,
+                'price' => 59.00,
                 'billing_cycle' => 'monthly',
                 'description' => 'Full ERP with POS, accounting, CRM & pipeline.',
                 'max_users' => 10,
@@ -68,6 +70,7 @@ class PlanSeeder extends Seeder
                     'suppliers',
                     // Professional features
                     'pos',
+                    'stock_opname',
                     'accounting',
                     'crm',
                     'sales_pipeline',
@@ -80,7 +83,7 @@ class PlanSeeder extends Seeder
             [
                 'slug' => 'enterprise',
                 'name' => 'Enterprise',
-                'price' => 89.00,
+                'price' => 109.00,
                 'billing_cycle' => 'monthly',
                 'description' => 'Advanced intelligence, API access & full compliance.',
                 'max_users' => -1, // unlimited
@@ -102,6 +105,7 @@ class PlanSeeder extends Seeder
                     'suppliers',
                     // All professional features
                     'pos',
+                    'stock_opname',
                     'accounting',
                     'crm',
                     'sales_pipeline',

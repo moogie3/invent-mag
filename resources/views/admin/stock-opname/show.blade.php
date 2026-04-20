@@ -1,6 +1,6 @@
 @extends('admin.layouts.base')
 
-@section('title', 'Stock Opname: ' . $stockOpname->reference_number)
+@section('title', __('messages.stock_opname_view') . ': ' . $stockOpname->reference_number)
 
 @section('content')
     <div class="page-wrapper">
@@ -17,13 +17,13 @@
                         <h2 class="page-title d-flex align-items-center">
                             <i class="ti ti-clipboard-check me-2"></i> {{ $stockOpname->reference_number }}
                             @if($stockOpname->status === 'Draft')
-                                <span class="badge bg-secondary text-white ms-3">{{ $stockOpname->status }}</span>
+                                <span class="badge bg-secondary text-white ms-3">{{ __('messages.draft') }}</span>
                             @elseif($stockOpname->status === 'In Progress')
-                                <span class="badge bg-warning text-white ms-3">{{ $stockOpname->status }}</span>
+                                <span class="badge bg-warning text-white ms-3">{{ __('messages.in_progress') }}</span>
                             @elseif($stockOpname->status === 'Completed')
-                                <span class="badge bg-success text-white ms-3">{{ $stockOpname->status }}</span>
+                                <span class="badge bg-success text-white ms-3">{{ __('messages.completed') }}</span>
                             @else
-                                <span class="badge bg-danger text-white ms-3">{{ $stockOpname->status }}</span>
+                                <span class="badge bg-danger text-white ms-3">{{ __('messages.canceled') }}</span>
                             @endif
                             <a href="#" class="ms-3 text-muted trigger-tutorial-modal" data-bs-toggle="tooltip" title="{{ __('messages.tutorial') }}">
                                 <i class="ti ti-help-circle fs-3"></i>
@@ -33,16 +33,12 @@
                     <div class="col-auto ms-auto d-print-none">
                         <div class="btn-list">
                             @if($stockOpname->status !== 'Completed' && $stockOpname->status !== 'Canceled')
-                                <form action="{{ route('admin.stock-opname.cancel', $stockOpname->id) }}" method="POST" class="d-inline" onsubmit="return confirm('Are you sure you want to cancel this Stock Opname?');">
-                                    @csrf
-                                    <button type="submit" class="btn btn-outline-danger">{{ __('messages.cancel_opname') }}</button>
-                                </form>
-                                <form action="{{ route('admin.stock-opname.complete', $stockOpname->id) }}" method="POST" class="d-inline" onsubmit="return confirm('Are you sure you want to complete this Stock Opname? This will automatically post all variance adjustments to inventory and accounting.');">
-                                    @csrf
-                                    <button type="submit" class="btn btn-success">
-                                        <i class="ti ti-check me-2"></i> {{ __('messages.complete_post_adjustments') }}
-                                    </button>
-                                </form>
+                                <button type="button" class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#cancelOpnameModal" data-action-url="{{ route('admin.stock-opname.cancel', $stockOpname->id) }}">
+                                    {{ __('messages.cancel_opname') }}
+                                </button>
+                                <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#completeOpnameModal" data-action-url="{{ route('admin.stock-opname.complete', $stockOpname->id) }}">
+                                    <i class="ti ti-check me-2"></i> {{ __('messages.complete_post_adjustments') }}
+                                </button>
                             @endif
                         </div>
                     </div>
@@ -60,29 +56,29 @@
                             </div>
                             <div class="card-body">
                                 <div class="mb-3">
-                                    <div class="text-muted">Warehouse</div>
+                                    <div class="text-muted">{{ __('messages.warehouse') }}</div>
                                     <div class="fw-bold">{{ $stockOpname->warehouse->name }}</div>
                                 </div>
                                 <div class="mb-3">
-                                    <div class="text-muted">Scheduled Date</div>
+                                    <div class="text-muted">{{ __('messages.scheduled_date') }}</div>
                                     <div class="fw-bold">{{ $stockOpname->scheduled_date->format('d M Y') }}</div>
                                 </div>
                                 <div class="mb-3">
-                                    <div class="text-muted">Created By</div>
+                                    <div class="text-muted">{{ __('messages.stock_opname_created_by') }}</div>
                                     <div class="fw-bold">
                                         {{ $stockOpname->createdBy->name }}
-                                        <span class="badge bg-blue-lt ms-2">{{ $stockOpname->createdBy->getRoleNames()->first() ?? 'User' }}</span>
+                                        <span class="badge bg-blue-lt ms-2">{{ $stockOpname->createdBy->getRoleNames()->first() ?? __('messages.user') }}</span>
                                     </div>
                                 </div>
                                 @if($stockOpname->completed_at)
                                 <div class="mb-3">
-                                    <div class="text-muted">Completed At</div>
+                                    <div class="text-muted">{{ __('messages.completed_at') }}</div>
                                     <div class="fw-bold">{{ $stockOpname->completed_at->format('d M Y H:i') }}</div>
                                 </div>
                                 @endif
                                 @if($stockOpname->notes)
                                 <div class="mb-3">
-                                    <div class="text-muted">Notes</div>
+                                    <div class="text-muted">{{ __('messages.notes') }}</div>
                                     <div class="fw-bold">{{ $stockOpname->notes }}</div>
                                 </div>
                                 @endif
@@ -96,7 +92,7 @@
                                 <h3 class="card-title">{{ __('messages.counting_sheet') }}</h3>
                                 @if($stockOpname->status !== 'Completed' && $stockOpname->status !== 'Canceled')
                                     <button type="submit" form="countsForm" class="btn btn-primary btn-sm">
-                                        <i class="ti ti-device-floppy me-2"></i> Save Counts
+                                        <i class="ti ti-device-floppy me-2"></i> {{ __('messages.save_counts') }}
                                     </button>
                                 @endif
                             </div>
@@ -106,11 +102,11 @@
                                     <table class="table table-vcenter card-table table-striped table-hover">
                                         <thead>
                                             <tr>
-                                                <th>Product Code</th>
-                                                <th>Product Name</th>
-                                                <th class="text-center">Expected Qty</th>
-                                                <th class="text-center" style="width: 150px;">Physical Count</th>
-                                                <th class="text-center">Variance</th>
+                                                <th>{{ __('messages.product_code') }}</th>
+                                                <th>{{ __('messages.product_name') }}</th>
+                                                <th class="text-center">{{ __('messages.expected_qty') }}</th>
+                                                <th class="text-center" style="width: 150px;">{{ __('messages.physical_count') }}</th>
+                                                <th class="text-center">{{ __('messages.variance') }}</th>
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -123,7 +119,7 @@
                                                         @if($stockOpname->status !== 'Completed' && $stockOpname->status !== 'Canceled')
                                                             <input type="number" step="0.01" class="form-control text-center" 
                                                                 name="counts[{{ $item->product_id }}]" 
-                                                                value="{{ $item->counted_qty }}" placeholder="Count">
+                                                                value="{{ $item->counted_qty }}" placeholder="{{ __('messages.physical_count') }}">
                                                         @else
                                                             <span class="fw-bold">{{ $item->counted_qty ?? '-' }}</span>
                                                         @endif
@@ -158,4 +154,6 @@
             </div>
         </div>
     </div>
+
+    @include('admin.layouts.modals.stock-opname.stockopnamemodals')
 @endsection

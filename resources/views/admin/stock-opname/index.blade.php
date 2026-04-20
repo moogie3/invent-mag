@@ -56,19 +56,19 @@
                                         <td>{{ $opname->warehouse->name }}</td>
                                         <td>
                                             @if($opname->status === 'Draft')
-                                                <span class="badge bg-secondary text-white">{{ $opname->status }}</span>
+                                                <span class="badge bg-secondary text-white">{{ __('messages.draft') }}</span>
                                             @elseif($opname->status === 'In Progress')
-                                                <span class="badge bg-warning text-white">{{ $opname->status }}</span>
+                                                <span class="badge bg-warning text-white">{{ __('messages.in_progress') }}</span>
                                             @elseif($opname->status === 'Completed')
-                                                <span class="badge bg-success text-white">{{ $opname->status }}</span>
+                                                <span class="badge bg-success text-white">{{ __('messages.completed') }}</span>
                                             @else
-                                                <span class="badge bg-danger text-white">{{ $opname->status }}</span>
+                                                <span class="badge bg-danger text-white">{{ __('messages.canceled') }}</span>
                                             @endif
                                         </td>
                                         <td>{{ $opname->scheduled_date->format('d M Y') }}</td>
                                         <td>
                                             {{ $opname->createdBy->name }}<br>
-                                            <span class="badge bg-blue-lt mt-1">{{ $opname->createdBy->getRoleNames()->first() ?? 'User' }}</span>
+                                            <span class="badge bg-blue-lt mt-1">{{ $opname->createdBy->getRoleNames()->first() ?? __('messages.user') }}</span>
                                         </td>
                                         <td>
                                             <a href="{{ route('admin.stock-opname.show', $opname->id) }}" class="btn btn-icon btn-ghost-primary" title="{{ __('messages.view') ?? 'View' }}">
@@ -78,8 +78,19 @@
                                     </tr>
                                 @empty
                                     <tr>
-                                        <td colspan="6" class="text-center py-4 text-muted">
-                                            No stock opnames found. Click "{{ __('messages.new_stock_opname') }}" to create one.
+                                        <td colspan="6">
+                                            <div class="empty">
+                                                <div class="empty-img">
+                                                    <i class="ti ti-clipboard-check" style="font-size: 5rem; color: #ccc;"></i>
+                                                </div>
+                                                <p class="empty-title">{{ __('messages.no_stock_opname') }}</p>
+                                                <p class="empty-subtitle text-muted">{{ __('messages.no_stock_opname_desc') }}</p>
+                                                <div class="empty-action">
+                                                    <a href="{{ route('admin.stock-opname.create') }}" class="btn btn-primary">
+                                                        <i class="ti ti-plus me-2"></i>{{ __('messages.new_stock_opname') }}
+                                                    </a>
+                                                </div>
+                                            </div>
                                         </td>
                                     </tr>
                                 @endforelse

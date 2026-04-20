@@ -95,11 +95,13 @@ class Product extends Model
 
 #### Subscription Tiers
 
-| Tier         | Users     | Warehouses | Products  | Features                              |
-| ------------ | --------- | ---------- | --------- | -------------------------------------- |
-| Starter      | 3         | 1          | 100       | Basic (Products, Sales, Purchases)    |
-| Professional | 10        | Unlimited  | 500       | + POS, Accounting, CRM, Pipeline     |
-| Enterprise   | Unlimited | Unlimited  | Unlimited | + Forecasting, API, Audit Trail       |
+| Tier         | Users     | Warehouses | Products  | Price  | Features                                   |
+| ------------ | --------- | ---------- | ---------|--------| ------------------------------------------ |
+| Starter      | 3         | 1          | 100      | $19/mo | Basic (Products, Sales, Purchases)             |
+| Professional | 10        | Unlimited  | 500      | $59/mo | + POS, Stock Opname, Accounting, CRM        |
+| Enterprise   | Unlimited | Unlimited  | Unlimited | $109/mo| + Forecasting, API, Audit Trail            |
+
+*(Updated: April 2026 - Stock Opname added to Professional tier)*
 
 #### Payment Flow
 

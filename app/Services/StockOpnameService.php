@@ -93,9 +93,12 @@ class StockOpnameService
                     ->first();
                     
                 if ($item) {
+                    $variance = (float) $countedQty - $item->expected_qty;
+                    $unitCost = $item->product->cost ?? $item->product->price ?? 0;
                     $item->update([
                         'counted_qty' => (float) $countedQty,
-                        'variance' => (float) $countedQty - $item->expected_qty
+                        'variance' => $variance,
+                        'variance_value' => abs($variance) * $unitCost
                     ]);
                 }
             }

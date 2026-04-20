@@ -78,6 +78,20 @@
 
 ---
 
+### 📦 Stock Opname & Audit (Professional+)
+
+- [x] Stock Opname scheduling by warehouse and date
+- [x] Multi-warehouse counting support
+- [x] Snapshot of current stock on opname creation
+- [x] Physical count entry with variance tracking
+- [x] Auto-calculate shortage/excess quantities
+- [x] Inventory adjustment on completion
+- [x] Accounting journal integration
+- [x] Audit trail for all counts
+- [x] Complete workflow (Draft → In Progress → Completed/Canceled)
+
+---
+
 ### 💰 Sales Management
 
 - [x] Sales order management (CRUD)

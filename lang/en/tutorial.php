@@ -5,16 +5,16 @@ return [
     'welcome_title' => 'Welcome to Invent-MAG',
     'welcome_subtitle' => 'Your Complete Inventory & Accounting Solution',
     'welcome_description' => 'To unlock the full potential of the app, follow this recommended setup flow:',
-    
+
     // Step titles
     'help_tutorial' => 'Help & Tutorial',
     'need_help_navigating' => 'Need help navigating this page? Here is what you can do.',
-    
+
     // Topics grid
     'what_to_explore' => 'What would you like to explore?',
     'select_category' => 'Select a category to see available pages.',
     'topics_title' => 'All Topics',
-    
+
     // Dashboard
     'dashboard' => 'Dashboard',
     'dashboard_desc' => 'Your business overview at a glance — metrics, charts, and quick actions.',
@@ -25,7 +25,7 @@ return [
     'recent_transactions' => 'Recent Transactions: The main content section shows your latest sales and purchase orders for quick access and review.',
     'quick_actions' => 'Quick Actions: Use the "New Invoice" button (top right) to quickly create a Sales Order or Purchase Order without navigating through the menu.',
     'system_alerts' => 'System Alerts: Low stock warnings and product expiry alerts are surfaced here so you can take action immediately.',
-    
+
     // Product
     // Stock Opname
     'stock_opname_desc' => 'Manage and review your physical inventory counts (Stock Opnames).',
@@ -33,13 +33,13 @@ return [
     'stock_opname_step_2' => 'Create New: Click the "New Stock Opname" button to plan a physical count for a specific warehouse.',
     'stock_opname_step_3' => 'Check Status: Monitor which counts are still pending vs already completed and posted to accounting.',
     'stock_opname_step_4' => 'View Details: Click "View" on any row to see the exact product variances and count sheets.',
-    
+
     'plan_stock_opname' => 'Plan Stock Opname',
     'plan_stock_opname_desc' => 'Initiate a new physical inventory count for a specific location.',
     'plan_stock_opname_step_1' => 'Select Warehouse: Choose the location you want to audit. The system will immediately take a snapshot of the expected system quantities.',
     'plan_stock_opname_step_2' => 'Set Date: Select the date the physical count is scheduled to take place.',
     'plan_stock_opname_step_3' => 'Add Notes: Provide any specific instructions for the warehouse staff performing the count.',
-    
+
     'execute_stock_opname' => 'Execute Stock Opname',
     'execute_stock_opname_desc' => 'Input physical counts and reconcile variances against system records.',
     'execute_stock_opname_step_1' => 'Input Counts: In the "Physical Count" column, enter the exact quantity found on the warehouse floor.',
@@ -73,7 +73,7 @@ return [
     'pricing_edit' => 'Pricing: Modify the buying price and selling price. The selling price is what customers pay.',
     'stock_warehouse_edit' => 'Stock by Warehouse: View current stock levels across all warehouses. Stock is adjusted through "Adjust Stock" (for individual products) or "Bulk Update" (for multiple products) from the product list page, not here.',
     'stock_transfer_edit' => 'Stock Transfer: Click "Transfer Stock" to open the stock transfer page. Select source warehouse, destination warehouse, enter quantity, and submit to move stock between warehouses.',
-    
+
     // Products list
     'warehouse_filter' => 'Warehouse Filter: The dropdown filter adjacent to the Create Product button allows you to view products specific to a particular warehouse location.',
     'stock_status' => 'Stock Status: The "Stock Status" feature displays all products with low stock levels, enabling timely replenishment.',
@@ -81,7 +81,7 @@ return [
     'bulk_actions' => 'Bulk Actions: Select multiple products using the checkboxes to perform Bulk Update (adjust quantities), Bulk Export (PDF/CSV), or Bulk Delete operations.',
     'table_actions' => 'Table Actions: Each row includes an action menu with the following options: View (product details and stock history), Edit (modify basic information), Adjust Stock (modify quantity for a specific warehouse), and Delete (remove the product).',
     'multi_warehouse_flow' => 'Multi-Warehouse Flow: Newly created products are automatically assigned to the Main Warehouse. In this multi-warehouse system, quantity is added through "Adjust Stock" for individual products or "Bulk Update" for multiple products. This applies regardless of the number of warehouses configured.',
-    
+
     // Stock Transfer
     'stock_transfer' => 'Stock Transfer',
     'stock_transfer_desc' => 'Move stock between warehouses to manage inventory distribution across locations.',
@@ -92,7 +92,7 @@ return [
     'add_reason' => 'Add Reason: Optionally add a reason for the transfer for better tracking and audit purposes.',
     'submit_transfer' => 'Submit Transfer: Click Transfer to complete the process. Stock will be deducted from source and added to destination warehouse.',
     'view_history' => 'View History: Click "View Adjustment Log" to see all stock transfers and adjustments made in the system.',
-    
+
     // Adjustment Log
     'adjustment_log' => 'Adjustment Log',
     'adjustment_log_desc' => 'View history of all stock adjustments and transfers for audit and tracking purposes.',
@@ -103,7 +103,7 @@ return [
     'filter_by_date' => 'Filter by Date: Use the Date From and Date To fields to narrow down the adjustment history to a specific period.',
     'export' => 'Export: Use the Export button to download the adjustment log as PDF or CSV for external reporting or auditing.',
     'quick_actions_adj' => 'Quick Actions: Click the eye icon on any row to view detailed information about that specific adjustment or transfer.',
-    
+
     // Warehouse
     'warehouse_management' => 'Warehouse Management',
     'warehouse_management_desc' => 'Configure physical or logical locations for storing and tracking inventory across your business operations.',
@@ -114,7 +114,7 @@ return [
     'export_warehouse' => 'Export: Use the export dropdown to download warehouse data as CSV or PDF for external use or reporting.',
     'table_actions_warehouse' => 'Table Actions: Each warehouse row has an action menu to View details (stock info), Edit information, or Delete. Note: The main warehouse cannot be deleted until another warehouse is set as main.',
     'stock_tracking' => 'Stock Tracking: Each warehouse maintains independent stock levels. Product views can be filtered by warehouse to display availability at each location.',
-    
+
     // Customer
     'customer_management' => 'Customer Management',
     'customer_management_desc' => 'Manage your customers for sales orders, invoicing, and tracking customer history.',
@@ -122,7 +122,7 @@ return [
     'customer_crm' => 'Customer CRM: Use the CRM features to track customer interactions, purchase history, and payment status. Access detailed analytics from the View option.',
     'customer_list' => 'Customer List: View all customers in a table with their details. Use the search box to find specific customers quickly.',
     'table_actions_customer' => 'Table Actions: Each customer row has an action menu to View CRM details, Edit information, or Delete the customer.',
-    
+
     // Supplier
     'supplier_management' => 'Supplier Management',
     'supplier_management_desc' => 'Manage your suppliers for purchase orders and tracking supply relationships.',
@@ -130,7 +130,7 @@ return [
     'supplier_srm' => 'Supplier SRM: Use the SRM (Supplier Relationship Management) features to track supplier performance, purchase history, and payment status. Access detailed analytics from the View option.',
     'supplier_list' => 'Supplier List: View all suppliers in a table with their details. Use the search box to find specific suppliers quickly.',
     'table_actions_supplier' => 'Table Actions: Each supplier row has an action menu to View SRM details, Edit information, or Delete the supplier.',
-    
+
     // Sales Orders
     'create_sales_order' => 'Create Sales Order',
     'create_sales_order_desc' => 'Create a new sales order by selecting a customer, adding products, and setting payment terms.',
@@ -143,7 +143,7 @@ return [
     'order_summary' => 'Order Summary: View subtotal, tax (PPN), discount, and grand total. Tax rate is pulled from your tax settings.',
     'credit_applied' => 'Credit Applied: If you applied customer credit, it will reduce the final balance. The invoice status will update to "Paid" if credit covers the full amount.',
     'submit_sales' => 'Submit: Click "Create Sales Order" to save. The order will be created as "Unpaid" and you can record payments later on the Sales Order Edit page.',
-    
+
     // Edit Sales Order
     'edit_sales_order' => 'Edit Sales Order',
     'edit_sales_order_desc' => 'View and edit sales order details, adjust items, record payments, and manage returns.',
@@ -155,7 +155,7 @@ return [
     'payment_info' => 'Payment Info: Total Paid shows the amount the customer has already paid. Balance shows the remaining amount the customer needs to pay (after credit applied).',
     'track_returns_sales' => 'Track Returns: The quantity field shows the FINAL quantity (original quantity minus returned items). A "Returned" badge shows how many items were returned per product (e.g., "-3 Returned"). The amounts shown are already ADJUSTED to reflect the final quantity after returns.',
     'save_sales' => 'Save: Click "Save Changes" to update the sales order. Note: You cannot change customer if payments have already been recorded.',
-    
+
     // View Sales Order
     'view_sales_order' => 'View Sales Order',
     'view_sales_order_desc' => 'View detailed sales order information including items, payment status, and history.',
@@ -166,7 +166,7 @@ return [
     'amount_display' => 'Amount Display: The amounts shown are already ADJUSTED - they reflect the final quantity after returns.',
     'create_return_link' => 'To Create Return: To process a new return for this invoice, go to the Sales Order Returns menu and create a new return for this invoice.',
     'actions_sales' => 'Actions: Use the "Print Invoice" button to print or download PDF. Click "Edit Invoice" to modify the order.',
-    
+
     // Sales Orders
     'sales_orders' => 'Sales Orders',
     'sales_orders_desc' => 'Manage customer orders, invoicing, payments, and tracking of sales transactions.',
@@ -448,7 +448,6 @@ return [
     'export_coa' => 'Export: Use the export dropdown to download accounts as PDF or CSV.',
 
     // Add Account
-    'add_account' => 'Add Account',
     'add_account_desc' => 'Create a new account in the chart of accounts.',
     'name_acc' => 'Name: Enter the official name of the account.',
     'code_acc' => 'Code: Enter a unique code for the account. Use a numbering system that matches your accounting standards.',
@@ -556,7 +555,6 @@ return [
     'search_filter_al' => 'Search & Filter: Use the search box to find logs by description. Filter by User, Module (e.g., Product, Warehouse), Action (Created, Updated, Deleted, Login), or Date Range.',
     'activity_timeline' => 'Activity Timeline: View a chronological record of all system actions, including who performed each action, when, and what was affected.',
     'filter_action_type' => 'Filter by Action Type: Filter logs by action type (e.g., Created, Updated, Deleted, Login) to locate specific activity categories.',
-    'filter_by_user' => 'Filter by User: View all activities performed by a specific user for individual behavior monitoring.',
     'security_compliance' => 'Security & Compliance: Utilize audit logs for issue investigation, unauthorized change detection, and compliance demonstration during audits.',
 
     // Users
@@ -569,7 +567,6 @@ return [
     'delete_user' => 'Delete User: Use the delete icon to remove a user from the system. This action cannot be undone.',
 
     // Notifications
-    'notifications' => 'Notifications',
     'notifications_desc' => 'View and manage system notifications and alerts.',
     'po_sales_notif' => 'Purchase Order & Sales: Displays notifications related to purchase orders and sales activities, including order confirmations, payment updates, and delivery notifications.',
     'low_stock_notif' => 'Low Stock: Shows alerts for products that are running low on inventory. Click to view which items need restocking and take action to replenish stock.',

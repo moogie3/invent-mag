@@ -37,17 +37,17 @@ return [
     |
     */
 
-    'features' => [
-        // Core features (all plans)
-        'products'        => 'Product & Inventory Management',
-        'inventory'       => 'Stock Tracking',
-        'sales'           => 'Sales & Purchase Orders',
-        'purchases'       => 'Purchase Order Management',
-        'invoices'        => 'Invoice Generation (PDF)',
-        'dashboard'       => 'Dashboard & Basic Reports',
-        'basic_reports'   => 'Basic Reports',
-        'customers'       => 'Customer Management',
-        'suppliers'       => 'Supplier Management',
+'features' => [
+        // Starter features
+        'products'          => 'Products',
+        'inventory'        => 'Inventory Management',
+        'sales'           => 'Sales Orders',
+        'purchases'        => 'Purchase Orders',
+        'invoices'        => 'Invoice Generation',
+        'dashboard'       => 'Dashboard',
+        'basic_reports'    => 'Basic Reports',
+        'customers'      => 'Customer Management',
+        'suppliers'      => 'Supplier Management',
 
         // Professional features
         'pos'               => 'Point of Sale (POS)',

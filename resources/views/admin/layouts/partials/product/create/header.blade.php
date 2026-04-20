@@ -2,20 +2,17 @@
     <div class="{{ $containerClass ?? "container-xl" }}">
         <div class="row align-items-center">
             <div class="col">
-                <div class="page-pretitle">{{ __('messages.product_management') }}</div>
+                <div class="page-pretitle">
+                    <a href="{{ route('admin.product') }}" class="text-muted text-decoration-none">
+                        <i class="ti ti-arrow-left"></i> {{ __('messages.back') }}
+                    </a>
+                </div>
                 <h2 class="page-title fw-bold d-flex align-items-center">
                     <i class="ti ti-plus me-2"></i>{{ __('messages.create_product') }}
                     <a href="#" class="ms-3 text-muted trigger-tutorial-modal" data-bs-toggle="tooltip" title="{{ __('messages.tutorial') }}">
                         <i class="ti ti-help-circle fs-3"></i>
                     </a>
                 </h2>
-            </div>
-            <div class="col-auto ms-auto">
-                <div class="btn-list">
-                    <a href="{{ route('admin.product') }}" class="btn btn-outline-primary">
-                        <i class="ti ti-arrow-left me-1"></i> {{ __('messages.back_to_products') }}
-                    </a>
-                </div>
             </div>
         </div>
     </div>

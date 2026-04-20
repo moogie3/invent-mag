@@ -2,7 +2,11 @@
     <div class="{{ $containerClass ?? "container-xl" }}">
         <div class="row g-2 align-items-center">
             <div class="col">
-                <div class="page-pretitle">{{ __('messages.accounting') }}</div>
+                <div class="page-pretitle">
+                    <a href="{{ route('admin.accounting.journal-entries.index') }}" class="text-muted text-decoration-none">
+                        <i class="ti ti-arrow-left"></i> {{ __('messages.back') }}
+                    </a>
+                </div>
                 <h2 class="page-title d-flex align-items-center">
                     <i class="ti ti-eye me-2"></i>{{ __('messages.journal_entry_details') }}
                     <a href="#" class="ms-3 text-muted trigger-tutorial-modal" data-bs-toggle="tooltip" title="{{ __('messages.tutorial') }}">
@@ -10,7 +14,7 @@
                     </a>
                 </h2>
             </div>
-            <div class="col-auto ms-auto d-print-none">
+            <div class="col-auto d-print-none">
                 <div class="btn-list">
                     @if($entry->status === 'draft')
                         <a href="{{ route('admin.accounting.journal-entries.edit', $entry) }}" class="btn btn-primary">
@@ -33,9 +37,6 @@
                             </button>
                         @endif
                     @endif
-                    <a href="{{ route('admin.accounting.journal-entries.index') }}" class="btn btn-secondary">
-                        <i class="ti ti-arrow-left me-2"></i>{{ __('messages.back') }}
-                    </a>
                 </div>
             </div>
         </div>

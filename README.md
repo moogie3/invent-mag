@@ -64,6 +64,16 @@ Experience Invent-MAG firsthand:
 - **Stock Adjustment Audit Trail:** Before/after quantities, user tracking
 - **Bulk Operations:** Delete, export, and update stock in bulk
 - **Per-Customer Pricing:** Historical pricing per customer
+- **Stock Opname (Physical Count):** Scheduled inventory counts with variance tracking, accounting integration
+
+#### Stock Opname & Audit (Professional+)
+
+- **Scheduled Counts:** Plan physical inventory counts by date and warehouse
+- **Multi-Warehouse Support:** Count across multiple warehouses
+- **Variance Auto-Calculation:** System calculates shortage/excess automatically
+- **Inventory Adjustment:** Auto-posts to stock levels on completion
+- **Accounting Integration:** Creates journal entries for shortages (expense) and excess (revenue)
+- **Audit Trail:** Full history of all counts and adjustments
 
 ---
 
@@ -132,9 +142,9 @@ Experience Invent-MAG firsthand:
 
 #### Subscription Tiers
 
-- **Starter Plan:** Basic features, limited users (3), warehouses (1), products (100)
-- **Professional Plan:** Advanced features, higher limits (10 users, unlimited warehouses, 500 products), includes POS, Accounting, CRM
-- **Enterprise Plan:** Full access, unlimited users, warehouses, products, plus sales forecasting, RESTful API, and audit trail
+- **Starter Plan:** Basic features, limited users (3), warehouses (1), products (100) - $19/mo
+- **Professional Plan:** Advanced features, higher limits (10 users, unlimited warehouses, 500 products), includes POS, **Stock Opname**, Accounting, CRM - $59/mo
+- **Enterprise Plan:** Full access, unlimited users, warehouses, products, plus sales forecasting, RESTful API, and audit trail - $109/mo
 
 #### Features
 

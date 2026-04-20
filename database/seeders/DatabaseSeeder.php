@@ -17,6 +17,7 @@ class DatabaseSeeder extends Seeder
         // 1. Create global roles, permissions, and plans first
         $this->call([
             PermissionSeeder::class,
+            StockOpnamePermissionSeeder::class,
             RoleSeeder::class,
             RolePermissionSeeder::class,
             PlanSeeder::class,
@@ -101,6 +102,7 @@ class DatabaseSeeder extends Seeder
                 TaxSeeder::class,
                 StockAdjustmentSeeder::class,
                 StockTransferSeeder::class,
+                StockOpnameSeeder::class,
                 SalesPipelineSeeder::class,
                 PipelineStageSeeder::class,
                 SalesOpportunitySeeder::class,

@@ -103,6 +103,9 @@
 {{-- SCRIPT FOR CUSTOMER --}}
 @vite('resources/js/admin/customer.js')
 
+{{-- SCRIPT FOR STOCK OPNAME --}}
+@vite('resources/js/admin/stock-opname.js')
+
 {{-- SCRIPT FOR SORTING TABLE --}}
 @vite('resources/js/admin/sorting.js')
 

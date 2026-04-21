@@ -12,8 +12,7 @@ class HandleTenantFromPath
     /**
      * Handle an incoming request.
      * Supports tenant identification via path: /{tenant-slug}/admin/...
-     * This runs AFTER NeedsTenant middleware to handle cases where subdomain-based
-     * tenant resolution fails (e.g., accessing via localhost or IP-based URLs).
+     * Also handles subdomain fallback when NeedsTenant fails.
      */
     public function handle(Request $request, Closure $next): Response
     {
@@ -22,23 +21,51 @@ class HandleTenantFromPath
             return $next($request);
         }
         
-        $path = $request->path();
+        // Get hostname from request (for subdomain detection)
+        $hostname = $request->getHost();
         
-        // Check if the first path segment matches a tenant domain prefix
-        // Example: demo-starter, demo-pro, my-shop
+        // Try to extract tenant from hostname (subdomain)
+        // e.g., demo-enterprise.invent-mag.web.id -> demo-enterprise
+        $appDomain = config('app.domain') ?: 'invent-mag.web.id';
+        
+        // If app domain is localhost, skip subdomain extraction
+        // Otherwise extract subdomain
+        if ($appDomain !== 'localhost' && str_ends_with($hostname, $appDomain)) {
+            $subdomain = str_replace('.' . $appDomain, '', $hostname);
+            
+            // Try to find tenant by subdomain
+            $tenant = Tenant::where('domain', 'like', $subdomain . '.%')
+                           ->first();
+            
+            if ($tenant) {
+                \Illuminate\Support\Facades\Log::debug('HandleTenantFromPath: Found tenant via hostname', [
+                    'hostname' => $hostname,
+                    'tenant' => $tenant->name,
+                ]);
+                
+                $tenant->makeCurrent();
+                return $next($request);
+            }
+        }
+        
+        // Fallback: Check if the first path segment matches a tenant domain prefix
+        $path = $request->path();
         $segments = explode('/', $path);
         
         if (!empty($segments[0])) {
             $tenantSlug = $segments[0];
             
             // Check if this slug matches any tenant's domain prefix
-            // We look for tenants where domain starts with this slug
             $tenant = Tenant::where('domain', 'like', $tenantSlug . '.%')
                            ->orWhere('name', 'like', '%' . $tenantSlug . '%')
                            ->first();
             
             if ($tenant) {
-                // Make this tenant current
+                \Illuminate\Support\Facades\Log::debug('HandleTenantFromPath: Found tenant via path', [
+                    'path' => $path,
+                    'tenant' => $tenant->name,
+                ]);
+                
                 $tenant->makeCurrent();
                 
                 // Remove the tenant slug from the path for route matching

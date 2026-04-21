@@ -16,7 +16,7 @@ use App\Http\Controllers\Auth\LoginController;
 // Admin Authentication Routes
 Route::middleware('web')->prefix('admin')->group(function () {
     Route::middleware('guest')->group(function () {
-        // Login
+        // Login - This route needs tenant context but should handle failure gracefully
         Route::get('/login', function (Request $request) {
             $email = $request->session()->get('attempted_email');
             $ip = $request->ip() ?? 'unknown';

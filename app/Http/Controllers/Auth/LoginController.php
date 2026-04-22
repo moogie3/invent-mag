@@ -76,9 +76,9 @@ class LoginController extends Controller
      */
     protected function failAuthentication(Request $request)
     {
-        return back()->withErrors([
-            'email' => __('auth.failed'),
-        ])->withInput($request->only('email'));
+        return back()
+            ->with('error', __('auth.failed'))
+            ->withInput($request->only('email'));
     }
 
     /**

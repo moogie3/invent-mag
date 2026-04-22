@@ -21,8 +21,14 @@
     if (empty($successMessage)) {
         $successMessage = $translatedStatus;
     }
+
+    // Safely resolve error message — never output PHP null as the string "null"
+    $errorMessage = session('error') ?? ($errors->any() ? $errors->first() : null);
 @endphp
 
-<div id="session-notification-data" data-success-message="{{ $successMessage }}"
-    data-error-message="{{ session('error') ?? $errors->first() }}" data-is-auth-page="{{ json_encode($isAuthPage) }}" style="display: none;">
+<div id="session-notification-data"
+    data-success-message="{{ $successMessage ?? '' }}"
+    data-error-message="{{ $errorMessage ?? '' }}"
+    data-is-auth-page="{{ json_encode($isAuthPage) }}"
+    style="display: none;">
 </div>

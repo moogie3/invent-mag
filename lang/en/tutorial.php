@@ -567,6 +567,7 @@ return [
     'delete_user' => 'Delete User: Use the delete icon to remove a user from the system. This action cannot be undone.',
 
     // Notifications
+    'notifications_title' => 'My Notifications',
     'notifications_desc' => 'View and manage system notifications and alerts.',
     'po_sales_notif' => 'Purchase Order & Sales: Displays notifications related to purchase orders and sales activities, including order confirmations, payment updates, and delivery notifications.',
     'low_stock_notif' => 'Low Stock: Shows alerts for products that are running low on inventory. Click to view which items need restocking and take action to replenish stock.',

@@ -687,7 +687,7 @@
             __('tutorial.delete_user')
         ];
     } elseif ($routeName === 'admin.notifications' || $routeName === 'admin.setting.notifications') {
-        $contextTitle = __('tutorial.notifications');
+        $contextTitle = __('tutorial.notifications_title');
         $contextIcon = 'ti-bell';
         $contextDesc = __('tutorial.notifications_desc');
         $contextSteps = [

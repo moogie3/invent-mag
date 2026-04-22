@@ -68,6 +68,12 @@
         [data-bs-theme="dark"] .bg-info-lt { background-color: rgba(13, 202, 240, 0.15) !important; color: #5bcaf0 !important; }
         [data-bs-theme="dark"] .bg-success-lt { background-color: rgba(47, 179, 68, 0.15) !important; color: #5cc86e !important; }
 
+        /* Expiring label colors - explicit for both modes */
+        .expiring-label-danger { color: #d63939; }
+        .expiring-label-warning { color: #f76707; }
+        [data-bs-theme="dark"] .expiring-label-danger { color: #ef6b6b; }
+        [data-bs-theme="dark"] .expiring-label-warning { color: #f98a42; }
+
         /* Status icon colors in avatar */
         .notification-item .avatar i {
             color: #333 !important;
@@ -78,7 +84,7 @@
     </style>
 
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('turbo:load', function() {
             // Get bootstrap from our exposed global (from tabler)
             const bs = window.bootstrap || (window.tabler && window.tabler.bootstrap);
             

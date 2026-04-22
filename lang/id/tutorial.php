@@ -576,6 +576,7 @@ return [
     'delete_user' => 'Hapus Pengguna: Gunakan ikon hapus.',
 
     // Notifications
+    'notifications_title' => 'Notifikasi Saya',
     'notifications_desc' => 'Lihat dan kelola notifikasi sistem.',
     'po_sales_notif' => 'Pesanan Pembelian & Penjualan: Menampilkan notifikasi terkait pesanan.',
     'low_stock_notif' => 'Stok Rendah: Menampilkan peringatan untuk produk dengan stok rendah.',

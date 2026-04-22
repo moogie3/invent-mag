@@ -21,7 +21,7 @@
                                     <span><i class="ti ti-calendar me-1"></i> {{ $item['description'] }}</span>
                                     <span><i class="ti ti-file-invoice me-1"></i> {{ __('messages.po_id') ?? 'PO ID' }}: <strong>#{{ $item['po_id'] }}</strong></span>
                                     <span><i class="ti ti-hash me-1"></i> {{ __('messages.quantity') ?? 'Quantity' }}: <strong>{{ $item['quantity'] }}</strong></span>
-                                    <span class="text-{{ $item['days_remaining'] < 7 ? 'danger' : 'warning' }} fw-medium"><i class="ti ti-clock-stop me-1"></i> {{ __('messages.expiring_in') ?? 'Expiring in' }} {{ $item['days_remaining'] }} {{ __('messages.days') ?? 'days' }}</span>
+                                    <span class="fw-medium expiring-label-{{ $item['days_remaining'] < 7 ? 'danger' : 'warning' }}"><i class="ti ti-clock-stop me-1"></i> {{ __('messages.expiring_in') ?? 'Expiring in' }} {{ $item['days_remaining'] }} {{ __('messages.days') ?? 'days' }}</span>
                                 </div>
                             </a>
                         </div>

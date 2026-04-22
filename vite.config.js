@@ -55,6 +55,7 @@ export default defineConfig({
                 "resources/js/admin/plan/checkout.js",
                 "resources/js/admin/layouts/tutorial-modal.js",
                 "resources/js/admin/opening-balance.js",
+                "resources/js/admin/stock-opname.js",
                 "resources/css/app.css",
                 "resources/css/auth.css",
                 "resources/css/navbar.css",

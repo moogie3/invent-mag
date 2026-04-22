@@ -23,8 +23,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->prepend(\Illuminate\Http\Middleware\HandleCors::class);
 
         $middleware->web(append: [
-            \App\Http\Middleware\DebugTenantResolution::class,
-            \App\Http\Middleware\NeedsTenantGracefully::class,
+            \Spatie\Multitenancy\Http\Middleware\NeedsTenant::class,
             \App\Http\Middleware\HandleTenantFromPath::class,
             \App\Http\Middleware\SetLocale::class,
             \App\Http\Middleware\DebugModeMiddleware::class,

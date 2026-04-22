@@ -258,21 +258,35 @@ window.showAuthModal = function (title, message, type) {
 
     document.body.insertAdjacentHTML("beforeend", authModalHtml);
 
-    const statusModalElement = document.getElementById("statusModal");
-    const statusModal = new bootstrap.Modal(statusModalElement, {});
+    // Wait for bootstrap to be exposed (authbase pages load it asynchronously)
+    function _showModal(retries) {
+        if (typeof bootstrap === 'undefined' || !bootstrap.Modal) {
+            if (retries > 0) {
+                setTimeout(() => _showModal(retries - 1), 50);
+            }
+            return;
+        }
 
-    const cleanupBackdrop = () => {
-        document.querySelectorAll('.modal-backdrop').forEach(b => b.remove());
-        document.body.classList.remove('modal-open');
-        document.body.style.overflow = '';
-    };
+        const statusModalElement = document.getElementById("statusModal");
+        if (!statusModalElement) return;
 
-    statusModalElement.addEventListener("hidden.bs.modal", () => {
-        cleanupBackdrop();
-        statusModalElement.remove();
-    });
+        const statusModal = new bootstrap.Modal(statusModalElement, {});
 
-    statusModal.show();
+        const cleanupBackdrop = () => {
+            document.querySelectorAll('.modal-backdrop').forEach(b => b.remove());
+            document.body.classList.remove('modal-open');
+            document.body.style.overflow = '';
+        };
+
+        statusModalElement.addEventListener("hidden.bs.modal", () => {
+            cleanupBackdrop();
+            statusModalElement.remove();
+        });
+
+        statusModal.show();
+    }
+
+    _showModal(20); // retry up to 20 times × 50ms = 1 second max wait
 };
 
 // Function to handle session-based notifications

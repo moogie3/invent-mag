@@ -1,5 +1,9 @@
 @php
-    $themeMode = auth()->user()->system_settings['theme_mode'] ?? 'light';
+    try {
+        $themeMode = auth()->check() ? (auth()->user()->system_settings['theme_mode'] ?? 'light') : 'light';
+    } catch (\Throwable $e) {
+        $themeMode = 'light';
+    }
 @endphp
 
 <!DOCTYPE html>

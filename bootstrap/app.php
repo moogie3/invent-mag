@@ -102,6 +102,22 @@ return Application::configure(basePath: dirname(__DIR__))
             return $handleError($request, 429, 'Too many requests');
         });
 
+        // NoCurrentTenant - Multitenancy (must be before Throwable catch-all)
+        $exceptions->render(function (\Spatie\Multitenancy\Exceptions\NoCurrentTenant $e, Illuminate\Http\Request $request) {
+            if ($request->expectsJson() || $request->is('api/*')) {
+                return response()->json(['message' => 'Workspace not found or no tenant specified.'], 404);
+            }
+
+            // Redirect to frontend login
+            $frontendUrl = config('app.frontend_url');
+            return redirect()->away($frontendUrl . '/login');
+        });
+
+        // Model Not Found
+        $exceptions->render(function (\Illuminate\Database\Eloquent\ModelNotFoundException $e, Illuminate\Http\Request $request) use ($handleError) {
+            return $handleError($request, 404, 'Resource not found');
+        });
+
         // 500 - Server Error (catch-all)
         $exceptions->render(function (\Throwable $e, Illuminate\Http\Request $request) use ($handleError) {
             // Let Laravel handle ValidationException natively (redirects back with errors)
@@ -113,21 +129,5 @@ return Application::configure(basePath: dirname(__DIR__))
                 return $handleError($request, 419, 'Page expired due to inactivity');
             }
             return $handleError($request, 500, 'Internal server error');
-        });
-
-        // Model Not Found
-        $exceptions->render(function (\Illuminate\Database\Eloquent\ModelNotFoundException $e, Illuminate\Http\Request $request) use ($handleError) {
-            return $handleError($request, 404, 'Resource not found');
-        });
-
-        // NoCurrentTenant - Multitenancy
-        $exceptions->render(function (\Spatie\Multitenancy\Exceptions\NoCurrentTenant $e, Illuminate\Http\Request $request) {
-            if ($request->expectsJson() || $request->is('api/*')) {
-                return response()->json(['message' => 'Workspace not found or no tenant specified.'], 404);
-            }
-            
-            // Redirect to frontend login
-            $frontendUrl = config('app.frontend_url');
-            return redirect()->away($frontendUrl . '/login');
         });
     })->create();

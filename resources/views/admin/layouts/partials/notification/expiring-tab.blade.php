@@ -13,9 +13,6 @@
                             <a href="{{ $item['route'] }}" class="text-reset d-block text-decoration-none">
                                 <div class="d-flex justify-content-between align-items-center mb-1">
                                     <span class="fw-bold fs-3">{{ $item['title'] }}</span>
-                                    <span class="badge {{ str_replace('text-', 'bg-', $item['status_badge']) }}-lt py-1 px-2">
-                                        {{ $item['status_text'] }}
-                                    </span>
                                 </div>
                                 <div class="text-secondary d-flex flex-wrap gap-3 mt-1">
                                     <span><i class="ti ti-calendar me-1"></i> {{ $item['description'] }}</span>

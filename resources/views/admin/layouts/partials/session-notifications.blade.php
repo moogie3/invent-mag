@@ -14,21 +14,29 @@
     ];
 
     $sessionStatus = session('status');
-    $translatedStatus = $statusTranslations[$sessionStatus] ?? $sessionStatus;
+    // Never pass through the literal string "null"
+    $translatedStatus = ($sessionStatus && $sessionStatus !== 'null')
+        ? ($statusTranslations[$sessionStatus] ?? $sessionStatus)
+        : null;
 
-    // Use session('success') if set, otherwise use translated status
-    $successMessage = session('success');
-    if (empty($successMessage)) {
-        $successMessage = $translatedStatus;
-    }
+    // Use session('success') if set and not "null", otherwise use translated status
+    $rawSuccess = session('success');
+    $successMessage = ($rawSuccess && $rawSuccess !== 'null') ? $rawSuccess : $translatedStatus;
 
-    // Safely resolve error message — never output PHP null as the string "null"
-    $errorMessage = session('error') ?? ($errors->any() ? $errors->first() : null);
+    // Safely resolve error message — never output PHP null or "null" string
+    $rawError = session('error');
+    $errorMessage = ($rawError && $rawError !== 'null')
+        ? $rawError
+        : ($errors->any() ? $errors->first() : null);
+
+    // Final safety — convert any remaining null to empty string for output
+    $successMessage = $successMessage ?: '';
+    $errorMessage = $errorMessage ?: '';
 @endphp
 
 <div id="session-notification-data"
-    data-success-message="{{ $successMessage ?? '' }}"
-    data-error-message="{{ $errorMessage ?? '' }}"
+    data-success-message="{{ $successMessage }}"
+    data-error-message="{{ $errorMessage }}"
     data-is-auth-page="{{ json_encode($isAuthPage) }}"
     style="display: none;">
 </div>

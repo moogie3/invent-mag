@@ -234,11 +234,18 @@ window.showAuthModal = function (title, message, type) {
     const safeTitle = escapeHtml(title);
     const safeMessage = escapeHtml(message);
 
+    // Remove any existing status modal to prevent duplicates
+    const existingModal = document.getElementById("statusModal");
+    if (existingModal) {
+        existingModal.remove();
+    }
+    document.querySelectorAll('.modal-backdrop').forEach(b => b.remove());
+
     const authModalHtml = `
-        <div class="modal modal-blur fade" id="statusModal" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal modal-blur fade show" id="statusModal" tabindex="-1" role="dialog" aria-modal="true" style="display:block;">
             <div class="modal-dialog modal-sm modal-dialog-centered" role="document">
                 <div class="modal-content rounded-3 shadow-lg border-0">
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <button type="button" class="btn-close" id="statusModalClose" aria-label="Close"></button>
                     <div class="modal-status ${modalStatusClass}"></div>
                     <div class="modal-body text-center py-5 px-4">
                         <i class="${iconClass} d-block mx-auto mb-3" style="font-size: 3rem;"></i>
@@ -248,45 +255,36 @@ window.showAuthModal = function (title, message, type) {
                 </div>
             </div>
         </div>
+        <div class="modal-backdrop fade show"></div>
     `;
 
-    // Remove any existing status modal to prevent duplicates
-    const existingModal = document.getElementById("statusModal");
-    if (existingModal) {
-        existingModal.remove();
-    }
-
     document.body.insertAdjacentHTML("beforeend", authModalHtml);
+    document.body.classList.add('modal-open');
 
-    // Wait for bootstrap to be exposed (authbase pages load it asynchronously)
-    function _showModal(retries) {
-        if (typeof bootstrap === 'undefined' || !bootstrap.Modal) {
-            if (retries > 0) {
-                setTimeout(() => _showModal(retries - 1), 50);
-            }
-            return;
-        }
-
-        const statusModalElement = document.getElementById("statusModal");
-        if (!statusModalElement) return;
-
-        const statusModal = new bootstrap.Modal(statusModalElement, {});
-
-        const cleanupBackdrop = () => {
-            document.querySelectorAll('.modal-backdrop').forEach(b => b.remove());
+    // Close button handler
+    const closeBtn = document.getElementById("statusModalClose");
+    if (closeBtn) {
+        closeBtn.addEventListener("click", () => {
+            const modal = document.getElementById("statusModal");
+            const backdrop = document.querySelector(".modal-backdrop");
+            if (modal) modal.remove();
+            if (backdrop) backdrop.remove();
             document.body.classList.remove('modal-open');
             document.body.style.overflow = '';
-        };
-
-        statusModalElement.addEventListener("hidden.bs.modal", () => {
-            cleanupBackdrop();
-            statusModalElement.remove();
         });
-
-        statusModal.show();
     }
 
-    _showModal(20); // retry up to 20 times × 50ms = 1 second max wait
+    // Also close on backdrop click
+    const backdrop = document.querySelector(".modal-backdrop");
+    if (backdrop) {
+        backdrop.addEventListener("click", () => {
+            const modal = document.getElementById("statusModal");
+            if (modal) modal.remove();
+            backdrop.remove();
+            document.body.classList.remove('modal-open');
+            document.body.style.overflow = '';
+        });
+    }
 };
 
 // Function to handle session-based notifications

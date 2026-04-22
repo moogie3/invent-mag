@@ -575,9 +575,17 @@ return [
     'edit_user' => 'Edit Pengguna: Gunakan ikon edit.',
     'delete_user' => 'Hapus Pengguna: Gunakan ikon hapus.',
 
-    // Notifications
+    // Notifications inbox (admin.notifications)
     'notifications_title' => 'Notifikasi Saya',
-    'notifications_desc' => 'Lihat dan kelola notifikasi sistem.',
+    'notifications_desc' => 'Lihat dan kelola semua notifikasi dan peringatan sistem dalam satu tempat.',
+
+    // Notification settings (admin.setting.notifications)
+    'notification_settings_title' => 'Pengaturan Notifikasi',
+    'notification_settings_desc' => 'Atur bagaimana dan kapan Anda menerima peringatan dari sistem.',
+    'notif_setting_sound' => 'Peringatan Suara: Aktifkan atau nonaktifkan suara saat notifikasi tiba. Pilih suara berbeda untuk sukses, error, dan peringatan umum.',
+    'notif_setting_browser_push' => 'Notifikasi Push Browser: Izinkan browser mengirim peringatan meskipun Anda berada di tab atau jendela lain.',
+    'notif_setting_success_toggle' => 'Pesan Sukses: Atur apakah toast sukses ditampilkan setelah tindakan seperti menyimpan data atau menyelesaikan operasi.',
+    'notif_setting_duration' => 'Durasi Notifikasi: Atur berapa lama toast terlihat — 3 detik, 5 detik, 10 detik, atau tutup manual (tetap tampil hingga Anda menutupnya).',
     'po_sales_notif' => 'Pesanan Pembelian & Penjualan: Menampilkan notifikasi terkait pesanan.',
     'low_stock_notif' => 'Stok Rendah: Menampilkan peringatan untuk produk dengan stok rendah.',
     'expiring_notif' => 'Kedaluwarsa: Memberitahu tentang produk mendekati tanggal kedaluwarsa.',

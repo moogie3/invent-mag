@@ -566,9 +566,17 @@ return [
     'edit_user' => 'Edit User: Use the edit icon to modify a user\'s details or change their role and permissions.',
     'delete_user' => 'Delete User: Use the delete icon to remove a user from the system. This action cannot be undone.',
 
-    // Notifications
+    // Notifications inbox (admin.notifications)
     'notifications_title' => 'My Notifications',
-    'notifications_desc' => 'View and manage system notifications and alerts.',
+    'notifications_desc' => 'View and manage all system notifications and alerts in one place.',
+
+    // Notification settings (admin.setting.notifications)
+    'notification_settings_title' => 'Notification Settings',
+    'notification_settings_desc' => 'Configure how and when you receive alerts from the system.',
+    'notif_setting_sound' => 'Sound Alerts: Enable or disable audio cues when notifications arrive. Choose distinct sounds for success, error, and general alerts.',
+    'notif_setting_browser_push' => 'Browser Push Notifications: Allow the browser to deliver alerts even when you are on a different tab or window.',
+    'notif_setting_success_toggle' => 'Success Messages: Toggle whether success toasts are displayed after actions like saving records or completing operations.',
+    'notif_setting_duration' => 'Notification Duration: Set how long toasts stay visible — 3 seconds, 5 seconds, 10 seconds, or manual dismiss (stays until you close it).',
     'po_sales_notif' => 'Purchase Order & Sales: Displays notifications related to purchase orders and sales activities, including order confirmations, payment updates, and delivery notifications.',
     'low_stock_notif' => 'Low Stock: Shows alerts for products that are running low on inventory. Click to view which items need restocking and take action to replenish stock.',
     'expiring_notif' => 'Expiring: Notifies about products approaching or past their expiration date. Essential for managing perishable inventory and preventing waste.',

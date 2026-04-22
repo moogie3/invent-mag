@@ -686,7 +686,8 @@
             __('tutorial.edit_user'),
             __('tutorial.delete_user')
         ];
-    } elseif ($routeName === 'admin.notifications' || $routeName === 'admin.setting.notifications') {
+    } elseif ($routeName === 'admin.notifications') {
+        // Notification inbox page
         $contextTitle = __('tutorial.notifications_title');
         $contextIcon = 'ti-bell';
         $contextDesc = __('tutorial.notifications_desc');
@@ -697,6 +698,17 @@
             __('tutorial.system_notif'),
             __('tutorial.clear_all_notif'),
             __('tutorial.clear_individual')
+        ];
+    } elseif ($routeName === 'admin.setting.notifications') {
+        // Notification settings page
+        $contextTitle = __('tutorial.notification_settings_title');
+        $contextIcon = 'ti-bell-cog';
+        $contextDesc = __('tutorial.notification_settings_desc');
+        $contextSteps = [
+            __('tutorial.notif_setting_sound'),
+            __('tutorial.notif_setting_browser_push'),
+            __('tutorial.notif_setting_success_toggle'),
+            __('tutorial.notif_setting_duration'),
         ];
     } else {
         // Generic Help

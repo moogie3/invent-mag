@@ -57,7 +57,8 @@ class StockOpnameController extends Controller
 
     public function show(StockOpname $stockOpname)
     {
-        if ($stockOpname->tenant_id !== Auth::user()->tenant_id) {
+        $user = Auth::user();
+        if (!$user || $stockOpname->tenant_id !== $user->tenant_id) {
             abort(403);
         }
 
@@ -72,7 +73,12 @@ class StockOpnameController extends Controller
 
     public function updateCounts(Request $request, StockOpname $stockOpname)
     {
-        if ($stockOpname->tenant_id !== Auth::user()->tenant_id || $stockOpname->status === 'Completed') {
+        $user = Auth::user();
+        if (!$user || $stockOpname->tenant_id !== $user->tenant_id) {
+            abort(403);
+        }
+        
+        if ($stockOpname->status === 'Completed') {
             abort(403);
         }
 
@@ -93,7 +99,12 @@ class StockOpnameController extends Controller
 
     public function complete(StockOpname $stockOpname)
     {
-        if ($stockOpname->tenant_id !== Auth::user()->tenant_id || $stockOpname->status === 'Completed') {
+        $user = Auth::user();
+        if (!$user || $stockOpname->tenant_id !== $user->tenant_id) {
+            abort(403);
+        }
+        
+        if ($stockOpname->status === 'Completed') {
             abort(403);
         }
 
@@ -109,7 +120,12 @@ class StockOpnameController extends Controller
     
     public function cancel(StockOpname $stockOpname)
     {
-        if ($stockOpname->tenant_id !== Auth::user()->tenant_id || $stockOpname->status === 'Completed') {
+        $user = Auth::user();
+        if (!$user || $stockOpname->tenant_id !== $user->tenant_id) {
+            abort(403);
+        }
+        
+        if ($stockOpname->status === 'Completed') {
             abort(403);
         }
 

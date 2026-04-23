@@ -340,7 +340,7 @@
 ### 🧪 Testing
 
 - [x] PHPUnit 10+ configured
-- [x] 776 test files (40 Feature + 45 Unit PHP, 171 JS)
+- [x] 791 test files (42 Feature + 48 Unit PHP, 171 JS)
 - [x] Feature tests (controllers, routes)
 - [x] Unit tests (services, helpers)
 - [x] Multi-tenancy tests

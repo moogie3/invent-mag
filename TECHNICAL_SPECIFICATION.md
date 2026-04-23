@@ -13,7 +13,7 @@ Invent-MAG is a production-ready, enterprise-grade ERP system built on Laravel 1
 ### Key Technical Highlights
 
 - **Multi-tenant SaaS architecture** with row-level database isolation
-- **786 test files** ensuring code reliability
+- **791 test files** ensuring code reliability
 - **451+ commits** demonstrating sustained development
 - **Docker + CI/CD** for modern DevOps practices
 - **Service-oriented architecture** with clean separation of concerns
@@ -180,9 +180,9 @@ Internet → [DNS: invent-mag.web.id]
 
 | Category          | Count | Coverage                        |
 | ----------------- | ----- | ------------------------------- |
-| **Feature Tests** | 40+   | Controllers, Routes, End-to-end |
-| **Unit Tests**    | 40+   | Services, Helpers, DTOs         |
-| **Total Tests**   | 786   | test files                      |
+| **Feature Tests** | 42+   | Controllers, Routes, End-to-end |
+| **Unit Tests**    | 48+   | Services, Helpers, DTOs         |
+| **Total Tests**   | 791   | test files                      |
 
 ### 2.2 Test Structure
 
@@ -197,7 +197,9 @@ tests/
 │   │   ├── POSControllerTest.php
 │   │   ├── DashboardControllerTest.php
 │   │   ├── AuditLogControllerTest.php
-│   │   └── ... (30+ more)
+│   │   ├── StockOpnameControllerTest.php
+│   │   ├── PlanControllerTest.php
+│   │   └── ... (32+ more)
 │   ├── Auth/
 │   │   ├── AuthenticationTest.php
 │   │   ├── PasswordResetTest.php
@@ -214,7 +216,10 @@ tests/
     │   ├── DashboardServiceTest.php
     │   ├── ActivityLogServiceTest.php
     │   ├── SecurityLoggerTest.php
-    │   └── ... (40+ more)
+    │   ├── StockOpnameServiceTest.php
+    │   ├── BillingServiceTest.php
+    │   ├── SystemNotificationServiceTest.php
+    │   └── ... (45+ more)
     ├── Helpers/
     │   ├── CurrencyHelperTest.php
     │   ├── SalesHelperTest.php

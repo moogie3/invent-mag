@@ -49,12 +49,12 @@ class SalesReturnControllerTest extends TestCase
         $this->warehouse = Warehouse::factory()->create(['is_main' => true]);
         $this->product = Product::factory()->withStock(10)->create();
         $customer = Customer::factory()->create();
-        
+
         $this->sale = Sales::factory()->create([
             'customer_id' => $customer->id,
             'warehouse_id' => $this->warehouse->id, // Added
         ]);
-        
+
         // Ensure sales item created and stock deducted (simulated)
         SalesItem::factory()->create([
             'sales_id' => $this->sale->id,
@@ -63,7 +63,7 @@ class SalesReturnControllerTest extends TestCase
             'customer_price' => 100,
             'total' => 500
         ]);
-        
+
         // Ensure pivot reflects post-sale state (10 - 5 = 5)
         // Note: Factory withStock(10) sets initial stock.
         // We simulate the sale already happened.
@@ -116,7 +116,7 @@ class SalesReturnControllerTest extends TestCase
     {
         $returnData = [
             'sales_id' => $this->sale->id,
-            'return_date' => \Carbon\Carbon::now()->format('Y-m-d'),
+            'return_date' => Carbon::now()->format('Y-m-d'),
             'items' => json_encode([
                 ['product_id' => $this->product->id, 'returned_quantity' => 1, 'price' => 100]
             ]),
@@ -127,14 +127,13 @@ class SalesReturnControllerTest extends TestCase
 
         $response = $this->post(route('admin.sales-returns.store'), $returnData);
 
-        $response->assertRedirect(route('admin.sales-returns.index'));
-        $response->assertSessionHas('success', 'Sales return created successfully.');
+        $response->assertRedirect(route('admin.sales-returns.index', ['status' => 'success', 'message' => 'Sales return created successfully.']));
         $this->assertDatabaseHas('sales_returns', ['sales_id' => $this->sale->id]);
     }
 
     public function test_it_can_show_a_sales_return()
     {
-        $salesReturn = \App\Models\SalesReturn::create([
+        $salesReturn = SalesReturn::create([
             'sales_id' => $this->sale->id,
             'user_id' => $this->user->id,
             'return_date' => '2025-12-12',
@@ -142,7 +141,7 @@ class SalesReturnControllerTest extends TestCase
             'status' => 'Completed',
             'reason' => 'Test reason',
         ]);
-        \App\Models\SalesReturnItem::create([ // Create a SalesReturnItem
+        SalesReturnItem::create([ // Create a SalesReturnItem
             'sales_return_id' => $salesReturn->id,
             'product_id' => $this->product->id,
             'quantity' => 1,
@@ -159,7 +158,7 @@ class SalesReturnControllerTest extends TestCase
 
     public function test_it_can_display_the_edit_page()
     {
-        $salesReturn = \App\Models\SalesReturn::create([
+        $salesReturn = SalesReturn::create([
             'sales_id' => $this->sale->id,
             'user_id' => $this->user->id,
             'return_date' => '2025-12-12',
@@ -176,14 +175,14 @@ class SalesReturnControllerTest extends TestCase
 
     public function test_it_can_update_a_sales_return()
     {
-        $salesReturn = \App\Models\SalesReturn::create([
+        $salesReturn = SalesReturn::create([
             'sales_id' => $this->sale->id,
             'user_id' => $this->user->id,
             'return_date' => '2025-12-12',
             'total_amount' => 100,
             'status' => 'Completed',
         ]);
-        \App\Models\SalesReturnItem::create([
+        SalesReturnItem::create([
             'sales_return_id' => $salesReturn->id,
             'product_id' => $this->product->id,
             'quantity' => 1,
@@ -193,7 +192,7 @@ class SalesReturnControllerTest extends TestCase
 
         $updateData = [
             'sales_id' => $this->sale->id,
-            'return_date' => \Carbon\Carbon::now()->addDay()->format('Y-m-d'),
+            'return_date' => Carbon::now()->addDay()->format('Y-m-d'),
             'items' => json_encode([
                 ['product_id' => $this->product->id, 'returned_quantity' => 2, 'price' => 150]
             ]),
@@ -204,8 +203,7 @@ class SalesReturnControllerTest extends TestCase
 
         $response = $this->put(route('admin.sales-returns.update', $salesReturn->id), $updateData);
 
-        $response->assertRedirect(route('admin.sales-returns.index'));
-        $response->assertSessionHas('success', 'Sales return updated successfully.');
+        $response->assertRedirect(route('admin.sales-returns.index', ['status' => 'success', 'message' => 'Sales return updated successfully.']));
         $this->assertDatabaseHas('sales_returns', [
             'id' => $salesReturn->id,
             'status' => 'Pending'
@@ -218,8 +216,7 @@ class SalesReturnControllerTest extends TestCase
 
         $response = $this->delete(route('admin.sales-returns.destroy', $salesReturn->id));
 
-        $response->assertRedirect(route('admin.sales-returns.index'));
-        $response->assertSessionHas('success', 'Sales return deleted successfully.');
+        $response->assertRedirect(route('admin.sales-returns.index', ['status' => 'success', 'message' => 'Sales return deleted successfully.']));
         $this->assertDatabaseMissing('sales_returns', ['id' => $salesReturn->id]);
     }
 

@@ -276,6 +276,59 @@
             __('tutorial.credit_info'),
             __('tutorial.print_ret')
         ];
+    } elseif ($routeName === 'admin.por.index') {
+        $contextTitle = __('tutorial.purchase_returns_list');
+        $contextIcon = 'ti-receipt-refund';
+        $contextDesc = __('tutorial.purchase_returns_list_desc');
+        $contextSteps = [
+            __('tutorial.view_por'),
+            __('tutorial.create_por'),
+            __('tutorial.por_status'),
+            __('tutorial.supplier_debit'),
+            __('tutorial.completed_por'),
+            __('tutorial.supplier_debit_info'),
+            __('tutorial.bulk_actions_por'),
+            __('tutorial.export_por')
+        ];
+    } elseif ($routeName === 'admin.por.create') {
+        $contextTitle = __('tutorial.create_purchase_return');
+        $contextIcon = 'ti-plus';
+        $contextDesc = __('tutorial.create_purchase_return_desc');
+        $contextSteps = [
+            __('tutorial.select_invoice_por'),
+            __('tutorial.return_date_por'),
+            __('tutorial.reason_por'),
+            __('tutorial.select_items_por'),
+            __('tutorial.return_quantity_por'),
+            __('tutorial.debit_note_condition'),
+            __('tutorial.status_por'),
+            __('tutorial.save_por')
+        ];
+    } elseif ($routeName === 'admin.por.edit') {
+        $contextTitle = __('tutorial.edit_purchase_return');
+        $contextIcon = 'ti-edit';
+        $contextDesc = __('tutorial.edit_purchase_return_desc');
+        $contextSteps = [
+            __('tutorial.return_info_por'),
+            __('tutorial.return_date_edit_por'),
+            __('tutorial.reason_edit_por'),
+            __('tutorial.edit_items_por'),
+            __('tutorial.return_quantity_edit_por'),
+            __('tutorial.status_edit_por'),
+            __('tutorial.debit_note_condition'),
+            __('tutorial.save_por_edit')
+        ];
+    } elseif ($routeName === 'admin.por.show') {
+        $contextTitle = __('tutorial.purchase_return_details');
+        $contextIcon = 'ti-eye';
+        $contextDesc = __('tutorial.purchase_return_details_desc');
+        $contextSteps = [
+            __('tutorial.return_details_por'),
+            __('tutorial.items_por'),
+            __('tutorial.status_por_view'),
+            __('tutorial.debit_info_por'),
+            __('tutorial.print_por')
+        ];
     } elseif (Str::startsWith($routeName, 'admin.sales') && !Str::startsWith($routeName, 'admin.sales_pipeline')) {
         $contextTitle = __('tutorial.sales_orders');
         $contextIcon = 'ti-shopping-cart';

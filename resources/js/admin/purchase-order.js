@@ -56,7 +56,7 @@ onPageLoad(function () {
         const pathname = window.location.pathname;
 
         try {
-            if (pathname.includes("/admin/po/create")) {
+            if (pathname === "/admin/po/create") {
                 window.poApp = new PurchaseOrderCreate();
                 window.shortcutManager.register(
                     "alt+n",
@@ -84,9 +84,8 @@ onPageLoad(function () {
                     "Save Purchase Order",
                 );
             } else if (
-                pathname.includes("/admin/po/edit") ||
-                (pathname.includes("/admin/po") &&
-                    pathname.match(/\/\d+\/edit$/))
+                pathname === "/admin/po/edit" ||
+                (pathname.match(/^\/admin\/po\/\d+\/edit$/) !== null)
             ) {
                 window.poApp = new PurchaseOrderEdit();
                 window.shortcutManager.register(
@@ -101,15 +100,13 @@ onPageLoad(function () {
                 window.shortcutManager.unregister("alt+d");
                 window.shortcutManager.unregister("alt+e");
             } else if (
-                pathname.includes("/admin/po/modal") ||
-                (pathname.includes("/admin/po") && pathname.match(/\/\d+$/)) ||
-                pathname.includes("/admin/po/show")
+                pathname === "/admin/po/modal" ||
+                pathname.match(/^\/admin\/po\/\d+$/) !== null ||
+                pathname === "/admin/po/show"
             ) {
                 window.poApp = new PurchaseOrderView();
             } else if (
-                pathname === "/admin/po" ||
-                pathname.includes("/admin/po?") ||
-                pathname.includes("/admin/po/")
+                pathname === "/admin/po"
             ) {
                 window.poApp = new PurchaseOrderView();
 

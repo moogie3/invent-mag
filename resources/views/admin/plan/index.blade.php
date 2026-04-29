@@ -69,20 +69,26 @@
                                     $expiryDate = null;
                                     $daysRemaining = null;
                                     if ($tenant && $currentPlan && !$isDemo) {
-                                        // Get last billing date (billing_period_start or plan_changed_at)
-                                        $lastBilling = $tenant->billing_period_start 
-                                            ? \Carbon\Carbon::parse($tenant->billing_period_start) 
-                                            : ($tenant->plan_changed_at ? \Carbon\Carbon::parse($tenant->plan_changed_at) : null);
+                                        if ($tenant->billing_period_end) {
+                                            $expiryDate = \Carbon\Carbon::parse($tenant->billing_period_end)->endOfDay();
+                                        } else {
+                                            // Get last billing date (billing_period_start or plan_changed_at)
+                                            $lastBilling = $tenant->billing_period_start 
+                                                ? \Carbon\Carbon::parse($tenant->billing_period_start) 
+                                                : ($tenant->plan_changed_at ? \Carbon\Carbon::parse($tenant->plan_changed_at) : null);
+                                                
+                                            // If no last billing date, use creation date
+                                            if (!$lastBilling) {
+                                                $lastBilling = $tenant->created_at ? \Carbon\Carbon::parse($tenant->created_at) : now();
+                                            }
                                             
-                                        // If no last billing date, use creation date
-                                        if (!$lastBilling) {
-                                            $lastBilling = $tenant->created_at ? \Carbon\Carbon::parse($tenant->created_at) : now();
+                                            // Add billing cycle days (default 30 for monthly)
+                                            $billingDays = $currentPlan->getBillingPeriodDays() ?? 30;
+                                            $expiryDate = $lastBilling->addDays($billingDays)->endOfDay();
                                         }
                                         
-                                        // Add billing cycle days (default 30 for monthly)
-                                        $billingDays = $currentPlan->getBillingPeriodDays() ?? 30;
-                                        $expiryDate = $lastBilling->addDays($billingDays);
-                                        $daysRemaining = now()->diffInDays($expiryDate, false);
+                                        $daysRemainingFloat = now()->diffInDays($expiryDate, false);
+                                        $daysRemaining = (int) round($daysRemainingFloat);
                                     }
                                 @endphp
 

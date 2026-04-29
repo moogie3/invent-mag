@@ -23,6 +23,8 @@ class CheckSubscriptionStatus
             'admin.setting.plan.upgrade',
             'admin.setting.plan.change',
             'admin.setting.plan.checkout',
+            'admin.setting.plan.confirm-payment',
+            'api.payment.confirm',
             'admin.login',
             'admin.logout',
             'admin.login.post',

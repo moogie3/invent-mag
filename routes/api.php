@@ -22,6 +22,7 @@ use App\Http\Controllers\Api\PaymentController;
 
 // Webhooks (Must be outside of CSRF and auth middleware)
 Route::post('/webhooks/midtrans', [MidtransController::class, 'handle'])->name('api.webhooks.midtrans');
+Route::post('/webhook', [MidtransController::class, 'handle']); // Fallback for misconfigured Midtrans dashboard
 
 // Payment confirmation - requires authentication
 Route::middleware('auth:sanctum')->group(function () {

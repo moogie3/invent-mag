@@ -309,28 +309,6 @@ function initSidebar() {
         toggleSidebar();
     };
 
-    // Click outside to close sidebar (respects lock and persistence)
-    const handleClickOutside = function (e) {
-        // Ignore clicks that happened at or before the most recent turbo:load completed.
-        // The click that triggered a Turbo navigation fires on the old page but its event
-        // can bleed into the newly loaded page, causing the sidebar to snap shut immediately
-        // after a nav-link click opens it. A 150ms buffer covers the transition time.
-        if (e.timeStamp <= lastTurboLoadTime + 150) return;
-
-        const isOpen = !sidebar.classList.contains("collapsed");
-
-        if (
-            isOpen &&
-            !document.body.classList.contains("sidebar-locked") && // Only close if not locked
-            !sidebar.contains(e.target) &&
-            !sidebarToggle?.contains(e.target)
-        ) {
-            // Save collapsed state when auto-closing
-            saveSidebarState(true);
-            toggleSidebar();
-        }
-    };
-
     // Initialize everything
     initializeSidebar();
 
@@ -376,37 +354,82 @@ function initSidebar() {
     });
 
     // Toggle button event with persistence
-    if (sidebarToggle) {
+    if (sidebarToggle && !sidebarToggle.dataset.clickBound) {
         sidebarToggle.addEventListener("click", function (e) {
             e.preventDefault();
             e.stopPropagation();
             toggleSidebarWithPersistence();
         });
+        sidebarToggle.dataset.clickBound = "true";
     }
 
-    // Add click outside listener
-    document.addEventListener("click", handleClickOutside);
+    // Add global listeners only once per page session
+    if (!window.sidebarGlobalListenersAdded) {
+        // Add click outside listener
+        document.addEventListener("click", function (e) {
+            // Ignore clicks that happened at or before the most recent turbo:load completed.
+            if (e.timeStamp <= lastTurboLoadTime + 150) return;
 
-    // Enhanced responsive behavior with persistence
-    let resizeTimeout;
-    window.addEventListener("resize", function () {
-        clearTimeout(resizeTimeout);
-        resizeTimeout = setTimeout(() => {
-            if (window.innerWidth < 768) {
-                if (!sidebar.classList.contains("collapsed")) {
-                    saveSidebarState(true);
-                    toggleSidebar();
+            const currentSidebar = document.querySelector(".sidebar");
+            const currentToggle = document.getElementById("sidebar-toggle");
+            
+            if (!currentSidebar) return;
+
+            const isOpen = !currentSidebar.classList.contains("collapsed");
+
+            if (
+                isOpen &&
+                !document.body.classList.contains("sidebar-locked") &&
+                !currentSidebar.contains(e.target) &&
+                !(currentToggle && currentToggle.contains(e.target))
+            ) {
+                localStorage.setItem("sidebarCollapsed", "true");
+                
+                // Fast closing
+                currentSidebar.classList.add("sidebar-fast-close");
+                const currentMain = document.querySelector(".main-content");
+                if(currentMain) currentMain.classList.add("main-content-fast-close");
+                
+                currentSidebar.querySelectorAll(".nav-link-title").forEach((text) => text.classList.add("nav-text-fade-out"));
+                
+                setTimeout(() => {
+                    currentSidebar.classList.add("collapsed");
+                    if(currentMain) currentMain.classList.add("sidebar-collapsed");
+                    document.body.classList.remove("sidebar-open");
+                }, 50);
+            }
+        });
+
+        // Enhanced responsive behavior with persistence
+        let resizeTimeout;
+        window.addEventListener("resize", function () {
+            clearTimeout(resizeTimeout);
+            resizeTimeout = setTimeout(() => {
+                const currentSidebar = document.querySelector(".sidebar");
+                if (currentSidebar && window.innerWidth < 768) {
+                    if (!currentSidebar.classList.contains("collapsed")) {
+                        localStorage.setItem("sidebarCollapsed", "true");
+                        currentSidebar.classList.add("collapsed");
+                        document.body.classList.remove("sidebar-open");
+                        const currentMain = document.querySelector(".main-content");
+                        if(currentMain) currentMain.classList.add("sidebar-collapsed");
+                    }
+                }
+            }, 150);
+        });
+
+        // Add keyboard support with persistence
+        document.addEventListener("keydown", function (e) {
+            // Toggle sidebar with Ctrl/Cmd + B
+            if ((e.ctrlKey || e.metaKey) && e.key === "b") {
+                const currentToggle = document.getElementById("sidebar-toggle");
+                if (currentToggle) {
+                    e.preventDefault();
+                    currentToggle.click();
                 }
             }
-        }, 150);
-    });
-
-    // Add keyboard support with persistence
-    document.addEventListener("keydown", function (e) {
-        // Toggle sidebar with Ctrl/Cmd + B
-        if ((e.ctrlKey || e.metaKey) && e.key === "b") {
-            e.preventDefault();
-            toggleSidebarWithPersistence();
-        }
-    });
+        });
+        
+        window.sidebarGlobalListenersAdded = true;
+    }
 }

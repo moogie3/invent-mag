@@ -1,8 +1,8 @@
 # Invent-MAG: Complete Feature Checklist
 
 **Last Updated:** April 2026  
-**Version:** 1.6  
-**System Version:** 1.6
+**Version:** 1.7  
+**System Version:** 1.7
 
 ---
 
@@ -51,6 +51,9 @@
 - [x] Invoice email sent on successful payment
 - [x] Subscription order tracking
 - [x] Plan upgrade/downgrade support
+- [x] 30-Day Rolling Billing Cycle with Date Stacking
+- [x] 7-Day Renewal Grace Period
+- [x] Midtrans Webhook Fallback Protection
 - [x] Current plan badge in sidebar
 - [x] Security: Signature verification for webhooks
 - [x] Security: Tenant ownership verification

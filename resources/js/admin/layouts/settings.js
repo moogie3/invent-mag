@@ -370,8 +370,3 @@ onPageLoad(() => {
     }
     handleNotificationsOnLoad();
 });
-
-// Reset init flags before Turbo caches so settings re-initialize properly
-document.addEventListener('turbo:before-cache', () => {
-    window.autoLogoutInitialized = false;
-});

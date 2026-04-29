@@ -92,11 +92,19 @@ class PlanController extends Controller
         // Check if plan is expiring soon (within 7 days)
         $expiringSoon = false;
         $expiryDays = null;
+        $currentExpiryDate = null;
         if ($tenant && $currentPlan) {
-            $endsAt = $tenant->subscription_ends_at;
-            if ($endsAt && $endsAt instanceof \Carbon\Carbon) {
-                $daysRemaining = now()->diffInDays($endsAt, false);
-                if ($daysRemaining !== null && $daysRemaining >= 0 && $daysRemaining <= 7) {
+            // Determine the true expiry date
+            $endsAt = $tenant->billing_period_end 
+                ? \Carbon\Carbon::parse($tenant->billing_period_end)->endOfDay()
+                : ($tenant->trial_ends_at ? \Carbon\Carbon::parse($tenant->trial_ends_at)->endOfDay() : null);
+
+            if ($endsAt) {
+                $currentExpiryDate = $endsAt->copy();
+                $daysRemainingFloat = now()->diffInDays($endsAt, false);
+                $daysRemaining = (int) round($daysRemainingFloat);
+                
+                if ($daysRemaining >= 0 && $daysRemaining <= 7) {
                     $expiringSoon = true;
                     $expiryDays = $daysRemaining;
                 }
@@ -112,7 +120,8 @@ class PlanController extends Controller
             'upgradeMessage',
             'planInactive',
             'expiringSoon',
-            'expiryDays'
+            'expiryDays',
+            'currentExpiryDate'
         ));
     }
 
@@ -297,15 +306,23 @@ if ($changeType === 'upgrade') {
                     ]);
                 } elseif ($changeType === 'same') {
                     // Same tier renewal - extend the subscription
-                    $period = $this->billingService->getCurrentBillingPeriod();
                     $tenant->plan_status = 'active';
-                    $tenant->billing_period_start = $period['start'];
-                    $tenant->billing_period_end = $period['end'];
                     $tenant->trial_ends_at = null; // Clear trial since we're now on a paid plan
                     $tenant->plan_changed_at = now();
+                    
+                    if ($tenant->billing_period_end && \Carbon\Carbon::parse($tenant->billing_period_end)->isFuture()) {
+                        // Stack the days if not yet expired, preserving the exact time
+                        $tenant->billing_period_end = \Carbon\Carbon::parse($tenant->billing_period_end)->addDays(30);
+                    } else {
+                        // Reset if already expired
+                        $period = $this->billingService->getCurrentBillingPeriod();
+                        $tenant->billing_period_start = $period['start'];
+                        $tenant->billing_period_end = $period['end'];
+                    }
+                    
                     $tenant->save();
 
-                    \Illuminate\Support\Facades\Log::info("Payment confirmed for order {$order->order_number}. Renewal: {$newPlan->name}. Period: {$period['start']} to {$period['end']}");
+                    \Illuminate\Support\Facades\Log::info("Payment confirmed for order {$order->order_number}. Renewal: {$newPlan->name}. Extended until: {$tenant->billing_period_end}");
 
                     return response()->json([
                         'message' => 'Payment confirmed successfully',

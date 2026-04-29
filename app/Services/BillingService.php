@@ -10,29 +10,29 @@ use Illuminate\Support\Facades\Log;
 class BillingService
 {
     /**
-     * Get the next billing period dates (calendar-based: 1st of next month).
+     * Get the next billing period dates (rolling 30 days).
      */
     public function getNextBillingPeriod(): array
     {
         $now = now();
-        $nextMonth = $now->copy()->addMonth()->startOfMonth();
+        $nextMonth = $now->copy()->addDays(30);
 
         return [
             'start' => $nextMonth->toDateString(),
-            'end' => $nextMonth->endOfMonth()->toDateString(),
+            'end' => $nextMonth->copy()->addDays(30)->toDateString(),
         ];
     }
 
     /**
-     * Get the current billing period dates.
+     * Get the current billing period dates (rolling 30 days).
      */
     public function getCurrentBillingPeriod(): array
     {
         $now = now();
 
         return [
-            'start' => $now->startOfMonth()->toDateString(),
-            'end' => $now->endOfMonth()->toDateString(),
+            'start' => $now->toDateString(),
+            'end' => $now->copy()->addDays(30)->toDateString(),
         ];
     }
 

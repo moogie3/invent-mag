@@ -8,10 +8,11 @@ onPageLoad(function () {
     // Initialize Bootstrap tooltips
     if (window.bootstrap) {
         var tooltipTriggerList = [].slice.call(
-            document.querySelectorAll('[data-bs-toggle="tooltip"]'),
+            document.querySelectorAll('[data-bs-toggle="tooltip"]:not(.bs-tooltip-bound)'),
         );
         tooltipTriggerList.map(function (tooltipTriggerEl) {
             try {
+                tooltipTriggerEl.classList.add('bs-tooltip-bound');
                 return new bootstrap.Tooltip(tooltipTriggerEl);
             } catch(e) {}
         });
@@ -19,9 +20,10 @@ onPageLoad(function () {
 
     // Avatar dropdown hover functionality
     const initAvatarHoverDropdown = () => {
-        const avatarDropdowns = document.querySelectorAll("#avatar-dropdown");
+        const avatarDropdowns = document.querySelectorAll("#avatar-dropdown:not(.avatar-bound)");
 
         avatarDropdowns.forEach((dropdown) => {
+            dropdown.classList.add("avatar-bound");
             const dropdownMenu = dropdown.querySelector(".dropdown-menu");
             let hoverTimeout;
 
@@ -105,15 +107,17 @@ onPageLoad(function () {
 
     // Apply click handlers to all notification tabs
     const notificationTabs = document.querySelectorAll(
-        "#notificationTabs .nav-link",
+        "#notificationTabs .nav-link:not(.tab-bound)",
     );
     notificationTabs.forEach((tab) => {
+        tab.classList.add("tab-bound");
         tab.addEventListener("click", handleTabClick);
     });
 
     // Set the active tab when dropdown is shown
     const notificationBell = document.getElementById("notification-bell");
-    if (notificationBell) {
+    if (notificationBell && !notificationBell.dataset.bound) {
+        notificationBell.dataset.bound = "true";
         // For click functionality (mobile)
         notificationBell.addEventListener("click", function (e) {
             // Only handle click on mobile devices
@@ -159,11 +163,12 @@ onPageLoad(function () {
     // Notification dot handling
     const initNotifications = () => {
         const notificationItems =
-            document.querySelectorAll(".notification-item");
+            document.querySelectorAll(".notification-item:not(.item-bound)");
         const notificationDot = document.getElementById("notification-dot");
 
         if (notificationItems.length > 0) {
             notificationItems.forEach((item) => {
+                item.classList.add("item-bound");
                 item.addEventListener("click", function (e) {
                     const notificationId = this.getAttribute(
                         "data-notification-id",
@@ -306,8 +311,9 @@ onPageLoad(function () {
         let hoverTimeout;
 
         if (!brandTrigger || !navContainer || !navDropdown) return;
-
-        const navItems = navDropdown.querySelectorAll("ul > li"); // Get all top-level nav items
+        
+        if (brandTrigger.dataset.bound) return;
+        brandTrigger.dataset.bound = "true";
 
         // Show dropdown on hover of brand trigger (icon only)
         brandTrigger.addEventListener("mouseenter", function () {
@@ -341,8 +347,9 @@ onPageLoad(function () {
     // Staggered dropdown children animation
     const initStaggeredDropdown = () => {
         document
-            .querySelectorAll(".nav-item.dropdown > .nav-link.dropdown-toggle")
+            .querySelectorAll(".nav-item.dropdown > .nav-link.dropdown-toggle:not(.stagger-bound)")
             .forEach((toggle) => {
+                toggle.classList.add("stagger-bound");
                 const dropdown = toggle.closest(".nav-item.dropdown");
                 
                 // Add hybrid animation listeners
@@ -398,8 +405,9 @@ onPageLoad(function () {
 
     // Fix for notification tabs to prevent dropdown from closing when clicking tabs
     const fixNotificationTabsDropdown = () => {
-        const notificationTabs = document.querySelectorAll(".notification-tabs .nav-link");
+        const notificationTabs = document.querySelectorAll(".notification-tabs .nav-link:not(.fix-bound)");
         notificationTabs.forEach((tab) => {
+            tab.classList.add("fix-bound");
             tab.addEventListener("click", function (e) {
                 e.stopPropagation();
             });
@@ -408,6 +416,9 @@ onPageLoad(function () {
 
     // Close dropdowns when clicking outside (for better UX)
     const initOutsideClickHandler = () => {
+        if (window.navbarOutsideClickBound) return;
+        window.navbarOutsideClickBound = true;
+        
         document.addEventListener("click", function (e) {
             if (!e.target.closest(".nav-item.dropdown") && !e.target.closest("#nav-dropdown")) {
                 document.querySelectorAll(".nav-item.dropdown .dropdown-menu.show").forEach((menu) => {
@@ -429,6 +440,9 @@ onPageLoad(function () {
 
     // Mobile responsive adjustments
     const initResponsiveBehavior = () => {
+        if (window.navbarResponsiveBound) return;
+        window.navbarResponsiveBound = true;
+        
         const handleResize = () => {
             if (window.innerWidth < 768) {
                 document.querySelectorAll(".nav-item.dropdown").forEach((dropdown) => {
@@ -447,49 +461,51 @@ onPageLoad(function () {
     initStaggeredDropdown();
     fixNotificationTabsDropdown();
     
-    // Global listeners should only be added once per page visit
-    if (!window.navbarGlobalInitialized) {
-        initOutsideClickHandler();
-        initResponsiveBehavior();
-        
-        const navbar = document.querySelector(".navbar");
-        if (navbar) {
-            window.addEventListener("scroll", function () {
+    // Global window/document listeners should only be added once
+    initOutsideClickHandler();
+    initResponsiveBehavior();
+    
+    // Attach to dynamic DOM elements safely
+    if (!window.navbarScrollBound) {
+        window.addEventListener("scroll", function () {
+            const navbar = document.querySelector(".navbar");
+            if (navbar) {
                 if (window.scrollY > 50) {
                     navbar.classList.add("scrolled");
                 } else {
                     navbar.classList.remove("scrolled");
                 }
-            });
-        }
+            }
+        });
+        window.navbarScrollBound = true;
+    }
 
-        const sidebarToggle = document.getElementById("sidebar-toggle");
-        if (sidebarToggle) {
-            sidebarToggle.addEventListener("click", function () {
-                document.body.classList.toggle("sidebar-open");
-            });
-        }
+    const sidebarToggle = document.getElementById("sidebar-toggle");
+    if (sidebarToggle && !sidebarToggle.dataset.navBound) {
+        sidebarToggle.dataset.navBound = "true";
+        sidebarToggle.addEventListener("click", function () {
+            document.body.classList.toggle("sidebar-open");
+        });
+    }
 
-        // Handle navbar sidebar toggle for layout-navbar mode
-        const navbarSidebarToggle = document.getElementById("navbar-sidebar-toggle");
-        if (navbarSidebarToggle) {
-            navbarSidebarToggle.addEventListener("click", function () {
-                const sidebar = document.querySelector('.sidebar');
-                if (sidebar) {
-                    sidebar.classList.toggle('sidebar-toggled');
-                    document.body.classList.toggle('sidebar-open');
-                    document.body.classList.toggle('sidebar-toggled-open');
-                }
-            });
-        }
+    // Handle navbar sidebar toggle for layout-navbar mode
+    const navbarSidebarToggle = document.getElementById("navbar-sidebar-toggle");
+    if (navbarSidebarToggle && !navbarSidebarToggle.dataset.navBound) {
+        navbarSidebarToggle.dataset.navBound = "true";
+        navbarSidebarToggle.addEventListener("click", function () {
+            const sidebar = document.querySelector('.sidebar');
+            if (sidebar) {
+                sidebar.classList.toggle('sidebar-toggled');
+                document.body.classList.toggle('sidebar-open');
+                document.body.classList.toggle('sidebar-toggled-open');
+            }
+        });
+    }
 
-        // Only start the notification interval if the bell exists
-        if (!window.notificationIntervalStarted && document.getElementById('notification-bell')) {
-            setInterval(checkForNewNotifications, 5 * 60 * 1000);
-            window.notificationIntervalStarted = true;
-        }
-
-        window.navbarGlobalInitialized = true;
+    // Only start the notification interval if the bell exists
+    if (!window.notificationIntervalStarted && document.getElementById('notification-bell')) {
+        setInterval(checkForNewNotifications, 5 * 60 * 1000);
+        window.notificationIntervalStarted = true;
     }
 
     // Only check for notifications if the bell icon exists
@@ -497,7 +513,3 @@ onPageLoad(function () {
         checkForNewNotifications();
     }
 });
-
-// The navbarGlobalInitialized flag is intentionally NOT reset on turbo:before-cache.
-// The document/window listeners (click outside, resize, scroll) must persist for the
-// lifetime of the JS session and must only be registered once ever.

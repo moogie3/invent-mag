@@ -504,7 +504,16 @@ docker-compose exec app php artisan migrate --seed
 
 ## 🗺️ Roadmap
 
-### Recently Added (v1.6)
+### Recently Added (v1.7)
+
+- ✅ Major Hotwire Turbo Performance Fix (Removed critical CPU memory leaks from 5+ JS files)
+- ✅ Subscription System Billing Overhaul (Switched to 30-day Rolling Cycle instead of strict Calendar month)
+- ✅ Intelligent Subscription Modal Math (Perfectly calculates and visually displays stacked renewal days)
+- ✅ 7-Day Renewal Grace Period Logic
+- ✅ Midtrans Fallback Webhook Route (Protects against misconfigured API endpoints)
+- ✅ UI Fix: Removed hardcoded bright backgrounds for Invoice inputs in Dark Mode
+
+### Previously Added (v1.6)
 
 - ✅ Tutorial Topics Sub-Topic Drill-Down Navigation
 - ✅ Click-Outside Closes Tutorial Modal

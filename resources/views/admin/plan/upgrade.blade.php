@@ -34,17 +34,23 @@
         @endif
 
         @if($expiringSoon && $expiryDays !== null)
-            <div class="alert alert-warning mb-4 border-0 shadow-sm rounded-4">
+            @php
+                if ($expiryDays <= 3) {
+                    $alertClass = 'alert-danger';
+                    $iconClass = 'ti-alert-triangle';
+                    $iconColor = 'text-danger';
+                } else {
+                    $alertClass = 'alert-warning';
+                    $iconClass = 'ti-alert-triangle';
+                    $iconColor = 'text-warning';
+                }
+            @endphp
+            <div class="alert {{ $alertClass }} mb-4 border-0 shadow-sm rounded-4">
                 <div class="d-flex align-items-center">
-                    <div><i class="ti ti-alert-triangle text-warning fs-2 me-3"></i></div>
+                    <div><i class="ti {{ $iconClass }} {{ $iconColor }} fs-2 me-3"></i></div>
                     <div>
-                        @if($expiryDays == 0)
-                            {{ __('plan.expiring_today') }}
-                        @elseif($expiryDays == 1)
-                            {{ __('plan.expiring_tomorrow') }}
-                        @else
-                            {{ __('plan.expiring_in_days', ['days' => $expiryDays]) }}
-                        @endif
+                        <strong>Your subscription ends on {{ $currentExpiryDate ? $currentExpiryDate->format('d F Y') : '' }}</strong>
+                        <div class="small mb-0">{{ $expiryDays }} {{ $expiryDays == 1 ? 'day' : 'days' }} remaining</div>
                     </div>
                 </div>
             </div>
@@ -55,8 +61,8 @@
                 @php
                     $isCurrent = $currentPlan && $currentPlan->id === $plan->id;
                     $isSuggested = $suggestedPlan && $suggestedPlan->id === $plan->id;
-                    // Allow renewing expired/inactive plans, but keep showing current for active plans
-                    $canRenew = $isCurrent && $planInactive;
+                    // Allow renewing expired/inactive plans OR plans expiring soon
+                    $canRenew = $isCurrent && ($planInactive || $expiringSoon);
                 @endphp
                 <div class="col-md-6 col-lg-4 mb-4">
                     <div class="card h-100 rounded-4 shadow-sm border-0 {{ $isSuggested ? 'border border-2 border-primary' : '' }} {{ $isCurrent && !$planInactive ? 'border border-2 border-success' : '' }}" style="transition: transform 0.2s;">
@@ -122,7 +128,11 @@
                                         data-bs-toggle="modal" data-bs-target="#upgradeModal"
                                         data-plan-name="{{ $plan->name }}"
                                         data-plan-price="{{ $plan->price }}"
-                                        data-plan-slug="{{ $plan->slug }}">
+                                        data-plan-slug="{{ $plan->slug }}"
+                                        data-is-renewal="true"
+                                        data-days-remaining="{{ $expiryDays ?? 0 }}"
+                                        data-new-days="{{ ($expiryDays ?? 0) + 30 }}"
+                                        data-new-date="{{ $currentExpiryDate ? $currentExpiryDate->copy()->addDays(30)->format('F d, Y') : now()->addDays(30)->format('F d, Y') }}">
                                     <i class="ti ti-refresh me-2"></i>{{ __('plan.renew_plan') }}
                                 </button>
                             @else
@@ -130,7 +140,8 @@
                                         data-bs-toggle="modal" data-bs-target="#upgradeModal"
                                         data-plan-name="{{ $plan->name }}"
                                         data-plan-price="{{ $plan->price }}"
-                                        data-plan-slug="{{ $plan->slug }}">
+                                        data-plan-slug="{{ $plan->slug }}"
+                                        data-is-renewal="false">
                                     {{ $isSuggested ? __('plan.upgrade_now') : __('plan.switch_plan') }}
                                 </button>
                             @endif
@@ -155,8 +166,22 @@
                 <div class="mb-3">
                     <i class="ti ti-rocket text-primary" style="font-size: 3rem;"></i>
                 </div>
-                <h4 class="mb-2">{{ __('plan.upgrade_to') }} <span id="modalPlanName"></span>?</h4>
-                <div class="text-muted">{{ __('plan.upgrade_amount') }}: <strong>$<span id="modalPlanPrice"></span></strong></div>
+                <h4 class="mb-2"><span id="modalActionText">{{ __('plan.upgrade_to') }}</span> <span id="modalPlanName"></span>?</h4>
+                <div class="text-muted mb-3">{{ __('plan.upgrade_amount') }}: <strong>$<span id="modalPlanPrice"></span></strong></div>
+                
+                <div id="renewalInfoBox" class="alert alert-info border-0 shadow-sm text-start d-none rounded-3 mb-0">
+                    <div class="d-flex">
+                        <div>
+                            <i class="ti ti-info-circle text-info fs-2 me-3"></i>
+                        </div>
+                        <div class="small">
+                            <h4 class="alert-title mb-1">Renewal Details</h4>
+                            <div class="mb-1">Current remaining: <strong id="modalDaysRemaining"></strong> days</div>
+                            <div class="mb-1">New total remaining: <strong id="modalNewDays"></strong> days</div>
+                            <div>New expiry date: <strong id="modalNewDate"></strong></div>
+                        </div>
+                    </div>
+                </div>
             </div>
             <div class="modal-footer">
                 <form method="POST" action="{{ route('admin.setting.plan.change') }}" id="upgradeForm" data-turbo="true">
@@ -180,10 +205,25 @@ document.addEventListener('turbo:load', function() {
             var planName = button.getAttribute('data-plan-name');
             var planPrice = button.getAttribute('data-plan-price');
             var planSlug = button.getAttribute('data-plan-slug');
+            var isRenewal = button.getAttribute('data-is-renewal') === 'true';
 
             document.getElementById('modalPlanName').textContent = planName;
             document.getElementById('modalPlanPrice').textContent = planPrice;
             document.getElementById('modalPlanSlug').value = planSlug;
+            
+            var actionText = document.getElementById('modalActionText');
+            var renewalInfoBox = document.getElementById('renewalInfoBox');
+            
+            if (isRenewal) {
+                actionText.textContent = "Renew";
+                document.getElementById('modalDaysRemaining').textContent = button.getAttribute('data-days-remaining');
+                document.getElementById('modalNewDays').textContent = button.getAttribute('data-new-days');
+                document.getElementById('modalNewDate').textContent = button.getAttribute('data-new-date');
+                renewalInfoBox.classList.remove('d-none');
+            } else {
+                actionText.textContent = "{{ __('plan.upgrade_to') }}";
+                renewalInfoBox.classList.add('d-none');
+            }
         });
 
         // Handle form submission for Turbo
@@ -249,10 +289,25 @@ document.addEventListener('DOMContentLoaded', function() {
             var planName = button.getAttribute('data-plan-name');
             var planPrice = button.getAttribute('data-plan-price');
             var planSlug = button.getAttribute('data-plan-slug');
+            var isRenewal = button.getAttribute('data-is-renewal') === 'true';
 
             document.getElementById('modalPlanName').textContent = planName;
             document.getElementById('modalPlanPrice').textContent = planPrice;
             document.getElementById('modalPlanSlug').value = planSlug;
+            
+            var actionText = document.getElementById('modalActionText');
+            var renewalInfoBox = document.getElementById('renewalInfoBox');
+            
+            if (isRenewal) {
+                actionText.textContent = "Renew";
+                document.getElementById('modalDaysRemaining').textContent = button.getAttribute('data-days-remaining');
+                document.getElementById('modalNewDays').textContent = button.getAttribute('data-new-days');
+                document.getElementById('modalNewDate').textContent = button.getAttribute('data-new-date');
+                renewalInfoBox.classList.remove('d-none');
+            } else {
+                actionText.textContent = "{{ __('plan.upgrade_to') }}";
+                renewalInfoBox.classList.add('d-none');
+            }
         });
     }
 });

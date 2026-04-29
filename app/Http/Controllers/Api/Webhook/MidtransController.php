@@ -73,28 +73,64 @@ class MidtransController extends Controller
 
             // Upgrade the tenant's plan (only if not already done via frontend)
             $tenant = $order->tenant;
-            $plan = $order->plan;
+            $newPlan = $order->plan;
             
             // Explicitly set tenant context for database operations
             $tenant->makeCurrent();
 
-            // Check if plan needs updating
-            if ($tenant->plan_id !== $plan->id) {
-                $this->planService->assignPlanToTenant($tenant, $plan->slug, false);
-                
-                // Send invoice email to the first user (usually the owner/admin)
-                $order->refresh();
-                $recipientEmail = \App\Models\User::first()?->email;
-                if ($recipientEmail) {
-                    Mail::to($recipientEmail)->send(new SubscriptionInvoiceMail($order));
-                    Log::info("Invoice email sent to {$recipientEmail} for order {$orderId}.");
-                }
+            $currentPlan = $tenant->getCurrentPlan();
+            $billingService = app(\App\Services\BillingService::class);
+            $changeType = $order->change_type ?? $billingService->getPlanChangeType($currentPlan, $newPlan);
 
-                Log::info("Order {$orderId} marked as paid. Tenant {$tenant->name} upgraded to {$plan->name}.");
-            } else {
-                Log::info("Order {$orderId} marked as paid. Plan already assigned (processed via frontend).");
+            if (!$tenant->billing_period_start) {
+                $period = $billingService->getCurrentBillingPeriod();
+                $tenant->billing_period_start = $period['start'];
+                $tenant->billing_period_end = $period['end'];
             }
-            
+
+            if ($changeType === 'upgrade') {
+                $tenant->plan_id = $newPlan->id;
+                $tenant->plan_status = 'active';
+                $tenant->trial_ends_at = null;
+                $tenant->plan_changed_at = now();
+                $tenant->save();
+                Log::info("Order {$orderId} marked as paid. Tenant {$tenant->name} upgraded to {$newPlan->name}.");
+            } elseif ($changeType === 'same') {
+                $tenant->plan_status = 'active';
+                $tenant->trial_ends_at = null;
+                $tenant->plan_changed_at = now();
+                
+                if ($tenant->billing_period_end && \Carbon\Carbon::parse($tenant->billing_period_end)->isFuture()) {
+                    $tenant->billing_period_end = \Carbon\Carbon::parse($tenant->billing_period_end)->addDays(30);
+                } else {
+                    $period = $billingService->getCurrentBillingPeriod();
+                    $tenant->billing_period_start = $period['start'];
+                    $tenant->billing_period_end = $period['end'];
+                }
+                
+                $tenant->save();
+                Log::info("Order {$orderId} marked as paid. Tenant {$tenant->name} renewed {$newPlan->name}.");
+            } else {
+                $nextPeriod = $billingService->getNextBillingPeriod();
+                $daysRemaining = $billingService->getDaysRemainingInPeriod($tenant);
+                $creditAmount = $billingService->calculateDowngradeCredit($currentPlan, $newPlan, $daysRemaining);
+                
+                $tenant->pending_plan_id = $newPlan->id;
+                $tenant->pending_plan_effective_at = $nextPeriod['start'] . ' 00:00:00';
+                $tenant->proration_credit = $creditAmount;
+                $tenant->trial_ends_at = null;
+                $tenant->save();
+                Log::info("Order {$orderId} marked as paid. Tenant {$tenant->name} scheduled downgrade to {$newPlan->name}.");
+            }
+
+            // Send invoice email to the first user (usually the owner/admin)
+            $order->refresh();
+            $recipientEmail = \App\Models\User::first()?->email;
+            if ($recipientEmail) {
+                Mail::to($recipientEmail)->send(new SubscriptionInvoiceMail($order));
+                Log::info("Invoice email sent to {$recipientEmail} for order {$orderId}.");
+            }
+
             \Spatie\Multitenancy\Models\Tenant::forgetCurrent();
             
         } elseif ($transactionStatus == 'cancel' || $transactionStatus == 'deny' || $transactionStatus == 'expire') {

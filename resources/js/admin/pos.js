@@ -15,9 +15,8 @@ import { onPageLoad } from "./utils/onPageLoad.js";
 onPageLoad(function () {
     if (window.location.pathname !== "/admin/pos") return;
 
-    let posBeforeCacheHandlerAttached = false;
-    if (!posBeforeCacheHandlerAttached) {
-        posBeforeCacheHandlerAttached = true;
+    if (!window.posBeforeCacheHandlerAttached) {
+        window.posBeforeCacheHandlerAttached = true;
         document.addEventListener("turbo:before-cache", function () {
             const processPaymentBtn = document.getElementById("processPaymentBtn");
             const barcodeInput = document.getElementById("barcodeScannerInput");
@@ -148,19 +147,22 @@ onPageLoad(function () {
         });
     }
 
-    document.addEventListener("ctrl-s-pressed", function () {
-        if (getProducts().length === 0) {
-            InventMagApp.showToast(
-                "Warning",
-                "Please add at least one product to the cart.",
-                "warning",
+    if (!window.posCtrlSHandlerAttached) {
+        window.posCtrlSHandlerAttached = true;
+        document.addEventListener("ctrl-s-pressed", function () {
+            if (getProducts().length === 0) {
+                InventMagApp.showToast(
+                    "Warning",
+                    "Please add at least one product to the cart.",
+                    "warning",
+                );
+                return;
+            }
+            populatePaymentModal();
+            const paymentModal = new bootstrap.Modal(
+                document.getElementById("paymentModal", {}),
             );
-            return;
-        }
-        populatePaymentModal();
-        const paymentModal = new bootstrap.Modal(
-            document.getElementById("paymentModal", {}),
-        );
-        paymentModal.show();
-    });
+            paymentModal.show();
+        });
+    }
 });

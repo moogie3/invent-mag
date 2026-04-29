@@ -57,10 +57,15 @@ onPageLoad(() => {
     }
 
     // Listen for when user settings are loaded (from settings.js)
-    document.addEventListener('usersettingsloaded', () => {
+    if (window._themeVisibilitySettingsHandler) {
+        document.removeEventListener('usersettingsloaded', window._themeVisibilitySettingsHandler);
+    }
+    
+    window._themeVisibilitySettingsHandler = () => {
         updateIconVisibility();
         updateSettingsPage();
-    });
+    };
+    document.addEventListener('usersettingsloaded', window._themeVisibilitySettingsHandler);
 
     // --- Initial Execution ---
 

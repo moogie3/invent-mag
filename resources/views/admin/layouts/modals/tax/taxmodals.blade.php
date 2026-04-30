@@ -55,128 +55,112 @@
 </div>
 
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        // Update modal preview when modal is shown
-        const confirmModal = document.getElementById('confirmModal');
-        if (confirmModal) {
-            confirmModal.addEventListener('show.bs.modal', function() {
-                // Wait a bit for the modal to fully show
-                setTimeout(() => {
-                    // Debug: Log all form elements to see what's available
-                    // console.log('All forms:', document.forms);
-                    // console.log('All inputs:', document.querySelectorAll('input'));
+    (function() {
+        function initTaxModal() {
+            // Update modal preview when modal is shown
+            const confirmModal = document.getElementById('confirmModal');
+            if (confirmModal) {
+                // Ensure we don't attach multiple listeners if called multiple times by Turbo
+                if (!confirmModal.dataset.listenerAttached) {
+                    confirmModal.dataset.listenerAttached = 'true';
+                    confirmModal.addEventListener('show.bs.modal', function() {
+                        // Wait a bit for the modal to fully show
+                        setTimeout(() => {
+                            // Try to find the tax settings form - update this selector to match your actual form
+                            const form = document.querySelector('#taxSettingsForm') ||
+                                document.querySelector('form[action*="tax"]') ||
+                                document.querySelector('form');
 
-                    // Try to find the tax settings form - update this selector to match your actual form
-                    const form = document.querySelector('#taxSettingsForm') ||
-                        document.querySelector('form[action*="tax"]') ||
-                        document.querySelector('form');
+                            // Multiple attempts to find tax name input
+                            let taxNameInput = null;
+                            const nameSelectors = [
+                                'input[name="tax_name"]',
+                                'input[name="name"]',
+                                'input[name="taxName"]',
+                                '#tax_name',
+                                '#taxName',
+                                '.tax-name-input'
+                            ];
 
-                    if (form) {
-                        // console.log('Found form:', form);
-                        // console.log('Form inputs:', form.querySelectorAll('input, select'));
-                    }
+                            for (const selector of nameSelectors) {
+                                taxNameInput = document.querySelector(selector);
+                                if (taxNameInput) {
+                                    break;
+                                }
+                            }
 
-                    // Multiple attempts to find tax name input
-                    let taxNameInput = null;
-                    const nameSelectors = [
-                        'input[name="tax_name"]',
-                        'input[name="name"]',
-                        'input[name="taxName"]',
-                        '#tax_name',
-                        '#taxName',
-                        '.tax-name-input'
-                    ];
+                            // Multiple attempts to find tax rate input
+                            let taxRateInput = null;
+                            const rateSelectors = [
+                                'input[name="tax_rate"]',
+                                'input[name="rate"]',
+                                'input[name="taxRate"]',
+                                '#tax_rate',
+                                '#taxRate',
+                                '.tax-rate-input'
+                            ];
 
-                    for (const selector of nameSelectors) {
-                        taxNameInput = document.querySelector(selector);
-                        if (taxNameInput) {
-                            // console.log('Found tax name input with selector:', selector);
-                            break;
-                        }
-                    }
+                            for (const selector of rateSelectors) {
+                                taxRateInput = document.querySelector(selector);
+                                if (taxRateInput) {
+                                    break;
+                                }
+                            }
 
-                    // Multiple attempts to find tax rate input
-                    let taxRateInput = null;
-                    const rateSelectors = [
-                        'input[name="tax_rate"]',
-                        'input[name="rate"]',
-                        'input[name="taxRate"]',
-                        '#tax_rate',
-                        '#taxRate',
-                        '.tax-rate-input'
-                    ];
+                            // Multiple attempts to find checkbox/switch
+                            let isActiveInput = null;
+                            const checkboxSelectors = [
+                                'input[name="is_active"][type="checkbox"]',
+                                'input[name="active"][type="checkbox"]',
+                                'input[name="status"][type="checkbox"]',
+                                '#tax_active',
+                                '#taxActive',
+                                '#taxSwitch',
+                                '.tax-status-switch'
+                            ];
 
-                    for (const selector of rateSelectors) {
-                        taxRateInput = document.querySelector(selector);
-                        if (taxRateInput) {
-                            // console.log('Found tax rate input with selector:', selector);
-                            break;
-                        }
-                    }
+                            for (const selector of checkboxSelectors) {
+                                isActiveInput = document.querySelector(selector);
+                                if (isActiveInput) {
+                                    break;
+                                }
+                            }
 
-                    // Multiple attempts to find checkbox/switch
-                    let isActiveInput = null;
-                    const checkboxSelectors = [
-                        'input[name="is_active"][type="checkbox"]',
-                        'input[name="active"][type="checkbox"]',
-                        'input[name="status"][type="checkbox"]',
-                        '#tax_active',
-                        '#taxActive',
-                        '#taxSwitch',
-                        '.tax-status-switch'
-                    ];
+                            // Get values with fallbacks
+                            const taxName = taxNameInput ? taxNameInput.value.trim() : '';
+                            const taxRate = taxRateInput ? taxRateInput.value.trim() : '';
+                            const isActive = isActiveInput ? isActiveInput.checked : false;
 
-                    for (const selector of checkboxSelectors) {
-                        isActiveInput = document.querySelector(selector);
-                        if (isActiveInput) {
-                            // console.log('Found checkbox input with selector:', selector);
-                            break;
-                        }
-                    }
+                            // Update preview elements
+                            const nameElement = document.getElementById('previewTaxName');
+                            const rateElement = document.getElementById('previewTaxRate');
+                            const statusElement = document.getElementById('previewTaxStatus');
 
-                    // Get values with fallbacks
-                    const taxName = taxNameInput ? taxNameInput.value.trim() : '';
-                    const taxRate = taxRateInput ? taxRateInput.value.trim() : '';
-                    const isActive = isActiveInput ? isActiveInput.checked : false;
+                            if (nameElement) {
+                                nameElement.textContent = taxName ||
+                                    '{{ __('messages.tax_modal_not_specified') }}';
+                            }
 
-                    // Update preview elements
-                    const nameElement = document.getElementById('previewTaxName');
-                    const rateElement = document.getElementById('previewTaxRate');
-                    const statusElement = document.getElementById('previewTaxStatus');
+                            if (rateElement) {
+                                rateElement.textContent = taxRate || '0';
+                            }
 
-                    if (nameElement) {
-                        nameElement.textContent = taxName ||
-                            '{{ __('messages.tax_modal_not_specified') }}';
-                    }
-
-                    if (rateElement) {
-                        rateElement.textContent = taxRate || '0';
-                    }
-
-                    if (statusElement) {
-                        if (isActive) {
-                            statusElement.textContent = '{{ __('messages.tax_modal_active') }}';
-                            statusElement.className = 'badge bg-success text-white';
-                        } else {
-                            statusElement.textContent = '{{ __('messages.tax_modal_inactive') }}';
-                            statusElement.className = 'badge bg-danger text-white';
-                        }
-                    }
-
-                    // If no inputs were found, show debug info
-                    if (!taxNameInput && !taxRateInput && !isActiveInput) {
-                        // No tax form inputs found on this page
-                    }
-                }, 100);
-            });
+                            if (statusElement) {
+                                if (isActive) {
+                                    statusElement.textContent = '{{ __('messages.tax_modal_active') }}';
+                                    statusElement.className = 'badge bg-success text-white';
+                                } else {
+                                    statusElement.textContent = '{{ __('messages.tax_modal_inactive') }}';
+                                    statusElement.className = 'badge bg-danger text-white';
+                                }
+                            }
+                        }, 100);
+                    });
+                }
+            }
         }
-
-        // Alternative: Update preview when button is clicked
-        const saveButton = document.querySelector('[data-bs-target="#confirmModal"]');
-        if (saveButton) {
-            saveButton.addEventListener('click', function() {
-                // console.log('Save button clicked - checking form data');
-            });
-        }
-    });
+        
+        // Execute immediately
+        initTaxModal();
+    })();
 </script>

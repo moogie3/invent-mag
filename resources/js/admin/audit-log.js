@@ -6,14 +6,17 @@ document.addEventListener('turbo:load', function () {
     initAuditLog();
 });
 
-// Fallback for non-Turbo navigation
-document.addEventListener('DOMContentLoaded', function () {
-    if (!window.location.pathname.includes('/admin/audit-log')) {
-        return;
+// Fallback for non-Turbo navigation (initial load)
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', function () {
+        if (!window.location.pathname.includes('/admin/audit-log')) return;
+        initAuditLog();
+    });
+} else {
+    if (window.location.pathname.includes('/admin/audit-log')) {
+        initAuditLog();
     }
-    
-    initAuditLog();
-});
+}
 
 var actionBadgeClasses = {
     'create': 'bg-success text-white',

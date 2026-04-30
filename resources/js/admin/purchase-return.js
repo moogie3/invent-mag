@@ -51,24 +51,27 @@ onPageLoad(function () {
             if (isCompletedOrCanceled) {
                 const prStatusWarningModalEl = document.getElementById("prStatusWarningModal");
                 if (!prStatusWarningModalEl) return;
-                var prStatusWarningModal = new bootstrap.Modal(prStatusWarningModalEl);
-                var message = "";
+                // Add slight delay to ensure DOM is fully ready for Bootstrap
+                setTimeout(() => {
+                    var prStatusWarningModal = new bootstrap.Modal(prStatusWarningModalEl);
+                    var message = "";
 
-                if (status === "Completed") {
-                    message =
-                        window.translations
-                            ?.pr_modal_completed_warning_message ||
-                        "This purchase return is completed and cannot be edited.";
-                } else if (status === "Canceled") {
-                    message =
-                        window.translations
-                            ?.pr_modal_canceled_warning_message ||
-                        "This purchase return is canceled and cannot be edited.";
-                }
+                    if (status === "Completed") {
+                        message =
+                            window.translations
+                                ?.pr_modal_completed_warning_message ||
+                            "This purchase return is completed and cannot be edited.";
+                    } else if (status === "Canceled") {
+                        message =
+                            window.translations
+                                ?.pr_modal_canceled_warning_message ||
+                            "This purchase return is canceled and cannot be edited.";
+                    }
 
-                const prStatusWarningMessage = document.getElementById("prStatusWarningMessage");
-                if (prStatusWarningMessage) prStatusWarningMessage.innerHTML = message;
-                prStatusWarningModal.show();
+                    const prStatusWarningMessage = document.getElementById("prStatusWarningMessage");
+                    if (prStatusWarningMessage) prStatusWarningMessage.innerHTML = message;
+                    prStatusWarningModal.show();
+                }, 50);
 
                 // Make form fields readonly
                 const formElements = document.querySelectorAll(

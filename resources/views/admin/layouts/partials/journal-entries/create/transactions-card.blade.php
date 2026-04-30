@@ -59,11 +59,12 @@
     }
     
     // Attach click handlers for save buttons
-    document.addEventListener('DOMContentLoaded', function() {
+    function initSaveBtns() {
         var saveDraftBtn = document.getElementById('saveDraftBtn');
         var savePostBtn = document.getElementById('savePostBtn');
         
-        if (saveDraftBtn) {
+        if (saveDraftBtn && !saveDraftBtn.dataset.listenerAttached) {
+            saveDraftBtn.dataset.listenerAttached = 'true';
             saveDraftBtn.addEventListener('click', function() {
                 if (typeof window.validateAndSubmit === 'function') {
                     window.validateAndSubmit(false);
@@ -71,14 +72,21 @@
             });
         }
         
-        if (savePostBtn) {
+        if (savePostBtn && !savePostBtn.dataset.listenerAttached) {
+            savePostBtn.dataset.listenerAttached = 'true';
             savePostBtn.addEventListener('click', function() {
                 if (typeof window.validateAndSubmit === 'function') {
                     window.validateAndSubmit(true);
                 }
             });
         }
-    });
+    }
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initSaveBtns);
+    } else {
+        initSaveBtns();
+    }
 })();
 </script>
         </div>

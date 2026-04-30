@@ -13,6 +13,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no" />
     <meta http-equiv="X-UA-Compatible" content="ie=edge" />
     <meta name="csrf-token" content="{{ csrf_token() }}">
+    {{-- Prevent search engines from indexing the admin panel --}}
+    <meta name="robots" content="noindex, nofollow, noarchive">
 
     @vite('resources/js/admin/layouts/theme-initializer.js')
 
@@ -103,11 +105,18 @@
     @turbo
 
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const showThemeToggle =
-                {{ json_encode(auth()->user()->system_settings['show_theme_toggle'] ?? true) }};
-            // console.log('show_theme_toggle setting (from base.blade.php):', showThemeToggle);
-        });
+        (function() {
+            function logThemeToggle() {
+                const showThemeToggle =
+                    {{ json_encode(auth()->user()->system_settings['show_theme_toggle'] ?? true) }};
+                // console.log('show_theme_toggle setting (from base.blade.php):', showThemeToggle);
+            }
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', logThemeToggle);
+            } else {
+                logThemeToggle();
+            }
+        })();
     </script>
 
     @if(isset($isDebugMode) && $isDebugMode)

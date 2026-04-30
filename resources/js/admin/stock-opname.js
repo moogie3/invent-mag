@@ -1,6 +1,7 @@
 import * as Turbo from "@hotwired/turbo";
+import { onPageLoad } from "./utils/onPageLoad.js";
 
-document.addEventListener("DOMContentLoaded", function initStockOpnameModals() {
+onPageLoad(function initStockOpnameModals() {
     const cancelOpnameModal = document.getElementById("cancelOpnameModal");
     const completeOpnameModal = document.getElementById("completeOpnameModal");
 

@@ -231,26 +231,43 @@
     </div>
 
     <script>
-        document.addEventListener("DOMContentLoaded", function() {
-            // Show the modal automatically when the page loads
-            var paidInvoiceModal = new bootstrap.Modal(document.getElementById('paidInvoiceModal'));
-            paidInvoiceModal.show();
+        (function() {
+            function initPaidModal() {
+                // Ensure bootstrap is available
+                if (typeof window.bootstrap !== 'undefined' && document.getElementById('paidInvoiceModal')) {
+                    // Add slight delay to ensure DOM is fully painted by Turbo before Bootstrap tries to animate it
+                    setTimeout(() => {
+                        var modalEl = document.getElementById('paidInvoiceModal');
+                        if (!modalEl) return;
+                        
+                        // Avoid double-showing if already shown
+                        if (!modalEl.classList.contains('show')) {
+                            var paidInvoiceModal = window.bootstrap.Modal.getOrCreateInstance(modalEl);
+                            paidInvoiceModal.show();
+                        }
 
-            // Make form fields readonly if invoice is paid
-            const formElements = document.querySelectorAll('input, select, textarea');
-            formElements.forEach(element => {
-                element.setAttribute('readonly', true);
-                if (element.tagName === 'SELECT') {
-                    element.setAttribute('disabled', true);
+                        // Make form fields readonly if invoice is paid
+                        const formElements = document.querySelectorAll('input, select, textarea');
+                        formElements.forEach(element => {
+                            element.setAttribute('readonly', true);
+                            if (element.tagName === 'SELECT') {
+                                element.setAttribute('disabled', true);
+                            }
+                        });
+
+                        // Hide any submit buttons
+                        const submitButtons = document.querySelectorAll('button[type="submit"], input[type="submit"]');
+                        submitButtons.forEach(button => {
+                            button.style.display = 'none';
+                        });
+                    }, 100);
+                } else {
+                    setTimeout(initPaidModal, 50);
                 }
-            });
-
-            // Hide any submit buttons
-            const submitButtons = document.querySelectorAll('button[type="submit"], input[type="submit"]');
-            submitButtons.forEach(button => {
-                button.style.display = 'none';
-            });
-        });
+            }
+            // Run immediately when evaluated by Turbo or on normal load
+            initPaidModal();
+        })();
     </script>
 @endif
 <!-- Expiring Soon Sales Invoices Modal -->

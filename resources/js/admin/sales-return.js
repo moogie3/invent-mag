@@ -55,24 +55,27 @@ onPageLoad(function () {
             if (isCompletedOrCanceled) {
                 const srStatusWarningModalEl = document.getElementById("srStatusWarningModal");
                 if (!srStatusWarningModalEl) return;
-                var srStatusWarningModal = new bootstrap.Modal(srStatusWarningModalEl);
-                var message = "";
+                // Add slight delay to ensure DOM is fully ready for Bootstrap
+                setTimeout(() => {
+                    var srStatusWarningModal = new bootstrap.Modal(srStatusWarningModalEl);
+                    var message = "";
 
-                if (status === "Completed") {
-                    message =
-                        window.translations
-                            ?.sr_modal_completed_warning_message ||
-                        "This sales return is completed and cannot be edited.";
-                } else if (status === "Canceled") {
-                    message =
-                        window.translations
-                            ?.sr_modal_canceled_warning_message ||
-                        "This sales return is canceled and cannot be edited.";
-                }
+                    if (status === "Completed") {
+                        message =
+                            window.translations
+                                ?.sr_modal_completed_warning_message ||
+                            "This sales return is completed and cannot be edited.";
+                    } else if (status === "Canceled") {
+                        message =
+                            window.translations
+                                ?.sr_modal_canceled_warning_message ||
+                            "This sales return is canceled and cannot be edited.";
+                    }
 
-                const srStatusWarningMessage = document.getElementById("srStatusWarningMessage");
-                if (srStatusWarningMessage) srStatusWarningMessage.innerHTML = message;
-                srStatusWarningModal.show();
+                    const srStatusWarningMessage = document.getElementById("srStatusWarningMessage");
+                    if (srStatusWarningMessage) srStatusWarningMessage.innerHTML = message;
+                    srStatusWarningModal.show();
+                }, 50);
 
                 // Make form fields readonly
                 const formElements = document.querySelectorAll(

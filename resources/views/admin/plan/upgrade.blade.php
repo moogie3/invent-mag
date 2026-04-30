@@ -281,34 +281,38 @@ document.addEventListener('turbo:load', function() {
 });
 
 // Fallback for non-Turbo navigation
-document.addEventListener('DOMContentLoaded', function() {
-    var upgradeModal = document.getElementById('upgradeModal');
-    if (upgradeModal) {
-        upgradeModal.addEventListener('show.bs.modal', function(event) {
-            var button = event.relatedTarget;
-            var planName = button.getAttribute('data-plan-name');
-            var planPrice = button.getAttribute('data-plan-price');
-            var planSlug = button.getAttribute('data-plan-slug');
-            var isRenewal = button.getAttribute('data-is-renewal') === 'true';
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', function() {
+        var upgradeModal = document.getElementById('upgradeModal');
+        if (upgradeModal && !upgradeModal.dataset.fallbackAttached) {
+            upgradeModal.dataset.fallbackAttached = 'true';
+            upgradeModal.addEventListener('show.bs.modal', function(event) {
+                var button = event.relatedTarget;
+                if (!button) return;
+                var planName = button.getAttribute('data-plan-name');
+                var planPrice = button.getAttribute('data-plan-price');
+                var planSlug = button.getAttribute('data-plan-slug');
+                var isRenewal = button.getAttribute('data-is-renewal') === 'true';
 
-            document.getElementById('modalPlanName').textContent = planName;
-            document.getElementById('modalPlanPrice').textContent = planPrice;
-            document.getElementById('modalPlanSlug').value = planSlug;
-            
-            var actionText = document.getElementById('modalActionText');
-            var renewalInfoBox = document.getElementById('renewalInfoBox');
-            
-            if (isRenewal) {
-                actionText.textContent = "Renew";
-                document.getElementById('modalDaysRemaining').textContent = button.getAttribute('data-days-remaining');
-                document.getElementById('modalNewDays').textContent = button.getAttribute('data-new-days');
-                document.getElementById('modalNewDate').textContent = button.getAttribute('data-new-date');
-                renewalInfoBox.classList.remove('d-none');
-            } else {
-                actionText.textContent = "{{ __('plan.upgrade_to') }}";
-                renewalInfoBox.classList.add('d-none');
-            }
-        });
-    }
-});
+                document.getElementById('modalPlanName').textContent = planName;
+                document.getElementById('modalPlanPrice').textContent = planPrice;
+                document.getElementById('modalPlanSlug').value = planSlug;
+                
+                var actionText = document.getElementById('modalActionText');
+                var renewalInfoBox = document.getElementById('renewalInfoBox');
+                
+                if (isRenewal) {
+                    actionText.textContent = "Renew";
+                    document.getElementById('modalDaysRemaining').textContent = button.getAttribute('data-days-remaining');
+                    document.getElementById('modalNewDays').textContent = button.getAttribute('data-new-days');
+                    document.getElementById('modalNewDate').textContent = button.getAttribute('data-new-date');
+                    renewalInfoBox.classList.remove('d-none');
+                } else {
+                    actionText.textContent = "{{ __('plan.upgrade_to') }}";
+                    renewalInfoBox.classList.add('d-none');
+                }
+            });
+        }
+    });
+}
 </script>

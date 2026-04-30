@@ -48,23 +48,37 @@
         </div>
 
         <script>
-            document.addEventListener('DOMContentLoaded', function() {
-                const banner = document.getElementById('demo-banner');
-                if (!banner) return;
+            (function() {
+                function initDemoBanner() {
+                    const banner = document.getElementById('demo-banner');
+                    if (!banner) return;
 
-                if (sessionStorage.getItem('demo_banner_dismissed_session') !== 'true') {
-                    banner.classList.remove('d-none');
+                    if (sessionStorage.getItem('demo_banner_dismissed_session') !== 'true') {
+                        banner.classList.remove('d-none');
+                    }
+
+                    const sessionBtn = document.getElementById('demo-btn-dismiss-session');
+                    if (sessionBtn && !sessionBtn.dataset.listenerAttached) {
+                        sessionBtn.dataset.listenerAttached = 'true';
+                        sessionBtn.addEventListener('click', function() {
+                            sessionStorage.setItem('demo_banner_dismissed_session', 'true');
+                            if (typeof bootstrap !== 'undefined') {
+                                const alert = new bootstrap.Alert(banner);
+                                alert.close();
+                            } else {
+                                banner.remove();
+                            }
+                        });
+                    }
                 }
 
-                const sessionBtn = document.getElementById('demo-btn-dismiss-session');
-                if (sessionBtn) {
-                    sessionBtn.addEventListener('click', function() {
-                        sessionStorage.setItem('demo_banner_dismissed_session', 'true');
-                        const alert = new bootstrap.Alert(banner);
-                        alert.close();
-                    });
+                if (document.readyState === 'loading') {
+                    document.addEventListener('DOMContentLoaded', initDemoBanner);
+                } else {
+                    initDemoBanner();
                 }
-            });
+                document.addEventListener('turbo:load', initDemoBanner);
+            })();
         </script>
     @elseif($tenant->onTrial())
         <style>
@@ -106,23 +120,37 @@
         </div>
 
         <script>
-            document.addEventListener('DOMContentLoaded', function() {
-                const banner = document.getElementById('trial-banner');
-                if (!banner) return;
+            (function() {
+                function initTrialBanner() {
+                    const banner = document.getElementById('trial-banner');
+                    if (!banner) return;
 
-                if (sessionStorage.getItem('trial_banner_dismissed_session') !== 'true') {
-                    banner.classList.remove('d-none');
+                    if (sessionStorage.getItem('trial_banner_dismissed_session') !== 'true') {
+                        banner.classList.remove('d-none');
+                    }
+
+                    const sessionBtn = document.getElementById('btn-dismiss-session');
+                    if (sessionBtn && !sessionBtn.dataset.listenerAttached) {
+                        sessionBtn.dataset.listenerAttached = 'true';
+                        sessionBtn.addEventListener('click', function() {
+                            sessionStorage.setItem('trial_banner_dismissed_session', 'true');
+                            if (typeof bootstrap !== 'undefined') {
+                                const alert = new bootstrap.Alert(banner);
+                                alert.close();
+                            } else {
+                                banner.remove();
+                            }
+                        });
+                    }
                 }
 
-                const sessionBtn = document.getElementById('btn-dismiss-session');
-                if (sessionBtn) {
-                    sessionBtn.addEventListener('click', function() {
-                        sessionStorage.setItem('trial_banner_dismissed_session', 'true');
-                        const alert = new bootstrap.Alert(banner);
-                        alert.close();
-                    });
+                if (document.readyState === 'loading') {
+                    document.addEventListener('DOMContentLoaded', initTrialBanner);
+                } else {
+                    initTrialBanner();
                 }
-            });
+                document.addEventListener('turbo:load', initTrialBanner);
+            })();
         </script>
     @endif
 @endif

@@ -1,0 +1,5 @@
+# robots.txt for the Invent-MAG Laravel backend / API
+# The admin panel is a private SaaS application — block all crawlers
+
+User-agent: *
+Disallow: /

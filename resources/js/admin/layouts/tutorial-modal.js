@@ -341,14 +341,15 @@ function onTurboLoad() {
 }
 
 // Handle normal load
-document.addEventListener('DOMContentLoaded', function() {
+function initTutorialModalSetup() {
     initAutoTutorial();
 
     // Wire up backdrop-click (and any other native Bootstrap hide) to run the skip logic.
     // This fires when the user clicks outside the modal (backdrop) since we removed data-bs-backdrop="static".
     // We use 'hide.bs.modal' so the fetch runs before the modal disappears.
     var modalElement = document.getElementById('tutorial-modal');
-    if (modalElement) {
+    if (modalElement && !modalElement.dataset.tutorialListenerAttached) {
+        modalElement.dataset.tutorialListenerAttached = 'true';
         modalElement.addEventListener('hide.bs.modal', function () {
             var isGlobalCompleted = modalElement.getAttribute('data-completed') === 'true';
             if (!isGlobalCompleted) {
@@ -368,7 +369,13 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     }
-});
+}
+
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initTutorialModalSetup);
+} else {
+    initTutorialModalSetup();
+}
 // Handle Turbo frame load — sync route first, then check auto-show
 document.addEventListener('turbo:load', onTurboLoad);
 

@@ -58,15 +58,22 @@
         window.handleInput = function(event) {};
     }
     
-    document.addEventListener('DOMContentLoaded', function() {
+    function initUpdateBtn() {
         var updateBtn = document.getElementById('updateEntryBtn');
-        if (updateBtn) {
+        if (updateBtn && !updateBtn.dataset.listenerAttached) {
+            updateBtn.dataset.listenerAttached = 'true';
             updateBtn.addEventListener('click', function() {
                 if (typeof window.validateAndSubmit === 'function') {
                     window.validateAndSubmit();
                 }
             });
         }
-    });
+    }
+    
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initUpdateBtn);
+    } else {
+        initUpdateBtn();
+    }
 })();
 </script>

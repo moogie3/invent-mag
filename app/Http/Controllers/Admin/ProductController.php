@@ -66,9 +66,21 @@ class ProductController extends Controller
     public function modalView($id)
     {
         try {
-            $product = Product::with(['category', 'supplier', 'unit', 'warehouses', 'poItems' => function($query) {
-                $query->where('remaining_quantity', '>', 0)->orderBy('expiry_date', 'asc');
-            }])->findOrFail($id);
+            $thirtyDaysFromNow = now()->addDays(30);
+            $product = Product::with([
+                'category', 
+                'supplier', 
+                'unit', 
+                'warehouses', 
+                'poItems' => function($query) use ($thirtyDaysFromNow) {
+                    $query->whereNotNull('expiry_date')
+                        ->where('expiry_date', '>=', now())
+                        ->where('expiry_date', '<=', $thirtyDaysFromNow)
+                        ->where('remaining_quantity', '>', 0)
+                        ->with('purchaseOrder.warehouse')
+                        ->orderBy('expiry_date', 'asc');
+                }
+            ])->findOrFail($id);
             $product->formatted_price = \App\Helpers\CurrencyHelper::formatWithPosition($product->price);
             $product->formatted_selling_price = \App\Helpers\CurrencyHelper::formatWithPosition($product->selling_price);
             return response()->json($product);

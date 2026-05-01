@@ -77,17 +77,17 @@ export function initProductModal() {
 function updateStockDisplay(data, warehouseId) {
     let stockQty = 0;
     let warehouseName = "All Warehouses";
+    const warehouseIdNum = warehouseId ? parseInt(warehouseId, 10) : null;
 
-    if (warehouseId === 'main') {
-        stockQty = data.main_warehouse_stock || 0;
-        const mainWarehouse = data.warehouses?.find(w => w.is_main);
-        warehouseName = mainWarehouse ? mainWarehouse.name : "Main Warehouse";
-    } else if (warehouseId) {
-        const warehouse = data.warehouses.find(w => w.id == warehouseId);
+    if (warehouseId === 'all' || !warehouseId) {
+        // Show all warehouses total stock
+        stockQty = data.total_stock || data.stock_quantity || 0;
+        warehouseName = "All Warehouses";
+    } else if (warehouseIdNum) {
+        // Show specific warehouse stock
+        const warehouse = data.warehouses.find(w => w.id == warehouseIdNum);
         stockQty = warehouse ? (warehouse.pivot ? warehouse.pivot.quantity : 0) : 0;
         warehouseName = warehouse ? warehouse.name : "N/A";
-    } else {
-        stockQty = data.main_warehouse_stock || data.total_stock || data.stock_quantity || 0;
     }
 
     setText("productQuantity", stockQty);
@@ -121,7 +121,7 @@ function renderProductDetails(data) {
     
     const warehouseContextSelect = document.getElementById('viewProductWarehouseContext');
     if (warehouseContextSelect) {
-        warehouseContextSelect.value = globalWarehouseId || 'main';
+        warehouseContextSelect.value = globalWarehouseId || 'all';
     }
 
     // Activate the first tab (Basic Info) by default
@@ -149,8 +149,8 @@ function renderProductDetails(data) {
     const warehouseEl = document.getElementById("productWarehouse");
     if (warehouseEl) warehouseEl.innerHTML = warehouseText;
 
-    // Initial stock display - use main warehouse by default
-    updateStockDisplay(data, globalWarehouseId || 'main');
+    // Initial stock display - use all warehouse by default
+    updateStockDisplay(data, globalWarehouseId || 'all');
 
     const productImageContainer = document.getElementById(
         "productImageContainer"
@@ -226,8 +226,9 @@ function renderExpiryItems(data, warehouseId = null) {
     if (expiryStatusPane) expiryStatusPane.style.display = '';
 
     let items = data.po_items || [];
-    if (warehouseId) {
-        items = items.filter(item => item.po && item.po.warehouse_id == warehouseId);
+    const warehouseIdNum = warehouseId ? parseInt(warehouseId, 10) : null;
+    if (warehouseId && warehouseId !== 'all' && warehouseIdNum) {
+        items = items.filter(item => item.purchase_order && item.purchase_order.warehouse_id == warehouseIdNum);
     }
 
     if (items.length > 0) {

@@ -1542,6 +1542,7 @@ return [
     'warehouse_export_pdf' => 'Export PDF',
     'warehouse_info_main_warehouse' => 'Main Warehouse',
     'warehouse_info_not_set' => 'Not set',
+    'warehouse_all' => 'All Warehouse',
     'warehouse_info_store_address' => 'Store Address',
     'warehouse_info_title' => 'Warehouse Information',
     'warehouse_info_total_warehouse' => 'Total Warehouses',

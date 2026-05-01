@@ -1,5 +1,5 @@
 @php
-    $routeName = Route::currentRouteName();
+$routeName = Route::currentRouteName();
     $contextTitle = __('tutorial.help_tutorial');
     $contextDesc = __('tutorial.need_help_navigating');
     $contextIcon = 'ti-help';
@@ -132,6 +132,7 @@
         $contextSteps = [
             __('tutorial.create_customer'),
             __('tutorial.customer_crm'),
+            __('tutorial.customer_credits_view'),
             __('tutorial.customer_list'),
             __('tutorial.export'),
             __('tutorial.table_actions_customer')
@@ -596,7 +597,7 @@
             __('tutorial.export_coa')
         ];
     } elseif ($routeName === 'admin.accounting.accounts.create') {
-        $contextTitle = __('tutorial.add_account');
+        $contextTitle = __('tutorial.add_account_title');
         $contextIcon = 'ti-plus';
         $contextDesc = __('tutorial.add_account_desc');
         $contextSteps = [
@@ -739,7 +740,7 @@
             __('tutorial.delete_user')
         ];
     } elseif ($routeName === 'admin.notifications' || $routeName === 'admin.setting.notifications') {
-        $contextTitle = __('tutorial.notifications');
+        $contextTitle = __('tutorial.notifications_title');
         $contextIcon = 'ti-bell';
         $contextDesc = __('tutorial.notifications_desc');
         $contextSteps = [

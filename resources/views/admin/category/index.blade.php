@@ -73,32 +73,24 @@
                                                                     <td class="sort-description">
                                                                         {{ $category->description }}</td>
                                                                     <td style="text-align:center">
-                                                                        <div class="dropdown">
-                                                                            <button
-                                                                                class="btn dropdown-toggle align-text-top"
-                                                                                data-bs-toggle="dropdown"
-                                                                                data-bs-boundary="viewport">
-                                                                                {{ __('messages.table_action') }}
+                                                                        <div class="btn-list flex-nowrap justify-content-center">
+                                                                            <button type="button" class="btn btn-icon btn-ghost-primary"
+                                                                                data-bs-toggle="modal"
+                                                                                data-bs-target="#editCategoryModal"
+                                                                                data-id="{{ $category->id }}"
+                                                                                data-name="{{ $category->name }}"
+                                                                                data-description="{{ $category->description }}"
+                                                                                title="{{ __('messages.edit') }}">
+                                                                                <i class="ti ti-edit"></i>
                                                                             </button>
-                                                                            <div class="dropdown-menu">
-                                                                                <a href="#" class="dropdown-item"
-                                                                                    data-bs-toggle="modal"
-                                                                                    data-bs-target="#editCategoryModal"
-                                                                                    data-id="{{ $category->id }}"
-                                                                                    data-name="{{ $category->name }}"
-                                                                                    data-description="{{ $category->description }}">
-                                                                                    <i class="ti ti-edit me-2"></i> {{ __('messages.edit') }}
-                                                                                </a>
 
-                                                                                <button type="button"
-                                                                                    class="dropdown-item text-danger"
-                                                                                    data-bs-toggle="modal"
-                                                                                    data-bs-target="#deleteModal"
-                                                                                    onclick="setDeleteFormAction('{{ route('admin.setting.category.destroy', $category->id) }}')">
-                                                                                    <i class="ti ti-trash me-2"></i>
-                                                                                    {{ __('messages.delete') }}
-                                                                                </button>
-                                                                            </div>
+                                                                            <button type="button" class="btn btn-icon btn-ghost-danger"
+                                                                                data-bs-toggle="modal"
+                                                                                data-bs-target="#deleteModal"
+                                                                                onclick="setDeleteFormAction('{{ route('admin.setting.category.destroy', $category->id) }}')"
+                                                                                title="{{ __('messages.delete') }}">
+                                                                                <i class="ti ti-trash"></i>
+                                                                            </button>
                                                                         </div>
                                                                     </td>
                                                                 </tr>

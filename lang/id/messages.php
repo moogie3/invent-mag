@@ -1543,6 +1543,7 @@ return [
     'warehouse_export_pdf' => 'Ekspor PDF',
     'warehouse_info_main_warehouse' => 'Gudang Utama',
     'warehouse_info_not_set' => 'Belum disetel',
+    'warehouse_all' => 'Semua Gudang',
     'warehouse_info_store_address' => 'Alamat Toko',
     'warehouse_info_title' => 'Informasi Gudang',
     'warehouse_info_total_warehouse' => 'Total Gudang',

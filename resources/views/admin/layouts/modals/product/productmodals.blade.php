@@ -272,7 +272,7 @@
                         <div style="min-width: 200px;">
                             <label class="form-label small mb-1">{{ __('messages.warehouse_context') }}</label>
                             <select class="form-select form-select-sm" id="viewProductWarehouseContext">
-                                <option value="main">{{ __('messages.warehouse_info_main_warehouse') }}</option>
+                                <option value="all" selected>{{ __('messages.warehouse_all') }}</option>
                                 @foreach($warehouses as $warehouse)
                                     <option value="{{ $warehouse->id }}">{{ $warehouse->name }}</option>
                                 @endforeach

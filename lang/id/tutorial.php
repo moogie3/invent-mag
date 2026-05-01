@@ -120,6 +120,7 @@ return [
     'customer_management_desc' => 'Kelola pelanggan Anda untuk pesanan penjualan, faktur, dan pelacakan riwayat pelanggan.',
     'create_customer' => 'Buat Pelanggan: Klik "Buat Pelanggan" untuk menambahkan pelanggan baru.',
     'customer_crm' => 'CRM Pelanggan: Gunakan fitur CRM untuk melacak interaksi pelanggan, riwayat pembelian, dan status pembayaran.',
+    'customer_credits_view' => 'Kredit Pelanggan: Lihat semua kredit pelanggan di modal CRM (klik nama pelanggan → tab Kredit Pelanggan). Kredit dari pengembalian penjualan dapat digunakan untuk membayar pesanan penjualan di masa depan.',
     'customer_list' => 'Daftar Pelanggan: Lihat semua pelanggan dalam tabel dengan detailnya.',
     'table_actions_customer' => 'Tindakan Tabel: Setiap baris pelanggan memiliki menu tindakan untuk Lihat CRM, Edit, atau Hapus.',
 
@@ -495,6 +496,7 @@ return [
     'export_coa' => 'Ekspor: Gunakan dropdown ekspor untuk mengunduh.',
 
     // Add Account
+    'add_account_title' => 'Tambah Akun ke COA',
     'add_account_desc' => 'Buat akun baru dalam chart of accounts.',
     'name_acc' => 'Nama: Masukkan nama resmi akun.',
     'code_acc' => 'Kode: Masukkan kode unik untuk akun.',

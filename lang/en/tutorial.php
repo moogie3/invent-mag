@@ -120,6 +120,7 @@ return [
     'customer_management_desc' => 'Manage your customers for sales orders, invoicing, and tracking customer history.',
     'create_customer' => 'Create Customer: Click "Create Customer" to add a new customer with their name, email, phone, address, and optional image. Also set the payment terms (e.g., Net 30, Net 60) to define when payment is due.',
     'customer_crm' => 'Customer CRM: Use the CRM features to track customer interactions, purchase history, and payment status. Access detailed analytics from the View option.',
+    'customer_credits_view' => 'Customer Credits: View all customer credits in the CRM modal (click customer name → Customer Credits tab). Credits from sales returns can be used to pay for future sales orders.',
     'customer_list' => 'Customer List: View all customers in a table with their details. Use the search box to find specific customers quickly.',
     'table_actions_customer' => 'Table Actions: Each customer row has an action menu to View CRM details, Edit information, or Delete the customer.',
 
@@ -486,6 +487,7 @@ return [
     'export_coa' => 'Export: Use the export dropdown to download accounts as PDF or CSV.',
 
     // Add Account
+    'add_account_title' => 'Add Account to COA',
     'add_account_desc' => 'Create a new account in the chart of accounts.',
     'name_acc' => 'Name: Enter the official name of the account.',
     'code_acc' => 'Code: Enter a unique code for the account. Use a numbering system that matches your accounting standards.',

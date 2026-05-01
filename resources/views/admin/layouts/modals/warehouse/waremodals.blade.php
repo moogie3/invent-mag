@@ -40,7 +40,7 @@
 <!-- View Warehouse Modal -->
 <div class="modal fade" id="viewWarehouseModal" tabindex="-1" aria-labelledby="viewWarehouseModalLabel"
     aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-dialog modal-dialog-centered modal-xl">
         <div class="modal-content border-0 shadow-lg rounded-3">
             <div class="modal-header">
                 <h5 class="modal-title fs-3" id="viewWarehouseModalLabel">
@@ -51,25 +51,29 @@
             <div class="modal-body">
                 <div class="row g-4 mb-4">
                     <div class="col-md-6">
-                        <div class="bg-body-secondary rounded-3 p-4">
+                        <div class="bg-body rounded-3 p-4 border">
                             <div class="text-muted mb-2">{{ __('messages.table_name') }}</div>
                             <div class="fw-bold fs-4" id="viewWarehouseName"></div>
                         </div>
                     </div>
                     <div class="col-md-6">
-                        <div class="bg-body-secondary rounded-3 p-4">
+                        <div class="bg-body rounded-3 p-4 border">
                             <div class="text-muted mb-2">{{ __('messages.table_address') }}</div>
                             <div class="fs-4" id="viewWarehouseAddress"></div>
                         </div>
                     </div>
                 </div>
 
-                <div class="mb-4">
-                    <div class="text-muted mb-2">{{ __('messages.table_description') }}</div>
-                    <div class="text-secondary fs-4" id="viewWarehouseDescription"></div>
+                <div class="row g-4 mb-4">
+                    <div class="col-12">
+                        <div class="bg-body rounded-3 p-4 border">
+                            <div class="text-muted mb-2">{{ __('messages.table_description') }}</div>
+                            <div class="fs-4" id="viewWarehouseDescription"></div>
+                        </div>
+                    </div>
                 </div>
 
-                <div class="border-top pt-4 mt-4">
+                <div class="border-top pt-4 mt-4" style="border-color: var(--tblr-border-color, #dee6ed) !important;">
                     <div class="d-flex justify-content-between align-items-center mb-4">
                         <div class="d-flex align-items-center">
                             <i class="ti ti-packages text-muted me-3 fs-3"></i>
@@ -77,11 +81,11 @@
                             <span class="badge bg-primary-lt text-primary ms-3 fs-4" id="viewWarehouseTotalProducts">0</span>
                         </div>
                         <div class="text-muted fs-4">
-                            {{ __('messages.total_stock') }}: <span class="fw-bold text-dark" id="viewWarehouseTotalStock">0</span>
+                            {{ __('messages.total_stock') }}: <span class="fw-bold" id="viewWarehouseTotalStock">-</span>
                         </div>
                     </div>
                     
-                    <div class="table-responsive" style="max-height: 400px; overflow-y: auto;">
+                    <div class="table-responsive" style="max-height: 500px; overflow-y: auto;">
                         <table class="table table-sm table-hover mb-0">
                             <thead class="table-light sticky-top">
                                 <tr>

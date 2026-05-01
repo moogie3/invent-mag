@@ -185,9 +185,9 @@ class WarehouseController extends Controller
                     'code' => $product->code,
                     'quantity' => $item->remaining_quantity,
                     'price' => $item->price,
-                    'expiry_date' => $item->expiry_date,
+                    'expiry_date' => $item->expiry_date ? $item->expiry_date->format('Y-m-d') : null,
                     'po_id' => $item->po_id,
-                    'po_date' => $item->purchaseOrder ? $item->purchaseOrder->date : null,
+                    'po_date' => $item->purchaseOrder ? $item->purchaseOrder->order_date?->format('Y-m-d') : null,
                     'category' => $product->category->name ?? 'N/A',
                     'unit' => $product->unit->name ?? 'N/A'
                 ];

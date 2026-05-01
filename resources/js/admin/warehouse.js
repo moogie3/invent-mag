@@ -212,8 +212,8 @@ function initViewWarehouseButtons() {
                     if (nameEl) nameEl.textContent = warehouse.name || '';
                     if (addressEl) addressEl.textContent = warehouse.address || '-';
                     if (descEl) descEl.textContent = warehouse.description || '-';
-                    if (totalProductsEl) totalProductsEl.textContent = warehouse.total_products || 0;
-                    if (totalStockEl) totalStockEl.textContent = warehouse.total_stock || 0;
+                    if (totalProductsEl) totalProductsEl.textContent = warehouse.total_products || '-';
+                    if (totalStockEl) totalStockEl.textContent = (warehouse.total_stock !== undefined && warehouse.total_stock !== null) ? warehouse.total_stock : '-';
                     
                     // Populate products table - now showing each PO item as separate row (per batch)
                     const productsList = document.getElementById('viewWarehouseProductsList');
@@ -236,13 +236,13 @@ function initViewWarehouseButtons() {
                                             const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
                                             
                                             if (diffDays < 0) {
-                                                expiryBadge = '<span class="badge bg-danger text-white">Expired</span>';
+                                                expiryBadge = '<span class="badge bg-danger-lt text-danger">Expired</span>';
                                             } else if (diffDays <= 7) {
-                                                expiryBadge = '<span class="badge bg-danger text-white">' + formattedDate + '</span>';
+                                                expiryBadge = '<span class="badge bg-danger-lt text-danger">' + formattedDate + '</span>';
                                             } else if (diffDays <= 30) {
-                                                expiryBadge = '<span class="badge bg-warning text-dark">' + formattedDate + '</span>';
+                                                expiryBadge = '<span class="badge bg-warning-lt text-warning">' + formattedDate + '</span>';
                                             } else {
-                                                expiryBadge = '<span class="badge bg-success text-white">' + formattedDate + '</span>';
+                                                expiryBadge = '<span class="badge bg-success-lt text-success">' + formattedDate + '</span>';
                                             }
                                         }
                                     }
@@ -254,7 +254,7 @@ function initViewWarehouseButtons() {
                                         <td class="fs-4">${item.code || '-'}</td>
                                         <td class="fs-4"><a href="/admin/po/edit/${item.po_id}" class="text-decoration-none">#${item.po_id}</a></td>
                                         <td class="text-center">
-                                            <span class="badge ${item.quantity > 10 ? 'bg-success' : (item.quantity > 0 ? 'bg-warning' : 'bg-danger')} text-white fs-5">
+                                            <span class="badge ${item.quantity > 10 ? 'bg-success-lt text-success' : (item.quantity > 0 ? 'bg-warning-lt text-warning' : 'bg-danger-lt text-danger')} fs-5">
                                                 ${item.quantity}
                                             </span>
                                         </td>

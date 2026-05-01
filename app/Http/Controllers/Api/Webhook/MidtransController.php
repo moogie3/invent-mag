@@ -80,7 +80,13 @@ class MidtransController extends Controller
 
             $currentPlan = $tenant->getCurrentPlan();
             $billingService = app(\App\Services\BillingService::class);
-            $changeType = $order->change_type ?? $billingService->getPlanChangeType($currentPlan, $newPlan);
+            
+            // If no current plan, treat as a fresh upgrade
+            if ($currentPlan === null) {
+                $changeType = 'upgrade';
+            } else {
+                $changeType = $order->change_type ?? $billingService->getPlanChangeType($currentPlan, $newPlan);
+            }
 
             if (!$tenant->billing_period_start) {
                 $period = $billingService->getCurrentBillingPeriod();

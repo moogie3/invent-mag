@@ -486,5 +486,5 @@
 
 ---
 
-**Document Version:** 1.6  
+**Document Version:** 1.7  
 **Last Updated:** April 2026

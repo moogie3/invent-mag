@@ -12,6 +12,7 @@ use Laravel\Fortify\Http\Controllers\NewPasswordController;
 use Laravel\Fortify\Http\Controllers\PasswordResetLinkController;
 use Laravel\Fortify\Http\Controllers\RegisteredUserController;
 use App\Http\Controllers\Auth\LoginController;
+use App\Models\Tax;
 
 // Admin Authentication Routes
 Route::middleware('web')->prefix('admin')->group(function () {
@@ -55,7 +56,7 @@ Route::middleware('web')->prefix('admin')->group(function () {
     })->name('verification.verified');
 
     // Override Fortify's verification.send route to ensure correct middleware
-    Route::post('/email/verification-notification', function (Illuminate\Http\Request $request) {
+    Route::post('/email/verification-notification', function (Request $request) {
         $request->user()->sendEmailVerificationNotification();
         return back()->with('status', 'verification-link-sent');
     })->middleware(['auth', 'throttle:6,1'])->name('verification.send');
@@ -68,13 +69,13 @@ Route::middleware('web')->prefix('admin')->group(function () {
         Route::get('/dashboard', [DashboardController::class, 'index'])->name('admin.dashboard');
 
         // Tutorial Skip
-        Route::post('/tutorial/skip', function (\Illuminate\Http\Request $request) {
+        Route::post('/tutorial/skip', function (Request $request) {
             $request->user()->update(['tutorial_completed' => true]);
             return response()->json(['success' => true]);
         })->name('admin.tutorial.skip');
 
         // Tutorial context endpoint - returns rendered context step HTML for a given route name
-        Route::get('/tutorial/context', function (\Illuminate\Http\Request $request) {
+        Route::get('/tutorial/context', function (Request $request) {
             $routeName = $request->query('route', '');
             return response()->view('admin.layouts.modals.general.tutorial-context', [
                 'routeName' => $routeName,
@@ -668,7 +669,7 @@ Route::middleware('web')->prefix('admin')->group(function () {
                 Route::get('/', [TaxController::class, 'index'])->name('admin.setting.tax');
                 Route::post('/update', [TaxController::class, 'update'])->name('admin.setting.tax.update');
                 Route::get('/get', function () {
-                    $tax = \App\Models\Tax::where('is_active', 1)->first();
+                    $tax = Tax::where('is_active', 1)->first();
                     return response()->json(['tax_rate' => $tax ? $tax->rate : 0]);
                 })->name('admin.setting.tax.get');
             });
@@ -710,9 +711,19 @@ Route::middleware('web')->prefix('admin')->group(function () {
                 Route::get('/upgrade', [PlanController::class, 'upgrade'])->name('admin.setting.plan.upgrade');
                 Route::post('/change', [PlanController::class, 'change'])->name('admin.setting.plan.change');
                 Route::get('/checkout/{order}', [PlanController::class, 'checkout'])->name('admin.setting.plan.checkout');
-                
+
                 // Payment confirmation via web route (AJAX with CSRF)
                 Route::post('/confirm-payment', [PlanController::class, 'confirmPayment'])->name('admin.setting.plan.confirm-payment');
+            });
+
+            // Backup Settings
+            Route::prefix('backup')->middleware('role:superuser')->group(function () {
+                Route::get('/', [\App\Http\Controllers\Admin\BackupController::class, 'index'])->name('admin.setting.backup.index');
+                Route::post('/run', [\App\Http\Controllers\Admin\BackupController::class, 'run'])->name('admin.setting.backup.run');
+                Route::get('/download/{filename}', [\App\Http\Controllers\Admin\BackupController::class, 'download'])->name('admin.setting.backup.download');
+                Route::delete('/delete/{filename}', [\App\Http\Controllers\Admin\BackupController::class, 'delete'])->name('admin.setting.backup.delete');
+                Route::post('/restore', [\App\Http\Controllers\Admin\BackupController::class, 'restore'])->name('admin.setting.backup.restore');
+                Route::post('/password', [\App\Http\Controllers\Admin\BackupController::class, 'updatePassword'])->name('admin.setting.backup.password');
             });
         });
 
@@ -822,7 +833,7 @@ Route::middleware('web')->prefix('admin')->group(function () {
     });
 });
 
-Route::get('/', function (\Illuminate\Http\Request $request) {
+Route::get('/', function (Request $request) {
     // If workspace param exists, the HandleWorkspaceParam middleware will handle it
     // This route only handles requests without workspace
     $frontendUrl = config('app.frontend_url');
@@ -830,6 +841,6 @@ Route::get('/', function (\Illuminate\Http\Request $request) {
 });
 
 // Fallback route for 404 - must be LAST
-Route::fallback(function (\Illuminate\Http\Request $request) {
+Route::fallback(function (Request $request) {
     return response()->view('errors.404', [], 404);
 });

@@ -633,6 +633,15 @@ return [
     'clear_all_notif' => 'Hapus Semua: Gunakan tombol "Hapus Semua Notifikasi".',
     'clear_individual' => 'Hapus Individual: Setiap notifikasi memiliki tombol hapus.',
 
+    // Backup Page
+    'backup_page' => 'Backup & Pulihkan',
+    'backup_page_desc' => 'Buat backup data tenant Anda dan pulihkan dari backup sebelumnya jika diperlukan.',
+    'backup_recommendation' => 'Kami merekomendasikan untuk melakukan backup data setidaknya sekali dalam sebulan untuk mencegah kehilangan data.',
+    'backup_create' => 'Buat Backup: Klik tombol "Buat Backup" untuk membuat backup baru. Pilih "Hanya Database" atau "Backup Penuh" (file + database). Backup bersifat spesifik tenant, hanya berisi data organisasi Anda.',
+    'backup_files' => 'File Backup: Lihat semua backup yang tersedia di daftar di bawah. Setiap backup menunjukkan nama file, ukuran, dan tanggal pembuatan. Gunakan ikon unduh untuk menyimpan backup ke perangkat Anda.',
+    'backup_restore' => 'Pulihkan: Untuk memulihkan dari backup, klik ikon pulihkan pada file backup. Catatan: Memulihkan akan mengganti data Anda saat ini dengan data backup. Gunakan dengan hati-hati!',
+    'backup_password' => 'Password Backup: Opsional - Atur password untuk mengenkripsi file backup Anda demi keamanan. Anda akan memerlukan password ini untuk memulihkan backup nanti.',
+
     // General / Welcome
     'general_navigation' => 'Navigasi: Gunakan menu sidebar di kiri untuk menavigasi.',
     'general_settings' => 'Pengaturan: Konfigurasi pengaturan dasar melalui menu Pengaturan.',

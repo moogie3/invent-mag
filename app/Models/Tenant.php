@@ -377,4 +377,24 @@ class Tenant extends BaseTenant
 
         return $this;
     }
+
+    // -------------------------------------------------------------------------
+    // Backup Configuration
+    // -------------------------------------------------------------------------
+
+    /**
+     * Check if the tenant has a backup password set.
+     */
+    public function hasBackupPassword(): bool
+    {
+        return !empty($this->backup_password);
+    }
+
+    /**
+     * Check if backup encryption is enabled for this tenant.
+     */
+    public function isBackupEncrypted(): bool
+    {
+        return $this->backup_encrypted && $this->hasBackupPassword();
+    }
 }

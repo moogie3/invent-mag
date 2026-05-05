@@ -488,6 +488,17 @@ $routeName = Route::currentRouteName();
             __('tutorial.cash_receivables'),
             __('tutorial.reset_option')
         ];
+    } elseif ($routeName === 'admin.setting.backup.index') {
+        $contextTitle = __('tutorial.backup_page');
+        $contextIcon = 'ti-database';
+        $contextDesc = __('tutorial.backup_page_desc');
+        $contextSteps = [
+            __('tutorial.backup_recommendation'),
+            __('tutorial.backup_create'),
+            __('tutorial.backup_files'),
+            __('tutorial.backup_restore'),
+            __('tutorial.backup_password')
+        ];
     } elseif ($routeName === 'admin.accounting.ledger') {
         $contextTitle = __('tutorial.general_ledger');
         $contextIcon = 'ti-book';

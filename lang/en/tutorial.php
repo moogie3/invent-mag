@@ -624,6 +624,15 @@ return [
     'clear_all_notif' => 'Clear All: Use the "Clear All Notifications" button at the top to remove all notifications in the current tab at once.',
     'clear_individual' => 'Clear Individual: Each notification has a clear/checkmark button on the right side to mark it as read and remove it individually.',
 
+    // Backup Page
+    'backup_page' => 'Backup & Restore',
+    'backup_page_desc' => 'Create backups of your tenant data and restore from previous backups when needed.',
+    'backup_recommendation' => 'We recommend backing up your data at least once a month to prevent data loss.',
+    'backup_create' => 'Create Backup: Click the "Create Backup" button to generate a new backup. Choose "Database Only" or "Full Backup" (files + database). The backup is tenant-specific, containing only your organization\'s data.',
+    'backup_files' => 'Backup Files: View all available backups in the list below. Each backup shows the filename, size, and creation date. Use the download icon to save a backup to your local device.',
+    'backup_restore' => 'Restore: To restore from a backup, click the restore icon on any backup file. Note: Restoring will replace your current data with the backup data. Use with caution!',
+    'backup_password' => 'Backup Password: Optional - Set a password to encrypt your backup files for security. You will need this password to restore the backup later.',
+
     // General / Welcome
     'general_navigation' => 'Navigation: Use the sidebar menu on the left to navigate between different modules such as Products, Sales, Purchases, and Accounting.',
     'general_settings' => 'Settings: Configure base settings through the Settings menu, including Units, Categories, Taxes, and Currencies.',

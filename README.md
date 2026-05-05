@@ -1,6 +1,6 @@
 # Invent-MAG: Enterprise Inventory & Accounting System
 
-**Version:** 1.6  
+**Version:** 1.7  
 **Author:** moogie3  
 **License:** MIT  
 **Development Time:** 1.5+ years (451+ commits)  

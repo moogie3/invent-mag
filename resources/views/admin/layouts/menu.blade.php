@@ -43,6 +43,10 @@
                 class="list-group-item list-group-item-action d-flex align-items-center {{ request()->routeIs('admin.users.index') || request()->routeIs('admin.users.create') || request()->routeIs('admin.users.edit') ? 'active' : '' }}">
                 <i class="ti ti-users fs-2 me-2"></i> {{ __('messages.user_management') }}
             </a>
+            <a href="{{ route('admin.setting.backup.index') }}"
+                class="list-group-item list-group-item-action d-flex align-items-center {{ request()->routeIs('admin.setting.backup.index') ? 'active' : '' }}">
+                <i class="ti ti-database fs-2 me-2"></i> {{ __('messages.backup') }}
+            </a>
         @endrole
         <a href="#" class="list-group-item list-group-item-action d-flex align-items-center trigger-tutorial-modal-general">
             <i class="ti ti-help fs-2 me-2"></i> {{ __('messages.tutorial') }}

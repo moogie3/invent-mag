@@ -1,8 +1,8 @@
 # Invent-MAG: Technical Specification Document
 
-**Document Version:** 1.6  
+**Document Version:** 1.7  
 **Last Updated:** April 2026  
-**System Version:** 1.6
+**System Version:** 1.7
 
 ---
 

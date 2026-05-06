@@ -3,9 +3,22 @@ document.addEventListener("DOMContentLoaded", initBackup);
 
 function initBackup() {
     const backupButton = document.getElementById("backupButton");
-    if (!backupButton) return;
-
-    backupButton.addEventListener("click", createBackup);
+    if (backupButton) {
+        backupButton.addEventListener("click", createBackup);
+    }
+    
+    // Handle restore form submission - disable button and show loading state
+    const restoreForm = document.querySelector('form[action*="restore"]');
+    if (restoreForm) {
+        restoreForm.addEventListener('submit', function(e) {
+            const submitBtn = e.target.querySelector('button[type="submit"]');
+            if (submitBtn) {
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-1" role="status"></span> Restoring...';
+            }
+            // Let form submit normally to show Laravel flash messages on redirect
+        });
+    }
 }
 
 function createBackup() {

@@ -60,37 +60,19 @@
                                     </div>
                                 @endif
 
-                                {{-- Current Plan Section --}}
-                                @php
-                                    $isDemo = $tenant && str_starts_with($tenant->name, 'Demo ');
-                                    $isEnterprise = $currentPlan && $currentPlan->slug === 'enterprise';
-                                    
-                                    // Calculate expiry based on billing cycle
-                                    $expiryDate = null;
-                                    $daysRemaining = null;
-                                    if ($tenant && $currentPlan && !$isDemo) {
-                                        if ($tenant->billing_period_end) {
-                                            $expiryDate = \Carbon\Carbon::parse($tenant->billing_period_end)->endOfDay();
-                                        } else {
-                                            // Get last billing date (billing_period_start or plan_changed_at)
-                                            $lastBilling = $tenant->billing_period_start 
-                                                ? \Carbon\Carbon::parse($tenant->billing_period_start) 
-                                                : ($tenant->plan_changed_at ? \Carbon\Carbon::parse($tenant->plan_changed_at) : null);
-                                                
-                                            // If no last billing date, use creation date
-                                            if (!$lastBilling) {
-                                                $lastBilling = $tenant->created_at ? \Carbon\Carbon::parse($tenant->created_at) : now();
-                                            }
-                                            
-                                            // Add billing cycle days (default 30 for monthly)
-                                            $billingDays = $currentPlan->getBillingPeriodDays() ?? 30;
-                                            $expiryDate = $lastBilling->addDays($billingDays)->endOfDay();
-                                        }
-                                        
-                                        $daysRemainingFloat = now()->diffInDays($expiryDate, false);
-                                        $daysRemaining = (int) round($daysRemainingFloat);
-                                    }
-                                @endphp
+{{-- Current Plan Section --}}
+@php
+    $isDemo = $tenant && str_starts_with($tenant->name, 'Demo ');
+    $isEnterprise = $currentPlan && $currentPlan->slug === 'enterprise';
+    
+    // Use Tenant model methods for robust subscription expiry calculation
+    $expiryDate = null;
+    $daysRemaining = null;
+    if ($tenant && $currentPlan && !$isDemo) {
+        $expiryDate = $tenant->getSubscriptionExpiryDate();
+        $daysRemaining = $tenant->subscriptionDaysRemaining();
+    }
+@endphp
 
                                 @if($expiryDate && $daysRemaining !== null)
                                     @php

@@ -1650,6 +1650,7 @@ return [
     'backup_delete_error' => 'Failed to delete backup',
     'backup_restore_error' => 'Failed to restore backup',
     'backup_restore_info' => 'Please download the backup file and restore manually using your database tool.',
+    'backup_restore_not_implemented' => 'Restore functionality is not fully implemented yet. The backup file was uploaded and validated successfully but data restoration requires manual SQL execution. Please contact support for assistance.',
     'backup_password_current_required' => 'Current password is required',
     'backup_password_new_required' => 'New password is required',
     'backup_password_confirm_required' => 'Password confirmation is required',

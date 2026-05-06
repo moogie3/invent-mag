@@ -174,24 +174,45 @@ class BackupController extends Controller
 
     public function restore(Request $request)
     {
-        $request->validate([
+        $tenant = app('currentTenant');
+        
+        Log::channel('security')->info('Restore attempt started', [
+            'tenant_id' => $tenant->id,
+            'is_encrypted' => $tenant->isBackupEncrypted(),
+            'has_file' => $request->hasFile('backup_file'),
+            'has_password' => $request->has('password'),
+        ]);
+        
+        // Password only required if encryption is enabled on the tenant
+        $rules = [
             'backup_file' => 'required|file|mimes:zip',
-            'password' => 'required|string',
-        ], [
+        ];
+        
+        $messages = [
             'backup_file.required' => __('messages.backup_file_required'),
             'backup_file.file' => __('messages.backup_file_must_be_file'),
             'backup_file.mimes' => __('messages.backup_file_must_be_zip'),
-            'password.required' => __('messages.backup_restore_password_required'),
-        ]);
+        ];
+        
+        if ($tenant->isBackupEncrypted()) {
+            $rules['password'] = 'required|string';
+            $messages['password.required'] = __('messages.backup_restore_password_required');
+        }
+        
+        $validated = $request->validate($rules, $messages);
 
-        $tenant = app('currentTenant');
         $file = $request->file('backup_file');
         $password = $request->input('password');
+
+        Log::channel('security')->info('Restore validation passed', [
+            'filename' => $file->getClientOriginalName(),
+            'size' => $file->getSize(),
+        ]);
 
         // Verify password for encrypted backup
         if ($tenant->isBackupEncrypted()) {
             if ($password !== $tenant->backup_password) {
-                return redirect()->back()->with('error', __('messages.backup_password_error'));
+                return redirect()->back()->with('error', __('messages.backup_password_error'))->withInput();
             }
         }
 
@@ -199,18 +220,46 @@ class BackupController extends Controller
             // Store the uploaded file temporarily
             $tempPath = $file->store('backup-restore');
             
-            Log::channel('security')->info('Backup restore attempted', [
+            Log::channel('security')->info('Backup restore file stored', [
                 'tenant_id' => $tenant->id,
+                'temp_path' => $tempPath,
                 'filename' => $file->getClientOriginalName(),
+                'encrypted' => $tenant->isBackupEncrypted(),
             ]);
 
-            // Note: Full restore implementation would require the stefanzweifel/laravel-backup-restore package
-            // For now, show info message
+            // Verify the ZIP file is valid by trying to open it
+            $zipPath = Storage::disk('local')->path($tempPath);
+            $zip = new \ZipArchive();
+            $openResult = $zip->open($zipPath);
+            
+            if ($openResult !== true) {
+                Storage::disk('local')->delete($tempPath);
+                Log::error('Restore failed: Invalid ZIP', ['result' => $openResult]);
+                return redirect()->back()->with('error', __('messages.backup_restore_error') . ': Invalid or corrupted ZIP file')->withInput();
+            }
+            
+            $numFiles = $zip->numFiles;
+            $zip->close();
+            
+            if ($numFiles === 0) {
+                Storage::disk('local')->delete($tempPath);
+                Log::error('Restore failed: Empty ZIP');
+                return redirect()->back()->with('error', __('messages.backup_restore_error') . ': Backup file is empty')->withInput();
+            }
+
+            // Clean up temp file
             Storage::disk('local')->delete($tempPath);
 
+            Log::channel('security')->info('Restore validated successfully', [
+                'files_count' => $numFiles,
+            ]);
+
+            // Restore is not fully implemented - show warning
             return redirect()->route('admin.setting.backup.index')
-                ->with('info', __('messages.backup_restore_info'));
+                ->with('warning', __('messages.backup_restore_not_implemented') ?? 'Restore functionality is not fully implemented yet. The backup file was uploaded and validated successfully but data restoration requires manual SQL execution. Please contact support for assistance.');
+
         } catch (\Exception $e) {
+            Log::error('Restore exception', ['error' => $e->getMessage(), 'trace' => $e->getTraceAsString()]);
             return redirect()->route('admin.setting.backup.index')
                 ->with('error', __('messages.backup_restore_error') . ': ' . $e->getMessage());
         }

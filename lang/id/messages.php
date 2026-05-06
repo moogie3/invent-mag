@@ -1644,6 +1644,7 @@ return [
     'backup_delete_error' => 'Gagal menghapus cadangan',
     'backup_restore_error' => 'Gagal memulihkan cadangan',
     'backup_restore_info' => 'Silakan unduh file cadangan dan pulihkan secara manual menggunakan tool database Anda.',
+    'backup_restore_not_implemented' => 'Fungsi pulihkan belum sepenuhnya diimplementasikan. File cadangan berhasil diunggah dan divalidasi tetapi restorasi data memerlukan eksekusi SQL manual. Silakan hubungi dukungan untuk bantuan.',
     'backup_password_current_required' => 'Kata sandi saat ini diperlukan',
     'backup_password_new_required' => 'Kata sandi baru diperlukan',
     'backup_password_confirm_required' => 'Konfirmasi kata sandi diperlukan',

@@ -114,6 +114,84 @@ class Tenant extends BaseTenant
     }
 
     /**
+     * Get the subscription expiry date.
+     * Returns the appropriate expiry date based on subscription state:
+     * - Trial: trial_ends_at
+     * - Paid with billing period: billing_period_end
+     * - Paid without billing period: plan_changed_at + billing cycle days
+     *
+     * @return \Carbon\Carbon|null
+     */
+    public function getSubscriptionExpiryDate(): ?\Carbon\Carbon
+    {
+        if (! $this->hasPlan()) {
+            return null;
+        }
+
+        // Priority 1: If on trial, use trial end date
+        if ($this->onTrial() && $this->trial_ends_at) {
+            return $this->trial_ends_at->copy()->endOfDay();
+        }
+
+        // Priority 2: If has billing period, use that
+        if ($this->billing_period_start && $this->billing_period_end) {
+            return \Carbon\Carbon::parse($this->billing_period_end)->endOfDay();
+        }
+
+        // Priority 3: Calculate from plan_changed_at + billing cycle
+        $plan = $this->getEffectivePlan();
+        if ($this->plan_changed_at && $plan) {
+            $billingDays = $plan->getBillingPeriodDays() ?? 30;
+            return $this->plan_changed_at->copy()->addDays($billingDays)->endOfDay();
+        }
+
+        return null;
+    }
+
+/**
+     * Get the number of days remaining in the subscription.
+     * Returns 0 if expired, negative if unlimited/error.
+     * Uses trialDaysRemaining() when on trial for consistency with trial badge.
+     *
+     * @return int
+     */
+    public function subscriptionDaysRemaining(): int
+    {
+        // When on trial, use trialDaysRemaining() for consistency with trial badge
+        if ($this->onTrial()) {
+            return $this->trialDaysRemaining();
+        }
+
+        $expiryDate = $this->getSubscriptionExpiryDate();
+
+        if (! $expiryDate) {
+            return -1; // Unlimited
+        }
+
+        // Return 0 if expired, otherwise return days remaining
+        $days = now()->diffInDays($expiryDate, false);
+        return $days < 0 ? 0 : (int) $days;
+    }
+
+    /**
+     * Check if the subscription is expiring soon (within specified days).
+     *
+     * @param int $days
+     * @return bool
+     */
+    public function isSubscriptionExpiringSoon(int $days = 7): bool
+    {
+        $daysRemaining = $this->subscriptionDaysRemaining();
+
+        // Negative means no expiry (unlimited) or error
+        if ($daysRemaining < 0) {
+            return false;
+        }
+
+        return $daysRemaining >= 0 && $daysRemaining <= $days;
+    }
+
+    /**
      * Check if the tenant has an active subscription (paid or trialing).
      */
     public function hasActiveSubscription(): bool

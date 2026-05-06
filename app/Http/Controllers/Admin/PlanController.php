@@ -89,24 +89,17 @@ class PlanController extends Controller
         // Check if current plan is expired/inactive (allows renewal of same tier)
         $planInactive = $tenant ? $tenant->planInactive() : false;
         
-        // Check if plan is expiring soon (within 7 days)
+        // Check if plan is expiring soon (within 7 days) - use Tenant model method for consistency
         $expiringSoon = false;
         $expiryDays = null;
         $currentExpiryDate = null;
         if ($tenant && $currentPlan) {
-            // Determine the true expiry date
-            $endsAt = $tenant->billing_period_end 
-                ? \Carbon\Carbon::parse($tenant->billing_period_end)->endOfDay()
-                : ($tenant->trial_ends_at ? \Carbon\Carbon::parse($tenant->trial_ends_at)->endOfDay() : null);
-
-            if ($endsAt) {
-                $currentExpiryDate = $endsAt->copy();
-                $daysRemainingFloat = now()->diffInDays($endsAt, false);
-                $daysRemaining = (int) round($daysRemainingFloat);
+            $currentExpiryDate = $tenant->getSubscriptionExpiryDate();
+            if ($currentExpiryDate) {
+                $expiryDays = $tenant->subscriptionDaysRemaining();
                 
-                if ($daysRemaining >= 0 && $daysRemaining <= 7) {
+                if ($expiryDays >= 0 && $expiryDays <= 7) {
                     $expiringSoon = true;
-                    $expiryDays = $daysRemaining;
                 }
             }
         }

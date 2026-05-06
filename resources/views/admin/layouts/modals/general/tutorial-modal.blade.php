@@ -497,7 +497,11 @@ $routeName = Route::currentRouteName();
             __('tutorial.backup_create'),
             __('tutorial.backup_files'),
             __('tutorial.backup_restore'),
-            __('tutorial.backup_password')
+            __('tutorial.backup_password_tab'),
+            __('tutorial.backup_password_first_time'),
+            __('tutorial.backup_password_enable'),
+            __('tutorial.backup_password_restore_needed'),
+            __('tutorial.backup_password_minimum'),
         ];
     } elseif ($routeName === 'admin.accounting.ledger') {
         $contextTitle = __('tutorial.general_ledger');

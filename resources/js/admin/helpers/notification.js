@@ -296,20 +296,28 @@ window.handleSessionNotifications = function () {
     if (notificationDataElement && !notificationDataElement.dataset.processed) {
         const successMessage = notificationDataElement.dataset.successMessage;
         const errorMessage = notificationDataElement.dataset.errorMessage;
+        const warningMessage = notificationDataElement.dataset.warningMessage;
         const isAuthPage =
             notificationDataElement.dataset.isAuthPage === "true";
 
-        if (successMessage && successMessage !== 'null' && successMessage !== '') {
-            if (isAuthPage) {
-                window.showAuthModal("Success", successMessage, "success");
-            } else {
-                InventMagApp.showToast("Success", successMessage, "success");
-            }
-        } else if (errorMessage && errorMessage !== 'null' && errorMessage !== '') {
+        // Priority: error > warning > success
+        if (errorMessage && errorMessage !== 'null' && errorMessage !== '') {
             if (isAuthPage) {
                 window.showAuthModal("Error", errorMessage, "error");
             } else {
                 InventMagApp.showToast("Error", errorMessage, "error");
+            }
+        } else if (warningMessage && warningMessage !== 'null' && warningMessage !== '') {
+            if (isAuthPage) {
+                window.showAuthModal("Warning", warningMessage, "warning");
+            } else {
+                InventMagApp.showToast("Warning", warningMessage, "warning");
+            }
+        } else if (successMessage && successMessage !== 'null' && successMessage !== '') {
+            if (isAuthPage) {
+                window.showAuthModal("Success", successMessage, "success");
+            } else {
+                InventMagApp.showToast("Success", successMessage, "success");
             }
         }
         

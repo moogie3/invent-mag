@@ -627,11 +627,15 @@ return [
     // Backup Page
     'backup_page' => 'Backup & Restore',
     'backup_page_desc' => 'Create backups of your tenant data and restore from previous backups when needed.',
-    'backup_recommendation' => 'We recommend backing up your data at least once a month to prevent data loss.',
-    'backup_create' => 'Create Backup: Click the "Create Backup" button to generate a new backup. Choose "Database Only" or "Full Backup" (files + database). The backup is tenant-specific, containing only your organization\'s data.',
-    'backup_files' => 'Backup Files: View all available backups in the list below. Each backup shows the filename, size, and creation date. Use the download icon to save a backup to your local device.',
-    'backup_restore' => 'Restore: To restore from a backup, click the restore icon on any backup file. Note: Restoring will replace your current data with the backup data. Use with caution!',
-    'backup_password' => 'Backup Password: Optional - Set a password to encrypt your backup files for security. You will need this password to restore the backup later.',
+    'backup_recommendation' => 'Data Safety First: We recommend backing up your data regularly - at least once a month - to prevent data loss from accidents or system issues.',
+    'backup_create' => 'Create Backup: Click "Create Backup" button to generate a new backup. Choose "Database Only" (recommended) for just your data, or "Full Backup" to include files. Each backup is tenant-specific - it only contains YOUR organization\'s data.',
+    'backup_files' => 'Backup Files: All your backups appear in the table below. Each row shows the date, size, and actions. Click the download icon to save a backup to your computer. Use the trash icon to delete old backups you no longer need.',
+    'backup_restore' => 'Restore Data: To restore from a backup, upload a .zip file and enter the password used when creating the encrypted backup. Warning: Restoring will replace your current data with the backup data.',
+    'backup_password_tab' => 'Password Tab: Click the "Password" tab to set or change your backup password. This is separate from your login password.',
+    'backup_password_first_time' => 'Set a Backup Password: By default, no backup password is set for new accounts. Go to the Password tab to create one. This password encrypts (locks) your backup files for extra security - you will need it when restoring encrypted backups.',
+    'backup_password_enable' => 'Enable Encryption: Check "Enable backup encryption" to encrypt your backup files. This adds a layer of security - only people with the password can open and restore the backup.',
+    'backup_password_restore_needed' => 'Password Required for Restore: When restoring an encrypted backup, you must enter the same password used when creating it. Without the correct password, the backup cannot be restored - there is no recovery option!',
+    'backup_password_minimum' => 'Password Requirements: Your backup password must be at least 16 characters with a mix of uppercase, lowercase, numbers, and special characters.',
 
     // General / Welcome
     'general_navigation' => 'Navigation: Use the sidebar menu on the left to navigate between different modules such as Products, Sales, Purchases, and Accounting.',

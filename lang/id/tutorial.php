@@ -636,11 +636,15 @@ return [
     // Backup Page
     'backup_page' => 'Backup & Pulihkan',
     'backup_page_desc' => 'Buat backup data tenant Anda dan pulihkan dari backup sebelumnya jika diperlukan.',
-    'backup_recommendation' => 'Kami merekomendasikan untuk melakukan backup data setidaknya sekali dalam sebulan untuk mencegah kehilangan data.',
-    'backup_create' => 'Buat Backup: Klik tombol "Buat Backup" untuk membuat backup baru. Pilih "Hanya Database" atau "Backup Penuh" (file + database). Backup bersifat spesifik tenant, hanya berisi data organisasi Anda.',
-    'backup_files' => 'File Backup: Lihat semua backup yang tersedia di daftar di bawah. Setiap backup menunjukkan nama file, ukuran, dan tanggal pembuatan. Gunakan ikon unduh untuk menyimpan backup ke perangkat Anda.',
-    'backup_restore' => 'Pulihkan: Untuk memulihkan dari backup, klik ikon pulihkan pada file backup. Catatan: Memulihkan akan mengganti data Anda saat ini dengan data backup. Gunakan dengan hati-hati!',
-    'backup_password' => 'Password Backup: Opsional - Atur password untuk mengenkripsi file backup Anda demi keamanan. Anda akan memerlukan password ini untuk memulihkan backup nanti.',
+    'backup_recommendation' => 'Keamanan Data: Kami merekomendasikan untuk melakukan backup data secara teratur - setidaknya sekali dalam sebulan - untuk mencegah kehilangan data akibat kesalahan atau masalah sistem.',
+    'backup_create' => 'Buat Backup: Klik tombol "Buat Backup" untuk membuat backup baru. Pilih "Hanya Database" (disarankan) untuk data Anda saja, atau "Backup Penuh" untuk menyertakan file. Setiap backup bersifat spesifik tenant - hanya berisi data ORGANISASI Anda.',
+    'backup_files' => 'File Backup: Semua backup Anda muncul di tabel di bawah. Setiap baris menunjukkan tanggal, ukuran, dan aksi. Klik ikon unduh untuk menyimpan backup ke komputer Anda. Gunakan ikon tempat sampah untuk menghapus backup lama yang tidak diperlukan.',
+    'backup_restore' => 'Pulihkan Data: Untuk memulihkan dari backup, upload file .zip dan masukkan password yang digunakan saat membuat backup terenkripsi. Peringatan: Memulihkan akan mengganti data Anda saat ini dengan data backup.',
+    'backup_password_tab' => 'Tab Password: Klik tab "Password" untuk mengatur atau mengubah password backup Anda. Ini terpisah dari password login Anda.',
+    'backup_password_first_time' => 'Atur Password Backup: Secara default, password backup tidak diatur untuk akun baru. Buka tab Password untuk membuatnya. Password ini mengenkripsi (mengunci) file backup Anda untuk keamanan ekstra - Anda membutuhkannya saat memulihkan backup terenkripsi.',
+    'backup_password_enable' => 'Aktifkan Enkripsi: Centang "Aktifkan enkripsi backup" untuk mengenkripsi file backup Anda. Ini menambahkan lapisan keamanan - hanya orang dengan password yang dapat membuka dan memulihkan backup.',
+    'backup_password_restore_needed' => 'Password Diperlukan untuk Pulihkan: Saat memulihkan backup terenkripsi, Anda harus memasukkan password yang sama yang digunakan saat membuatnya. Tanpa password yang benar, backup tidak dapat dipulihkan - tidak ada opsi pemulihan!',
+    'backup_password_minimum' => 'Persyaratan Password: Password backup Anda harus minimal 16 karakter dengan campuran huruf besar, kecil, angka, dan karakter khusus.',
 
     // General / Welcome
     'general_navigation' => 'Navigasi: Gunakan menu sidebar di kiri untuk menavigasi.',

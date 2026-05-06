@@ -27,16 +27,22 @@
     $rawError = session('error');
     $errorMessage = ($rawError && $rawError !== 'null')
         ? $rawError
-        : ($errors->any() ? $errors->first() : null);
+        : (isset($errors) && $errors->any() ? $errors->first() : null);
+
+    // Warning message support
+    $rawWarning = session('warning');
+    $warningMessage = ($rawWarning && $rawWarning !== 'null') ? $rawWarning : '';
 
     // Final safety — convert any remaining null to empty string for output
     $successMessage = $successMessage ?: '';
     $errorMessage = $errorMessage ?: '';
+    $warningMessage = $warningMessage ?: '';
 @endphp
 
 <div id="session-notification-data"
     data-success-message="{{ $successMessage }}"
     data-error-message="{{ $errorMessage }}"
+    data-warning-message="{{ $warningMessage }}"
     data-is-auth-page="{{ json_encode($isAuthPage) }}"
     style="display: none;">
 </div>

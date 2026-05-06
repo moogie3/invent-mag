@@ -159,7 +159,8 @@
                                                             </div>
                                                             <div class="col-md-4">
                                                                 <label class="form-label">{{ __('messages.backup_restore_password') }}</label>
-                                                                <input type="password" name="password" class="form-control" required>
+                                                                <input type="password" name="password" class="form-control">
+                                                                <small class="text-muted">{{ !$tenant?->backup_password ? __('tutorial.backup_password_first_time') ?? 'Optional - leave blank if no password set' : '' }}</small>
                                                             </div>
                                                             <div class="col-md-3">
                                                                 <button type="submit" class="btn btn-warning w-100">

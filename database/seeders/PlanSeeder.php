@@ -78,6 +78,7 @@ class PlanSeeder extends Seeder
                     'multi_currency',
                     'sales_returns',
                     'purchase_returns',
+                    'hr',
                 ],
             ],
             [
@@ -119,6 +120,7 @@ class PlanSeeder extends Seeder
                     'audit_compliance',
                     'custom_roles',
                     'dedicated_support',
+                    'hr',
                 ],
             ],
         ];

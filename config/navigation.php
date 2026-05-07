@@ -188,5 +188,44 @@ return [
                 ],
             ],
         ],
+        [
+            'title' => 'messages.administration',
+            'icon' => 'ti ti-shield-cog',
+            'permission' => 'view-hr',
+            'plan_feature' => 'hr',
+            'key' => 'administration',
+            'children' => [
+                [
+                    'title' => 'messages.hr_employees',
+                    'route' => 'admin.hr.employee.index',
+                    'permission' => 'view-hr',
+                    'icon' => 'ti ti-id-badge',
+                ],
+                [
+                    'title' => 'messages.hr_attendance',
+                    'route' => 'admin.hr.attendance.index',
+                    'permission' => 'view-hr',
+                    'icon' => 'ti ti-calendar-check',
+                ],
+                [
+                    'title' => 'messages.hr_payroll',
+                    'route' => 'admin.hr.payroll.index',
+                    'permission' => 'view-hr',
+                    'icon' => 'ti ti-wallet',
+                ],
+                [
+                    'title' => 'messages.user_management',
+                    'route' => 'admin.users.index',
+                    'permission' => 'view-users',
+                    'icon' => 'ti ti-users',
+                ],
+                [
+                    'title' => 'messages.audit_log',
+                    'route' => 'admin.audit-log.index',
+                    'permission' => 'view-audit-log',
+                    'icon' => 'ti ti-shield-check',
+                ],
+            ],
+        ],
     ],
 ];

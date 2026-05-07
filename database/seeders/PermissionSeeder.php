@@ -138,6 +138,12 @@ class PermissionSeeder extends Seeder
 
             // Audit Log (superuser only - no plan restriction)
             'view-audit-log',
+            
+            // HR
+            'view-hr',
+            'manage-employees',
+            'manage-attendance',
+            'manage-payroll',
         ];
 
         $this->command->info("Creating " . count($permissions) . " permissions...");

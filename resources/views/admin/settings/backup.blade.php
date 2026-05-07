@@ -20,26 +20,33 @@
                     </div>
                     <div class="col-12 col-md-9 d-flex flex-column">
                         <div class="card-body">
-                            <!-- Tab Navigation -->
+
+                            {{-- Tab Navigation --}}
                             <ul class="nav nav-tabs card-header-tabs mb-4" id="backupTabs" role="tablist">
                                 <li class="nav-item" role="presentation">
-                                    <button class="nav-link active" id="backup-tab" data-bs-toggle="tab" data-bs-target="#backup-panel" type="button" role="tab" aria-controls="backup-panel" aria-selected="true">
+                                    <button class="nav-link active" id="backup-tab" data-bs-toggle="tab"
+                                        data-bs-target="#backup-panel" type="button" role="tab"
+                                        aria-controls="backup-panel" aria-selected="true">
                                         <i class="ti ti-refresh me-1"></i>{{ __('messages.backup') }}
                                     </button>
                                 </li>
                                 <li class="nav-item" role="presentation">
-                                    <button class="nav-link" id="password-tab" data-bs-toggle="tab" data-bs-target="#password-panel" type="button" role="tab" aria-controls="password-panel" aria-selected="false">
+                                    <button class="nav-link" id="password-tab" data-bs-toggle="tab"
+                                        data-bs-target="#password-panel" type="button" role="tab"
+                                        aria-controls="password-panel" aria-selected="false">
                                         <i class="ti ti-key me-1"></i>{{ __('messages.backup_password') }}
                                     </button>
                                 </li>
                             </ul>
 
-                            <!-- Tab Content -->
+                            {{-- Tab Content --}}
                             <div class="tab-content" id="backupTabsContent">
-                                <!-- Tab 1: Backup & Restore -->
+
+                                {{-- ── Tab 1: Backup & Restore ── --}}
                                 <div class="tab-pane fade show active" id="backup-panel" role="tabpanel" aria-labelledby="backup-tab">
                                     <div class="row g-4">
-                                        <!-- Create Backup Section -->
+
+                                        {{-- Create Backup --}}
                                         <div class="col-12">
                                             <div class="settings-section">
                                                 <div class="settings-section-header">
@@ -54,24 +61,24 @@
                                                     </div>
                                                 </div>
                                                 <div class="settings-section-content">
-                                                    <div class="row g-3 align-items-end">
-                                                        <div class="col-md-6">
-                                                            <select id="backupType" class="form-select" required>
-                                                                <option value="db_only">{{ __('messages.backup_database_only') }}</option>
-                                                                <option value="full">{{ __('messages.backup_database_files') }}</option>
-                                                            </select>
-                                                        </div>
-                                                        <div class="col-md-6">
-                                                            <button type="button" class="btn btn-primary w-100" id="backupButton" data-url="{{ route('admin.setting.backup.run') }}">
-                                                                <i class="ti ti-device-floppy me-1"></i>{{ __('messages.backup_create') }}
-                                                            </button>
-                                                        </div>
+                                                    <div class="mb-3">
+                                                        <label class="form-label fw-semibold">{{ __('messages.backup_type') ?? 'Backup Type' }}</label>
+                                                        <select id="backupType" class="form-select">
+                                                            <option value="db_only">{{ __('messages.backup_database_only') }}</option>
+                                                            <option value="full">{{ __('messages.backup_database_files') }}</option>
+                                                        </select>
+                                                    </div>
+                                                    <div>
+                                                        <button type="button" class="btn btn-primary" id="backupButton"
+                                                            data-url="{{ route('admin.setting.backup.run') }}">
+                                                            <i class="ti ti-device-floppy me-1"></i>{{ __('messages.backup_create') }}
+                                                        </button>
                                                     </div>
                                                 </div>
                                             </div>
                                         </div>
 
-                                        <!-- Backup List Section -->
+                                        {{-- Backup File List --}}
                                         <div class="col-12">
                                             <div class="settings-section">
                                                 <div class="settings-section-header">
@@ -107,13 +114,18 @@
                                                                         <td>{{ number_format($file['size'] / 1024 / 1024, 2) }} MB</td>
                                                                         <td>
                                                                             <div class="btn-list">
-                                                                                <a href="{{ route('admin.setting.backup.download', $file['filename']) }}" class="btn btn-sm btn-icon btn-ghost-primary" title="{{ __('messages.backup_download') }}">
+                                                                                <a href="{{ route('admin.setting.backup.download', $file['filename']) }}"
+                                                                                    class="btn btn-sm btn-icon btn-ghost-primary"
+                                                                                    title="{{ __('messages.backup_download') }}">
                                                                                     <i class="ti ti-download"></i>
                                                                                 </a>
                                                                                 <form action="{{ route('admin.setting.backup.delete', $file['filename']) }}" method="POST" class="d-inline">
                                                                                     @csrf
                                                                                     @method('DELETE')
-                                                                                    <button type="submit" class="btn btn-sm btn-icon btn-ghost-danger" title="{{ __('messages.backup_delete') }}" onclick="return confirm('{{ __('messages.backup_delete_confirm') ?? 'Are you sure?' }}')">
+                                                                                    <button type="submit"
+                                                                                        class="btn btn-sm btn-icon btn-ghost-danger"
+                                                                                        title="{{ __('messages.backup_delete') }}"
+                                                                                        onclick="return confirm('{{ __('messages.backup_delete_confirm') ?? 'Are you sure?' }}')">
                                                                                         <i class="ti ti-trash"></i>
                                                                                     </button>
                                                                                 </form>
@@ -134,7 +146,7 @@
                                             </div>
                                         </div>
 
-<!-- Restore Section -->
+                                        {{-- Restore --}}
                                         <div class="col-12">
                                             <div class="settings-section">
                                                 <div class="settings-section-header">
@@ -151,35 +163,39 @@
                                                 <div class="settings-section-content">
                                                     <form action="{{ route('admin.setting.backup.restore') }}" method="POST" enctype="multipart/form-data">
                                                         @csrf
-                                                        <div class="row g-3 align-items-end">
-                                                            <div class="col-md-5">
-                                                                <label class="form-label">{{ __('messages.backup_file') }}</label>
-                                                                <input type="file" name="backup_file" class="form-control" accept=".zip" required>
-                                                                <small class="text-muted">{{ __('messages.backup_file_format') ?? 'Upload .zip backup file' }}</small>
-                                                            </div>
-                                                            <div class="col-md-4">
-                                                                <label class="form-label">{{ __('messages.backup_restore_password') }}</label>
-                                                                <input type="password" name="password" class="form-control">
-                                                                <small class="text-muted">{{ !$tenant?->backup_password ? __('tutorial.backup_password_first_time') ?? 'Optional - leave blank if no password set' : '' }}</small>
-                                                            </div>
-                                                            <div class="col-md-3">
-                                                                <button type="submit" class="btn btn-warning w-100">
-                                                                    <i class="ti ti-upload me-1"></i>{{ __('messages.backup_restore_button') }}
-                                                                </button>
-                                                            </div>
+                                                        <div class="mb-3">
+                                                            <label class="form-label fw-semibold">{{ __('messages.backup_file') }}</label>
+                                                            <input type="file" name="backup_file" class="form-control" accept=".zip" required>
+                                                            <small class="text-muted">{{ __('messages.backup_file_format') ?? 'Upload a .zip backup file' }}</small>
+                                                        </div>
+                                                        <div class="mb-4">
+                                                            <label class="form-label fw-semibold">{{ __('messages.backup_restore_password') }}</label>
+                                                            <input type="password" name="password" class="form-control">
+                                                            @if(!$tenant?->backup_password)
+                                                                <small class="text-muted">{{ __('tutorial.backup_password_first_time') ?? 'No password set — leave blank.' }}</small>
+                                                            @else
+                                                                <small class="text-muted">{{ __('messages.backup_restore_password') }}</small>
+                                                            @endif
+                                                        </div>
+                                                        <div>
+                                                            <button type="submit" class="btn btn-warning">
+                                                                <i class="ti ti-upload me-1"></i>{{ __('messages.backup_restore_button') }}
+                                                            </button>
                                                         </div>
                                                     </form>
                                                 </div>
                                             </div>
                                         </div>
-                                    </div>
-                                </div>
 
-                                <!-- Tab 2: Password Settings -->
+                                    </div>
+                                </div>{{-- end #backup-panel --}}
+
+                                {{-- ── Tab 2: Password Settings ── --}}
                                 <div class="tab-pane fade" id="password-panel" role="tabpanel" aria-labelledby="password-tab">
                                     <div class="row g-4">
                                         <div class="col-12">
-                                            <!-- Warning Banner -->
+
+                                            {{-- Warning Banner --}}
                                             <div class="alert alert-warning border-0 rounded-4 mb-4">
                                                 <div class="d-flex align-items-center">
                                                     <i class="ti ti-alert-triangle fs-4 me-2"></i>
@@ -189,36 +205,34 @@
                                                 </div>
                                             </div>
 
-                                            <!-- Password Form -->
+                                            {{-- Password Form --}}
                                             <div class="settings-section">
                                                 <form action="{{ route('admin.setting.backup.password') }}" method="POST" id="passwordForm">
                                                     @csrf
                                                     <div class="settings-section-content">
-                                                        <div class="row g-3">
-                                                            <div class="col-md-12">
-                                                                <label class="form-label">{{ __('messages.backup_password_current') }}</label>
-                                                                <input type="password" name="current_password" class="form-control" required>
-                                                            </div>
-                                                            <div class="col-md-12">
-                                                                <label class="form-label">{{ __('messages.backup_password_new') }}</label>
-                                                                <input type="password" name="new_password" class="form-control" required minlength="16">
-                                                                <small class="text-muted">{{ __('messages.backup_password_min') }} - {{ __('messages.backup_password_strength') }}</small>
-                                                            </div>
-                                                            <div class="col-md-12">
-                                                                <label class="form-label">{{ __('messages.backup_password_confirm') }}</label>
-                                                                <input type="password" name="new_password_confirmation" class="form-control" required>
-                                                            </div>
-                                                            <div class="col-md-12">
-                                                                <div class="form-check">
-                                                                    <input type="checkbox" name="encryption_enabled" class="form-check-input" id="encryptionEnabled" value="1" {{ ($tenant->backup_encrypted ?? false) ? 'checked' : '' }}>
-                                                                    <label class="form-check-label" for="encryptionEnabled">
-                                                                        {{ __('messages.backup_encryption_enable') }}
-                                                                    </label>
-                                                                </div>
-                                                            </div>
+                                                        <div class="mb-3">
+                                                            <label class="form-label fw-semibold">{{ __('messages.backup_password_current') }}</label>
+                                                            <input type="password" name="current_password" class="form-control" required>
+                                                        </div>
+                                                        <div class="mb-3">
+                                                            <label class="form-label fw-semibold">{{ __('messages.backup_password_new') }}</label>
+                                                            <input type="password" name="new_password" class="form-control" required minlength="16">
+                                                            <small class="text-muted">{{ __('messages.backup_password_min') }} — {{ __('messages.backup_password_strength') }}</small>
+                                                        </div>
+                                                        <div class="mb-3">
+                                                            <label class="form-label fw-semibold">{{ __('messages.backup_password_confirm') }}</label>
+                                                            <input type="password" name="new_password_confirmation" class="form-control" required>
+                                                        </div>
+                                                        <div class="mb-4">
+                                                            <label class="form-check">
+                                                                <input type="checkbox" name="encryption_enabled" class="form-check-input"
+                                                                    id="encryptionEnabled" value="1"
+                                                                    {{ ($tenant->backup_encrypted ?? false) ? 'checked' : '' }}>
+                                                                <span class="form-check-label">{{ __('messages.backup_encryption_enable') }}</span>
+                                                            </label>
                                                         </div>
                                                     </div>
-                                                    <div class="card-footer bg-transparent mt-4">
+                                                    <div class="card-footer bg-transparent pt-0">
                                                         <div class="btn-list justify-content-end">
                                                             <button type="submit" class="btn btn-primary">
                                                                 <i class="ti ti-device-floppy me-1"></i>{{ __('messages.save') }}
@@ -227,10 +241,12 @@
                                                     </div>
                                                 </form>
                                             </div>
+
                                         </div>
                                     </div>
-                                </div>
-                            </div>
+                                </div>{{-- end #password-panel --}}
+
+                            </div>{{-- end .tab-content --}}
                         </div>
                     </div>
                 </div>

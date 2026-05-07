@@ -174,6 +174,7 @@
 @vite('resources/js/admin/layouts/settings.js')
 @vite('resources/js/admin/layouts/advanced-settings.js')
 @vite('resources/js/admin/backup.js')
+@vite('resources/js/admin/hr.js')
 @vite('resources/js/admin/layouts/selectable-table.js')
 
 {{-- SCRIPT FOR NAVBAR --}}

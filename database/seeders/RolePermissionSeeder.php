@@ -39,6 +39,12 @@ class RolePermissionSeeder extends Seeder
             'manage-stock-opname',
 
             'edit-warehouses',
+            
+            // HR
+            'view-hr',
+            'manage-employees',
+            'manage-attendance',
+            'manage-payroll',
         ]);
 
         // Create POS Role and assign permissions

@@ -219,44 +219,102 @@ class BackupController extends Controller
         try {
             // Store the uploaded file temporarily
             $tempPath = $file->store('backup-restore');
-            
+
             Log::channel('security')->info('Backup restore file stored', [
                 'tenant_id' => $tenant->id,
                 'temp_path' => $tempPath,
-                'filename' => $file->getClientOriginalName(),
+                'filename'  => $file->getClientOriginalName(),
                 'encrypted' => $tenant->isBackupEncrypted(),
             ]);
 
-            // Verify the ZIP file is valid by trying to open it
-            $zipPath = Storage::disk('local')->path($tempPath);
-            $zip = new \ZipArchive();
+            // Open and validate the ZIP
+            $zipPath   = Storage::disk('local')->path($tempPath);
+            $zip       = new \ZipArchive();
             $openResult = $zip->open($zipPath);
-            
+
             if ($openResult !== true) {
                 Storage::disk('local')->delete($tempPath);
                 Log::error('Restore failed: Invalid ZIP', ['result' => $openResult]);
-                return redirect()->back()->with('error', __('messages.backup_restore_error') . ': Invalid or corrupted ZIP file')->withInput();
-            }
-            
-            $numFiles = $zip->numFiles;
-            $zip->close();
-            
-            if ($numFiles === 0) {
-                Storage::disk('local')->delete($tempPath);
-                Log::error('Restore failed: Empty ZIP');
-                return redirect()->back()->with('error', __('messages.backup_restore_error') . ': Backup file is empty')->withInput();
+                return redirect()->back()
+                    ->with('error', __('messages.backup_restore_error') . ': Invalid or corrupted ZIP file')
+                    ->withInput();
             }
 
-            // Clean up temp file
+            // Find backup.sql inside the ZIP
+            $sqlIndex = $zip->locateName('backup.sql');
+            if ($sqlIndex === false) {
+                $zip->close();
+                Storage::disk('local')->delete($tempPath);
+                return redirect()->back()
+                    ->with('error', __('messages.backup_restore_error') . ': backup.sql not found inside ZIP')
+                    ->withInput();
+            }
+
+            // Extract SQL content from ZIP
+            $sqlContent = $zip->getFromIndex($sqlIndex);
+            $zip->close();
+
+            // Clean up ZIP temp file
             Storage::disk('local')->delete($tempPath);
 
-            Log::channel('security')->info('Restore validated successfully', [
-                'files_count' => $numFiles,
+            if (empty($sqlContent)) {
+                return redirect()->back()
+                    ->with('error', __('messages.backup_restore_error') . ': backup.sql is empty')
+                    ->withInput();
+            }
+
+            // Execute the SQL to restore tenant data
+            $dbConfig   = config('database.connections.mysql');
+            $tenantId   = $tenant->getKey();
+            $mysqlPath  = $dbConfig['dump']['dump_binary_path'] ?? 'C:/xampp/mysql/bin';
+            $host       = $dbConfig['host'];
+            $port       = $dbConfig['port'];
+            $username   = $dbConfig['username'];
+            $dbPassword = $dbConfig['password'];
+            $database   = $dbConfig['database'];
+
+            // Write SQL to a temp file for mysql CLI
+            $sqlTempPath = storage_path('app/backup-restore/restore_' . $tenantId . '_' . time() . '.sql');
+            if (!is_dir(dirname($sqlTempPath))) {
+                mkdir(dirname($sqlTempPath), 0755, true);
+            }
+            file_put_contents($sqlTempPath, $sqlContent);
+
+            // Build mysql command
+            $cmd = [
+                "{$mysqlPath}/mysql.exe",
+                '-h', $host,
+                '-P', (string) $port,
+                '-u', $username,
+            ];
+            if ($dbPassword) {
+                $cmd[] = '-p' . $dbPassword;
+            }
+            $cmd[] = $database;
+
+            $process = new \Symfony\Component\Process\Process($cmd);
+            $process->setWorkingDirectory(base_path());
+            $process->setInput(file_get_contents($sqlTempPath));
+            $process->setTimeout(300);
+            $process->run();
+
+            // Clean up SQL temp file
+            @unlink($sqlTempPath);
+
+            if (!$process->isSuccessful()) {
+                $error = $process->getErrorOutput();
+                Log::error('Restore SQL execution failed', ['error' => $error, 'tenant_id' => $tenantId]);
+                return redirect()->route('admin.setting.backup.index')
+                    ->with('error', __('messages.backup_restore_error') . ': ' . $error);
+            }
+
+            Log::channel('security')->info('Backup restored successfully', [
+                'tenant_id' => $tenantId,
+                'filename'  => $file->getClientOriginalName(),
             ]);
 
-            // Restore is not fully implemented - show warning
             return redirect()->route('admin.setting.backup.index')
-                ->with('warning', __('messages.backup_restore_not_implemented') ?? 'Restore functionality is not fully implemented yet. The backup file was uploaded and validated successfully but data restoration requires manual SQL execution. Please contact support for assistance.');
+                ->with('success', __('messages.backup_restore_success') ?? 'Backup restored successfully. Your data has been replaced with the backup.');
 
         } catch (\Exception $e) {
             Log::error('Restore exception', ['error' => $e->getMessage(), 'trace' => $e->getTraceAsString()]);

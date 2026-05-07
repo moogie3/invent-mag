@@ -84,7 +84,7 @@
                 @include('admin.layouts.navbar')
             @endif
             @include('admin.layouts.partials.trial-banner')
-            @if(request()->routeIs('admin.setting.*') || request()->routeIs('admin.users.*'))
+            @if(request()->routeIs('admin.setting.*') || request()->routeIs('admin.users.*') || request()->routeIs('admin.hr.*'))
                 {{-- Disable turbo-frame for settings and user management pages to fix modal issues --}}
                 @yield('content')
             @else

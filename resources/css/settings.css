@@ -151,3 +151,10 @@
 #navbar-options-wrapper.disabled .form-check-label {
     color: #6c757d;
 }
+
+.sticky-col {
+    position: sticky;
+    left: 0;
+    background: white;
+    z-index: 1;
+}

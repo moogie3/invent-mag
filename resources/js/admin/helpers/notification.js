@@ -155,18 +155,32 @@ window.showConfirmModal = function (title, message, onConfirm) {
     // Sanitize inputs to prevent XSS
     const safeTitle = escapeHtml(title);
     const safeMessage = escapeHtml(message);
-    
+
     const confirmModalHtml = `
         <div class="modal modal-blur fade" id="confirmModal" tabindex="-1" role="dialog" aria-hidden="true">
             <div class="modal-dialog modal-sm modal-dialog-centered" role="document">
-                <div class="modal-content">
-                    <div class="modal-body">
-                        <div class="modal-title">${safeTitle}</div>
-                        <div>${safeMessage}</div>
+                <div class="modal-content border-0 shadow-lg rounded-3">
+                    <div class="modal-header">
+                        <h5 class="modal-title"><i class="ti ti-alert-triangle me-1"></i>${safeTitle}</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-status bg-danger"></div>
+                    <div class="modal-body text-center py-4">
+                        <i class="ti ti-alert-triangle text-danger" style="font-size: 3rem;"></i>
+                        <h3 class="mt-3">${safeTitle}</h3>
+                        <div class="text-muted">${safeMessage}</div>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-link link-secondary me-auto" data-bs-dismiss="modal">Cancel</button>
-                        <button type="button" class="btn btn-danger" id="confirmModalBtn">Confirm</button>
+                        <div class="w-100">
+                            <div class="row">
+                                <div class="col">
+                                    <button type="button" class="btn w-100" data-bs-dismiss="modal">Cancel</button>
+                                </div>
+                                <div class="col">
+                                    <button type="button" class="btn btn-danger w-100" id="confirmModalBtn">Confirm</button>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>

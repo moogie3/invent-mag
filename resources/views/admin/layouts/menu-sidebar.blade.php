@@ -127,30 +127,6 @@
                 </a>
             </li>
 
-            <!-- New User Management Link -->
-            @role('superuser')
-                <li class="nav-item">
-                    <a class="nav-link {{ request()->routeIs('admin.users.index') || request()->routeIs('admin.users.create') || request()->routeIs('admin.users.edit') ? 'active' : '' }}"
-                        href="{{ route('admin.users.index') }}" data-turbo="true" data-turbo-cache="false" data-bs-toggle="tooltip" data-bs-placement="top">
-                        <div class="nav-link-icon">
-                            <i class="ti ti-users"></i>
-                        </div>
-                        <span class="nav-link-title">{{ __('messages.user_management') }}</span>
-                    </a>
-                </li>
-
-                <!-- Audit Log Link -->
-                <li class="nav-item">
-                    <a class="nav-link {{ request()->routeIs('admin.audit-log.*') ? 'active' : '' }}"
-                        href="{{ route('admin.audit-log.index') }}" data-turbo="true" data-turbo-cache="false" data-bs-toggle="tooltip" data-bs-placement="top">
-                        <div class="nav-link-icon">
-                            <i class="ti ti-shield-check"></i>
-                        </div>
-                        <span class="nav-link-title">{{ __('messages.audit_log') }}</span>
-                    </a>
-                </li>
-            @endrole
-
             <li class="nav-item">
                 <a class="nav-link" href="#" data-turbo-cache="false" data-bs-toggle="tooltip" data-bs-placement="top"
                     onclick="event.preventDefault(); document.getElementById('logout-form').submit();">

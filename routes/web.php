@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Str;
 use App\Http\Controllers\Admin\{CategoryController, CustomerController, ProductController, PurchaseController, SalesPipelineController, SupplierController, UnitController, CurrencyController, SalesController, DashboardController, ProfileController, NotificationController, POSController, ReportController, WarehouseController, TaxController, UserController, CustomerCrmController, SupplierCrmController, SettingsController, PurchaseReturnController, SalesReturnController, JournalEntryController, StockTransferController, PlanController, ProductStockController, AuditLogController};
+use App\Http\Controllers\Admin\Hr\{EmployeeController, AttendanceController, PayrollController, PayslipController};
 use Laravel\Fortify\Http\Controllers\AuthenticatedSessionController;
 use App\Http\Controllers\Admin\StockOpnameController;
 use Laravel\Fortify\Http\Controllers\NewPasswordController;
@@ -641,6 +642,24 @@ Route::middleware('web')->prefix('admin')->group(function () {
         Route::middleware('role:superuser', 'plan.feature:audit_compliance')->group(function () {
             Route::get('/audit-log', [AuditLogController::class, 'index'])->name('admin.audit-log.index');
             Route::get('/audit-log/{auditLog}', [AuditLogController::class, 'show'])->name('admin.audit-log.show');
+        });
+
+        // HR Routes - requires hr plan feature
+        Route::middleware('plan.feature:hr')->prefix('hr')->name('admin.hr.')->group(function () {
+            Route::resource('employee', EmployeeController::class)->only(['index', 'store', 'update', 'destroy']);
+            Route::get('attendance', [AttendanceController::class, 'index'])->name('attendance.index');
+            Route::get('attendance/{period}', [AttendanceController::class, 'show'])->name('attendance.show');
+            Route::post('attendance/period', [AttendanceController::class, 'openPeriod'])->name('attendance.open-period');
+            Route::post('attendance/{period}/close', [AttendanceController::class, 'closePeriod'])->name('attendance.close-period');
+            Route::post('attendance/record', [AttendanceController::class, 'upsert'])->name('attendance.upsert');
+            Route::post('attendance/{period}/bulk-fill', [AttendanceController::class, 'bulkFill'])->name('attendance.bulk-fill');
+            Route::get('payroll', [PayrollController::class, 'index'])->name('payroll.index');
+            Route::get('payroll/{run}', [PayrollController::class, 'show'])->name('payroll.show');
+            Route::post('payroll/run/{period}', [PayrollController::class, 'run'])->name('payroll.run');
+            Route::put('payroll/item/{item}', [PayrollController::class, 'updateItem'])->name('payroll.item.update');
+            Route::post('payroll/{run}/pay', [PayrollController::class, 'markPaid'])->name('payroll.pay');
+            Route::post('payslip/{item}/generate', [PayslipController::class, 'generate'])->name('payslip.generate');
+            Route::get('payslip/{item}/download', [PayslipController::class, 'download'])->name('payslip.download');
         });
 
         Route::get('api/settings', [SettingsController::class, 'getSettings'])->name('admin.api.settings');

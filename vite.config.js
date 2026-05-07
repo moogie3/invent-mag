@@ -18,6 +18,7 @@ export default defineConfig({
                 "resources/js/admin/adjustment-log.js",
                 "resources/js/admin/category.js",
                 "resources/js/admin/backup.js",
+                "resources/js/admin/hr.js",
                 "resources/js/admin/journal-entry.js",
                 "resources/js/admin/currency.js",
                 "resources/js/admin/customer.js",

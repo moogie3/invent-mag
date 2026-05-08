@@ -1,15 +1,81 @@
 import { onPageLoad } from './utils/onPageLoad.js';
 
 onPageLoad(() => {
+    initEmployeeModals();
     initAttendance();
     initPayroll();
 }, { id: 'hr' });
 
-function initAttendance() {
-    const container = document.querySelector('[data-hr-attendance]');
-    if (!container) return;
+// Before Turbo snapshots the page into cache, strip the handlerAttached flags
+// so that when the cached page is restored, listeners are re-attached cleanly.
+document.addEventListener('turbo:before-cache', () => {
+    const createEmployeeModal = document.getElementById('createEmployeeModal');
+    if (createEmployeeModal) delete createEmployeeModal.dataset.handlerAttached;
 
-    document.querySelectorAll('[contenteditable]').forEach(cell => {
+    const editModal = document.getElementById('editEmployeeModal');
+    if (editModal) delete editModal.dataset.handlerAttached;
+
+    const deleteModal = document.getElementById('deleteEmployeeModal');
+    if (deleteModal) delete deleteModal.dataset.handlerAttached;
+    
+    window.addAllowance = undefined;
+    window.addDeduction = undefined;
+});
+
+function initEmployeeModals() {
+    const createModal = document.getElementById('createEmployeeModal');
+    if (createModal && !createModal.dataset.handlerAttached) {
+        createModal.dataset.handlerAttached = 'true';
+        createModal.addEventListener('shown.bs.modal', function() {
+            const form = createModal.querySelector('form');
+            if (form) form.reset();
+        });
+    }
+
+    const editModal = document.getElementById('editEmployeeModal');
+    if (!editModal) return;
+
+    if (editModal.dataset.handlerAttached) return;
+    editModal.dataset.handlerAttached = 'true';
+
+    editModal.addEventListener('show.bs.modal', function(e) {
+        const button = e.relatedTarget;
+        document.getElementById('edit_id').value = button.dataset.id;
+        document.getElementById('edit_employee_code').value = button.dataset.employee_code;
+        document.getElementById('edit_name').value = button.dataset.name;
+        document.getElementById('edit_department').value = button.dataset.department || '';
+        document.getElementById('edit_position').value = button.dataset.position || '';
+        document.getElementById('edit_employment_type').value = button.dataset.employment_type;
+        document.getElementById('edit_join_date').value = button.dataset.join_date;
+        document.getElementById('edit_base_salary').value = button.dataset.base_salary;
+        document.getElementById('edit_status').value = button.dataset.status;
+        document.getElementById('edit_bank_name').value = button.dataset.bank_name || '';
+        document.getElementById('edit_bank_account').value = button.dataset.bank_account || '';
+        document.getElementById('edit_notes').value = button.dataset.notes || '';
+        document.getElementById('editEmployeeForm').action = '/admin/hr/employee/' + button.dataset.id;
+    });
+
+    const deleteModal = document.getElementById('deleteEmployeeModal');
+    if (!deleteModal) return;
+
+    if (deleteModal.dataset.handlerAttached) return;
+    deleteModal.dataset.handlerAttached = 'true';
+
+    deleteModal.addEventListener('show.bs.modal', function(e) {
+        const button = e.relatedTarget;
+        document.getElementById('delete_employee_name').textContent = button.dataset.name;
+        document.getElementById('deleteEmployeeForm').action = '/admin/hr/employee/' + button.dataset.id;
+    });
+}
+
+function initAttendance() {
+    const editableCells = document.querySelectorAll('[contenteditable]');
+    if (!editableCells.length) return;
+
+    editableCells.forEach(cell => {
+        if (cell.dataset.handlerAttached) return;
+        cell.dataset.handlerAttached = 'true';
+
         cell.addEventListener('blur', function() {
             const employeeId = this.dataset.employee;
             const date = this.dataset.date;
@@ -18,9 +84,7 @@ function initAttendance() {
 
             if (!employeeId || !date || !periodId) return;
 
-            const validStatuses = ['P', 'A', 'S', 'L', 'H', '½'];
             const statusMap = { 'P': 'present', 'A': 'absent', 'S': 'sick', 'L': 'leave', 'H': 'holiday', '½': 'half_day' };
-
             const mappedStatus = statusMap[status];
             if (!mappedStatus) return;
 
@@ -45,20 +109,14 @@ function initAttendance() {
             });
         });
     });
-
-    document.querySelectorAll('.btn-remove').forEach(btn => {
-        btn.addEventListener('click', function() {
-            this.closest('.row').remove();
-        });
-    });
 }
 
 function initPayroll() {
-    const container = document.querySelector('[data-hr-payroll]');
-    if (!container) return;
+    if (window.addAllowance) return;
 
     window.addAllowance = function(itemId) {
         const container = document.getElementById(`allowances-container${itemId}`);
+        if (!container) return;
         const idx = container.querySelectorAll('.row').length;
         const div = document.createElement('div');
         div.className = 'row mb-2';
@@ -70,17 +128,18 @@ function initPayroll() {
                 <input type="number" name="allowances[${idx}][amount]" class="form-control" value="0" step="0.01">
             </div>
             <div class="col-2">
-                <button type="button" class="btn btn-danger btn-remove"><i class="ti ti-trash"></i></button>
+                <button type="button" class="btn btn-danger btn-remove-row"><i class="ti ti-trash"></i></button>
             </div>
         `;
         container.appendChild(div);
-        div.querySelector('.btn-remove').addEventListener('click', function() {
+        div.querySelector('.btn-remove-row').addEventListener('click', function() {
             div.remove();
         });
     };
 
     window.addDeduction = function(itemId) {
         const container = document.getElementById(`deductions-container${itemId}`);
+        if (!container) return;
         const idx = container.querySelectorAll('.row').length;
         const div = document.createElement('div');
         div.className = 'row mb-2';
@@ -92,11 +151,11 @@ function initPayroll() {
                 <input type="number" name="deductions[${idx}][amount]" class="form-control" value="0" step="0.01">
             </div>
             <div class="col-2">
-                <button type="button" class="btn btn-danger btn-remove"><i class="ti ti-trash"></i></button>
+                <button type="button" class="btn btn-danger btn-remove-row"><i class="ti ti-trash"></i></button>
             </div>
         `;
         container.appendChild(div);
-        div.querySelector('.btn-remove').addEventListener('click', function() {
+        div.querySelector('.btn-remove-row').addEventListener('click', function() {
             div.remove();
         });
     };
@@ -109,8 +168,3 @@ function showToast(message) {
         console.log(message);
     }
 }
-
-document.addEventListener('turbo:before-cache', () => {
-    window.addAllowance = undefined;
-    window.addDeduction = undefined;
-});

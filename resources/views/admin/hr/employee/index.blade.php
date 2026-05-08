@@ -48,6 +48,7 @@
                                             <table class="table card-table table-vcenter">
                                                 <thead style="font-size: large">
                                                     <tr>
+                                                        <th style="width: 50px;"><button class="table-sort fs-4 py-3" data-sort="sort-no">{{ __('messages.table_no') }}</button></th>
                                                         <th><button class="table-sort fs-4 py-3" data-sort="sort-code">{{ __('messages.hr_employee_code') }}</button></th>
                                                         <th><button class="table-sort fs-4 py-3" data-sort="sort-name">{{ __('messages.name') }}</button></th>
                                                         <th><button class="table-sort fs-4 py-3" data-sort="sort-dept">{{ __('messages.hr_department') }}</button></th>
@@ -58,30 +59,31 @@
                                                     </tr>
                                                 </thead>
                                                 <tbody class="table-tbody">
-                                                    @forelse($employees as $employee)
+                                                    @forelse($employees as $index => $employee)
                                                         <tr>
+                                                            <td class="sort-no">{{ $employees->firstItem() + $index }}</td>
                                                             <td class="sort-code">{{ $employee->employee_code }}</td>
                                                             <td class="sort-name">{{ $employee->name }}</td>
                                                             <td class="sort-dept">{{ $employee->department }}</td>
                                                             <td class="sort-position">{{ $employee->position }}</td>
                                                             <td class="sort-type">
                                                                 @if($employee->employment_type === 'permanent')
-                                                                    <span class="badge bg-success">{{ __('messages.hr_permanent') }}</span>
+                                                                    <span class="badge bg-success text-white">{{ __('messages.hr_permanent') }}</span>
                                                                 @elseif($employee->employment_type === 'contract')
-                                                                    <span class="badge bg-warning">{{ __('messages.hr_contract') }}</span>
+                                                                    <span class="badge bg-warning text-white">{{ __('messages.hr_contract') }}</span>
                                                                 @else
-                                                                    <span class="badge bg-secondary">{{ __('messages.hr_part_time') }}</span>
+                                                                    <span class="badge bg-secondary text-white">{{ __('messages.hr_part_time') }}</span>
                                                                 @endif
                                                             </td>
                                                             <td class="sort-status">
                                                                 @if($employee->status === 'active')
-                                                                    <span class="badge bg-success">{{ __('messages.hr_active') }}</span>
+                                                                    <span class="badge bg-success text-white">{{ __('messages.hr_active') }}</span>
                                                                 @elseif($employee->status === 'inactive')
-                                                                    <span class="badge bg-secondary">{{ __('messages.hr_inactive') }}</span>
+                                                                    <span class="badge bg-secondary text-white">{{ __('messages.hr_inactive') }}</span>
                                                                 @elseif($employee->status === 'resigned')
-                                                                    <span class="badge bg-warning">{{ __('messages.hr_resigned') }}</span>
+                                                                    <span class="badge bg-warning text-white">{{ __('messages.hr_resigned') }}</span>
                                                                 @else
-                                                                    <span class="badge bg-danger">{{ __('messages.hr_terminated') }}</span>
+                                                                    <span class="badge bg-danger text-white">{{ __('messages.hr_terminated') }}</span>
                                                                 @endif
                                                             </td>
                                                             <td style="text-align:center">
@@ -130,6 +132,20 @@
                                                 </tbody>
                                             </table>
                                         </div>
+                                        @if(method_exists($employees, 'links'))
+                                            <div class="card-footer d-flex align-items-center">
+                                                <p class="m-0 text-secondary">
+                                                    {{ __('messages.pagination_showing_entries', [
+                                                        'first' => $employees->firstItem(),
+                                                        'last' => $employees->lastItem(),
+                                                        'total' => $employees->total(),
+                                                    ]) }}
+                                                </p>
+                                                <div class="ms-auto">
+                                                    {{ $employees->appends(request()->query())->links('vendor.pagination.tabler') }}
+                                                </div>
+                                            </div>
+                                        @endif
                                     </div>
                                 </div>
                             </div>
@@ -200,7 +216,7 @@
                             <div class="col-md-6">
                                 <div class="mb-3">
                                     <label class="form-label fw-semibold">{{ __('messages.hr_base_salary') }} <span class="text-danger">*</span></label>
-                                    <input type="number" name="base_salary" class="form-control" step="0.01" value="0" required>
+                                    <input type="number" name="base_salary" class="form-control" value="0" required>
                                 </div>
                             </div>
                             <div class="col-md-6">
@@ -305,7 +321,7 @@
                             <div class="col-md-6">
                                 <div class="mb-3">
                                     <label class="form-label fw-semibold">{{ __('messages.hr_base_salary') }} <span class="text-danger">*</span></label>
-                                    <input type="number" name="base_salary" id="edit_base_salary" class="form-control" step="0.01" required>
+                                    <input type="number" name="base_salary" id="edit_base_salary" class="form-control" required>
                                 </div>
                             </div>
                             <div class="col-md-6">
@@ -366,7 +382,7 @@
                         <button type="submit" class="btn btn-danger">{{ __('messages.delete') }}</button>
                     </div>
                 </form>
-            </div>
+</div>
         </div>
     </div>
 @endsection

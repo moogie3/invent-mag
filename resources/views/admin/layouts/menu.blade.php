@@ -43,20 +43,21 @@
                 class="list-group-item list-group-item-action d-flex align-items-center {{ request()->routeIs('admin.users.index') || request()->routeIs('admin.users.create') || request()->routeIs('admin.users.edit') ? 'active' : '' }}">
                 <i class="ti ti-users fs-2 me-2"></i> {{ __('messages.user_management') }}
             </a>
-            <div class="list-group-item list-group-item-action d-flex align-items-center {{ request()->routeIs('admin.hr.*') ? 'active' : '' }}">
+            <a href="#" class="list-group-item list-group-item-action d-flex align-items-center" data-bs-toggle="collapse" data-bs-target="#adminCollapse" role="button" aria-expanded="{{ request()->routeIs('admin.hr.*') ? 'true' : 'false' }}">
                 <i class="ti ti-shield-cog fs-2 me-2"></i> {{ __('messages.administration') }}
-            </div>
-            <div class="list-group ms-4">
+                <i class="ti ti-chevron-down ms-auto"></i>
+            </a>
+            <div class="collapse {{ request()->routeIs('admin.hr.*') ? 'show' : '' }}" id="adminCollapse">
                 <a href="{{ route('admin.hr.employee.index') }}"
-                    class="list-group-item list-group-item-action d-flex align-items-center ps-4 {{ request()->routeIs('admin.hr.employee.*') ? 'active' : '' }}">
+                    class="list-group-item list-group-item-action d-flex align-items-center ps-5 {{ request()->routeIs('admin.hr.employee.*') ? 'active' : '' }}">
                     <i class="ti ti-id-badge fs-2 me-2"></i> {{ __('messages.hr_employees') }}
                 </a>
                 <a href="{{ route('admin.hr.attendance.index') }}"
-                    class="list-group-item list-group-item-action d-flex align-items-center ps-4 {{ request()->routeIs('admin.hr.attendance.*') ? 'active' : '' }}">
+                    class="list-group-item list-group-item-action d-flex align-items-center ps-5 {{ request()->routeIs('admin.hr.attendance.*') ? 'active' : '' }}">
                     <i class="ti ti-calendar-check fs-2 me-2"></i> {{ __('messages.hr_attendance') }}
                 </a>
                 <a href="{{ route('admin.hr.payroll.index') }}"
-                    class="list-group-item list-group-item-action d-flex align-items-center ps-4 {{ request()->routeIs('admin.hr.payroll.*') ? 'active' : '' }}">
+                    class="list-group-item list-group-item-action d-flex align-items-center ps-5 {{ request()->routeIs('admin.hr.payroll.*') ? 'active' : '' }}">
                     <i class="ti ti-wallet fs-2 me-2"></i> {{ __('messages.hr_payroll') }}
                 </a>
             </div>

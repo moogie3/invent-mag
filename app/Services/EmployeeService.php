@@ -9,7 +9,7 @@ class EmployeeService
 {
     public function getIndexData()
     {
-        $employees = Employee::all();
+        $employees = Employee::paginate(20);
         return compact('employees');
     }
 
@@ -45,9 +45,7 @@ class EmployeeService
     {
         return validator($data, [
             'name' => ['required', 'string', 'max:255'],
-            'employee_code' => ['required', 'string', 'max:50', Rule::unique('employees')->where(fn ($query) => 
-                $query->where('tenant_id', tenant('id'))
-            )->ignore($id)],
+            'employee_code' => ['required', 'string', 'max:50'],
             'department' => ['nullable', 'string', 'max:100'],
             'position' => ['nullable', 'string', 'max:100'],
             'employment_type' => ['required', 'string', 'in:permanent,contract,part_time'],

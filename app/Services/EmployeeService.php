@@ -31,7 +31,7 @@ class EmployeeService
 
     public function update(Employee $employee, array $data): Employee
     {
-        $validated = $this->validate($data, $employee->id);
+        $validated = $this->validateUpdate($data);
         $employee->update($validated);
         return $employee;
     }
@@ -50,6 +50,21 @@ class EmployeeService
             'position' => ['nullable', 'string', 'max:100'],
             'employment_type' => ['required', 'string', 'in:permanent,contract,part_time'],
             'join_date' => ['required', 'date'],
+            'bank_name' => ['nullable', 'string', 'max:100'],
+            'bank_account' => ['nullable', 'string', 'max:100'],
+            'base_salary' => ['required', 'numeric', 'min:0'],
+            'status' => ['required', 'string', 'in:active,inactive,resigned,terminated'],
+            'notes' => ['nullable', 'string'],
+        ])->validate();
+    }
+
+    protected function validateUpdate(array $data): array
+    {
+        return validator($data, [
+            'name' => ['required', 'string', 'max:255'],
+            'department' => ['nullable', 'string', 'max:100'],
+            'position' => ['nullable', 'string', 'max:100'],
+            'employment_type' => ['required', 'string', 'in:permanent,contract,part_time'],
             'bank_name' => ['nullable', 'string', 'max:100'],
             'bank_account' => ['nullable', 'string', 'max:100'],
             'base_salary' => ['required', 'numeric', 'min:0'],

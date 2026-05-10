@@ -1737,5 +1737,6 @@ return [
     'hr_total_runs' => 'Total Run',
     'hr_paid_date' => 'Tanggal Dibayar',
     'hr_employee_new' => 'Karyawan Baru',
+    'hr_employee' => 'Karyawan',
     'delete_employee_confirm' => 'Apakah Anda yakin ingin menghapus',
 ];

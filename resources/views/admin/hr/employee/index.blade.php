@@ -97,7 +97,7 @@
                                                                         data-department="{{ $employee->department }}"
                                                                         data-position="{{ $employee->position }}"
                                                                         data-employment_type="{{ $employee->employment_type }}"
-                                                                        data-join_date="{{ $employee->join_date }}"
+                                                                        data-join_date="{{ $employee->join_date instanceof \Carbon\Carbon ? $employee->join_date->format('Y-m-d') : $employee->join_date }}"
                                                                         data-base_salary="{{ $employee->base_salary }}"
                                                                         data-status="{{ $employee->status }}"
                                                                         data-bank_name="{{ $employee->bank_name }}"
@@ -275,7 +275,7 @@
                             <div class="col-md-6">
                                 <div class="mb-3">
                                     <label class="form-label fw-semibold">{{ __('messages.hr_employee_code') }} <span class="text-danger">*</span></label>
-                                    <input type="text" name="employee_code" id="edit_employee_code" class="form-control" required>
+                                    <input type="text" name="employee_code" id="edit_employee_code" class="form-control" readonly>
                                 </div>
                             </div>
                             <div class="col-md-6">
@@ -313,7 +313,7 @@
                             <div class="col-md-6">
                                 <div class="mb-3">
                                     <label class="form-label fw-semibold">{{ __('messages.hr_join_date') }} <span class="text-danger">*</span></label>
-                                    <input type="date" name="join_date" id="edit_join_date" class="form-control" required>
+                                    <input type="date" name="join_date" id="edit_join_date" class="form-control" readonly>
                                 </div>
                             </div>
                         </div>
@@ -364,56 +364,39 @@
         </div>
     </div>
 
-    <div class="modal modal-blur fade" id="deleteEmployeeModal" tabindex="-1" role="dialog" aria-hidden="true">
+<div class="modal modal-blur fade" id="deleteEmployeeModal" tabindex="-1" role="dialog" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered modal-sm">
-            <div class="modal-content">
+            <div class="modal-content border-0 shadow-lg rounded-3">
                 <div class="modal-header">
                     <h5 class="modal-title">{{ __('messages.delete') }} {{ __('messages.hr_employee') }}</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
-                <form method="POST" id="deleteEmployeeForm">
-                    @csrf
-                    @method('DELETE')
-                    <div class="modal-body">
-                        <p>{{ __('messages.delete_employee_confirm') }} <strong id="delete_employee_name"></strong>?</p>
+                <div class="modal-status bg-danger"></div>
+                <div class="modal-body text-center py-4">
+                    <i class="ti ti-alert-triangle text-danger" style="font-size: 3rem;"></i>
+                    <h3>{{ __('messages.are_you_sure') }}</h3>
+                    <div class="text-muted">{{ __('messages.delete_employee_confirm') }} <strong id="delete_employee_name"></strong>?</div>
+                </div>
+                <div class="modal-footer">
+                    <div class="w-100">
+                        <div class="row">
+                            <div class="col">
+                                <button type="button" class="btn w-100" data-bs-dismiss="modal">{{ __('messages.cancel') }}</button>
+                            </div>
+                            <div class="col">
+                                <form method="POST" id="deleteEmployeeForm">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="btn btn-danger w-100">{{ __('messages.delete') }}</button>
+                                </form>
+                            </div>
+                        </div>
                     </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ __('messages.cancel') }}</button>
-                        <button type="submit" class="btn btn-danger">{{ __('messages.delete') }}</button>
-                    </div>
-                </form>
-</div>
+                </div>
+            </div>
         </div>
     </div>
 @endsection
 
 @section('scripts')
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    const editModal = document.getElementById('editEmployeeModal');
-    editModal.addEventListener('show.bs.modal', function(e) {
-        const button = e.relatedTarget;
-        document.getElementById('edit_id').value = button.dataset.id;
-        document.getElementById('edit_employee_code').value = button.dataset.employee_code;
-        document.getElementById('edit_name').value = button.dataset.name;
-        document.getElementById('edit_department').value = button.dataset.department || '';
-        document.getElementById('edit_position').value = button.dataset.position || '';
-        document.getElementById('edit_employment_type').value = button.dataset.employment_type;
-        document.getElementById('edit_join_date').value = button.dataset.join_date;
-        document.getElementById('edit_base_salary').value = button.dataset.base_salary;
-        document.getElementById('edit_status').value = button.dataset.status;
-        document.getElementById('edit_bank_name').value = button.dataset.bank_name || '';
-        document.getElementById('edit_bank_account').value = button.dataset.bank_account || '';
-        document.getElementById('edit_notes').value = button.dataset.notes || '';
-        document.getElementById('editEmployeeForm').action = '/admin/hr/employee/' + button.dataset.id;
-    });
-
-    const deleteModal = document.getElementById('deleteEmployeeModal');
-    deleteModal.addEventListener('show.bs.modal', function(e) {
-        const button = e.relatedTarget;
-        document.getElementById('delete_employee_name').textContent = button.dataset.name;
-        document.getElementById('deleteEmployeeForm').action = '/admin/hr/employee/' + button.dataset.id;
-    });
-});
-</script>
 @endsection

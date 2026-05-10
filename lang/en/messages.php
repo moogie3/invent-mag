@@ -1743,5 +1743,6 @@ return [
     'hr_total_runs' => 'Total Runs',
     'hr_paid_date' => 'Paid Date',
     'hr_employee_new' => 'New Employee',
+    'hr_employee' => 'Employee',
     'delete_employee_confirm' => 'Are you sure you want to delete',
 ];

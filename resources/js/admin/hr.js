@@ -4,67 +4,43 @@ onPageLoad(() => {
     initEmployeeModals();
     initAttendance();
     initPayroll();
-}, { id: 'hr' });
-
-// Before Turbo snapshots the page into cache, strip the handlerAttached flags
-// so that when the cached page is restored, listeners are re-attached cleanly.
-document.addEventListener('turbo:before-cache', () => {
-    const createEmployeeModal = document.getElementById('createEmployeeModal');
-    if (createEmployeeModal) delete createEmployeeModal.dataset.handlerAttached;
-
-    const editModal = document.getElementById('editEmployeeModal');
-    if (editModal) delete editModal.dataset.handlerAttached;
-
-    const deleteModal = document.getElementById('deleteEmployeeModal');
-    if (deleteModal) delete deleteModal.dataset.handlerAttached;
-    
-    window.addAllowance = undefined;
-    window.addDeduction = undefined;
 });
 
 function initEmployeeModals() {
     const createModal = document.getElementById('createEmployeeModal');
-    if (createModal && !createModal.dataset.handlerAttached) {
-        createModal.dataset.handlerAttached = 'true';
+    if (createModal) {
         createModal.addEventListener('shown.bs.modal', function() {
             const form = createModal.querySelector('form');
             if (form) form.reset();
         });
     }
 
-    const editModal = document.getElementById('editEmployeeModal');
-    if (!editModal) return;
-
-    if (editModal.dataset.handlerAttached) return;
-    editModal.dataset.handlerAttached = 'true';
-
-    editModal.addEventListener('show.bs.modal', function(e) {
-        const button = e.relatedTarget;
-        document.getElementById('edit_id').value = button.dataset.id;
-        document.getElementById('edit_employee_code').value = button.dataset.employee_code;
-        document.getElementById('edit_name').value = button.dataset.name;
-        document.getElementById('edit_department').value = button.dataset.department || '';
-        document.getElementById('edit_position').value = button.dataset.position || '';
-        document.getElementById('edit_employment_type').value = button.dataset.employment_type;
-        document.getElementById('edit_join_date').value = button.dataset.join_date;
-        document.getElementById('edit_base_salary').value = button.dataset.base_salary;
-        document.getElementById('edit_status').value = button.dataset.status;
-        document.getElementById('edit_bank_name').value = button.dataset.bank_name || '';
-        document.getElementById('edit_bank_account').value = button.dataset.bank_account || '';
-        document.getElementById('edit_notes').value = button.dataset.notes || '';
-        document.getElementById('editEmployeeForm').action = '/admin/hr/employee/' + button.dataset.id;
+    document.querySelectorAll('[data-bs-target="#editEmployeeModal"]').forEach(btn => {
+        btn.onclick = function(e) {
+            // Use getAttribute to avoid dataset naming issues
+            const get = (attr) => this.getAttribute(attr) || '';
+            
+            document.getElementById('edit_id').value = get('data-id');
+            document.getElementById('edit_employee_code').value = get('data-employee_code');
+            document.getElementById('edit_name').value = get('data-name');
+            document.getElementById('edit_department').value = get('data-department');
+            document.getElementById('edit_position').value = get('data-position');
+            document.getElementById('edit_employment_type').value = get('data-employment_type');
+            document.getElementById('edit_join_date').value = get('data-join_date');
+            document.getElementById('edit_base_salary').value = get('data-base_salary');
+            document.getElementById('edit_status').value = get('data-status');
+            document.getElementById('edit_bank_name').value = get('data-bank_name');
+            document.getElementById('edit_bank_account').value = get('data-bank_account');
+            document.getElementById('edit_notes').value = get('data-notes');
+            document.getElementById('editEmployeeForm').action = '/admin/hr/employee/' + get('data-id');
+        };
     });
 
-    const deleteModal = document.getElementById('deleteEmployeeModal');
-    if (!deleteModal) return;
-
-    if (deleteModal.dataset.handlerAttached) return;
-    deleteModal.dataset.handlerAttached = 'true';
-
-    deleteModal.addEventListener('show.bs.modal', function(e) {
-        const button = e.relatedTarget;
-        document.getElementById('delete_employee_name').textContent = button.dataset.name;
-        document.getElementById('deleteEmployeeForm').action = '/admin/hr/employee/' + button.dataset.id;
+    document.querySelectorAll('[data-bs-target="#deleteEmployeeModal"]').forEach(btn => {
+        btn.onclick = function() {
+            document.getElementById('delete_employee_name').textContent = this.getAttribute('data-name') || '';
+            document.getElementById('deleteEmployeeForm').action = '/admin/hr/employee/' + this.getAttribute('data-id');
+        };
     });
 }
 

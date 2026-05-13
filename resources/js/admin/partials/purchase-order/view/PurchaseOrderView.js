@@ -56,7 +56,7 @@ export class PurchaseOrderView extends PurchaseOrderModule {
             this.elements.poModalEdit.href = `/admin/po/edit/${id}`;
         }
         if (this.elements.poModalFullView) {
-            this.elements.poModalFullView.href = `/admin/po/view/${id}`;
+            this.elements.poModalFullView.href = `/admin/po/show/${id}`;
         }
 
         this.elements.viewPoModalContent.innerHTML = `

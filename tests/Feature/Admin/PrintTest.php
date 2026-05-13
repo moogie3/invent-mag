@@ -51,7 +51,7 @@ class PrintTest extends TestCase
     {
         $sale = Sales::factory()->create(['is_pos' => false]);
 
-        $response = $this->get(route('admin.sales.view', $sale->id));
+        $response = $this->get(route('admin.sales.show', $sale->id));
 
         $response->assertOk();
         $response->assertSeeText(__('messages.view_sales_invoice'));
@@ -62,7 +62,7 @@ class PrintTest extends TestCase
     {
         $purchase = Purchase::factory()->create();
 
-        $response = $this->get(route('admin.po.view', $purchase->id));
+        $response = $this->get(route('admin.po.show', $purchase->id));
 
         $response->assertOk();
         $response->assertSeeText(__('messages.view_po_invoice'));

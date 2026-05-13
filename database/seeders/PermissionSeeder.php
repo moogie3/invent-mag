@@ -144,6 +144,12 @@ class PermissionSeeder extends Seeder
             'manage-employees',
             'manage-attendance',
             'manage-payroll',
+
+            // Backup (superuser only)
+            'view-backup',
+            'create-backup',
+            'delete-backup',
+            'restore-backup',
         ];
 
         $this->command->info("Creating " . count($permissions) . " permissions...");
@@ -213,6 +219,12 @@ class PermissionSeeder extends Seeder
             'view-sales-pipeline', 'manage-sales-pipelines', 'manage-pipeline-stages', 'manage-sales-opportunities',
             'view-payments', 'create-payments', 'edit-payments', 'delete-payments',
             'view-customer-interactions', 'create-customer-interactions', 'edit-customer-interactions', 'delete-customer-interactions',
+
+            // HR
+            'view-hr',
+            'manage-employees',
+            'manage-attendance',
+            'manage-payroll',
         ];
         $role->syncPermissions($permissions);
     }

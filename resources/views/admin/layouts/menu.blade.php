@@ -43,6 +43,12 @@
                 class="list-group-item list-group-item-action d-flex align-items-center {{ request()->routeIs('admin.users.index') || request()->routeIs('admin.users.create') || request()->routeIs('admin.users.edit') ? 'active' : '' }}">
                 <i class="ti ti-users fs-2 me-2"></i> {{ __('messages.user_management') }}
             </a>
+            <a href="{{ route('admin.setting.backup.index') }}"
+                class="list-group-item list-group-item-action d-flex align-items-center {{ request()->routeIs('admin.setting.backup.index') ? 'active' : '' }}">
+                <i class="ti ti-database fs-2 me-2"></i> {{ __('messages.backup') }}
+            </a>
+        @endrole
+        @can('view-hr')
             <a href="#" class="list-group-item list-group-item-action d-flex align-items-center" data-bs-toggle="collapse" data-bs-target="#adminCollapse" role="button" aria-expanded="{{ request()->routeIs('admin.hr.*') ? 'true' : 'false' }}">
                 <i class="ti ti-shield-cog fs-2 me-2"></i> {{ __('messages.administration') }}
                 <i class="ti ti-chevron-down ms-auto"></i>
@@ -61,11 +67,7 @@
                     <i class="ti ti-wallet fs-2 me-2"></i> {{ __('messages.hr_payroll') }}
                 </a>
             </div>
-            <a href="{{ route('admin.setting.backup.index') }}"
-                class="list-group-item list-group-item-action d-flex align-items-center {{ request()->routeIs('admin.setting.backup.index') ? 'active' : '' }}">
-                <i class="ti ti-database fs-2 me-2"></i> {{ __('messages.backup') }}
-            </a>
-        @endrole
+        @endcan
         <a href="#" class="list-group-item list-group-item-action d-flex align-items-center trigger-tutorial-modal-general">
             <i class="ti ti-help fs-2 me-2"></i> {{ __('messages.tutorial') }}
         </a>

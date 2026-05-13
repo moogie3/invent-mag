@@ -163,7 +163,7 @@ class PurchaseControllerTest extends TestCase
 
         $response = $this->put(route('admin.po.update', $purchase->id), $updateData);
 
-        $response->assertRedirect(route('admin.po.view', $purchase->id));
+        $response->assertRedirect(route('admin.po.show', $purchase->id));
         $response->assertSessionHas('success', 'Purchase order updated successfully.');
 
         $this->assertDatabaseHas('po', [
@@ -202,10 +202,10 @@ class PurchaseControllerTest extends TestCase
         ]);
         POItemFactory::new()->create(['po_id' => $purchase->id, 'product_id' => $this->product->id]);
 
-        $response = $this->get(route('admin.po.view', $purchase->id));
+        $response = $this->get(route('admin.po.show', $purchase->id));
 
         $response->assertStatus(200);
-        $response->assertViewIs('admin.po.purchase-view');
+        $response->assertViewIs('admin.po.show');
         $response->assertViewHas('pos', $purchase);
     }
 
@@ -226,7 +226,7 @@ class PurchaseControllerTest extends TestCase
 
         $response = $this->post(route('admin.po.add-payment', $purchase->id), $paymentData);
 
-        $response->assertRedirect(route('admin.po.view', $purchase->id));
+        $response->assertRedirect(route('admin.po.show', $purchase->id));
         $response->assertSessionHas('success', 'Payment added successfully.');
 
         $this->assertDatabaseHas('payments', [

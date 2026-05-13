@@ -318,7 +318,7 @@ class TransactionService
             'paid_amount' => $paidAmount,
             'due_amount' => $dueAmount,
             'status' => $this->getPaymentStatus($sale->status, $paidAmount, $sale->total),
-            'view_url' => route('admin.sales.view', $sale->id),
+            'view_url' => route('admin.sales.show', $sale->id),
             'edit_url' => route('admin.sales.edit', $sale->id),
         ];
         return $forExport ? $data : new TransactionDTO($data);
@@ -339,7 +339,7 @@ class TransactionService
             'paid_amount' => $paidAmount,
             'due_amount' => $dueAmount,
             'status' => $this->getPaymentStatus($purchase->status, $paidAmount, $purchase->total),
-            'view_url' => route('admin.po.view', $purchase->id),
+            'view_url' => route('admin.po.show', $purchase->id),
             'edit_url' => route('admin.po.edit', $purchase->id),
         ];
         return $forExport ? $data : new TransactionDTO($data);

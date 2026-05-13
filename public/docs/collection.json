@@ -10,7 +10,7 @@
     ],
     "info": {
         "name": "INVENT-MAG API Documentation",
-        "_postman_id": "b4be471b-6625-4ff5-b25b-d1bb93b4133f",
+        "_postman_id": "55b0d590-fe6f-44e5-bbfa-2a9fa3d6dbc6",
         "description": "",
         "schema": "https:\/\/schema.getpostman.com\/json\/collection\/v2.1.0\/collection.json"
     },
@@ -60,6 +60,59 @@
                                 {
                                     "key": "x-ratelimit-remaining",
                                     "value": "59"
+                                },
+                                {
+                                    "key": "vary",
+                                    "value": "Origin"
+                                }
+                            ],
+                            "code": 400,
+                            "body": "{\"message\":\"Invalid payload\"}",
+                            "name": ""
+                        }
+                    ]
+                },
+                {
+                    "name": "POST api\/webhook",
+                    "request": {
+                        "url": {
+                            "host": "{{baseUrl}}",
+                            "path": "api\/webhook",
+                            "query": [],
+                            "raw": "{{baseUrl}}\/api\/webhook"
+                        },
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application\/json"
+                            },
+                            {
+                                "key": "Accept",
+                                "value": "application\/json"
+                            }
+                        ],
+                        "body": null,
+                        "description": ""
+                    },
+                    "response": [
+                        {
+                            "header": [
+                                {
+                                    "key": "cache-control",
+                                    "value": "no-cache, private"
+                                },
+                                {
+                                    "key": "content-type",
+                                    "value": "application\/json"
+                                },
+                                {
+                                    "key": "x-ratelimit-limit",
+                                    "value": "60"
+                                },
+                                {
+                                    "key": "x-ratelimit-remaining",
+                                    "value": "58"
                                 },
                                 {
                                     "key": "vary",
@@ -195,7 +248,7 @@
                         ],
                         "body": {
                             "mode": "raw",
-                            "raw": "{\"name\":\"vmqeopfuudtdsufvyvddq\",\"shopname\":\"amniihfqcoynlazghdtqt\",\"email\":\"andreanne00@example.org\",\"password\":\"O[2UZ5ij-e\\\/dl4m{o,\",\"plan\":\"professional\"}"
+                            "raw": "{\"name\":\"vmqeopfuudtdsufvyvddq\",\"shopname\":\"amniihfqcoynlazghdtqt\",\"email\":\"andreanne00@example.org\",\"password\":\"O[2UZ5ij-e\\\/dl4m{o,\",\"plan\":\"enterprise\"}"
                         },
                         "description": ""
                     },

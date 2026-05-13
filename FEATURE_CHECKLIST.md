@@ -93,6 +93,21 @@
 - [x] Audit trail for all counts
 - [x] Complete workflow (Draft → In Progress → Completed/Canceled)
 
+### 🔄 Stock Transfer (All Plans)
+
+- [x] Warehouse-to-warehouse stock transfer
+- [x] Source/destination warehouse selection
+- [x] Real-time available stock display per warehouse
+- [x] Quantity and reason entry
+- [x] Automatic stock decrement from source warehouse
+- [x] Automatic stock increment to destination warehouse
+- [x] Dual StockAdjustment records with `adjustment_type = 'transfer'`
+- [x] Adjustment log integration
+- [x] Activity log tracking (MODULE_STOCK_TRANSFER)
+- [x] Demo data seeder (`StockTransferSeeder`)
+- [x] Full test suite (`StockTransferControllerTest` — 7 tests)
+- [x] Linked from product edit page and adjustment log page
+
 ---
 
 ### 💰 Sales Management
@@ -136,7 +151,7 @@
 
 ---
 
-### 🏪 Point of Sale (POS)
+### 🏪 Point of Sale (POS) (All Plans)
 
 - [x] Dedicated POS interface
 - [x] Barcode scanning
@@ -266,6 +281,38 @@
 - [x] Recurring journal entry infrastructure
 - [x] Journal entry approval workflow
 - [x] Comprehensive accounting audit log
+
+---
+
+### 👥 HR & Payroll (Professional + Enterprise)
+
+#### Employee Management
+- [x] Employee profile CRUD (Name, Code, Department, Position, Type)
+- [x] Base salary & banking details tracking
+- [x] Employment status tracking (Active, Resigned, etc.)
+- [x] **Default Allowances & Deductions** per employee
+- [x] Employee history tracking
+
+#### Attendance Tracking
+- [x] Monthly attendance period management
+- [x] Open / Close periods workflow
+- [x] **Configurable Working Days** per month (flexible for Mon-Fri vs Mon-Sat work weeks)
+- [x] Interactive daily grid (Present, Absent, Sick, Leave, Holiday, Half Day)
+- [x] Fast individual entry via keyboard
+- [x] **Bulk Fill** tool for massive attendance updates
+- [x] Custom "Skip Days" selector (e.g. automatically skip weekends during bulk fill)
+- [x] Overtime hours tracking
+
+#### Payroll Engine
+- [x] Automated monthly payroll generation
+- [x] **Salaried Proration Engine:** Auto-deducts pay for unpaid absences: `(Base Salary / Total Working Days) * Absent Days`
+- [x] Half-day proration support
+- [x] Auto-populates recurring default allowances and deductions
+- [x] Draft payslip editing
+- [x] **Two-Step Accounting Flow:**
+  - [x] *Step 1 (Approve):* Creates Accrual Journal Entry (`Debit: Salary Expense, Credit: Salary Payable`)
+  - [x] *Step 2 (Pay):* Select specific bank account and creates Payment Journal Entry (`Debit: Salary Payable, Credit: Bank`)
+- [x] PDF Payslip generation and download
 
 ---
 

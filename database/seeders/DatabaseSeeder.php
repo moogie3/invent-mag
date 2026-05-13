@@ -109,6 +109,9 @@ class DatabaseSeeder extends Seeder
                 ManualJournalEntrySeeder::class,
                 ActivityLogSeeder::class,
                 CreditFeatureSeeder::class,
+                EmployeeSeeder::class,
+                AttendanceSeeder::class,
+                PayrollSeeder::class,
             ]);
         }
 

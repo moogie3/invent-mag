@@ -33,6 +33,62 @@ function initEmployeeModals() {
             document.getElementById('edit_bank_account').value = get('data-bank_account');
             document.getElementById('edit_notes').value = get('data-notes');
             document.getElementById('editEmployeeForm').action = '/admin/hr/employee/' + get('data-id');
+
+            // Populate allowances
+            const allowancesContainer = document.getElementById('edit-allowances-container');
+            if (allowancesContainer) {
+                allowancesContainer.innerHTML = '';
+                try {
+                    const allowances = JSON.parse(get('data-allowances'));
+                    if (Array.isArray(allowances)) {
+                        allowances.forEach((al, idx) => {
+                            const div = document.createElement('div');
+                            div.className = 'row mb-2';
+                            div.innerHTML = `
+                                <div class="col-6">
+                                    <input type="text" name="default_allowances[${idx}][label]" class="form-control" value="${al.label}" required>
+                                </div>
+                                <div class="col-4">
+                                    <input type="number" name="default_allowances[${idx}][amount]" class="form-control" value="${al.amount}" step="0.01" required>
+                                </div>
+                                <div class="col-2">
+                                    <button type="button" class="btn btn-danger btn-remove-row"><i class="ti ti-trash"></i></button>
+                                </div>
+                            `;
+                            allowancesContainer.appendChild(div);
+                            div.querySelector('.btn-remove-row').addEventListener('click', function() { div.remove(); });
+                        });
+                    }
+                } catch(e) {}
+            }
+
+            // Populate deductions
+            const deductionsContainer = document.getElementById('edit-deductions-container');
+            if (deductionsContainer) {
+                deductionsContainer.innerHTML = '';
+                try {
+                    const deductions = JSON.parse(get('data-deductions'));
+                    if (Array.isArray(deductions)) {
+                        deductions.forEach((ded, idx) => {
+                            const div = document.createElement('div');
+                            div.className = 'row mb-2';
+                            div.innerHTML = `
+                                <div class="col-6">
+                                    <input type="text" name="default_deductions[${idx}][label]" class="form-control" value="${ded.label}" required>
+                                </div>
+                                <div class="col-4">
+                                    <input type="number" name="default_deductions[${idx}][amount]" class="form-control" value="${ded.amount}" step="0.01" required>
+                                </div>
+                                <div class="col-2">
+                                    <button type="button" class="btn btn-danger btn-remove-row"><i class="ti ti-trash"></i></button>
+                                </div>
+                            `;
+                            deductionsContainer.appendChild(div);
+                            div.querySelector('.btn-remove-row').addEventListener('click', function() { div.remove(); });
+                        });
+                    }
+                } catch(e) {}
+            }
         };
     });
 
@@ -68,6 +124,7 @@ function initAttendance() {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
+                    'Accept': 'application/json',
                     'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
                 },
                 body: JSON.stringify({
@@ -81,7 +138,31 @@ function initAttendance() {
             .then(data => {
                 if (data.success) {
                     showToast(data.message || 'Record updated');
+                    // Update UI with badge
+                    const badgeClasses = {
+                        'present': 'bg-success text-white',
+                        'absent': 'bg-danger text-white',
+                        'sick': 'bg-warning text-white',
+                        'leave': 'bg-info text-white',
+                        'holiday': 'bg-secondary text-white',
+                        'half_day': 'bg-primary text-white'
+                    };
+                    const labels = {
+                        'present': 'P',
+                        'absent': 'A',
+                        'sick': 'S',
+                        'leave': 'L',
+                        'holiday': 'H',
+                        'half_day': '½'
+                    };
+                    this.innerHTML = `<span class="badge ${badgeClasses[mappedStatus]}">${labels[mappedStatus]}</span>`;
+                } else {
+                    showToast(data.message || 'Error updating record', 'error');
                 }
+            })
+            .catch(err => {
+                console.error(err);
+                showToast('Error saving attendance', 'error');
             });
         });
     });
@@ -90,18 +171,20 @@ function initAttendance() {
 function initPayroll() {
     if (window.addAllowance) return;
 
-    window.addAllowance = function(itemId) {
-        const container = document.getElementById(`allowances-container${itemId}`);
+    window.addAllowance = function(containerId, inputName = 'allowances') {
+        // Support old format (itemId) or new format (containerId string)
+        const id = typeof containerId === 'number' || !isNaN(containerId) ? `allowances-container${containerId}` : containerId;
+        const container = document.getElementById(id);
         if (!container) return;
         const idx = container.querySelectorAll('.row').length;
         const div = document.createElement('div');
         div.className = 'row mb-2';
         div.innerHTML = `
             <div class="col-6">
-                <input type="text" name="allowances[${idx}][label]" class="form-control" placeholder="Label">
+                <input type="text" name="${inputName}[${idx}][label]" class="form-control" placeholder="Label" required>
             </div>
             <div class="col-4">
-                <input type="number" name="allowances[${idx}][amount]" class="form-control" value="0" step="0.01">
+                <input type="number" name="${inputName}[${idx}][amount]" class="form-control" value="0" step="0.01" required>
             </div>
             <div class="col-2">
                 <button type="button" class="btn btn-danger btn-remove-row"><i class="ti ti-trash"></i></button>
@@ -113,18 +196,19 @@ function initPayroll() {
         });
     };
 
-    window.addDeduction = function(itemId) {
-        const container = document.getElementById(`deductions-container${itemId}`);
+    window.addDeduction = function(containerId, inputName = 'deductions') {
+        const id = typeof containerId === 'number' || !isNaN(containerId) ? `deductions-container${containerId}` : containerId;
+        const container = document.getElementById(id);
         if (!container) return;
         const idx = container.querySelectorAll('.row').length;
         const div = document.createElement('div');
         div.className = 'row mb-2';
         div.innerHTML = `
             <div class="col-6">
-                <input type="text" name="deductions[${idx}][label]" class="form-control" placeholder="Label">
+                <input type="text" name="${inputName}[${idx}][label]" class="form-control" placeholder="Label" required>
             </div>
             <div class="col-4">
-                <input type="number" name="deductions[${idx}][amount]" class="form-control" value="0" step="0.01">
+                <input type="number" name="${inputName}[${idx}][amount]" class="form-control" value="0" step="0.01" required>
             </div>
             <div class="col-2">
                 <button type="button" class="btn btn-danger btn-remove-row"><i class="ti ti-trash"></i></button>
@@ -144,3 +228,135 @@ function showToast(message) {
         console.log(message);
     }
 }
+
+// --- Export functions ---
+
+window.exportEmployees = function (exportOption) {
+    const form = document.createElement('form');
+    form.method = 'POST';
+    form.action = '/admin/hr/employee/export';
+    form.style.display = 'none';
+
+    const csrfToken = document.querySelector('meta[name="csrf-token"]');
+    if (csrfToken) {
+        const input = document.createElement('input');
+        input.type = 'hidden';
+        input.name = '_token';
+        input.value = csrfToken.getAttribute('content');
+        form.appendChild(input);
+    }
+
+    const optionInput = document.createElement('input');
+    optionInput.type = 'hidden';
+    optionInput.name = 'export_option';
+    optionInput.value = exportOption;
+    form.appendChild(optionInput);
+
+    document.body.appendChild(form);
+    form.submit();
+    setTimeout(() => document.body.removeChild(form), 2000);
+};
+
+window.exportAttendancePeriods = function (exportOption) {
+    const form = document.createElement('form');
+    form.method = 'POST';
+    form.action = '/admin/hr/attendance/export';
+    form.style.display = 'none';
+
+    const csrfToken = document.querySelector('meta[name="csrf-token"]');
+    if (csrfToken) {
+        const input = document.createElement('input');
+        input.type = 'hidden';
+        input.name = '_token';
+        input.value = csrfToken.getAttribute('content');
+        form.appendChild(input);
+    }
+
+    const optionInput = document.createElement('input');
+    optionInput.type = 'hidden';
+    optionInput.name = 'export_option';
+    optionInput.value = exportOption;
+    form.appendChild(optionInput);
+
+    document.body.appendChild(form);
+    form.submit();
+    setTimeout(() => document.body.removeChild(form), 2000);
+};
+
+window.exportPayrollRuns = function (exportOption) {
+    const form = document.createElement('form');
+    form.method = 'POST';
+    form.action = '/admin/hr/payroll/export';
+    form.style.display = 'none';
+
+    const csrfToken = document.querySelector('meta[name="csrf-token"]');
+    if (csrfToken) {
+        const input = document.createElement('input');
+        input.type = 'hidden';
+        input.name = '_token';
+        input.value = csrfToken.getAttribute('content');
+        form.appendChild(input);
+    }
+
+    const optionInput = document.createElement('input');
+    optionInput.type = 'hidden';
+    optionInput.name = 'export_option';
+    optionInput.value = exportOption;
+    form.appendChild(optionInput);
+
+    document.body.appendChild(form);
+    form.submit();
+    setTimeout(() => document.body.removeChild(form), 2000);
+};
+
+window.exportAttendancePeriod = function (periodId, exportOption) {
+    const form = document.createElement('form');
+    form.method = 'POST';
+    form.action = `/admin/hr/attendance/${periodId}/export`;
+    form.style.display = 'none';
+
+    const csrfToken = document.querySelector('meta[name="csrf-token"]');
+    if (csrfToken) {
+        const input = document.createElement('input');
+        input.type = 'hidden';
+        input.name = '_token';
+        input.value = csrfToken.getAttribute('content');
+        form.appendChild(input);
+    }
+
+    const optionInput = document.createElement('input');
+    optionInput.type = 'hidden';
+    optionInput.name = 'export_option';
+    optionInput.value = exportOption;
+    form.appendChild(optionInput);
+
+    document.body.appendChild(form);
+    form.submit();
+    setTimeout(() => document.body.removeChild(form), 2000);
+};
+
+window.exportPayrollRun = function (runId, exportOption) {
+    const form = document.createElement('form');
+    form.method = 'POST';
+    form.action = `/admin/hr/payroll/${runId}/export`;
+    form.style.display = 'none';
+
+    const csrfToken = document.querySelector('meta[name="csrf-token"]');
+    if (csrfToken) {
+        const input = document.createElement('input');
+        input.type = 'hidden';
+        input.name = '_token';
+        input.value = csrfToken.getAttribute('content');
+        form.appendChild(input);
+    }
+
+    const optionInput = document.createElement('input');
+    optionInput.type = 'hidden';
+    optionInput.name = 'export_option';
+    optionInput.value = exportOption;
+    form.appendChild(optionInput);
+
+    document.body.appendChild(form);
+    form.submit();
+    setTimeout(() => document.body.removeChild(form), 2000);
+};

@@ -189,6 +189,6 @@ class Purchase extends Model
          */
         public function path(): string
         {
-            return route('admin.po.view', $this);
+            return route('admin.po.show', $this);
         }
     }

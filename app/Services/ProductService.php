@@ -38,12 +38,12 @@ class ProductService
         }
 
         $paginator = $query->paginate($entries);
-        
+
         // Remove expensive appends for the listing
         $paginator->getCollection()->each->setAppends([]);
-        
+
         // Pre-fetch the main warehouse to avoid doing it N times per product in the loop
-        $mainWarehouseId = \App\Models\Warehouse::where('is_main', true)->value('id');
+        $mainWarehouseId = Warehouse::where('is_main', true)->value('id');
 
         // Manually assign total_stock to avoid hitting the accessors and DB
         $paginator->getCollection()->each(function ($product) use ($mainWarehouseId) {
@@ -68,7 +68,7 @@ class ProductService
             'suppliers' => Supplier::all(),
             'warehouses' => Warehouse::all(),
             'mainWarehouse' => Warehouse::where('is_main', true)->first(),
-            'lowStockProducts' => Product::getLowStockProducts(), 
+            'lowStockProducts' => Product::getLowStockProducts(),
         ];
     }
 
@@ -106,7 +106,7 @@ class ProductService
     public function updateProduct(Product $product, array $data)
     {
         $data['has_expiry'] = !empty($data['has_expiry']);
-        
+
         // warehouse_id is no longer updatable on the product itself
         unset($data['warehouse_id']);
 
@@ -173,7 +173,7 @@ class ProductService
     public function bulkExportProducts(array $filters, ?array $ids, string $exportOption)
     {
         $query = Product::with(['category', 'supplier', 'unit', 'warehouses']);
-        
+
         if ($ids) {
             $query->whereIn('id', $ids);
         } else {
@@ -290,7 +290,7 @@ class ProductService
         DB::transaction(function () use ($updates, $reason, $adjustedBy, $targetWarehouse, &$updatedCount, &$stockChanges) {
             foreach ($updates as $update) {
                 $product = Product::findOrFail($update['id']);
-                
+
                 $stockRecord = ProductWarehouse::firstOrCreate(
                     ['product_id' => $product->id, 'warehouse_id' => $targetWarehouse->id, 'tenant_id' => $product->tenant_id],
                     ['quantity' => 0]
@@ -351,7 +351,7 @@ class ProductService
         if (!$warehouseId) {
             $warehouseId = Product::getMainWarehouseId();
         }
-        
+
         if (!$warehouseId) {
              throw new \Exception('No warehouse specified and no main warehouse found.');
         }
@@ -375,7 +375,7 @@ class ProductService
         }
 
         DB::transaction(function () use ($product, $adjustmentAmount, $adjustmentType, $reason, $adjustedBy, $warehouseId, &$quantityBefore, &$quantityAfter) {
-            
+
             $stockRecord = ProductWarehouse::firstOrCreate(
                 ['product_id' => $product->id, 'warehouse_id' => $warehouseId, 'tenant_id' => $product->tenant_id],
                 ['quantity' => 0]

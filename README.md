@@ -75,6 +75,15 @@ Experience Invent-MAG firsthand:
 - **Accounting Integration:** Creates journal entries for shortages (expense) and excess (revenue)
 - **Audit Trail:** Full history of all counts and adjustments
 
+#### Stock Transfer (All Plans)
+
+- **Warehouse-to-Warehouse Transfer:** Move stock between warehouses with quantity and reason entry
+- **Real-Time Stock Display:** Shows available quantity for each product when selecting source warehouse
+- **Automatic Adjustment:** Source warehouse decremented, destination warehouse incremented automatically
+- **Dual Audit Records:** Two StockAdjustment records created with `adjustment_type = 'transfer'`
+- **Adjustment Log Integration:** All transfers visible in the adjustment log report
+- **Linked from Product Edit:** Quick access to stock transfer from product warehouse stock section
+
 ---
 
 ### **💰 Sales & Customer Management (CRM)**
@@ -82,9 +91,9 @@ Experience Invent-MAG firsthand:
 #### Sales Operations
 
 - **Sales Order Management:** Full lifecycle from quote to payment
-- **Point of Sale (POS):** Dedicated interface with receipt printing
+- **Point of Sale (POS):** Dedicated interface with receipt printing **(All Plans)**
 - **Multiple Payment Methods:** Cash, card, transfer per transaction
-- **Sales Returns:** Complete returns workflow with configurable accounting entries
+- **Sales Returns:** Complete returns workflow with configurable accounting entries **(All Plans)**
 - **Invoice Generation:** PDF invoice creation
 - **Consistent Payment Status Labels:** Paid, Partially Paid, Unpaid (Pending / Due Today / Due in X Days / Overdue), Returned
 - **Customer Credit Notes:** Auto-created when return is Completed AND original invoice is Paid
@@ -124,7 +133,7 @@ Experience Invent-MAG firsthand:
 
 - **Purchase Order Management:** Full CRUD with stock reconciliation
 - **Multi-warehouse Receiving:** Receive to specific warehouses
-- **Purchase Returns:** Complete returns to suppliers with stock and accounting adjustments
+- **Purchase Returns:** Complete returns to suppliers with stock and accounting adjustments **(All Plans)**
 - **Expiry Date Tracking:** Monitor product expiration dates
 - **Consistent Payment Status Labels:** Paid, Partially Paid, Pending (Due Today / Due in X Days / Overdue), Returned
 - **Autofill Info:** Past price & due date auto-filled from supplier history on PO creation
@@ -143,7 +152,7 @@ Experience Invent-MAG firsthand:
 #### Subscription Tiers
 
 - **Starter Plan:** Basic features, limited users (3), warehouses (1), products (100) - $19/mo
-- **Professional Plan:** Advanced features, higher limits (10 users, unlimited warehouses, 500 products), includes POS, **Stock Opname**, Accounting, CRM - $59/mo
+- **Professional Plan:** Advanced features, higher limits (10 users, unlimited warehouses, 500 products), includes **Stock Opname**, Accounting, CRM, HR & Payroll - $59/mo
 - **Enterprise Plan:** Full access, unlimited users, warehouses, products, plus sales forecasting, RESTful API, and audit trail - $109/mo
 
 #### Features
@@ -207,6 +216,29 @@ Experience Invent-MAG firsthand:
 - **Opening Balances Module:** Step-by-step setup wizard for initializing new fiscal year accounts.
 - **Recurring Entries:** Infrastructure for automated recurring journals
 - **Audit Logging:** Complete accounting audit trail
+
+---
+
+### **👥 HR & Payroll System (Professional + Enterprise)**
+
+#### Employee Management
+- **Employee Profiles:** Complete CRUD for staff details, department, and positions.
+- **Compensation Configuration:** Track base salary and banking details.
+- **Recurring Defaults:** Set default monthly allowances (e.g., Transport) and deductions (e.g., Insurance) that auto-populate into payroll.
+
+#### Time & Attendance
+- **Attendance Periods:** Manage monthly tracking periods (Open/Closed workflows).
+- **Flexible Work Weeks:** Define exact Total Working Days per month (supports standard Mon-Fri or custom Mon-Sat setups).
+- **Interactive Grid:** Fast, keyboard-friendly daily status logging (Present, Absent, Sick, Leave, Holiday, Half Day).
+- **Bulk Operations:** Instantly fill attendance for multiple employees while skipping specific days (like weekends).
+
+#### Payroll Engine
+- **Automated Calculations:** Instantly calculate Gross and Net pay based on attendance records.
+- **Salaried Proration:** Auto-calculates an "Absence Deduction" for any unpaid/unrecorded days using formula: `(Base Salary / Total Working Days) * Absent Days`.
+- **Two-Step Accounting Sync:**
+  - **Approve Payroll:** Locks the draft and creates Accrual Journal Entry (`Debit: Salary Expense, Credit: Salary Payable`).
+  - **Record Payment:** Select disbursement bank account to create Payment Journal Entry (`Debit: Salary Payable, Credit: Bank`).
+- **Payslip Generation:** Export beautiful PDF payslips for distribution.
 
 ---
 
@@ -546,6 +578,54 @@ docker-compose exec app php artisan migrate --seed
 - 🔄 Advanced Multi-Currency
 - 🔄 Indonesian Tax Compliance (PPN, e-Faktur)
 - 🔄 Mobile Application
+
+---
+
+## 📁 Project Structure
+
+```
+invent-mag/
+├── app/
+│   ├── Console/
+│   │   └── Commands/          # Artisan commands (backup:tenant, etc.)
+│   ├── Http/
+│   │   ├── Controllers/
+│   │   │   └── Admin/
+│   │   │       ├── Accounting/  # Chart of Accounts, Journal, Reports
+│   │   │       ├── Hr/          # Employee, Attendance, Payroll, Payslip
+│   │   │       └── ...          # Product, Sales, Purchase, POS, etc.
+│   │   └── Middleware/          # plan.feature, role, permission middleware
+│   ├── Models/                  # Eloquent models (multitenant-scoped)
+│   └── Services/                # Business logic layer (Dompdf exports, etc.)
+├── bootstrap/
+├── config/
+│   ├── navigation.php           # Sidebar menu structure & permissions
+│   └── plans.php                # Plan features & limits
+├── database/
+│   ├── migrations/              # 50+ migration files
+│   └── seeders/                 # PermissionSeeder, demo data seeders
+├── lang/
+│   ├── en/                      # English translations (messages.php)
+│   └── id/                      # Indonesian translations (messages.php)
+├── resources/
+│   ├── js/
+│   │   └── admin/
+│   │       ├── hr.js            # HR module JS
+│   │       └── reports/         # Stock transfer, adjustment log JS
+│   └── views/
+│       └── admin/
+│           ├── hr/              # employee, attendance, payroll views
+│           ├── reports/         # stock-transfer, adjustment-log views
+│           ├── layouts/         # menu, sidebar, modals, partials
+│           └── settings/        # backup, plan settings
+├── routes/
+│   └── web.php                  # All web routes (750+ lines)
+├── tests/
+│   └── Feature/
+│       ├── Admin/               # StockTransferControllerTest, etc.
+│       └── HrFeatureTest.php    # HR feature tests
+└── docker-compose.yml
+```
 
 ---
 

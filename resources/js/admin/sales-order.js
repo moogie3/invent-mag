@@ -237,7 +237,7 @@ onPageLoad(function () {
                             <td class="text-center">${escapeHtml(sale.due_date)}</td>
                             <td class="text-end">${escapeHtml(sale.total)}</td>
                             <td class="text-end">
-                                <a href="/admin/sales/view/${
+                                <a href="/admin/sales/show/${
                                     sale.id
                                 }" class="btn btn-sm btn-primary">
                                     <i class="ti ti-eye me-1"></i> View

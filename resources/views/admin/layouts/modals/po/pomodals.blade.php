@@ -224,7 +224,7 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <a href="{{ route('admin.po.view', $pos->id) }}"
+                    <a href="{{ route('admin.po.show', $pos->id) }}"
                         class="btn btn-primary w-100">{{ __('messages.po_modal_paid_view_invoice_button') }}</a>
                 </div>
             </div>

@@ -149,7 +149,8 @@ return $dompdf->stream('FP-' . $faktur->nsfp . '.pdf', ['Attachment' => false]);
 | Sales & purchase orders | ✅ Live | `Sales` + `Purchase` models |
 | Invoice generation (PDF) | ✅ Live | Dompdf via `SalesService::printInvoice()` |
 | Dashboard & basic reports | ✅ Live | |
-| **POS** | ❌ Not included | Feature slug: `pos` |
+| **POS** | ✅ Included | Feature slug: `pos` |
+| **Sales & purchase returns** | ✅ Included | Feature slugs: `sales_returns`, `purchase_returns` |
 | **Full accounting suite** | ❌ Not included | Feature slug: `accounting` |
 | **CRM & sales pipeline** | ❌ Not included | Feature slug: `crm` |
 | **Stock Opname** | ❌ Not included | Feature slug: `stock_opname` |
@@ -174,6 +175,7 @@ return $dompdf->stream('FP-' . $faktur->nsfp . '.pdf', ['Attachment' => false]);
 | Financial reports & multi-currency | ✅ Live | |
 | Stock Opname & Auditing | ✅ Live | Feature slug: `stock_opname` |
 | Sales & purchase returns | ✅ Live | |
+| **HR & Payroll** | ✅ Live | Feature slug: `hr` |
 | **Sales forecasting (AI)** | ❌ Not included | Enterprise only |
 | **RESTful API** | ❌ Not included | Enterprise only |
 
@@ -190,6 +192,7 @@ return $dompdf->stream('FP-' . $faktur->nsfp . '.pdf', ['Attachment' => false]);
 | RESTful API (Scribe-documented) | ✅ Live | Feature slug: `api` |
 | Audit trail & compliance logging | ✅ Live | Feature slug: `audit_log` |
 | Custom roles & 79 granular permissions | ✅ Live | Spatie Permission |
+| **HR & Payroll** | ✅ Live | Feature slug: `hr` |
 | Dedicated support & SLA | ✅ Live | |
 
 ---
@@ -214,8 +217,9 @@ return $dompdf->stream('FP-' . $faktur->nsfp . '.pdf', ['Attachment' => false]);
 | Users | 3 | 10 | 1 |
 | Billing | Monthly | Monthly | **Annual only** |
 | Accounting | ❌ | ✅ | ✅ |
+| Sales & purchase returns | ✅ | ✅ | ✅ |
 | CRM / Pipeline | ❌ | ✅ | ❌ |
-| POS | ❌ | ✅ | ❌ |
+| POS | ✅ | ✅ | ❌ |
 | AI Forecasting | ❌ | ❌ | ❌ |
 | e-Faktur (DJP) | 🔜 | 🔜 | CSV only |
 | REST API | ❌ | ❌ | ❌ |
@@ -1737,7 +1741,8 @@ Tax double-submissions to DJP are a legal problem. Protection at 5 levels:
 | Billing Flexibility | Monthly ✅ | Monthly ✅ | Annual only ❌ |
 | Accounting (double-entry) | ❌ | ✅ | ✅ |
 | CRM / Pipeline | ❌ | ✅ | ❌ |
-| POS | ❌ | ✅ | ❌ |
+| Sales & purchase returns | ✅ | ✅ | Limited |
+| POS | ✅ | ✅ | ❌ |
 | Stock Opname | ❌ | ✅ | Limited |
 | Multi-currency | ❌ | ✅ | ✅ (paid add-on) |
 | AI Sales Forecasting | ❌ | ❌ | ❌ |

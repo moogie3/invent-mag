@@ -59,7 +59,7 @@
                                             <div><strong>{{ __('messages.sr_original_sale') }}</strong></div>
                                             <div>
                                                 @if ($salesReturn->sale)
-                                                    <a href="{{ route('admin.sales.view', $salesReturn->sales_id) }}">#{{ $salesReturn->sale->invoice }}</a>
+                                                    <a href="{{ route('admin.sales.show', $salesReturn->sales_id) }}">#{{ $salesReturn->sale->invoice }}</a>
                                                 @else
                                                     {{ __('messages.not_available') }}
                                                 @endif

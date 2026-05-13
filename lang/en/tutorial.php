@@ -301,6 +301,42 @@ return [
     'debit_info_por' => 'Debit Information: If a debit note was created, view the debit details.',
     'print_por' => 'Print: Use the Print button to generate a PDF of the return slip.',
 
+    // HR Employee
+    'hr_employee' => 'Employee Management',
+    'hr_employee_desc' => 'Manage your company employees, including their personal info, department, position, salary and bank details.',
+    'hr_employee_step_1' => 'Add Employee: Click "Add New" to create a new employee profile. Fill in the required fields like Name, Employee Code, and Employment Type.',
+    'hr_employee_step_2' => 'Salary & Bank: Enter the base salary and bank account information which will be used during Payroll runs.',
+    'hr_employee_step_3' => 'Employment Status: You can set the status as Active, Inactive, Resigned, or Terminated. Only Active employees will appear in Attendance tracking.',
+    'hr_employee_step_4' => 'Edit & Delete: Use the action buttons on the right side of the table to update employee records or delete them.',
+
+    // HR Attendance
+    'hr_attendance' => 'Attendance Management',
+    'hr_attendance_desc' => 'Track and manage employee attendance by monthly periods. Open new periods to start tracking daily attendance.',
+    'hr_attendance_step_1' => 'Open Period: Click "Open Period" to start tracking attendance for a new month. You select the Year and Month.',
+    'hr_attendance_step_2' => 'View Period: Click the eye icon to view the daily attendance grid for a specific month.',
+    'hr_attendance_step_3' => 'Close Period: Once a month is complete and verified, you can close the period to prevent further edits. This is usually done before running payroll.',
+    
+    'hr_attendance_details' => 'Attendance Tracker',
+    'hr_attendance_details_desc' => 'Mark employee attendance for each day of the month.',
+    'hr_attendance_details_step_1' => 'Individual Edit: Click on any empty cell in the grid and type a status code: P (Present), A (Absent), S (Sick), L (Leave), H (Holiday), or ½ (Half Day). Click away to auto-save.',
+    'hr_attendance_details_step_2' => 'Off Days: Weekends (Saturdays and Sundays) are grayed out by default, but you can still click and edit them if someone works on a weekend.',
+    'hr_attendance_details_step_3' => 'Bulk Fill: Use the Bulk Fill button to quickly mark multiple employees with the same status (e.g. Present) for the entire month. You can customize which days to skip (like weekends).',
+    'hr_attendance_details_step_4' => 'Overtime: The Bulk Fill modal also allows you to record overtime hours for the selected employees.',
+
+    // HR Payroll
+    'hr_payroll' => 'Payroll Management',
+    'hr_payroll_desc' => 'Generate and process monthly payroll based on attendance data and default allowances/deductions.',
+    'hr_payroll_step_1' => 'Run Payroll: Click "Run Payroll" and select an attendance period. The system will automatically calculate pro-rated salaries, overtime pay, and pull default allowances/deductions.',
+    'hr_payroll_step_2' => 'Proration Math: Employees are treated as salaried. Paid Days = Present, Sick, Leave, Holiday. Unpaid = Absent. If an employee is absent, the system auto-calculates an "Absence Deduction" and subtracts it from their gross pay.',
+    
+    'hr_payroll_details' => 'Payroll Details & Accounting',
+    'hr_payroll_details_desc' => 'Review individual payslips and process the two-step accounting flow. To remove a payroll run, click the red Delete button (only available while in Draft).',
+    'hr_payroll_details_step_1' => 'Edit Drafts: While the run is in "Draft" status, you can click the edit button on any employee to manually adjust their allowances and deductions for this month. Or click Delete to completely delete the run and redo it.',
+    'hr_payroll_details_step_2' => 'Proration Logic: Check the Net Pay! It automatically calculates deductions for unrecorded days or explicit absences based on the formula: (Base Salary ÷ Total Working Days) × Absent Days.',
+    'hr_payroll_details_step_3' => 'Two-Step Accounting (Step 1): Once reviewed, click "Approve Payroll". This locks the payroll and creates an Accrual Journal Entry (Debit: Salary Expense, Credit: Salary Payable liability) in your General Ledger to record the expense accurately.',
+    'hr_payroll_details_step_4' => 'Two-Step Accounting (Step 2): On payday, click "Record Payment" and select the source Bank/Cash account. This creates the Payment Journal Entry (Debit: Salary Payable, Credit: Bank/Cash) to clear the liability and reflect cash outflow.',
+    'hr_payroll_details_step_5' => 'Payslips: After the payroll is Paid, you can generate and download beautiful PDF payslips for each employee.',
+
     // POS
     'pos' => 'Point of Sales (POS)',
     'pos_desc' => 'Process retail sales transactions with product selection, cart management, and multiple payment options.',

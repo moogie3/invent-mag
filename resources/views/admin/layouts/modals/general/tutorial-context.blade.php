@@ -194,7 +194,7 @@
             __('tutorial.track_returns_po'),
             __('tutorial.save_po')
         ];
-    } elseif ($routeName === 'admin.sales.view') {
+    } elseif ($routeName === 'admin.sales.show') {
         $contextTitle = __('tutorial.view_sales_order');
         $contextIcon = 'ti-eye';
         $contextDesc = __('tutorial.view_sales_order_desc');
@@ -208,7 +208,7 @@
             __('tutorial.create_return_link'),
             __('tutorial.actions_sales')
         ];
-    } elseif ($routeName === 'admin.po.view') {
+    } elseif ($routeName === 'admin.po.show') {
         $contextTitle = __('tutorial.view_purchase_order');
         $contextIcon = 'ti-eye';
         $contextDesc = __('tutorial.view_purchase_order_desc');

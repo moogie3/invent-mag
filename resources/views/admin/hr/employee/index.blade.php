@@ -38,6 +38,24 @@
                                                     </div>
                                                 </div>
                                                 <div class="btn-list">
+                                                    <div class="dropdown d-inline-block me-2">
+                                                        <button class="btn btn-secondary dropdown-toggle" type="button"
+                                                            id="exportDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                                                            <i class="ti ti-download me-2"></i> {{ __('messages.export') }}
+                                                        </button>
+                                                        <ul class="dropdown-menu" aria-labelledby="exportDropdown">
+                                                            <li>
+                                                                <a class="dropdown-item" href="#" onclick="exportEmployees('pdf'); return false;">
+                                                                    {{ __('messages.export_as_pdf') }}
+                                                                </a>
+                                                            </li>
+                                                            <li>
+                                                                <a class="dropdown-item" href="#" onclick="exportEmployees('csv'); return false;">
+                                                                    {{ __('messages.export_as_csv') }}
+                                                                </a>
+                                                            </li>
+                                                        </ul>
+                                                    </div>
                                                     <button class="btn btn-primary d-none d-sm-inline-block" data-bs-toggle="modal" data-bs-target="#createEmployeeModal">
                                                         <i class="ti ti-plus fs-4"></i> {{ __('messages.add') }}
                                                     </button>
@@ -102,6 +120,8 @@
                                                                         data-status="{{ $employee->status }}"
                                                                         data-bank_name="{{ $employee->bank_name }}"
                                                                         data-bank_account="{{ $employee->bank_account }}"
+                                                                        data-allowances="{{ json_encode($employee->default_allowances) }}"
+                                                                        data-deductions="{{ json_encode($employee->default_deductions) }}"
                                                                         data-notes="{{ $employee->notes }}"
                                                                         title="{{ __('messages.edit') }}">
                                                                         <i class="ti ti-edit"></i>
@@ -245,6 +265,21 @@
                                 </div>
                             </div>
                         </div>
+
+                        <hr>
+                        <h6>Default {{ __('messages.hr_allowances') }}</h6>
+                        <div id="create-allowances-container"></div>
+                        <button type="button" class="btn btn-sm btn-outline-secondary mb-3" onclick="addAllowance('create-allowances-container', 'default_allowances')">
+                            <i class="ti ti-plus"></i> {{ __('messages.add') }}
+                        </button>
+
+                        <h6>Default {{ __('messages.hr_deductions') }}</h6>
+                        <div id="create-deductions-container"></div>
+                        <button type="button" class="btn btn-sm btn-outline-secondary mb-3" onclick="addDeduction('create-deductions-container', 'default_deductions')">
+                            <i class="ti ti-plus"></i> {{ __('messages.add') }}
+                        </button>
+                        <hr>
+
                         <div class="mb-3">
                             <label class="form-label fw-semibold">{{ __('messages.notes') }}</label>
                             <textarea name="notes" class="form-control" rows="2"></textarea>
@@ -350,6 +385,21 @@
                                 </div>
                             </div>
                         </div>
+
+                        <hr>
+                        <h6>Default {{ __('messages.hr_allowances') }}</h6>
+                        <div id="edit-allowances-container"></div>
+                        <button type="button" class="btn btn-sm btn-outline-secondary mb-3" onclick="addAllowance('edit-allowances-container', 'default_allowances')">
+                            <i class="ti ti-plus"></i> {{ __('messages.add') }}
+                        </button>
+
+                        <h6>Default {{ __('messages.hr_deductions') }}</h6>
+                        <div id="edit-deductions-container"></div>
+                        <button type="button" class="btn btn-sm btn-outline-secondary mb-3" onclick="addDeduction('edit-deductions-container', 'default_deductions')">
+                            <i class="ti ti-plus"></i> {{ __('messages.add') }}
+                        </button>
+                        <hr>
+
                         <div class="mb-3">
                             <label class="form-label fw-semibold">{{ __('messages.notes') }}</label>
                             <textarea name="notes" id="edit_notes" class="form-control" rows="2"></textarea>

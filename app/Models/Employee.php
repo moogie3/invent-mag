@@ -17,6 +17,8 @@ class Employee extends Model
     protected $casts = [
         'join_date' => 'date',
         'base_salary' => 'decimal:2',
+        'default_allowances' => 'array',
+        'default_deductions' => 'array',
     ];
 
     public function attendanceRecords(): HasMany

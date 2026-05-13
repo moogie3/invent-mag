@@ -310,6 +310,42 @@ return [
     'debit_info_por' => 'Info Debit: Jika catatan debit dibuat, lihat detail debit.',
     'print_por' => 'Cetak: Gunakan tombol Cetak untuk menghasilkan PDF.',
 
+    // HR Employee
+    'hr_employee' => 'Manajemen Karyawan',
+    'hr_employee_desc' => 'Kelola karyawan perusahaan Anda, termasuk info pribadi, departemen, posisi, gaji, dan detail bank.',
+    'hr_employee_step_1' => 'Tambah Karyawan: Klik "Tambah Baru" untuk membuat profil karyawan. Isi form yang diperlukan seperti Nama, Kode Karyawan, dan Tipe Pekerjaan.',
+    'hr_employee_step_2' => 'Gaji & Bank: Masukkan gaji pokok dan informasi rekening bank yang akan digunakan selama proses Penggajian (Payroll).',
+    'hr_employee_step_3' => 'Status Pekerjaan: Anda dapat mengatur status sebagai Aktif, Tidak Aktif, Mengundurkan Diri, atau Diberhentikan. Hanya karyawan Aktif yang akan muncul di pelacakan Kehadiran.',
+    'hr_employee_step_4' => 'Edit & Hapus: Gunakan tombol aksi di sisi kanan tabel untuk memperbarui data karyawan atau menghapusnya.',
+
+    // HR Attendance
+    'hr_attendance' => 'Manajemen Kehadiran',
+    'hr_attendance_desc' => 'Lacak dan kelola kehadiran karyawan per periode bulanan. Buka periode baru untuk mulai melacak kehadiran harian.',
+    'hr_attendance_step_1' => 'Buka Periode: Klik "Buka Periode" untuk mulai melacak kehadiran untuk bulan baru. Anda memilih Tahun dan Bulan.',
+    'hr_attendance_step_2' => 'Lihat Periode: Klik ikon mata untuk melihat tabel kehadiran harian untuk bulan tertentu.',
+    'hr_attendance_step_3' => 'Tutup Periode: Setelah bulan selesai dan diverifikasi, Anda dapat menutup periode untuk mencegah pengeditan lebih lanjut. Ini biasanya dilakukan sebelum menjalankan penggajian (payroll).',
+    
+    'hr_attendance_details' => 'Pelacak Kehadiran',
+    'hr_attendance_details_desc' => 'Tandai kehadiran karyawan untuk setiap hari dalam sebulan.',
+    'hr_attendance_details_step_1' => 'Edit Individu: Klik pada sel kosong di tabel dan ketik kode status: P (Hadir), A (Absen), S (Sakit), L (Izin), H (Libur), atau ½ (Setengah Hari). Klik di luar kotak untuk menyimpan otomatis.',
+    'hr_attendance_details_step_2' => 'Hari Libur: Akhir pekan (Sabtu dan Minggu) diwarnai abu-abu secara default, tetapi Anda masih dapat mengklik dan mengeditnya jika seseorang bekerja di akhir pekan.',
+    'hr_attendance_details_step_3' => 'Isi Massal (Bulk Fill): Gunakan tombol Isi Massal untuk menandai beberapa karyawan sekaligus dengan status yang sama (mis. Hadir) selama sebulan penuh. Anda dapat menyesuaikan hari mana yang akan dilewati (seperti akhir pekan).',
+    'hr_attendance_details_step_4' => 'Lembur: Modal Isi Massal juga memungkinkan Anda untuk merekam jam lembur bagi karyawan yang dipilih.',
+
+    // HR Payroll
+    'hr_payroll' => 'Manajemen Penggajian',
+    'hr_payroll_desc' => 'Hasilkan dan proses penggajian bulanan berdasarkan data kehadiran dan default tunjangan/potongan.',
+    'hr_payroll_step_1' => 'Proses Penggajian: Klik "Proses Penggajian" dan pilih periode kehadiran. Sistem akan secara otomatis menghitung gaji prorata, uang lembur, dan menarik default tunjangan/potongan.',
+    'hr_payroll_step_2' => 'Perhitungan Prorata: Jika seorang karyawan absen (Alpa), sistem secara otomatis menghitung "Potongan Absen" dan menguranginya dari gaji bruto mereka.',
+    
+    'hr_payroll_details' => 'Detail & Akuntansi Penggajian',
+    'hr_payroll_details_desc' => 'Tinjau slip gaji individu dan proses alur akuntansi dua langkah. Untuk menghapus draf penggajian, klik tombol Hapus merah (hanya tersedia saat masih berstatus Draft).',
+    'hr_payroll_details_step_1' => 'Edit Draf: Saat proses masih dalam status "Draft", Anda dapat mengklik tombol edit pada setiap karyawan untuk menyesuaikan tunjangan dan potongan mereka secara manual untuk bulan ini. Atau klik Hapus untuk menghapus draf secara keseluruhan.',
+    'hr_payroll_details_step_2' => 'Logika Prorata: Periksa Gaji Bersih (Net Pay)! Sistem secara otomatis menghitung potongan untuk hari yang tidak tercatat atau absen menggunakan rumus: (Gaji Pokok ÷ Total Hari Kerja) × Jumlah Hari Absen.',
+    'hr_payroll_details_step_3' => 'Akuntansi Dua Langkah (Langkah 1): Setelah ditinjau, klik "Setujui Penggajian". Ini mengunci penggajian dan membuat Entri Jurnal Akrual (Debit: Beban Gaji, Kredit: Kewajiban Hutang Gaji) di Buku Besar untuk mencatat beban secara akurat.',
+    'hr_payroll_details_step_4' => 'Akuntansi Dua Langkah (Langkah 2): Pada hari gajian, klik "Catat Pembayaran" dan pilih akun Kas/Bank sumber. Ini membuat Entri Jurnal Pembayaran (Debit: Hutang Gaji, Kredit: Kas/Bank) untuk menghapus kewajiban dan mencatat arus kas keluar.',
+    'hr_payroll_details_step_5' => 'Slip Gaji: Setelah penggajian berstatus Dibayar, Anda dapat menghasilkan dan mengunduh slip gaji PDF yang indah untuk setiap karyawan.',
+
     // POS
     'pos' => 'Kasir (POS)',
     'pos_desc' => 'Proses transaksi penjualan retail.',

@@ -24,7 +24,7 @@ class AttendancePeriod extends Model
 
     public function payrollRuns(): HasMany
     {
-        return $this->hasMany(PayrollRun::class);
+        return $this->hasMany(PayrollRun::class, 'period_id');
     }
 
     public function isClosed(): bool

@@ -38,6 +38,24 @@
                                                     </div>
                                                 </div>
                                                 <div class="btn-list">
+                                                    <div class="dropdown d-inline-block me-2">
+                                                        <button class="btn btn-secondary dropdown-toggle" type="button"
+                                                            id="exportDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                                                            <i class="ti ti-download me-2"></i> {{ __('messages.export') }}
+                                                        </button>
+                                                        <ul class="dropdown-menu" aria-labelledby="exportDropdown">
+                                                            <li>
+                                                                <a class="dropdown-item" href="#" onclick="exportAttendancePeriods('pdf'); return false;">
+                                                                    {{ __('messages.export_as_pdf') }}
+                                                                </a>
+                                                            </li>
+                                                            <li>
+                                                                <a class="dropdown-item" href="#" onclick="exportAttendancePeriods('csv'); return false;">
+                                                                    {{ __('messages.export_as_csv') }}
+                                                                </a>
+                                                            </li>
+                                                        </ul>
+                                                    </div>
                                                     <button class="btn btn-primary d-none d-sm-inline-block" data-bs-toggle="modal" data-bs-target="#openPeriodModal">
                                                         <i class="ti ti-plus fs-4"></i> {{ __('messages.hr_open_period') }}
                                                     </button>
@@ -60,20 +78,24 @@
                                                             <td class="sort-period">{{ $period->year }}-{{ str_pad($period->month, 2, '0', STR_PAD_LEFT) }}</td>
                                                             <td class="sort-status">
                                                                 @if($period->status === 'open')
-                                                                    <span class="badge bg-success">{{ __('messages.open') }}</span>
+                                                                    <span class="badge bg-success text-white">{{ __('messages.open') }}</span>
                                                                 @else
-                                                                    <span class="badge bg-secondary">{{ __('messages.closed') }}</span>
+                                                                    <span class="badge bg-secondary text-white">{{ __('messages.closed') }}</span>
                                                                 @endif
                                                             </td>
                                                             <td class="sort-closed">{{ $period->closed_at ? $period->closed_at->format('Y-m-d') : '-' }}</td>
                                                             <td style="text-align:center">
                                                                 <div class="btn-list flex-nowrap justify-content-center">
+                                                                    <a href="{{ route('admin.hr.attendance.show', $period) }}" class="btn btn-icon btn-ghost-primary" title="{{ __('messages.view') }}">
+                                                                        <i class="ti ti-eye"></i>
+                                                                    </a>
                                                                     @if($period->status === 'open')
-                                                                        <a href="{{ route('admin.hr.attendance.show', $period) }}" class="btn btn-icon btn-ghost-primary" title="{{ __('messages.view') }}">
-                                                                            <i class="ti ti-eye"></i>
-                                                                        </a>
-                                                                    @else
-                                                                        <span class="text-muted">-</span>
+                                                                        <button class="btn btn-icon btn-ghost-danger"
+                                                                            data-bs-toggle="modal"
+                                                                            data-bs-target="#deletePeriodModal{{ $period->id }}"
+                                                                            title="{{ __('messages.delete') }}">
+                                                                            <i class="ti ti-trash"></i>
+                                                                        </button>
                                                                     @endif
                                                                 </div>
                                                             </td>
@@ -103,9 +125,46 @@
         </div>
     </div>
 
-    <div class="modal modal-blur" id="openPeriodModal" tabindex="-1">
+    @foreach($periods as $period)
+        @if($period->status === 'open')
+        <div class="modal modal-blur fade" id="deletePeriodModal{{ $period->id }}" tabindex="-1">
+            <div class="modal-dialog modal-dialog-centered modal-sm">
+                <div class="modal-content border-0 shadow-lg rounded-3">
+                    <div class="modal-header">
+                        <h5 class="modal-title">{{ __('messages.delete') }}</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-status bg-danger"></div>
+                    <div class="modal-body text-center py-4">
+                        <i class="ti ti-alert-triangle text-danger" style="font-size: 3rem;"></i>
+                        <h3>{{ __('messages.are_you_sure') }}</h3>
+                        <div class="text-muted">{{ __('messages.delete_period_confirm') }}</div>
+                    </div>
+                    <div class="modal-footer">
+                        <div class="w-100">
+                            <div class="row">
+                                <div class="col">
+                                    <button type="button" class="btn w-100" data-bs-dismiss="modal">{{ __('messages.cancel') }}</button>
+                                </div>
+                                <div class="col">
+                                    <form method="POST" action="{{ route('admin.hr.attendance.destroy', $period) }}">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="btn btn-danger w-100">{{ __('messages.delete') }}</button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        @endif
+    @endforeach
+
+    <div class="modal modal-blur fade" id="openPeriodModal" tabindex="-1">
         <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content">
+            <div class="modal-content border-0 shadow-lg rounded-3">
                 <div class="modal-header">
                     <h5 class="modal-title">{{ __('messages.hr_open_period') }}</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
@@ -120,6 +179,11 @@
                         <div class="mb-3">
                             <label class="form-label fw-semibold">{{ __('messages.month') }}</label>
                             <input type="number" name="month" class="form-control" value="{{ date('n') }}" min="1" max="12" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Total Working Days</label>
+                            <input type="number" name="working_days" class="form-control" value="21" min="1" max="31" required>
+                            <div class="form-hint">Set the exact number of working days for this month (excluding weekends/public holidays) to be used for accurate payroll proration.</div>
                         </div>
                     </div>
                     <div class="modal-footer">

@@ -13,7 +13,7 @@ class EmployeeController extends Controller
 
     public function __construct(EmployeeService $service)
     {
-        $this->middleware('permission:view-hr', ['only' => ['index', 'show']]);
+        $this->middleware('permission:view-hr', ['only' => ['index', 'show', 'export']]);
         $this->middleware('permission:manage-employees', ['only' => ['create', 'store', 'edit', 'update', 'destroy']]);
         $this->service = $service;
     }
@@ -51,6 +51,25 @@ class EmployeeController extends Controller
             return redirect()->route('admin.hr.employee.index')->with('success', __('messages.record_deleted'));
         } catch (\Exception $e) {
             return back()->with('error', $e->getMessage());
+        }
+    }
+
+    public function export(Request $request)
+    {
+        $request->validate([
+            'ids' => 'nullable|array',
+            'ids.*' => 'integer',
+            'export_option' => 'required|string|in:pdf,csv',
+        ]);
+
+        try {
+            return $this->service->exportEmployees($request->ids, $request->export_option);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error exporting employees.',
+                'error_details' => config('app.debug') ? $e->getMessage() : null,
+            ], 500);
         }
     }
 }

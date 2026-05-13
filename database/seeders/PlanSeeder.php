@@ -26,7 +26,7 @@ class PlanSeeder extends Seeder
                 'name' => 'Starter',
                 'price' => 19.00,
                 'billing_cycle' => 'monthly',
-                'description' => 'Everything you need to manage inventory and orders.',
+                'description' => 'Everything you need to manage inventory, sales, and orders.',
                 'max_users' => 3,
                 'max_warehouses' => 1,
                 'max_products' => 100,
@@ -43,6 +43,9 @@ class PlanSeeder extends Seeder
                     'basic_reports',
                     'customers',
                     'suppliers',
+                    'pos',
+                    'sales_returns',
+                    'purchase_returns',
                 ],
             ],
             [
@@ -50,7 +53,7 @@ class PlanSeeder extends Seeder
                 'name' => 'Professional',
                 'price' => 59.00,
                 'billing_cycle' => 'monthly',
-                'description' => 'Full ERP with POS, accounting, CRM & pipeline.',
+                'description' => 'Full ERP with accounting, CRM & pipeline.',
                 'max_users' => 10,
                 'max_warehouses' => -1, // unlimited
                 'max_products' => 500,

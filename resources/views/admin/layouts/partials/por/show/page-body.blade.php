@@ -60,7 +60,7 @@
                                             <div><strong>{{ __('messages.pr_original_po') }}</strong></div>
                                             <div>
                                                 @if ($por->purchase)
-                                                    <a href="{{ route('admin.po.view', $por->purchase_id) }}">#{{ $por->purchase->invoice }}</a>
+                                                    <a href="{{ route('admin.po.show', $por->purchase_id) }}">#{{ $por->purchase->invoice }}</a>
                                                 @else
                                                     {{ __('messages.not_available') }}
                                                 @endif

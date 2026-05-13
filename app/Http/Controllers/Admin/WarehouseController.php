@@ -158,63 +158,6 @@ class WarehouseController extends Controller
         return redirect()->route('admin.warehouse')->with('success', 'Main warehouse status removed');
     }
 
-    public function view(Request $request, $id)
-    {
-        $warehouse = Warehouse::find($id);
-
-        if (!$warehouse) {
-            if ($request->ajax()) {
-                return response()->json(['success' => false, 'message' => 'Warehouse not found.'], 404);
-            }
-            return redirect()->route('admin.warehouse')->with('error', 'Warehouse not found.');
-        }
-
-        // Get all PO items for this warehouse with remaining quantity
-        $poItems = \App\Models\POItem::with(['product.category', 'product.unit', 'purchaseOrder'])
-            ->whereHas('purchaseOrder', function($q) use ($id) {
-                $q->where('warehouse_id', $id);
-            })
-            ->where('remaining_quantity', '>', 0)
-            ->orderBy('expiry_date', 'asc')
-            ->get()
-            ->map(function($item) {
-                $product = $item->product;
-                return [
-                    'id' => $product->id,
-                    'name' => $product->name,
-                    'code' => $product->code,
-                    'quantity' => $item->remaining_quantity,
-                    'price' => $item->price,
-                    'expiry_date' => $item->expiry_date ? $item->expiry_date->format('Y-m-d') : null,
-                    'po_id' => $item->po_id,
-                    'po_date' => $item->purchaseOrder ? $item->purchaseOrder->order_date?->format('Y-m-d') : null,
-                    'category' => $product->category->name ?? 'N/A',
-                    'unit' => $product->unit->name ?? 'N/A'
-                ];
-            });
-
-        $totalStock = $poItems->sum('quantity');
-        $totalProducts = $poItems->pluck('id')->unique()->count();
-
-        if ($request->ajax()) {
-            return response()->json([
-                'success' => true,
-                'warehouse' => [
-                    'id' => $warehouse->id,
-                    'name' => $warehouse->name,
-                    'address' => $warehouse->address,
-                    'description' => $warehouse->description,
-                    'is_main' => $warehouse->is_main,
-                    'po_items' => $poItems->toArray(),
-                    'total_products' => $totalProducts,
-                    'total_stock' => $totalStock
-                ]
-            ]);
-        }
-
-        return view('admin.warehouse.view', compact('warehouse'));
-    }
-
     /**
      * @group Warehouses
      * @summary Export All Warehouses

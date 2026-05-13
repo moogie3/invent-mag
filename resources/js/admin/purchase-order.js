@@ -195,7 +195,7 @@ onPageLoad(function () {
                             <td class="text-center">${escapeHtml(po.due_date)}</td>
                             <td class="text-end">${escapeHtml(po.total)}</td>
                             <td class="text-end">
-                                <a href="/admin/po/view/${
+                                <a href="/admin/po/show/${
                                     po.id
                                 }" class="btn btn-sm btn-primary">
                                     <i class="ti ti-eye me-1"></i> View

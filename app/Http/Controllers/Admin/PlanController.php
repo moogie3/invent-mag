@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Plan;
+use App\Models\SubscriptionOrder;
 use App\Services\BillingService;
 use App\Services\PlanService;
 use Illuminate\Http\Request;
@@ -33,39 +35,39 @@ class PlanController extends Controller
         } catch (\Exception $e) {
             $tenant = null;
         }
-        
+
         $usageStats = $this->planService->getUsageStats();
         $currentPlan = $this->planService->getCurrentPlan();
         $plans = $this->planService->getAvailablePlans();
         $features = config('plans.features');
 
         if ($request->query('success') == 1 && $tenant) {
-            $recentOrder = \App\Models\SubscriptionOrder::where('tenant_id', $tenant->id)
+            $recentOrder = SubscriptionOrder::where('tenant_id', $tenant->id)
                 ->where('status', 'paid')
                 ->latest('paid_at')
                 ->first();
 
             if ($recentOrder && $recentOrder->paid_at > now()->subMinutes(5)) {
                 $tenant->refresh();
-                
+
                 $currentPlan = $tenant->getEffectivePlan();
                 $usageStats = $this->planService->getUsageStats();
-                
+
                 $newPlan = $recentOrder->plan;
                 $oldPlan = $tenant->getCurrentPlan();
-                
+
                 $message = '';
-                
+
                 if ($tenant->hasScheduledDowngrade()) {
                     $scheduledPlan = $tenant->getScheduledPlan();
                     $effectiveDate = $tenant->pending_plan_effective_at->format('F d, Y');
                     $credit = $tenant->proration_credit ?? 0;
-                    
+
                     $message = "Payment successful! Your downgrade to {$scheduledPlan->name} will take effect on {$effectiveDate}. You will keep your current {$oldPlan->name} plan until then. A credit of $" . number_format($credit, 2) . " will be applied to your next bill.";
                 } else {
                     $message = "Payment successful! You are now on the {$currentPlan->name} plan.";
                 }
-                
+
                 return redirect()->route('admin.setting.plan')->with('success', $message);
             }
         }
@@ -85,10 +87,10 @@ class PlanController extends Controller
         $feature = $request->query('feature');
         $suggestedPlan = $feature ? $this->planService->getSuggestedUpgrade($feature) : null;
         $upgradeMessage = $feature ? (config("plans.upgrade_messages.{$feature}") ?? null) : null;
-        
+
         // Check if current plan is expired/inactive (allows renewal of same tier)
         $planInactive = $tenant ? $tenant->planInactive() : false;
-        
+
         // Check if plan is expiring soon (within 7 days) - use Tenant model method for consistency
         $expiringSoon = false;
         $expiryDays = null;
@@ -97,7 +99,7 @@ class PlanController extends Controller
             $currentExpiryDate = $tenant->getSubscriptionExpiryDate();
             if ($currentExpiryDate) {
                 $expiryDays = $tenant->subscriptionDaysRemaining();
-                
+
                 if ($expiryDays >= 0 && $expiryDays <= 7) {
                     $expiringSoon = true;
                 }
@@ -128,16 +130,16 @@ class PlanController extends Controller
         ]);
 
         $tenant = app('currentTenant');
-        $newPlan = \App\Models\Plan::where('slug', $request->input('plan'))->first();
-        
+        $newPlan = Plan::where('slug', $request->input('plan'))->first();
+
         $currentPlan = $tenant->getCurrentPlan();
         $changeType = $this->billingService->getPlanChangeType($currentPlan, $newPlan);
 
         $orderNumber = 'INV-' . strtoupper(uniqid()) . '-' . time();
-        
+
         $exchangeRate = 16000;
         $taxRate = 0.12;
-        
+
         if ($changeType === 'upgrade') {
             $daysRemaining = $this->billingService->getDaysRemainingInPeriod($tenant);
             $prorationAmount = $this->billingService->calculateUpgradeProration($currentPlan, $newPlan, $daysRemaining);
@@ -145,11 +147,11 @@ class PlanController extends Controller
         } else {
             $subtotalIdr = (int) round($newPlan->price * $exchangeRate);
         }
-        
+
         $taxIdr = (int) round($subtotalIdr * $taxRate);
         $priceIdr = $subtotalIdr + $taxIdr;
-        
-        $order = \App\Models\SubscriptionOrder::create([
+
+        $order = SubscriptionOrder::create([
             'tenant_id' => $tenant->id,
             'plan_id' => $newPlan->id,
             'order_number' => $orderNumber,
@@ -162,7 +164,7 @@ class PlanController extends Controller
         \Midtrans\Config::$isProduction = config('midtrans.is_production', false);
         \Midtrans\Config::$isSanitized = true;
         \Midtrans\Config::$is3ds = true;
-        
+
         $params = [
             'transaction_details' => [
                 'order_id' => $orderNumber,
@@ -185,7 +187,7 @@ class PlanController extends Controller
 
         try {
             $snapToken = \Midtrans\Snap::getSnapToken($params);
-            
+
             $order->update(['snap_token' => $snapToken]);
 
             if ($request->header('X-Laravel-JSON') || $request->expectsJson()) {
@@ -198,11 +200,11 @@ class PlanController extends Controller
 
         } catch (\Exception $e) {
             \Illuminate\Support\Facades\Log::error('Midtrans Error: ' . $e->getMessage());
-            
+
             if ($request->header('X-Laravel-JSON') || $request->expectsJson()) {
                 return response()->json(['error' => 'Payment gateway error. Please try again later.'], 500);
             }
-            
+
             return back()->with('error', 'Payment gateway error. Please try again later. ' . $e->getMessage());
         }
     }
@@ -212,13 +214,13 @@ class PlanController extends Controller
      */
     public function checkout(Request $request, $order)
     {
-        $order = \App\Models\SubscriptionOrder::findOrFail($order);
+        $order = SubscriptionOrder::findOrFail($order);
         $newPlan = $order->plan;
         $currentPlan = app('currentTenant')->plan;
         $snapToken = $order->snap_token;
         $priceIdr = $order->amount;
         $changeType = $order->change_type;
-        
+
         $exchangeRate = 16000;
         $priceUsd = $priceIdr / $exchangeRate;
         $taxRate = 0.12;
@@ -242,8 +244,8 @@ class PlanController extends Controller
         $transactionResult = $request->input('transaction_result');
 
         $tenant = app('currentTenant');
-        
-        $order = \App\Models\SubscriptionOrder::where('order_number', $orderId)
+
+        $order = SubscriptionOrder::where('order_number', $orderId)
             ->where('tenant_id', $tenant->id)
             ->first();
 
@@ -259,9 +261,9 @@ class PlanController extends Controller
         try {
             \Midtrans\Config::$isProduction = config('midtrans.is_production', false);
             \Midtrans\Config::$serverKey = config('midtrans.server_key');
-            
+
             $status = \Midtrans\Transaction::status($orderId);
-            
+
             if ($status->transaction_status === 'settlement' || $status->transaction_status === 'capture') {
                 $order->update([
                     'status' => 'paid',
@@ -282,7 +284,7 @@ class PlanController extends Controller
 if ($changeType === 'upgrade') {
                     $daysRemaining = $this->billingService->getDaysRemainingInPeriod($tenant);
                     $prorationAmount = $this->billingService->calculateUpgradeProration($currentPlan, $newPlan, $daysRemaining);
-                    
+
                     $tenant->plan_id = $newPlan->id;
                     $tenant->plan_status = 'active';
                     $tenant->trial_ends_at = null; // Clear any remaining trial when upgrading to paid plan
@@ -302,7 +304,7 @@ if ($changeType === 'upgrade') {
                     $tenant->plan_status = 'active';
                     $tenant->trial_ends_at = null; // Clear trial since we're now on a paid plan
                     $tenant->plan_changed_at = now();
-                    
+
                     if ($tenant->billing_period_end && \Carbon\Carbon::parse($tenant->billing_period_end)->isFuture()) {
                         // Stack the days if not yet expired, preserving the exact time
                         $tenant->billing_period_end = \Carbon\Carbon::parse($tenant->billing_period_end)->addDays(30);
@@ -312,7 +314,7 @@ if ($changeType === 'upgrade') {
                         $tenant->billing_period_start = $period['start'];
                         $tenant->billing_period_end = $period['end'];
                     }
-                    
+
                     $tenant->save();
 
                     \Illuminate\Support\Facades\Log::info("Payment confirmed for order {$order->order_number}. Renewal: {$newPlan->name}. Extended until: {$tenant->billing_period_end}");
@@ -326,7 +328,7 @@ if ($changeType === 'upgrade') {
                     $nextPeriod = $this->billingService->getNextBillingPeriod();
                     $daysRemaining = $this->billingService->getDaysRemainingInPeriod($tenant);
                     $creditAmount = $this->billingService->calculateDowngradeCredit($currentPlan, $newPlan, $daysRemaining);
-                    
+
                     $tenant->pending_plan_id = $newPlan->id;
                     $tenant->pending_plan_effective_at = $nextPeriod['start'] . ' 00:00:00';
                     $tenant->proration_credit = $creditAmount;
@@ -334,7 +336,7 @@ if ($changeType === 'upgrade') {
                     $tenant->save();
 
                     \Illuminate\Support\Facades\Log::info("Payment confirmed for order {$order->order_number}. Downgrade scheduled: {$currentPlan?->name} -> {$newPlan->name}. Effective: {$nextPeriod['start']}. Credit: \${$creditAmount}");
-                    
+
                     return response()->json([
                         'message' => 'Payment confirmed successfully',
                         'plan' => $newPlan->name,
@@ -351,7 +353,7 @@ if ($changeType === 'upgrade') {
             }
         } catch (\Exception $e) {
             \Illuminate\Support\Facades\Log::error('Payment confirmation error: ' . $e->getMessage());
-            
+
             return response()->json(['message' => 'Payment verification failed. Please try again later.'], 500);
         }
     }

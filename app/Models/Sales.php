@@ -293,6 +293,6 @@ class Sales extends Model
      */
     public function path(): string
     {
-        return route('admin.sales.view', $this);
+        return route('admin.sales.show', $this);
     }
 }

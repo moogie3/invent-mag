@@ -85,8 +85,8 @@ class NotificationController extends Controller
         }
 
         $route = match ($type) {
-            'po' => 'admin.po.view',
-            'sale' => 'admin.sales.view',
+            'po' => 'admin.po.show',
+            'sale' => 'admin.sales.show',
             'product' => 'admin.product.edit',
             'system' => 'admin.settings', // Fallback for system notifications if accessed via /view
             default => null,

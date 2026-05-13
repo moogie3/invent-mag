@@ -53,7 +53,7 @@ class SalesController extends Controller
         return view('admin.sales.sales-edit', $data);
     }
 
-    public function view($id)
+    public function show($id)
     {
         $sale = Sales::findOrFail($id);
 
@@ -63,7 +63,7 @@ class SalesController extends Controller
 
         $data = $this->salesService->getSalesViewData($id);
 
-        return view('admin.sales.sales-view', $data);
+        return view('admin.sales.show', $data);
     }
 
     public function modalViews($id)
@@ -119,7 +119,7 @@ class SalesController extends Controller
 
         try {
             $this->salesService->updateSale($sale, $request->all());
-            return redirect()->route('admin.sales.view', $id)->with('success', 'Sale updated successfully.');
+            return redirect()->route('admin.sales.show', $id)->with('success', 'Sale updated successfully.');
         } catch (\Exception $e) {
             Log::error('Sale update failed for ID ' . $id . ': ' . $e->getMessage(), ['exception' => $e, 'input' => $request->all()]);
             return back()
@@ -141,7 +141,7 @@ class SalesController extends Controller
         try {
             $sale = Sales::findOrFail($id);
             $this->salesService->addPayment($sale, $request->all());
-            return redirect()->route('admin.sales.view', $sale->id)->with('success', 'Payment added successfully.');
+            return redirect()->route('admin.sales.show', $sale->id)->with('success', 'Payment added successfully.');
         } catch (\Exception $e) {
             return back()
                 ->withErrors(['error' => 'Something went wrong: ' . $e->getMessage()])

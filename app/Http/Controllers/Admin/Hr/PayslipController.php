@@ -5,7 +5,7 @@ namespace App\Http\Controllers\Admin\Hr;
 use App\Http\Controllers\Controller;
 use App\Models\PayrollItem;
 use App\Services\PayrollService;
-use Barryvdh\DomPDF\Facade\Pdf;
+use Dompdf\Dompdf;
 use Illuminate\Http\Request;
 
 class PayslipController extends Controller
@@ -34,12 +34,15 @@ class PayslipController extends Controller
             return back()->with('error', 'Payslip not generated yet.');
         }
 
-        $pdf = Pdf::loadView('admin.hr.payslip.print', [
+        $dompdf = new Dompdf();
+        $html = view('admin.hr.payslip.print', [
             'item' => $item,
             'employee' => $item->employee,
             'period' => $item->payrollRun->period,
-        ]);
-
-        return $pdf->download("payslip-{$item->employee->employee_code}-{$item->payrollRun->period->year}-{$item->payrollRun->period->month}.pdf");
+        ])->render();
+        $dompdf->loadHtml($html);
+        $dompdf->setPaper('A4');
+        $dompdf->render();
+        return $dompdf->stream("payslip-{$item->employee->employee_code}-{$item->payrollRun->period->year}-{$item->payrollRun->period->month}.pdf");
     }
 }

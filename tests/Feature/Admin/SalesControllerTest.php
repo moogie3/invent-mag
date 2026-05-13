@@ -184,7 +184,7 @@ class SalesControllerTest extends TestCase
 
         $response = $this->put(route('admin.sales.update', $sale->id), $updateData);
 
-        $response->assertRedirect(route('admin.sales.view', $sale->id));
+        $response->assertRedirect(route('admin.sales.show', $sale->id));
         $response->assertSessionHas('success', 'Sale updated successfully.');
 
         $this->assertDatabaseHas('sales', [
@@ -226,10 +226,10 @@ class SalesControllerTest extends TestCase
         ]);
         SalesItem::factory()->create(['sales_id' => $sale->id, 'product_id' => $this->product->id]);
 
-        $response = $this->get(route('admin.sales.view', $sale->id));
+        $response = $this->get(route('admin.sales.show', $sale->id));
 
         $response->assertStatus(200);
-        $response->assertViewIs('admin.sales.sales-view');
+        $response->assertViewIs('admin.sales.show');
         $response->assertViewHas('sales', $sale);
     }
 
@@ -251,7 +251,7 @@ class SalesControllerTest extends TestCase
 
         $response = $this->post(route('admin.sales.add-payment', $sale->id), $paymentData);
 
-        $response->assertRedirect(route('admin.sales.view', $sale->id));
+        $response->assertRedirect(route('admin.sales.show', $sale->id));
         $response->assertSessionHas('success', 'Payment added successfully.');
 
         $this->assertDatabaseHas('payments', [

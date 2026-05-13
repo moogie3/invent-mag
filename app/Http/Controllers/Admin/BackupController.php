@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
@@ -23,12 +24,12 @@ class BackupController extends Controller
         $path = 'backups';
         $tenant = app('currentTenant');
         $domainPrefix = $tenant->domain . '-';
-        
+
         $allFiles = Storage::disk('local')->files($path);
-        
+
         return collect($allFiles)
             ->filter(function ($file) use ($domainPrefix) {
-                return pathinfo($file, PATHINFO_EXTENSION) === 'zip' 
+                return pathinfo($file, PATHINFO_EXTENSION) === 'zip'
                     && str_starts_with(basename($file), $domainPrefix);
             })
             ->map(function ($file) {
@@ -36,7 +37,7 @@ class BackupController extends Controller
                     'filename' => basename($file),
                     'path' => $file,
                     'size' => Storage::disk('local')->size($file),
-                    'last_modified' => \Carbon\Carbon::createFromTimestamp(Storage::disk('local')->lastModified($file)),
+                    'last_modified' => Carbon::createFromTimestamp(Storage::disk('local')->lastModified($file)),
                 ];
             })->sortByDesc('last_modified')->values()->toArray();
     }
@@ -64,22 +65,22 @@ class BackupController extends Controller
 
             $artisan = base_path('artisan');
             $backupCmd = 'backup:tenant';
-            
+
             $cmd = ['php', $artisan, $backupCmd, $tenantId, $type, $filename];
 
             $process = new Process($cmd);
             $process->setWorkingDirectory(base_path());
-            
+
             // Set password via environment variable to isolate config
             $env = [];
             if ($tenant->isBackupEncrypted()) {
                 $env['BACKUP_ARCHIVE_PASSWORD'] = $tenant->backup_password;
             }
-            
+
             $process->setEnv($env);
             $process->setTimeout(600); // 10 minutes max
             $process->run();
-            
+
             $output = $process->getOutput();
             $errorOutput = $process->getErrorOutput();
 
@@ -87,28 +88,28 @@ class BackupController extends Controller
             $backupPath = 'backups/' . $filename;
             if (Storage::disk('local')->exists($backupPath)) {
                 return response()->json([
-                    'success' => true, 
+                    'success' => true,
                     'message' => __('messages.backup_success')
                 ]);
             }
-            
+
             // If failed, see if it's mysqldump
             if (str_contains(strtolower($output . $errorOutput), 'mysqldump')) {
                 return response()->json([
-                    'success' => false, 
-                    'warning' => true, 
+                    'success' => false,
+                    'warning' => true,
                     'message' => __('messages.backup_info_local')
                 ]);
             }
-            
+
             return response()->json([
-                'success' => false, 
+                'success' => false,
                 'message' => __('messages.backup_error') . ': ' . ($errorOutput ?: 'Unknown error')
             ], 500);
-                
+
         } catch (\Exception $e) {
             return response()->json([
-                'success' => false, 
+                'success' => false,
                 'message' => $e->getMessage()
             ], 500);
         }
@@ -175,30 +176,30 @@ class BackupController extends Controller
     public function restore(Request $request)
     {
         $tenant = app('currentTenant');
-        
+
         Log::channel('security')->info('Restore attempt started', [
             'tenant_id' => $tenant->id,
             'is_encrypted' => $tenant->isBackupEncrypted(),
             'has_file' => $request->hasFile('backup_file'),
             'has_password' => $request->has('password'),
         ]);
-        
+
         // Password only required if encryption is enabled on the tenant
         $rules = [
             'backup_file' => 'required|file|mimes:zip',
         ];
-        
+
         $messages = [
             'backup_file.required' => __('messages.backup_file_required'),
             'backup_file.file' => __('messages.backup_file_must_be_file'),
             'backup_file.mimes' => __('messages.backup_file_must_be_zip'),
         ];
-        
+
         if ($tenant->isBackupEncrypted()) {
             $rules['password'] = 'required|string';
             $messages['password.required'] = __('messages.backup_restore_password_required');
         }
-        
+
         $validated = $request->validate($rules, $messages);
 
         $file = $request->file('backup_file');
@@ -292,7 +293,7 @@ class BackupController extends Controller
             }
             $cmd[] = $database;
 
-            $process = new \Symfony\Component\Process\Process($cmd);
+            $process = new Process($cmd);
             $process->setWorkingDirectory(base_path());
             $process->setInput(file_get_contents($sqlTempPath));
             $process->setTimeout(300);

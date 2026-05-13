@@ -114,10 +114,6 @@ Route::middleware('web')->prefix('admin')->group(function () {
                 ->name('admin.product.destroy')
                 ->middleware('can:delete-products');
 
-            Route::get('/view/{id}', [ProductController::class, 'view'])
-                ->name('admin.product.view')
-                ->middleware('can:view-products');
-
             Route::get('/modal-view/{id}', [ProductController::class, 'modalView'])
                 ->name('admin.product.modal-view')
                 ->middleware('can:view-products');
@@ -194,7 +190,6 @@ Route::middleware('web')->prefix('admin')->group(function () {
             Route::get('/create', [SupplierController::class, 'create'])->name('admin.supplier.create')->middleware('can:create-supplier');
             Route::post('/store', [SupplierController::class, 'store'])->name('admin.supplier.store')->middleware('can:create-supplier');
             Route::get('/edit/{id}', [SupplierController::class, 'edit'])->name('admin.supplier.edit')->middleware('can:edit-supplier');
-            Route::get('/view/{id}', [SupplierController::class, 'view'])->name('admin.supplier.view')->middleware('can:view-supplier');
             Route::put('/update/{id}', [SupplierController::class, 'update'])->name('admin.supplier.update')->middleware('can:edit-supplier');
             Route::delete('/destroy/{id}', [SupplierController::class, 'destroy'])->name('admin.supplier.destroy')->middleware('can:delete-supplier');
             Route::get('/metrics', [SupplierController::class, 'getMetrics'])->name('admin.supplier.metrics')->middleware('can:view-supplier');
@@ -209,7 +204,6 @@ Route::middleware('web')->prefix('admin')->group(function () {
             Route::get('/create', [CustomerController::class, 'create'])->name('admin.customer.create')->middleware('can:create-customer');
             Route::post('/store', [CustomerController::class, 'store'])->name('admin.customer.store')->middleware('can:create-customer');
             Route::get('/edit/{id}', [CustomerController::class, 'edit'])->name('admin.customer.edit')->middleware('can:edit-customer');
-            Route::get('/view/{id}', [CustomerController::class, 'view'])->name('admin.customer.view')->middleware('can:view-customer');
             Route::put('/update/{id}', [CustomerController::class, 'update'])->name('admin.customer.update')->middleware('can:edit-customer');
             Route::delete('/destroy/{id}', [CustomerController::class, 'destroy'])->name('admin.customer.destroy')->middleware('can:delete-customer');
             Route::post('/quick-create', [CustomerController::class, 'quickCreate'])->name('admin.customer.quickCreate')->middleware('can:create-customer');
@@ -300,8 +294,8 @@ Route::middleware('web')->prefix('admin')->group(function () {
                 ->name('admin.po.edit')
                 ->middleware('can:edit-purchase-orders');
 
-            Route::get('/view/{id}', [PurchaseController::class, 'view'])
-                ->name('admin.po.view')
+            Route::get('/show/{id}', [PurchaseController::class, 'show'])
+                ->name('admin.po.show')
                 ->middleware('can:view-purchase-orders');
 
             Route::put('/update/{id}', [PurchaseController::class, 'update'])
@@ -367,8 +361,8 @@ Route::middleware('web')->prefix('admin')->group(function () {
                 ->name('admin.sales.edit')
                 ->middleware('can:edit-sales');
 
-            Route::get('/view/{id}', [SalesController::class, 'view'])
-                ->name('admin.sales.view')
+            Route::get('/show/{id}', [SalesController::class, 'show'])
+                ->name('admin.sales.show')
                 ->middleware('can:view-sales');
 
             Route::put('/update/{id}', [SalesController::class, 'update'])
@@ -473,10 +467,6 @@ Route::middleware('web')->prefix('admin')->group(function () {
                 ->name('admin.warehouse.edit')
                 ->middleware('can:edit-warehouses');
 
-            Route::get('/view/{id}', [WarehouseController::class, 'view'])
-                ->name('admin.warehouse.view')
-                ->middleware('can:view-warehouses');
-
             Route::put('/update/{id}', [WarehouseController::class, 'update'])
                 ->name('admin.warehouse.update')
                 ->middleware('can:edit-warehouses');
@@ -516,9 +506,6 @@ Route::middleware('web')->prefix('admin')->group(function () {
                 ->name('admin.pos.edit')
                 ->middleware('can:access-pos');
 
-            Route::get('/view/{id}', [POSController::class, 'view'])
-                ->name('admin.pos.view')
-                ->middleware('can:access-pos');
 
             Route::put('/update/{id}', [POSController::class, 'update'])
                 ->name('admin.pos.update')
@@ -647,17 +634,25 @@ Route::middleware('web')->prefix('admin')->group(function () {
         // HR Routes - requires hr plan feature
         Route::middleware('plan.feature:hr')->prefix('hr')->name('admin.hr.')->group(function () {
             Route::resource('employee', EmployeeController::class)->only(['index', 'store', 'update', 'destroy']);
+            Route::post('employee/export', [EmployeeController::class, 'export'])->name('employee.export');
             Route::get('attendance', [AttendanceController::class, 'index'])->name('attendance.index');
             Route::get('attendance/{period}', [AttendanceController::class, 'show'])->name('attendance.show');
             Route::post('attendance/period', [AttendanceController::class, 'openPeriod'])->name('attendance.open-period');
+            Route::delete('attendance/{period}', [AttendanceController::class, 'destroy'])->name('attendance.destroy');
             Route::post('attendance/{period}/close', [AttendanceController::class, 'closePeriod'])->name('attendance.close-period');
+            Route::post('attendance/{period}/export', [AttendanceController::class, 'exportPeriod'])->name('attendance.export-period');
             Route::post('attendance/record', [AttendanceController::class, 'upsert'])->name('attendance.upsert');
             Route::post('attendance/{period}/bulk-fill', [AttendanceController::class, 'bulkFill'])->name('attendance.bulk-fill');
+            Route::post('attendance/export', [AttendanceController::class, 'export'])->name('attendance.export');
             Route::get('payroll', [PayrollController::class, 'index'])->name('payroll.index');
             Route::get('payroll/{run}', [PayrollController::class, 'show'])->name('payroll.show');
+            Route::delete('payroll/{run}', [PayrollController::class, 'destroy'])->name('payroll.destroy');
             Route::post('payroll/run/{period}', [PayrollController::class, 'run'])->name('payroll.run');
             Route::put('payroll/item/{item}', [PayrollController::class, 'updateItem'])->name('payroll.item.update');
+            Route::post('payroll/{run}/approve', [PayrollController::class, 'approve'])->name('payroll.approve');
             Route::post('payroll/{run}/pay', [PayrollController::class, 'markPaid'])->name('payroll.pay');
+            Route::post('payroll/{run}/export', [PayrollController::class, 'exportRun'])->name('payroll.export-run');
+            Route::post('payroll/export', [PayrollController::class, 'export'])->name('payroll.export');
             Route::post('payslip/{item}/generate', [PayslipController::class, 'generate'])->name('payslip.generate');
             Route::get('payslip/{item}/download', [PayslipController::class, 'download'])->name('payslip.download');
         });

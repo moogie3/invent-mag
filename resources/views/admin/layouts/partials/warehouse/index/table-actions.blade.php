@@ -1,11 +1,4 @@
 <div class="btn-list flex-nowrap justify-content-center">
-    <button type="button" class="btn btn-icon btn-ghost-primary view-warehouse-btn"
-        data-id="{{ $wo->id }}"
-        data-url="{{ route('admin.warehouse.view', $wo->id) }}"
-        title="{{ __('messages.view') }}">
-        <i class="ti ti-eye"></i>
-    </button>
-
     <button type="button" class="btn btn-icon btn-ghost-primary" data-bs-toggle="modal" data-bs-target="#editWarehouseModal"
         data-id="{{ $wo->id }}" data-name="{{ $wo->name }}" data-address="{{ $wo->address }}"
         data-description="{{ $wo->description }}" data-is-main="{{ $wo->is_main }}"

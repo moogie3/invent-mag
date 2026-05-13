@@ -70,7 +70,7 @@ class NotificationControllerTest extends TestCase
                 'title' => 'PO Overdue',
                 'description' => 'Purchase Order PO-123 is overdue.',
                 'urgency' => 'high',
-                'route' => route('admin.po.view', 1),
+                'route' => route('admin.po.show', 1),
             ],
         ]);
         $this->notificationServiceMock->shouldReceive('getDueNotifications')->andReturn($notifications);
@@ -85,7 +85,7 @@ class NotificationControllerTest extends TestCase
                     'title' => 'PO Overdue',
                     'description' => 'Purchase Order PO-123 is overdue.',
                     'urgency' => 'high',
-                    'route' => route('admin.po.view', 1),
+                    'route' => route('admin.po.show', 1),
                 ],
             ],
         ]);
@@ -94,10 +94,10 @@ class NotificationControllerTest extends TestCase
     public function test_view_redirects_to_correct_route()
     {
         $response = $this->actingAs($this->user)->get(route('admin.notifications.view', 'po::1'));
-        $response->assertRedirect(route('admin.po.view', 1));
+        $response->assertRedirect(route('admin.po.show', 1));
 
         $response = $this->actingAs($this->user)->get(route('admin.notifications.view', 'sale::1'));
-        $response->assertRedirect(route('admin.sales.view', 1));
+        $response->assertRedirect(route('admin.sales.show', 1));
 
         $response = $this->actingAs($this->user)->get(route('admin.notifications.view', 'product::1'));
         $response->assertRedirect(route('admin.product.edit', 1));

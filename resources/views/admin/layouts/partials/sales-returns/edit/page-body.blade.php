@@ -24,7 +24,7 @@
                                             <option value="{{ $salesReturn->sales_id }}" selected>{{ $salesReturn->sale->invoice }}</option>
                                         </select>
                                         <div class="form-control-plaintext fw-bold">
-                                            <a href="{{ route('admin.sales.view', $salesReturn->sales_id) }}" class="text-primary">
+                                            <a href="{{ route('admin.sales.show', $salesReturn->sales_id) }}" class="text-primary">
                                                 {{ $salesReturn->sale->invoice }}
                                             </a>
                                             <span class="text-muted">({{ App\Helpers\CurrencyHelper::format($salesReturn->sale->total) }})</span>

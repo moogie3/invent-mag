@@ -110,7 +110,7 @@ export class SalesOrderView extends SalesOrderModule {
                         this.elements.salesModalEdit.href = `/admin/sales/edit/${id}`;
                     }
                     if (this.elements.salesModalFullView) {
-                        this.elements.salesModalFullView.href = `/admin/sales/view/${id}`;
+                        this.elements.salesModalFullView.href = `/admin/sales/show/${id}`;
                     }
                 }
             })

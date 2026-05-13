@@ -222,7 +222,7 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <a href="{{ route('admin.sales.view', $sales->id) }}"
+                    <a href="{{ route('admin.sales.show', $sales->id) }}"
                         class="btn btn-primary w-100">{{ __('messages.sales_modal_paid_view_invoice_button') }}
                     </a>
                 </div>

@@ -112,6 +112,54 @@ $routeName = Route::currentRouteName();
             __('tutorial.execute_stock_opname_step_3'),
             __('tutorial.execute_stock_opname_step_4'),
         ];
+    } elseif ($routeName === 'admin.hr.employee.index') {
+        $contextTitle = __('tutorial.hr_employee');
+        $contextIcon = 'ti-id-badge';
+        $contextDesc = __('tutorial.hr_employee_desc');
+        $contextSteps = [
+            __('tutorial.hr_employee_step_1'),
+            __('tutorial.hr_employee_step_2'),
+            __('tutorial.hr_employee_step_3'),
+            __('tutorial.hr_employee_step_4')
+        ];
+    } elseif ($routeName === 'admin.hr.attendance.index') {
+        $contextTitle = __('tutorial.hr_attendance');
+        $contextIcon = 'ti-calendar-check';
+        $contextDesc = __('tutorial.hr_attendance_desc');
+        $contextSteps = [
+            __('tutorial.hr_attendance_step_1'),
+            __('tutorial.hr_attendance_step_2'),
+            __('tutorial.hr_attendance_step_3')
+        ];
+    } elseif ($routeName === 'admin.hr.attendance.show') {
+        $contextTitle = __('tutorial.hr_attendance_details');
+        $contextIcon = 'ti-calendar-time';
+        $contextDesc = __('tutorial.hr_attendance_details_desc');
+        $contextSteps = [
+            __('tutorial.hr_attendance_details_step_1'),
+            __('tutorial.hr_attendance_details_step_2'),
+            __('tutorial.hr_attendance_details_step_3'),
+            __('tutorial.hr_attendance_details_step_4')
+        ];
+    } elseif ($routeName === 'admin.hr.payroll.index') {
+        $contextTitle = __('tutorial.hr_payroll');
+        $contextIcon = 'ti-cash-banknote';
+        $contextDesc = __('tutorial.hr_payroll_desc');
+        $contextSteps = [
+            __('tutorial.hr_payroll_step_1'),
+            __('tutorial.hr_payroll_step_2')
+        ];
+    } elseif ($routeName === 'admin.hr.payroll.show') {
+        $contextTitle = __('tutorial.hr_payroll_details');
+        $contextIcon = 'ti-receipt';
+        $contextDesc = __('tutorial.hr_payroll_details_desc');
+        $contextSteps = [
+            __('tutorial.hr_payroll_details_step_1'),
+            __('tutorial.hr_payroll_details_step_2'),
+            __('tutorial.hr_payroll_details_step_3'),
+            __('tutorial.hr_payroll_details_step_4'),
+            __('tutorial.hr_payroll_details_step_5')
+        ];
     } elseif (Str::startsWith($routeName, 'admin.warehouse')) {
         $contextTitle = __('tutorial.warehouse_management');
         $contextIcon = 'ti-building-warehouse';
@@ -194,7 +242,7 @@ $routeName = Route::currentRouteName();
             __('tutorial.track_returns_po'),
             __('tutorial.save_po')
         ];
-    } elseif ($routeName === 'admin.sales.view') {
+    } elseif ($routeName === 'admin.sales.show') {
         $contextTitle = __('tutorial.view_sales_order');
         $contextIcon = 'ti-eye';
         $contextDesc = __('tutorial.view_sales_order_desc');
@@ -208,7 +256,7 @@ $routeName = Route::currentRouteName();
             __('tutorial.create_return_link'),
             __('tutorial.actions_sales')
         ];
-    } elseif ($routeName === 'admin.po.view') {
+    } elseif ($routeName === 'admin.po.show') {
         $contextTitle = __('tutorial.view_purchase_order');
         $contextIcon = 'ti-eye';
         $contextDesc = __('tutorial.view_purchase_order_desc');
@@ -839,6 +887,17 @@ window.tutorialSubTopics = {
             { icon: 'ti-pencil', label: 'Manual Journal Entries', url: '{{ route('admin.accounting.journal-entries.index') }}' },
             { icon: 'ti-scale', label: 'Trial Balance', url: '{{ route('admin.accounting.trial_balance') }}' },
             { icon: 'ti-scale', label: 'Opening Balance', url: '{{ route('admin.accounting.opening-balance.index') }}' },
+        ]
+    },
+    hr: {
+        label: 'HR & Payroll',
+        subtitle: 'Employee management and payroll',
+        color: 'pink',
+        icon: 'ti-users-group',
+        items: [
+            { icon: 'ti-id-badge', label: 'Employees', url: '{{ route('admin.hr.employee.index') }}' },
+            { icon: 'ti-calendar-check', label: 'Attendance', url: '{{ route('admin.hr.attendance.index') }}' },
+            { icon: 'ti-cash-banknote', label: 'Payroll', url: '{{ route('admin.hr.payroll.index') }}' },
         ]
     },
     reports: {

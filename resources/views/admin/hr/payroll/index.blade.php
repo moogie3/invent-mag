@@ -37,6 +37,29 @@
                                                         </div>
                                                     </div>
                                                 </div>
+                                                <div class="btn-list">
+                                                    <div class="dropdown d-inline-block me-2">
+                                                        <button class="btn btn-secondary dropdown-toggle" type="button"
+                                                            id="exportDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                                                            <i class="ti ti-download me-2"></i> {{ __('messages.export') }}
+                                                        </button>
+                                                        <ul class="dropdown-menu" aria-labelledby="exportDropdown">
+                                                            <li>
+                                                                <a class="dropdown-item" href="#" onclick="exportPayrollRuns('pdf'); return false;">
+                                                                    {{ __('messages.export_as_pdf') }}
+                                                                </a>
+                                                            </li>
+                                                            <li>
+                                                                <a class="dropdown-item" href="#" onclick="exportPayrollRuns('csv'); return false;">
+                                                                    {{ __('messages.export_as_csv') }}
+                                                                </a>
+                                                            </li>
+                                                        </ul>
+                                                    </div>
+                                                    <button class="btn btn-primary d-none d-sm-inline-block" data-bs-toggle="modal" data-bs-target="#runPayrollModal">
+                                                        <i class="ti ti-player-play fs-4"></i> Run Payroll
+                                                    </button>
+                                                </div>
                                             </div>
                                         </div>
                                         <div class="table-responsive">
@@ -53,17 +76,20 @@
                                                 <tbody class="table-tbody">
                                                     @forelse($runs as $run)
                                                         <tr>
-                                                            <td class="sort-period">{{ $run->period->year }}-{{ str_pad($run->period->month, 2, '0', STR_PAD_LEFT) }}</td>
+                                                            <td class="sort-period">{{ \Carbon\Carbon::createFromDate($run->period->year, $run->period->month, 1)->translatedFormat('F Y') }}</td>
                                                             <td class="sort-status">
                                                                 @switch($run->status)
                                                                     @case('draft')
-                                                                        <span class="badge bg-warning">{{ __('messages.draft') }}</span>
+                                                                        <span class="badge bg-warning text-white">{{ __('messages.draft') }}</span>
+                                                                        @break
+                                                                    @case('approved')
+                                                                        <span class="badge bg-info text-white">Approved</span>
                                                                         @break
                                                                     @case('paid')
-                                                                        <span class="badge bg-success">{{ __('messages.paid') }}</span>
+                                                                        <span class="badge bg-success text-white">{{ __('messages.paid') }}</span>
                                                                         @break
                                                                     @default
-                                                                        <span class="badge bg-secondary">{{ $run->status }}</span>
+                                                                        <span class="badge bg-secondary text-white">{{ ucfirst($run->status) }}</span>
                                                                 @endswitch
                                                             </td>
                                                             <td class="sort-run-date">{{ $run->run_date ? $run->run_date->format('Y-m-d') : '-' }}</td>
@@ -97,6 +123,36 @@
                         </div>
                     </div>
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal modal-blur fade" id="runPayrollModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow-lg rounded-3">
+                <div class="modal-header">
+                    <h5 class="modal-title">Run Payroll</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <form method="POST" id="runPayrollForm">
+                    @csrf
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Select Attendance Period</label>
+                            <select name="period_id" id="period_id" class="form-select" required onchange="document.getElementById('runPayrollForm').action = '/admin/hr/payroll/run/' + this.value;">
+                                <option value="" disabled selected>-- Select a period --</option>
+                                @foreach($availablePeriods as $period)
+                                    <option value="{{ $period->id }}">{{ \Carbon\Carbon::createFromDate($period->year, $period->month, 1)->translatedFormat('F Y') }} ({{ ucfirst($period->status) }})</option>
+                                @endforeach
+                            </select>
+                            <div class="form-hint mt-2">Only periods that haven't been run yet are shown. It is recommended to close the period before running payroll.</div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ __('messages.cancel') }}</button>
+                        <button type="submit" class="btn btn-primary"><i class="ti ti-player-play me-2"></i>Run</button>
+                    </div>
+                </form>
             </div>
         </div>
     </div>

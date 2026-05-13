@@ -23,7 +23,7 @@
                                             <option value="{{ $por->purchase_id }}" selected>{{ $por->purchase->invoice }}</option>
                                         </select>
                                         <div class="form-control-plaintext fw-bold">
-                                            <a href="{{ route('admin.po.view', $por->purchase_id) }}" class="text-primary">
+                                            <a href="{{ route('admin.po.show', $por->purchase_id) }}" class="text-primary">
                                                 {{ $por->purchase->invoice }}
                                             </a>
                                             <span class="text-muted">({{ App\Helpers\CurrencyHelper::format($por->purchase->total) }})</span>

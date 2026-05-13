@@ -57,11 +57,11 @@ class PurchaseController extends Controller
         return view('admin.po.purchase-edit', $data);
     }
 
-    public function view($id)
+    public function show($id)
     {
         $data = $this->purchaseService->getPurchaseViewData($id);
 
-        return view('admin.po.purchase-view', $data);
+        return view('admin.po.show', $data);
     }
 
     public function modalView($id)
@@ -119,7 +119,7 @@ class PurchaseController extends Controller
 
         try {
             $this->purchaseService->updatePurchase($purchase, $request->all());
-            return redirect()->route('admin.po.view', $purchase->id)->with('success', 'Purchase order updated successfully.');
+            return redirect()->route('admin.po.show', $purchase->id)->with('success', 'Purchase order updated successfully.');
         } catch (\Exception $e) {
             Log::error('Purchase Order update failed for ID ' . $id . ': ' . $e->getMessage(), ['exception' => $e, 'input' => $request->all()]);
             return back()
@@ -140,7 +140,7 @@ class PurchaseController extends Controller
         try {
             $purchase = Purchase::findOrFail($id);
             $this->purchaseService->addPayment($purchase, $request->all());
-            return redirect()->route('admin.po.view', $purchase->id)->with('success', 'Payment added successfully.');
+            return redirect()->route('admin.po.show', $purchase->id)->with('success', 'Payment added successfully.');
         } catch (\Exception $e) {
             return back()
                 ->withErrors(['error' => 'Something went wrong: ' . $e->getMessage()])

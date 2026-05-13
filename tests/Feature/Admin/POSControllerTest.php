@@ -230,7 +230,7 @@ class POSControllerTest extends TestCase
         ]);
         SalesItem::factory()->create(['sales_id' => $sale->id, 'product_id' => $this->product->id]);
 
-        $response = $this->get(route('admin.sales.view', $sale->id));
+        $response = $this->get(route('admin.sales.show', $sale->id));
 
         $response->assertRedirect(route('admin.pos.receipt', $sale->id));
     }

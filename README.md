@@ -255,12 +255,12 @@ Experience Invent-MAG firsthand:
 #### Contextual Tutorial System
 
 - **Tutorial Button:** Every page title includes a `?` help button (dashboard included)
-- **30+ Page-Specific Guides:** From Products to all Accounting and Reports pages
-- **Multi-Step Modal:** Setup workflow overview → topic grid → page-specific quick guide
-- **Topic Drill-Down:** Topics grid (6 categories) → click category → sub-topic list (e.g., Accounting → Chart of Accounts, Ledger, Trial Balance...) → click to navigate with contextual tutorial auto-opened
+- **40+ Page-Specific Guides:** From Products and Sales to HR (Employee, Attendance, Payroll) and all Accounting/Reports pages
+- **Multi-Step Modal:** 6-step setup workflow overview → topic grid → page-specific quick guide
+- **Topic Drill-Down:** Topics grid (7 categories) → click category → sub-topic list (e.g., Accounting → Chart of Accounts, Ledger, Trial Balance...) → click to navigate with contextual tutorial auto-opened
 - **Click-Outside to Close:** Modal backdrop click now closes the tutorial modal
 - **Auto-Show on Sub-Topic Navigation:** Clicking a sub-topic link and navigating triggers the contextual tutorial modal for the destination page
-- **First-Login Experience:** Setup workflow shown only on first login; direct to contextual guide on return visits
+- **First-Login Experience:** 6-step setup workflow shown only on first login; direct to contextual guide on return visits
 
 #### User Management
 
@@ -538,6 +538,8 @@ docker-compose exec app php artisan migrate --seed
 
 ### Recently Added (v1.7)
 
+- ✅ Tutorial Welcome Greeting — Added HR & Payroll as step 4 in setup workflow (now 6 steps)
+- ✅ Tutorial Master Data — Added Employees, Attendance, Payroll to Master Data subtopics
 - ✅ Major Hotwire Turbo Performance Fix (Removed critical CPU memory leaks from 5+ JS files)
 - ✅ Subscription System Billing Overhaul (Switched to 30-day Rolling Cycle instead of strict Calendar month)
 - ✅ Intelligent Subscription Modal Math (Perfectly calculates and visually displays stacked renewal days)

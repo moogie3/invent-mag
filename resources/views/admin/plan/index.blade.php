@@ -68,13 +68,25 @@
     // Use Tenant model methods for robust subscription expiry calculation
     $expiryDate = null;
     $daysRemaining = null;
+    $isOnActiveTrial = false;
     if ($tenant && $currentPlan && !$isDemo) {
         $expiryDate = $tenant->getSubscriptionExpiryDate();
         $daysRemaining = $tenant->subscriptionDaysRemaining();
+        $isOnActiveTrial = $tenant->isOnActiveTrial();
     }
 @endphp
 
-                                @if($expiryDate && $daysRemaining !== null)
+                                @if($isOnActiveTrial && $expiryDate)
+                                    <div class="alert alert-info border-0 shadow-sm" style="border-radius: 8px;">
+                                        <div class="d-flex align-items-center">
+                                            <i class="ti ti-calendar-clock fs-4 text-info me-3"></i>
+                                            <div>
+                                                <strong>Your free trial ends on {{ $expiryDate->format('d F Y') }}</strong>
+                                                <div class="small mb-0">{{ $daysRemaining }} {{ $daysRemaining == 1 ? 'day' : 'days' }} remaining — upgrade to keep access</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                @elseif($expiryDate && $daysRemaining !== null && !$isOnActiveTrial)
                                     @php
                                         // Determine alert color based on days remaining
                                         if ($daysRemaining <= 3) {

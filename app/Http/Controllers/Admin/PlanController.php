@@ -91,7 +91,13 @@ class PlanController extends Controller
         // Check if current plan is expired/inactive (allows renewal of same tier)
         $planInactive = $tenant ? $tenant->planInactive() : false;
 
-        // Check if plan is expiring soon (within 7 days) - use Tenant model method for consistency
+        // Detect active trial — used to suppress renewal buttons and expiring-soon banners
+        // because a trial countdown should not be conflated with a paid subscription expiry
+        $isOnActiveTrial = $tenant ? $tenant->isOnActiveTrial() : false;
+
+        // Check if plan is expiring soon (within 7 days) — only for paid subscriptions.
+        // Active trials are excluded because their 7-day trial window should not
+        // trigger the "renew" workflow.
         $expiringSoon = false;
         $expiryDays = null;
         $currentExpiryDate = null;
@@ -100,7 +106,7 @@ class PlanController extends Controller
             if ($currentExpiryDate) {
                 $expiryDays = $tenant->subscriptionDaysRemaining();
 
-                if ($expiryDays >= 0 && $expiryDays <= 7) {
+                if (!$isOnActiveTrial && $expiryDays >= 0 && $expiryDays <= 7) {
                     $expiringSoon = true;
                 }
             }
@@ -114,6 +120,7 @@ class PlanController extends Controller
             'suggestedPlan',
             'upgradeMessage',
             'planInactive',
+            'isOnActiveTrial',
             'expiringSoon',
             'expiryDays',
             'currentExpiryDate'

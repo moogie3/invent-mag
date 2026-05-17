@@ -18,7 +18,7 @@ Invent-MAG is a production-ready, enterprise-grade ERP system built on Laravel 1
 - **Docker + CI/CD** for modern DevOps practices
 - **Service-oriented architecture** with clean separation of concerns
 - **Turbo Drive (Hotwire)** for SPA-like navigation without a frontend framework
-- **Contextual tutorial system** with 30+ page-specific help modals, sub-topic drill-down navigation, and auto-show on sub-topic clicks
+- **Contextual tutorial system** with 40+ page-specific help modals, sub-topic drill-down navigation, and auto-show on sub-topic clicks
 
 ---
 
@@ -626,11 +626,11 @@ Invent-MAG uses **Hotwire Turbo Drive** (`@hotwired/turbo-rails`) to deliver SPA
 - Every page title includes a `?` tutorial button (`<a class="trigger-tutorial-modal">`) alongside the page icon
 - Clicking opens `#tutorial-modal`, a multi-step Bootstrap modal with three steps:
   1. **Setup Workflow Overview** – shown only on first login (`tutorial_completed = false`)
-  2. **Topic Grid** – 6 category tiles (Configuration, Master Data, Operations, Accounting, Reports, Administration) that drill into sub-topic lists
+   2. **Topic Grid** – 7 category tiles (Configuration, Master Data, Operations, HR & Payroll, Accounting, Reports, Administration) that drill into sub-topic lists
   3. **Page-Specific Quick Guide** – contextual steps driven by `Route::currentRouteName()` in `tutorial-modal.blade.php`
 - **Sub-topic drill-down navigation** – clicking a topic card (e.g., "Accounting") shows a list of pages in that category (e.g., Chart of Accounts, General Ledger, Trial Balance...). Clicking one navigates to that page and auto-opens its contextual tutorial modal via `sessionStorage` flag and Turbo-aware fetch chain.
 - **Click-outside to close** – removed `data-bs-backdrop="static"`, enabling backdrop click to dismiss the modal
-- 30+ route contexts covered, from Products and Sales Orders to all Accounting and Reports pages
+- 40+ route contexts covered, from Products and Sales Orders to HR (Employee, Attendance, Payroll) and all Accounting and Reports pages
 - **Ordering rule:** Specific `$routeName === '...'` checks must come BEFORE `Str::startsWith()` catch-alls in the Blade file to avoid incorrect context being displayed
 - Page title convention: `<i class="ti ti-{icon} me-2"></i>` → title text → tutorial button (`ms-3`)
 
@@ -749,6 +749,7 @@ class SalesForecastService
 
 | Version | Date          | Changes                                                                                                                                                                                                                                                                                                                                                                                            |
 | ------- | ------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1.7     | May 2026     | Tutorial HR Expansion: Added HR & Payroll as step 4 in welcome setup workflow (now 6 steps). Added Employees, Attendance, Payroll to Master Data sub-topics. Master Data topic card description updated. |
 | 1.6     | April 2026    | Tutorial System Enhancements: Topic grid sub-topic drill-down (click category → see all pages in that category → click to navigate). Click-outside closes modal (removed static backdrop). Sub-topic navigation auto-shows contextual tutorial on destination page via sessionStorage flag + Turbo-aware async fetch chain. Fixed sidebar stale nav-click closing bug. Added dashboard tutorial button and context. |
 | 1.5     | April 2026    | UI/UX Polish & Tutorial System: Contextual tutorial button (?) added to every page title. 30+ page-specific help modals in `tutorial-modal.blade.php`. Consistent `ti-*` icon system across all page headers. "Partially Paid" status label standardized across Sales & Purchase Orders. Sales Return credit note condition documented. Purchase Order autofill info label. Journal entry audit log sidebar badge fix. |
 | 1.4     | March 2026    | Financial & CRM Integrations: Full integration of Sales and Purchase Returns into GL, Dashboards, and CRM (Adjusted LTV). Extracted `SalesHelper`, `PurchaseHelper`, and `ProductStockController` for DRY calculations. Added Opening Balance Module. Added `ACCOUNTING_SETUP_GUIDE.md`. |
@@ -834,6 +835,7 @@ Common extension points:
 | 1.4     | Mar 2026 | Financial & CRM Integrations: Full integration of Returns into GL, Dashboards, and CRM (Net LTV). `SalesHelper` & `PurchaseHelper` extraction. Opening Balance Module added.  |
 | 1.3     | Mar 2026 | Turbo Drive integration: `onPageLoad` utility, `bootstrap-init.js`, `receipt-page.js`, POS reactivity fix, `DashboardService` extraction, auth error handling improvements.   |
 | 1.5     | Apr 2026 | UI/UX Polish & Tutorial System: Contextual tutorial buttons on all pages. 30+ page-specific help modals. Consistent icon system. Partially Paid status standardization. Sales Return credit note conditions. PO autofill info. Journal entry audit log sidebar badge fix. |
+| 1.7     | May 2026     | Tutorial HR Expansion: Added HR & Payroll to welcome setup workflow. Added Employees, Attendance, Payroll to Master Data sub-topics. Tech spec category count updated (6→7), context count updated (30+→40+).
 | 1.6     | Apr 2026 | Tutorial System Enhancements: Sub-topic drill-down navigation, click-outside closes modal, auto-show on sub-topic navigation, sidebar bug fix, dashboard tutorial button.
 
 ---

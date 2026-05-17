@@ -113,6 +113,54 @@
             __('tutorial.execute_stock_opname_step_3'),
             __('tutorial.execute_stock_opname_step_4'),
         ];
+    } elseif ($routeName === 'admin.hr.employee.index') {
+        $contextTitle = __('tutorial.hr_employee');
+        $contextIcon = 'ti-id-badge';
+        $contextDesc = __('tutorial.hr_employee_desc');
+        $contextSteps = [
+            __('tutorial.hr_employee_step_1'),
+            __('tutorial.hr_employee_step_2'),
+            __('tutorial.hr_employee_step_3'),
+            __('tutorial.hr_employee_step_4')
+        ];
+    } elseif ($routeName === 'admin.hr.attendance.index') {
+        $contextTitle = __('tutorial.hr_attendance');
+        $contextIcon = 'ti-calendar-check';
+        $contextDesc = __('tutorial.hr_attendance_desc');
+        $contextSteps = [
+            __('tutorial.hr_attendance_step_1'),
+            __('tutorial.hr_attendance_step_2'),
+            __('tutorial.hr_attendance_step_3')
+        ];
+    } elseif ($routeName === 'admin.hr.attendance.show') {
+        $contextTitle = __('tutorial.hr_attendance_details');
+        $contextIcon = 'ti-calendar-time';
+        $contextDesc = __('tutorial.hr_attendance_details_desc');
+        $contextSteps = [
+            __('tutorial.hr_attendance_details_step_1'),
+            __('tutorial.hr_attendance_details_step_2'),
+            __('tutorial.hr_attendance_details_step_3'),
+            __('tutorial.hr_attendance_details_step_4')
+        ];
+    } elseif ($routeName === 'admin.hr.payroll.index') {
+        $contextTitle = __('tutorial.hr_payroll');
+        $contextIcon = 'ti-cash-banknote';
+        $contextDesc = __('tutorial.hr_payroll_desc');
+        $contextSteps = [
+            __('tutorial.hr_payroll_step_1'),
+            __('tutorial.hr_payroll_step_2')
+        ];
+    } elseif ($routeName === 'admin.hr.payroll.show') {
+        $contextTitle = __('tutorial.hr_payroll_details');
+        $contextIcon = 'ti-receipt';
+        $contextDesc = __('tutorial.hr_payroll_details_desc');
+        $contextSteps = [
+            __('tutorial.hr_payroll_details_step_1'),
+            __('tutorial.hr_payroll_details_step_2'),
+            __('tutorial.hr_payroll_details_step_3'),
+            __('tutorial.hr_payroll_details_step_4'),
+            __('tutorial.hr_payroll_details_step_5')
+        ];
     } elseif (Str::startsWith($routeName, 'admin.warehouse')) {
         $contextTitle = __('tutorial.warehouse_management');
         $contextIcon = 'ti-building-warehouse';
@@ -487,6 +535,21 @@
             __('tutorial.default_accounts'),
             __('tutorial.cash_receivables'),
             __('tutorial.reset_option')
+        ];
+    } elseif ($routeName === 'admin.setting.backup.index') {
+        $contextTitle = __('tutorial.backup_page');
+        $contextIcon = 'ti-database';
+        $contextDesc = __('tutorial.backup_page_desc');
+        $contextSteps = [
+            __('tutorial.backup_recommendation'),
+            __('tutorial.backup_create'),
+            __('tutorial.backup_files'),
+            __('tutorial.backup_restore'),
+            __('tutorial.backup_password_tab'),
+            __('tutorial.backup_password_first_time'),
+            __('tutorial.backup_password_enable'),
+            __('tutorial.backup_password_restore_needed'),
+            __('tutorial.backup_password_minimum'),
         ];
     } elseif ($routeName === 'admin.accounting.ledger') {
         $contextTitle = __('tutorial.general_ledger');

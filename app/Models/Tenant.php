@@ -91,6 +91,16 @@ class Tenant extends BaseTenant
     }
 
     /**
+     * Expressive alias for onTrial() used by UI logic.
+     * Returns true only when the tenant is actively trialing
+     * and trial_ends_at is still in the future.
+     */
+    public function isOnActiveTrial(): bool
+    {
+        return $this->onTrial();
+    }
+
+    /**
      * Check if the tenant's trial has expired.
      */
     public function trialExpired(): bool
@@ -116,7 +126,8 @@ class Tenant extends BaseTenant
     /**
      * Get the subscription expiry date.
      * Returns the appropriate expiry date based on subscription state:
-     * - Trial: trial_ends_at
+     * - Active trial: trial_ends_at
+     * - Expired trial: trial_ends_at (mirrors the actual end date)
      * - Paid with billing period: billing_period_end
      * - Paid without billing period: plan_changed_at + billing cycle days
      *
@@ -128,17 +139,24 @@ class Tenant extends BaseTenant
             return null;
         }
 
-        // Priority 1: If on trial, use trial end date
+        // Priority 1: If on active trial, use trial end date
         if ($this->onTrial() && $this->trial_ends_at) {
             return $this->trial_ends_at->copy()->endOfDay();
         }
 
-        // Priority 2: If has billing period, use that
+        // Priority 2: If trial has expired, return trial_ends_at as the actual expiry date.
+        // Without this, the method falls through to plan_changed_at + 30 which gives a
+        // misleading future date for tenants who never converted from trial to paid.
+        if ($this->trialExpired() && $this->trial_ends_at) {
+            return $this->trial_ends_at->copy()->endOfDay();
+        }
+
+        // Priority 3: If has billing period, use that
         if ($this->billing_period_start && $this->billing_period_end) {
             return \Carbon\Carbon::parse($this->billing_period_end)->endOfDay();
         }
 
-        // Priority 3: Calculate from plan_changed_at + billing cycle
+        // Priority 4: Calculate from plan_changed_at + billing cycle
         $plan = $this->getEffectivePlan();
         if ($this->plan_changed_at && $plan) {
             $billingDays = $plan->getBillingPeriodDays() ?? 30;
@@ -148,7 +166,7 @@ class Tenant extends BaseTenant
         return null;
     }
 
-/**
+    /**
      * Get the number of days remaining in the subscription.
      * Returns 0 if expired, negative if unlimited/error.
      * Uses trialDaysRemaining() when on trial for consistency with trial badge.
@@ -157,9 +175,16 @@ class Tenant extends BaseTenant
      */
     public function subscriptionDaysRemaining(): int
     {
-        // When on trial, use trialDaysRemaining() for consistency with trial badge
+        // When on active trial, use trialDaysRemaining() for consistency with trial badge
         if ($this->onTrial()) {
             return $this->trialDaysRemaining();
+        }
+
+        // Trial has expired — no remaining days. Prevents fallthrough to
+        // getSubscriptionExpiryDate() Priority 4 (plan_changed_at + 30) which
+        // would incorrectly return a future date for expired trial tenants.
+        if ($this->trialExpired()) {
+            return 0;
         }
 
         $expiryDate = $this->getSubscriptionExpiryDate();

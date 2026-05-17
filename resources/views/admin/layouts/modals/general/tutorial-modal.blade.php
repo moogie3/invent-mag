@@ -858,6 +858,9 @@ window.tutorialSubTopics = {
             { icon: 'ti-building-warehouse', label: 'Warehouses', url: '{{ route('admin.warehouse') }}' },
             { icon: 'ti-users', label: 'Customers', url: '{{ route('admin.customer') }}' },
             { icon: 'ti-truck', label: 'Suppliers', url: '{{ route('admin.supplier') }}' },
+            { icon: 'ti-id-badge', label: 'Employees', url: '{{ route('admin.hr.employee.index') }}' },
+            { icon: 'ti-calendar-check', label: 'Attendance', url: '{{ route('admin.hr.attendance.index') }}' },
+            { icon: 'ti-cash-banknote', label: 'Payroll', url: '{{ route('admin.hr.payroll.index') }}' },
         ]
     },
     operations: {
@@ -923,6 +926,7 @@ window.tutorialSubTopics = {
         items: [
             { icon: 'ti-shield-lock', label: 'Audit Log', url: '{{ route('admin.audit-log.index') }}' },
             { icon: 'ti-users', label: 'User Management', url: '{{ route('admin.users.index') }}' },
+            { icon: 'ti-database', label: 'Backup', url: '{{ route('admin.setting.backup.index') }}' },
         ]
     },
 };
@@ -980,11 +984,21 @@ window.tutorialSubTopics = {
                         </div>
 
                         <div class="tutorial-list-item">
+                            <div class="tutorial-icon-box bg-pink-lt text-pink me-4 shadow-sm">
+                                <i class="ti ti-users-group"></i>
+                            </div>
+                            <div>
+                                <h3 class="mb-1 fw-bold fs-4">4. HR & Payroll</h3>
+                                <p class="text-secondary mb-0">Manage your workforce: <strong>Employees, Attendance tracking, and Payroll processing</strong>.</p>
+                            </div>
+                        </div>
+
+                        <div class="tutorial-list-item">
                             <div class="tutorial-icon-box bg-info-lt text-info me-4 shadow-sm">
                                 <i class="ti ti-chart-bar"></i>
                             </div>
                             <div>
-                                <h3 class="mb-1 fw-bold fs-4">4. Accounting & Reports</h3>
+                                <h3 class="mb-1 fw-bold fs-4">5. Accounting & Reports</h3>
                                 <p class="text-secondary mb-0">Track your finances: <strong>Journals, Chart of Accounts, Income Statements</strong>.</p>
                             </div>
                         </div>
@@ -994,7 +1008,7 @@ window.tutorialSubTopics = {
                                 <i class="ti ti-shield-lock"></i>
                             </div>
                             <div>
-                                <h3 class="mb-1 fw-bold fs-4">5. Administration & Security</h3>
+                                <h3 class="mb-1 fw-bold fs-4">6. Administration & Security</h3>
                                 <p class="text-secondary mb-0">Configure system preferences on the <strong>Settings page</strong>, and monitor system changes via the <strong>Audit & Activity Logs</strong>.</p>
                             </div>
                         </div>
@@ -1030,7 +1044,7 @@ window.tutorialSubTopics = {
                                     <i class="ti ti-packages"></i>
                                 </div>
                                 <h4 class="fw-bold text-dark">Master Data</h4>
-                                <p class="text-secondary small mb-0">Products, Warehouses, Suppliers, Customers</p>
+                                <p class="text-secondary small mb-0">Products, Warehouses, Suppliers, Customers, Employees, Attendance, Payroll</p>
                             </div>
                         </div>
                     </div>
@@ -1078,7 +1092,7 @@ window.tutorialSubTopics = {
                                     <i class="ti ti-shield-lock"></i>
                                 </div>
                                 <h4 class="fw-bold text-dark">Administration</h4>
-                                <p class="text-secondary small mb-0">Audit Logs, User Management, Settings</p>
+                                <p class="text-secondary small mb-0">Audit Logs, User Management, Backup, Settings</p>
                             </div>
                         </div>
                     </div>

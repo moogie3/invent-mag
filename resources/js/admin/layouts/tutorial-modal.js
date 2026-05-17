@@ -86,7 +86,7 @@ function initAutoTutorial() {
         if(!currentRoute) return;
 
         // Only auto-show for main modules, not every single subpage
-        var majorRoutes = ['admin.dashboard', 'admin.product', 'admin.product.create', 'admin.warehouse', 'admin.customer', 'admin.supplier', 'admin.sales', 'admin.po', 'admin.accounting.chart', 'admin.setting.index', 'admin.setting.unit', 'admin.setting.category', 'admin.setting.tax'];
+        var majorRoutes = ['admin.dashboard', 'admin.product', 'admin.product.create', 'admin.warehouse', 'admin.customer', 'admin.supplier', 'admin.sales', 'admin.po', 'admin.accounting.chart', 'admin.setting.index', 'admin.setting.unit', 'admin.setting.category', 'admin.setting.tax', 'admin.setting.backup.index', 'admin.stock-opname.index', 'admin.reports.stock-transfer.page', 'admin.hr.employee.index', 'admin.hr.attendance.index', 'admin.hr.payroll.index'];
         
         // Allow exact match or if current route starts with one of the major routes (like edit, view)
         var isMajorRoute = majorRoutes.some(r => currentRoute === r || (currentRoute.startsWith(r) && r !== 'admin.setting.index'));

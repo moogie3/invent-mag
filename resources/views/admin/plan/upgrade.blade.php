@@ -33,7 +33,7 @@
             </div>
         @endif
 
-        @if($expiringSoon && $expiryDays !== null)
+        @if($expiringSoon && $expiryDays !== null && !$isOnActiveTrial)
             @php
                 if ($expiryDays <= 3) {
                     $alertClass = 'alert-danger';
@@ -61,8 +61,9 @@
                 @php
                     $isCurrent = $currentPlan && $currentPlan->id === $plan->id;
                     $isSuggested = $suggestedPlan && $suggestedPlan->id === $plan->id;
-                    // Allow renewing expired/inactive plans OR plans expiring soon
-                    $canRenew = $isCurrent && ($planInactive || $expiringSoon);
+                    // Allow renewing expired/inactive plans OR plans expiring soon.
+                    // Active trials are excluded because trial → paid is an upgrade, not a renewal.
+                    $canRenew = $isCurrent && ($planInactive || $expiringSoon) && !$isOnActiveTrial;
                 @endphp
                 <div class="col-md-6 col-lg-4 mb-4">
                     <div class="card h-100 rounded-4 shadow-sm border-0 {{ $isSuggested ? 'border border-2 border-primary' : '' }} {{ $isCurrent && !$planInactive ? 'border border-2 border-success' : '' }}" style="transition: transform 0.2s;">
@@ -132,7 +133,7 @@
                                         data-is-renewal="true"
                                         data-days-remaining="{{ $expiryDays ?? 0 }}"
                                         data-new-days="{{ ($expiryDays ?? 0) + 30 }}"
-                                        data-new-date="{{ $currentExpiryDate ? $currentExpiryDate->copy()->addDays(30)->format('F d, Y') : now()->addDays(30)->format('F d, Y') }}">
+                                        data-new-date="{{ ($expiryDays > 0 && $currentExpiryDate) ? $currentExpiryDate->copy()->addDays(30)->format('F d, Y') : now()->addDays(30)->format('F d, Y') }}">
                                     <i class="ti ti-refresh me-2"></i>{{ __('plan.renew_plan') }}
                                 </button>
                             @else

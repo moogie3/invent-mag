@@ -31,7 +31,11 @@ class PayrollService
             ->with('employee')
             ->get();
 
-        $accounts = Account::where('type', 'asset')->where('is_active', true)->get();
+        $accounts = Account::where('type', 'asset')
+            ->where('is_active', true)
+            ->where('level', '>=', 2)
+            ->orderBy('code')
+            ->get();
 
         return compact('run', 'items', 'accounts');
     }
@@ -158,7 +162,7 @@ class PayrollService
 
     public function markPaid(PayrollRun $run, int $accountId): PayrollRun
     {
-        if ($run->status !== 'approved') {
+        if ($run->status !== 'processed') {
             throw new \InvalidArgumentException('Payroll must be approved before recording payment.');
         }
 

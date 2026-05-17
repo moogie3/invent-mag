@@ -69,9 +69,9 @@
                                                                 <i class="ti ti-check"></i> {{ __('messages.hr_approve_payroll') }}
                                                             </button>
                                                         </form>
-                                                    @elseif($run->status === 'approved')
+                                                    @elseif($run->status === 'processed')
                                                         <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#recordPaymentModal">
-                                                            <i class="ti ti-cash"></i> {{ __('messages.hr_record_payment') }}
+                                                            <i class="ti ti-cash me-2"></i> {{ __('messages.hr_record_payment') }}
                                                         </button>
                                                     @endif
                                                 </div>
@@ -268,7 +268,7 @@
         </div>
     </div>
 
-    @if($run->status === 'approved')
+    @if($run->status === 'processed')
     <div class="modal modal-blur fade" id="recordPaymentModal" tabindex="-1">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content border-0 shadow-lg rounded-3">

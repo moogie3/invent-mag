@@ -82,8 +82,8 @@
                                                                     @case('draft')
                                                                         <span class="badge bg-warning text-white">{{ __('messages.draft') }}</span>
                                                                         @break
-                                                                    @case('approved')
-                                                                        <span class="badge bg-info text-white">Approved</span>
+                                                                    @case('processed')
+                                                                        <span class="badge bg-info text-white">Processed</span>
                                                                         @break
                                                                     @case('paid')
                                                                         <span class="badge bg-success text-white">{{ __('messages.paid') }}</span>
@@ -137,6 +137,7 @@
                 <form method="POST" id="runPayrollForm">
                     @csrf
                     <div class="modal-body">
+                        @if($availablePeriods->isNotEmpty())
                         <div class="mb-3">
                             <label class="form-label fw-semibold">Select Attendance Period</label>
                             <select name="period_id" id="period_id" class="form-select" required onchange="document.getElementById('runPayrollForm').action = '/admin/hr/payroll/run/' + this.value;">
@@ -147,10 +148,23 @@
                             </select>
                             <div class="form-hint mt-2">Only periods that haven't been run yet are shown. It is recommended to close the period before running payroll.</div>
                         </div>
+                        @else
+                        <div class="text-center py-4">
+                            <i class="ti ti-calendar-off text-muted" style="font-size: 3rem;"></i>
+                            <h5 class="mt-3">No Periods Available</h5>
+                            <p class="text-muted mb-0">All attendance periods have been processed, or none exist yet.</p>
+                            <p class="text-muted">Go to <strong>HR → Attendance</strong> to open a new period first.</p>
+                            <a href="{{ route('admin.hr.attendance.index') }}" class="btn btn-primary mt-3">
+                                <i class="ti ti-calendar-plus me-2"></i>Open Attendance Period
+                            </a>
+                        </div>
+                        @endif
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ __('messages.cancel') }}</button>
+                        @if($availablePeriods->isNotEmpty())
                         <button type="submit" class="btn btn-primary"><i class="ti ti-player-play me-2"></i>Run</button>
+                        @endif
                     </div>
                 </form>
             </div>

@@ -175,5 +175,13 @@ return [
             'name' => 'Depreciation Expense',
             'description' => 'Expense recognized for the wear and tear of fixed assets.',
         ],
+        'salary_expense' => [
+            'name' => 'Salary Expense',
+            'description' => 'Total salary expense for payroll.',
+        ],
+        'salary_payable' => [
+            'name' => 'Salary Payable',
+            'description' => 'Accrued salary liability to employees.',
+        ],
     ],
 ];

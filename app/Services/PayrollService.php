@@ -150,7 +150,7 @@ class PayrollService
             throw new \InvalidArgumentException('Can only approve draft payrolls.');
         }
 
-        $run->update(['status' => 'approved']);
+        $run->update(['status' => 'processed']);
         $this->postApprovalJournalEntry($run);
 
         return $run;
@@ -177,16 +177,17 @@ class PayrollService
         $totalNet = $run->items->sum('net_pay');
         if ($totalNet <= 0) return;
 
+        $tenantId = app('currentTenant')->id;
         $accountingService = app(AccountingService::class);
 
         $transactions = [
             [
-                'account_name' => 'Salary Expense', // You may replace this with mapped settings
+                'account_code' => '6300-' . $tenantId,
                 'type' => 'debit',
                 'amount' => $totalNet
             ],
             [
-                'account_name' => 'Salary Payable',
+                'account_code' => '2140-' . $tenantId,
                 'type' => 'credit',
                 'amount' => $totalNet
             ]
@@ -205,6 +206,7 @@ class PayrollService
         $totalNet = $run->items->sum('net_pay');
         if ($totalNet <= 0) return;
 
+        $tenantId = app('currentTenant')->id;
         $paymentAccount = Account::find($accountId);
         if (!$paymentAccount) {
             throw new \InvalidArgumentException("Payment account not found.");
@@ -214,7 +216,7 @@ class PayrollService
 
         $transactions = [
             [
-                'account_name' => 'Salary Payable',
+                'account_code' => '2140-' . $tenantId,
                 'type' => 'debit',
                 'amount' => $totalNet
             ],

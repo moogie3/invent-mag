@@ -59,6 +59,7 @@ class AccountSeeder extends Seeder
                             ['name' => 'accounting.accounts.accounts_payable.name', 'code' => '2110-' . $tenantId, 'type' => 'liability', 'level' => 2, 'description' => 'accounting.accounts.accounts_payable.description'],
                             ['name' => 'accounting.accounts.accrued_expenses.name', 'code' => '2120-' . $tenantId, 'type' => 'liability', 'level' => 2, 'description' => 'accounting.accounts.accrued_expenses.description'],
                             ['name' => 'accounting.accounts.output_vat.name', 'code' => '2130-' . $tenantId, 'type' => 'liability', 'level' => 2, 'description' => 'accounting.accounts.output_vat.description'],
+                            ['name' => 'accounting.accounts.salary_payable.name', 'code' => '2140-' . $tenantId, 'type' => 'liability', 'level' => 2, 'description' => 'accounting.accounts.salary_payable.description'],
                         ]
                     ],
                     ['name' => 'accounting.accounts.long_term_liabilities.name', 'code' => '2200-' . $tenantId, 'type' => 'liability', 'level' => 1,
@@ -115,6 +116,7 @@ class AccountSeeder extends Seeder
                             ['name' => 'accounting.accounts.depreciation_expense.name', 'code' => '6240-' . $tenantId, 'type' => 'expense', 'level' => 2, 'description' => 'accounting.accounts.depreciation_expense.description'],
                         ]
                     ],
+                    ['name' => 'accounting.accounts.salary_expense.name', 'code' => '6300-' . $tenantId, 'type' => 'expense', 'level' => 1, 'description' => 'accounting.accounts.salary_expense.description'],
                 ]
             ],
         ];

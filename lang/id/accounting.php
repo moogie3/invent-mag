@@ -175,5 +175,13 @@ return [
             'name' => 'Beban Penyusutan',
             'description' => 'Beban yang diakui untuk keausan aset tetap.',
         ],
+        'salary_expense' => [
+            'name' => 'Beban Gaji',
+            'description' => 'Total beban gaji untuk payroll.',
+        ],
+        'salary_payable' => [
+            'name' => 'Utang Gaji',
+            'description' => 'Liabilitas gaji accrued kepada karyawan.',
+        ],
     ],
 ];

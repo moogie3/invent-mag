@@ -37,14 +37,14 @@ class PurchaseControllerTest extends TestCase
         $this->seed(AccountSeeder::class);
         $this->user->assignRole('superuser');
 
-        // Ensure the authenticated user has the necessary accounting settings
+        // Ensure the current tenant has the necessary accounting settings
         $tenantId = app('currentTenant')->id;
-        $this->user->accounting_settings = [
+        $this->tenant->accounting_settings = [
             'cash_account_id' => Account::where('code', '1110-' . $tenantId)->first()->id,
             'accounts_payable_account_id' => Account::where('code', '2110-' . $tenantId)->first()->id,
             'inventory_account_id' => Account::where('code', '1140-' . $tenantId)->first()->id,
         ];
-        $this->user->save();
+        $this->tenant->save();
         $this->actingAs($this->user);
 
         $this->warehouse = Warehouse::factory()->create(['is_main' => true]); // Added

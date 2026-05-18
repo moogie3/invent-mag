@@ -223,8 +223,8 @@ class PurchaseService
             $finalTotal = $totalAmount - $orderDiscount;
             $purchase->update(['total' => $finalTotal]);
 
-            // Get accounting settings from the user
-            $accountingSettings = Auth::user()->accounting_settings;
+            // Get accounting settings from tenant
+            $accountingSettings = app('currentTenant')->accounting_settings ?? [];
 
             if (!$accountingSettings || !isset($accountingSettings['inventory_account_id']) || !isset($accountingSettings['accounts_payable_account_id'])) {
                 throw new \Exception('Accounting settings for inventory or accounts payable are not configured.');
@@ -363,8 +363,8 @@ class PurchaseService
             $purchase->load('payments'); // Refresh the payments relationship
             $this->updatePurchaseStatus($purchase);
 
-            // Get accounting settings from the user
-            $accountingSettings = Auth::user()->accounting_settings;
+            // Get accounting settings from tenant
+            $accountingSettings = app('currentTenant')->accounting_settings ?? [];
 
             if (!$accountingSettings || !isset($accountingSettings['accounts_payable_account_id']) || !isset($accountingSettings['cash_account_id'])) {
                 throw new \Exception('Accounting settings for accounts payable or cash are not configured.');

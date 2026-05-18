@@ -37,7 +37,7 @@ class SalesFactory extends Factory
             'total_tax' => $this->faker->randomFloat(2, 0, 1000),
             'amount_received' => $this->faker->randomFloat(2, 0, 10000),
             'change_amount' => $this->faker->randomFloat(2, 0, 100),
-            'is_pos' => $this->faker->boolean(),
+            'type' => $this->faker->randomElement([\App\Models\Sales::TYPE_REGULAR, \App\Models\Sales::TYPE_POS]),
             'sales_opportunity_id' => null, // Assuming this can be null
             'warehouse_id' => Warehouse::factory(), // Added for multi-warehouse
         ];

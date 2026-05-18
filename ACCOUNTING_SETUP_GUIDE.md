@@ -73,6 +73,7 @@ Users need the following permissions to access accounting features:
 │   2. DAILY OPERATIONS                                           │
 │      ├── Sales Orders create journal entries                    │
 │      ├── Purchase Orders create journal entries                 │
+│      ├── HR Payroll processes accruals & payments               │
 │      ├── Payments are recorded                                  │
 │                                                                 │
 │   3. PERIODIC REVIEW                                            │
@@ -154,6 +155,7 @@ The system creates the following account structure:
 | 2110 | Accounts Payable | Money owed to suppliers |
 | 2120 | Accrued Expenses | Expenses incurred but not yet paid |
 | 2130 | Output VAT | VAT collected from customers |
+| 2140 | Salary Payable | Wages owed to employees |
 | 2200 | Long-Term Liabilities | Parent for long-term debts |
 | 2210 | Bank Loans | Loans with maturity > 1 year |
 
@@ -213,6 +215,8 @@ The system needs to know which specific accounts to use when recording transacti
 | Inventory Account | 1140 - Inventory | Inventory tracking |
 | Accounts Payable Account | 2110 - Accounts Payable | Supplier debt tracking |
 | Cash Account | 1110 or 1120 - Cash/Bank | Payment tracking |
+| Salary Expense Account | 6300 - Salary Expense | Payroll accrual |
+| Salary Payable Account | 2140 - Salary Payable | Unpaid employee wages |
 
 **Important:** These settings affect all future transactions. Changing them won't affect past transactions.
 
@@ -559,6 +563,42 @@ Journal Entry:
 Additionally:
 - Inventory is deducted from the warehouse
 - The purchase order amount is adjusted accordingly
+
+### 7. HR & Payroll Processing
+
+Payroll uses a two-step accounting sync:
+
+**Step A: Approve Payroll (Accrual)**
+When a draft payroll run is "Approved":
+
+```
+Transaction: Total payroll cost recognized
+Total Gross Pay: Rp 20,000,000
+
+Journal Entry:
+┌─────────────────────────────────────┬──────────┬──────────┐
+│ Account                             │ Debit    │ Credit   │
+├─────────────────────────────────────┼──────────┼──────────┤
+│ Salary Expense (6300)               │20,000,000│          │
+│   Salary Payable (2140)             │          │20,000,000│
+└─────────────────────────────────────┴──────────┴──────────┘
+```
+
+**Step B: Record Payment (Cash Output)**
+When the payroll is marked "Paid" via a specific bank/cash account:
+
+```
+Transaction: Salary distributed to employees
+Payment Source: Bank BCA
+
+Journal Entry:
+┌─────────────────────────────────────┬──────────┬──────────┐
+│ Account                             │ Debit    │ Credit   │
+├─────────────────────────────────────┼──────────┼──────────┤
+│ Salary Payable (2140)               │20,000,000│          │
+│   Bank (1120)                       │          │20,000,000│
+└─────────────────────────────────────┴──────────┴──────────┘
+```
 
 ---
 

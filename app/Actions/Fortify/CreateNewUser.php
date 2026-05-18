@@ -83,7 +83,7 @@ class CreateNewUser implements CreatesNewUsers
             $costOfGoodsSoldAccount = Account::where('code', '5200-' . $tenantId)->first();
 
             if ($cashAccount && $accountsPayableAccount && $inventoryAccount && $salesRevenueAccount && $accountsReceivableAccount && $costOfGoodsSoldAccount) {
-                $user->accounting_settings = [
+                $tenant->accounting_settings = [
                     'cash_account_id' => $cashAccount->id,
                     'accounts_payable_account_id' => $accountsPayableAccount->id,
                     'inventory_account_id' => $inventoryAccount->id,
@@ -91,7 +91,7 @@ class CreateNewUser implements CreatesNewUsers
                     'accounts_receivable_account_id' => $accountsReceivableAccount->id,
                     'cost_of_goods_sold_account_id' => $costOfGoodsSoldAccount->id,
                 ];
-                $user->save();
+                $tenant->save();
             }
 
             event(new Registered($user));

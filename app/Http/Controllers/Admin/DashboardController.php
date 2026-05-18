@@ -38,7 +38,7 @@ class DashboardController extends Controller
             if ($request->get('action') === 'forecast') {
                 $tenant = app('currentTenant');
                 if (!$tenant || !$tenant->hasFeature('sales_forecasting')) {
-                    return response()->json(['labels' => [], 'historical' => [], 'forecast' => []]);
+                    return response()->json(['labels' => [], 'historical' => [], 'forecast' => [], 'metrics' => null]);
                 }
 
                 $forecastData = $this->salesForecastService->generateForecast();
@@ -54,10 +54,11 @@ class DashboardController extends Controller
                         'labels' => $forecastData['labels'],
                         'historical' => $historicalSeries,
                         'forecast' => $forecastSeries,
+                        'metrics' => $forecastData['metrics'] ?? null
                     ]);
                 }
                 
-                return response()->json(['labels' => [], 'historical' => [], 'forecast' => []]);
+                return response()->json(['labels' => [], 'historical' => [], 'forecast' => [], 'metrics' => null]);
             }
 
             // If the caller passes date_range (same parameter as the full page load),

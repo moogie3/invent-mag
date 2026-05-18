@@ -181,15 +181,15 @@ class StockOpnameService
     
     protected function processAccounting(StockOpname $opname, float $totalShrinkageValue, float $totalExcessValue)
     {
-        $accountingSettings = Auth::user()->accounting_settings;
+        $accountingSettings = app('currentTenant')->accounting_settings ?? [];
         if (!$accountingSettings || !isset($accountingSettings['inventory_account_id']) || !isset($accountingSettings['cost_of_goods_sold_account_id'])) {
             // Silently skip if accounting not configured
             return;
         }
 
-        $inventoryAccount = Account::find($accountingSettings['inventory_account_id']);
+        $inventoryAccount = Account::find($accountingSettings['inventory_account_id'] ?? null);
         // We use COGS or a dedicated Shrinkage account. Here we use COGS as fallback since it's an expense.
-        $expenseAccount = Account::find($accountingSettings['cost_of_goods_sold_account_id']); 
+        $expenseAccount = Account::find($accountingSettings['cost_of_goods_sold_account_id'] ?? null); 
 
         if (!$inventoryAccount || !$expenseAccount) {
             return;

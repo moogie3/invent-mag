@@ -99,14 +99,14 @@ class SalesService
         // Calculate POS Total minus returns
         $posSales = DB::table('sales')
             ->where('tenant_id', $tenantId)
-            ->where('is_pos', true)
+            ->where('type', Sales::TYPE_POS)
             ->selectRaw('SUM(total) as pos_total')
             ->first();
             
         $posReturns = DB::table('sales_returns')
             ->join('sales', 'sales_returns.sales_id', '=', 'sales.id')
             ->where('sales_returns.tenant_id', $tenantId)
-            ->where('sales.is_pos', true)
+            ->where('sales.type', Sales::TYPE_POS)
             ->where('sales_returns.status', 'Completed')
             ->selectRaw('SUM(sales_returns.total_amount) as returned_total')
             ->first();
@@ -291,7 +291,7 @@ class SalesService
                 }
             }
 
-            if ($sale->is_pos) {
+            if ($sale->type === Sales::TYPE_POS) {
                 $posTotal += $sale->total_amount;
             }
         }
@@ -360,7 +360,7 @@ class SalesService
                 'order_discount_type' => $orderDiscountType,
                 'status' => 'Unpaid',
                 'payment_type' => '-',
-                'is_pos' => false,
+                'type' => Sales::TYPE_REGULAR,
                 'customer_credit_used' => 0,
             ]);
 
@@ -464,12 +464,12 @@ class SalesService
                 $totalCostOfGoods += $itemCOGS;
             }
 
-            $accountingSettings = Auth::user()->accounting_settings;
+            $accountingSettings = app('currentTenant')->accounting_settings ?? [];
 
-            $salesRevenueAccount = Account::find($accountingSettings['sales_revenue_account_id']);
-            $accountsReceivableAccount = Account::find($accountingSettings['accounts_receivable_account_id']);
-            $costOfGoodsSoldAccount = Account::find($accountingSettings['cost_of_goods_sold_account_id']);
-            $inventoryAccount = Account::find($accountingSettings['inventory_account_id']);
+            $salesRevenueAccount = Account::find($accountingSettings['sales_revenue_account_id'] ?? null);
+            $accountsReceivableAccount = Account::find($accountingSettings['accounts_receivable_account_id'] ?? null);
+            $costOfGoodsSoldAccount = Account::find($accountingSettings['cost_of_goods_sold_account_id'] ?? null);
+            $inventoryAccount = Account::find($accountingSettings['inventory_account_id'] ?? null);
 
             if (!$salesRevenueAccount || !$accountsReceivableAccount || !$costOfGoodsSoldAccount || !$inventoryAccount) {
                 throw new \Exception('One or more required accounts (Sales Revenue, AR, COGS, Inventory) not found. Please check Accounting Settings.');
@@ -710,11 +710,11 @@ class SalesService
             $this->updateSaleStatus($sale);
             $sale->refresh();
 
-            // Get accounting settings from the user
-            $accountingSettings = Auth::user()->accounting_settings;
+            // Get accounting settings from tenant
+            $accountingSettings = app('currentTenant')->accounting_settings ?? [];
 
             // Only create journal entry for actual cash payments
-            if ($cashAmount > 0 && $accountingSettings && isset($accountingSettings['cash_account_id']) && isset($accountingSettings['accounts_receivable_account_id'])) {
+            if ($cashAmount > 0 && !empty($accountingSettings) && isset($accountingSettings['cash_account_id']) && isset($accountingSettings['accounts_receivable_account_id'])) {
                 // Retrieve account names using the IDs from settings
                 $cashAccount = Account::find($accountingSettings['cash_account_id']);
                 $accountsReceivableAccount = Account::find($accountingSettings['accounts_receivable_account_id']);
@@ -1064,7 +1064,7 @@ class SalesService
                 $sale->update(['status' => 'Partial']);
             }
 
-            $accountingSettings = Auth::user()->accounting_settings;
+            $accountingSettings = app('currentTenant')->accounting_settings ?? [];
             if (!$accountingSettings || !isset($accountingSettings['inventory_account_id']) || !isset($accountingSettings['accounts_receivable_account_id'])) {
                 throw new \Exception('Accounting settings for inventory or accounts receivable are not configured.');
             }

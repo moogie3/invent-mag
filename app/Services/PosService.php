@@ -185,7 +185,7 @@ class PosService
                 'payment_type' => $data['payment_method'],
                 'amount_received' => $data['amount_received'] ?? $grandTotal,
                 'change_amount' => $data['change_amount'] ?? 0,
-                'is_pos' => true,
+                'type' => Sales::TYPE_POS,
             ]);
 
             $sale->payments()->create([

@@ -344,7 +344,7 @@ Data:
 
 - **Laravel Pint:** Code formatting
 - **Service Layer Pattern:** Clean architecture
-- **Repository Pattern:** Data access abstraction
+- **Active Record:** Eloquent data access abstraction
 - **Type Hints:** Full PHP 8+ type declarations
 
 #### Developer Tools

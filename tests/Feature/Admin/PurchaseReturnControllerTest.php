@@ -32,15 +32,15 @@ class PurchaseReturnControllerTest extends TestCase
         $this->seed(AccountSeeder::class);
         $this->user->assignRole('superuser');
 
-        // Ensure the authenticated user has the necessary accounting settings
+        // Ensure the current tenant has the necessary accounting settings
         $tenantId = app('currentTenant')->id;
-        $this->user->accounting_settings = [
+        $this->tenant->accounting_settings = [
             'cash_account_id' => Account::where('code', '1110-' . $tenantId)->first()->id,
             'accounts_payable_account_id' => Account::where('code', '2110-' . $tenantId)->first()->id,
             'inventory_account_id' => Account::where('code', '1140-' . $tenantId)->first()->id,
             'cost_of_goods_sold_account_id' => Account::where('code', '5100-' . $tenantId)->first()->id,
         ];
-        $this->user->save();
+        $this->tenant->save();
         $this->actingAs($this->user);
 
         $this->product = Product::factory()->create();
@@ -73,7 +73,7 @@ class PurchaseReturnControllerTest extends TestCase
 
     public function test_it_can_store_a_new_purchase_return()
     {
-        // Set up accounting settings with all required accounts
+        // Set up accounting settings with all required accounts on the tenant
         $tenantId = app('currentTenant')->id;
         
         $cashAccount = \App\Models\Account::where('code', '1110-' . $tenantId)->first();
@@ -81,13 +81,13 @@ class PurchaseReturnControllerTest extends TestCase
         $inventoryAccount = \App\Models\Account::where('code', '1140-' . $tenantId)->first();
         $cogsAccount = \App\Models\Account::where('code', '5100-' . $tenantId)->first();
         
-        $this->user->accounting_settings = [
+        $this->tenant->accounting_settings = [
             'cash_account_id' => $cashAccount->id ?? null,
             'accounts_payable_account_id' => $apAccount->id ?? null,
             'inventory_account_id' => $inventoryAccount->id ?? null,
             'cost_of_goods_sold_account_id' => $cogsAccount->id ?? null,
         ];
-        $this->user->save();
+        $this->tenant->save();
 
         // Create purchase with proper status
         $this->purchase->update(['status' => 'Paid', 'amount_received' => 100]);

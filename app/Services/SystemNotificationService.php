@@ -280,7 +280,8 @@ class SystemNotificationService
             return collect();
         }
 
-        $settings = $user->accounting_settings ?? [];
+        // Read accounting settings from the tenant (not the user)
+        $settings = $tenant !== null ? ($tenant->accounting_settings ?? []) : [];
 
         $requiredKeys = [
             'cash_account_id',

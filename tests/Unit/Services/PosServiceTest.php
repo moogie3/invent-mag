@@ -108,7 +108,7 @@ class PosServiceTest extends TestCase
             'id' => $sale->id,
             'customer_id' => $customer->id,
             'status' => 'Paid',
-            'is_pos' => true,
+            'type' => \App\Models\Sales::TYPE_POS,
         ]);
 
         // Assert totals

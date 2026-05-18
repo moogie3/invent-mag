@@ -26,9 +26,9 @@ class TransactionServiceTest extends TestCase
         // Seed accounts
         $this->seed(AccountSeeder::class);
         
-        // Configure user accounting settings
+        // Configure tenant accounting settings (settings belong to the tenant, not the user)
         $tenantId = app('currentTenant')->id;
-        $this->user->accounting_settings = [
+        $this->tenant->accounting_settings = [
             'cash_account_id' => Account::where('code', '1110-' . $tenantId)->first()->id,
             'accounts_receivable_account_id' => Account::where('code', '1130-' . $tenantId)->first()->id,
             'sales_revenue_account_id' => Account::where('code', '4100-' . $tenantId)->first()->id,
@@ -36,7 +36,7 @@ class TransactionServiceTest extends TestCase
             'inventory_account_id' => Account::where('code', '1140-' . $tenantId)->first()->id,
             'accounts_payable_account_id' => Account::where('code', '2110-' . $tenantId)->first()->id,
         ];
-        $this->user->save();
+        $this->tenant->save();
 
         $this->transactionService = app(TransactionService::class);
     }

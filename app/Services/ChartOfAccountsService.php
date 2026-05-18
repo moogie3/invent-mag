@@ -6,22 +6,21 @@ use App\Models\Account;
 use App\Models\JournalEntry;
 use App\Models\Transaction;
 use Illuminate\Support\Facades\Artisan;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
 class ChartOfAccountsService
 {
     /**
-     * Get accounting settings for the current user.
+     * Get accounting settings for the current tenant.
      *
      * @return array
      */
     public function getAccountingSettings(): array
     {
         $accounts = Account::all()->groupBy('type');
-        $user = Auth::user();
-        $settings = $user->accounting_settings ?? [];
+        $tenant = app('currentTenant');
+        $settings = $tenant->accounting_settings ?? [];
 
         return [
             'accounts' => $accounts,
@@ -30,16 +29,16 @@ class ChartOfAccountsService
     }
 
     /**
-     * Update accounting settings for the current user.
+     * Update accounting settings for the current tenant.
      *
      * @param array $data
      * @return array
      */
     public function updateAccountingSettings(array $data): array
     {
-        $user = Auth::user();
-        $user->accounting_settings = $data;
-        $user->save();
+        $tenant = app('currentTenant');
+        $tenant->accounting_settings = $data;
+        $tenant->save();
 
         return [
             'success' => true,

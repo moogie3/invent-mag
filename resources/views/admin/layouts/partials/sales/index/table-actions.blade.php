@@ -3,7 +3,7 @@
         {{ __('messages.actions') }}
     </button>
     <div class="dropdown-menu">
-        @if ($sale->is_pos)
+        @if ($sale->type === \App\Models\Sales::TYPE_POS)
             <a href="{{ route('admin.pos.receipt', $sale->id) }}" class="dropdown-item" target="_blank">
                 <i class="ti ti-receipt me-2"></i> {{ __('messages.view_receipt') }}
             </a>

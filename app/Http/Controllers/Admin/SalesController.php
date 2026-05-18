@@ -57,7 +57,7 @@ class SalesController extends Controller
     {
         $sale = Sales::findOrFail($id);
 
-        if ($sale->is_pos) {
+        if ($sale->type === \App\Models\Sales::TYPE_POS) {
             return redirect()->route('admin.pos.receipt', $id);
         }
 

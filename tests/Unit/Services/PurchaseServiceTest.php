@@ -52,8 +52,8 @@ class PurchaseServiceTest extends TestCase
         $this->assertNotNull($accountsPayable, 'Accounts Payable account not found in seeder.');
         $this->assertNotNull($inventory, 'Inventory account not found in seeder.');
 
-        // Update the existing user (created by setupTenant) with accounting settings
-        $this->user->update([
+        // Update the tenant's accounting settings (settings belong to the tenant, not a user)
+        $this->tenant->update([
             'accounting_settings' => [
                 'accounts_payable_account_id' => $accountsPayable->id,
                 'inventory_account_id' => $inventory->id,
@@ -204,7 +204,7 @@ class PurchaseServiceTest extends TestCase
 
         $finalTotal = 200;
 
-        $accountingSettings = $this->user->accounting_settings;
+        $accountingSettings = app('currentTenant')->accounting_settings;
         $inventoryAccountName = Account::find($accountingSettings['inventory_account_id'])->name;
         $accountsPayableAccountName = Account::find($accountingSettings['accounts_payable_account_id'])->name;
 
@@ -243,7 +243,7 @@ class PurchaseServiceTest extends TestCase
                 "Payment for PO #PO-123",
                 Mockery::any(),
                 Mockery::on(function ($transactions) {
-                    $accountingSettings = Auth::user()->accounting_settings;
+                    $accountingSettings = app('currentTenant')->accounting_settings;
                     $accountsPayableAccountName = Account::find($accountingSettings['accounts_payable_account_id'])->name;
                     $cashAccountName = Account::find($accountingSettings['cash_account_id'])->name;
 

@@ -190,15 +190,15 @@ class SalesReturnService
             // Note: Sale status update moved to BEFORE return creation (see above)
             // This duplicate code is kept for backward compatibility but should be cleaned up later
 
-            $accountingSettings = Auth::user()->accounting_settings;
+            $accountingSettings = app('currentTenant')->accounting_settings ?? [];
             if (!$accountingSettings || !isset($accountingSettings['inventory_account_id']) || !isset($accountingSettings['accounts_receivable_account_id'])) {
                 throw new \Exception('Accounting settings for inventory or accounts receivable are not configured.');
             }
 
-            $salesRevenueAccount = Account::find($accountingSettings['sales_revenue_account_id']);
-            $accountsReceivableAccount = Account::find($accountingSettings['accounts_receivable_account_id']);
-            $costOfGoodsSoldAccount = Account::find($accountingSettings['cost_of_goods_sold_account_id']);
-            $inventoryAccount = Account::find($accountingSettings['inventory_account_id']);
+            $salesRevenueAccount = Account::find($accountingSettings['sales_revenue_account_id'] ?? null);
+            $accountsReceivableAccount = Account::find($accountingSettings['accounts_receivable_account_id'] ?? null);
+            $costOfGoodsSoldAccount = Account::find($accountingSettings['cost_of_goods_sold_account_id'] ?? null);
+            $inventoryAccount = Account::find($accountingSettings['inventory_account_id'] ?? null);
 
             if (!$salesRevenueAccount || !$accountsReceivableAccount || !$costOfGoodsSoldAccount || !$inventoryAccount) {
                 throw new \Exception('Required accounts (Sales Revenue, AR, COGS, Inventory) not found for Sales Return. Please check Accounting Settings.');

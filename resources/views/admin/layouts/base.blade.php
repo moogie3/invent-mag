@@ -104,7 +104,7 @@
 
     @turbo
 
-    <script>
+    <script nonce="{{ $cspNonce ?? '' }}">
         (function() {
             function logThemeToggle() {
                 const showThemeToggle =

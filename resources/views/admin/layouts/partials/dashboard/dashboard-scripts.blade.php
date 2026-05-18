@@ -159,9 +159,18 @@
                     labels: data.labels,
                     historical: data.historical,
                     forecast: data.forecast,
+                    metrics: data.metrics,
                     deferred: false // Unmark deferred once loaded
                 };
                 container.innerHTML = '<canvas id="sales-forecast-chart"></canvas>';
+                if (data.metrics && data.metrics.mape !== undefined) {
+                    container.innerHTML += `
+                        <div class="mt-2 text-center text-muted small d-flex justify-content-center align-items-center gap-3">
+                            <span><i class="ti ti-chart-line text-blue"></i> MAPE: <strong>${data.metrics.mape}%</strong></span>
+                            <span><i class="ti ti-calculator text-green"></i> RMSE: <strong>${data.metrics.rmse}</strong></span>
+                        </div>
+                    `;
+                }
                 createSalesForecastChart(); // Re-run now with data
             })
             .catch(err => {

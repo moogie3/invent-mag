@@ -1,7 +1,7 @@
 # Invent-MAG: Technical Specification Document
 
-**Document Version:** 1.7  
-**Last Updated:** April 2026  
+**Document Version:** 1.8
+**Last Updated:** May 2026
 **System Version:** 1.7
 
 ---
@@ -56,8 +56,8 @@ Invent-MAG is a production-ready, enterprise-grade ERP system built on Laravel 1
 │  └──────────────┘  └──────────────┘  └──────────────┘      │
 │                                                              │
 │  ┌──────────────┐  ┌──────────────┐                        │
-│  │ MySQL/SQLite │  │ Redis (opt)  │                        │
-│  │   Database   │  │    Cache     │                        │
+│  │ MySQL/SQLite │  │    Redis     │                        │
+│  │   Database   │  │  Cache/Queue │                        │
 │  └──────────────┘  └──────────────┘                        │
 └─────────────────────────────────────────────────────────────┘
 ```
@@ -268,7 +268,9 @@ class SalesService
 
 #### Repository Pattern (Implicit)
 
-Eloquent models act as repositories with custom scopes and methods.
+> **Note:** This is more accurately described as **Service Layer over Eloquent Active Record**. Eloquent models are not repositories in the strict sense — they do not provide a data-access abstraction that can be swapped for a different backing store. Business logic is correctly isolated in the service layer; the data layer is Eloquent Active Record with custom scopes and model methods.
+
+Eloquent models act as Active Record objects with custom scopes and query methods.
 
 #### Helper Layer Pattern
 
@@ -293,6 +295,29 @@ class SalesHelper
 - Eliminates calculation discrepancies between different modules (e.g. Dashboard vs CRM vs POS)
 - Simplifies controllers and services
 - Easy to unit test mathematical operations
+
+### 2.4 Route Architecture
+
+In May 2026, the 850+ line `routes/web.php` file was split into domain-specific files for maintainability.
+
+```
+routes/
+├── web.php                 # Orchestrator (bootstrapping & includes)
+└── admin/                  # Domain-specific route files
+    ├── accounting.php      # Chart of accounts, journal entries, ledger
+    ├── auth.php            # Login, password reset, verification
+    ├── contacts.php        # Customers, suppliers, CRM/SRM details
+    ├── crm.php             # Sales pipeline and opportunities
+    ├── dashboard.php       # Dashboard and tutorial context
+    ├── hr.php              # Employees, attendance, payroll, payslips
+    ├── inventory.php       # Warehouses, POS, stock opname
+    ├── notifications.php   # System notifications, users, audit log
+    ├── products.php        # Product CRUD and stock API
+    ├── purchases.php       # POs and purchase returns
+    ├── reports.php         # Financial and transaction reports
+    ├── sales.php           # Sales orders and sales returns
+    └── settings.php        # System, profile, and backup settings
+```
 
 ---
 
@@ -334,12 +359,13 @@ public function store(Request $request)
 | Feature                | Implementation           | Status                  |
 | ---------------------- | ------------------------ | ----------------------- |
 | **CSRF Protection**    | Laravel built-in         | ✅ Active               |
-| **XSS Prevention**     | Blade auto-escaping      | ✅ Active               |
+| **XSS Prevention**     | Blade auto-escaping + CSP nonces | ✅ Active       |
 | **SQL Injection**      | Query Builder/Eloquent   | ✅ Protected            |
 | **Rate Limiting**      | Custom middleware        | ✅ 5 login attempts     |
 | **Security Logging**   | SecurityLogger service   | ✅ Logs all auth events |
 | **Input Sanitization** | sanitize.js + validation | ✅ XSS protected        |
 | **Email Verification** | Fortify built-in         | ✅ Required             |
+| **CSP Nonces**         | Per-request nonce via SecurityHeaders middleware | ✅ Implemented May 2026 |
 
 ### 3.4 Audit Trail
 
@@ -412,7 +438,7 @@ Tenant (1)
 | Table                 | Purpose           | Records            |
 | --------------------- | ----------------- | ------------------ |
 | **users**             | Authentication    | Per tenant         |
-| **tenants**           | Multi-tenancy     | Master table       |
+| **tenants**           | Multi-tenancy + accounting settings | Master table |
 | **products**          | Product catalog   | 1000s per tenant   |
 | **product_warehouse** | Stock levels      | 1000s per tenant   |
 | **sales**             | Sales orders      | 10000s per tenant  |
@@ -428,7 +454,7 @@ Tenant (1)
 | **Indexing**      | Tenant_id + foreign keys indexed      |
 | **Eager Loading** | Consistent `with()` usage in services |
 | **Pagination**    | 20-50 items per page                  |
-| **Caching**       | Permission cache (24 hours)           |
+| **Caching**       | Redis cache (24-hour permission cache) |
 | **Transactions**  | DB::transaction for atomic operations |
 
 ---
@@ -503,7 +529,7 @@ services:
     app: # PHP 8.2-FPM
     webserver: # Nginx
     database: # MySQL 8.0
-    redis: # Redis (optional)
+    redis: # Redis (cache + queue default)
 ```
 
 **Usage:**
@@ -544,6 +570,8 @@ php artisan backup:clean        # Clean old backups
 - Database dump
 - Storage files
 - Configuration
+
+**Security:** Backup encryption passwords are encrypted at rest using Laravel's `encrypted` cast and the application's `APP_KEY`. The raw password is never stored in plaintext, preventing compromise via database leak alone.
 
 ---
 
@@ -692,8 +720,8 @@ class SalesForecastService
 | **Payment** | Midtrans       | ✅ Subscriptions      |
 | **Email**   | Laravel Mail   | ✅ Notifications      |
 | **PDF**     | DomPDF         | ✅ Invoice generation |
-| **Queue**   | Database/Redis | ✅ Job processing     |
-| **Cache**   | File/Redis     | ✅ Performance        |
+| **Queue**   | Redis (default) | ✅ Job processing    |
+| **Cache**   | Redis (default) | ✅ Performance       |
 | **Storage** | Local/S3       | ✅ File uploads       |
 
 ### 9.2 API-Ready Architecture
@@ -733,7 +761,7 @@ class SalesForecastService
 
 - Stateless application (session in DB/cache)
 - Database replication ready
-- Load balancer compatible
+- Load balancer compatible *(requires Redis for cache and queue — default since May 2026)*
 - Queue workers scalable
 
 **Vertical Scaling:**
@@ -749,6 +777,7 @@ class SalesForecastService
 
 | Version | Date          | Changes                                                                                                                                                                                                                                                                                                                                                                                            |
 | ------- | ------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1.8     | May 2026     | Architecture fixes: Split `web.php` into domain route files. Migrated `accounting_settings` to `tenants` table for data integrity. Set Redis as default cache/queue. Implemented CSP nonces for XSS protection. Encrypted backup passwords with APP_KEY. |
 | 1.7     | May 2026     | Tutorial HR Expansion: Added HR & Payroll as step 4 in welcome setup workflow (now 6 steps). Added Employees, Attendance, Payroll to Master Data sub-topics. Master Data topic card description updated. |
 | 1.6     | April 2026    | Tutorial System Enhancements: Topic grid sub-topic drill-down (click category → see all pages in that category → click to navigate). Click-outside closes modal (removed static backdrop). Sub-topic navigation auto-shows contextual tutorial on destination page via sessionStorage flag + Turbo-aware async fetch chain. Fixed sidebar stale nav-click closing bug. Added dashboard tutorial button and context. |
 | 1.5     | April 2026    | UI/UX Polish & Tutorial System: Contextual tutorial button (?) added to every page title. 30+ page-specific help modals in `tutorial-modal.blade.php`. Consistent `ti-*` icon system across all page headers. "Partially Paid" status label standardized across Sales & Purchase Orders. Sales Return credit note condition documented. Purchase Order autofill info label. Journal entry audit log sidebar badge fix. |
@@ -835,8 +864,8 @@ Common extension points:
 | 1.4     | Mar 2026 | Financial & CRM Integrations: Full integration of Returns into GL, Dashboards, and CRM (Net LTV). `SalesHelper` & `PurchaseHelper` extraction. Opening Balance Module added.  |
 | 1.3     | Mar 2026 | Turbo Drive integration: `onPageLoad` utility, `bootstrap-init.js`, `receipt-page.js`, POS reactivity fix, `DashboardService` extraction, auth error handling improvements.   |
 | 1.5     | Apr 2026 | UI/UX Polish & Tutorial System: Contextual tutorial buttons on all pages. 30+ page-specific help modals. Consistent icon system. Partially Paid status standardization. Sales Return credit note conditions. PO autofill info. Journal entry audit log sidebar badge fix. |
-| 1.7     | May 2026     | Tutorial HR Expansion: Added HR & Payroll to welcome setup workflow. Added Employees, Attendance, Payroll to Master Data sub-topics. Tech spec category count updated (6→7), context count updated (30+→40+).
-| 1.6     | Apr 2026 | Tutorial System Enhancements: Sub-topic drill-down navigation, click-outside closes modal, auto-show on sub-topic navigation, sidebar bug fix, dashboard tutorial button.
+| 1.8     | May 2026 | Architecture Assessment Fixes: Migrated accounting settings to tenants, implemented CSP nonces, split route files, encrypted backup keys, made Redis the default. |
+| 1.7     | May 2026     | Tutorial HR Expansion: Added HR & Payroll to welcome setup workflow. Added Employees, Attendance, Payroll to Master Data sub-topics. Tech spec category count updated (6→7), context count updated (30+→40+). |
 
 ---
 

@@ -29,7 +29,7 @@ class PrintTest extends TestCase
     {
         // Create a product and a POS sale with one item
         $product = Product::factory()->create();
-        $sale = Sales::factory()->create(['is_pos' => true]);
+        $sale = Sales::factory()->create(['type' => \App\Models\Sales::TYPE_POS]);
         $salesItem = \App\Models\SalesItem::factory()->create([
             'sales_id' => $sale->id,
             'product_id' => $product->id,
@@ -49,7 +49,7 @@ class PrintTest extends TestCase
 
     public function test_sales_invoice_can_be_rendered_for_printing()
     {
-        $sale = Sales::factory()->create(['is_pos' => false]);
+        $sale = Sales::factory()->create(['type' => \App\Models\Sales::TYPE_REGULAR]);
 
         $response = $this->get(route('admin.sales.show', $sale->id));
 

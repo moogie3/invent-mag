@@ -15,13 +15,54 @@ class Tenant extends BaseTenant
     protected function casts(): array
     {
         return [
-            'trial_ends_at' => 'datetime',
-            'plan_expires_at' => 'datetime',
-            'plan_changed_at' => 'datetime',
+            'trial_ends_at'             => 'datetime',
+            'plan_expires_at'           => 'datetime',
+            'plan_changed_at'           => 'datetime',
             'pending_plan_effective_at' => 'datetime',
-            'billing_period_start' => 'date',
-            'billing_period_end' => 'date',
+            'billing_period_start'      => 'date',
+            'billing_period_end'        => 'date',
+            'accounting_settings'       => 'array',
+            'backup_password'           => 'encrypted',
         ];
+    }
+
+    // -------------------------------------------------------------------------
+    // Accounting Settings Helpers
+    // -------------------------------------------------------------------------
+
+    /**
+     * Get a specific accounting setting value by key.
+     * Returns null if not configured.
+     */
+    public function getAccountingSetting(string $key): mixed
+    {
+        return $this->accounting_settings[$key] ?? null;
+    }
+
+    /**
+     * Check whether the accounting integration is fully configured.
+     * All six core account IDs must be set for automatic journal entries to work.
+     */
+    public function isAccountingConfigured(): bool
+    {
+        $required = [
+            'sales_revenue_account_id',
+            'accounts_receivable_account_id',
+            'cost_of_goods_sold_account_id',
+            'inventory_account_id',
+            'accounts_payable_account_id',
+            'cash_account_id',
+        ];
+
+        $settings = $this->accounting_settings ?? [];
+
+        foreach ($required as $key) {
+            if (empty($settings[$key])) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     // -------------------------------------------------------------------------

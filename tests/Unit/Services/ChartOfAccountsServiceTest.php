@@ -96,8 +96,8 @@ class ChartOfAccountsServiceTest extends TestCase
 
         $this->service->updateAccountingSettings($data);
 
-        $user->refresh();
+        $tenant = app('currentTenant')->fresh();
         
-        $this->assertEquals($data['sales_revenue_account_id'], $user->accounting_settings['sales_revenue_account_id']);
+        $this->assertEquals($data['sales_revenue_account_id'], $tenant->accounting_settings['sales_revenue_account_id']);
     }
 }

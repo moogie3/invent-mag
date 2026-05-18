@@ -53,9 +53,9 @@ class SalesServiceTest extends TestCase
         $this->assertNotNull($costOfGoodsSold, 'Cost of Goods Sold account not found in seeder.');
         $this->assertNotNull($inventory, 'Inventory account not found in seeder.');
 
-        // The user is already created and logged in by the CreatesTenant trait.
-        // We just need to update their accounting settings.
-        $this->user->update([
+        // The tenant is already created and current by the CreatesTenant trait.
+        // Update the tenant's accounting settings (settings belong to the tenant, not a user).
+        $this->tenant->update([
             'accounting_settings' => [
                 'cash_account_id' => $cash->id,
                 'accounts_receivable_account_id' => $accountsReceivable->id,
@@ -208,7 +208,7 @@ class SalesServiceTest extends TestCase
         $grandTotal = 200; // 2 * 100
         $cogs = 100; // 2 * 50
 
-        $accountingSettings = $this->user->accounting_settings;
+        $accountingSettings = app('currentTenant')->accounting_settings;
         $salesRevenueAccountName = Account::find($accountingSettings['sales_revenue_account_id'])->name;
         $accountsReceivableAccountName = Account::find($accountingSettings['accounts_receivable_account_id'])->name;
         $costOfGoodsSoldAccountName = Account::find($accountingSettings['cost_of_goods_sold_account_id'])->name;
@@ -251,7 +251,7 @@ class SalesServiceTest extends TestCase
                 "Payment for Sale #{$sale->invoice}",
                 Mockery::any(),
                 Mockery::on(function ($transactions) {
-                    $accountingSettings = Auth::user()->accounting_settings;
+                    $accountingSettings = app('currentTenant')->accounting_settings;
                     $cashAccountName = Account::find($accountingSettings['cash_account_id'])->name;
                     $accountsReceivableAccountName = Account::find($accountingSettings['accounts_receivable_account_id'])->name;
 

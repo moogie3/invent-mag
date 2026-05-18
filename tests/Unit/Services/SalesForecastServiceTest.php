@@ -61,6 +61,7 @@ class SalesForecastServiceTest extends TestCase
         $this->assertArrayHasKey('labels', $result);
         $this->assertArrayHasKey('historical', $result);
         $this->assertArrayHasKey('forecast', $result);
+        $this->assertArrayHasKey('metrics', $result);
         // The service may return fewer months based on available data
         $this->assertNotEmpty($result['historical']);
     }
@@ -83,6 +84,7 @@ class SalesForecastServiceTest extends TestCase
         $this->assertArrayHasKey('labels', $result);
         $this->assertArrayHasKey('historical', $result);
         $this->assertArrayHasKey('forecast', $result);
+        $this->assertArrayHasKey('metrics', $result);
         // The service may return fewer months based on available data
         $this->assertNotEmpty($result['historical']);
     }

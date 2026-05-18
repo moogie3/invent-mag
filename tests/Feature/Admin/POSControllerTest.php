@@ -100,7 +100,7 @@ class POSControllerTest extends TestCase
         $this->assertDatabaseHas('sales', [
             'id' => $saleId,
             'customer_id' => $this->customer->id,
-            'is_pos' => true, // POS sales should be marked as such
+            'type' => \App\Models\Sales::TYPE_POS, // POS sales should be marked as such
         ]);
 
         $this->assertDatabaseHas('sales_items', [
@@ -142,7 +142,7 @@ class POSControllerTest extends TestCase
         $this->assertDatabaseHas('sales', [
             'id' => $saleId,
             'customer_id' => $this->customer->id,
-            'is_pos' => true,
+            'type' => \App\Models\Sales::TYPE_POS,
         ]);
     }
 
@@ -208,7 +208,7 @@ class POSControllerTest extends TestCase
         $sale = SalesFactory::new()->create([
             'customer_id' => $this->customer->id,
             'user_id' => $this->user->id,
-            'is_pos' => true,
+            'type' => \App\Models\Sales::TYPE_POS,
         ]);
         SalesItem::factory()->create(['sales_id' => $sale->id, 'product_id' => $this->product->id]);
 
@@ -225,7 +225,7 @@ class POSControllerTest extends TestCase
         $sale = SalesFactory::new()->create([
             'customer_id' => $this->customer->id,
             'user_id' => $this->user->id,
-            'is_pos' => true,
+            'type' => \App\Models\Sales::TYPE_POS,
             'invoice' => 'POS-1234'
         ]);
         SalesItem::factory()->create(['sales_id' => $sale->id, 'product_id' => $this->product->id]);
@@ -240,7 +240,7 @@ class POSControllerTest extends TestCase
         $sale = SalesFactory::new()->create([
             'customer_id' => $this->customer->id,
             'user_id' => $this->user->id,
-            'is_pos' => true,
+            'type' => \App\Models\Sales::TYPE_POS,
         ]);
         SalesItem::factory()->create(['sales_id' => $sale->id, 'product_id' => $this->product->id]);
 

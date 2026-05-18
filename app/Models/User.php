@@ -22,8 +22,9 @@ class User extends Authenticatable implements MustVerifyEmail
         'avatar',
         'timezone',
         'system_settings',
-        'accounting_settings',
         'tutorial_completed',
+        // NOTE: accounting_settings intentionally removed — now stored on tenants table.
+        // The column still exists on users for backward-compat reads during migration window.
     ];
 
     protected $guarded = [
@@ -41,9 +42,8 @@ class User extends Authenticatable implements MustVerifyEmail
     {
         return [
             'email_verified_at' => 'datetime',
-            'password' => 'hashed',
-            'system_settings' => 'array',
-            'accounting_settings' => 'array',
+            'password'          => 'hashed',
+            'system_settings'   => 'array',
         ];
     }
 

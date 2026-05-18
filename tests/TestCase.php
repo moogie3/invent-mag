@@ -56,13 +56,20 @@ abstract class TestCase extends BaseTestCase
         $accountsPayableAccount = \App\Models\Account::firstOrCreate(['name' => 'Accounts Payable'], ['type' => 'liability']);
         $cashAccount = \App\Models\Account::firstOrCreate(['name' => 'Cash'], ['type' => 'asset']);
 
-
-        $user->accounting_settings = [
-            'inventory_account_id' => $inventoryAccount->id,
-            'accounts_payable_account_id' => $accountsPayableAccount->id,
-            'cash_account_id' => $cashAccount->id,
-        ];
-        $user->save();
+        // Accounting settings belong to the tenant, not the user.
+        // If a current tenant is set in context, update it; otherwise skip (no-op).
+        try {
+            $tenant = app('currentTenant');
+            $existing = $tenant->accounting_settings ?? [];
+            $tenant->accounting_settings = array_merge($existing, [
+                'inventory_account_id' => $inventoryAccount->id,
+                'accounts_payable_account_id' => $accountsPayableAccount->id,
+                'cash_account_id' => $cashAccount->id,
+            ]);
+            $tenant->save();
+        } catch (\Throwable $e) {
+            // No current tenant set — skip accounting settings setup
+        }
 
         return $user;
     }

@@ -43,9 +43,23 @@ class SalesForecastService
         $historicalLabels = $salesData->pluck('month')->toArray();
 
         if ($model === 'holt-winters' && $salesData->count() >= 12) {
-            $forecastData = $this->forecastHoltWinters($historicalValues, $monthsToForecast);
+            $optimizationResult = $this->optimizeHoltWinters($historicalValues);
+            $forecastData = $this->forecastHoltWinters(
+                $historicalValues, 
+                $monthsToForecast, 
+                12, 
+                $optimizationResult['alpha'], 
+                $optimizationResult['beta'], 
+                $optimizationResult['gamma']
+            );
+            $mape = $optimizationResult['mape'];
+            $rmse = $optimizationResult['rmse'];
         } else {
             $forecastData = $this->forecastLinearRegression($historicalValues, $monthsToForecast);
+            // We can calculate basic metrics for linear regression too
+            $metrics = $this->calculateLinearRegressionMetrics($historicalValues);
+            $mape = $metrics['mape'];
+            $rmse = $metrics['rmse'];
         }
 
         $lastMonth = Carbon::createFromFormat('Y-m', $salesData->last()->month);
@@ -58,7 +72,138 @@ class SalesForecastService
             'labels' => array_merge($historicalLabels, $forecastLabels),
             'historical' => $historicalValues,
             'forecast' => $forecastData,
+            'metrics' => [
+                'mape' => $mape,
+                'rmse' => $rmse
+            ]
         ];
+    }
+
+    private function calculateLinearRegressionMetrics(array $data): array
+    {
+        $x = range(1, count($data));
+        $y = $data;
+        $n = count($x);
+        $sumX = array_sum($x);
+        $sumY = array_sum($y);
+        $sumX2 = array_sum(array_map(fn($val) => $val * $val, $x));
+        $sumXY = 0;
+        for ($i = 0; $i < $n; $i++) {
+            $sumXY += $x[$i] * $y[$i];
+        }
+
+        $denominator = ($n * $sumX2 - $sumX * $sumX);
+        if ($denominator == 0) {
+            return ['mape' => 0, 'rmse' => 0];
+        }
+
+        $slope = ($n * $sumXY - $sumX * $sumY) / $denominator;
+        $intercept = ($sumY - $slope * $sumX) / $n;
+
+        $errorsSq = 0;
+        $absPercentErrors = 0;
+        $validMapeCount = 0;
+
+        for ($i = 0; $i < $n; $i++) {
+            $predicted = $slope * $x[$i] + $intercept;
+            $actual = $y[$i];
+            
+            $errorsSq += pow($actual - $predicted, 2);
+            
+            if ($actual > 0) {
+                $absPercentErrors += abs(($actual - $predicted) / $actual);
+                $validMapeCount++;
+            }
+        }
+
+        $rmse = sqrt($errorsSq / $n);
+        $mape = $validMapeCount > 0 ? ($absPercentErrors / $validMapeCount) * 100 : 0;
+
+        return ['mape' => round($mape, 2), 'rmse' => round($rmse, 2)];
+    }
+
+    private function optimizeHoltWinters(array $data, int $seasonLength = 12): array
+    {
+        $bestAlpha = 0.3;
+        $bestBeta = 0.1;
+        $bestGamma = 0.1;
+        $bestRmse = PHP_FLOAT_MAX;
+        $bestMape = 0;
+
+        // Simple grid search over a reasonable parameter space
+        // Step of 0.2 keeps it fast (125 combinations)
+        $steps = [0.1, 0.3, 0.5, 0.7, 0.9];
+
+        foreach ($steps as $alpha) {
+            foreach ($steps as $beta) {
+                foreach ($steps as $gamma) {
+                    $metrics = $this->calculateHoltWintersInSampleMetrics($data, $seasonLength, $alpha, $beta, $gamma);
+                    
+                    if ($metrics['rmse'] < $bestRmse) {
+                        $bestRmse = $metrics['rmse'];
+                        $bestMape = $metrics['mape'];
+                        $bestAlpha = $alpha;
+                        $bestBeta = $beta;
+                        $bestGamma = $gamma;
+                    }
+                }
+            }
+        }
+
+        return [
+            'alpha' => $bestAlpha,
+            'beta' => $bestBeta,
+            'gamma' => $bestGamma,
+            'rmse' => round($bestRmse, 2),
+            'mape' => round($bestMape, 2)
+        ];
+    }
+
+    private function calculateHoltWintersInSampleMetrics(array $data, int $seasonLength, float $alpha, float $beta, float $gamma): array
+    {
+        $level = 0;
+        $trend = 0;
+        $season = [];
+
+        // Initialize seasonal components
+        for ($i = 0; $i < $seasonLength; $i++) {
+            $season[] = $data[$i] ?? 0;
+        }
+
+        $level = $data[0] ?? 0;
+        $trend = (($data[$seasonLength - 1] ?? 0) - ($data[0] ?? 0)) / $seasonLength;
+
+        $errorsSq = 0;
+        $absPercentErrors = 0;
+        $validMapeCount = 0;
+        $n = count($data);
+
+        foreach ($data as $i => $actual) {
+            $seasonIndex = $i % $seasonLength;
+            
+            // In-sample prediction for current period (using previous level, trend, and season)
+            $predicted = max(0, $level + $trend + $season[$seasonIndex]);
+
+            // Track error metrics
+            $errorsSq += pow($actual - $predicted, 2);
+            if ($actual > 0) {
+                $absPercentErrors += abs(($actual - $predicted) / $actual);
+                $validMapeCount++;
+            }
+
+            // Update components for next period
+            $lastLevel = $level;
+            $lastTrend = $trend;
+
+            $level = $alpha * ($actual - $season[$seasonIndex]) + (1 - $alpha) * ($lastLevel + $lastTrend);
+            $trend = $beta * ($level - $lastLevel) + (1 - $beta) * $lastTrend;
+            $season[$seasonIndex] = $gamma * ($actual - $level) + (1 - $gamma) * $season[$seasonIndex];
+        }
+
+        $rmse = sqrt($errorsSq / max(1, $n));
+        $mape = $validMapeCount > 0 ? ($absPercentErrors / $validMapeCount) * 100 : 0;
+
+        return ['rmse' => $rmse, 'mape' => $mape];
     }
 
     private function forecastLinearRegression(array $data, int $monthsToForecast): array

@@ -79,8 +79,8 @@ trait CreatesTenant
             ]
         );
 
-        // Update user's accounting settings
-        $this->user->update([
+        // Update tenant's accounting settings (settings belong to the tenant, not a user)
+        $this->tenant->update([
             'accounting_settings' => [
                 'inventory_account_id' => $inventoryAccount->id,
                 'cash_account_id' => $cashAccount->id,

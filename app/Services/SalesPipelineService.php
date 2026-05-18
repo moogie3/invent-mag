@@ -287,7 +287,7 @@ class SalesPipelineService
                 'total_tax' => $taxAmount,
                 'total' => $grandTotal,
                 'status' => 'Unpaid',
-                'is_pos' => false,
+                'type' => \App\Models\Sales::TYPE_REGULAR,
                 'sales_opportunity_id' => $opportunity->id,
             ]);
 

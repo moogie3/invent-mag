@@ -6,7 +6,7 @@
 <script src="{{ asset('tabler/dist/js/tabler.min.js?1692870487') }}"></script>
 <script src="{{ asset('tabler/dist/js/demo.min.js?1692870487') }}"></script>
 
-<script>
+<script nonce="{{ $cspNonce ?? '' }}">
     // CRITICAL: Tabler doesn't expose bootstrap globally, so we need to do it manually
     // This must run immediately after tabler.min.js loads
     (function() {
@@ -113,7 +113,7 @@
 @vite('resources/js/admin/currency.js')
 
 {{-- GLOBAL FALLBACK FUNCTIONS FOR JOURNAL ENTRIES - Load before journal-entry.js --}}
-<script>
+<script nonce="{{ $cspNonce ?? '' }}">
 // These fallbacks ensure functions exist before journal-entry.js loads
 // They will be overwritten by the actual functions when the page has the journal form
 (function() {
@@ -152,7 +152,7 @@
 @vite('resources/js/admin/tax.js')
 
 {{-- SCRIPT FOR SALES PIPELINE (SortableJS only loaded when needed) --}}
-<script>
+<script nonce="{{ $cspNonce ?? '' }}">
     // Lazily load SortableJS only when navigating to the sales-pipeline page
     document.addEventListener('turbo:load', function () {
         if (window.location.pathname.includes('/admin/sales-pipeline')) {
@@ -190,7 +190,7 @@
 @vite('resources/js/admin/layouts/tutorial-modal.js')
 
 {{-- SCRIPT FOR ADMIN DASHBOARD (ApexCharts lazy-loaded) --}}
-<script>
+<script nonce="{{ $cspNonce ?? '' }}">
     document.addEventListener('turbo:load', function () {
         if (window.location.pathname.includes('/admin/dashboard') && typeof ApexCharts === 'undefined') {
             var s = document.createElement('script');
@@ -201,7 +201,7 @@
 </script>
 
 {{-- DELETE MODAL --}}
-<script>
+<script nonce="{{ $cspNonce ?? '' }}">
     function setDeleteFormAction(action) {
         document.getElementById('deleteForm').setAttribute('action', action);
     }

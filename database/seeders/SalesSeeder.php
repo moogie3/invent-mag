@@ -80,7 +80,7 @@ class SalesSeeder extends Seeder
                 'total_tax' => 0,
                 'total' => 0,
                 'status' => $status,
-                'is_pos' => false,
+                'type' => \App\Models\Sales::TYPE_REGULAR,
                 'tenant_id' => $tenantId,
             ]);
 

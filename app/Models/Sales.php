@@ -31,6 +31,9 @@ class Sales extends Model
     use HasFactory, BelongsToTenant;
 
     protected $table = 'sales';
+    public const TYPE_REGULAR = 'regular';
+    public const TYPE_POS = 'pos';
+
     protected $fillable = [
         'invoice',
         'customer_id',
@@ -46,7 +49,7 @@ class Sales extends Model
         'total_tax',
         'amount_received',
         'change_amount',
-        'is_pos',
+        'type',
         'sales_opportunity_id',
         'warehouse_id',
         'customer_credit_used',
@@ -66,8 +69,16 @@ class Sales extends Model
 
     protected $attributes = [
         'status' => 'Unpaid',
-        'is_pos' => 'false',
+        'type' => self::TYPE_REGULAR,
     ];
+
+    /**
+     * Backward compatibility accessor for existing views that check $sale->is_pos
+     */
+    public function getIsPosAttribute(): bool
+    {
+        return $this->type === self::TYPE_POS;
+    }
 
     public static $paymentStatus = [
         'Paid',
@@ -217,7 +228,6 @@ class Sales extends Model
         'order_discount' => 'float',
         'amount_received' => 'float',
         'change_amount' => 'float',
-        'is_pos' => 'boolean',
         'customer_credit_used' => 'float',
     ];
 

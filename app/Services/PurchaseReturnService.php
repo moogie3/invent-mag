@@ -160,14 +160,14 @@ class PurchaseReturnService
             }
 
             // Create Journal Entry for the return
-            $accountingSettings = Auth::user()->accounting_settings;
+            $accountingSettings = app('currentTenant')->accounting_settings ?? [];
             if (!$accountingSettings || !isset($accountingSettings['inventory_account_id']) || !isset($accountingSettings['accounts_payable_account_id'])) {
                 throw new \Exception('Accounting settings for inventory or accounts payable are not configured.');
             }
 
-            $inventoryAccount = Account::find($accountingSettings['inventory_account_id']);
-            $accountsPayableAccount = Account::find($accountingSettings['accounts_payable_account_id']);
-            $purchaseAccount = Account::find($accountingSettings['cost_of_goods_sold_account_id']); // Use COGS account for Purchase
+            $inventoryAccount = Account::find($accountingSettings['inventory_account_id'] ?? null);
+            $accountsPayableAccount = Account::find($accountingSettings['accounts_payable_account_id'] ?? null);
+            $purchaseAccount = Account::find($accountingSettings['cost_of_goods_sold_account_id'] ?? null); // Use COGS account for Purchase
 
             if (!$inventoryAccount || !$accountsPayableAccount || !$purchaseAccount) {
                 throw new \Exception('Required accounts (Inventory, Accounts Payable, Purchases) not found for Purchase Return. Please check Accounting Settings.');

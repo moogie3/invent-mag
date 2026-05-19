@@ -18,7 +18,7 @@
             <a href="{{ route('admin.accounting.accounts.edit', $account) }}" class="btn btn-icon btn-ghost-primary" title="{{ __('messages.edit') }}">
                 <i class="ti ti-edit"></i>
             </a>
-            <form action="{{ route('admin.accounting.accounts.destroy', $account) }}" method="POST" onsubmit="return confirm('{{ __('messages.are_you_sure') }}');" class="d-inline">
+            <form action="{{ route('admin.accounting.accounts.destroy', $account) }}" method="POST" data-onsubmit="return confirm('{{ __('messages.are_you_sure') }}');" class="d-inline">
                 @csrf
                 @method('DELETE')
                 <button type="submit" class="btn btn-icon btn-ghost-danger" title="{{ __('messages.delete') }}">

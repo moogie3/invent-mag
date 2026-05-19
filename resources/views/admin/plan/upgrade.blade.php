@@ -197,7 +197,7 @@
     </div>
 </div>
 
-<script>
+<script nonce="{{ $cspNonce ?? '' }}">
 document.addEventListener('turbo:load', function() {
     var upgradeModal = document.getElementById('upgradeModal');
     if (upgradeModal) {

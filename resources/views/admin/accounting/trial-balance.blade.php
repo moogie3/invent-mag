@@ -41,9 +41,9 @@
                                     <i class="ti ti-printer fs-4 me-2"></i> {{ __('messages.export') }}
                                 </button>
                                 <ul class="dropdown-menu">
-                                    <li><a class="dropdown-item" href="#" onclick="window.print()">{{ __('messages.print') }}</a></li>
-                                    <li><a class="dropdown-item" href="#" onclick="exportTrialBalance('pdf')">Export as PDF</a></li>
-                                    <li><a class="dropdown-item" href="#" onclick="exportTrialBalance('csv')">Export as CSV</a></li>
+                                    <li><a class="dropdown-item" href="#" data-onclick="window.print()">{{ __('messages.print') }}</a></li>
+                                    <li><a class="dropdown-item" href="#" data-onclick="exportTrialBalance('pdf')">Export as PDF</a></li>
+                                    <li><a class="dropdown-item" href="#" data-onclick="exportTrialBalance('csv')">Export as CSV</a></li>
                                 </ul>
                             </div>
                         </div>

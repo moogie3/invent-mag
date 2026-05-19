@@ -19,10 +19,10 @@
             </div>
             <div class="col-lg-6 col-md-12">
                 <div class="d-flex flex-wrap justify-content-lg-end justify-content-center gap-2 mt-lg-0 mt-2">
-                    <button onclick="bulkMarkCompletedSalesReturns()" class="btn btn-success action-btn d-flex align-items-center">
+                    <button data-onclick="bulkMarkCompletedSalesReturns()" class="btn btn-success action-btn d-flex align-items-center">
                         <i class="ti ti-checks me-2"></i> {{ __('messages.mark_as_completed') }}
                     </button>
-                    <button onclick="bulkMarkCanceledSalesReturns()" class="btn btn-warning action-btn d-flex align-items-center">
+                    <button data-onclick="bulkMarkCanceledSalesReturns()" class="btn btn-warning action-btn d-flex align-items-center">
                         <i class="ti ti-x me-2"></i> {{ __('messages.mark_as_canceled') }}
                     </button>
                     <div class="btn-group">
@@ -30,14 +30,14 @@
                             <i class="ti ti-download me-2"></i> {{ __('messages.export') }}
                         </button>
                         <ul class="dropdown-menu">
-                            <li><a class="dropdown-item" href="#" onclick="bulkExportSalesReturns('pdf')">Export as PDF</a></li>
-                            <li><a class="dropdown-item" href="#" onclick="bulkExportSalesReturns('csv')">Export as CSV</a></li>
+                            <li><a class="dropdown-item" href="#" data-onclick="bulkExportSalesReturns('pdf')">Export as PDF</a></li>
+                            <li><a class="dropdown-item" href="#" data-onclick="bulkExportSalesReturns('csv')">Export as CSV</a></li>
                         </ul>
                     </div>
-                    <button onclick="bulkDeleteSalesReturns()" class="btn btn-danger action-btn d-flex align-items-center">
+                    <button data-onclick="bulkDeleteSalesReturns()" class="btn btn-danger action-btn d-flex align-items-center">
                         <i class="ti ti-trash me-2"></i> {{ __('messages.delete') }}
                     </button>
-                    <button onclick="clearSalesReturnSelection()"
+                    <button data-onclick="clearSalesReturnSelection()"
                         class="btn btn-outline-secondary action-btn d-flex align-items-center">
                         <i class="ti ti-x me-2"></i> {{ __('messages.clear_selection') }}
                     </button>

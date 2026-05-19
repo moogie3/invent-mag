@@ -19,7 +19,7 @@
             </div>
             <div class="col-lg-6 col-md-12">
                 <div class="d-flex flex-wrap justify-content-lg-end justify-content-center gap-2 mt-lg-0 mt-2">
-                    <button onclick="bulkUpdateStock()" class="btn btn-info action-btn d-flex align-items-center">
+                    <button data-onclick="bulkUpdateStock()" class="btn btn-info action-btn d-flex align-items-center">
                         <i class="ti ti-packages me-2"></i> {{ __('messages.update_stock') }}
                     </button>
                     <div class="btn-group">
@@ -27,14 +27,14 @@
                             <i class="ti ti-download me-2"></i> {{ __('messages.export') }}
                         </button>
                         <ul class="dropdown-menu dropdown-menu-end">
-                            <li><a class="dropdown-item" href="#" onclick="bulkExportProducts('pdf')">Export as PDF</a></li>
-                            <li><a class="dropdown-item" href="#" onclick="bulkExportProducts('csv')">Export as CSV</a></li>
+                            <li><a class="dropdown-item" href="#" data-onclick="bulkExportProducts('pdf')">Export as PDF</a></li>
+                            <li><a class="dropdown-item" href="#" data-onclick="bulkExportProducts('csv')">Export as CSV</a></li>
                         </ul>
                     </div>
-                    <button onclick="bulkDeleteProducts()" class="btn btn-danger action-btn d-flex align-items-center">
+                    <button data-onclick="bulkDeleteProducts()" class="btn btn-danger action-btn d-flex align-items-center">
                         <i class="ti ti-trash me-2"></i> {{ __('messages.delete') }}
                     </button>
-                    <button onclick="clearProductSelection()"
+                    <button data-onclick="clearProductSelection()"
                         class="btn btn-outline-secondary action-btn d-flex align-items-center">
                         <i class="ti ti-x me-2"></i> {{ __('messages.clear_selection') }}
                     </button>

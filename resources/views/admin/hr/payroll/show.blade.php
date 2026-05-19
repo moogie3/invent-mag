@@ -48,12 +48,12 @@
                                                         </button>
                                                         <ul class="dropdown-menu" aria-labelledby="exportShowDropdown">
                                                             <li>
-                                                                <a class="dropdown-item" href="#" onclick="exportPayrollRun({{ $run->id }}, 'pdf'); return false;">
+                                                                <a class="dropdown-item" href="#" data-onclick="exportPayrollRun({{ $run->id }}, 'pdf'); return false;">
                                                                     {{ __('messages.export_as_pdf') }}
                                                                 </a>
                                                             </li>
                                                             <li>
-                                                                <a class="dropdown-item" href="#" onclick="exportPayrollRun({{ $run->id }}, 'csv'); return false;">
+                                                                <a class="dropdown-item" href="#" data-onclick="exportPayrollRun({{ $run->id }}, 'csv'); return false;">
                                                                     {{ __('messages.export_as_csv') }}
                                                                 </a>
                                                             </li>
@@ -183,7 +183,7 @@
                                                                                         </div>
                                                                                     @endforeach
                                                                                     @if($run->status === 'draft')
-                                                                                    <button type="button" class="btn btn-sm btn-outline-secondary mt-1" onclick="addAllowance({{ $item->id }})">
+                                                                                    <button type="button" class="btn btn-sm btn-outline-secondary mt-1" data-onclick="addAllowance({{ $item->id }})">
                                                                                         <i class="ti ti-plus"></i> {{ __('messages.add') }}
                                                                                     </button>
                                                                                     @endif
@@ -214,7 +214,7 @@
                                                                                         </div>
                                                                                     @endforeach
                                                                                     @if($run->status === 'draft')
-                                                                                    <button type="button" class="btn btn-sm btn-outline-secondary mt-1" onclick="addDeduction({{ $item->id }})">
+                                                                                    <button type="button" class="btn btn-sm btn-outline-secondary mt-1" data-onclick="addDeduction({{ $item->id }})">
                                                                                         <i class="ti ti-plus"></i> {{ __('messages.add') }}
                                                                                     </button>
                                                                                     @endif

@@ -431,7 +431,7 @@
                         @csrf
                     </form>
                     <a href="#" class="dropdown-item" data-turbo="false"
-                        onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
+                        data-onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
                         <i class="ti ti-logout me-2"></i>{{ __('messages.logout') }}
                     </a>
                 </div>

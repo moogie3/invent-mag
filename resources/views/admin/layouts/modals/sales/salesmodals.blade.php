@@ -230,7 +230,7 @@
         </div>
     </div>
 
-    <script>
+    <script nonce="{{ $cspNonce ?? '' }}">
         (function() {
             function initPaidModal() {
                 // Ensure bootstrap is available

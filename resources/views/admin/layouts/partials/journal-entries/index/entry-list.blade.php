@@ -75,7 +75,7 @@
                                     <button type="button" 
                                         class="btn btn-icon btn-ghost-warning"
                                         title="{{ __('messages.reverse') }}"
-                                        onclick="confirmAction('{{ route('admin.accounting.journal-entries.reverse', $entry) }}', '{{ __('messages.reverse_entry') }}', '{{ __('messages.reverse_confirmation') }}')">
+                                        data-onclick="confirmAction('{{ route('admin.accounting.journal-entries.reverse', $entry) }}', '{{ __('messages.reverse_entry') }}', '{{ __('messages.reverse_confirmation') }}')">
                                         <i class="ti ti-arrow-back-up"></i>
                                     </button>
                                 @endif

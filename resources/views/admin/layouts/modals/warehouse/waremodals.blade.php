@@ -214,7 +214,7 @@
     </div>
 </div>
 
-<script>
+<script nonce="{{ $cspNonce ?? '' }}">
     function setDeleteFormAction(action) {
         var form = document.getElementById('deleteForm');
         if (form) form.action = action;

@@ -17,12 +17,12 @@
                     </button>
                     <ul class="dropdown-menu" aria-labelledby="exportDropdown">
                         <li>
-                            <a class="dropdown-item" href="#" onclick="exportAllPurchaseReturns('pdf'); return false;">
+                            <a class="dropdown-item" href="#" data-onclick="exportAllPurchaseReturns('pdf'); return false;">
                                 {{ __('messages.export_as_pdf') }}
                             </a>
                         </li>
                         <li>
-                            <a class="dropdown-item" href="#" onclick="exportAllPurchaseReturns('csv'); return false;">
+                            <a class="dropdown-item" href="#" data-onclick="exportAllPurchaseReturns('csv'); return false;">
                                 {{ __('messages.export_as_csv') }}
                             </a>
                         </li>

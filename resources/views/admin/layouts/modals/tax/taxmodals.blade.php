@@ -54,7 +54,7 @@
     </div>
 </div>
 
-<script>
+<script nonce="{{ $cspNonce ?? '' }}">
     (function() {
         function initTaxModal() {
             // Update modal preview when modal is shown

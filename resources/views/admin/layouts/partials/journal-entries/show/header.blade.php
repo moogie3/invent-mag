@@ -29,10 +29,10 @@
                     @endif
                     @if($entry->status === 'posted')
                         @if(!$entry->reversingEntry)
-                            <button type="button" class="btn btn-warning" onclick="reverseEntry('{{ route('admin.accounting.journal-entries.reverse', $entry) }}')">
+                            <button type="button" class="btn btn-warning" data-onclick="reverseEntry('{{ route('admin.accounting.journal-entries.reverse', $entry) }}')">
                                 <i class="ti ti-arrow-back-up me-2"></i>{{ __('messages.reverse') }}
                             </button>
-                            <button type="button" class="btn btn-danger" onclick="voidEntry('{{ route('admin.accounting.journal-entries.void', $entry) }}')">
+                            <button type="button" class="btn btn-danger" data-onclick="voidEntry('{{ route('admin.accounting.journal-entries.void', $entry) }}')">
                                 <i class="ti ti-x me-2"></i>{{ __('messages.void') }}
                             </button>
                         @endif

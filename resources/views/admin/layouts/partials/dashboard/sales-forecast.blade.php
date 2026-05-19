@@ -5,9 +5,10 @@
         </div>
         <div class="card-body">
             @if(isset($salesForecast) && is_array($salesForecast) && (count($salesForecast['labels'] ?? []) > 0 || ($salesForecast['deferred'] ?? false)))
-                <div style="position: relative; min-height: 300px;">
+                <div id="sales-forecast-wrapper" style="position: relative; height: 350px; width: 100%;">
                     <canvas id="sales-forecast-chart"></canvas>
                 </div>
+                <div id="forecast-metrics-container"></div>
             @else
                 <div class="empty">
                     <div class="empty-icon">

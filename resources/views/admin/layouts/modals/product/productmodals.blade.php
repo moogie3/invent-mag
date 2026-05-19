@@ -489,16 +489,16 @@
                                 </button>
                                 <ul class="dropdown-menu">
                                     <li><a class="dropdown-item" href="#"
-                                            onclick="setBulkAction('add', '{{ __('messages.product_bulk_update_stock_add_to_all') }}')">{{ __('messages.product_bulk_update_stock_add_to_all') }}</a>
+                                            data-onclick="setBulkAction('add', '{{ __('messages.product_bulk_update_stock_add_to_all') }}')">{{ __('messages.product_bulk_update_stock_add_to_all') }}</a>
                                     </li>
                                     <li><a class="dropdown-item" href="#"
-                                            onclick="setBulkAction('subtract', '{{ __('messages.product_bulk_update_stock_subtract_from_all') }}')">{{ __('messages.product_bulk_update_stock_subtract_from_all') }}</a>
+                                            data-onclick="setBulkAction('subtract', '{{ __('messages.product_bulk_update_stock_subtract_from_all') }}')">{{ __('messages.product_bulk_update_stock_subtract_from_all') }}</a>
                                     </li>
                                     <li><a class="dropdown-item" href="#"
-                                            onclick="setBulkAction('set', '{{ __('messages.product_bulk_update_stock_set_all_to') }}')">{{ __('messages.product_bulk_update_stock_set_all_to') }}</a>
+                                            data-onclick="setBulkAction('set', '{{ __('messages.product_bulk_update_stock_set_all_to') }}')">{{ __('messages.product_bulk_update_stock_set_all_to') }}</a>
                                     </li>
                                 </ul>
-                                <button class="btn btn-info" type="button" onclick="applyBulkStockAction()">
+                                <button class="btn btn-info" type="button" data-onclick="applyBulkStockAction()">
                                     {{ __('messages.product_bulk_update_stock_apply_button') }}
                                 </button>
                             </div>

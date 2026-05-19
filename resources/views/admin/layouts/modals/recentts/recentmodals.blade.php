@@ -72,7 +72,7 @@
                     <i class="ti ti-x me-1"></i>
                     {{ __('messages.cancel') }}
                 </button>
-                <button type="button" class="btn btn-success" id="confirmMarkPaidBtn" onclick="confirmMarkAsPaid()">
+                <button type="button" class="btn btn-success" id="confirmMarkPaidBtn" data-onclick="confirmMarkAsPaid()">
                     <i class="ti ti-check me-1"></i>
                     {{ __('messages.po_modal_bulk_mark_paid_button') }}
                 </button>

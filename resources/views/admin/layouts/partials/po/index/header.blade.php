@@ -17,12 +17,12 @@
                     </button>
                     <ul class="dropdown-menu" aria-labelledby="exportDropdown">
                         <li>
-                            <a class="dropdown-item" href="#" onclick="exportAllPurchases('pdf'); return false;">
+                            <a class="dropdown-item" href="#" data-onclick="exportAllPurchases('pdf'); return false;">
                                 Export as PDF
                             </a>
                         </li>
                         <li>
-                            <a class="dropdown-item" href="#" onclick="exportAllPurchases('csv'); return false;">
+                            <a class="dropdown-item" href="#" data-onclick="exportAllPurchases('csv'); return false;">
                                 Export as CSV
                             </a>
                         </li>

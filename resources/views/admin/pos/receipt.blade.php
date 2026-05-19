@@ -12,7 +12,7 @@
                         <h2 class="page-title no-print"><i class="ti ti-receipt me-2"></i>{{ __('messages.pos_receipt_title') }}</h2>
                     </div>
                     <div class="col text-end">
-                        <button type="button" class="btn btn-secondary" onclick="javascript:window.print();">
+                        <button type="button" class="btn btn-secondary" data-onclick="javascript:window.print();">
                             <i class="ti ti-printer me-1"></i> {{ __('messages.print_receipt') }}
                         </button>
                         <a href="{{ route('admin.pos') }}" class="btn btn-primary">

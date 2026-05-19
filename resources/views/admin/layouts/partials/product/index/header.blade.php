@@ -33,12 +33,12 @@
                     </button>
                     <ul class="dropdown-menu" aria-labelledby="exportDropdown">
                         <li>
-                            <a class="dropdown-item" href="#" onclick="exportAllProducts('pdf'); return false;">
+                            <a class="dropdown-item" href="#" data-onclick="exportAllProducts('pdf'); return false;">
                                 Export as PDF
                             </a>
                         </li>
                         <li>
-                            <a class="dropdown-item" href="#" onclick="exportAllProducts('csv'); return false;">
+                            <a class="dropdown-item" href="#" data-onclick="exportAllProducts('csv'); return false;">
                                 Export as CSV
                             </a>
                         </li>

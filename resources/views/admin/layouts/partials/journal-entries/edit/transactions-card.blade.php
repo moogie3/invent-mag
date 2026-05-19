@@ -2,7 +2,7 @@
     <div class="card-header">
         <h3 class="card-title">{{ __('messages.transactions') }}</h3>
         <div class="card-actions">
-            <button type="button" class="btn btn-sm btn-primary" onclick="addTransactionRow()">
+            <button type="button" class="btn btn-sm btn-primary" data-onclick="addTransactionRow()">
                 <i class="ti ti-plus me-2"></i>{{ __('messages.add_transaction') }}
             </button>
         </div>
@@ -38,7 +38,7 @@
     </div>
 </div>
 
-<script>
+<script nonce="{{ $cspNonce ?? '' }}">
 (function() {
     if (typeof window.updateTotals !== 'function') {
         window.updateTotals = function() {

@@ -31,12 +31,12 @@
                                 </button>
                                 <ul class="dropdown-menu" aria-labelledby="exportRecentTransactionsDropdown">
                                     <li>
-                                        <a class="dropdown-item" href="#" onclick="exportRecentTransactions('pdf')">
+                                        <a class="dropdown-item" href="#" data-onclick="exportRecentTransactions('pdf')">
                                             Export as PDF
                                         </a>
                                     </li>
                                     <li>
-                                        <a class="dropdown-item" href="#" onclick="exportRecentTransactions('csv')">
+                                        <a class="dropdown-item" href="#" data-onclick="exportRecentTransactions('csv')">
                                             Export as CSV
                                         </a>
                                     </li>
@@ -242,7 +242,7 @@
                                 <div class="col-lg-6 col-md-12">
                                     <div
                                         class="d-flex flex-wrap justify-content-lg-end justify-content-center gap-2 mt-lg-0 mt-2">
-                                        <button onclick="bulkMarkAsPaid()"
+                                        <button data-onclick="bulkMarkAsPaid()"
                                             class="btn btn-success action-btn d-flex align-items-center">
                                             <i class="ti ti-check me-2"></i> {{ __('messages.mark_as_paid') }}
                                         </button>
@@ -254,17 +254,17 @@
                                             <ul class="dropdown-menu">
                                                 <li>
                                                     <a class="dropdown-item" href="#"
-                                                        onclick="bulkExport('pdf')">Export as PDF
+                                                        data-onclick="bulkExport('pdf')">Export as PDF
                                                     </a>
                                                 </li>
                                                 <li>
                                                     <a class="dropdown-item" href="#"
-                                                        onclick="bulkExport('csv')">Export as CSV
+                                                        data-onclick="bulkExport('csv')">Export as CSV
                                                     </a>
                                                 </li>
                                             </ul>
                                         </div>
-                                        <button onclick="clearSelection()"
+                                        <button data-onclick="clearSelection()"
                                             class="btn btn-outline-secondary action-btn d-flex align-items-center">
                                             <i class="ti ti-x me-2"></i> {{ __('messages.clear_selection') }}
                                         </button>
@@ -283,7 +283,7 @@
                                 <input type="text" class="form-control"
                                     placeholder="{{ __('messages.search_transactions') }}" id="searchInput"
                                     value="{{ $search }}">
-                                <button class="btn btn-outline-secondary" type="button" onclick="searchTransactions()">
+                                <button class="btn btn-outline-secondary" type="button" data-onclick="searchTransactions()">
                                     <i class="ti ti-search"></i>
                                 </button>
                             </div>
@@ -453,7 +453,7 @@
                                                     @endif
                                                     @if ($transaction->status != 'Paid')
                                                         <a class="dropdown-item text-success" href="#"
-                                                            onclick="showMarkAsPaidModal('{{ $transaction->id ?? '' }}', '{{ $transaction->type }}', '{{ $transaction->invoice }}', '{{ $transaction->customer_supplier }}', '{{ \App\Helpers\CurrencyHelper::format($transaction->amount) }}')">
+                                                            data-onclick="showMarkAsPaidModal('{{ $transaction->id ?? '' }}', '{{ $transaction->type }}', '{{ $transaction->invoice }}', '{{ $transaction->customer_supplier }}', '{{ \App\Helpers\CurrencyHelper::format($transaction->amount) }}')">
                                                             <i class="ti ti-check me-2"></i>
                                                             {{ __('messages.mark_as_paid') }}
                                                         </a>

@@ -3,7 +3,7 @@
         {{ __('messages.actions') }}
     </button>
     <div class="dropdown-menu">
-        <a href="javascript:void(0)" onclick="loadPoDetails('{{ $po->id }}')" data-bs-toggle="modal"
+        <a href="javascript:void(0)" data-onclick="loadPoDetails('{{ $po->id }}')" data-bs-toggle="modal"
             data-bs-target="#viewPoModal" class="dropdown-item">
             <i class="ti ti-zoom-scan me-2"></i> {{ __('messages.view_details') }}
         </a>
@@ -11,7 +11,7 @@
             <i class="ti ti-edit me-2"></i> {{ __('messages.edit') }}
         </a>
         <button type="button" class="dropdown-item text-danger" data-bs-toggle="modal" data-bs-target="#deleteModal"
-            onclick="setDeleteFormAction('{{ route('admin.po.destroy', $po->id) }}')">
+            data-onclick="setDeleteFormAction('{{ route('admin.po.destroy', $po->id) }}')">
             <i class="ti ti-trash me-2"></i> {{ __('messages.delete') }}
         </button>
     </div>

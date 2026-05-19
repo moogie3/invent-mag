@@ -686,4 +686,11 @@ return [
     'view_all_topics' => 'View All Topics',
     'next_view_topics' => 'Next: View Topics',
     'back' => 'Back',
+    // Buttons
+    'skip_tutorial' => 'Skip Tutorial',
+    'back' => 'Back',
+    'next' => 'Next',
+    'got_it' => 'Got it!',
+    'quick_guide' => 'Quick Guide',
+    'back_to_categories' => 'Back to Categories',
 ];

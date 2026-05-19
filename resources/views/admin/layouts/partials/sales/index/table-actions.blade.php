@@ -18,7 +18,7 @@
         </a>
 
         <button type="button" class="dropdown-item text-danger" data-bs-toggle="modal" data-bs-target="#deleteModal"
-            onclick="setDeleteFormAction('{{ route('admin.sales.destroy', $sale->id) }}')">
+            data-onclick="setDeleteFormAction('{{ route('admin.sales.destroy', $sale->id) }}')">
             <i class="ti ti-trash me-2"></i> {{ __('messages.delete') }}
         </button>
     </div>

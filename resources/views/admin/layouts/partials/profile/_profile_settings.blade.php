@@ -97,7 +97,7 @@
                             <small class="form-text text-muted mt-1">
                                 {{ __('messages.email_not_verified_action') }}
                                 <a href="#"
-                                    onclick="event.preventDefault(); document.getElementById('resendVerificationForm').submit();"
+                                    data-onclick="event.preventDefault(); document.getElementById('resendVerificationForm').submit();"
                                     class="btn-link">
                                     {{ __('messages.resend_verification_email') }}
                                 </a>
@@ -232,7 +232,7 @@
                         <input type="text" class="form-control" id="apiTokenValue"
                             value="{{ session('api_token') }}" readonly>
                         <button class="btn" type="button"
-                            onclick="copyToken()">{{ __('messages.copy') }}</button>
+                            data-onclick="copyToken()">{{ __('messages.copy') }}</button>
                     </div>
                 @elseif ($hasApiToken)
                     <div class="alert alert-success" role="alert">
@@ -258,7 +258,7 @@
         </div>
     </form>
 
-    <script>
+    <script nonce="{{ $cspNonce ?? '' }}">
         function copyToken() {
             const tokenInput = document.getElementById('apiTokenValue');
             tokenInput.select();

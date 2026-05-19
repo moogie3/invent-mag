@@ -115,7 +115,7 @@
         </div>
     </div>
 
-    <script>
+    <script nonce="{{ $cspNonce ?? '' }}">
         // Stock Transfer - Direct inline script for debugging
         (function() {
             console.log('Stock Transfer inline script loaded');

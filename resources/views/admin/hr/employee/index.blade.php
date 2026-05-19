@@ -45,12 +45,12 @@
                                                         </button>
                                                         <ul class="dropdown-menu" aria-labelledby="exportDropdown">
                                                             <li>
-                                                                <a class="dropdown-item" href="#" onclick="exportEmployees('pdf'); return false;">
+                                                                <a class="dropdown-item" href="#" data-onclick="exportEmployees('pdf'); return false;">
                                                                     {{ __('messages.export_as_pdf') }}
                                                                 </a>
                                                             </li>
                                                             <li>
-                                                                <a class="dropdown-item" href="#" onclick="exportEmployees('csv'); return false;">
+                                                                <a class="dropdown-item" href="#" data-onclick="exportEmployees('csv'); return false;">
                                                                     {{ __('messages.export_as_csv') }}
                                                                 </a>
                                                             </li>
@@ -269,13 +269,13 @@
                         <hr>
                         <h6>Default {{ __('messages.hr_allowances') }}</h6>
                         <div id="create-allowances-container"></div>
-                        <button type="button" class="btn btn-sm btn-outline-secondary mb-3" onclick="addAllowance('create-allowances-container', 'default_allowances')">
+                        <button type="button" class="btn btn-sm btn-outline-secondary mb-3" data-onclick="addAllowance('create-allowances-container', 'default_allowances')">
                             <i class="ti ti-plus"></i> {{ __('messages.add') }}
                         </button>
 
                         <h6>Default {{ __('messages.hr_deductions') }}</h6>
                         <div id="create-deductions-container"></div>
-                        <button type="button" class="btn btn-sm btn-outline-secondary mb-3" onclick="addDeduction('create-deductions-container', 'default_deductions')">
+                        <button type="button" class="btn btn-sm btn-outline-secondary mb-3" data-onclick="addDeduction('create-deductions-container', 'default_deductions')">
                             <i class="ti ti-plus"></i> {{ __('messages.add') }}
                         </button>
                         <hr>
@@ -389,13 +389,13 @@
                         <hr>
                         <h6>Default {{ __('messages.hr_allowances') }}</h6>
                         <div id="edit-allowances-container"></div>
-                        <button type="button" class="btn btn-sm btn-outline-secondary mb-3" onclick="addAllowance('edit-allowances-container', 'default_allowances')">
+                        <button type="button" class="btn btn-sm btn-outline-secondary mb-3" data-onclick="addAllowance('edit-allowances-container', 'default_allowances')">
                             <i class="ti ti-plus"></i> {{ __('messages.add') }}
                         </button>
 
                         <h6>Default {{ __('messages.hr_deductions') }}</h6>
                         <div id="edit-deductions-container"></div>
-                        <button type="button" class="btn btn-sm btn-outline-secondary mb-3" onclick="addDeduction('edit-deductions-container', 'default_deductions')">
+                        <button type="button" class="btn btn-sm btn-outline-secondary mb-3" data-onclick="addDeduction('edit-deductions-container', 'default_deductions')">
                             <i class="ti ti-plus"></i> {{ __('messages.add') }}
                         </button>
                         <hr>

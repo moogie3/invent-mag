@@ -22,7 +22,7 @@
     @endif
 
     <button type="button" class="btn btn-icon btn-ghost-danger" data-bs-toggle="modal" data-bs-target="#deleteModal"
-        onclick="setDeleteFormAction('{{ route('admin.warehouse.destroy', $wo->id) }}')" @if($wo->is_main) disabled @endif
+        data-onclick="setDeleteFormAction('{{ route('admin.warehouse.destroy', $wo->id) }}')" @if($wo->is_main) disabled @endif
         title="{{ __('messages.delete') }}">
         <i class="ti ti-trash"></i>
     </button>

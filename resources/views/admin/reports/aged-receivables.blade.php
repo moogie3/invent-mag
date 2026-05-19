@@ -35,9 +35,9 @@
                                 </button>
                                 <ul class="dropdown-menu">
                                     <li><a class="dropdown-item" href="#"
-                                            onclick="exportAgedReceivables('pdf')">Export as PDF</a></li>
+                                            data-onclick="exportAgedReceivables('pdf')">Export as PDF</a></li>
                                     <li><a class="dropdown-item" href="#"
-                                            onclick="exportAgedReceivables('csv')">Export as CSV</a></li>
+                                            data-onclick="exportAgedReceivables('csv')">Export as CSV</a></li>
                                 </ul>
                             </div>
                         </div>

@@ -28,7 +28,7 @@
     <input type="hidden" id="customerCreditInput" name="customer_credit_amount" value="0">
 </div>
 
-<script>
+<script nonce="{{ $cspNonce ?? '' }}">
 (function() {
     function initCustomerCredit() {
         const customerSelect = document.getElementById('customer_id');

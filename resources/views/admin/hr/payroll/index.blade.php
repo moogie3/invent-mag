@@ -45,12 +45,12 @@
                                                         </button>
                                                         <ul class="dropdown-menu" aria-labelledby="exportDropdown">
                                                             <li>
-                                                                <a class="dropdown-item" href="#" onclick="exportPayrollRuns('pdf'); return false;">
+                                                                <a class="dropdown-item" href="#" data-onclick="exportPayrollRuns('pdf'); return false;">
                                                                     {{ __('messages.export_as_pdf') }}
                                                                 </a>
                                                             </li>
                                                             <li>
-                                                                <a class="dropdown-item" href="#" onclick="exportPayrollRuns('csv'); return false;">
+                                                                <a class="dropdown-item" href="#" data-onclick="exportPayrollRuns('csv'); return false;">
                                                                     {{ __('messages.export_as_csv') }}
                                                                 </a>
                                                             </li>
@@ -140,7 +140,7 @@
                         @if($availablePeriods->isNotEmpty())
                         <div class="mb-3">
                             <label class="form-label fw-semibold">Select Attendance Period</label>
-                            <select name="period_id" id="period_id" class="form-select" required onchange="document.getElementById('runPayrollForm').action = '/admin/hr/payroll/run/' + this.value;">
+                            <select name="period_id" id="period_id" class="form-select" required data-onchange="document.getElementById('runPayrollForm').action = '/admin/hr/payroll/run/' + this.value;">
                                 <option value="" disabled selected>-- Select a period --</option>
                                 @foreach($availablePeriods as $period)
                                     <option value="{{ $period->id }}">{{ \Carbon\Carbon::createFromDate($period->year, $period->month, 1)->translatedFormat('F Y') }} ({{ ucfirst($period->status) }})</option>

@@ -47,7 +47,7 @@
             </div>
         </div>
 
-        <script>
+        <script nonce="{{ $cspNonce ?? '' }}">
             (function() {
                 function initDemoBanner() {
                     const banner = document.getElementById('demo-banner');
@@ -119,7 +119,7 @@
             </div>
         </div>
 
-        <script>
+        <script nonce="{{ $cspNonce ?? '' }}">
             (function() {
                 function initTrialBanner() {
                     const banner = document.getElementById('trial-banner');

@@ -66,9 +66,9 @@
                                     <i class="ti ti-download me-2"></i> {{ __('messages.export') }}
                                 </button>
                                 <ul class="dropdown-menu">
-                                    <li><a class="dropdown-item" href="#" onclick="exportGeneralLedger('pdf')">Export
+                                    <li><a class="dropdown-item" href="#" data-onclick="exportGeneralLedger('pdf')">Export
                                             as PDF</a></li>
-                                    <li><a class="dropdown-item" href="#" onclick="exportGeneralLedger('csv')">Export
+                                    <li><a class="dropdown-item" href="#" data-onclick="exportGeneralLedger('csv')">Export
                                             as CSV</a></li>
                                 </ul>
                             </div>

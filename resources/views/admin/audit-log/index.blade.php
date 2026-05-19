@@ -15,7 +15,7 @@
 @endsection
 
 @push('scripts')
-<script>
+<script nonce="{{ $cspNonce ?? '' }}">
     window.auditLogTranslations = {
         timestamp: '{{ __("messages.timestamp") }}',
         user: '{{ __("messages.user") }}',

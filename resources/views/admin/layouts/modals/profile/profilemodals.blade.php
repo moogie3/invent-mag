@@ -53,7 +53,7 @@
                 <button type="button" class="btn btn-secondary"
                     data-bs-dismiss="modal">{{ __('messages.cancel') }}</button>
                 <button type="button" class="btn btn-primary"
-                    onclick="submitProfileForm()">{{ __('messages.confirm') }}</button>
+                    data-onclick="submitProfileForm()">{{ __('messages.confirm') }}</button>
             </div>
         </div>
     </div>

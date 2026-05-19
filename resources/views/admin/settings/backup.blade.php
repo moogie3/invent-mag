@@ -125,7 +125,7 @@
                                                                                     <button type="submit"
                                                                                         class="btn btn-sm btn-icon btn-ghost-danger"
                                                                                         title="{{ __('messages.backup_delete') }}"
-                                                                                        onclick="return confirm('{{ __('messages.backup_delete_confirm') ?? 'Are you sure?' }}')">
+                                                                                        data-onclick="return confirm('{{ __('messages.backup_delete_confirm') ?? 'Are you sure?' }}')">
                                                                                         <i class="ti ti-trash"></i>
                                                                                     </button>
                                                                                 </form>

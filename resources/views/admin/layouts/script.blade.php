@@ -6,42 +6,6 @@
 <script src="{{ asset('tabler/dist/js/tabler.min.js?1692870487') }}"></script>
 <script src="{{ asset('tabler/dist/js/demo.min.js?1692870487') }}"></script>
 
-<script nonce="{{ $cspNonce ?? '' }}">
-    // CRITICAL: Tabler doesn't expose bootstrap globally, so we need to do it manually
-    // This must run immediately after tabler.min.js loads
-    (function() {
-        var checkCount = 0;
-        var maxChecks = 10;
-        
-        function exposeBootstrap() {
-            checkCount++;
-            
-            // Check if Tabler is available
-            if (window.tabler && window.tabler.bootstrap) {
-                window.bootstrap = window.tabler.bootstrap;
-                return true;
-            }
-            
-            // If not found yet, try a few more times
-            if (checkCount < maxChecks) {
-                setTimeout(exposeBootstrap, 50);
-            }
-            return false;
-        }
-        
-        // Start checking
-        exposeBootstrap();
-    })();
-    
-    // Also ensure bootstrap is available on every turbo:load
-    document.addEventListener('turbo:load', function() {
-        if (window.tabler && window.tabler.bootstrap && !window.bootstrap) {
-            window.bootstrap = window.tabler.bootstrap;
-        }
-    });
-</script>
-
-
 {{-- Load other external libraries --}}
 <script src="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/js/select2.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/list.js/2.3.1/list.min.js"></script>
@@ -113,23 +77,6 @@
 @vite('resources/js/admin/currency.js')
 
 {{-- GLOBAL FALLBACK FUNCTIONS FOR JOURNAL ENTRIES - Load before journal-entry.js --}}
-<script nonce="{{ $cspNonce ?? '' }}">
-// These fallbacks ensure functions exist before journal-entry.js loads
-// They will be overwritten by the actual functions when the page has the journal form
-(function() {
-    var funcs = [
-        'updateTotals', 'validateAndSubmit', 'handleAccountChange', 
-        'handleInput', 'addTransactionRow', 'removeTransactionRow',
-        'searchAccounts', 'confirmAction', 'reverseEntry', 'voidEntry'
-    ];
-    funcs.forEach(function(name) {
-        if (typeof window[name] !== 'function') {
-            window[name] = function() {};
-        }
-    });
-})();
-</script>
-
 {{-- SCRIPT FOR ACCOUNTING settings --}}
 @vite('resources/js/admin/accounting.js')
 
@@ -152,18 +99,6 @@
 @vite('resources/js/admin/tax.js')
 
 {{-- SCRIPT FOR SALES PIPELINE (SortableJS only loaded when needed) --}}
-<script nonce="{{ $cspNonce ?? '' }}">
-    // Lazily load SortableJS only when navigating to the sales-pipeline page
-    document.addEventListener('turbo:load', function () {
-        if (window.location.pathname.includes('/admin/sales-pipeline')) {
-            if (typeof Sortable === 'undefined') {
-                var s = document.createElement('script');
-                s.src = 'https://cdn.jsdelivr.net/npm/sortablejs@1.14.0/Sortable.min.js';
-                document.head.appendChild(s);
-            }
-        }
-    });
-</script>
 @vite('resources/js/admin/sales-pipeline.js')
 
 {{-- SCRIPT FOR ADMIN LOGIN & PASSWORD RESET --}}
@@ -180,6 +115,9 @@
 {{-- SCRIPT FOR NAVBAR --}}
 @vite('resources/js/admin/layouts/navbar.js')
 
+{{-- REFACTORED INLINE SCRIPTS --}}
+@vite('resources/js/admin/layouts/legacy-inline-scripts.js')
+
 {{-- BOOTSTRAP RE-INITIALIZATION FOR TURBO --}}
 @vite('resources/js/admin/bootstrap-init.js')
 
@@ -190,19 +128,4 @@
 @vite('resources/js/admin/layouts/tutorial-modal.js')
 
 {{-- SCRIPT FOR ADMIN DASHBOARD (ApexCharts lazy-loaded) --}}
-<script nonce="{{ $cspNonce ?? '' }}">
-    document.addEventListener('turbo:load', function () {
-        if (window.location.pathname.includes('/admin/dashboard') && typeof ApexCharts === 'undefined') {
-            var s = document.createElement('script');
-            s.src = '{{ asset('tabler/dist/libs/apexcharts/dist/apexcharts.min.js') }}';
-            document.head.appendChild(s);
-        }
-    });
-</script>
-
 {{-- DELETE MODAL --}}
-<script nonce="{{ $cspNonce ?? '' }}">
-    function setDeleteFormAction(action) {
-        document.getElementById('deleteForm').setAttribute('action', action);
-    }
-</script>

@@ -27,9 +27,9 @@
                             <i class="ti ti-download fs-4 me-2"></i> {{ __('messages.export') }}
                         </button>
                         <ul class="dropdown-menu">
-                            <li><a class="dropdown-item" href="#" onclick="exportAccounts('csv')">Export as CSV</a>
+                            <li><a class="dropdown-item" href="#" data-onclick="exportAccounts('csv')">Export as CSV</a>
                             </li>
-                            <li><a class="dropdown-item" href="#" onclick="exportAccounts('pdf')">Export as PDF</a>
+                            <li><a class="dropdown-item" href="#" data-onclick="exportAccounts('pdf')">Export as PDF</a>
                             </li>
                         </ul>
                     </div>

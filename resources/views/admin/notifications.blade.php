@@ -83,7 +83,7 @@
         }
     </style>
 
-    <script>
+    <script nonce="{{ $cspNonce ?? '' }}">
         document.addEventListener('turbo:load', function() {
             // Get bootstrap from our exposed global (from tabler)
             const bs = window.bootstrap || (window.tabler && window.tabler.bootstrap);

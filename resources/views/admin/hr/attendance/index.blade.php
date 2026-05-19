@@ -45,12 +45,12 @@
                                                         </button>
                                                         <ul class="dropdown-menu" aria-labelledby="exportDropdown">
                                                             <li>
-                                                                <a class="dropdown-item" href="#" onclick="exportAttendancePeriods('pdf'); return false;">
+                                                                <a class="dropdown-item" href="#" data-onclick="exportAttendancePeriods('pdf'); return false;">
                                                                     {{ __('messages.export_as_pdf') }}
                                                                 </a>
                                                             </li>
                                                             <li>
-                                                                <a class="dropdown-item" href="#" onclick="exportAttendancePeriods('csv'); return false;">
+                                                                <a class="dropdown-item" href="#" data-onclick="exportAttendancePeriods('csv'); return false;">
                                                                     {{ __('messages.export_as_csv') }}
                                                                 </a>
                                                             </li>

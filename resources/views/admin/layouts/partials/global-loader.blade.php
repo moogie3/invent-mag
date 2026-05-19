@@ -9,7 +9,7 @@
             <div class="spinner-border text-primary" role="status"></div>
         </div>
     </div>
-    <script>
+    <script nonce="{{ $cspNonce ?? '' }}">
         // Check theme immediately to adjust background color if needed
         (function() {
             var theme = localStorage.getItem('theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');

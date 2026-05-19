@@ -35,9 +35,9 @@
                                     <i class="ti ti-printer fs-4 me-2"></i> {{ __('messages.export') }}
                                 </button>
                                 <ul class="dropdown-menu">
-                                    <li><a class="dropdown-item" href="#" onclick="exportBalanceSheet('pdf')">Export
+                                    <li><a class="dropdown-item" href="#" data-onclick="exportBalanceSheet('pdf')">Export
                                             as PDF</a></li>
-                                    <li><a class="dropdown-item" href="#" onclick="exportBalanceSheet('csv')">Export
+                                    <li><a class="dropdown-item" href="#" data-onclick="exportBalanceSheet('csv')">Export
                                             as CSV</a></li>
                                 </ul>
                             </div>

@@ -129,7 +129,7 @@
 
             <li class="nav-item">
                 <a class="nav-link" href="#" data-turbo-cache="false" data-bs-toggle="tooltip" data-bs-placement="top"
-                    onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
+                    data-onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
                     <div class="nav-link-icon">
                         <i class="ti ti-logout"></i>
                     </div>

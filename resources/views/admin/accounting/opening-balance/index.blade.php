@@ -74,7 +74,7 @@
                     <div class="card-header">
                         <h3 class="card-title">{{ __('messages.account_balances') }}</h3>
                         <div class="card-actions">
-                            <button type="button" class="btn btn-sm btn-outline-primary" onclick="resetAllBalances()">
+                            <button type="button" class="btn btn-sm btn-outline-primary" data-onclick="resetAllBalances()">
                                 <i class="ti ti-refresh me-1"></i>{{ __('messages.reset_all') }}
                             </button>
                         </div>
@@ -118,7 +118,7 @@
                                                 <select name="balances[{{ $account->id }}][type]" 
                                                     class="form-select form-select-sm balance-type"
                                                     data-account-id="{{ $account->id }}"
-                                                    onchange="updateBalance({{ $account->id }})">
+                                                    data-onchange="updateBalance({{ $account->id }})">
                                                     <option value="debit" {{ $debit > 0 ? 'selected' : '' }}>{{ __('messages.debit') }}</option>
                                                     <option value="credit" {{ $credit > 0 ? 'selected' : '' }}>{{ __('messages.credit') }}</option>
                                                 </select>
@@ -202,7 +202,7 @@
                             <div class="col-md-6">
                                 <div class="d-flex justify-content-end gap-2">
                                     <button type="button" class="btn btn-outline-danger" 
-                                        onclick="deleteOpeningBalances()"
+                                        data-onclick="deleteOpeningBalances()"
                                         {{ $summary['count'] == 0 ? 'disabled' : '' }}>
                                         <i class="ti ti-trash me-1"></i>{{ __('messages.delete_opening_balances') }}
                                     </button>

@@ -37,7 +37,7 @@
                     <div class="card-header">
                         <h3 class="card-title">{{ __('messages.adjustment_log') }}</h3>
                         <div class="ms-auto d-flex gap-2">
-                            <select class="form-select" style="width: auto;" name="warehouse_id" onchange="window.location.href = this.value">
+                            <select class="form-select" style="width: auto;" name="warehouse_id" data-onchange="window.location.href = this.value">
                                 <option value="{{ route('admin.reports.adjustment-log', ['warehouse_id' => 'all', 'type' => request('type', 'all')]) }}"
                                     {{ !request('warehouse_id') || request('warehouse_id') == 'all' ? 'selected' : '' }}>
                                     {{ __('messages.all_warehouses') }}
@@ -49,7 +49,7 @@
                                     </option>
                                 @endforeach
                             </select>
-                            <select class="form-select" style="width: auto;" name="type" onchange="window.location.href = this.value">
+                            <select class="form-select" style="width: auto;" name="type" data-onchange="window.location.href = this.value">
                                 <option value="{{ route('admin.reports.adjustment-log', ['type' => 'all', 'warehouse_id' => request('warehouse_id', 'all')]) }}"
                                     {{ !request('type') || request('type') == 'all' ? 'selected' : '' }}>
                                     {{ __('messages.all_types') }}
@@ -68,12 +68,12 @@
                                 </button>
                                 <ul class="dropdown-menu" aria-labelledby="exportAdjustmentLogDropdown">
                                     <li>
-                                        <a class="dropdown-item" href="#" onclick="exportAdjustmentLog('pdf')">
+                                        <a class="dropdown-item" href="#" data-onclick="exportAdjustmentLog('pdf')">
                                             Export as PDF
                                         </a>
                                     </li>
                                     <li>
-                                        <a class="dropdown-item" href="#" onclick="exportAdjustmentLog('csv')">
+                                        <a class="dropdown-item" href="#" data-onclick="exportAdjustmentLog('csv')">
                                             Export as CSV
                                         </a>
                                     </li>

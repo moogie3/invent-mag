@@ -20,8 +20,8 @@ function openTutorialModal(isManual = false, forceTopics = false) {
     var stepSubTopics = document.getElementById('tutorial-step-subtopics');
     var stepContext = document.getElementById('tutorial-step-context');
     
-    var btnNext = document.getElementById('btn-next-tutorial');
-    var btnBack = document.getElementById('btn-back-topics');
+    var btnNext = document.getElementById('tutorial-btn-next');
+    var btnBack = document.getElementById('tutorial-btn-back');
     var modalTitle = document.getElementById('tutorial-modal-title');
 
     // Reset display cleanly without transitions to avoid visual bugs on first open
@@ -49,12 +49,28 @@ function openTutorialModal(isManual = false, forceTopics = false) {
         if (btnNext) btnNext.style.display = 'none';
         if (btnBack) btnBack.classList.add('d-none');
         if (modalTitle) modalTitle.innerHTML = '<i class="ti ti-grid-dots me-2"></i> All Topics';
+        var footer = document.querySelector('#tutorial-modal .modal-footer');
+        if (footer) {
+            footer.classList.remove('justify-content-center');
+            footer.classList.add('justify-content-between');
+        }
+        
+        var footer = document.querySelector('#tutorial-modal .modal-footer');
+        if (footer) {
+            footer.classList.remove('justify-content-center');
+            footer.classList.add('justify-content-between');
+        }
     } else if (isManual && stepContext) {
         // Opened manually from pretitle -> show contextual help for current page
         stepContext.classList.remove('d-none');
         stepContext.style.opacity = '1';
         if (btnNext) btnNext.style.display = 'none';
         if (btnBack) btnBack.classList.remove('d-none');
+        var footer = document.querySelector('#tutorial-modal .modal-footer');
+        if (footer) {
+            footer.classList.remove('justify-content-center');
+            footer.classList.add('justify-content-between');
+        }
         if (modalTitle) modalTitle.innerHTML = '<i class="ti ti-help me-2"></i> Page Tutorial';
     } else if (step1) {
         // Auto opened -> show welcome overview
@@ -63,6 +79,11 @@ function openTutorialModal(isManual = false, forceTopics = false) {
         if (btnNext) btnNext.style.display = 'block';
         if (btnBack) btnBack.classList.add('d-none');
         if (modalTitle) modalTitle.innerHTML = '<i class="ti ti-rocket me-2"></i> Welcome to Invent-MAG';
+        var footer = document.querySelector('#tutorial-modal .modal-footer');
+        if (footer) {
+            footer.classList.remove('justify-content-center');
+            footer.classList.add('justify-content-between');
+        }
     }
 
     modalInstance.show();
@@ -154,17 +175,24 @@ window.showTopics = function() {
             
             // Prepare Topics grid
             if (stepTopics) {
+                stepTopics.style.opacity = '0';
                 stepTopics.classList.remove('d-none');
                 void stepTopics.offsetWidth; // Reflow
                 stepTopics.style.opacity = '1';
             }
             
-            var btnNext = document.getElementById('btn-next-tutorial');
-            var btnBack = document.getElementById('btn-back-topics');
+            var btnNext = document.getElementById('tutorial-btn-next');
+            var btnBack = document.getElementById('tutorial-btn-back');
             
             if (btnNext) btnNext.style.display = 'none';
             if (btnBack) btnBack.classList.add('d-none');
             if (modalTitle) modalTitle.innerHTML = '<i class="ti ti-grid-dots me-2"></i> All Topics';
+            
+            var footer = document.querySelector('#tutorial-modal .modal-footer');
+            if (footer) {
+                footer.classList.remove('justify-content-center');
+                footer.classList.add('justify-content-between');
+            }
         }, 300);
     } else {
         // Fallback if none active
@@ -174,12 +202,18 @@ window.showTopics = function() {
             stepTopics.style.opacity = '1';
         }
         
-        var btnNext = document.getElementById('btn-next-tutorial');
-        var btnBack = document.getElementById('btn-back-topics');
+        var btnNext = document.getElementById('tutorial-btn-next');
+        var btnBack = document.getElementById('tutorial-btn-back');
         
         if (btnNext) btnNext.style.display = 'none';
         if (btnBack) btnBack.classList.add('d-none');
         if (modalTitle) modalTitle.innerHTML = '<i class="ti ti-grid-dots me-2"></i> All Topics';
+        
+        var footer = document.querySelector('#tutorial-modal .modal-footer');
+        if (footer) {
+            footer.classList.remove('justify-content-center');
+            footer.classList.add('justify-content-between');
+        }
     }
     
     var modalElement = document.getElementById('tutorial-modal');
@@ -195,7 +229,11 @@ window.showTopics = function() {
 
 // Sub-topics drill-down: show a category's page list
 window.showSubTopics = function(topicKey) {
-    var data = (window.tutorialSubTopics || {})[topicKey];
+    var modalEl = document.getElementById('tutorial-modal');
+    var topicsRaw = modalEl ? modalEl.getAttribute('data-topics') : '{}';
+    var topicsObj = {};
+    try { topicsObj = JSON.parse(topicsRaw); } catch(e) {}
+    var data = topicsObj[topicKey];
     if (!data) return;
 
     var stepTopics = document.getElementById('tutorial-step-topics');
@@ -206,6 +244,11 @@ window.showSubTopics = function(topicKey) {
     var modalTitle = document.getElementById('tutorial-modal-title');
 
     if (!stepSubTopics || !listEl) return;
+
+    var mainIconWrapper = document.getElementById('subtopics-icon-wrapper');
+    var mainIcon = document.getElementById('subtopics-icon');
+    if (mainIcon) mainIcon.className = 'ti ' + data.icon;
+    if (mainIconWrapper) mainIconWrapper.className = 'icon-wrapper text-white mx-auto shadow mb-3 bg-' + data.color;
 
     // Build the sub-items list HTML
     var colorClass = 'bg-' + data.color + '-lt';
@@ -237,25 +280,42 @@ window.showSubTopics = function(topicKey) {
     if (subtitleEl) subtitleEl.textContent = data.subtitle;
     if (modalTitle) modalTitle.innerHTML = '<i class="ti ' + data.icon + ' me-2"></i>' + data.label;
 
+    var btnNext = document.getElementById('tutorial-btn-next');
+    var btnBack = document.getElementById('tutorial-btn-back');
+    var footer = document.querySelector('#tutorial-modal .modal-footer');
+
     // Fade topics out, show subtopics
     if (stepTopics && !stepTopics.classList.contains('d-none')) {
         stepTopics.classList.add('fade-out');
         setTimeout(function() {
             stepTopics.classList.add('d-none');
+            stepSubTopics.style.opacity = '0';
             stepSubTopics.classList.remove('d-none');
             void stepSubTopics.offsetWidth;
             stepSubTopics.style.opacity = '1';
+            
+            // Footer: hide Next and Back buttons, center Skip button (Synced with animation)
+            if (btnNext) btnNext.style.display = 'none';
+            if (btnBack) btnBack.classList.add('d-none');
+            if (footer) {
+                footer.classList.remove('justify-content-between');
+                footer.classList.add('justify-content-center');
+            }
         }, 250);
     } else {
+        stepSubTopics.style.opacity = '0';
         stepSubTopics.classList.remove('d-none');
+        void stepSubTopics.offsetWidth;
         stepSubTopics.style.opacity = '1';
+        
+        // Footer: hide Next and Back buttons, center Skip button
+        if (btnNext) btnNext.style.display = 'none';
+        if (btnBack) btnBack.classList.add('d-none');
+        if (footer) {
+            footer.classList.remove('justify-content-between');
+            footer.classList.add('justify-content-center');
+        }
     }
-
-    // Footer: hide Next button, show Back button
-    var btnNext = document.getElementById('btn-next-tutorial');
-    var btnBack = document.getElementById('btn-back-topics');
-    if (btnNext) btnNext.style.display = 'none';
-    if (btnBack) btnBack.classList.remove('d-none');
 };
 
 // Back from sub-topics to the topics grid
@@ -382,6 +442,42 @@ document.addEventListener('turbo:load', onTurboLoad);
 // Global click listener for the tutorial buttons
 // This avoids inline onclick handlers which cause Bootstrap event conflicts in Tabler
 document.addEventListener('click', function(e) {
+        // --- Tutorial Navigation ---
+    if (e.target.closest('#tutorial-btn-close') || e.target.closest('#tutorial-btn-skip') || e.target.closest('#tutorial-btn-finish')) {
+        e.preventDefault();
+        if (typeof window.closeTutorialExplicitly === 'function') {
+            window.closeTutorialExplicitly();
+        }
+        return;
+    }
+
+    if (e.target.closest('#tutorial-btn-next')) {
+        e.preventDefault();
+        // The only "Next" logic in the system is going from Welcome/Context to Topics Grid
+        if (typeof window.showTopics === 'function') {
+            window.showTopics();
+        }
+        return;
+    }
+
+    if (e.target.closest('#tutorial-btn-back') || e.target.closest('#tutorial-btn-back-to-topics')) {
+        e.preventDefault();
+        if (typeof window.showTopics === 'function') {
+            window.showTopics();
+        }
+        return;
+    }
+
+    var topicTrigger = e.target.closest('.tutorial-topic-trigger');
+    if (topicTrigger) {
+        e.preventDefault();
+        var topic = topicTrigger.getAttribute('data-topic');
+        if (topic && typeof window.showSubTopics === 'function') {
+            window.showSubTopics(topic);
+        }
+        return;
+    }
+
     var triggerGeneral = e.target.closest('.trigger-tutorial-modal-general');
     if (triggerGeneral) {
         e.preventDefault();

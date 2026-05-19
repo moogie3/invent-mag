@@ -90,7 +90,7 @@
                                                     <button type="button" class="btn btn-icon btn-ghost-danger"
                                                         data-bs-toggle="modal" data-bs-target="#deleteModal"
                                                         title="{{ __('messages.delete') }}"
-                                                        onclick="setDeleteFormAction('{{ route('admin.sales-returns.destroy', $return->id) }}')">
+                                                        data-onclick="setDeleteFormAction('{{ route('admin.sales-returns.destroy', $return->id) }}')">
                                                         <i class="ti ti-trash"></i>
                                                     </button>
                                                 </div>

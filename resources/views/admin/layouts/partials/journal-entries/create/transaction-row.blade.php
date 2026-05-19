@@ -1,6 +1,6 @@
 <div class="transaction-row row g-2 mb-2 align-items-center" data-row-id="{{ $rowId }}">
     <div class="col-md-4">
-        <select class="form-select account-select" onchange="handleAccountChange(event)">
+        <select class="form-select account-select" data-onchange="handleAccountChange(event)">
             <option value="">{{ __('messages.select_account') }}</option>
             @foreach($accounts as $account)
                 <option value="{{ $account->code }}">{{ $account->code }} - {{ __($account->name) }}</option>
@@ -20,7 +20,7 @@
         </div>
     </div>
     <div class="col-md-2 text-end">
-        <button type="button" class="btn btn-outline-danger btn-sm" onclick="removeTransactionRow(this)">
+        <button type="button" class="btn btn-outline-danger btn-sm" data-onclick="removeTransactionRow(this)">
             <i class="ti ti-trash"></i>
         </button>
     </div>

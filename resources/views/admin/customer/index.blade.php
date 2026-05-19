@@ -26,9 +26,9 @@
                                 <i class="ti ti-download fs-4 me-2"></i> {{ __('messages.export') }}
                             </button>
                             <ul class="dropdown-menu">
-                                <li><a class="dropdown-item" href="#" onclick="exportCustomers('csv')">Export as
+                                <li><a class="dropdown-item" href="#" data-onclick="exportCustomers('csv')">Export as
                                         CSV</a></li>
-                                <li><a class="dropdown-item" href="#" onclick="exportCustomers('pdf')">Export as
+                                <li><a class="dropdown-item" href="#" data-onclick="exportCustomers('pdf')">Export as
                                         PDF</a></li>
                             </ul>
                         </div>
@@ -99,7 +99,7 @@
                                                         {{ __('messages.warehouse_search_show') }}
                                                         <div class="mx-1 mt-2 d-inline-block">
                                                             <select name="entries" id="entriesSelect"
-                                                                onchange="window.location.href='?entries=' + this.value;">
+                                                                data-onchange="window.location.href='?entries=' + this.value;">
                                                                 <option value="10" {{ $entries == 10 ? 'selected' : '' }}>10
                                                                 </option>
                                                                 <option value="25" {{ $entries == 25 ? 'selected' : '' }}>25

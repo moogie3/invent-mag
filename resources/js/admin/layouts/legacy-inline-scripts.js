@@ -65,3 +65,59 @@ window.setDeleteFormAction = function(action) {
         form.setAttribute('action', action);
     }
 };
+
+// 5. Demo and Trial Banner dismissal handlers
+(function() {
+    function initTrialBanners() {
+        // Demo banner
+        const demoBanner = document.getElementById('demo-banner');
+        if (demoBanner) {
+            if (sessionStorage.getItem('demo_banner_dismissed_session') !== 'true') {
+                demoBanner.classList.remove('d-none');
+            }
+
+            const demoSessionBtn = document.getElementById('demo-btn-dismiss-session');
+            if (demoSessionBtn && !demoSessionBtn.dataset.listenerAttached) {
+                demoSessionBtn.dataset.listenerAttached = 'true';
+                demoSessionBtn.addEventListener('click', function() {
+                    sessionStorage.setItem('demo_banner_dismissed_session', 'true');
+                    if (typeof bootstrap !== 'undefined') {
+                        const alert = new bootstrap.Alert(demoBanner);
+                        alert.close();
+                    } else {
+                        demoBanner.remove();
+                    }
+                });
+            }
+        }
+
+        // Trial banner
+        const trialBanner = document.getElementById('trial-banner');
+        if (trialBanner) {
+            if (sessionStorage.getItem('trial_banner_dismissed_session') !== 'true') {
+                trialBanner.classList.remove('d-none');
+            }
+
+            const trialSessionBtn = document.getElementById('btn-dismiss-session');
+            if (trialSessionBtn && !trialSessionBtn.dataset.listenerAttached) {
+                trialSessionBtn.dataset.listenerAttached = 'true';
+                trialSessionBtn.addEventListener('click', function() {
+                    sessionStorage.setItem('trial_banner_dismissed_session', 'true');
+                    if (typeof bootstrap !== 'undefined') {
+                        const alert = new bootstrap.Alert(trialBanner);
+                        alert.close();
+                    } else {
+                        trialBanner.remove();
+                    }
+                });
+            }
+        }
+    }
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initTrialBanners);
+    } else {
+        initTrialBanners();
+    }
+    document.addEventListener('turbo:load', initTrialBanners);
+})();

@@ -66,6 +66,7 @@
 
 {{-- SCRIPT FOR CUSTOMER --}}
 @vite('resources/js/admin/customer.js')
+@vite('resources/js/admin/customer-credit.js')
 
 {{-- SCRIPT FOR STOCK OPNAME --}}
 @vite('resources/js/admin/stock-opname.js')
@@ -123,6 +124,7 @@
 
 {{-- SCRIPT FOR PLAN CHECKOUT --}}
 @vite('resources/js/admin/plan/checkout.js')
+@vite('resources/js/admin/plan/upgrade.js')
 
 {{-- SCRIPT FOR TUTORIAL MODAL --}}
 @vite('resources/js/admin/layouts/tutorial-modal.js')

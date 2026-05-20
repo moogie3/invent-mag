@@ -36,7 +36,8 @@ var actionBadgeClasses = {
     'reverse': 'bg-lime text-dark'
 };
 
-var auditLogTranslations = window.auditLogTranslations || {
+var configEl = document.getElementById('audit-log-config');
+var auditLogTranslations = configEl ? JSON.parse(configEl.getAttribute('data-translations') || '{}') : (window.auditLogTranslations || {
     timestamp: 'Timestamp',
     user: 'User',
     module: 'Module',
@@ -48,7 +49,7 @@ var auditLogTranslations = window.auditLogTranslations || {
     after: 'After',
     error_loading_details: 'Error loading details',
     close: 'Close'
-};
+});
 
 function initAuditLog() {
     document.querySelectorAll('.btn-view-detail').forEach(function (btn) {

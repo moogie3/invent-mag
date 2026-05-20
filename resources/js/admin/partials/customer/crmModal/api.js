@@ -62,7 +62,7 @@ function populateCrmData(data, append = false) {
         safeUpdateElement("crmCustomerPaymentTerms", data.customer.payment_terms || "N/A");
         
         const crmCustomerImageContainer = document.getElementById("crmCustomerImageContainer");
-        const defaultPlaceholderUrl = window.defaultPlaceholderUrl || "/img/default_placeholder.png";
+        const defaultPlaceholderUrl = document.querySelector('meta[name="default-placeholder-url"]')?.content || window.defaultPlaceholderUrl || "/img/default_placeholder.png";
 
         if (crmCustomerImageContainer) {
             if (data.customer.image && data.customer.image !== defaultPlaceholderUrl && !data.customer.image.includes('default_placeholder')) {

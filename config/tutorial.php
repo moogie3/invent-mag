@@ -202,7 +202,7 @@ return [
         ],
         'admin.warehouse*' => [
             'title' => 'tutorial.warehouse_management',
-            'icon  ' => 'ti-building-warehouse',
+            'icon' => 'ti-building-warehouse',
             'desc'  => 'tutorial.warehouse_management_desc',
             'steps' => ['tutorial.create_warehouse', 'tutorial.main_warehouse', 'tutorial.warehouse_list', 'tutorial.view_details_warehouse', 'tutorial.export_warehouse', 'tutorial.table_actions_warehouse', 'tutorial.stock_tracking'],
         ],
@@ -274,7 +274,7 @@ return [
         ],
         'admin.sales-returns.show' => [
             'title' => 'tutorial.sales_return_details',
-            'icon  ' => 'ti-eye',
+            'icon' => 'ti-eye',
             'desc'  => 'tutorial.sales_return_details_desc',
             'steps' => ['tutorial.return_details', 'tutorial.items_ret', 'tutorial.status_ret_view', 'tutorial.credit_info', 'tutorial.print_ret'],
         ],

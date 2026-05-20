@@ -7,7 +7,7 @@ export function handleCustomerImage(button) {
         "currentCustomerImageContainer"
     );
     const defaultPlaceholderUrl =
-        window.defaultPlaceholderUrl || "/img/default_placeholder.png";
+        document.querySelector('meta[name="default-placeholder-url"]')?.content || window.defaultPlaceholderUrl || "/img/default_placeholder.png";
 
     if (currentCustomerImageContainer) {
         if (

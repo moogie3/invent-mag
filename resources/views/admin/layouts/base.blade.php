@@ -13,6 +13,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no" />
     <meta http-equiv="X-UA-Compatible" content="ie=edge" />
     <meta name="csrf-token" content="{{ csrf_token() }}">
+    <meta name="default-placeholder-url" content="{{ asset('img/default_placeholder.png') }}">
     {{-- Prevent search engines from indexing the admin panel --}}
     <meta name="robots" content="noindex, nofollow, noarchive">
 
@@ -93,21 +94,6 @@
     @include('admin.layouts.modals.general.tutorial-modal')
 
     @turbo
-
-    <script nonce="{{ $cspNonce ?? '' }}">
-        (function() {
-            function logThemeToggle() {
-                const showThemeToggle =
-                    {{ json_encode(auth()->user()->system_settings['show_theme_toggle'] ?? true) }};
-                // console.log('show_theme_toggle setting (from base.blade.php):', showThemeToggle);
-            }
-            if (document.readyState === 'loading') {
-                document.addEventListener('DOMContentLoaded', logThemeToggle);
-            } else {
-                logThemeToggle();
-            }
-        })();
-    </script>
 
     @if(isset($isDebugMode) && $isDebugMode)
         <div style="position: fixed; bottom: 0; left: 0; background: rgba(0,0,0,0.7); color: white; padding: 5px 10px; font-size: 0.8em; z-index: 10000;">

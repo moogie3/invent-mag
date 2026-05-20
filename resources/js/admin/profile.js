@@ -171,3 +171,23 @@ onPageLoad(function () {
         submitButton.disabled = true;
     }
 });
+window.copyToken = function() {
+    const tokenInput = document.getElementById('apiTokenValue');
+    if (!tokenInput) return;
+    
+    tokenInput.select();
+    tokenInput.setSelectionRange(0, 99999); // For mobile devices
+    document.execCommand('copy');
+
+    const configEl = document.getElementById('profile-settings-config');
+    const copiedText = configEl ? configEl.getAttribute('data-copied') : 'Copied!';
+    const copyText = configEl ? configEl.getAttribute('data-copy') : 'Copy';
+
+    const copyButton = document.querySelector('#apiTokenValue + .btn');
+    if (copyButton) {
+        copyButton.innerText = copiedText;
+        setTimeout(() => {
+            copyButton.innerText = copyText;
+        }, 2000);
+    }
+};

@@ -9,18 +9,13 @@ onPageLoad(function() {
     const form = document.getElementById('stockTransferForm');
 
     if (!fromWarehouseSelect || !productSelect) {
-        console.error('Stock Transfer: Required elements not found');
         return;
     }
-
-    console.log('Stock Transfer: Initializing...');
 
     // Validate warehouses and show toast if same
     function validateWarehouses() {
         const fromWarehouse = fromWarehouseSelect.value;
         const toWarehouse = toWarehouseSelect.value;
-
-        console.log('Validating warehouses:', fromWarehouse, toWarehouse);
 
         if (fromWarehouse && toWarehouse && fromWarehouse === toWarehouse) {
             const errorMsg = form.dataset.sameWarehouseError || 'Source and destination warehouses must be different';
@@ -41,14 +36,11 @@ onPageLoad(function() {
 
     // Load products for selected warehouse
     function loadProducts(warehouseId) {
-        console.log('Loading products for warehouse:', warehouseId);
-        
         const defaultText = productSelect.dataset.placeholder || 'Select Product';
         productSelect.innerHTML = '<option value="">' + defaultText + '</option>';
         availableQtyInput.value = '';
 
         if (!warehouseId) {
-            console.log('No warehouse selected, skipping product load');
             return;
         }
 
@@ -57,15 +49,12 @@ onPageLoad(function() {
 
         fetch('/admin/reports/stock-transfer/products/' + warehouseId)
             .then(function(response) {
-                console.log('Fetch response:', response.status);
                 if (!response.ok) {
                     throw new Error('HTTP ' + response.status);
                 }
                 return response.json();
             })
             .then(function(products) {
-                console.log('Products received:', products);
-                
                 productSelect.innerHTML = '<option value="">' + defaultText + '</option>';
                 
                 if (!products || products.length === 0) {
@@ -81,8 +70,7 @@ onPageLoad(function() {
                     productSelect.appendChild(option);
                 });
             })
-            .catch(function(error) {
-                console.error('Error fetching products:', error);
+            .catch(function() {
                 productSelect.innerHTML = '<option value="">Error loading products</option>';
                 
                 if (typeof window.InventMagApp !== 'undefined' && window.InventMagApp.showToast) {
@@ -93,7 +81,6 @@ onPageLoad(function() {
 
     // Event listener for From Warehouse change
     fromWarehouseSelect.addEventListener('change', function() {
-        console.log('From warehouse changed:', this.value);
         loadProducts(this.value);
         validateWarehouses();
     });
@@ -101,7 +88,6 @@ onPageLoad(function() {
     // Event listener for To Warehouse change
     if (toWarehouseSelect) {
         toWarehouseSelect.addEventListener('change', function() {
-            console.log('To warehouse changed:', this.value);
             validateWarehouses();
         });
     }
@@ -135,6 +121,4 @@ onPageLoad(function() {
     if (fromWarehouseSelect.value) {
         loadProducts(fromWarehouseSelect.value);
     }
-    
-    console.log('Stock Transfer: Initialization complete');
 });

@@ -132,7 +132,3 @@
         </div>
     </div>
 </div>
-
-<script nonce="{{ $cspNonce ?? '' }}">
-    window.defaultPlaceholderUrl = "{{ asset('img/default_placeholder.png') }}";
-</script>

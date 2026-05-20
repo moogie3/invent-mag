@@ -106,9 +106,7 @@ window.InventMagApp.showToast = function (
                     <div class="${currentType.mutedColor}" style="font-size: 0.875rem; line-height: 1.4;">${safeMessage}</div>
                 </div>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast" aria-label="Close"
-                        style="opacity: 0.8;"
-                        onmouseover="this.style.opacity='1'"
-                        onmouseout="this.style.opacity='0.8'"></button>
+                        style="opacity: 0.8;"></button>
             </div>
         </div>
     `;

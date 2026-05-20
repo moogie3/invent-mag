@@ -258,20 +258,6 @@
         </div>
     </form>
 
-    <script nonce="{{ $cspNonce ?? '' }}">
-        function copyToken() {
-            const tokenInput = document.getElementById('apiTokenValue');
-            tokenInput.select();
-            tokenInput.setSelectionRange(0, 99999); // For mobile devices
-            document.execCommand('copy');
-
-            // Optional: Provide feedback to the user
-            const originalButtonText = document.querySelector('#apiTokenForm .btn-list button').innerText;
-            const copyButton = document.querySelector('#apiTokenValue + .btn');
-            copyButton.innerText = '{{ __('messages.copied') }}';
-            setTimeout(() => {
-                copyButton.innerText = '{{ __('messages.copy') }}';
-            }, 2000);
-        }
-    </script>
 </div>
+
+<div id="profile-settings-config" data-copied="{{ __('messages.copied') }}" data-copy="{{ __('messages.copy') }}" class="d-none"></div>

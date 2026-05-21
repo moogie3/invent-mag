@@ -213,11 +213,3 @@
         </div>
     </div>
 </div>
-
-<script nonce="{{ $cspNonce ?? '' }}">
-    function setDeleteFormAction(action) {
-        var form = document.getElementById('deleteForm');
-        if (form) form.action = action;
-    }
-    window.setDeleteFormAction = setDeleteFormAction;
-</script>

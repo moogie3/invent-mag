@@ -97,9 +97,9 @@ class Product extends Model
 
 | Tier         | Users     | Warehouses | Products  | Price  | Features                                   |
 | ------------ | --------- | ---------- | ---------|--------| ------------------------------------------ |
-| Starter      | 3         | 1          | 100      | $19/mo | Basic (Products, Sales, Purchases)             |
-| Professional | 10        | Unlimited  | 500      | $59/mo | + POS, Stock Opname, Accounting, CRM        |
-| Enterprise   | Unlimited | Unlimited  | Unlimited | $109/mo| + Forecasting, API, Audit Trail            |
+| Starter      | 3         | 1          | 100      | $19/mo | Inventory, Sales/Purchases, POS, Returns, Stock Transfer |
+| Professional | 10        | Unlimited  | 500      | $59/mo | + Stock Opname, Accounting, CRM, HR & Payroll |
+| Enterprise   | Unlimited | Unlimited  | Unlimited | $109/mo| + Forecasting, API, Audit Trail, Custom Roles |
 
 *(Updated: April 2026 - Stock Opname added to Professional tier)*
 

@@ -161,6 +161,15 @@
     document.addEventListener('turbo:before-render', cleanupModals);
     document.addEventListener('turbo:before-frame-render', cleanupModals);
 
+    // Fix WAI-ARIA "Blocked aria-hidden" warning on ALL modals
+    // When a modal hides, focus is often still inside it, causing a11y violations
+    document.addEventListener('hide.bs.modal', function(e) {
+        var modal = e.target;
+        if (modal && document.activeElement && (document.activeElement === modal || modal.contains(document.activeElement))) {
+            document.activeElement.blur();
+        }
+    });
+
     // Also clean up modal backdrops when any modal is hidden (including native ones)
     document.addEventListener('hidden.bs.modal', function(e) {
         // Small delay to let Bootstrap finish cleanup

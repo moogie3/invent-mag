@@ -1694,15 +1694,23 @@ Tax double-submissions to DJP are a legal problem. Protection at 5 levels:
 
 ---
 
-### 5.2 Cash Flow Statement
+### 5.2 Cash Flow Statement ✅ DONE
 
 **Why:** The third core financial statement. P&L and Balance Sheet already exist. Cash Flow Statement completes the set — required by Indonesian accounting standards (PSAK).
 
-**Method:** Indirect method (Net Income → adjust for non-cash items + working capital changes). More standard and easier to implement than direct method.
+**Method:** Indirect method (Net Income → adjust for non-cash items + working capital changes). Uses existing CoA classification — no `cash_flow_category` field needed; the system derives operating/investing/financing from account type and natural balance.
 
-**What:** New `FinancialReportingService` method (or extend existing `AccountingReportService`). Requires classifying all CoA accounts as operating/investing/financing activity types — add `cash_flow_category` field to `accounts` table.
+**Implementation:**
+- `CashFlowService` — generates cash flow statement data (operating, investing, financing sections)
+- `ReportController::cashFlow()` + `exportCashFlow()` — report view and PDF/CSV export
+- `cash-flow.blade.php` + `cash-flow-export-pdf.blade.php` — report views
+- Plan feature tiering: `cash_flow` slug, gated behind Professional+ plans
+- Navigation menu item under Reports section
+- Full feature tests (`CashFlowServiceTest`)
+- EN/ID language translations
+- Route-level middleware protection (`plan.feature:cash_flow`)
 
-**Complexity:** Medium (~2 weeks).
+**Complexity:** Medium (~2 weeks). ✅ Completed.
 
 ---
 

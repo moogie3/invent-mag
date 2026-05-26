@@ -10,6 +10,7 @@ use App\Observers\ActivityObserver;
 use App\Observers\CustomerCreditObserver;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Blade;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\View;
 use App\Models\Purchase;
 use Illuminate\Auth\Notifications\VerifyEmail;
@@ -91,6 +92,26 @@ class AppServiceProvider extends ServiceProvider
             } catch (\Exception $e) {
                 return true; // No tenant context, allow content
             }
+        });
+
+        /**
+         * DB::tenantTable() — Safeguard against missing tenant_id in raw queries.
+         *
+         * Auto-injects ->where('tenant_id', $tenantId) so developers cannot forget it.
+         * Pass $requireTenant = false to opt out (e.g. cross-tenant admin queries).
+         */
+        DB::macro('tenantTable', function (string $table, ?int $tenantId = null, bool $requireTenant = true) {
+            $tenantId = $tenantId ?? app('currentTenant')->id ?? null;
+            $query = DB::table($table);
+            if ($tenantId) {
+                $query->where('tenant_id', $tenantId);
+            } elseif ($requireTenant) {
+                throw new \RuntimeException(
+                    'DB::tenantTable() called without a tenant context. ' .
+                    'Pass $tenantId explicitly or set $requireTenant = false if this is intentional.'
+                );
+            }
+            return $query;
         });
 
         /**

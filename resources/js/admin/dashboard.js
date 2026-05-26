@@ -176,7 +176,6 @@
                     metricsContainer.innerHTML = `
                         <div class="mt-2 text-center text-muted small d-flex justify-content-center align-items-center gap-3">
                             <span><i class="ti ti-chart-line text-blue"></i> MAPE: <strong>${data.metrics.mape}%</strong></span>
-                            <span><i class="ti ti-calculator text-green"></i> RMSE: <strong>${data.metrics.rmse}</strong></span>
                         </div>
                     `;
                 }
@@ -199,7 +198,6 @@
             metricsContainer.innerHTML = `
                 <div class="mt-2 text-center text-muted small d-flex justify-content-center align-items-center gap-3">
                     <span><i class="ti ti-chart-line text-blue"></i> MAPE: <strong>${window.salesForecastData.metrics.mape}%</strong></span>
-                    <span><i class="ti ti-calculator text-green"></i> RMSE: <strong>${window.salesForecastData.metrics.rmse}</strong></span>
                 </div>
             `;
         }

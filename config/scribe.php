@@ -38,15 +38,15 @@ return [
 
             // Include these routes even if they did not match the rules above.
             'include' => [
-                'po.bulk-delete',
-                'po.bulk-mark-paid',
-                'admin.product.quickCreate',
-                'product.bulk-delete',
             ],
 
             // Exclude these routes even if they matched the rules above.
             'exclude' => [
-                // 'GET /health', 'admin.*'
+                // Admin AJAX endpoints — session-authenticated, not REST API
+                'po.bulk-delete',
+                'po.bulk-mark-paid',
+                'admin.product.quickCreate',
+                'product.bulk-delete',
             ],
         ],
     ],

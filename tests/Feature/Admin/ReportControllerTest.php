@@ -4,6 +4,7 @@ namespace Tests\Feature\Admin;
 
 use App\Models\User;
 use App\Services\AgingReportService;
+use App\Services\CashFlowService;
 use App\Services\FinancialReportingService;
 use App\Services\ReportExporter;
 use App\Services\TransactionService;
@@ -21,6 +22,7 @@ class ReportControllerTest extends TestCase
     use WithFaker, CreatesTenant, RefreshDatabase;
 
     protected $transactionServiceMock;
+    protected $cashFlowServiceMock;
     protected $financialReportingServiceMock;
     protected $agingReportServiceMock;
     protected $reportExporterMock;
@@ -34,11 +36,13 @@ class ReportControllerTest extends TestCase
 
         // Mock the services
         $this->transactionServiceMock = Mockery::mock(TransactionService::class);
+        $this->cashFlowServiceMock = Mockery::mock(CashFlowService::class);
         $this->financialReportingServiceMock = Mockery::mock(FinancialReportingService::class);
         $this->agingReportServiceMock = Mockery::mock(AgingReportService::class);
         $this->reportExporterMock = Mockery::mock(ReportExporter::class);
 
         $this->app->instance(TransactionService::class, $this->transactionServiceMock);
+        $this->app->instance(CashFlowService::class, $this->cashFlowServiceMock);
         $this->app->instance(FinancialReportingService::class, $this->financialReportingServiceMock);
         $this->app->instance(AgingReportService::class, $this->agingReportServiceMock);
         $this->app->instance(ReportExporter::class, $this->reportExporterMock);
@@ -397,6 +401,111 @@ class ReportControllerTest extends TestCase
         ]);
 
         $response->assertStatus(302); // Validation error redirects back
+        $response->assertSessionHasErrors('export_option');
+    }
+
+    public function test_cash_flow_displays_cash_flow_page()
+    {
+        $this->cashFlowServiceMock->shouldReceive('generateCashFlowStatement')->andReturn([
+            'net_income' => 50000,
+            'non_cash_items' => [],
+            'non_cash_total' => 0,
+            'working_capital_changes' => [],
+            'working_capital_total' => 0,
+            'operating_cash_flow' => 50000,
+            'investing_activities' => [],
+            'investing_cash_flow' => -10000,
+            'financing_activities' => [],
+            'financing_cash_flow' => 0,
+            'net_change_in_cash' => 40000,
+            'opening_cash_balance' => 100000,
+            'closing_cash_balance' => 140000,
+            'start_date' => '2024-01-01',
+            'end_date' => '2024-01-31',
+        ]);
+
+        $response = $this->actingAs($this->user)->get(route('admin.reports.cash-flow'));
+
+        $response->assertStatus(200);
+        $response->assertViewIs('admin.reports.cash-flow');
+        $response->assertViewHas('net_income');
+        $response->assertViewHas('operating_cash_flow');
+        $response->assertViewHas('investing_cash_flow');
+        $response->assertViewHas('financing_cash_flow');
+        $response->assertViewHas('net_change_in_cash');
+        $response->assertViewHas('start_date');
+        $response->assertViewHas('end_date');
+    }
+
+    public function test_export_cash_flow_returns_pdf()
+    {
+        $this->cashFlowServiceMock->shouldReceive('generateCashFlowStatement')->andReturn([
+            'net_income' => 50000,
+            'non_cash_items' => [],
+            'non_cash_total' => 0,
+            'working_capital_changes' => [],
+            'working_capital_total' => 0,
+            'operating_cash_flow' => 50000,
+            'investing_activities' => [],
+            'investing_cash_flow' => 0,
+            'financing_activities' => [],
+            'financing_cash_flow' => 0,
+            'net_change_in_cash' => 50000,
+            'opening_cash_balance' => 100000,
+            'closing_cash_balance' => 150000,
+            'start_date' => '2024-01-01',
+            'end_date' => '2024-01-31',
+        ]);
+
+        $this->reportExporterMock->shouldReceive('exportToPdf')->andReturn(response('pdf content', 200, [
+            'Content-Type' => 'application/pdf',
+        ]));
+
+        $response = $this->actingAs($this->user)->post(route('admin.reports.cash-flow.export'), [
+            'export_option' => 'pdf',
+        ]);
+
+        $response->assertStatus(200);
+    }
+
+    public function test_export_cash_flow_returns_csv()
+    {
+        $this->cashFlowServiceMock->shouldReceive('generateCashFlowStatement')->andReturn([
+            'net_income' => 50000,
+            'non_cash_items' => [],
+            'non_cash_total' => 0,
+            'working_capital_changes' => [],
+            'working_capital_total' => 0,
+            'operating_cash_flow' => 50000,
+            'investing_activities' => [],
+            'investing_cash_flow' => 0,
+            'financing_activities' => [],
+            'financing_cash_flow' => 0,
+            'net_change_in_cash' => 50000,
+            'opening_cash_balance' => 100000,
+            'closing_cash_balance' => 150000,
+            'start_date' => '2024-01-01',
+            'end_date' => '2024-01-31',
+        ]);
+
+        $this->reportExporterMock->shouldReceive('exportCashFlowToCsv')->andReturn(response('csv content', 200, [
+            'Content-Type' => 'text/csv',
+        ]));
+
+        $response = $this->actingAs($this->user)->post(route('admin.reports.cash-flow.export'), [
+            'export_option' => 'csv',
+        ]);
+
+        $response->assertStatus(200);
+    }
+
+    public function test_export_cash_flow_validates_export_option()
+    {
+        $response = $this->actingAs($this->user)->post(route('admin.reports.cash-flow.export'), [
+            'export_option' => 'invalid',
+        ]);
+
+        $response->assertStatus(302);
         $response->assertSessionHasErrors('export_option');
     }
 }

@@ -272,4 +272,54 @@ class ReportExporter
             fclose($file);
         }, $filename);
     }
+
+    /**
+     * Export Cash Flow Statement to CSV.
+     *
+     * @param array $reportData
+     * @param string $filename
+     * @return Response
+     */
+    public function exportCashFlowToCsv(array $reportData, string $filename): Response
+    {
+        return $this->exportToCsv(function () use ($reportData) {
+            $file = fopen('php://output', 'w');
+            
+            fputcsv($file, ['Cash Flow Statement']);
+            fputcsv($file, ["Period: {$reportData['start_date']} to {$reportData['end_date']}"]);
+            fputcsv($file, []);
+
+            fputcsv($file, ['Operating Activities']);
+            fputcsv($file, ['Net Income', CurrencyHelper::format($reportData['net_income'])]);
+            
+            foreach ($reportData['non_cash_items'] as $item) {
+                fputcsv($file, [$item['account_name'], CurrencyHelper::format($item['amount'])]);
+            }
+            foreach ($reportData['working_capital_changes'] as $item) {
+                fputcsv($file, [$item['account_name'], CurrencyHelper::format($item['amount'])]);
+            }
+            fputcsv($file, ['Net Cash from Operating Activities', CurrencyHelper::format($reportData['operating_cash_flow'])]);
+            fputcsv($file, []);
+
+            fputcsv($file, ['Investing Activities']);
+            foreach ($reportData['investing_activities'] as $item) {
+                fputcsv($file, [$item['account_name'], CurrencyHelper::format($item['amount'])]);
+            }
+            fputcsv($file, ['Net Cash from Investing Activities', CurrencyHelper::format($reportData['investing_cash_flow'])]);
+            fputcsv($file, []);
+
+            fputcsv($file, ['Financing Activities']);
+            foreach ($reportData['financing_activities'] as $item) {
+                fputcsv($file, [$item['account_name'], CurrencyHelper::format($item['amount'])]);
+            }
+            fputcsv($file, ['Net Cash from Financing Activities', CurrencyHelper::format($reportData['financing_cash_flow'])]);
+            fputcsv($file, []);
+
+            fputcsv($file, ['Net Increase (Decrease) in Cash', CurrencyHelper::format($reportData['net_change_in_cash'])]);
+            fputcsv($file, ['Cash at Beginning of Period', CurrencyHelper::format($reportData['opening_cash_balance'])]);
+            fputcsv($file, ['Cash at End of Period', CurrencyHelper::format($reportData['closing_cash_balance'])]);
+
+            fclose($file);
+        }, $filename);
+    }
 }

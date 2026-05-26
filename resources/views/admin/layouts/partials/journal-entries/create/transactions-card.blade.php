@@ -38,57 +38,7 @@
                 </button>
             </div>
 
-<script nonce="{{ $cspNonce ?? '' }}">
-(function() {
-    if (typeof window.updateTotals !== 'function') {
-        window.updateTotals = function() {
-            return { totalDebit: 0, totalCredit: 0, isBalanced: true };
-        };
-    }
-    
-    if (typeof window.validateAndSubmit !== 'function') {
-        window.validateAndSubmit = function(autoPost) {};
-    }
-    
-    if (typeof window.handleAccountChange !== 'function') {
-        window.handleAccountChange = function(event) {};
-    }
-    
-    if (typeof window.handleInput !== 'function') {
-        window.handleInput = function(event) {};
-    }
-    
-    // Attach click handlers for save buttons
-    function initSaveBtns() {
-        var saveDraftBtn = document.getElementById('saveDraftBtn');
-        var savePostBtn = document.getElementById('savePostBtn');
-        
-        if (saveDraftBtn && !saveDraftBtn.dataset.listenerAttached) {
-            saveDraftBtn.dataset.listenerAttached = 'true';
-            saveDraftBtn.addEventListener('click', function() {
-                if (typeof window.validateAndSubmit === 'function') {
-                    window.validateAndSubmit(false);
-                }
-            });
-        }
-        
-        if (savePostBtn && !savePostBtn.dataset.listenerAttached) {
-            savePostBtn.dataset.listenerAttached = 'true';
-            savePostBtn.addEventListener('click', function() {
-                if (typeof window.validateAndSubmit === 'function') {
-                    window.validateAndSubmit(true);
-                }
-            });
-        }
-    }
-
-    if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', initSaveBtns);
-    } else {
-        initSaveBtns();
-    }
-})();
-</script>
+{{-- Button listeners and function stubs handled by resources/js/admin/journal-entry.js --}}
         </div>
     </div>
 </div>

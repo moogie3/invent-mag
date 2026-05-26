@@ -4,7 +4,7 @@ use App\Http\Controllers\Admin\ReportController;
 
 // Reports Routes
 Route::prefix('reports')->group(function () {
-    // Financial Reports - Protected by plan feature
+    // Financial Reports (Income Statement, Balance Sheet, Aged) - Protected by plan.feature:financial_reports
     Route::middleware('plan.feature:financial_reports')->group(function () {
         Route::get('/income-statement', [ReportController::class, 'incomeStatement'])
             ->name('admin.reports.income-statement')
@@ -22,7 +22,6 @@ Route::prefix('reports')->group(function () {
             ->name('admin.reports.aged-payables')
             ->middleware('can:view-financial-reports');
 
-        // Financial report exports
         Route::post('/income-statement/export', [ReportController::class, 'exportIncomeStatement'])
             ->name('admin.reports.income-statement.export')
             ->middleware('can:view-financial-reports');
@@ -37,6 +36,17 @@ Route::prefix('reports')->group(function () {
 
         Route::post('/aged-payables/export', [ReportController::class, 'exportAgedPayables'])
             ->name('admin.reports.aged-payables.export')
+            ->middleware('can:view-financial-reports');
+    });
+
+    // Cash Flow Statement - Protected by its own plan.feature:cash_flow (Professional+)
+    Route::middleware('plan.feature:cash_flow')->group(function () {
+        Route::get('/cash-flow', [ReportController::class, 'cashFlow'])
+            ->name('admin.reports.cash-flow')
+            ->middleware('can:view-financial-reports');
+
+        Route::post('/cash-flow/export', [ReportController::class, 'exportCashFlow'])
+            ->name('admin.reports.cash-flow.export')
             ->middleware('can:view-financial-reports');
     });
 

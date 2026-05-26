@@ -45,6 +45,7 @@
 
 {{-- SCRIPT FOR ADMIN PO --}}
 @vite('resources/js/admin/purchase-order.js')
+@vite('resources/js/admin/paid-invoice-modal.js')
 
 {{-- SCRIPT FOR ADMIN PURCHASE RETURN --}}
 @vite('resources/js/admin/purchase-return.js')
@@ -118,6 +119,9 @@
 
 {{-- REFACTORED INLINE SCRIPTS --}}
 @vite('resources/js/admin/layouts/legacy-inline-scripts.js')
+
+{{-- SCRIPT FOR NOTIFICATIONS PAGE --}}
+@vite('resources/js/admin/notifications.js')
 
 {{-- BOOTSTRAP RE-INITIALIZATION FOR TURBO --}}
 @vite('resources/js/admin/bootstrap-init.js')

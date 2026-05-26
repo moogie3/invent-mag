@@ -283,7 +283,7 @@ endpoints:
         name: plan
         description: ''
         required: false
-        example: enterprise
+        example: professional
         type: string
         enumValues:
           - starter
@@ -297,7 +297,7 @@ endpoints:
       shopname: amniihfqcoynlazghdtqt
       email: andreanne00@example.org
       password: 'O[2UZ5ij-e/dl4m{o,'
-      plan: enterprise
+      plan: professional
     fileParameters: []
     responses:
       -

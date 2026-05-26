@@ -38,42 +38,4 @@
     </div>
 </div>
 
-<script nonce="{{ $cspNonce ?? '' }}">
-(function() {
-    if (typeof window.updateTotals !== 'function') {
-        window.updateTotals = function() {
-            return { totalDebit: 0, totalCredit: 0, isBalanced: true };
-        };
-    }
-    
-    if (typeof window.validateAndSubmit !== 'function') {
-        window.validateAndSubmit = function() {};
-    }
-    
-    if (typeof window.handleAccountChange !== 'function') {
-        window.handleAccountChange = function(event) {};
-    }
-    
-    if (typeof window.handleInput !== 'function') {
-        window.handleInput = function(event) {};
-    }
-    
-    function initUpdateBtn() {
-        var updateBtn = document.getElementById('updateEntryBtn');
-        if (updateBtn && !updateBtn.dataset.listenerAttached) {
-            updateBtn.dataset.listenerAttached = 'true';
-            updateBtn.addEventListener('click', function() {
-                if (typeof window.validateAndSubmit === 'function') {
-                    window.validateAndSubmit();
-                }
-            });
-        }
-    }
-    
-    if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', initUpdateBtn);
-    } else {
-        initUpdateBtn();
-    }
-})();
-</script>
+{{-- Button listener and function stubs handled by resources/js/admin/journal-entry.js --}}

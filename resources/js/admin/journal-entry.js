@@ -89,10 +89,45 @@ function initializeJournalEntry() {
     window.updateTotals();
 }
 
+// Attach click handlers for the create-form save buttons.
+// These live in transactions-card (create) partial and must be wired after
+// the real validateAndSubmit function is defined above.
+function initSaveBtns() {
+    const saveDraftBtn = document.getElementById('saveDraftBtn');
+    const savePostBtn  = document.getElementById('savePostBtn');
+
+    if (saveDraftBtn && !saveDraftBtn.dataset.listenerAttached) {
+        saveDraftBtn.dataset.listenerAttached = 'true';
+        saveDraftBtn.addEventListener('click', function () {
+            window.validateAndSubmit(false);
+        });
+    }
+
+    if (savePostBtn && !savePostBtn.dataset.listenerAttached) {
+        savePostBtn.dataset.listenerAttached = 'true';
+        savePostBtn.addEventListener('click', function () {
+            window.validateAndSubmit(true);
+        });
+    }
+}
+
+// Attach click handler for the edit-form update button.
+function initUpdateBtn() {
+    const updateBtn = document.getElementById('updateEntryBtn');
+    if (updateBtn && !updateBtn.dataset.listenerAttached) {
+        updateBtn.dataset.listenerAttached = 'true';
+        updateBtn.addEventListener('click', function () {
+            window.validateAndSubmit();
+        });
+    }
+}
+
 onPageLoad(function () {
     if (!window.location.pathname.includes("/admin/accounting/journal-entries")) return;
     initializeJournalEntry();
     initDeleteModal();
+    initSaveBtns();
+    initUpdateBtn();
 });
 
 // Delete modal initialization

@@ -53,13 +53,10 @@ class SalesForecastService
                 $optimizationResult['gamma']
             );
             $mape = $optimizationResult['mape'];
-            $rmse = $optimizationResult['rmse'];
         } else {
             $forecastData = $this->forecastLinearRegression($historicalValues, $monthsToForecast);
-            // We can calculate basic metrics for linear regression too
             $metrics = $this->calculateLinearRegressionMetrics($historicalValues);
             $mape = $metrics['mape'];
-            $rmse = $metrics['rmse'];
         }
 
         $lastMonth = Carbon::createFromFormat('Y-m', $salesData->last()->month);
@@ -73,8 +70,7 @@ class SalesForecastService
             'historical' => $historicalValues,
             'forecast' => $forecastData,
             'metrics' => [
-                'mape' => $mape,
-                'rmse' => $rmse
+                'mape' => $mape
             ]
         ];
     }

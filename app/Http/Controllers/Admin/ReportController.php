@@ -6,6 +6,7 @@ use App\Helpers\CurrencyHelper;
 use App\Http\Controllers\Controller;
 use App\Models\StockAdjustment;
 use App\Services\AgingReportService;
+use App\Services\CashFlowService;
 use App\Services\FinancialReportingService;
 use App\Services\ReportExporter;
 use App\Services\TransactionService;
@@ -16,17 +17,20 @@ use Illuminate\Support\Facades\Log;
 class ReportController extends Controller
 {
     protected $transactionService;
+    protected $cashFlowService;
     protected $financialReportingService;
     protected $agingReportService;
     protected $reportExporter;
 
     public function __construct(
         TransactionService $transactionService,
+        CashFlowService $cashFlowService,
         FinancialReportingService $financialReportingService,
         AgingReportService $agingReportService,
         ReportExporter $reportExporter
     ) {
         $this->transactionService = $transactionService;
+        $this->cashFlowService = $cashFlowService;
         $this->financialReportingService = $financialReportingService;
         $this->agingReportService = $agingReportService;
         $this->reportExporter = $reportExporter;
@@ -431,6 +435,58 @@ class ReportController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Error exporting recent transactions. Please try again.',
+                'error_details' => 'Internal server error',
+            ], 500);
+        }
+    }
+
+    /**
+     * Display the Cash Flow Statement.
+     */
+    public function cashFlow(Request $request)
+    {
+        $startDate = $request->input('start_date', Carbon::now()->startOfMonth()->toDateString());
+        $endDate = $request->input('end_date', Carbon::now()->endOfMonth()->toDateString());
+
+        $reportData = $this->cashFlowService->generateCashFlowStatement($startDate, $endDate);
+
+        return view('admin.reports.cash-flow', $reportData);
+    }
+
+    /**
+     * Export Cash Flow Statement
+     */
+    public function exportCashFlow(Request $request)
+    {
+        $request->validate([
+            'export_option' => 'required|string|in:pdf,csv',
+            'start_date' => 'nullable|date',
+            'end_date' => 'nullable|date',
+        ]);
+
+        try {
+            $startDate = $request->input('start_date', Carbon::now()->startOfMonth()->toDateString());
+            $endDate = $request->input('end_date', Carbon::now()->endOfMonth()->toDateString());
+
+            $reportData = $this->cashFlowService->generateCashFlowStatement($startDate, $endDate);
+
+            if ($request->export_option === 'pdf') {
+                return $this->reportExporter->exportToPdf(
+                    'admin.reports.cash-flow-export-pdf',
+                    $reportData,
+                    'cash-flow.pdf'
+                );
+            }
+
+            if ($request->export_option === 'csv') {
+                return $this->reportExporter->exportCashFlowToCsv($reportData, 'cash-flow.csv');
+            }
+        } catch (\Exception $e) {
+            Log::error('Error exporting cash flow statement: ' . $e->getMessage());
+            
+            return response()->json([
+                'success' => false,
+                'message' => 'Error exporting cash flow statement. Please try again.',
                 'error_details' => 'Internal server error',
             ], 500);
         }

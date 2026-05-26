@@ -205,6 +205,7 @@ invent-mag/
 │   │   ├── AgingReportService.php
 │   │   ├── AttendanceService.php
 │   │   ├── BillingService.php
+│   │   ├── CashFlowService.php
 │   │   ├── CategoryService.php
 │   │   ├── ChartOfAccountsService.php
 │   │   ├── CrmService.php
@@ -280,6 +281,7 @@ invent-mag/
 │   │   ├── ... (65+ tenant migrations)
 │   │   ├── 2026_05_07_081251_add_hr_feature_to_plans_table.php
 │   │   ├── 2026_05_12_035444_add_allowances_deductions_to_employees_table.php
+│   │   ├── 2026_05_25_000001_add_cash_flow_feature_to_plans_table.php
 │   │   └── 2026_05_12_045741_add_working_days_to_attendance_periods_table.php
 │   │
 │   └── seeders/
@@ -421,7 +423,7 @@ invent-mag/
 │       │   ├── pos/{index,receipt}.blade.php
 │       │   ├── product/{index,product-create,product-edit}.blade.php
 │       │   ├── profile/profile-edit.blade.php
-│       │   ├── reports/  (income-statement, balance-sheet, aged-*, etc.)
+│       │   ├── reports/  (income-statement, balance-sheet, cash-flow, aged-*, etc.)
 │       │   ├── sales/{index,show,sales-create,sales-edit,pipeline}.blade.php
 │       │   ├── sales-returns/{index,show,create,edit}.blade.php
 │       │   ├── settings/{settings,backup}.blade.php
@@ -482,5 +484,5 @@ invent-mag/
         ├── Http/Middleware/SetLocaleTest.php
         ├── Http/Requests/ProfileUpdateRequestTest.php
         ├── Models/ProductStockTest.php
-        └── Services/   (20+ service tests)
+        └── Services/   (CashFlowServiceTest + 20+ service tests)
 ```

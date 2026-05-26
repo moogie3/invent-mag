@@ -60,6 +60,8 @@ export default defineConfig({
                 "resources/js/admin/plan/upgrade.js",
                 "resources/js/admin/layouts/tutorial-modal.js",
                 "resources/js/admin/opening-balance.js",
+                "resources/js/admin/paid-invoice-modal.js",
+                "resources/js/admin/notifications.js",
                 "resources/js/admin/stock-opname.js",
                 "resources/css/app.css",
                 "resources/css/auth.css",

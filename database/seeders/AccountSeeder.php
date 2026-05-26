@@ -141,6 +141,26 @@ class AccountSeeder extends Seeder
                 $this->command->info("  - " . ucfirst($type) . ": {$count} accounts");
             }
         }
+
+        // Auto-configure accounting integration settings
+        $tenant = app('currentTenant');
+        $codePrefix = $tenantId;
+        $accountSettings = [
+            'sales_revenue_account_id'       => Account::where('tenant_id', $tenantId)->where('code', '4100-' . $codePrefix)->value('id'),
+            'accounts_receivable_account_id'  => Account::where('tenant_id', $tenantId)->where('code', '1130-' . $codePrefix)->value('id'),
+            'cost_of_goods_sold_account_id'  => Account::where('tenant_id', $tenantId)->where('code', '5200-' . $codePrefix)->value('id'),
+            'inventory_account_id'           => Account::where('tenant_id', $tenantId)->where('code', '1140-' . $codePrefix)->value('id'),
+            'accounts_payable_account_id'    => Account::where('tenant_id', $tenantId)->where('code', '2110-' . $codePrefix)->value('id'),
+            'cash_account_id'                => Account::where('tenant_id', $tenantId)->where('code', '1110-' . $codePrefix)->value('id'),
+        ];
+
+        $tenant->accounting_settings = $accountSettings;
+        $tenant->save();
+
+        if (isset($this->command)) {
+            $this->command->newLine();
+            $this->command->info("Accounting integration settings configured for tenant.");
+        }
     }
 
     private function seedAccounts(array $accounts, int $tenantId, ?int $parentId = null): int

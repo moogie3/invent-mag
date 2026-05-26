@@ -2,43 +2,11 @@
 
 return [
 
-    /*
-    |--------------------------------------------------------------------------
-    | Default Plan
-    |--------------------------------------------------------------------------
-    |
-    | The plan slug assigned to new tenants when no plan is specified during
-    | registration. This ensures backward compatibility.
-    |
-    */
-
     'default_plan' => 'starter',
-
-    /*
-    |--------------------------------------------------------------------------
-    | Backward Compatibility
-    |--------------------------------------------------------------------------
-    |
-    | When true, tenants without an assigned plan_id (legacy tenants created
-    | before the plan system) will be treated as having enterprise-level
-    | access. Set to false to force all tenants to have a plan.
-    |
-    */
 
     'legacy_full_access' => true,
 
-    /*
-    |--------------------------------------------------------------------------
-    | Feature Definitions
-    |--------------------------------------------------------------------------
-    |
-    | Maps feature slugs (stored in plans.features JSON) to human-readable
-    | labels. Used for display in the upgrade prompt and plan comparison.
-    |
-    */
-
-'features' => [
-        // Starter features
+    'features' => [
         'products'          => 'Products',
         'inventory'        => 'Inventory Management',
         'sales'           => 'Sales Orders',
@@ -49,7 +17,6 @@ return [
         'customers'      => 'Customer Management',
         'suppliers'      => 'Supplier Management',
 
-        // Professional features
         'pos'               => 'Point of Sale (POS)',
         'stock_opname'      => 'Stock Opname (Physical Count)',
         'accounting'        => 'Full Accounting Suite',
@@ -59,25 +26,15 @@ return [
         'multi_currency'    => 'Multi-Currency Support',
         'sales_returns'     => 'Sales Returns',
         'purchase_returns'  => 'Purchase Returns',
+        'hr'                => 'HR Module (Employees, Attendance & Payroll)',
+        'cash_flow'         => 'Cash Flow Statement',
 
-        // Enterprise features
         'sales_forecasting' => 'Sales Forecasting (Holt-Winters)',
         'api_access'        => 'RESTful API Access',
         'audit_compliance'  => 'Audit Trail & Compliance Logging',
         'custom_roles'      => 'Custom Roles & 79 Permissions',
         'dedicated_support' => 'Dedicated Support',
     ],
-
-    /*
-    |--------------------------------------------------------------------------
-    | Feature-to-Route Group Mapping
-    |--------------------------------------------------------------------------
-    |
-    | Maps feature slugs to the route name prefixes they protect.
-    | Used by the CheckPlanFeature middleware to determine which feature
-    | is required for a given route.
-    |
-    */
 
     'feature_routes' => [
         'stock_opname' => [
@@ -110,6 +67,10 @@ return [
             'admin.reports.aged-payables',
             'admin.reports.aged-payables.*',
         ],
+        'cash_flow' => [
+            'admin.reports.cash-flow',
+            'admin.reports.cash-flow.*',
+        ],
         'multi_currency' => [
             'admin.setting.currency.*',
         ],
@@ -122,17 +83,10 @@ return [
         'api_access' => [
             'admin.setting.profile.token',
         ],
+        'hr' => [
+            'admin.hr.*',
+        ],
     ],
-
-    /*
-    |--------------------------------------------------------------------------
-    | Upgrade Prompt Messages
-    |--------------------------------------------------------------------------
-    |
-    | Messages shown when a tenant tries to access a feature not included
-    | in their current plan.
-    |
-    */
 
     'upgrade_messages' => [
         'stock_opname'      => 'Stock Opname is available on the Professional plan and above.',
@@ -144,10 +98,12 @@ return [
         'multi_currency'    => 'Multi-Currency support is available on the Professional plan and above.',
         'sales_returns'     => 'Sales Returns management is available on the Professional plan and above.',
         'purchase_returns'  => 'Purchase Returns management is available on the Professional plan and above.',
+        'cash_flow'         => 'Cash Flow Statement is available on the Professional plan and above.',
         'sales_forecasting' => 'Sales Forecasting is available on the Enterprise plan.',
         'api_access'        => 'API Access is available on the Enterprise plan.',
         'audit_compliance'  => 'Audit Trail & Compliance Logging is available on the Enterprise plan.',
         'custom_roles'      => 'Custom Roles & Permissions management is available on the Enterprise plan.',
+        'hr'                => 'The HR Module (Employees, Attendance & Payroll) is available on the Professional plan and above.',
     ],
 
 ];

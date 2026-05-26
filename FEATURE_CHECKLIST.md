@@ -210,6 +210,7 @@
 
 - [x] Income Statement (P&L)
 - [x] Balance Sheet
+- [x] Cash Flow Statement (operating, investing, financing activities)
 - [x] Trial Balance
 - [x] AR Aging Report (buckets: Current, 1-30, 31-60, 61-90, 90+)
 - [x] AP Aging Report (same buckets)

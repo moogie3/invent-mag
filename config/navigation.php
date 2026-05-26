@@ -152,6 +152,13 @@ return [
                     'plan_feature' => 'financial_reports', // Professional+
                 ],
                 [
+                    'title' => 'messages.cash_flow_statement',
+                    'route' => 'admin.reports.cash-flow',
+                    'permission' => 'view-reports',
+                    'icon' => 'ti ti-currency-dollar',
+                    'plan_feature' => 'cash_flow', // Professional+
+                ],
+                [
                     'title' => 'messages.aged_receivables_report',
                     'route' => 'admin.reports.aged-receivables',
                     'permission' => 'view-reports',

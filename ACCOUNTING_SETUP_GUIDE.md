@@ -84,6 +84,7 @@ Users need the following permissions to access accounting features:
 │   4. FINANCIAL REPORTS                                          │
 │      ├── Income Statement (Profit & Loss)                       │
 │      ├── Balance Sheet                                          │
+│      ├── Cash Flow Statement                                    │
 │      └── Other Reports                                          │
 │                                                                 │
 └─────────────────────────────────────────────────────────────────┘

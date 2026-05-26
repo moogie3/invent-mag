@@ -20,7 +20,7 @@ return [
     'dashboard_desc' => 'Your business overview at a glance — metrics, charts, and quick actions.',
     'key_metrics' => 'Key Metrics: The top cards show today\'s sales, purchases, profit, and outstanding receivables/payables updated in real time.',
     'sales_purchase_chart' => 'Sales & Purchase Chart: Toggle between Sales and Purchases using the tabs. Filter by date range (This Week, This Month, This Year, Custom) using the dropdown above the chart.',
-    'sales_forecast' => 'Sales Forecast: If enabled on your plan, a predictive forecast chart is shown below the main chart, using historical data to project future sales trends.',
+    'sales_forecast' => 'Sales Forecast: Available on the Enterprise plan, a predictive forecast chart is shown below the main chart, using historical data to project future sales trends. The forecast uses Holt-Winters (Triple Exponential Smoothing) to capture trend and seasonality. Below the chart, MAPE (Mean Absolute Percentage Error) is displayed — it shows the average forecast error as a percentage; lower is better.',
     'accounting_summary' => 'Accounting Summary: If accounting is enabled, a financial summary panel shows revenue, expenses, and net income for the selected period.',
     'recent_transactions' => 'Recent Transactions: The main content section shows your latest sales and purchase orders for quick access and review.',
     'quick_actions' => 'Quick Actions: Use the "New Invoice" button (top right) to quickly create a Sales Order or Purchase Order without navigating through the menu.',
@@ -623,6 +623,17 @@ return [
     'transactions_table' => 'Transactions Table: View all transactions with invoice number, date, type, customer/supplier, amount, status, and actions.',
     'bulk_actions_tl' => 'Bulk Actions: Select multiple transactions to perform bulk delete or export.',
     'export_tl' => 'Export: Use the export dropdown to download as PDF or CSV.',
+
+    // Cash Flow Statement
+    'cash_flow' => 'Cash Flow Statement',
+    'cash_flow_desc' => 'Track cash inflows and outflows across operating, investing, and financing activities.',
+    'date_range_cf' => 'Date Range: Set the start and end date to define the cash flow reporting period.',
+    'generate_report_cf' => 'Generate Report: Click "Generate Report" to load the cash flow statement for the selected period.',
+    'operating_section' => 'Operating Activities: Shows cash flows from core business operations including net income, non-cash adjustments (depreciation, amortization), and changes in working capital (receivables, inventory, payables).',
+    'investing_section' => 'Investing Activities: Shows cash flows from purchases or sales of long-term assets such as property, plant, and equipment.',
+    'financing_section' => 'Financing Activities: Shows cash flows from debt, equity, and dividend transactions.',
+    'net_change_cf' => 'Net Change in Cash: The bottom section shows the net increase or decrease in cash, plus the opening and closing cash balances.',
+    'export_cf' => 'Export: Use the export dropdown to print or download the report as PDF or CSV.',
 
     // Activity Log
     'activity_log' => 'Activity Log',

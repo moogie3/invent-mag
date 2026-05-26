@@ -135,7 +135,7 @@
     </ul>
 
     <ul class="toc-footer" id="last-updated">
-        <li>Last updated: May 13, 2026</li>
+        <li>Last updated: May 25, 2026</li>
     </ul>
 </div>
 
@@ -793,7 +793,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
     \"shopname\": \"amniihfqcoynlazghdtqt\",
     \"email\": \"andreanne00@example.org\",
     \"password\": \"O[2UZ5ij-e\\/dl4m{o,\",
-    \"plan\": \"enterprise\"
+    \"plan\": \"professional\"
 }"
 </code></pre></div>
 
@@ -814,7 +814,7 @@ let body = {
     "shopname": "amniihfqcoynlazghdtqt",
     "email": "andreanne00@example.org",
     "password": "O[2UZ5ij-e\/dl4m{o,",
-    "plan": "enterprise"
+    "plan": "professional"
 };
 
 fetch(url, {
@@ -989,10 +989,10 @@ You can check the Dev Tools console for debugging information.</code></pre>
  &nbsp;
                 <input type="text" style="display: none"
                               name="plan"                data-endpoint="POSTapi-register"
-               value="enterprise"
+               value="professional"
                data-component="body">
     <br>
-<p>Example: <code>enterprise</code></p>
+<p>Example: <code>professional</code></p>
 Must be one of:
 <ul style="list-style-type: square;"><li><code>starter</code></li> <li><code>professional</code></li> <li><code>enterprise</code></li></ul>
         </div>
@@ -1621,9 +1621,9 @@ You can check the Dev Tools console for debugging information.</code></pre>
     --form "units_id=1"\
     --form "supplier_id=1"\
     --form "description=Dolores dolorum amet iste laborum eius est dolor."\
-    --form "has_expiry=1"\
+    --form "has_expiry="\
     --form "stock_quantity=100"\
-    --form "image=@C:\Users\123\AppData\Local\Temp\php67ED.tmp" </code></pre></div>
+    --form "image=@C:\Users\123\AppData\Local\Temp\phpDE58.tmp" </code></pre></div>
 
 
 <div class="javascript-example">
@@ -1648,7 +1648,7 @@ body.append('category_id', '1');
 body.append('units_id', '1');
 body.append('supplier_id', '1');
 body.append('description', 'Dolores dolorum amet iste laborum eius est dolor.');
-body.append('has_expiry', '1');
+body.append('has_expiry', '');
 body.append('stock_quantity', '100');
 body.append('image', document.querySelector('input[name="image"]').files[0]);
 
@@ -1890,7 +1890,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
                value=""
                data-component="body">
     <br>
-<p>Must be an image. Must not be greater than 2048 kilobytes. Example: <code>C:\Users\123\AppData\Local\Temp\php67ED.tmp</code></p>
+<p>Must be an image. Must not be greater than 2048 kilobytes. Example: <code>C:\Users\123\AppData\Local\Temp\phpDE58.tmp</code></p>
         </div>
                 <div style=" padding-left: 28px;  clear: unset;">
             <b style="line-height: 2;"><code>has_expiry</code></b>&nbsp;&nbsp;
@@ -1912,7 +1912,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
             <code>false</code>
         </label>
     <br>
-<p>Example: <code>true</code></p>
+<p>Example: <code>false</code></p>
         </div>
                 <div style=" padding-left: 28px;  clear: unset;">
             <b style="line-height: 2;"><code>stock_quantity</code></b>&nbsp;&nbsp;

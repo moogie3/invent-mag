@@ -546,6 +546,7 @@ docker-compose exec app php artisan migrate --seed
 - ✅ 7-Day Renewal Grace Period Logic
 - ✅ Midtrans Fallback Webhook Route (Protects against misconfigured API endpoints)
 - ✅ UI Fix: Removed hardcoded bright backgrounds for Invoice inputs in Dark Mode
+- ✅ Cash Flow Statement (operating, investing, financing activities with PDF/CSV export)
 
 ### Previously Added (v1.6)
 
@@ -576,7 +577,6 @@ docker-compose exec app php artisan migrate --seed
 ### Planned Features
 
 - 🔄 Bank Reconciliation
-- 🔄 Cash Flow Statement
 - 🔄 Advanced Multi-Currency
 - 🔄 Indonesian Tax Compliance (PPN, e-Faktur)
 - 🔄 Mobile Application

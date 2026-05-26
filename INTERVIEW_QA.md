@@ -853,10 +853,10 @@ a = (ΣY - b×ΣX) / n
 
 5. **12-month minimum is arbitrary:** Some seasonal businesses need 24+ months to capture multi-year seasonality patterns.
 
-6. **No model evaluation metric:** There is no MAPE (Mean Absolute Percentage Error) or RMSE calculation to tell the user how accurate recent forecasts have been.
+6. **No model evaluation metric:** There is no MAPE (Mean Absolute Percentage Error) to tell the user how accurate recent forecasts have been.
 
 **Improvements:**
-- Parameter optimization using RMSE minimization
+- MAPE displayed in dashboard forecast card (RMSE used internally for Holt-Winters parameter optimization via grid search)
 - Prediction intervals using bootstrap or analytical methods
 - Prophet (Facebook) or ARIMA models for more complex patterns
 - Anomaly detection to exclude outlier months from training

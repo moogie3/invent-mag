@@ -20,7 +20,7 @@ return [
     'dashboard_desc' => 'Gambaran bisnis Anda secara sekilas — metrik, grafik, dan tindakan cepat.',
     'key_metrics' => 'Metrik Utama: Kartu teratas menunjukkan penjualan, pembelian, dan keuntungan hari ini serta piutang dan hutang outstanding yang diperbarui secara real-time.',
     'sales_purchase_chart' => 'Grafik Penjualan & Pembelian: Beralih antara Penjualan dan Pembelian menggunakan tab. Filter berdasarkan rentang tanggal menggunakan dropdown di atas grafik.',
-    'sales_forecast' => 'Prediksi Penjualan: Jika diaktifkan di paket Anda, grafik prediksi ditampilkan di bawah grafik utama.',
+    'sales_forecast' => 'Prediksi Penjualan: Tersedia di paket Enterprise, grafik prediksi ditampilkan di bawah grafik utama menggunakan data historis untuk memproyeksikan tren penjualan. Metode yang digunakan adalah Holt-Winters (Pemulusan Eksponensial Tiga Kali Lipat) yang menangkap tren dan musiman. Metrik akurasi ditampilkan di bawah grafik: MAPE (Mean Absolute Percentage Error / Rata-rata Persentase Kesalahan Absolut) menunjukkan rata-rata kesalahan prediksi dalam persentase — semakin rendah semakin baik.',
     'accounting_summary' => 'Ringkasan Akuntansi: Jika akuntansi diaktifkan, panel ringkasan keuangan menunjukkan pendapatan, pengeluaran, dan pendapatan bersih.',
     'recent_transactions' => 'Transaksi Terbaru: Bagian konten utama menunjukkan pesanan penjualan dan pembelian terbaru.',
     'quick_actions' => 'Tindakan Cepat: Tombol "Invoice Baru" (kanan atas) untuk membuat Pesanan Penjualan atau Pembelian dengan cepat.',
@@ -632,6 +632,17 @@ return [
     'transactions_table' => 'Tabel Transaksi: Lihat semua transaksi.',
     'bulk_actions_tl' => 'Tindakan Massal: Pilih beberapa transaksi.',
     'export_tl' => 'Ekspor: Gunakan dropdown ekspor.',
+
+    // Cash Flow Statement
+    'cash_flow' => 'Laporan Arus Kas',
+    'cash_flow_desc' => 'Lacak arus kas masuk dan keluar melalui aktivitas operasi, investasi, dan pendanaan.',
+    'date_range_cf' => 'Rentang Tanggal: Atur tanggal mulai dan akhir untuk menentukan periode pelaporan.',
+    'generate_report_cf' => 'Hasilkan Laporan: Klik "Hasilkan Laporan" untuk memuat laporan.',
+    'operating_section' => 'Aktivitas Operasi: Menunjukkan arus kas dari operasi bisnis inti termasuk laba bersih, penyesuaian non-kas, dan perubahan modal kerja.',
+    'investing_section' => 'Aktivitas Investasi: Menunjukkan arus kas dari pembelian atau penjualan aset jangka panjang.',
+    'financing_section' => 'Aktivitas Pendanaan: Menunjukkan arus kas dari utang, ekuitas, dan dividen.',
+    'net_change_cf' => 'Perubahan Bersih Kas: Bagian bawah menunjukkan kenaikan atau penurunan bersih kas, plus saldo kas awal dan akhir.',
+    'export_cf' => 'Ekspor: Gunakan dropdown ekspor untuk mencetak atau mengunduh PDF atau CSV.',
 
     // Activity Log
     'activity_log' => 'Log Aktivitas',

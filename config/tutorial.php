@@ -92,6 +92,7 @@ return [
                 ['icon' => 'ti-history', 'label' => 'Recent Transactions', 'route' => 'admin.reports.recent-transactions'],
                 ['icon' => 'ti-forklift', 'label' => 'Stock Transfer', 'route' => 'admin.reports.stock-transfer.page'],
                 ['icon' => 'ti-file-text', 'label' => 'Adjustment Log', 'route' => 'admin.reports.adjustment-log'],
+                ['icon' => 'ti-currency-dollar', 'label' => 'Cash Flow Statement', 'route' => 'admin.reports.cash-flow'],
             ]
         ],
         'administration' => [
@@ -487,6 +488,12 @@ return [
             'icon'  => 'ti-history',
             'desc'  => 'tutorial.transaction_list_desc',
             'steps' => ['tutorial.date_range_tl', 'tutorial.transaction_type_tl', 'tutorial.payment_status_tl', 'tutorial.apply_filters', 'tutorial.summary_cards', 'tutorial.transactions_table', 'tutorial.bulk_actions_tl', 'tutorial.export_tl'],
+        ],
+        'admin.reports.cash-flow*' => [
+            'title' => 'tutorial.cash_flow',
+            'icon'  => 'ti-currency-dollar',
+            'desc'  => 'tutorial.cash_flow_desc',
+            'steps' => ['tutorial.date_range_cf', 'tutorial.generate_report_cf', 'tutorial.operating_section', 'tutorial.investing_section', 'tutorial.financing_section', 'tutorial.net_change_cf', 'tutorial.export_cf'],
         ],
         'admin.audit-log*' => [
             'title' => 'tutorial.activity_log',

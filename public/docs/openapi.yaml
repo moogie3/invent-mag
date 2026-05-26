@@ -188,7 +188,7 @@ paths:
                 plan:
                   type: string
                   description: ''
-                  example: enterprise
+                  example: professional
                   enum:
                     - starter
                     - professional
@@ -391,7 +391,7 @@ paths:
                 has_expiry:
                   type: boolean
                   description: ''
-                  example: true
+                  example: false
                   nullable: true
                 stock_quantity:
                   type: integer

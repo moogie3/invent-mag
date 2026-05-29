@@ -34,7 +34,7 @@ class AttendanceSeeder extends Seeder
             'closed_at' => now(),
         ]);
 
-        $daysInMonth = cal_days_in_month(CAL_GREGORIAN, $month, $year);
+        $daysInMonth = $lastMonth->daysInMonth;
 
         foreach ($employees as $employee) {
             for ($day = 1; $day <= $daysInMonth; $day++) {

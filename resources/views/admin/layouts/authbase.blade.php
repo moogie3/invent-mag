@@ -19,13 +19,6 @@
     @vite('resources/css/auth.css')
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
     @vite('resources/js/admin/layouts/page-loader.js')
-    <noscript>
-        <style>
-            #global-loader { display: none !important; }
-            body.is-loading-page { visibility: visible !important; opacity: 1 !important; overflow: auto !important; }
-            .auth-content { visibility: visible !important; opacity: 1 !important; }
-        </style>
-    </noscript>
 </head>
 
 <body class="auth-body is-loading-page">

@@ -59,6 +59,16 @@
         }
     </style>
 
+    <noscript>
+        <style>
+            #global-loader { display: none !important; }
+            body.is-loading-page { visibility: visible !important; opacity: 1 !important; overflow: auto !important; }
+        </style>
+        <div class="alert alert-danger m-3 text-center" style="position: relative; z-index: 99999;">
+            <strong>JavaScript is disabled or blocked!</strong> If you clicked a link from an email app, please copy the URL and open it directly in Safari/Chrome to use the dashboard.
+        </div>
+    </noscript>
+
 </head>
 
 <body data-currency-settings='{{ json_encode(['locale' => $currencySettings->locale, 'currency_code' => $currencySettings->currency_code, 'currency_symbol' => $currencySettings->currency_symbol, 'decimal_places' => $currencySettings->decimal_places, 'decimal_separator' => $currencySettings->decimal_separator, 'thousand_separator' => $currencySettings->thousand_separator, 'position' => $currencySettings->position]) }}'

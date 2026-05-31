@@ -13,7 +13,7 @@
 
             <div class="form-footer">
                 <div class="d-flex justify-content-center mt-4">
-                    <a href="{{ route('admin.dashboard') }}" class="btn btn-primary w-100">
+                    <a href="{{ route('admin.dashboard') }}" target="_blank" rel="noopener noreferrer" class="btn btn-primary w-100">
                         {{ __('messages.go_to_dashboard') }}
                     </a>
                 </div>

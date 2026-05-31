@@ -141,8 +141,16 @@
     background-color: #273449;
     border-color: rgba(255,255,255,0.08);
 }
+[data-bs-theme="dark"] .tutorial-modal-dialog .tutorial-list-item {
+    background-color: #273449;
+    border-color: rgba(255,255,255,0.08);
+}
+[data-bs-theme="dark"] .tutorial-modal-dialog .tutorial-list-item h3 {
+    color: #e2e8f0;
+}
 [data-bs-theme="dark"] .tutorial-modal-dialog .tutorial-list-item:hover {
     background-color: rgba(32, 107, 196, 0.1);
+    border-color: rgba(32, 107, 196, 0.25);
 }
 /* Same CSS as before */
 .icon-wrapper {

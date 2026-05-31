@@ -505,6 +505,14 @@
     transition: opacity 0.3s, visibility 0.3s;
 }
 
+/* Make dropdown visible when .show class is present (click toggling) */
+.navbar .nav-item.dropdown .dropdown-menu.show {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+    pointer-events: auto;
+}
+
 /* FIXED: Full background hover effects for navbar icons - matching sidebar style */
 .navbar .nav-link.px-0,
 .navbar .nav-link.px-2 {

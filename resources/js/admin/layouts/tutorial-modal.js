@@ -443,8 +443,31 @@ document.addEventListener('turbo:load', onTurboLoad);
 // This avoids inline onclick handlers which cause Bootstrap event conflicts in Tabler
 document.addEventListener('click', function(e) {
         // --- Tutorial Navigation ---
-    if (e.target.closest('#tutorial-btn-close') || e.target.closest('#tutorial-btn-skip') || e.target.closest('#tutorial-btn-finish')) {
+    if (e.target.closest('#tutorial-btn-close') || e.target.closest('#tutorial-btn-finish')) {
         e.preventDefault();
+        if (typeof window.closeTutorialExplicitly === 'function') {
+            window.closeTutorialExplicitly();
+        }
+        return;
+    }
+
+    if (e.target.closest('#tutorial-btn-skip')) {
+        e.preventDefault();
+        // Always call the skip API directly — don't rely on data-completed state
+        // (which may have been set to 'true' prematurely by showTopics())
+        var modalElement = document.getElementById('tutorial-modal');
+        var csrfToken = document.querySelector('meta[name="csrf-token"]');
+        if (csrfToken) {
+            fetch('/admin/tutorial/skip', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': csrfToken.getAttribute('content')
+                }
+            }).then(function() {
+                if (modalElement) modalElement.setAttribute('data-completed', 'true');
+            });
+        }
         if (typeof window.closeTutorialExplicitly === 'function') {
             window.closeTutorialExplicitly();
         }

@@ -37,6 +37,7 @@ Most Laravel codebases at this age and team size collapse into fat controllers. 
 What makes it notable is that this discipline held across 1.5 years of feature additions. When the HR module was added, `PayrollService` was created correctly rather than bolting payroll logic onto `UserController`. When stock transfers were added, `StockTransferController` delegated to the service layer rather than running raw queries inline. The pattern was established early and enforced consistently throughout development. That is unusual for a solo project.
 
 **Specific evidence of correctness:**
+
 - Controllers validate via Form Requests and delegate immediately — they do not contain business logic
 - `PosService` exists separately from `SalesService` even though POS creates a `Sales` record, because the business rules differ (always Paid, no partial, receipt format)
 - `AccountingService` is the single entry point for all journal entry creation — no other service creates `JournalEntry` records directly
@@ -124,12 +125,14 @@ $arAccountId = $accountingSettings['accounts_receivable_account_id'] ?? null;
 ```
 
 **The consequence:** If a tenant has 5 users, and only the admin has configured accounting settings, then:
+
 - A sale created while the admin is logged in → correct journal entries
 - A sale created while a staff user is logged in → `$arAccountId = null`, journal entry silently skipped (the code has `if (!$arAccountId) { Log::warning(...); return; }`)
 
 This means accounting journal entries for sales are silently missing for non-admin users. The books are incomplete and the system does not surface this to the tenant. The `Log::warning()` in `postPpnKeluaranJournalEntry()` shows the developer is aware this can happen but the resolution is incorrect — a warning log is not an acceptable failure mode for financial data.
 
 **What it should be:**
+
 ```php
 // Stored on the tenant, not the user
 $accountingSettings = app('currentTenant')->accounting_settings ?? [];
@@ -150,6 +153,7 @@ The problem is that this is a convention enforced by code review discipline alon
 **Current state:** The convention is followed correctly in the existing code. The risk is in future development.
 
 **What should exist:**
+
 - A mandatory code review checklist item: "Every `DB::table()` query includes `->where('tenant_id', ...)`"
 - Ideally, a custom query builder macro or a base raw-query service that injects the tenant filter automatically
 - A PHPStan rule or custom lint check that flags `DB::table()` calls without `tenant_id` in tenant-scoped contexts
@@ -164,11 +168,11 @@ The problem is that this is a convention enforced by code review discipline alon
 
 This is not true under the original configuration:
 
-| Driver | Current | Horizontal Scaling Compatible |
-|---|---|---|
-| Cache | `file` | No — each container has its own file cache |
-| Queue | `database` | Marginally — but creates DB contention at scale |
-| Session | `database` | Yes |
+| Driver  | Current    | Horizontal Scaling Compatible                   |
+| ------- | ---------- | ----------------------------------------------- |
+| Cache   | `file`     | No — each container has its own file cache      |
+| Queue   | `database` | Marginally — but creates DB contention at scale |
+| Session | `database` | Yes                                             |
 
 If Railway scales the application to 2 containers, Spatie Permission's 24-hour permission cache will be inconsistent between nodes — one container may cache "user has accounting permission" while another caches the revoked version. This is a silent authorization bug.
 
@@ -187,6 +191,7 @@ The fix is Redis for both cache and queue. The codebase is already Redis-ready (
 > **Resolution (Phase 1):** Per-request CSP nonces implemented in `SecurityHeaders` middleware via `random_bytes(16)`. Nonce shared with all Blade views via `View::share('cspNonce', $nonce)`. Nonce added to the CSP `script-src` header alongside retained `unsafe-inline` (which CSP Level 3 browsers ignore when a nonce is present, preserving compatibility with CSP Level 2 browsers). All inline `<script>` blocks in `base.blade.php` and `script.blade.php` updated with `nonce="{{ $cspNonce ?? '' }}"`. The `?? ''` fallback ensures PDF generation contexts (Dompdf, outside middleware stack) do not throw undefined variable errors.
 >
 > **Resolution (Phase 2):** All remaining per-page inline `<script>` blocks extracted to dedicated `.js` entry points. Zero inline scripts remain in any Blade file. Specific extractions:
+>
 > - `pomodals.blade.php` + `salesmodals.blade.php` → `resources/js/admin/paid-invoice-modal.js`
 > - `notifications.blade.php` → `resources/js/admin/notifications.js`
 > - `journal-entries/create/transactions-card.blade.php` + `edit/transactions-card.blade.php` → button wiring moved into `resources/js/admin/journal-entry.js`; redundant no-op stubs removed
@@ -225,6 +230,7 @@ $tenant->backup_encrypted // whether the backup is encrypted
 The encrypted backup and the key to decrypt it are stored in the same MySQL database. Anyone with read access to the database — a compromised DB connection string, a SQL injection vulnerability in a raw query missing the tenant_id filter, a rogue DB administrator — can read both the encrypted backup and the key to decrypt it. The encryption provides no security benefit in this configuration.
 
 **What this should be:**
+
 - The backup password should be generated and held by the tenant admin only, passed in at restore time
 - Or managed via a secrets service (AWS KMS, HashiCorp Vault, Railway Secrets)
 - At minimum, the backup password should be stored encrypted using the application's `APP_KEY` via Laravel's `encrypt()`/`decrypt()` — so database read access alone is insufficient to decrypt backups without also having the application key
@@ -291,6 +297,7 @@ Inertia.js with Vue 3 would have eliminated this entire class of problem — Vue
 > **Resolution:** `routes/web.php` reduced from 861 lines to 35 lines. Twelve domain-specific sub-files created under `routes/admin/`: `auth.php`, `dashboard.php`, `products.php`, `contacts.php`, `crm.php`, `purchases.php`, `sales.php`, `inventory.php`, `reports.php`, `notifications.php`, `hr.php`, `settings.php`, `accounting.php`. All 316 routes verified with `php artisan route:list` and `php artisan route:cache` with no conflicts. `web.php` now contains only bootstrapping includes.
 
 A single route file with 200+ routes is not readable. It makes it hard to:
+
 - Verify that all routes in a feature group have the correct middleware applied
 - Spot naming conflicts (route names in a 750-line file require search, not review)
 - Do focused code review on a feature (the entire route file appears in every PR that touches routes)
@@ -333,18 +340,18 @@ The documentation should say what it is: "Service Layer over Eloquent Active Rec
 
 The following are gaps relative to what the system claims to be (a production ERP) or what the market it targets (Indonesian SMBs) requires.
 
-| Missing Feature | Severity | Reason |
-|---|---|---|
-| Cash Flow Statement | **✅ DONE** | Implemented May 2026: CashFlowService, report view, PDF/CSV export, plan tiering, lang translations, feature tests. |
-| Bank Reconciliation | High | Without bank reconciliation, the Cash/Bank account balance in the system is unverified. Any discrepancy between the bank statement and the system's cash account is invisible. This is a fundamental internal control gap. |
-| e-Faktur / PPN Compliance | High | For the Indonesian market, any business registered as PKP (which is any medium/large business) cannot use this as their primary system without e-Faktur. The ROADMAP has a detailed implementation plan — this is a known gap being actively addressed. |
-| ~~CSP Nonces~~ | ~~Medium~~ | ~~Required to make the CSP header actually effective against XSS.~~ **✅ Resolved May 2026** |
-| ~~`tenant_accounting_settings` migration~~ | ~~Critical~~ | ~~The `accounting_settings` on `users` is a live data integrity bug, not a missing feature. It must be migrated.~~ **✅ Resolved May 2026** |
-| ~~Forecast accuracy metrics (MAPE/RMSE)~~ | ~~Medium~~ | ~~The feature is listed as implemented in the feature checklist but does not exist in the codebase.~~ **✅ Resolved May 2026** |
-| ~~Redis as default for cache and queue~~ | ~~Medium~~ | ~~Required before the horizontal scaling claim is accurate.~~ **✅ Resolved May 2026** |
-| ~~Route file splitting~~ | ~~Low~~ | ~~Maintainability improvement, not a functional gap.~~ **✅ Resolved May 2026** |
-| API boundary cleanup (web vs. REST separation) | **✅ DONE** | Scribe scope cleaned May 2026: admin AJAX routes moved from include to exclude; docs now document only Sanctum-authenticated `/api/v1/*` endpoints. |
-| ~~Backup password encryption~~ | ~~Medium~~ | ~~Backup password stored plaintext in same DB as the data it protects.~~ **✅ Resolved May 2026** |
+| Missing Feature                                | Severity     | Reason                                                                                                                                                                                                                                                  |
+| ---------------------------------------------- | ------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Cash Flow Statement                            | **✅ DONE**  | Implemented May 2026: CashFlowService, report view, PDF/CSV export, plan tiering, lang translations, feature tests.                                                                                                                                     |
+| Bank Reconciliation                            | High         | Without bank reconciliation, the Cash/Bank account balance in the system is unverified. Any discrepancy between the bank statement and the system's cash account is invisible. This is a fundamental internal control gap.                              |
+| e-Faktur / PPN Compliance                      | High         | For the Indonesian market, any business registered as PKP (which is any medium/large business) cannot use this as their primary system without e-Faktur. The ROADMAP has a detailed implementation plan — this is a known gap being actively addressed. |
+| ~~CSP Nonces~~                                 | ~~Medium~~   | ~~Required to make the CSP header actually effective against XSS.~~ **✅ Resolved May 2026**                                                                                                                                                            |
+| ~~`tenant_accounting_settings` migration~~     | ~~Critical~~ | ~~The `accounting_settings` on `users` is a live data integrity bug, not a missing feature. It must be migrated.~~ **✅ Resolved May 2026**                                                                                                             |
+| ~~Forecast accuracy metrics (MAPE/RMSE)~~      | ~~Medium~~   | ~~The feature is listed as implemented in the feature checklist but does not exist in the codebase.~~ **✅ Resolved May 2026**                                                                                                                          |
+| ~~Redis as default for cache and queue~~       | ~~Medium~~   | ~~Required before the horizontal scaling claim is accurate.~~ **✅ Resolved May 2026**                                                                                                                                                                  |
+| ~~Route file splitting~~                       | ~~Low~~      | ~~Maintainability improvement, not a functional gap.~~ **✅ Resolved May 2026**                                                                                                                                                                         |
+| API boundary cleanup (web vs. REST separation) | **✅ DONE**  | Scribe scope cleaned May 2026: admin AJAX routes moved from include to exclude; docs now document only Sanctum-authenticated `/api/v1/*` endpoints.                                                                                                     |
+| ~~Backup password encryption~~                 | ~~Medium~~   | ~~Backup password stored plaintext in same DB as the data it protects.~~ **✅ Resolved May 2026**                                                                                                                                                       |
 
 ---
 
@@ -372,15 +379,15 @@ If this codebase were presented to me in a technical due diligence for acquisiti
 
 ### Rating Breakdown
 
-| Dimension | Score | Notes |
-|---|---|---|
-| Architecture pattern | 8/10 | Service Layer + Eloquent is correct and consistently applied |
-| Accounting correctness | 9/10 | Double-entry is real; accounting_settings bug resolved ✅ |
-| Multitenancy implementation | 8.5/10 | Correct design; DB::tenantTable() macro now guards raw queries ✅ |
-| Security | 8/10 | CSP nonces implemented ✅; all inline scripts extracted ✅; backup password encrypted ✅; DB::tenantTable() guard added ✅ |
-| Documentation accuracy | 9/10 | Scaling ✅; Repository Pattern ✅; forecast metrics ✅; Scribe scope cleaned ✅ |
-| Infrastructure / DevOps | 7.5/10 | Docker + CI/CD is real; Railway deployment is simple and functional |
-| **Overall** | **8.5/10** | *Revised from 8.2 — Cash Flow Statement implemented; items 7, 10, 11 confirmed done May 2026* |
+| Dimension                   | Score      | Notes                                                                                                                      |
+| --------------------------- | ---------- | -------------------------------------------------------------------------------------------------------------------------- |
+| Architecture pattern        | 8/10       | Service Layer + Eloquent is correct and consistently applied                                                               |
+| Accounting correctness      | 9/10       | Double-entry is real; accounting_settings bug resolved ✅                                                                  |
+| Multitenancy implementation | 8.5/10     | Correct design; DB::tenantTable() macro now guards raw queries ✅                                                          |
+| Security                    | 8/10       | CSP nonces implemented ✅; all inline scripts extracted ✅; backup password encrypted ✅; DB::tenantTable() guard added ✅ |
+| Documentation accuracy      | 9/10       | Scaling ✅; Repository Pattern ✅; forecast metrics ✅; Scribe scope cleaned ✅                                            |
+| Infrastructure / DevOps     | 7.5/10     | Docker + CI/CD is real; Railway deployment is simple and functional                                                        |
+| **Overall**                 | **8.5/10** | _Revised from 8.2 — Cash Flow Statement implemented; items 7, 10, 11 confirmed done May 2026_                              |
 
 ---
 
@@ -406,4 +413,4 @@ None of these require rewriting the application. The foundation — the service 
 
 ---
 
-*This assessment is based on full static analysis of the codebase including all source files, migrations, services, controllers, middleware, tests, and documentation files. No runtime profiling was performed.*
+_This assessment is based on full static analysis of the codebase including all source files, migrations, services, controllers, middleware, tests, and documentation files. No runtime profiling was performed._

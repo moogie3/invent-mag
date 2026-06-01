@@ -194,6 +194,7 @@
 - [x] Low stock alerts
 - [x] Expiring product alerts
 - [x] Due date notifications
+- [x] System Notifications (Subscription, Backups, Setup Alerts)
 - [x] Collection rate metrics
 
 #### Sales Analytics

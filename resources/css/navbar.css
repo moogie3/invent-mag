@@ -493,17 +493,7 @@
     }
 }
 
-.sidebar-open .nav-dropdown {
-    pointer-events: none;
-    opacity: 0;
-}
-
-.sidebar-open #navbar-brand-title,
-.sidebar-open #navbar-right-content {
-    opacity: 0;
-    visibility: hidden;
-    transition: opacity 0.3s, visibility 0.3s;
-}
+/* Removed sidebar-open hiding rules that caused navbar items to disappear when sidebar was locked open */
 
 /* FIXED: Full background hover effects for navbar icons - matching sidebar style */
 .navbar .nav-link.px-0,
@@ -842,11 +832,21 @@ body.sticky-navbar .navbar.scrolled {
 }
 
 /* Sticky Navbar */
-body.sticky-navbar .navbar {
-    position: sticky;
-    top: 0;
-    z-index: 1000;
-    width: 100%;
+body.sticky-navbar .nav-container {
+    position: sticky !important;
+    top: 0 !important;
+    z-index: 1030 !important;
+    background-color: var(--tblr-bg-surface);
+    border-bottom: 1px solid var(--tblr-border-color);
+    margin: 0;
+}
+
+[data-bs-theme="dark"] body.sticky-navbar .nav-container {
+    background-color: var(--tblr-bg-surface-dark, #1e293b);
+}
+
+[data-bs-theme="dark"] body.sticky-navbar .navbar {
+    background-color: var(--tblr-bg-surface-dark, #1e293b);
 }
 
 body.layout-navbar-v2.sidebar-open #navbar-brand-title {

@@ -82,6 +82,17 @@ class LoginController extends Controller
     }
 
     /**
+     * Keep the session alive — called by the inactivity modal "Stay" button.
+     * Simply touches the session to prevent premature expiration.
+     */
+    public function keepAlive(Request $request)
+    {
+        $request->session()->put('_last_activity', time());
+
+        return response()->json(['status' => 'ok']);
+    }
+
+    /**
      * Log the user out of the application.
      *
      * @param  \Illuminate\Http\Request  $request

@@ -253,6 +253,16 @@ function initAutoLogout(settings) {
         const logoutBtn = document.getElementById('logoutBtn');
         if (stayLoggedInBtn) {
             stayLoggedInBtn.addEventListener('click', () => {
+                // Refresh the server session so it doesn't expire while user is still active
+                const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') ?? '';
+                fetch('/admin/session/keepalive', {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': csrfToken,
+                        'Accept': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest',
+                    },
+                }).catch(() => {});
                 resetLogoutTimer();
             });
         }

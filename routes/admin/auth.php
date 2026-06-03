@@ -53,3 +53,8 @@ Route::post('/email/verification-notification', function (Request $request) {
 })->middleware(['auth', 'throttle:6,1'])->name('verification.send');
 
 Route::post('/logout', [LoginController::class, 'destroy'])->name('admin.logout');
+
+// Session keepalive — used by the inactivity modal "Stay" button to refresh server session
+Route::post('/session/keepalive', [LoginController::class, 'keepAlive'])
+    ->middleware('auth')
+    ->name('admin.session.keepalive');

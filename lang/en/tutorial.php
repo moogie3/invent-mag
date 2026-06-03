@@ -28,6 +28,7 @@ return [
 
     // Product
     // Stock Opname
+    'stock_opname' => 'Stock Opname',
     'stock_opname_desc' => 'Manage and review your physical inventory counts (Stock Opnames).',
     'stock_opname_step_1' => 'View History: See a log of all Draft, In Progress, Completed, and Canceled stock opnames.',
     'stock_opname_step_2' => 'Create New: Click the "New Stock Opname" button to plan a physical count for a specific warehouse.',
@@ -75,6 +76,7 @@ return [
     'stock_transfer_edit' => 'Stock Transfer: Click "Transfer Stock" to open the stock transfer page. Select source warehouse, destination warehouse, enter quantity, and submit to move stock between warehouses.',
 
     // Products list
+    'create_product_btn' => 'Create Product: Click "Create Product" to add a new item to your inventory. Fill in the product name, code, select a category, set pricing, and configure stock settings.',
     'warehouse_filter' => 'Warehouse Filter: The dropdown filter adjacent to the Create Product button allows you to view products specific to a particular warehouse location.',
     'stock_status' => 'Stock Status: The "Stock Status" feature displays all products with low stock levels, enabling timely replenishment.',
     'expiry_status' => 'Expiry Status: The "Expiry Status" feature provides visibility into expired or soon-to-expire products, essential for managing perishable inventory.',
@@ -165,6 +167,7 @@ return [
     'items_table' => 'Items Table: Shows all products sold in this order. The quantity shown is the FINAL quantity (original quantity minus any returned items).',
     'returned_items' => 'Returned Items: If items have been returned, a "Returned" badge shows how many items were returned per product.',
     'amount_display' => 'Amount Display: The amounts shown are already ADJUSTED - they reflect the final quantity after returns.',
+    'returned_adjusted' => 'Returned (Adjusted): At the bottom in the amount summary, the "Returned" row shows only the returned amount, not the original total. The adjusted subtotal shows the final total after deducting returns.',
     'create_return_link' => 'To Create Return: To process a new return for this invoice, go to the Sales Order Returns menu and create a new return for this invoice.',
     'actions_sales' => 'Actions: Use the "Print Invoice" button to print or download PDF. Click "Edit Invoice" to modify the order.',
 
@@ -183,6 +186,7 @@ return [
     // Purchase Orders
     'purchase_orders' => 'Purchase Orders (PO)',
     'purchase_orders_desc' => 'Manage stock replenishment from suppliers through purchase order creation and tracking.',
+    'create_purchase_order_btn' => 'Create Purchase Order: Click "Create Purchase Order" to start a new purchase. Select a supplier, add products, specify quantities and prices, and the system handles the rest.',
     'create_purchase_order' => 'Create Purchase Order',
     'create_purchase_order_desc' => 'Create a new purchase order to record stock purchases from suppliers.',
     'edit_purchase_order' => 'Edit Purchase Order',

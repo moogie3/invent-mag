@@ -1,6 +1,6 @@
 # Invent-MAG: Enterprise Inventory & Accounting System
 
-**Version:** 1.7  
+**Version:** 1.8  
 **Author:** moogie3  
 **License:** MIT  
 **Development Time:** 1.5+ years (451+ commits)  
@@ -206,6 +206,7 @@ Experience Invent-MAG firsthand:
 - **AR Aging Report:** Outstanding receivables (Current, 1-30, 31-60, 61-90, 90+ days)
 - **AP Aging Report:** Outstanding payables (same buckets)
 - **Cash Position:** Current cash across accounts
+- **Cash Flow Statement:** Operating, investing, and financing activities with PDF/CSV export
 
 #### Advanced Accounting Features
 
@@ -250,6 +251,7 @@ Experience Invent-MAG firsthand:
 - **Sales Charts:** Visual sales trends
 - **Financial Health:** Cash position, AR/AP summaries
 - **Alerts:** Low stock, expiring products, due dates
+- **System Notifications:** Plan expiry, product expiry, backup status, trial status, usage limits
 - **Sales Forecast:** Visual forecast with confidence intervals
 
 #### Contextual Tutorial System
@@ -535,6 +537,12 @@ docker-compose exec app php artisan migrate --seed
 ---
 
 ## 🗺️ Roadmap
+
+### Recently Added (v1.8)
+
+- ✅ **System Notifications Enhancement** — Dashboard notification center with plan expiry (14-day warning), product expiry (30/7-day alerts), backup status (no backup in 7+ days), trial status, usage limits, and accounting setup reminders
+- ✅ **POS, Sales Returns & Purchase Returns available on Starter plan** — Core operational features accessible to all tiers
+- ✅ Various quality-of-life fixes (Turbo compatibility, navbar, tutorial consistency, translations)
 
 ### Recently Added (v1.7)
 

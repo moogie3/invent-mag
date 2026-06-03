@@ -1,8 +1,8 @@
 # Invent-MAG: Technical Specification Document
 
 **Document Version:** 1.8
-**Last Updated:** May 2026
-**System Version:** 1.7
+**Last Updated:** June 2026
+**System Version:** 1.8
 
 ---
 
@@ -777,7 +777,7 @@ class SalesForecastService
 
 | Version | Date          | Changes                                                                                                                                                                                                                                                                                                                                                                                            |
 | ------- | ------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 1.8     | May 2026     | Architecture fixes: Split `web.php` into domain route files. Migrated `accounting_settings` to `tenants` table for data integrity. Set Redis as default cache/queue. Implemented CSP nonces for XSS protection. Encrypted backup passwords with APP_KEY. |
+| 1.8     | June 2026    | System Notifications: Added product expiry alerts (30/7-day windows), subscription plan expiry warnings (14-day), and backup status notifications. POS, Sales Returns & Purchase Returns now available on Starter plan. Architecture fixes: Split `web.php` into domain route files. Migrated `accounting_settings` to `tenants` table. Set Redis as default cache/queue. Implemented CSP nonces. Encrypted backup passwords. |
 | 1.7     | May 2026     | Tutorial HR Expansion: Added HR & Payroll as step 4 in welcome setup workflow (now 6 steps). Added Employees, Attendance, Payroll to Master Data sub-topics. Master Data topic card description updated. |
 | 1.6     | April 2026    | Tutorial System Enhancements: Topic grid sub-topic drill-down (click category → see all pages in that category → click to navigate). Click-outside closes modal (removed static backdrop). Sub-topic navigation auto-shows contextual tutorial on destination page via sessionStorage flag + Turbo-aware async fetch chain. Fixed sidebar stale nav-click closing bug. Added dashboard tutorial button and context. |
 | 1.5     | April 2026    | UI/UX Polish & Tutorial System: Contextual tutorial button (?) added to every page title. 30+ page-specific help modals in `tutorial-modal.blade.php`. Consistent `ti-*` icon system across all page headers. "Partially Paid" status label standardized across Sales & Purchase Orders. Sales Return credit note condition documented. Purchase Order autofill info label. Journal entry audit log sidebar badge fix. |

@@ -1,10 +1,10 @@
 # Invent-MAG: Senior Engineer Architecture Assessment
 
 **Assessor:** Senior Software Engineer (AI-assisted deep codebase review)
-**Codebase Version:** 1.7
-**Review Date:** May 2026
+**Codebase Version:** 1.8
+**Review Date:** June 2026
 **Development Context:** Solo developer, 1.5 years, 451+ commits, production SaaS
-**Last Updated:** May 2026 — All 11 path-to-8.5 items verified and resolved; rating revised to 8.5
+**Last Updated:** June 2026 — All 11 path-to-8.5 items verified and resolved; rating revised to 8.5
 
 ---
 

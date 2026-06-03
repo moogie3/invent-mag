@@ -1614,6 +1614,7 @@ return [
 
     // Backup
     'backup' => 'Backup',
+    'backup_type' => 'Backup Type',
     'backup_create' => 'Create Backup',
     'backup_restore' => 'Restore',
     'backup_download' => 'Download',

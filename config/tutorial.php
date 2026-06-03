@@ -166,7 +166,7 @@ return [
             'steps' => ['tutorial.execute_stock_opname_step_1', 'tutorial.execute_stock_opname_step_2', 'tutorial.execute_stock_opname_step_3', 'tutorial.execute_stock_opname_step_4'],
         ],
         'admin.stock-opname*' => [
-            'title' => 'messages.stock_opname',
+            'title' => 'tutorial.stock_opname',
             'icon'  => 'ti-clipboard-check',
             'desc'  => 'tutorial.stock_opname_desc',
             'steps' => ['tutorial.stock_opname_step_1', 'tutorial.stock_opname_step_2', 'tutorial.stock_opname_step_3', 'tutorial.stock_opname_step_4'],
@@ -237,30 +237,6 @@ return [
             'desc'  => 'tutorial.view_sales_order_desc',
             'steps' => ['tutorial.order_information', 'tutorial.customer_credit_view', 'tutorial.items_table', 'tutorial.returned_items', 'tutorial.amount_display', 'tutorial.returned_adjusted', 'tutorial.create_return_link', 'tutorial.actions_sales'],
         ],
-        'admin.po.create' => [
-            'title' => 'tutorial.create_purchase_order',
-            'icon'  => 'ti-plus',
-            'desc'  => 'tutorial.create_purchase_order_desc',
-            'steps' => ['tutorial.purchase_info', 'tutorial.product_selection_po', 'tutorial.supplier_price_po', 'tutorial.autofill_info', 'tutorial.quantity_po', 'tutorial.invoice_discount_po', 'tutorial.order_summary_po', 'tutorial.submit_po'],
-        ],
-        'admin.po.edit' => [
-            'title' => 'tutorial.edit_purchase_order',
-            'icon'  => 'ti-edit',
-            'desc'  => 'tutorial.edit_purchase_order_desc',
-            'steps' => ['tutorial.purchase_info_edit', 'tutorial.supplier_info', 'tutorial.fully_paid_warning_po', 'tutorial.edit_items_po', 'tutorial.invoice_discount_po_edit', 'tutorial.record_payment_po', 'tutorial.payment_info_po', 'tutorial.track_returns_po', 'tutorial.save_po'],
-        ],
-        'admin.po.show' => [
-            'title' => 'tutorial.view_purchase_order',
-            'icon'  => 'ti-eye',
-            'desc'  => 'tutorial.view_purchase_order_desc',
-            'steps' => ['tutorial.order_info_po_view', 'tutorial.supplier_info_view', 'tutorial.items_table_po_view', 'tutorial.returned_items_po_view', 'tutorial.amount_display_po_view', 'tutorial.returned_adjusted_po', 'tutorial.create_return_po', 'tutorial.actions_po_view'],
-        ],
-        'admin.po*' => [
-            'title' => 'tutorial.purchase_orders',
-            'icon'  => 'ti-truck-delivery',
-            'desc'  => 'tutorial.purchase_orders_desc',
-            'steps' => ['tutorial.create_purchase_order', 'tutorial.view_details_po', 'tutorial.payment_status_po', 'tutorial.returned_indicator_po', 'tutorial.purchase_returns_btn', 'tutorial.accounting_po', 'tutorial.bulk_actions_po', 'tutorial.supplier_association', 'tutorial.goods_receipt', 'tutorial.export_po'],
-        ],
         'admin.sales-returns.create' => [
             'title' => 'tutorial.create_sales_return',
             'icon'  => 'ti-plus',
@@ -284,6 +260,12 @@ return [
             'icon'  => 'ti-receipt-refund',
             'desc'  => 'tutorial.sales_returns_list_desc',
             'steps' => ['tutorial.view_returns', 'tutorial.create_return', 'tutorial.return_status', 'tutorial.credit_note', 'tutorial.completed_returns', 'tutorial.customer_credit_ret', 'tutorial.view_credit', 'tutorial.bulk_actions_returns', 'tutorial.export_returns'],
+        ],
+        'admin.pos*' => [
+            'title' => 'tutorial.pos',
+            'icon'  => 'ti-cash',
+            'desc'  => 'tutorial.pos_desc',
+            'steps' => ['tutorial.product_catalog', 'tutorial.quick_create_product', 'tutorial.shopping_cart', 'tutorial.customer_selection', 'tutorial.sale_summary', 'tutorial.payment_methods', 'tutorial.complete_sale'],
         ],
         'admin.por.create' => [
             'title' => 'tutorial.create_purchase_return',
@@ -309,6 +291,30 @@ return [
             'desc'  => 'tutorial.purchase_returns_list_desc',
             'steps' => ['tutorial.view_por', 'tutorial.create_por', 'tutorial.por_status', 'tutorial.supplier_debit', 'tutorial.completed_por', 'tutorial.supplier_debit_info', 'tutorial.bulk_actions_por', 'tutorial.export_por'],
         ],
+        'admin.po.create' => [
+            'title' => 'tutorial.create_purchase_order',
+            'icon'  => 'ti-plus',
+            'desc'  => 'tutorial.create_purchase_order_desc',
+            'steps' => ['tutorial.purchase_info', 'tutorial.product_selection_po', 'tutorial.supplier_price_po', 'tutorial.autofill_info', 'tutorial.quantity_po', 'tutorial.invoice_discount_po', 'tutorial.order_summary_po', 'tutorial.submit_po'],
+        ],
+        'admin.po.edit' => [
+            'title' => 'tutorial.edit_purchase_order',
+            'icon'  => 'ti-edit',
+            'desc'  => 'tutorial.edit_purchase_order_desc',
+            'steps' => ['tutorial.purchase_info_edit', 'tutorial.supplier_info', 'tutorial.fully_paid_warning_po', 'tutorial.edit_items_po', 'tutorial.invoice_discount_po_edit', 'tutorial.record_payment_po', 'tutorial.payment_info_po', 'tutorial.track_returns_po', 'tutorial.save_po'],
+        ],
+        'admin.po.show' => [
+            'title' => 'tutorial.view_purchase_order',
+            'icon'  => 'ti-eye',
+            'desc'  => 'tutorial.view_purchase_order_desc',
+            'steps' => ['tutorial.order_info_po_view', 'tutorial.supplier_info_view', 'tutorial.items_table_po_view', 'tutorial.returned_items_po_view', 'tutorial.amount_display_po_view', 'tutorial.returned_adjusted_po', 'tutorial.create_return_po', 'tutorial.actions_po_view'],
+        ],
+        'admin.po*' => [
+            'title' => 'tutorial.purchase_orders',
+            'icon'  => 'ti-truck-delivery',
+            'desc'  => 'tutorial.purchase_orders_desc',
+            'steps' => ['tutorial.create_purchase_order_btn', 'tutorial.view_details_po', 'tutorial.payment_status_po', 'tutorial.returned_indicator_po', 'tutorial.purchase_returns_btn', 'tutorial.accounting_po', 'tutorial.bulk_actions_po', 'tutorial.supplier_association', 'tutorial.goods_receipt', 'tutorial.export_po'],
+        ],
         'admin.sales_pipeline*' => [
             'title' => 'tutorial.sales_pipeline',
             'icon'  => 'ti-chart-line',
@@ -320,12 +326,6 @@ return [
             'icon'  => 'ti-shopping-cart',
             'desc'  => 'tutorial.sales_orders_desc',
             'steps' => ['tutorial.create_sales_order_btn', 'tutorial.view_details_sales', 'tutorial.payment_status', 'tutorial.returned_indicator', 'tutorial.sales_returns_btn', 'tutorial.accounting_sales', 'tutorial.bulk_actions_sales', 'tutorial.export_sales'],
-        ],
-        'admin.pos*' => [
-            'title' => 'tutorial.pos',
-            'icon'  => 'ti-cash',
-            'desc'  => 'tutorial.pos_desc',
-            'steps' => ['tutorial.product_catalog', 'tutorial.quick_create_product', 'tutorial.shopping_cart', 'tutorial.customer_selection', 'tutorial.sale_summary', 'tutorial.payment_methods', 'tutorial.complete_sale'],
         ],
         'admin.setting.unit*' => [
             'title' => 'tutorial.unit_management',
@@ -376,10 +376,10 @@ return [
             'steps' => ['tutorial.backup_recommendation', 'tutorial.backup_create', 'tutorial.backup_files', 'tutorial.backup_restore', 'tutorial.backup_password_tab', 'tutorial.backup_password_first_time', 'tutorial.backup_password_enable', 'tutorial.backup_password_restore_needed', 'tutorial.backup_password_minimum'],
         ],
         'admin.setting.notifications*' => [
-            'title' => 'tutorial.notifications_title',
-            'icon'  => 'ti-bell',
-            'desc'  => 'tutorial.notifications_desc',
-            'steps' => ['tutorial.po_sales_notif', 'tutorial.low_stock_notif', 'tutorial.expiring_notif', 'tutorial.system_notif', 'tutorial.clear_all_notif', 'tutorial.clear_individual'],
+            'title' => 'tutorial.notification_settings_title',
+            'icon'  => 'ti-bell-cog',
+            'desc'  => 'tutorial.notification_settings_desc',
+            'steps' => ['tutorial.notif_setting_sound', 'tutorial.notif_setting_browser_push', 'tutorial.notif_setting_success_toggle', 'tutorial.notif_setting_duration'],
         ],
         'admin.setting*' => [
             'title' => 'tutorial.system_settings',
@@ -512,12 +512,6 @@ return [
             'icon'  => 'ti-bell',
             'desc'  => 'tutorial.notifications_desc',
             'steps' => ['tutorial.po_sales_notif', 'tutorial.low_stock_notif', 'tutorial.expiring_notif', 'tutorial.system_notif', 'tutorial.clear_all_notif', 'tutorial.clear_individual'],
-        ],
-        'admin.setting.notifications*' => [
-            'title' => 'tutorial.notification_settings_title',
-            'icon'  => 'ti-bell-cog',
-            'desc'  => 'tutorial.notification_settings_desc',
-            'steps' => ['tutorial.notif_setting_sound', 'tutorial.notif_setting_browser_push', 'tutorial.notif_setting_success_toggle', 'tutorial.notif_setting_duration'],
         ],
         // Default catch-all
         '*' => [

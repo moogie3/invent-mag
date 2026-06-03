@@ -414,6 +414,26 @@ TOTAL                      | 80,000,000  | 80,000,000 ✓
 
 ---
 
+### Cash Flow Statement
+
+**Purpose:** Track cash inflows and outflows across three categories
+
+**Use when:**
+- Analyzing liquidity and cash position
+- Understanding where cash comes from and where it goes
+- Planning cash reserves for future obligations
+
+**The three sections:**
+1. **Operating Activities** — Cash from core business operations (sales receipts, supplier payments, salary payments)
+2. **Investing Activities** — Cash from asset purchases/sales (equipment, buildings, investments)
+3. **Financing Activities** — Cash from loans, owner investments, dividends
+
+**Navigation:** `Reports → Cash Flow Statement`
+
+**Export:** PDF and CSV formats supported
+
+---
+
 ### Opening Balance
 
 **Purpose:** Set initial account balances when starting to use the system
@@ -706,5 +726,5 @@ If you encounter issues:
 
 ---
 
-*Document Version: 1.1*  
-*Last Updated: April 2026*
+*Document Version: 1.2*  
+*Last Updated: June 2026*

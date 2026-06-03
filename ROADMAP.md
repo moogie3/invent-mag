@@ -1,7 +1,7 @@
 # Invent-MAG — Product Roadmap
 
-> **Last updated:** May 15, 2026  
-> **Version:** 1.7  
+> **Last updated:** June 3, 2026  
+> **Version:** 1.8  
 > **Stack:** Laravel 11 · Blade/Alpine.js · MySQL · Redis · Dompdf · Spatie Multitenancy · Spatie Permission  
 > **Deployment:** Docker · DigitalOcean (backend) · Vercel (frontend/marketing)  
 > **Domain:** https://invent-mag.web.id

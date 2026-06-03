@@ -1,8 +1,8 @@
 # Invent-MAG: Complete Feature Checklist
 
-**Last Updated:** May 2026  
-**Version:** 1.7  
-**System Version:** 1.7
+**Last Updated:** June 2026  
+**Version:** 1.8  
+**System Version:** 1.8
 
 ---
 
@@ -328,6 +328,14 @@
 - [x] Expiring product alerts
 - [x] Due date alerts
 - [x] Sound notifications (optional)
+- [x] **System Notifications** — Dashboard notification center with categories:
+  - [x] Plan expiry alerts (14-day warning before subscription expires)
+  - [x] Product expiry alerts (items expiring within 30/7 days)
+  - [x] Backup status alerts (no backup taken in 7+ days)
+  - [x] Trial status notifications
+  - [x] Usage limit warnings
+  - [x] Accounting setup reminders
+  - [x] Plan upgrade/downgrade notifications
 
 ---
 
@@ -480,7 +488,6 @@
 ### High Priority
 
 - [ ] Bank reconciliation
-- [ ] Cash flow statement
 - [ ] Advanced multi-currency (real-time rates)
 
 ### Medium Priority
@@ -531,9 +538,9 @@
 5. **776 Test Files** - Enterprise-grade testing (PHP + JS)
 6. **Docker + CI/CD** - Modern DevOps ready
 7. **Comprehensive Audit Trail** - Security and accounting
-8. **Contextual Tutorial System** - 30+ page-specific help guides with drill-down navigation - users click a topic category, see all pages in that category, click one to navigate there with its contextual tutorial auto-opened
+8. **Contextual Tutorial System** - 40+ page-specific help guides with drill-down navigation - users click a topic category, see all pages in that category, click one to navigate there with its contextual tutorial auto-opened
 
 ---
 
-**Document Version:** 1.7  
-**Last Updated:** April 2026
+**Document Version:** 1.8  
+**Last Updated:** June 2026

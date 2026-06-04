@@ -8,9 +8,29 @@ use App\Providers\FortifyServiceProvider;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
-        web: __DIR__.'/../routes/web.php',
-        api: __DIR__.'/../routes/api.php',
-        commands: __DIR__.'/../routes/console.php',
+        using: function () {
+            $appUrl = env('APP_URL', 'http://localhost');
+            $baseDomain = env('APP_URL_BASE', parse_url($appUrl, PHP_URL_HOST) ?? 'localhost');
+
+            // Super admin routes — registered FIRST so domain-specific routes
+            // take priority over the generic root route in web.php
+            Route::middleware('web')
+                ->domain('super.' . $baseDomain)
+                ->withoutMiddleware([
+                    \Spatie\Multitenancy\Http\Middleware\NeedsTenant::class,
+                    \App\Http\Middleware\HandleTenantFromPath::class,
+                ])
+                ->group(base_path('routes/superadmin.php'));
+
+            // Standard tenant routes
+            require base_path('routes/web.php');
+
+            // API routes
+            require base_path('routes/api.php');
+
+            // Console commands (Artisan)
+            require base_path('routes/console.php');
+        },
         health: '/up',
     )
     ->withProviders([
@@ -28,8 +48,9 @@ return Application::configure(basePath: dirname(__DIR__))
             \App\Http\Middleware\SetLocale::class,
             \App\Http\Middleware\DebugModeMiddleware::class,
             \App\Http\Middleware\SecurityHeaders::class,
-            \App\Http\Middleware\SetSessionCookieName::class,
             \HotwiredLaravel\TurboLaravel\Http\Middleware\TurboMiddleware::class,
+        ])->web(prepend: [
+            \App\Http\Middleware\SetSessionCookieName::class,
         ]);
 
         $middleware->api(append: [
@@ -37,7 +58,13 @@ return Application::configure(basePath: dirname(__DIR__))
             \Illuminate\Routing\Middleware\SubstituteBindings::class,
         ]);
 
-        $middleware->redirectGuestsTo(fn () => route('admin.login'));
+        $middleware->redirectGuestsTo(function (\Illuminate\Http\Request $request) {
+            $baseDomain = env('APP_URL_BASE', parse_url(env('APP_URL', 'http://localhost'), PHP_URL_HOST) ?? 'localhost');
+            if ($request->getHost() === 'super.' . $baseDomain) {
+                return route('superadmin.login');
+            }
+            return route('admin.login');
+        });
 
         $middleware->alias([
             'role' => \Spatie\Permission\Middleware\RoleMiddleware::class,
@@ -67,10 +94,7 @@ return Application::configure(basePath: dirname(__DIR__))
             return $handleError($request, 400, 'Bad Request');
         });
 
-        // 401 - Unauthorized
-        $exceptions->render(function (\Illuminate\Auth\AuthenticationException $e, Illuminate\Http\Request $request) use ($handleError) {
-            return $handleError($request, 401, 'Unauthorized');
-        });
+        // 401 - Unauthorized (handled by redirectGuestsTo in middleware config above)
 
         // 403 - Forbidden
         $exceptions->render(function (\Illuminate\Auth\Access\AuthorizationException $e, Illuminate\Http\Request $request) use ($handleError) {
@@ -106,6 +130,13 @@ return Application::configure(basePath: dirname(__DIR__))
         $exceptions->render(function (\Spatie\Multitenancy\Exceptions\NoCurrentTenant $e, Illuminate\Http\Request $request) {
             if ($request->expectsJson() || $request->is('api/*')) {
                 return response()->json(['message' => 'Workspace not found or no tenant specified.'], 404);
+            }
+
+            // If on the super admin domain, redirect to super admin dashboard
+            $appUrl = env('APP_URL', 'http://localhost');
+            $baseDomain = env('APP_URL_BASE', parse_url($appUrl, PHP_URL_HOST) ?? 'localhost');
+            if ($request->getHost() === 'super.' . $baseDomain) {
+                return redirect()->route('superadmin.dashboard');
             }
 
             // Redirect to frontend login

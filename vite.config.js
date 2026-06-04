@@ -72,6 +72,7 @@ export default defineConfig({
                 "resources/css/error.css",
                 "resources/css/settings.css",
                 "resources/css/tutorial-modal.css",
+                "resources/css/superadmin.css",
             ],
             refresh: true,
         }),

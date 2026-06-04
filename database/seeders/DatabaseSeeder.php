@@ -14,7 +14,10 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // 1. Create global roles, permissions, and plans first
+        // 1. Create super admin account (landlord-level)
+        $this->call(SuperAdminSeeder::class);
+
+        // 2. Create global roles, permissions, and plans first
         $this->call([
             PermissionSeeder::class,
             StockOpnamePermissionSeeder::class,

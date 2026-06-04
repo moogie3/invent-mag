@@ -19,7 +19,7 @@ class SalesItemFactory extends Factory
     public function definition(): array
     {
         $quantity = $this->faker->numberBetween(1, 10);
-        $product = Product::factory()->create(); // Create a product for the sales item
+        $product = Product::factory()->withStock(1000)->create();
         $customerPrice = $product->selling_price;
         $total = $quantity * $customerPrice;
 

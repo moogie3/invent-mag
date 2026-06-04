@@ -3,7 +3,9 @@
 namespace App\Http\Controllers\Admin\Hr;
 
 use App\Http\Controllers\Controller;
+use App\Models\ActivityLog;
 use App\Models\Employee;
+use App\Services\ActivityLogService;
 use App\Services\EmployeeService;
 use Illuminate\Http\Request;
 
@@ -63,6 +65,10 @@ class EmployeeController extends Controller
         ]);
 
         try {
+            app(ActivityLogService::class)->logExport(
+                ActivityLog::MODULE_EMPLOYEE,
+                'Exported Employees'
+            );
             return $this->service->exportEmployees($request->ids, $request->export_option);
         } catch (\Exception $e) {
             return response()->json([

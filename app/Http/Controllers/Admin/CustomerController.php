@@ -3,8 +3,10 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\ActivityLog;
 use App\Models\Customer;
 use App\Models\CustomerCredit;
+use App\Services\ActivityLogService;
 use App\Services\CustomerService;
 use Illuminate\Http\Request;
 
@@ -138,6 +140,10 @@ class CustomerController extends Controller
         ]);
 
         try {
+            app(ActivityLogService::class)->logExport(
+                ActivityLog::MODULE_CUSTOMER,
+                'Exported Customers'
+            );
             $file = $this->customerService->exportAllCustomers($request->export_option);
             return $file;
         } catch (\Exception $e) {

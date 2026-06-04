@@ -75,7 +75,7 @@
                                                 <table class="table table-bordered table-striped">
                                                     <thead>
                                                         <tr>
-                                                            <th class="sticky-col bg-white">{{ __('messages.hr_employee') }}</th>
+                                                            <th class="sticky-col bg-body">{{ __('messages.hr_employee') }}</th>
                                                             @for($day = 1; $day <= cal_days_in_month(CAL_GREGORIAN, $period->month, $period->year); $day++)
                                                                 <th class="text-center {{ in_array(date('N', mktime(0,0,0,$period->month,$day,$period->year)), [6,7]) ? 'table-secondary' : '' }}">{{ $day }}</th>
                                                             @endfor
@@ -84,7 +84,7 @@
                                                     <tbody>
                                                         @forelse($employees as $employee)
                                                             <tr>
-                                                                <td class="sticky-col bg-white fw-semibold">{{ $employee->name }}</td>
+                                                                <td class="sticky-col bg-body fw-semibold">{{ $employee->name }}</td>
                                                                 @for($day = 1; $day <= cal_days_in_month(CAL_GREGORIAN, $period->month, $period->year); $day++)
                                                                     @php
                                                                         $date = sprintf('%04d-%02d-%02d', $period->year, $period->month, $day);

@@ -3,9 +3,11 @@
 namespace App\Http\Controllers\Admin\Hr;
 
 use App\Http\Controllers\Controller;
+use App\Models\ActivityLog;
 use App\Models\AttendancePeriod;
 use App\Models\PayrollItem;
 use App\Models\PayrollRun;
+use App\Services\ActivityLogService;
 use App\Services\PayrollService;
 use Illuminate\Http\Request;
 
@@ -39,6 +41,11 @@ class PayrollController extends Controller
         ]);
 
         try {
+            $runLabel = $run->period?->name ?? "Run #{$run->id}";
+            app(ActivityLogService::class)->logExport(
+                ActivityLog::MODULE_PAYROLL,
+                "Exported Payroll Items for {$runLabel}"
+            );
             return $this->service->exportRunItems($run, $request->export_option);
         } catch (\Exception $e) {
             return response()->json([
@@ -82,6 +89,11 @@ class PayrollController extends Controller
 
         try {
             $this->service->updateItem($item, $validated);
+            app(ActivityLogService::class)->logUpdate(
+                ActivityLog::MODULE_PAYROLL,
+                "Updated payroll item #{$item->id} for employee #{$item->employee_id}",
+                $item
+            );
             return back()->with('success', __('messages.record_updated'));
         } catch (\Exception $e) {
             return back()->with('error', $e->getMessage());
@@ -107,6 +119,10 @@ class PayrollController extends Controller
         ]);
 
         try {
+            app(ActivityLogService::class)->logExport(
+                ActivityLog::MODULE_PAYROLL,
+                'Exported Payroll Runs'
+            );
             return $this->service->exportRuns($request->ids, $request->export_option);
         } catch (\Exception $e) {
             return response()->json([

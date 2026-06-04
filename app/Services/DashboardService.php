@@ -49,6 +49,7 @@ class DashboardService
         $tenantId = app('currentTenant')->id;
         $lowStockProducts = \App\Models\ProductWarehouse::with(['product', 'warehouse'])
             ->where('product_warehouse.tenant_id', $tenantId)
+            ->where('product_warehouse.quantity', '>', 0)
             ->whereHas('product', function ($query) use ($tenantId) {
                 $query->where('tenant_id', $tenantId)
                     ->whereRaw('products.low_stock_threshold >= product_warehouse.quantity');

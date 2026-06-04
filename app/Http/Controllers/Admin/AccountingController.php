@@ -4,9 +4,11 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Account;
+use App\Models\ActivityLog;
 use App\Services\AccountService;
 use App\Services\AccountingExportService;
 use App\Services\AccountingReportService;
+use App\Services\ActivityLogService;
 use App\Services\ChartOfAccountsService;
 use App\Services\GeneralLedgerService;
 use Carbon\Carbon;
@@ -238,6 +240,11 @@ class AccountingController extends Controller
         ]);
 
         try {
+            app(ActivityLogService::class)->logExport(
+                ActivityLog::MODULE_ACCOUNTING,
+                'Exported Chart of Accounts'
+            );
+
             $accounts = $this->accountService->getAccountsWithChildren();
 
             if ($request->export_option === 'pdf') {
@@ -277,6 +284,11 @@ class AccountingController extends Controller
         ]);
 
         try {
+            app(ActivityLogService::class)->logExport(
+                ActivityLog::MODULE_ACCOUNTING,
+                'Exported General Journal'
+            );
+
             $startDate = $request->input('start_date', Carbon::now()->startOfMonth()->toDateString());
             $endDate = $request->input('end_date', Carbon::now()->endOfMonth()->toDateString());
 
@@ -316,6 +328,11 @@ class AccountingController extends Controller
         ]);
 
         try {
+            app(ActivityLogService::class)->logExport(
+                ActivityLog::MODULE_ACCOUNTING,
+                'Exported Trial Balance'
+            );
+
             $endDate = $request->input('end_date', Carbon::now()->toDateString());
             $reportData = $this->accountingReportService->generateTrialBalance($endDate);
 
@@ -362,6 +379,11 @@ class AccountingController extends Controller
         ]);
 
         try {
+            app(ActivityLogService::class)->logExport(
+                ActivityLog::MODULE_ACCOUNTING,
+                'Exported General Ledger'
+            );
+
             $accountId = $request->input('account_id');
             $startDate = $request->input('start_date', Carbon::now()->startOfMonth()->toDateString());
             $endDate = $request->input('end_date', Carbon::now()->endOfMonth()->toDateString());

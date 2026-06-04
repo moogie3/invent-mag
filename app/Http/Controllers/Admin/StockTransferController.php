@@ -3,10 +3,12 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\ActivityLog;
 use App\Models\Product;
 use App\Models\ProductWarehouse;
 use App\Models\StockAdjustment;
 use App\Models\Warehouse;
+use App\Services\ActivityLogService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -85,6 +87,15 @@ class StockTransferController extends Controller
                 'tenant_id' => $product->tenant_id,
             ]);
         });
+
+        try {
+            app(ActivityLogService::class)->logCreate(
+                ActivityLog::MODULE_STOCK_TRANSFER,
+                "Transferred {$request['quantity']} units of {$product->name} from {$fromWarehouse->name} to {$toWarehouse->name}"
+            );
+        } catch (\Throwable $e) {
+            // never block the transfer for logging failure
+        }
 
         return redirect()->route('admin.reports.adjustment-log')
             ->with('success', "Successfully transferred {$request['quantity']} units of {$product->name} from {$fromWarehouse->name} to {$toWarehouse->name}");

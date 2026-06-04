@@ -214,22 +214,34 @@ class AppServiceProvider extends ServiceProvider
         // handles null users gracefully.
 
         $map = [
-            \App\Models\Product::class          => \App\Models\ActivityLog::MODULE_PRODUCT,
-            \App\Models\Sales::class            => \App\Models\ActivityLog::MODULE_SALES,
-            \App\Models\Purchase::class         => \App\Models\ActivityLog::MODULE_PURCHASE_ORDER,
-            \App\Models\SalesReturn::class      => \App\Models\ActivityLog::MODULE_SALES_RETURN,
-            \App\Models\PurchaseReturn::class   => \App\Models\ActivityLog::MODULE_PURCHASE_RETURN,
-            \App\Models\Customer::class         => \App\Models\ActivityLog::MODULE_CUSTOMER,
-            \App\Models\Supplier::class         => \App\Models\ActivityLog::MODULE_SUPPLIER,
-            \App\Models\Warehouse::class        => \App\Models\ActivityLog::MODULE_WAREHOUSE,
-            \App\Models\Categories::class       => \App\Models\ActivityLog::MODULE_CATEGORY,
-            \App\Models\Unit::class             => \App\Models\ActivityLog::MODULE_UNIT,
-            \App\Models\Tax::class              => \App\Models\ActivityLog::MODULE_TAX,
-            \App\Models\CurrencySetting::class  => \App\Models\ActivityLog::MODULE_CURRENCY,
-            \App\Models\User::class             => \App\Models\ActivityLog::MODULE_USER,
-            \App\Models\JournalEntry::class     => \App\Models\ActivityLog::MODULE_JOURNAL_ENTRY,
-            \App\Models\StockAdjustment::class  => \App\Models\ActivityLog::MODULE_STOCK_ADJUSTMENT,
-            \App\Models\Payment::class          => \App\Models\ActivityLog::MODULE_PAYMENT,
+            \App\Models\Product::class            => \App\Models\ActivityLog::MODULE_PRODUCT,
+            \App\Models\Sales::class              => \App\Models\ActivityLog::MODULE_SALES,
+            \App\Models\Purchase::class           => \App\Models\ActivityLog::MODULE_PURCHASE_ORDER,
+            \App\Models\SalesReturn::class        => \App\Models\ActivityLog::MODULE_SALES_RETURN,
+            \App\Models\PurchaseReturn::class     => \App\Models\ActivityLog::MODULE_PURCHASE_RETURN,
+            \App\Models\Customer::class           => \App\Models\ActivityLog::MODULE_CUSTOMER,
+            \App\Models\Supplier::class           => \App\Models\ActivityLog::MODULE_SUPPLIER,
+            \App\Models\Warehouse::class          => \App\Models\ActivityLog::MODULE_WAREHOUSE,
+            \App\Models\Categories::class         => \App\Models\ActivityLog::MODULE_CATEGORY,
+            \App\Models\Unit::class               => \App\Models\ActivityLog::MODULE_UNIT,
+            \App\Models\Tax::class                => \App\Models\ActivityLog::MODULE_TAX,
+            \App\Models\CurrencySetting::class    => \App\Models\ActivityLog::MODULE_CURRENCY,
+            \App\Models\User::class               => \App\Models\ActivityLog::MODULE_USER,
+            \App\Models\JournalEntry::class       => \App\Models\ActivityLog::MODULE_JOURNAL_ENTRY,
+            \App\Models\StockAdjustment::class    => \App\Models\ActivityLog::MODULE_STOCK_ADJUSTMENT,
+            \App\Models\StockOpname::class        => \App\Models\ActivityLog::MODULE_STOCK_OPNAME,
+            \App\Models\Payment::class            => \App\Models\ActivityLog::MODULE_PAYMENT,
+            \App\Models\Account::class            => \App\Models\ActivityLog::MODULE_ACCOUNTING,
+            \App\Models\OpeningBalance::class     => \App\Models\ActivityLog::MODULE_ACCOUNTING,
+            \App\Models\Employee::class           => \App\Models\ActivityLog::MODULE_EMPLOYEE,
+            \App\Models\AttendanceRecord::class   => \App\Models\ActivityLog::MODULE_ATTENDANCE,
+            \App\Models\AttendancePeriod::class   => \App\Models\ActivityLog::MODULE_ATTENDANCE,
+            \App\Models\PayrollRun::class         => \App\Models\ActivityLog::MODULE_PAYROLL,
+            \App\Models\SalesOpportunity::class   => \App\Models\ActivityLog::MODULE_SALES_PIPELINE,
+            \App\Models\SalesPipeline::class      => \App\Models\ActivityLog::MODULE_SALES_PIPELINE,
+            \App\Models\PipelineStage::class      => \App\Models\ActivityLog::MODULE_SALES_PIPELINE,
+            \App\Models\CustomerInteraction::class => \App\Models\ActivityLog::MODULE_CRM,
+            \App\Models\SupplierInteraction::class => \App\Models\ActivityLog::MODULE_SRM,
         ];
 
         $logService = $this->app->make(ActivityLogService::class);
@@ -237,7 +249,23 @@ class AppServiceProvider extends ServiceProvider
         foreach ($map as $modelClass => $module) {
             $observer = new ActivityObserver($logService);
             $observer->setModule($module);
-            $modelClass::observe($observer);
+
+            // IMPORTANT: Do NOT use $modelClass::observe($observer) here.
+            // Laravel's observe() converts instances to string callables
+            // (e.g. "App\Observers\ActivityObserver@updated"), and when the
+            // event fires, createClassCallable() resolves a FRESH instance
+            // from the container — losing the $module set by setModule().
+            // Register closures directly to capture $observer by reference.
+            // Note: prepareListeners wraps ALL listeners via makeListener(),
+            // which spreads payload as individual args, so the model is
+            // received directly as the first (and only) argument.
+            foreach (['created', 'updated', 'deleted'] as $methodName) {
+                $modelClass::{$methodName}(function ($model) use ($observer, $methodName) {
+                    if ($model) {
+                        $observer->{$methodName}($model);
+                    }
+                });
+            }
         }
     }
 }

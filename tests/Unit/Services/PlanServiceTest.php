@@ -77,17 +77,17 @@ class PlanServiceTest extends TestCase
         $starterPlan = Plan::findBySlug('starter');
         $this->tenant->assignPlan($starterPlan);
 
-        // Starter plan should have 'products' but NOT 'pos'
+        // Starter plan should have 'products' but NOT 'accounting'
         $this->assertTrue($this->planService->tenantHasFeature('products'));
-        $this->assertFalse($this->planService->tenantHasFeature('pos'));
+        $this->assertFalse($this->planService->tenantHasFeature('accounting'));
         
         $professionalPlan = Plan::findBySlug('professional');
         $this->tenant->assignPlan($professionalPlan);
         $this->tenant->refresh(); // Clear relation cache
 
-        // Professional plan should have both 'products' and 'pos', but NOT 'api_access'
+        // Professional plan should have both 'products' and 'accounting', but NOT 'api_access'
         $this->assertTrue($this->planService->tenantHasFeature('products'));
-        $this->assertTrue($this->planService->tenantHasFeature('pos'));
+        $this->assertTrue($this->planService->tenantHasFeature('accounting'));
         $this->assertFalse($this->planService->tenantHasFeature('api_access'));
     }
 
@@ -165,9 +165,9 @@ class PlanServiceTest extends TestCase
     #[Test]
     public function it_suggests_correct_upgrade_for_feature()
     {
-        $suggestion = $this->planService->getSuggestedUpgrade('pos');
+        $suggestion = $this->planService->getSuggestedUpgrade('accounting');
         
-        // POS is in Professional
+        // Accounting is in Professional
         $this->assertNotNull($suggestion);
         $this->assertEquals('professional', $suggestion->slug);
         

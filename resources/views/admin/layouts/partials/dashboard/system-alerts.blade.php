@@ -11,13 +11,19 @@
             <li class="nav-item" role="presentation">
                 <button class="nav-link active py-3" id="low-stock-tab" data-bs-toggle="tab"
                     data-bs-target="#low-stock-content" type="button" role="tab">
-                    <span class="badge bg-danger-lt me-2">{{ $lowStockProducts->count() }}</span> {{ __('messages.low_stock') }}
+                    @if($lowStockProducts->count() > 0)
+                        <span class="badge bg-danger-lt me-2">{{ $lowStockProducts->count() }}</span>
+                    @endif
+                    {{ __('messages.low_stock') }}
                 </button>
             </li>
             <li class="nav-item" role="presentation">
                 <button class="nav-link py-3" id="expiring-soon-tab" data-bs-toggle="tab"
                     data-bs-target="#expiring-soon-content" type="button" role="tab">
-                    <span class="badge bg-warning-lt me-2">{{ $expiringSoonItems->count() }}</span> {{ __('messages.expiring_soon') }}
+                    @if($expiringSoonItems->count() > 0)
+                        <span class="badge bg-warning-lt me-2">{{ $expiringSoonItems->count() }}</span>
+                    @endif
+                    {{ __('messages.expiring_soon') }}
                 </button>
             </li>
         </ul>

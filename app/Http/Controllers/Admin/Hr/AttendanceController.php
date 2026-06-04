@@ -3,7 +3,9 @@
 namespace App\Http\Controllers\Admin\Hr;
 
 use App\Http\Controllers\Controller;
+use App\Models\ActivityLog;
 use App\Models\AttendancePeriod;
+use App\Services\ActivityLogService;
 use App\Services\AttendanceService;
 use Illuminate\Http\Request;
 
@@ -37,6 +39,10 @@ class AttendanceController extends Controller
         ]);
 
         try {
+            app(ActivityLogService::class)->logExport(
+                ActivityLog::MODULE_ATTENDANCE,
+                "Exported Attendance Records for {$period->name}"
+            );
             return $this->service->exportPeriodRecords($period, $request->export_option);
         } catch (\Exception $e) {
             return response()->json([
@@ -112,6 +118,10 @@ class AttendanceController extends Controller
         ]);
 
         try {
+            app(ActivityLogService::class)->logExport(
+                ActivityLog::MODULE_ATTENDANCE,
+                'Exported Attendance Periods'
+            );
             return $this->service->exportPeriods($request->ids, $request->export_option);
         } catch (\Exception $e) {
             return response()->json([

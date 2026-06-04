@@ -3,6 +3,7 @@
 namespace App\Observers;
 
 use App\Models\ActivityLog;
+use App\Models\Sales;
 use App\Services\ActivityLogService;
 
 /**
@@ -25,16 +26,25 @@ class ActivityObserver
         return $this;
     }
 
+    protected function resolveModule($model): string
+    {
+        if ($model instanceof Sales && $model->type === Sales::TYPE_POS) {
+            return ActivityLog::MODULE_POS;
+        }
+        return $this->module;
+    }
+
     public function created($model): void
     {
         try {
-            if (empty($this->module)) {
+            $module = $this->resolveModule($model);
+            if (empty($module)) {
                 return;
             }
             $label = $this->guessLabel($model);
             $this->logService->logCreate(
-                $this->module,
-                "Created {$this->module}" . ($label ? ": {$label}" : " #{$model->id}"),
+                $module,
+                "Created {$module}" . ($label ? ": {$label}" : " #{$model->id}"),
                 $model,
                 $model->toArray()
             );
@@ -46,7 +56,8 @@ class ActivityObserver
     public function updated($model): void
     {
         try {
-            if (empty($this->module)) {
+            $module = $this->resolveModule($model);
+            if (empty($module)) {
                 return;
             }
             $label    = $this->guessLabel($model);
@@ -58,8 +69,8 @@ class ActivityObserver
             }
 
             $this->logService->logUpdate(
-                $this->module,
-                "Updated {$this->module}" . ($label ? ": {$label}" : " #{$model->id}"),
+                $module,
+                "Updated {$module}" . ($label ? ": {$label}" : " #{$model->id}"),
                 $model,
                 $oldValues,
                 $newValues
@@ -72,13 +83,14 @@ class ActivityObserver
     public function deleted($model): void
     {
         try {
-            if (empty($this->module)) {
+            $module = $this->resolveModule($model);
+            if (empty($module)) {
                 return;
             }
             $label = $this->guessLabel($model);
             $this->logService->logDelete(
-                $this->module,
-                "Deleted {$this->module}" . ($label ? ": {$label}" : " #{$model->id}"),
+                $module,
+                "Deleted {$module}" . ($label ? ": {$label}" : " #{$model->id}"),
                 $model,
                 $model->toArray()
             );

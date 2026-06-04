@@ -3,7 +3,9 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\ActivityLog;
 use App\Models\Supplier;
+use App\Services\ActivityLogService;
 use App\Services\SupplierService;
 use Illuminate\Http\Request;
 
@@ -137,6 +139,10 @@ class SupplierController extends Controller
         ]);
 
         try {
+            app(ActivityLogService::class)->logExport(
+                ActivityLog::MODULE_SUPPLIER,
+                'Exported Suppliers'
+            );
             $file = $this->supplierService->exportAllSuppliers($request->export_option);
             return $file;
         } catch (\Exception $e) {

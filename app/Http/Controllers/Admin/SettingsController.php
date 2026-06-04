@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Account;
+use App\Models\ActivityLog;
+use App\Services\ActivityLogService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -79,6 +81,15 @@ class SettingsController extends Controller
             'theme_mode' => $settingsToSave['theme_mode'],
             'settings' => $settingsToSave
         ]);
+
+        try {
+            app(ActivityLogService::class)->logCreate(
+                ActivityLog::MODULE_SETTINGS,
+                'System settings updated'
+            );
+        } catch (\Throwable $e) {
+            // never block settings save for logging failure
+        }
 
         if ($request->ajax()) {
             return response()->json(['success' => true, 'message' => 'System settings updated successfully.', 'settings' => $settingsToSave]);

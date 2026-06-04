@@ -3,8 +3,10 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\ActivityLog;
 use App\Models\User;
 use App\Models\Warehouse;
+use App\Services\ActivityLogService;
 use App\Services\WarehouseService;
 use Illuminate\Http\Request;
 
@@ -171,6 +173,10 @@ class WarehouseController extends Controller
         ]);
 
         try {
+            app(ActivityLogService::class)->logExport(
+                ActivityLog::MODULE_WAREHOUSE,
+                'Exported Warehouses'
+            );
             $file = $this->warehouseService->exportAllWarehouses($request->export_option);
             return $file;
         } catch (\Exception $e) {

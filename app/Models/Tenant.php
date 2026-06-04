@@ -192,12 +192,18 @@ class Tenant extends BaseTenant
             return $this->trial_ends_at->copy()->endOfDay();
         }
 
-        // Priority 3: If has billing period, use that
+        // Priority 3: If plan_expires_at is set directly, use that.
+        // This is the canonical expiry date set by the subscription system.
+        if ($this->plan_expires_at) {
+            return $this->plan_expires_at->copy()->endOfDay();
+        }
+
+        // Priority 4: If has billing period, use that
         if ($this->billing_period_start && $this->billing_period_end) {
             return \Carbon\Carbon::parse($this->billing_period_end)->endOfDay();
         }
 
-        // Priority 4: Calculate from plan_changed_at + billing cycle
+        // Priority 5: Calculate from plan_changed_at + billing cycle
         $plan = $this->getEffectivePlan();
         if ($this->plan_changed_at && $plan) {
             $billingDays = $plan->getBillingPeriodDays() ?? 30;

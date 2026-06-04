@@ -333,6 +333,13 @@
     border-bottom: 1px solid rgba(255, 255, 255, 0.06);
 }
 
+[data-bs-theme="dark"] .table .table-secondary,
+[data-bs-theme="dark"] .table td.table-secondary,
+[data-bs-theme="dark"] .table th.table-secondary {
+    background-color: rgba(255, 255, 255, 0.08) !important;
+    color: inherit !important;
+}
+
 /* Text colors adjustments */
 [data-bs-theme="dark"] .text-muted {
     color: rgba(255, 255, 255, 0.6) !important;
@@ -646,6 +653,12 @@
 
 [data-bs-theme="dark"] .table-hover tbody tr:hover {
     background-color: var(--tblr-active-bg);
+}
+
+/* Attendance weekend cells — restore visible shading over the default table/thead bg */
+[data-bs-theme="dark"] .table th.table-secondary,
+[data-bs-theme="dark"] .table td.table-secondary {
+    background-color: rgba(255, 255, 255, 0.06) !important;
 }
 
 /* Specific adjustments for elements that might still be white */

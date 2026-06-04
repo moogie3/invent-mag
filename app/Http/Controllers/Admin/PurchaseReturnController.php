@@ -3,8 +3,10 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\ActivityLog;
 use App\Models\Purchase;
 use App\Models\PurchaseReturn;
+use App\Services\ActivityLogService;
 use App\Services\PurchaseReturnService;
 use App\Services\PurchaseService;
 use App\Helpers\PurchaseReturnHelper;
@@ -116,14 +118,30 @@ class PurchaseReturnController extends Controller
     public function bulkComplete(Request $request)
     {
         $ids = $request->input('ids');
+        $purchaseReturns = PurchaseReturn::whereIn('id', $ids)->get();
         PurchaseReturn::whereIn('id', $ids)->update(['status' => 'Completed']);
+        foreach ($purchaseReturns as $pr) {
+            app(ActivityLogService::class)->logUpdate(
+                ActivityLog::MODULE_PURCHASE_RETURN,
+                "Bulk marked purchase return #{$pr->id} as Completed",
+                $pr
+            );
+        }
         return response()->json(['success' => true, 'message' => 'Selected purchase returns have been marked as completed.']);
     }
 
     public function bulkCancel(Request $request)
     {
         $ids = $request->input('ids');
+        $purchaseReturns = PurchaseReturn::whereIn('id', $ids)->get();
         PurchaseReturn::whereIn('id', $ids)->update(['status' => 'Canceled']);
+        foreach ($purchaseReturns as $pr) {
+            app(ActivityLogService::class)->logUpdate(
+                ActivityLog::MODULE_PURCHASE_RETURN,
+                "Bulk canceled purchase return #{$pr->id}",
+                $pr
+            );
+        }
         return response()->json(['success' => true, 'message' => 'Selected purchase returns have been marked as canceled.']);
     }
 

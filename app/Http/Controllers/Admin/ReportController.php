@@ -4,7 +4,9 @@ namespace App\Http\Controllers\Admin;
 
 use App\Helpers\CurrencyHelper;
 use App\Http\Controllers\Controller;
+use App\Models\ActivityLog;
 use App\Models\StockAdjustment;
+use App\Services\ActivityLogService;
 use App\Services\AgingReportService;
 use App\Services\CashFlowService;
 use App\Services\FinancialReportingService;
@@ -187,6 +189,11 @@ class ReportController extends Controller
         ]);
 
         try {
+            app(ActivityLogService::class)->logExport(
+                ActivityLog::MODULE_REPORT,
+                'Exported Income Statement'
+            );
+
             $startDate = $request->input('start_date', Carbon::now()->startOfMonth()->toDateString());
             $endDate = $request->input('end_date', Carbon::now()->endOfMonth()->toDateString());
 
@@ -246,6 +253,11 @@ class ReportController extends Controller
         ]);
 
         try {
+            app(ActivityLogService::class)->logExport(
+                ActivityLog::MODULE_REPORT,
+                'Exported Balance Sheet'
+            );
+
             $endDate = $request->input('end_date', Carbon::now()->endOfDay()->toDateString());
 
             $reportData = $this->financialReportingService->generateBalanceSheet($endDate);
@@ -292,6 +304,11 @@ class ReportController extends Controller
         ]);
 
         try {
+            app(ActivityLogService::class)->logExport(
+                ActivityLog::MODULE_REPORT,
+                'Exported Aged Receivables'
+            );
+
             $aging = $this->agingReportService->generateAgedReceivables();
 
             if ($request->export_option === 'pdf') {
@@ -336,6 +353,11 @@ class ReportController extends Controller
         ]);
 
         try {
+            app(ActivityLogService::class)->logExport(
+                ActivityLog::MODULE_REPORT,
+                'Exported Aged Payables'
+            );
+
             $aging = $this->agingReportService->generateAgedPayables();
 
             if ($request->export_option === 'pdf') {
@@ -370,6 +392,11 @@ class ReportController extends Controller
         ]);
 
         try {
+            app(ActivityLogService::class)->logExport(
+                ActivityLog::MODULE_REPORT,
+                'Exported Adjustment Log'
+            );
+
             $adjustments = StockAdjustment::with(['product:id,name', 'adjustedBy:id,name'])
                 ->orderBy('created_at', 'desc')
                 ->get();
@@ -406,6 +433,11 @@ class ReportController extends Controller
         ]);
 
         try {
+            app(ActivityLogService::class)->logExport(
+                ActivityLog::MODULE_REPORT,
+                'Exported Recent Transactions'
+            );
+
             $selectedIds = $request->input('selected', []);
             $filters = [
                 'type' => $request->get('type'),
@@ -465,6 +497,11 @@ class ReportController extends Controller
         ]);
 
         try {
+            app(ActivityLogService::class)->logExport(
+                ActivityLog::MODULE_REPORT,
+                'Exported Cash Flow Statement'
+            );
+
             $startDate = $request->input('start_date', Carbon::now()->startOfMonth()->toDateString());
             $endDate = $request->input('end_date', Carbon::now()->endOfMonth()->toDateString());
 

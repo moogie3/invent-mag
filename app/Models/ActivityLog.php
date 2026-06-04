@@ -62,6 +62,7 @@ class ActivityLog extends Model
     public const MODULE_WAREHOUSE          = 'Warehouse';
     public const MODULE_STOCK_ADJUSTMENT   = 'Stock Adjustment';
     public const MODULE_STOCK_TRANSFER     = 'Stock Transfer';
+    public const MODULE_STOCK_OPNAME       = 'Stock Opname';
     public const MODULE_CATEGORY           = 'Category';
     public const MODULE_UNIT               = 'Unit';
     public const MODULE_TAX                = 'Tax';
@@ -71,6 +72,11 @@ class ActivityLog extends Model
     public const MODULE_ACCOUNTING         = 'Accounting';
     public const MODULE_JOURNAL_ENTRY      = 'Journal Entry';
     public const MODULE_SALES_PIPELINE     = 'Sales Pipeline';
+    public const MODULE_CRM                = 'CRM';
+    public const MODULE_SRM                = 'Supplier Management';
+    public const MODULE_EMPLOYEE           = 'Employee';
+    public const MODULE_ATTENDANCE         = 'Attendance';
+    public const MODULE_PAYROLL            = 'Payroll';
     public const MODULE_REPORT             = 'Report';
     public const MODULE_PAYMENT            = 'Payment';
 

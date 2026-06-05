@@ -1,77 +1,135 @@
 <aside class="sidebar">
     <div class="sidebar-header">
-        <a href="{{ route('superadmin.dashboard') }}" class="sidebar-logo d-flex align-items-center gap-2 text-decoration-none">
-            <i class="ti ti-brand-minecraft fs-2 text-primary"></i>
-            <span class="fs-3 fw-bold">Invent-MAG</span>
-        </a>
-        <button class="sidebar-close d-lg-none" id="sidebar-close">
-            <i class="ti ti-x"></i>
+        <button type="button" id="sidebar-toggle" class="navbar-brand">
+            <div class="brand-icon">
+                <i class="ti ti-brand-minecraft brand-icon"></i>
+            </div>
+            <span class="brand-text">Invent-MAG</span>
         </button>
     </div>
 
-    <div class="sidebar-content">
-        <div class="sidebar-menu">
-            <div class="sidebar-menu-category">MAIN</div>
-            <a href="{{ route('superadmin.dashboard') }}" class="sidebar-menu-item {{ request()->routeIs('superadmin.dashboard') ? 'active' : '' }}">
-                <i class="ti ti-layout-dashboard sidebar-menu-icon"></i>
-                <span class="sidebar-menu-text">Dashboard</span>
-            </a>
-
-            <div class="sidebar-menu-category mt-3">MANAGEMENT</div>
-            <a href="#" class="sidebar-menu-item">
-                <i class="ti ti-building-community sidebar-menu-icon"></i>
-                <span class="sidebar-menu-text">Tenants</span>
-            </a>
-            <a href="#" class="sidebar-menu-item">
-                <i class="ti ti-packages sidebar-menu-icon"></i>
-                <span class="sidebar-menu-text">Plans</span>
-            </a>
-            <a href="#" class="sidebar-menu-item">
-                <i class="ti ti-receipt sidebar-menu-icon"></i>
-                <span class="sidebar-menu-text">Subscriptions</span>
-            </a>
-
-            <div class="sidebar-menu-category mt-3">SYSTEM</div>
-            <a href="#" class="sidebar-menu-item">
-                <i class="ti ti-shield-lock sidebar-menu-icon"></i>
-                <span class="sidebar-menu-text">Permissions</span>
-            </a>
-            <a href="#" class="sidebar-menu-item">
-                <i class="ti ti-database sidebar-menu-icon"></i>
-                <span class="sidebar-menu-text">Backups</span>
-            </a>
-            <a href="#" class="sidebar-menu-item">
-                <i class="ti ti-file-text sidebar-menu-icon"></i>
-                <span class="sidebar-menu-text">Audit Log</span>
-            </a>
-
-            <div class="sidebar-menu-category mt-3">CONFIGURATION</div>
-            <a href="#" class="sidebar-menu-item">
-                <i class="ti ti-settings sidebar-menu-icon"></i>
-                <span class="sidebar-menu-text">System Settings</span>
-            </a>
-            <a href="#" class="sidebar-menu-item">
-                <i class="ti ti-flag sidebar-menu-icon"></i>
-                <span class="sidebar-menu-text">Features</span>
-            </a>
-            <a href="#" class="sidebar-menu-item">
-                <i class="ti ti-currency-dollar sidebar-menu-icon"></i>
-                <span class="sidebar-menu-text">Billing</span>
-            </a>
+    <div class="sidebar-user">
+        <div class="user-info">
+            <span class="user-avatar">
+                @if (Auth::guard('super_admin')->check())
+                    <span class="avatar avatar-sm"
+                        style="background-image: url('https://ui-avatars.com/api/?name={{ urlencode(Auth::guard('super_admin')->user()->name) }}&background=random');"></span>
+                @else
+                    <span class="avatar avatar-sm"
+                        style="background-image: url('{{ asset('storage/default-avatar.png') }}');"></span>
+                @endif
+            </span>
+            <div class="user-details">
+                @if (Auth::guard('super_admin')->check())
+                    <span class="user-name">{{ Auth::guard('super_admin')->user()->name }}</span>
+                    <span class="user-role">System Administrator</span>
+                @else
+                    <span class="user-name">Guest</span>
+                    <span class="user-role">Not logged in</span>
+                @endif
+            </div>
         </div>
     </div>
 
+    <nav class="sidebar-nav">
+        <ul class="navbar-nav">
+            <li class="nav-item">
+                <a class="nav-link {{ request()->routeIs('superadmin.dashboard') ? 'active' : '' }}" href="{{ route('superadmin.dashboard') }}" data-turbo="true" data-turbo-cache="false">
+                    <span class="nav-link-icon"><i class="ti ti-layout-dashboard"></i></span>
+                    <span class="nav-link-title">Dashboard</span>
+                </a>
+            </li>
+
+            <li class="nav-item">
+                <div class="nav-item-divider" style="font-size: 0.65rem; font-weight: 700; color: #6c757d; text-transform: uppercase; letter-spacing: 0.05em; padding: 0.75rem 0.75rem 0.35rem; margin-top: 0.5rem; white-space: nowrap;">Management</div>
+            </li>
+
+            <li class="nav-item">
+                <a class="nav-link {{ request()->routeIs('superadmin.tenants.*') ? 'active' : '' }}" href="{{ route('superadmin.tenants.index') }}" data-turbo="true" data-turbo-cache="false">
+                    <span class="nav-link-icon"><i class="ti ti-building-community"></i></span>
+                    <span class="nav-link-title">Tenants</span>
+                </a>
+            </li>
+
+            <li class="nav-item">
+                <a class="nav-link {{ request()->routeIs('superadmin.plans.*') ? 'active' : '' }}" href="{{ route('superadmin.plans.index') }}" data-turbo="true" data-turbo-cache="false">
+                    <span class="nav-link-icon"><i class="ti ti-packages"></i></span>
+                    <span class="nav-link-title">Plans</span>
+                </a>
+            </li>
+
+            <li class="nav-item">
+                <a class="nav-link {{ request()->routeIs('superadmin.subscriptions.*') ? 'active' : '' }}" href="{{ route('superadmin.subscriptions.index') }}" data-turbo="true" data-turbo-cache="false">
+                    <span class="nav-link-icon"><i class="ti ti-receipt"></i></span>
+                    <span class="nav-link-title">Subscriptions</span>
+                </a>
+            </li>
+
+            <li class="nav-item">
+                <div class="nav-item-divider" style="font-size: 0.65rem; font-weight: 700; color: #6c757d; text-transform: uppercase; letter-spacing: 0.05em; padding: 0.75rem 0.75rem 0.35rem; margin-top: 0.5rem; white-space: nowrap;">System</div>
+            </li>
+
+            <li class="nav-item">
+                <a class="nav-link {{ request()->routeIs('superadmin.permissions.*') ? 'active' : '' }}" href="{{ route('superadmin.permissions.index') }}" data-turbo="true" data-turbo-cache="false">
+                    <span class="nav-link-icon"><i class="ti ti-shield-lock"></i></span>
+                    <span class="nav-link-title">Permissions</span>
+                </a>
+            </li>
+
+            <li class="nav-item">
+                <a class="nav-link {{ request()->routeIs('superadmin.backups.*') ? 'active' : '' }}" href="{{ route('superadmin.backups.index') }}" data-turbo="true" data-turbo-cache="false">
+                    <span class="nav-link-icon"><i class="ti ti-database"></i></span>
+                    <span class="nav-link-title">Backups</span>
+                </a>
+            </li>
+
+            <li class="nav-item">
+                <a class="nav-link {{ request()->routeIs('superadmin.audit-log.*') ? 'active' : '' }}" href="{{ route('superadmin.audit-log.index') }}" data-turbo="true" data-turbo-cache="false">
+                    <span class="nav-link-icon"><i class="ti ti-file-text"></i></span>
+                    <span class="nav-link-title">Audit Log</span>
+                </a>
+            </li>
+
+            <li class="nav-item">
+                <div class="nav-item-divider" style="font-size: 0.65rem; font-weight: 700; color: #6c757d; text-transform: uppercase; letter-spacing: 0.05em; padding: 0.75rem 0.75rem 0.35rem; margin-top: 0.5rem; white-space: nowrap;">Configuration</div>
+            </li>
+
+            <li class="nav-item">
+                <a class="nav-link {{ request()->routeIs('superadmin.settings.*') ? 'active' : '' }}" href="{{ route('superadmin.settings.index') }}" data-turbo="true" data-turbo-cache="false">
+                    <span class="nav-link-icon"><i class="ti ti-settings"></i></span>
+                    <span class="nav-link-title">System Settings</span>
+                </a>
+            </li>
+
+            <li class="nav-item">
+                <a class="nav-link {{ request()->routeIs('superadmin.features.*') ? 'active' : '' }}" href="{{ route('superadmin.features.index') }}" data-turbo="true" data-turbo-cache="false">
+                    <span class="nav-link-icon"><i class="ti ti-flag"></i></span>
+                    <span class="nav-link-title">Features</span>
+                </a>
+            </li>
+
+            <li class="nav-item">
+                <a class="nav-link {{ request()->routeIs('superadmin.billing.*') ? 'active' : '' }}" href="{{ route('superadmin.billing.index') }}" data-turbo="true" data-turbo-cache="false">
+                    <span class="nav-link-icon"><i class="ti ti-currency-dollar"></i></span>
+                    <span class="nav-link-title">Billing</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+
     <div class="sidebar-footer">
-        <div class="d-flex align-items-center justify-content-between px-3 py-2">
-            <a href="#" class="nav-link px-0" id="theme-toggle-sidebar" title="Toggle theme">
-                <i class="ti ti-sun fs-2 theme-icon-light"></i>
-                <i class="ti ti-moon fs-2 theme-icon-dark"></i>
+        <div class="d-flex align-items-center justify-content-evenly w-100">
+            <div class="nav-item" id="theme-toggle-sidebar-container">
+                <a href="#" class="nav-link px-0" id="theme-toggle-sidebar" title="Toggle theme">
+                    <i class="ti ti-sun fs-2 theme-icon-light"></i>
+                    <i class="ti ti-moon fs-2 theme-icon-dark"></i>
+                </a>
+            </div>
+            <a class="nav-link px-0" href="#" onclick="event.preventDefault(); document.getElementById('sa-logout-form').submit();" title="Logout">
+                <i class="ti ti-logout fs-2"></i>
             </a>
-            <form method="POST" action="{{ route('superadmin.logout') }}" class="m-0">
+            <form id="sa-logout-form" method="POST" action="{{ route('superadmin.logout') }}" style="display: none;">
                 @csrf
-                <button type="submit" class="nav-link px-0 btn btn-link text-decoration-none" title="Logout">
-                    <i class="ti ti-logout fs-2"></i>
-                </button>
             </form>
         </div>
     </div>

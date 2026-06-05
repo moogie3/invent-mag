@@ -353,15 +353,17 @@ function initSidebar() {
         });
     });
 
-    // Toggle button event with persistence
-    if (sidebarToggle && !sidebarToggle.dataset.clickBound) {
-        sidebarToggle.addEventListener("click", function (e) {
+    // Toggle button event with persistence (use delegation for robust binding)
+    document.removeEventListener('click', window.sidebarToggleHandler);
+    window.sidebarToggleHandler = function (e) {
+        const toggleBtn = e.target.closest("#sidebar-toggle");
+        if (toggleBtn) {
             e.preventDefault();
             e.stopPropagation();
             toggleSidebarWithPersistence();
-        });
-        sidebarToggle.dataset.clickBound = "true";
-    }
+        }
+    };
+    document.addEventListener('click', window.sidebarToggleHandler);
 
     // Add global listeners only once per page session
     if (!window.sidebarGlobalListenersAdded) {

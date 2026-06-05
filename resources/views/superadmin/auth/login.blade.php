@@ -28,14 +28,16 @@
                 <div class="text-center mb-4">
                     <h1 class="navbar-brand text-center mx-auto m-0">
                         <a href="{{ route('superadmin.login') }}" class="nav-link fs-1 fw-bold">
-                            <i class="ti ti-shield-lock fs-2 me-2"></i>Super Admin
+                            <i class="ti ti-brand-minecraft fs-2 me-2 text-primary"></i>Invent-MAG
                         </a>
                     </h1>
-                    <div class="text-muted mt-1">Platform Management</div>
                 </div>
                 <div class="card card-md border-0 shadow-sm rounded-3">
                     <div class="card-body">
-                        <h2 class="h2 text-center mb-5">Sign in</h2>
+                        <div class="text-center mb-4">
+                            <h2 class="h2 mb-0">Super Admin</h2>
+                            <div class="text-muted mt-1">Platform Management</div>
+                        </div>
                         <form action="{{ route('superadmin.login') }}" method="POST" autocomplete="off" novalidate>
                             @csrf
                             <div class="mb-3">

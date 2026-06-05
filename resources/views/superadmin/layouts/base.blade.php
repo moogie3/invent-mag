@@ -40,6 +40,7 @@
     @vite('resources/js/admin/layouts/page-loader.js')
     @vite('resources/js/admin/layouts/theme-toggle.js')
     @vite('resources/js/admin/layouts/theme-visibility.js')
+    @vite('resources/js/admin/layouts/menu-sidebar.js')
     @vite('resources/js/admin/bootstrap-init.js')
 
     @stack('head-scripts')
@@ -53,6 +54,7 @@
     <div class="wrapper">
         @include('superadmin.layouts.menu-sidebar')
         <div class="main-content">
+            @include('superadmin.layouts.navbar')
             <turbo-frame id="main-content" data-turbo-action="advance">
                 <span id="page-route-indicator" data-route="{{ Route::currentRouteName() }}" class="d-none" aria-hidden="true"></span>
                 @yield('content')

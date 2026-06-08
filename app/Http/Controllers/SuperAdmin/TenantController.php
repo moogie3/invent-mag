@@ -30,4 +30,15 @@ class TenantController extends Controller
         $tenant->update(['is_active' => !$tenant->is_active]);
         return back()->with('success', 'Tenant status updated.');
     }
+
+    public function updateDomain(Request $request, Tenant $tenant)
+    {
+        $data = $request->validate([
+            'domain' => 'required|string|max:255|unique:tenants,domain,' . $tenant->id,
+        ]);
+
+        $tenant->update(['domain' => $data['domain']]);
+
+        return back()->with('success', 'Tenant domain updated successfully.');
+    }
 }

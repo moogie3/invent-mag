@@ -11,7 +11,7 @@ class FeatureController extends Controller
     public function index()
     {
         $plans = Plan::ordered()->get();
-        $allFeatures = $this->getAllFeatures();
+        $allFeatures = static::getAllFeatures();
 
         return view('superadmin.features.index', compact('plans', 'allFeatures'));
     }
@@ -33,32 +33,8 @@ class FeatureController extends Controller
             ->with('success', 'Feature assignments updated successfully.');
     }
 
-    private function getAllFeatures(): array
+    public static function getAllFeatures(): array
     {
-        return [
-            'purchase_order'    => 'Purchase Order',
-            'purchase_return'   => 'Purchase Return',
-            'sales_order'       => 'Sales Order',
-            'sales_return'      => 'Sales Return',
-            'pos'               => 'Point of Sale',
-            'product'           => 'Product Management',
-            'customer'          => 'Customer Management',
-            'supplier'          => 'Supplier Management',
-            'warehouse'         => 'Warehouse Management',
-            'stock_opname'      => 'Stock Opname',
-            'stock_transfer'    => 'Stock Transfer',
-            'stock_adjustment'  => 'Stock Adjustment',
-            'category'          => 'Category Management',
-            'unit'              => 'Unit Management',
-            'tax'               => 'Tax Management',
-            'multi_currency'    => 'Multi-Currency',
-            'financial_reports' => 'Financial Reports',
-            'crm'               => 'CRM & Sales Pipeline',
-            'srm'               => 'Supplier Relationship Mgmt',
-            'hr'                => 'HR & Payroll',
-            'accounting'        => 'Accounting',
-            'audit_compliance'  => 'Audit & Compliance',
-            'backup'            => 'Backup & Restore',
-        ];
+        return config('plans.features');
     }
 }

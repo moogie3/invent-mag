@@ -81,44 +81,31 @@
                             </div>
                         </div>
                         <div class="mb-3">
-                            <label class="form-label">Features</label>
-                            <div class="row">
-                                @php
-                                    $featureOptions = [
-                                        'purchase_order' => 'Purchase Order',
-                                        'purchase_return' => 'Purchase Return',
-                                        'sales_order' => 'Sales Order',
-                                        'sales_return' => 'Sales Return',
-                                        'pos' => 'Point of Sale',
-                                        'product' => 'Product Management',
-                                        'customer' => 'Customer Management',
-                                        'supplier' => 'Supplier Management',
-                                        'warehouse' => 'Warehouse Management',
-                                        'stock_opname' => 'Stock Opname',
-                                        'stock_transfer' => 'Stock Transfer',
-                                        'stock_adjustment' => 'Stock Adjustment',
-                                        'category' => 'Category Management',
-                                        'unit' => 'Unit Management',
-                                        'tax' => 'Tax Management',
-                                        'multi_currency' => 'Multi-Currency',
-                                        'financial_reports' => 'Financial Reports',
-                                        'crm' => 'CRM & Sales Pipeline',
-                                        'srm' => 'Supplier Relationship Mgmt',
-                                        'hr' => 'HR & Payroll',
-                                        'accounting' => 'Accounting',
-                                        'audit_compliance' => 'Audit & Compliance',
-                                        'backup' => 'Backup & Restore',
-                                    ];
-                                @endphp
-                                @foreach($featureOptions as $key => $label)
-                                <div class="col-md-3">
-                                    <label class="form-check">
-                                        <input type="checkbox" name="features[]" value="{{ $key }}" class="form-check-input" @checked(in_array($key, $plan->features ?? []))>
-                                        <span class="form-check-label">{{ $label }}</span>
-                                    </label>
+                            <label class="form-label fw-semibold">Features</label>
+                            @php
+                                $sections = [
+                                    'Core Features' => ['products', 'inventory', 'sales', 'purchases', 'invoices', 'dashboard', 'basic_reports', 'customers', 'suppliers', 'pos', 'sales_returns', 'purchase_returns'],
+                                    'Professional Features' => ['stock_opname', 'accounting', 'crm', 'sales_pipeline', 'financial_reports', 'multi_currency', 'hr', 'cash_flow'],
+                                    'Enterprise Features' => ['sales_forecasting', 'api_access', 'audit_compliance', 'custom_roles', 'dedicated_support'],
+                                ];
+                            @endphp
+                            @foreach($sections as $sectionLabel => $sectionKeys)
+                            <div class="mb-3">
+                                <div class="text-muted text-uppercase small fw-semibold mb-2" style="font-size: 0.7rem; letter-spacing: 0.08em;">{{ $sectionLabel }}</div>
+                                <div class="row">
+                                    @foreach($sectionKeys as $key)
+                                        @if(isset($allFeatures[$key]))
+                                        <div class="col-md-3 mb-1">
+                                            <label class="form-check">
+                                                <input type="checkbox" name="features[]" value="{{ $key }}" class="form-check-input" @checked(in_array($key, $plan->features ?? []))>
+                                                <span class="form-check-label">{{ $allFeatures[$key] }}</span>
+                                            </label>
+                                        </div>
+                                        @endif
+                                    @endforeach
                                 </div>
-                                @endforeach
                             </div>
+                            @endforeach
                         </div>
                         <div class="d-flex gap-2">
                             <button type="submit" class="btn btn-primary px-4">Update Plan</button>

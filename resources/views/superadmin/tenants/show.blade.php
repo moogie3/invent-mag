@@ -21,12 +21,24 @@
     </div>
     <div class="page-body">
         <div class="container-xl">
+            @if(session('success'))
+            <div class="alert alert-success alert-dismissible mb-3" role="alert">
+                <i class="ti ti-circle-check me-2"></i>{{ session('success') }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+            @endif
+            @if(session('error'))
+            <div class="alert alert-danger alert-dismissible mb-3" role="alert">
+                <i class="ti ti-alert-circle me-2"></i>{{ session('error') }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+            @endif
             <div class="row row-deck row-cards">
                 <div class="col-lg-4">
                     <div class="card shadow border-0 rounded-4 card-hover">
                         <div class="card-body text-center py-4">
                             <div class="mb-3">
-                                <span class="avatar avatar-xl" style="background-image: url('https://ui-avatars.com/api/?name={{ urlencode($tenant->name) }}&background=random&size=128')"></span>
+                                <span class="avatar avatar-xl" style="background-image: url('https://ui-avatars.com/api/?name={{ urlencode($tenant->name) }}&background=1a56db&color=fff&size=128')"></span>
                             </div>
                             <h3>{{ $tenant->name }}</h3>
                             <div class="text-muted">{{ $tenant->email }}</div>
@@ -52,7 +64,23 @@
                         <div class="card-body">
                             <dl class="row">
                                 <dt class="col-5">Domain</dt>
-                                <dd class="col-7"><code>{{ $tenant->domain ?? 'N/A' }}</code></dd>
+                                <dd class="col-7">
+                                    <div class="d-flex align-items-center gap-2">
+                                        <code>{{ $tenant->domain ?? 'N/A' }}</code>
+                                        <button type="button" class="btn btn-sm btn-ghost" data-bs-toggle="collapse" data-bs-target="#editDomainForm" aria-expanded="false">
+                                            <i class="ti ti-pencil"></i>
+                                        </button>
+                                    </div>
+                                    <div class="collapse mt-2" id="editDomainForm">
+                                        <form method="POST" action="{{ route('superadmin.tenants.update-domain', $tenant) }}" class="d-flex gap-2">
+                                            @csrf @method('PUT')
+                                            <input type="text" name="domain" class="form-control form-control-sm" value="{{ $tenant->domain }}" placeholder="tenant.example.com">
+                                            <button type="submit" class="btn btn-sm btn-primary">
+                                                <i class="ti ti-check me-1"></i>Save
+                                            </button>
+                                        </form>
+                                    </div>
+                                </dd>
 
                                 <dt class="col-5">Plan</dt>
                                 <dd class="col-7">{{ $tenant->plan?->name ?? 'No plan' }}</dd>

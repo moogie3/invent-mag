@@ -26,72 +26,72 @@
         <div class="container-xl">
             <div class="row row-deck row-cards mb-4">
                 <div class="col-sm-6 col-lg-3">
-                    <div class="card shadow border-0 rounded-4 stat-card card-hover">
+                    <div class="card border-0 rounded-4 stat-card stat-card-primary card-hover" style="box-shadow: 0 1px 8px rgba(0,0,0,0.07);">
                         <div class="card-body">
-                            <div class="d-flex align-items-center mb-3">
-                                <div class="subheader">TOTAL TENANTS</div>
-                                <div class="ms-auto lh-1 text-primary">
-                                    <div class="avatar bg-primary-lt avatar-sm rounded"><i class="ti ti-building"></i></div>
+                            <div class="d-flex align-items-center mb-2">
+                                <div class="subheader text-muted" style="font-size:0.68rem;letter-spacing:0.06em;">TOTAL TENANTS</div>
+                                <div class="ms-auto">
+                                    <div class="avatar bg-primary-lt avatar-sm rounded-3"><i class="ti ti-building-community text-primary"></i></div>
                                 </div>
                             </div>
-                            <div class="h1 mb-3">{{ $totalTenants }}</div>
-                            <div class="d-flex mb-2">
-                                <a href="{{ route('superadmin.tenants.index') }}" class="text-primary text-decoration-none fw-medium">View all tenants <i class="ti ti-arrow-right"></i></a>
+                            <div class="h1 mb-2 fw-bold">{{ $totalTenants }}</div>
+                            <div class="d-flex mb-0">
+                                <a href="{{ route('superadmin.tenants.index') }}" class="text-primary text-decoration-none fw-semibold small">View all tenants <i class="ti ti-arrow-right"></i></a>
                             </div>
                         </div>
-                        <i class="ti ti-building stat-icon"></i>
+                        <i class="ti ti-building-community stat-icon text-primary"></i>
                     </div>
                 </div>
                 <div class="col-sm-6 col-lg-3">
-                    <div class="card shadow border-0 rounded-4 stat-card card-hover">
+                    <div class="card border-0 rounded-4 stat-card stat-card-success card-hover" style="box-shadow: 0 1px 8px rgba(0,0,0,0.07);">
                         <div class="card-body">
-                            <div class="d-flex align-items-center mb-3">
-                                <div class="subheader">ACTIVE / TRIAL</div>
-                                <div class="ms-auto lh-1 text-success">
-                                    <div class="avatar bg-success-lt avatar-sm rounded"><i class="ti ti-check"></i></div>
+                            <div class="d-flex align-items-center mb-2">
+                                <div class="subheader text-muted" style="font-size:0.68rem;letter-spacing:0.06em;">ACTIVE / TRIAL</div>
+                                <div class="ms-auto">
+                                    <div class="avatar bg-success-lt avatar-sm rounded-3"><i class="ti ti-circle-check text-success"></i></div>
                                 </div>
                             </div>
-                            <div class="h1 mb-3">{{ $activeTenants }}</div>
-                            <div class="d-flex mb-2">
-                                <a href="{{ route('superadmin.subscriptions.index') }}" class="text-success text-decoration-none fw-medium">View subscriptions <i class="ti ti-arrow-right"></i></a>
+                            <div class="h1 mb-2 fw-bold">{{ $activeTenants }}</div>
+                            <div class="d-flex mb-0">
+                                <a href="{{ route('superadmin.subscriptions.index') }}" class="text-success text-decoration-none fw-semibold small">View subscriptions <i class="ti ti-arrow-right"></i></a>
                             </div>
                         </div>
-                        <i class="ti ti-check stat-icon text-success"></i>
+                        <i class="ti ti-circle-check stat-icon text-success"></i>
                     </div>
                 </div>
                 <div class="col-sm-6 col-lg-3">
-                    <div class="card shadow border-0 rounded-4 stat-card card-hover">
+                    <div class="card border-0 rounded-4 stat-card stat-card-info card-hover" style="box-shadow: 0 1px 8px rgba(0,0,0,0.07);">
                         <div class="card-body">
-                            <div class="d-flex align-items-center mb-3">
-                                <div class="subheader">ACTIVE PLANS</div>
-                                <div class="ms-auto lh-1 text-info">
-                                    <div class="avatar bg-info-lt avatar-sm rounded"><i class="ti ti-tag"></i></div>
+                            <div class="d-flex align-items-center mb-2">
+                                <div class="subheader text-muted" style="font-size:0.68rem;letter-spacing:0.06em;">ACTIVE PLANS</div>
+                                <div class="ms-auto">
+                                    <div class="avatar bg-info-lt avatar-sm rounded-3"><i class="ti ti-packages text-info"></i></div>
                                 </div>
                             </div>
-                            <div class="h1 mb-3">{{ $activePlans }}</div>
-                            <div class="d-flex mb-2">
-                                <a href="{{ route('superadmin.plans.index') }}" class="text-info text-decoration-none fw-medium">Manage plans <i class="ti ti-arrow-right"></i></a>
+                            <div class="h1 mb-2 fw-bold">{{ $activePlans }}</div>
+                            <div class="d-flex mb-0">
+                                <a href="{{ route('superadmin.plans.index') }}" class="text-info text-decoration-none fw-semibold small">Manage plans <i class="ti ti-arrow-right"></i></a>
                             </div>
                         </div>
-                        <i class="ti ti-tag stat-icon text-info"></i>
+                        <i class="ti ti-packages stat-icon text-info"></i>
                     </div>
                 </div>
                 <div class="col-sm-6 col-lg-3">
-                    <div class="card shadow border-0 rounded-4 stat-card card-hover">
+                    <div class="card border-0 rounded-4 stat-card stat-card-warning card-hover" style="box-shadow: 0 1px 8px rgba(0,0,0,0.07);">
                         <div class="card-body">
-                            <div class="d-flex align-items-center mb-3">
-                                <div class="subheader">TOTAL SUBSCRIPTIONS</div>
-                                <div class="ms-auto lh-1 text-warning">
-                                    <div class="avatar bg-warning-lt avatar-sm rounded"><i class="ti ti-chart-pie"></i></div>
+                            <div class="d-flex align-items-center mb-2">
+                                <div class="subheader text-muted" style="font-size:0.68rem;letter-spacing:0.06em;">TOTAL SUBSCRIPTIONS</div>
+                                <div class="ms-auto">
+                                    <div class="avatar bg-warning-lt avatar-sm rounded-3"><i class="ti ti-receipt text-warning"></i></div>
                                 </div>
                             </div>
-                            <div class="h1 mb-3">{{ $totalSubscriptions }}</div>
-                            <div class="d-flex mb-2">
-                                <span class="text-success fw-medium">{{ $activeSubscriptions }} active</span>
-                                <span class="text-muted ms-2">, {{ $trialSubscriptions }} trial</span>
+                            <div class="h1 mb-2 fw-bold">{{ $totalSubscriptions }}</div>
+                            <div class="d-flex mb-0 gap-2">
+                                <span class="text-success fw-semibold small">{{ $activeSubscriptions }} active</span>
+                                <span class="text-muted small">&middot; {{ $trialSubscriptions }} trial</span>
                             </div>
                         </div>
-                        <i class="ti ti-chart-pie stat-icon text-warning"></i>
+                        <i class="ti ti-receipt stat-icon text-warning"></i>
                     </div>
                 </div>
             </div>

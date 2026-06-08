@@ -12,6 +12,11 @@ use App\Http\Controllers\SuperAdmin\AuditLogController;
 use App\Http\Controllers\SuperAdmin\SettingController;
 use App\Http\Controllers\SuperAdmin\FeatureController;
 use App\Http\Controllers\SuperAdmin\BillingController;
+use App\Http\Controllers\SuperAdmin\PaymentOverviewController;
+use App\Http\Controllers\SuperAdmin\TransactionController;
+use App\Http\Controllers\SuperAdmin\PendingPaymentController;
+use App\Http\Controllers\SuperAdmin\InvoiceController;
+use App\Http\Controllers\SuperAdmin\CmsController;
 
 Route::middleware('guest:super_admin')->group(function () {
     Route::get('/login', [LoginController::class, 'create'])->name('superadmin.login');
@@ -27,6 +32,7 @@ Route::middleware('auth:super_admin')->group(function () {
     Route::get('/tenants/{tenant}', [TenantController::class, 'show'])->name('superadmin.tenants.show');
     Route::post('/tenants/{tenant}/impersonate', [TenantController::class, 'impersonate'])->name('superadmin.tenants.impersonate');
     Route::post('/tenants/{tenant}/toggle-active', [TenantController::class, 'toggleActive'])->name('superadmin.tenants.toggle-active');
+    Route::put('/tenants/{tenant}/domain', [TenantController::class, 'updateDomain'])->name('superadmin.tenants.update-domain');
 
     // Plans
     Route::get('/plans', [PlanController::class, 'index'])->name('superadmin.plans.index');
@@ -60,6 +66,25 @@ Route::middleware('auth:super_admin')->group(function () {
     // Billing
     Route::get('/billing', [BillingController::class, 'index'])->name('superadmin.billing.index');
     Route::get('/billing/{order}', [BillingController::class, 'show'])->name('superadmin.billing.show');
+
+    // Payment Overview
+    Route::get('/payment-overview', [PaymentOverviewController::class, 'index'])->name('superadmin.payment-overview.index');
+
+    // Transactions
+    Route::get('/transactions', [TransactionController::class, 'index'])->name('superadmin.transactions.index');
+
+    // Pending Payments
+    Route::get('/pending-payments', [PendingPaymentController::class, 'index'])->name('superadmin.pending-payments.index');
+    Route::post('/pending-payments/{order}/approve', [PendingPaymentController::class, 'approve'])->name('superadmin.pending-payments.approve');
+    Route::post('/pending-payments/{order}/reject', [PendingPaymentController::class, 'reject'])->name('superadmin.pending-payments.reject');
+
+    // Invoices
+    Route::get('/invoices', [InvoiceController::class, 'index'])->name('superadmin.invoices.index');
+    Route::get('/invoices/{order}', [InvoiceController::class, 'show'])->name('superadmin.invoices.show');
+
+    // CMS (Landing Page)
+    Route::get('/cms', [CmsController::class, 'index'])->name('superadmin.cms.index');
+    Route::post('/cms', [CmsController::class, 'update'])->name('superadmin.cms.update');
 
     // Redirect common tenant paths back to super admin dashboard
     Route::redirect('/admin/dashboard', '/');

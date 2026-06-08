@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\SuperAdmin;
 
+use App\Http\Controllers\SuperAdmin\FeatureController;
 use App\Http\Controllers\Controller;
 use App\Models\Plan;
 use Illuminate\Http\Request;
@@ -16,7 +17,8 @@ class PlanController extends Controller
 
     public function create()
     {
-        return view('superadmin.plans.create');
+        $allFeatures = FeatureController::getAllFeatures();
+        return view('superadmin.plans.create', compact('allFeatures'));
     }
 
     public function store(Request $request)
@@ -47,7 +49,8 @@ class PlanController extends Controller
 
     public function edit(Plan $plan)
     {
-        return view('superadmin.plans.edit', compact('plan'));
+        $allFeatures = FeatureController::getAllFeatures();
+        return view('superadmin.plans.edit', compact('plan', 'allFeatures'));
     }
 
     public function update(Request $request, Plan $plan)

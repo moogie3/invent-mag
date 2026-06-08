@@ -5,6 +5,11 @@ namespace Database\Seeders;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use App\Models\Account;
+use App\Models\OpeningBalance;
+use App\Models\JournalEntry;
+use App\Models\Transaction;
+use App\Services\AccountingService;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\App;
 
 class AccountSeeder extends Seeder
@@ -160,6 +165,100 @@ class AccountSeeder extends Seeder
         if (isset($this->command)) {
             $this->command->newLine();
             $this->command->info("Accounting integration settings configured for tenant.");
+        }
+
+        // Seed opening balances for a healthy company
+        $this->seedOpeningBalances($tenantId, $codePrefix);
+    }
+
+    private function seedOpeningBalances(int $tenantId, string $codePrefix): void
+    {
+        $balanceDate = now()->startOfMonth()->subMonth()->toDateString();
+
+        $balances = [
+            '1110-' . $codePrefix => ['debit' => 50000,  'credit' => 0,      'name' => 'Cash'],
+            '1120-' . $codePrefix => ['debit' => 200000, 'credit' => 0,      'name' => 'Bank'],
+            '1130-' . $codePrefix => ['debit' => 75000,  'credit' => 0,      'name' => 'Accounts Receivable'],
+            '1135-' . $codePrefix => ['debit' => 0,      'credit' => 2500,   'name' => 'Allowance for Doubtful Accounts'],
+            '1140-' . $codePrefix => ['debit' => 100000, 'credit' => 0,      'name' => 'Inventory'],
+            '1150-' . $codePrefix => ['debit' => 5000,   'credit' => 0,      'name' => 'Prepaid Expenses'],
+            '1210-' . $codePrefix => ['debit' => 500000, 'credit' => 0,      'name' => 'Land'],
+            '1220-' . $codePrefix => ['debit' => 300000, 'credit' => 0,      'name' => 'Buildings'],
+            '1225-' . $codePrefix => ['debit' => 0,      'credit' => 50000,  'name' => 'Accum. Deprec. Buildings'],
+            '1230-' . $codePrefix => ['debit' => 100000, 'credit' => 0,      'name' => 'Equipment'],
+            '1235-' . $codePrefix => ['debit' => 0,      'credit' => 20000,  'name' => 'Accum. Deprec. Equipment'],
+            '2110-' . $codePrefix => ['debit' => 0,      'credit' => 45000,  'name' => 'Accounts Payable'],
+            '2120-' . $codePrefix => ['debit' => 0,      'credit' => 10000,  'name' => 'Accrued Expenses'],
+            '2140-' . $codePrefix => ['debit' => 0,      'credit' => 15000,  'name' => 'Salary Payable'],
+            '2210-' . $codePrefix => ['debit' => 0,      'credit' => 300000, 'name' => 'Bank Loans'],
+            '3100-' . $codePrefix => ['debit' => 0,      'credit' => 887500, 'name' => 'Owner\'s Equity'],
+        ];
+
+        $totalDebit = collect($balances)->sum('debit');
+        $totalCredit = collect($balances)->sum('credit');
+
+        if (isset($this->command)) {
+            $this->command->newLine();
+            $this->command->info("Seeding opening balances for a healthy company...");
+            $this->command->info("Total Debits: \$" . number_format($totalDebit, 2));
+            $this->command->info("Total Credits: \$" . number_format($totalCredit, 2));
+        }
+
+        if (abs($totalDebit - $totalCredit) > 0.01) {
+            if (isset($this->command)) {
+                $this->command->error("Opening balances do not balance! Debits: \$" . $totalDebit . " Credits: \$" . $totalCredit);
+            }
+            return;
+        }
+
+        $transactions = [];
+        foreach ($balances as $code => $data) {
+            $account = Account::where('tenant_id', $tenantId)->where('code', $code)->first();
+            if (!$account) {
+                if (isset($this->command)) {
+                    $this->command->warn("Account {$code} not found, skipping opening balance.");
+                }
+                continue;
+            }
+
+            $type = $data['debit'] > 0 ? 'debit' : 'credit';
+            $amount = $data['debit'] > 0 ? $data['debit'] : $data['credit'];
+
+            OpeningBalance::updateOrCreate(
+                ['account_id' => $account->id, 'balance_date' => $balanceDate, 'tenant_id' => $tenantId],
+                [
+                    'debit_amount' => $data['debit'],
+                    'credit_amount' => $data['credit'],
+                    'balance' => $data['debit'] - $data['credit'],
+                    'notes' => 'Opening balance seeded for ' . $data['name'],
+                ]
+            );
+
+            $transactions[] = [
+                'account_code' => $account->code,
+                'type' => $type,
+                'amount' => $amount,
+            ];
+
+            if (isset($this->command)) {
+                $this->command->info("  {$data['name']}: \${$data['debit']} / \${$data['credit']}");
+            }
+        }
+
+        // Create Journal Entry with Transactions so Trial Balance reports can see opening balances
+        if (!empty($transactions)) {
+            $accountingService = app(AccountingService::class);
+            $accountingService->createOpeningBalanceEntry(
+                Carbon::parse($balanceDate),
+                $transactions
+            );
+            if (isset($this->command)) {
+                $this->command->info("Opening balance journal entry created with " . count($transactions) . " transactions.");
+            }
+        }
+
+        if (isset($this->command)) {
+            $this->command->info("Opening balances seeded successfully!");
         }
     }
 

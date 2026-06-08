@@ -6,7 +6,6 @@ use Illuminate\Database\Seeder;
 use App\Models\Supplier;
 use App\Models\User;
 use App\Models\SupplierInteraction;
-use Illuminate\Support\Facades\Schema;
 
 class SupplierInteractionSeeder extends Seeder
 {
@@ -19,9 +18,10 @@ class SupplierInteractionSeeder extends Seeder
     {
         $tenantId = app('currentTenant')->id;
 
-        Schema::disableForeignKeyConstraints();
-        SupplierInteraction::where('tenant_id', $tenantId)->delete();
-        Schema::enableForeignKeyConstraints();
+        if (SupplierInteraction::where('tenant_id', $tenantId)->count() > 0) {
+            $this->command->info("Supplier interactions already exist for tenant " . app('currentTenant')->name . ". Skipping.");
+            return;
+        }
 
         $suppliers = Supplier::where('tenant_id', $tenantId)->get();
         $user = User::where('tenant_id', $tenantId)->first(); // Get the first user for the tenant

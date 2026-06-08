@@ -13,8 +13,6 @@ use App\Models\ProductWarehouse;
 use App\Services\AccountingService;
 use Carbon\Carbon;
 
-use Illuminate\Support\Facades\Schema;
-
 class SalesSeeder extends Seeder
 {
     protected $accountingService;
@@ -33,12 +31,11 @@ class SalesSeeder extends Seeder
     {
         $tenantId = app('currentTenant')->id;
 
-        Schema::disableForeignKeyConstraints();
-        Sales::where('tenant_id', $tenantId)->delete();
-        // We can't truncate SalesItem directly without a tenant_id, so we'll delete them based on the sales of the current tenant
-        $salesIds = Sales::where('tenant_id', $tenantId)->pluck('id');
-        SalesItem::whereIn('sales_id', $salesIds)->delete();
-        Schema::enableForeignKeyConstraints();
+        $existingSales = Sales::where('tenant_id', $tenantId)->count();
+        if ($existingSales > 0) {
+            $this->command->info("Sales already exist for tenant " . app('currentTenant')->name . ". Skipping to preserve existing data.");
+            return;
+        }
 
         $customers = Customer::where('tenant_id', $tenantId)->get();
         $users = User::where('tenant_id', $tenantId)->get();
@@ -54,11 +51,11 @@ class SalesSeeder extends Seeder
         $this->command->info("Seeding Sales data for tenant: " . app('currentTenant')->name);
         $this->command->info("Available: {$customers->count()} customers, {$users->count()} users, {$products->count()} products, " . count($warehouseIds) . " warehouses");
 
-        for ($i = 0; $i < 100; $i++) { // Create 100 sample sales
+        for ($i = 0; $i < 50; $i++) { // Create 50 sample sales
             $customer = $customers->random();
             $user = $users->random();
             $warehouseId = collect($warehouseIds)->random(); // Pick a warehouse
-            $orderDate = Carbon::now()->subMonths(rand(0, 11))->subDays(rand(0, 29));
+            $orderDate = Carbon::now()->subDays(rand(0, 59));
             $dueDate = $orderDate->copy()->addDays(rand(7, 30));
             $paymentType = collect(['Cash', 'Card', 'Transfer', 'eWallet', '-'])->random();
             $status = collect(['Unpaid', 'Paid', 'Partial'])->random();
@@ -116,32 +113,39 @@ class SalesSeeder extends Seeder
                     ];
                 }
 
-                // Apply discount for calculation purposes
+                // Apply discount
                 $discountAmount = 0;
                 if ($sales->order_discount_type === 'percentage') {
                     $discountAmount = ($totalSalesAmount * $sales->order_discount) / 100;
                 } else {
                     $discountAmount = $sales->order_discount;
                 }
-                $currentTotalAfterDiscount = $totalSalesAmount - $discountAmount;
+                $netSales = $totalSalesAmount - $discountAmount;
 
-                // Apply tax for calculation purposes
-                $currentTotalTaxAmount = ($currentTotalAfterDiscount * $sales->tax_rate) / 100;
-                $finalCalculatedTotal = $currentTotalAfterDiscount + $currentTotalTaxAmount;
+                // Apply tax (tax-exclusive: added on top)
+                $totalTaxAmount = ($netSales * $sales->tax_rate) / 100;
+                $grandTotal = $netSales + $totalTaxAmount;
 
                 $attempts++;
-            } while (($finalCalculatedTotal < 100 || $finalCalculatedTotal > 10000) && $attempts < $maxAttempts);
+            } while (($grandTotal < 100 || $grandTotal > 10000 || $netSales < $totalCostOfGoods) && $attempts < $maxAttempts);
 
-            // If after maxAttempts, still not in range, adjust to be within range
-            if ($finalCalculatedTotal < 100) {
-                $finalCalculatedTotal = rand(100, 1000);
-            } elseif ($finalCalculatedTotal > 10000) {
-                $finalCalculatedTotal = rand(8000, 10000);
+            // If after maxAttempts totals are still out of range, rescale proportionally
+            if ($grandTotal < 100) {
+                $scaleFactor = rand(100, 1000) / $grandTotal;
+                $netSales *= $scaleFactor;
+                $totalCostOfGoods *= $scaleFactor;
+                $totalTaxAmount = ($netSales * $sales->tax_rate) / 100;
+                $grandTotal = $netSales + $totalTaxAmount;
+            } elseif ($grandTotal > 10000) {
+                $scaleFactor = rand(8000, 10000) / $grandTotal;
+                $netSales *= $scaleFactor;
+                $totalCostOfGoods *= $scaleFactor;
+                $totalTaxAmount = ($netSales * $sales->tax_rate) / 100;
+                $grandTotal = $netSales + $totalTaxAmount;
             }
 
-            // Recalculate total_tax based on the adjusted final total (simplified for seeding)
-            $totalTaxAmount = ($finalCalculatedTotal * $sales->tax_rate) / (100 + $sales->tax_rate); // Reverse calculate tax
-            $totalSalesAmount = $finalCalculatedTotal - $totalTaxAmount;
+            $finalCalculatedTotal = $grandTotal;
+            $totalSalesAmount = $netSales;
 
             foreach ($salesItemsData as $itemData) {
                 SalesItem::create(array_merge(['sales_id' => $sales->id], $itemData));
@@ -246,6 +250,6 @@ class SalesSeeder extends Seeder
         }
         
         $this->command->info("Sales seeding completed successfully!");
-        $this->command->info("Created 100 sales invoices with items, payments, and journal entries.");
+        $this->command->info("Created 50 sales invoices with items, payments, and journal entries.");
     }
 }

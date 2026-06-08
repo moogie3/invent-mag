@@ -61,8 +61,8 @@ class ManualJournalEntrySeeder extends Seeder
             'Office Supplies Purchase',
             Carbon::now()->subDays(5),
             [
-                ['account_id' => $expenseAccount->id, 'type' => 'debit', 'amount' => 250000],
-                ['account_id' => $cashAccount->id, 'type' => 'credit', 'amount' => 250000],
+                ['account_id' => $expenseAccount->id, 'type' => 'debit', 'amount' => 250],
+                ['account_id' => $cashAccount->id, 'type' => 'credit', 'amount' => 250],
             ],
             'Purchase of stationery and office supplies',
             false // draft
@@ -70,7 +70,7 @@ class ManualJournalEntrySeeder extends Seeder
 
         // Draft Entry 2: Utility accrual
         $utilityAccount = Account::where('tenant_id', $tenantId)
-            ->where('code', 'like', '5230-%')
+            ->where('code', 'like', '6230-%')
             ->first();
         
         if ($utilityAccount) {
@@ -78,8 +78,8 @@ class ManualJournalEntrySeeder extends Seeder
                 'Utility Expense Accrual',
                 Carbon::now()->subDays(3),
                 [
-                    ['account_id' => $utilityAccount->id, 'type' => 'debit', 'amount' => 500000],
-                    ['account_id' => $cashAccount->id, 'type' => 'credit', 'amount' => 500000],
+                    ['account_id' => $utilityAccount->id, 'type' => 'debit', 'amount' => 500],
+                    ['account_id' => $cashAccount->id, 'type' => 'credit', 'amount' => 500],
                 ],
                 'Monthly electricity and water bill accrual',
                 false // draft
@@ -101,8 +101,8 @@ class ManualJournalEntrySeeder extends Seeder
                 'Monthly Rent Payment',
                 Carbon::now()->subDays(10),
                 [
-                    ['account_id' => $rentAccount->id, 'type' => 'debit', 'amount' => 5000000],
-                    ['account_id' => $cashAccount->id, 'type' => 'credit', 'amount' => 5000000],
+                    ['account_id' => $rentAccount->id, 'type' => 'debit', 'amount' => 5000],
+                    ['account_id' => $cashAccount->id, 'type' => 'credit', 'amount' => 5000],
                 ],
                 'Office space rental for February 2026',
                 true // auto-post
@@ -115,8 +115,8 @@ class ManualJournalEntrySeeder extends Seeder
                 'Sales Revenue - Invoice #001',
                 Carbon::now()->subDays(7),
                 [
-                    ['account_id' => $arAccount->id, 'type' => 'debit', 'amount' => 15000000],
-                    ['account_id' => $revenueAccount->id, 'type' => 'credit', 'amount' => 15000000],
+                    ['account_id' => $arAccount->id, 'type' => 'debit', 'amount' => 15000],
+                    ['account_id' => $revenueAccount->id, 'type' => 'credit', 'amount' => 15000],
                 ],
                 'Product sales to customer on credit',
                 true // auto-post
@@ -128,7 +128,7 @@ class ManualJournalEntrySeeder extends Seeder
             ->where('code', 'like', '6210-%')
             ->first();
         $salaryPayable = Account::where('tenant_id', $tenantId)
-            ->where('code', 'like', '2110-%')
+            ->where('code', 'like', '2140-%')
             ->first();
         
         if ($salaryAccount && $salaryPayable) {
@@ -136,8 +136,8 @@ class ManualJournalEntrySeeder extends Seeder
                 'Monthly Salary Accrual',
                 Carbon::now()->subDays(2),
                 [
-                    ['account_id' => $salaryAccount->id, 'type' => 'debit', 'amount' => 25000000],
-                    ['account_id' => $salaryPayable->id, 'type' => 'credit', 'amount' => 25000000],
+                    ['account_id' => $salaryAccount->id, 'type' => 'debit', 'amount' => 9500],
+                    ['account_id' => $salaryPayable->id, 'type' => 'credit', 'amount' => 9500],
                 ],
                 'Employee salaries for February 2026',
                 true // auto-post
@@ -154,8 +154,8 @@ class ManualJournalEntrySeeder extends Seeder
             'Erroneous Entry - To Be Voided',
             Carbon::now()->subDays(1),
             [
-                ['account_id' => $expenseAccount->id, 'type' => 'debit', 'amount' => 1000000],
-                ['account_id' => $cashAccount->id, 'type' => 'credit', 'amount' => 1000000],
+                ['account_id' => $expenseAccount->id, 'type' => 'debit', 'amount' => 1000],
+                ['account_id' => $cashAccount->id, 'type' => 'credit', 'amount' => 1000],
             ],
             'This entry will be voided as an example',
             true // auto-post

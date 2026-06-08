@@ -12,7 +12,6 @@ use App\Models\PurchaseReturnItem;
 use App\Services\AccountingService;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Schema;
 
 class PurchaseReturnSeeder extends Seeder
 {
@@ -32,11 +31,11 @@ class PurchaseReturnSeeder extends Seeder
     {
         $tenantId = app('currentTenant')->id;
 
-        Schema::disableForeignKeyConstraints();
-        PurchaseReturn::where('tenant_id', $tenantId)->delete();
-        $purchaseReturnIds = PurchaseReturn::where('tenant_id', $tenantId)->pluck('id');
-        PurchaseReturnItem::whereIn('purchase_return_id', $purchaseReturnIds)->delete();
-        Schema::enableForeignKeyConstraints();
+        $existingReturns = PurchaseReturn::where('tenant_id', $tenantId)->count();
+        if ($existingReturns > 0) {
+            $this->command->info("Purchase returns already exist for tenant " . app('currentTenant')->name . ". Skipping to preserve existing data.");
+            return;
+        }
 
         $users = User::where('tenant_id', $tenantId)->get();
         $purchases = Purchase::where('tenant_id', $tenantId)->has('items')->get(); // Only purchases with items

@@ -29,14 +29,30 @@ class StockAdjustmentSeeder extends Seeder
             return;
         }
 
-        $this->command->info("Seeding Initial Stock Adjustments for tenant: " . app('currentTenant')->name);
+        $this->command->info("Seeding Initial Stock for tenant: " . app('currentTenant')->name);
+
+        // Get IDs of products that already have stock (e.g. from ProductSeeder) to avoid double-stocking
+        $productsWithExistingStock = ProductWarehouse::where('tenant_id', $tenantId)
+            ->where('quantity', '>', 0)
+            ->pluck('product_id')
+            ->toArray();
+
+        $products = $products->reject(fn ($p) => in_array($p->id, $productsWithExistingStock));
         $totalProducts = $products->count();
+
+        if ($totalProducts === 0) {
+            $this->command->info("All products already have stock. Skipping stock adjustment seeding.");
+            return;
+        }
+
+        $totalValue = 0;
         $this->command->getOutput()->progressStart($totalProducts);
 
         foreach ($products as $product) {
             $warehouse = $warehouses->random();
-            
-            // Get current stock from pivot or init at 0
+            $initialQty = rand(100, 500);
+            $totalValue += $initialQty * ($product->price ?? 0);
+
             $stockRecord = ProductWarehouse::firstOrCreate(
                 ['product_id' => $product->id, 'warehouse_id' => $warehouse->id, 'tenant_id' => $tenantId],
                 ['quantity' => 0]
@@ -44,23 +60,24 @@ class StockAdjustmentSeeder extends Seeder
 
             StockAdjustment::create([
                 'product_id' => $product->id,
-                'warehouse_id' => $warehouse->id, // Added
+                'warehouse_id' => $warehouse->id,
                 'adjustment_type' => 'increase',
                 'quantity_before' => $stockRecord->quantity,
-                'quantity_after' => $stockRecord->quantity + 10,
-                'adjustment_amount' => 10,
+                'quantity_after' => $stockRecord->quantity + $initialQty,
+                'adjustment_amount' => $initialQty,
                 'reason' => 'Initial stock adjustment',
                 'adjusted_by' => $users->random()->id,
                 'tenant_id' => $tenantId,
             ]);
-            
-            $stockRecord->increment('quantity', 10);
-            
+
+            $stockRecord->increment('quantity', $initialQty);
+
             $this->command->getOutput()->progressAdvance();
         }
-        
+
         $this->command->getOutput()->progressFinish();
-        $this->command->info("Stock Adjustment seeding completed!");
-        $this->command->info("Created initial stock increase records for {$totalProducts} products (+10 qty each).");
+
+        $this->command->info("Stock seeding completed!");
+        $this->command->info("Created initial stock records for {$totalProducts} products (100-500 qty each). Total value: \$" . number_format($totalValue, 2));
     }
 }

@@ -164,9 +164,12 @@ class ActivityLogSeeder extends Seeder
             $action = collect($actionsForModule)->random();
             $daysAgo = rand(0, 30);
             $hoursAgo = rand(0, 23);
-            
+
             $description = $descriptions[$module][$action] ?? "{$action} {$module}";
-            
+
+            // Normalize module name to a valid class name (remove spaces)
+            $entityType = "App\\Models\\" . str_replace(' ', '', $module);
+
             ActivityLog::create([
                 'tenant_id'    => $tenantId,
                 'user_id'      => $user->id,
@@ -174,7 +177,7 @@ class ActivityLogSeeder extends Seeder
                 'user_role'    => $user->getRoleNames()->first() ?? 'staff',
                 'module'       => $module,
                 'action'       => $action,
-                'entity_type'  => "App\\Models\\{$module}",
+                'entity_type'  => $entityType,
                 'entity_id'    => rand(1, 100),
                 'entity_label' => "Sample {$module} " . rand(1, 100),
                 'description'  => $description,

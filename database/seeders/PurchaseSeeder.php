@@ -42,10 +42,10 @@ class PurchaseSeeder extends Seeder
         $this->command->info("Seeding Purchase Orders for tenant: " . app('currentTenant')->name);
         $this->command->info("Available: {$suppliers->count()} suppliers, {$products->count()} products, " . count($warehouseIds) . " warehouses");
 
-        for ($i = 0; $i < 100; $i++) {
+        for ($i = 0; $i < 50; $i++) {
             $supplier = $suppliers->random();
             $warehouseId = collect($warehouseIds)->random();
-            $orderDate = Carbon::now()->subDays(rand(0, 29));
+            $orderDate = Carbon::now()->subDays(rand(0, 59));
             $dueDate = $orderDate->copy()->addDays(rand(7, 30));
             $paymentType = collect(['Cash', 'Transfer', '-'])->random();
             $status = collect(['Unpaid', 'Paid', 'Partial'])->random();
@@ -90,11 +90,21 @@ class PurchaseSeeder extends Seeder
                 $attempts++;
             } while (($totalPurchaseAmount < 100 || $totalPurchaseAmount > 10000) && $attempts < $maxAttempts);
 
-            // If after maxAttempts, still not in range, adjust to be within range
+            // If after maxAttempts totals are still out of range, rescale proportionally
             if ($totalPurchaseAmount < 100) {
-                $totalPurchaseAmount = rand(100, 1000);
+                $scaleFactor = rand(100, 1000) / $totalPurchaseAmount;
+                foreach ($poItemsData as &$item) {
+                    $item['total'] = round($item['total'] * $scaleFactor);
+                }
+                unset($item);
+                $totalPurchaseAmount = array_sum(array_column($poItemsData, 'total'));
             } elseif ($totalPurchaseAmount > 10000) {
-                $totalPurchaseAmount = rand(8000, 10000);
+                $scaleFactor = rand(8000, 10000) / $totalPurchaseAmount;
+                foreach ($poItemsData as &$item) {
+                    $item['total'] = round($item['total'] * $scaleFactor);
+                }
+                unset($item);
+                $totalPurchaseAmount = array_sum(array_column($poItemsData, 'total'));
             }
 
             foreach ($poItemsData as $itemData) {
@@ -186,6 +196,6 @@ class PurchaseSeeder extends Seeder
         }
         
         $this->command->info("Purchase Orders seeding completed successfully!");
-        $this->command->info("Created 100 purchase orders with items, payments, and journal entries.");
+        $this->command->info("Created 50 purchase orders with items, payments, and journal entries.");
     }
 }

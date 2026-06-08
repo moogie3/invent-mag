@@ -6,6 +6,7 @@ use Illuminate\Database\Seeder;
 use App\Models\Product;
 use App\Models\ProductWarehouse;
 use App\Models\StockAdjustment;
+use App\Models\User;
 use App\Models\Warehouse;
 use Illuminate\Support\Facades\DB;
 
@@ -19,6 +20,9 @@ class StockTransferSeeder extends Seeder
     public function run()
     {
         $tenantId = app('currentTenant')->id;
+
+        $systemUser = User::where('tenant_id', $tenantId)->first();
+        $systemUserId = $systemUser ? $systemUser->id : 1;
 
         $warehouses = Warehouse::where('tenant_id', $tenantId)->get();
         
@@ -127,7 +131,7 @@ class StockTransferSeeder extends Seeder
                     'quantity_after' => $fromQty - $quantity,
                     'adjustment_amount' => $quantity,
                     'reason' => collect($transferReasons)->random() . " (to {$toWarehouse->name})",
-                    'adjusted_by' => 1, // System user
+                    'adjusted_by' => $systemUserId,
                     'tenant_id' => $tenantId,
                 ]);
 
@@ -139,7 +143,7 @@ class StockTransferSeeder extends Seeder
                     'quantity_after' => $toQty + $quantity,
                     'adjustment_amount' => $quantity,
                     'reason' => collect($transferReasons)->random() . " (from {$fromWarehouse->name})",
-                    'adjusted_by' => 1, // System user
+                    'adjusted_by' => $systemUserId,
                     'tenant_id' => $tenantId,
                 ]);
             });

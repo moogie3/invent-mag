@@ -13,7 +13,6 @@ use App\Models\SalesReturnItem;
 use App\Services\AccountingService;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Schema;
 
 class SalesReturnSeeder extends Seeder
 {
@@ -33,11 +32,11 @@ class SalesReturnSeeder extends Seeder
     {
         $tenantId = app('currentTenant')->id;
 
-        Schema::disableForeignKeyConstraints();
-        SalesReturn::where('tenant_id', $tenantId)->delete();
-        $salesReturnIds = SalesReturn::where('tenant_id', $tenantId)->pluck('id');
-        SalesReturnItem::whereIn('sales_return_id', $salesReturnIds)->delete();
-        Schema::enableForeignKeyConstraints();
+        $existingReturns = SalesReturn::where('tenant_id', $tenantId)->count();
+        if ($existingReturns > 0) {
+            $this->command->info("Sales returns already exist for tenant " . app('currentTenant')->name . ". Skipping to preserve existing data.");
+            return;
+        }
 
         $users = User::where('tenant_id', $tenantId)->get();
         $sales = Sales::where('tenant_id', $tenantId)->has('salesItems')->get(); // Only sales with items

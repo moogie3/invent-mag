@@ -17,7 +17,7 @@ return new class extends Migration
             $table->decimal('balance', 15, 2)->default(0);
             $table->date('balance_date');
             $table->text('notes')->nullable();
-            $table->unsignedBigInteger('created_by');
+            $table->unsignedBigInteger('created_by')->nullable();
             $table->timestamps();
 
             $table->unique(['tenant_id', 'account_id', 'balance_date']);

@@ -20,6 +20,7 @@ use App\Services\SalesReturnService;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Str;
 
 class CreditFeatureSeeder extends Seeder
 {
@@ -94,10 +95,13 @@ class CreditFeatureSeeder extends Seeder
         $this->command->info('');
         $this->command->info('STEP 1: Creating PAID sales invoice with return...');
 
+        $this->ensureStock($product1->id, $warehouse->id, $tenantId, 50);
+        $this->ensureStock($product2->id, $warehouse->id, $tenantId, 50);
+
         $orderDate = Carbon::now()->subDays(10);
         $dueDate = $orderDate->copy()->addDays(30);
 
-        $invoiceNumber = 'INV/CR/TEST/' . $tenantId . '/' . date('YmdHis') . rand(100, 999);
+        $invoiceNumber = 'INV/CR/TEST/' . $tenantId . '/' . Str::random(12);
         
         $qty1 = 5;
         $price1 = $product1->selling_price;
@@ -132,9 +136,6 @@ class CreditFeatureSeeder extends Seeder
 
         $sale = $this->salesService->createSale($salesData);
 
-        $this->updateStock($product1->id, $warehouse->id, $tenantId, -$qty1);
-        $this->updateStock($product2->id, $warehouse->id, $tenantId, -$qty2);
-
         $sale->payments()->create([
             'amount' => $grandTotal,
             'payment_date' => $orderDate->copy()->addDays(2),
@@ -166,7 +167,6 @@ class CreditFeatureSeeder extends Seeder
         ];
 
         $salesReturn = $this->salesReturnService->createSalesReturn($returnData);
-        $this->updateStock($product1->id, $warehouse->id, $tenantId, $returnQty);
 
         $this->command->info("Created return #{$salesReturn->id}");
         $this->command->info("Return amount: Rp " . number_format($returnTotal, 0, ',', '.'));
@@ -189,8 +189,10 @@ class CreditFeatureSeeder extends Seeder
         $this->command->info('');
         $this->command->info('STEP 2: Creating second PAID invoice with return...');
 
+        $this->ensureStock($product1->id, $warehouse->id, $tenantId, 50);
+
         $orderDate2 = Carbon::now()->subDays(3);
-        $invoiceNumber2 = 'INV/CR/TEST/' . $tenantId . '/' . date('YmdHis') . rand(100, 999);
+        $invoiceNumber2 = 'INV/CR/TEST/' . $tenantId . '/' . Str::random(12);
         
         $qty3 = 4;
         $price3 = $product1->selling_price;
@@ -218,7 +220,6 @@ class CreditFeatureSeeder extends Seeder
         ];
 
         $sale2 = $this->salesService->createSale($salesData2);
-        $this->updateStock($product1->id, $warehouse->id, $tenantId, -$qty3);
 
         $sale2->payments()->create([
             'amount' => $grandTotal2,
@@ -244,7 +245,6 @@ class CreditFeatureSeeder extends Seeder
         ];
 
         $salesReturn2 = $this->salesReturnService->createSalesReturn($returnData2);
-        $this->updateStock($product1->id, $warehouse->id, $tenantId, $returnQty2);
 
         $this->command->info("Created second return #{$salesReturn2->id}");
         $this->command->info("Second credit amount: Rp " . number_format($returnTotal2, 0, ',', '.'));
@@ -258,7 +258,7 @@ class CreditFeatureSeeder extends Seeder
         $this->command->info("Total available credits: Rp " . number_format($totalAvailable, 0, ',', '.'));
 
         $orderDate3 = Carbon::now();
-        $invoiceNumber3 = 'INV/CR/TEST/' . $tenantId . '/' . date('YmdHis') . rand(100, 999);
+        $invoiceNumber3 = 'INV/CR/TEST/' . $tenantId . '/' . Str::random(12);
         
         $creditToUse = min($totalAvailable, 50000); // Use credit up to 50k or available amount
         
@@ -272,6 +272,8 @@ class CreditFeatureSeeder extends Seeder
 
         $this->command->info("Order subtotal: Rp " . number_format($grandTotal3, 0, ',', '.'));
         $this->command->info("Credit to apply: Rp " . number_format($creditToUse, 0, ',', '.'));
+
+        $this->ensureStock($product2->id, $warehouse->id, $tenantId, 50);
 
         $salesData3 = [
             'invoice' => $invoiceNumber3,
@@ -292,7 +294,6 @@ class CreditFeatureSeeder extends Seeder
         ];
 
         $sale3 = $this->salesService->createSale($salesData3);
-        $this->updateStock($product2->id, $warehouse->id, $tenantId, -$qty4);
 
         $sale3->refresh();
 
@@ -348,22 +349,26 @@ class CreditFeatureSeeder extends Seeder
         $this->command->info('Cleaned up previous test data for customer: ' . $customer->name);
     }
 
-    protected function updateStock($productId, $warehouseId, $tenantId, $quantity)
+    protected function ensureStock($productId, $warehouseId, $tenantId, $minimum)
     {
         $stock = ProductWarehouse::where('product_id', $productId)
             ->where('warehouse_id', $warehouseId)
             ->where('tenant_id', $tenantId)
             ->first();
 
-        if ($stock) {
-            $stock->increment('quantity', $quantity);
-        } else {
-            ProductWarehouse::create([
-                'product_id' => $productId,
-                'warehouse_id' => $warehouseId,
-                'quantity' => $quantity,
-                'tenant_id' => $tenantId,
-            ]);
+        $current = $stock ? $stock->quantity : 0;
+        if ($current < $minimum) {
+            $additional = $minimum - $current;
+            if ($stock) {
+                $stock->increment('quantity', $additional);
+            } else {
+                ProductWarehouse::create([
+                    'product_id' => $productId,
+                    'warehouse_id' => $warehouseId,
+                    'quantity' => $additional,
+                    'tenant_id' => $tenantId,
+                ]);
+            }
         }
     }
 }

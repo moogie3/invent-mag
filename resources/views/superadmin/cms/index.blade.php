@@ -15,13 +15,6 @@
     </div>
     <div class="page-body">
         <div class="container-xl">
-            @if(session('success'))
-            <div class="alert alert-success alert-dismissible mb-3" role="alert">
-                <i class="ti ti-circle-check me-2"></i>{{ session('success') }}
-                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-            </div>
-            @endif
-
             <div class="row g-3 mb-4">
                 <div class="col-md-4">
                     <div class="card shadow border-0 rounded-3 card-hover h-100 text-center p-3">

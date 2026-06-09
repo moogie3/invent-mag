@@ -78,11 +78,18 @@
     </div>
     @include('admin.layouts.partials.session-notifications')
 
+    <button id="theme-toggle-button" class="btn btn-icon theme-toggle-button"
+        style="position: absolute; top: 1rem; right: 1rem;">
+        <i class="ti ti-moon" id="theme-icon"></i>
+    </button>
+
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"
         integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"
         nonce="{{ $cspNonce ?? '' }}"></script>
     <script src="{{ asset('tabler/dist/js/tabler.min.js?1692870487') }}" nonce="{{ $cspNonce ?? '' }}"></script>
     <script src="{{ asset('tabler/dist/js/demo.min.js?1692870487') }}" nonce="{{ $cspNonce ?? '' }}"></script>
+
+    @vite('resources/js/admin/layouts/theme-toggle.js')
 </body>
 
 </html>

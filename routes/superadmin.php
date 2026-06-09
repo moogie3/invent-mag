@@ -58,6 +58,9 @@ Route::middleware('auth:super_admin')->group(function () {
     // System Settings
     Route::get('/settings', [SettingController::class, 'index'])->name('superadmin.settings.index');
     Route::post('/settings', [SettingController::class, 'update'])->name('superadmin.settings.update');
+    Route::get('/settings/preferences', [SettingController::class, 'preferences'])->name('superadmin.settings.preferences');
+    Route::post('/settings/preferences', [SettingController::class, 'updatePreferences'])->name('superadmin.settings.preferences.update');
+    Route::post('/settings/update-theme-mode', [SettingController::class, 'updateThemeMode'])->name('superadmin.settings.update-theme-mode');
 
     // Features
     Route::get('/features', [FeatureController::class, 'index'])->name('superadmin.features.index');

@@ -15,6 +15,17 @@ document.addEventListener("turbo:load", function () {
     syncActiveState();
 });
 
+// Fallback for contexts without Turbo (e.g. superadmin)
+if (document.readyState === "complete" || document.readyState === "interactive") {
+    initSidebar();
+    syncActiveState();
+} else {
+    document.addEventListener("DOMContentLoaded", function () {
+        initSidebar();
+        syncActiveState();
+    });
+}
+
 function syncActiveState() {
     const currentPath = window.location.pathname;
     const sidebar = document.querySelector(".sidebar");
@@ -176,6 +187,15 @@ function initSidebar() {
                 tooltipManager.create(link, titleElement.textContent.trim());
             }
         });
+
+        // Also add tooltips to sidebar footer buttons using their title attribute
+        const footerBtns = sidebar.querySelectorAll(".sidebar-footer-btn");
+        footerBtns.forEach((btn) => {
+            const title = btn.getAttribute("title");
+            if (title) {
+                tooltipManager.create(btn, title);
+            }
+        });
     };
 
     // Enhanced sidebar toggle with fast closing, smooth opening
@@ -208,8 +228,8 @@ function initSidebar() {
                 sidebar.classList.add("collapsed");
                 mainContent.classList.add("sidebar-collapsed");
                 body.classList.remove("sidebar-open");
-                // Only add tooltips if the setting is enabled
-                if (window.userSettings && window.userSettings.show_tooltips) {
+                // Only add tooltips if the setting is enabled (default: enabled when unset)
+                if (!window.userSettings || window.userSettings.show_tooltips) {
                     addTooltips();
                 }
             }, 50);
@@ -282,8 +302,8 @@ function initSidebar() {
             }, index * 80);
         });
 
-        // Add tooltips if sidebar is collapsed AND the setting is enabled
-        if (shouldBeCollapsed && window.userSettings && window.userSettings.show_tooltips) {
+        // Add tooltips if sidebar is collapsed AND the setting is enabled (default: enabled when unset)
+        if (shouldBeCollapsed && (!window.userSettings || window.userSettings.show_tooltips)) {
             setTimeout(addTooltips, navItems.length * 40 + 100);
         }
 

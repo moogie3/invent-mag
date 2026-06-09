@@ -17,7 +17,7 @@ class TenantLookupControllerTest extends TestCase
             'domain' => 'existing-shop.localhost',
         ]);
 
-        $response = $this->postJson('/api/lookup-tenant', [
+        $response = $this->postJson('/lookup-tenant', [
             'shopname' => 'Existing Shop',
         ]);
 
@@ -29,7 +29,7 @@ class TenantLookupControllerTest extends TestCase
 
     public function test_lookup_returns_404_for_non_existent_tenant()
     {
-        $response = $this->postJson('/api/lookup-tenant', [
+        $response = $this->postJson('/lookup-tenant', [
             'shopname' => 'Non Existent Shop',
         ]);
 
@@ -41,7 +41,7 @@ class TenantLookupControllerTest extends TestCase
 
     public function test_lookup_requires_shopname()
     {
-        $response = $this->postJson('/api/lookup-tenant', []);
+        $response = $this->postJson('/lookup-tenant', []);
 
         $response->assertStatus(422);
         $response->assertJsonValidationErrors(['shopname']);

@@ -45,8 +45,14 @@ onPageLoad(() => {
             return;
         }
 
-        fetch('/admin/settings/update-theme-mode', {
-            method: 'PUT',
+        const isSuperAdmin = window.location.hostname.startsWith('super.');
+        const themeUrl = isSuperAdmin
+            ? '/settings/update-theme-mode'
+            : '/admin/settings/update-theme-mode';
+        const themeMethod = isSuperAdmin ? 'POST' : 'PUT';
+
+        fetch(themeUrl, {
+            method: themeMethod,
             headers: {
                 'Content-Type': 'application/json',
                 'X-CSRF-TOKEN': csrfTokenMeta.getAttribute('content')

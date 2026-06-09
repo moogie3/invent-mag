@@ -64,6 +64,7 @@ export default defineConfig({
                 "resources/js/admin/notifications.js",
                 "resources/js/admin/stock-opname.js",
                 "resources/js/admin/layouts/legacy-inline-scripts.js",
+                "resources/js/superadmin/layouts/notifications.js",
                 "resources/css/app.css",
                 "resources/css/auth.css",
                 "resources/css/navbar.css",

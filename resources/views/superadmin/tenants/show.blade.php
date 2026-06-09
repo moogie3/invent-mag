@@ -21,18 +21,6 @@
     </div>
     <div class="page-body">
         <div class="container-xl">
-            @if(session('success'))
-            <div class="alert alert-success alert-dismissible mb-3" role="alert">
-                <i class="ti ti-circle-check me-2"></i>{{ session('success') }}
-                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-            </div>
-            @endif
-            @if(session('error'))
-            <div class="alert alert-danger alert-dismissible mb-3" role="alert">
-                <i class="ti ti-alert-circle me-2"></i>{{ session('error') }}
-                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-            </div>
-            @endif
             <div class="row row-deck row-cards">
                 <div class="col-lg-4">
                     <div class="card shadow border-0 rounded-4 card-hover">

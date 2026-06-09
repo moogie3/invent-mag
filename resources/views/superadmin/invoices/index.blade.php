@@ -15,12 +15,6 @@
     </div>
     <div class="page-body">
         <div class="container-xl">
-            @if(session('success'))
-            <div class="alert alert-success alert-dismissible mb-3" role="alert">
-                <i class="ti ti-circle-check me-2"></i>{{ session('success') }}
-                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-            </div>
-            @endif
             <div class="row row-deck row-cards mb-4">
                 <div class="col-sm-6">
                     <div class="card shadow border-0 rounded-4 stat-card card-hover">

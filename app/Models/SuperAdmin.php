@@ -15,6 +15,7 @@ class SuperAdmin extends Authenticatable
         'name',
         'email',
         'password',
+        'system_settings',
     ];
 
     protected $hidden = [
@@ -27,6 +28,7 @@ class SuperAdmin extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'system_settings' => 'array',
         ];
     }
 }

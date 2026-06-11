@@ -100,6 +100,9 @@
 {{-- SCRIPT FOR TAX settings --}}
 @vite('resources/js/admin/tax.js')
 
+{{-- SCRIPT FOR QUOTATIONS CREATE & EDIT --}}
+@vite('resources/js/admin/quotation.js')
+
 {{-- SCRIPT FOR SALES PIPELINE (SortableJS only loaded when needed) --}}
 @vite('resources/js/admin/sales-pipeline.js')
 

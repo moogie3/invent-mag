@@ -63,6 +63,13 @@ return [
                     'icon' => 'ti ti-arrow-back',
                     'plan_feature' => 'sales_returns',
                 ],
+                [
+                    'title' => 'messages.quotations',
+                    'route' => 'admin.quotations',
+                    'permission' => 'view-quotations',
+                    'icon' => 'ti ti-file-description',
+                    'plan_feature' => 'quotations',
+                ],
             ],
         ],
         [

@@ -150,6 +150,12 @@ class PermissionSeeder extends Seeder
             'create-backup',
             'delete-backup',
             'restore-backup',
+
+            // Quotations
+            'view-quotations',
+            'create-quotations',
+            'edit-quotations',
+            'delete-quotations',
         ];
 
         $this->command->info("Creating " . count($permissions) . " permissions...");
@@ -217,6 +223,7 @@ class PermissionSeeder extends Seeder
             'access-dashboard',
             'view-purchase-returns', 'create-purchase-returns', 'edit-purchase-returns', 'delete-purchase-returns',
             'view-sales-pipeline', 'manage-sales-pipelines', 'manage-pipeline-stages', 'manage-sales-opportunities',
+            'view-quotations', 'create-quotations', 'edit-quotations', 'delete-quotations',
             'view-payments', 'create-payments', 'edit-payments', 'delete-payments',
             'view-customer-interactions', 'create-customer-interactions', 'edit-customer-interactions', 'delete-customer-interactions',
 

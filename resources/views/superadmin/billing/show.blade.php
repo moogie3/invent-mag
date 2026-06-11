@@ -21,6 +21,18 @@
     </div>
     <div class="page-body">
         <div class="container-xl">
+            @if(session('success'))
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                <i class="ti ti-check me-1"></i>{{ session('success') }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+            @endif
+            @if(session('error'))
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                <i class="ti ti-alert-triangle me-1"></i>{{ session('error') }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+            @endif
             <div class="row row-deck row-cards">
                 <div class="col-lg-6">
                     <div class="card shadow border-0 rounded-4">
@@ -43,6 +55,8 @@
                                         <span class="badge bg-warning text-white fs-6">Pending</span>
                                     @elseif($order->status === 'failed')
                                         <span class="badge bg-danger text-white fs-6">Failed</span>
+                                    @elseif($order->status === 'voided')
+                                        <span class="badge bg-secondary text-white fs-6">Voided</span>
                                     @else
                                         <span class="badge bg-secondary text-white fs-6">{{ $order->status }}</span>
                                     @endif
@@ -89,6 +103,19 @@
                         </div>
                         <div class="card-body">
                             <pre class="m-0" style="max-height: 200px; overflow: auto;">{{ json_encode($order->payment_info, JSON_PRETTY_PRINT) }}</pre>
+                        </div>
+                    </div>
+                    @endif
+
+                    @if($order->status !== 'voided')
+                    <div class="card shadow border-0 rounded-4 mt-3">
+                        <div class="card-body">
+                            <form method="POST" action="{{ route('superadmin.billing.void', $order) }}" onsubmit="return confirm('Void order #{{ $order->order_number }} for ${{ number_format($order->amount, 2) }}? This action cannot be undone.')">
+                                @csrf
+                                <button type="submit" class="btn btn-outline-danger w-100">
+                                    <i class="ti ti-ban me-2"></i>Void Order
+                                </button>
+                            </form>
                         </div>
                     </div>
                     @endif

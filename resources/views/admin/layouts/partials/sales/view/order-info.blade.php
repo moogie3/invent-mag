@@ -8,7 +8,7 @@
     </div>
     <div class="d-flex justify-content-between mb-2">
         <div><strong>{{ __('messages.due_date') }}</strong></div>
-        <div>{{ $sales->due_date->format('d F Y') }}</div>
+        <div>{{ $sales->due_date?->format('d F Y') ?? '-' }}</div>
     </div>
     <div class="d-flex justify-content-between mb-2">
         <div><strong>{{ __('messages.payment_type') }}</strong></div>

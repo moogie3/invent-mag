@@ -83,6 +83,7 @@ class PlanSeeder extends Seeder
                     'purchase_returns',
                     'hr',
                     'cash_flow',
+                    'quotations',
                 ],
             ],
             [
@@ -119,6 +120,7 @@ class PlanSeeder extends Seeder
                     'sales_returns',
                     'purchase_returns',
                     'cash_flow',
+                    'quotations',
                     // Enterprise-only features
                     'sales_forecasting',
                     'api_access',

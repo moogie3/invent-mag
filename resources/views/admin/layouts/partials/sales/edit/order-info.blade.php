@@ -15,7 +15,7 @@
             </div>
             <div class="mb-2">
                 <label class="form-label fw-bold">{{ __('messages.due_date') }}</label>
-                <div class="form-control-plaintext">{{ $sales->due_date->format('d F Y') }}</div>
+                <div class="form-control-plaintext">{{ $sales->due_date?->format('d F Y') ?? '-' }}</div>
                 <input type="hidden" name="due_date" value="{{ optional($sales->due_date)->format('Y-m-d') }}">
             </div>
         </div>

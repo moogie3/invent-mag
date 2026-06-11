@@ -110,6 +110,7 @@ class DatabaseSeeder extends Seeder
                 PipelineStageSeeder::class,
                 SalesOpportunitySeeder::class,
                 ManualJournalEntrySeeder::class,
+                QuotationSeeder::class,
                 ActivityLogSeeder::class,
                 CreditFeatureSeeder::class,
                 EmployeeSeeder::class,

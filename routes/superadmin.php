@@ -44,12 +44,19 @@ Route::middleware('auth:super_admin')->group(function () {
 
     // Subscriptions
     Route::get('/subscriptions', [SubscriptionController::class, 'index'])->name('superadmin.subscriptions.index');
+    Route::post('/subscriptions/{tenant}/terminate', [SubscriptionController::class, 'terminate'])->name('superadmin.subscriptions.terminate');
+    Route::post('/subscriptions/{tenant}/reactivate', [SubscriptionController::class, 'reactivate'])->name('superadmin.subscriptions.reactivate');
 
     // Permissions
     Route::get('/permissions', [PermissionController::class, 'index'])->name('superadmin.permissions.index');
 
     // Backups
     Route::get('/backups', [BackupController::class, 'index'])->name('superadmin.backups.index');
+    Route::post('/backups/create', [BackupController::class, 'create'])->name('superadmin.backups.create');
+    Route::post('/backups/create-tenant', [BackupController::class, 'createTenant'])->name('superadmin.backups.create-tenant');
+    Route::post('/backups/restore', [BackupController::class, 'restore'])->name('superadmin.backups.restore');
+    Route::get('/backups/{filename}/download', [BackupController::class, 'download'])->name('superadmin.backups.download');
+    Route::delete('/backups/{filename}', [BackupController::class, 'destroy'])->name('superadmin.backups.destroy');
 
     // Audit Log
     Route::get('/audit-log', [AuditLogController::class, 'index'])->name('superadmin.audit-log.index');
@@ -69,6 +76,7 @@ Route::middleware('auth:super_admin')->group(function () {
     // Billing
     Route::get('/billing', [BillingController::class, 'index'])->name('superadmin.billing.index');
     Route::get('/billing/{order}', [BillingController::class, 'show'])->name('superadmin.billing.show');
+    Route::post('/billing/{order}/void', [BillingController::class, 'void'])->name('superadmin.billing.void');
 
     // Payment Overview
     Route::get('/payment-overview', [PaymentOverviewController::class, 'index'])->name('superadmin.payment-overview.index');

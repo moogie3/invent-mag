@@ -116,7 +116,8 @@ class StockTransferSeeder extends Seeder
                 $toQty, 
                 $quantity, 
                 $transferReasons,
-                $tenantId
+                $tenantId,
+                $systemUserId
             ) {
                 // Update quantities
                 $fromStockRecord->update(['quantity' => $fromQty - $quantity]);

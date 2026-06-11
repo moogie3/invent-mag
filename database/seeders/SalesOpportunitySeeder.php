@@ -40,6 +40,8 @@ class SalesOpportunitySeeder extends Seeder
                 'name' => 'Opportunity ' . ($i + 1),
                 'amount' => rand(1000, 10000),
                 'status' => $status,
+                'notes' => 'Notes for opportunity ' . ($i + 1),
+                'terms_conditions' => 'Standard terms and conditions for opportunity ' . ($i + 1),
                 'tenant_id' => $tenantId,
             ]);
 

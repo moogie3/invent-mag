@@ -7,7 +7,7 @@
             </li>
         @else
             <li class="page-item">
-                <a href="{{ $paginator->previousPageUrl() }}" class="page-link fs-3" rel="prev">«</a>
+                <a href="{{ $paginator->previousPageUrl() }}" class="page-link fs-3" rel="prev" data-turbo="false">«</a>
             </li>
         @endif
 
@@ -30,7 +30,7 @@
         @endphp
 
         @if ($startPage > 1)
-            <li class="page-item"><a href="{{ $paginator->url(1) }}" class="page-link fs-3">1</a></li>
+            <li class="page-item"><a href="{{ $paginator->url(1) }}" class="page-link fs-3" data-turbo="false">1</a></li>
             @if ($startPage > 2)
                 <li class="page-item disabled"><span class="page-link fs-3">...</span></li>
             @endif
@@ -40,7 +40,7 @@
             @if ($page == $currentPage)
                 <li class="page-item active"><span class="page-link fs-3">{{ $page }}</span></li>
             @else
-                <li class="page-item"><a href="{{ $paginator->url($page) }}" class="page-link fs-3">{{ $page }}</a></li>
+                <li class="page-item"><a href="{{ $paginator->url($page) }}" class="page-link fs-3" data-turbo="false">{{ $page }}</a></li>
             @endif
         @endfor
 
@@ -48,13 +48,13 @@
             @if ($endPage < $lastPage - 1)
                 <li class="page-item disabled"><span class="page-link fs-3">...</span></li>
             @endif
-            <li class="page-item"><a href="{{ $paginator->url($lastPage) }}" class="page-link fs-3">{{ $lastPage }}</a></li>
+            <li class="page-item"><a href="{{ $paginator->url($lastPage) }}" class="page-link fs-3" data-turbo="false">{{ $lastPage }}</a></li>
         @endif
 
         {{-- Next Page Link --}}
         @if ($paginator->hasMorePages())
             <li class="page-item">
-                <a href="{{ $paginator->nextPageUrl() }}" class="page-link fs-3" rel="next">»</a>
+                <a href="{{ $paginator->nextPageUrl() }}" class="page-link fs-3" rel="next" data-turbo="false">»</a>
             </li>
         @else
             <li class="page-item disabled">

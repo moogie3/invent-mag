@@ -23,7 +23,7 @@
             <thead class="text-center">
                 <tr>
                     <th class="text-center" style="width: 60px">{{ __('messages.table_no') }}</th>
-                    <th>{{ __('messages.table_product') }}</th>
+                    <th class="text-start">{{ __('messages.table_product') }}</th>
                     <th class="text-center" style="width: 100px">{{ __('messages.table_qty') }}</th>
                     <th class="text-end" style="width: 140px">{{ __('messages.table_price') }}</th>
                     <th class="text-end" style="width: 160px">{{ __('messages.table_discount') }}</th>

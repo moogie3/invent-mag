@@ -138,6 +138,8 @@ class SalesPipelineController extends Controller
             'pipeline_stage_id' => 'required|exists:pipeline_stages,id',
             'name' => 'required|string|max:255',
             'description' => 'nullable|string',
+            'notes' => 'nullable|string',
+            'terms_conditions' => 'nullable|string',
             'expected_close_date' => 'nullable|date',
             'status' => 'required|in:open,won,lost',
             'items' => 'required|array|min:1',
@@ -162,6 +164,8 @@ class SalesPipelineController extends Controller
             'pipeline_stage_id' => 'required|exists:pipeline_stages,id',
             'name' => 'required|string|max:255',
             'description' => 'nullable|string',
+            'notes' => 'nullable|string',
+            'terms_conditions' => 'nullable|string',
             'expected_close_date' => 'nullable|date',
             'status' => 'required|in:open,won,lost',
             'items' => 'required|array',
@@ -213,6 +217,17 @@ class SalesPipelineController extends Controller
             return $this->salesPipelineService->printOpportunity($id);
         } catch (\Exception $e) {
             return back()->with('error', 'Error generating quotation. ' . $e->getMessage());
+        }
+    }
+
+    public function generateQuotation($id)
+    {
+        try {
+            $quotation = $this->salesPipelineService->generateQuotation($id);
+            return redirect()->route('admin.quotations.edit', $quotation->id)
+                ->with('success', 'Quotation generated from opportunity. You can review and send it.');
+        } catch (\Exception $e) {
+            return back()->with('error', 'Error generating quotation: ' . $e->getMessage());
         }
     }
 

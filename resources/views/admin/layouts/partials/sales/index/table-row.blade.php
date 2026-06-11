@@ -7,8 +7,8 @@
     <td class="sort-warehouse">{{ $sale->warehouse->name ?? 'N/A' }}</td>
     <td class="sort-customer">{{ $sale->customer->name }}</td>
     <td class="sort-orderdate">{{ $sale->order_date->format('d F Y') }}</td>
-    <td class="sort-duedate" data-date="{{ $sale->due_date->format('Y-m-d') }}">
-        {{ $sale->due_date->format('d F Y') }}
+    <td class="sort-duedate" data-date="{{ $sale->due_date?->format('Y-m-d') ?? '-' }}">
+        {{ $sale->due_date?->format('d F Y') ?? '-' }}
     </td>
     <td class="sort-tax">
         @if ($sale->tax_rate)

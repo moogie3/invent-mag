@@ -86,7 +86,7 @@
                             @php
                                 $sections = [
                                     'Core Features' => ['products', 'inventory', 'sales', 'purchases', 'invoices', 'dashboard', 'basic_reports', 'customers', 'suppliers', 'pos', 'sales_returns', 'purchase_returns'],
-                                    'Professional Features' => ['stock_opname', 'accounting', 'crm', 'sales_pipeline', 'financial_reports', 'multi_currency', 'hr', 'cash_flow'],
+                                    'Professional Features' => ['stock_opname', 'accounting', 'crm', 'sales_pipeline', 'financial_reports', 'multi_currency', 'hr', 'cash_flow', 'quotations'],
                                     'Enterprise Features' => ['sales_forecasting', 'api_access', 'audit_compliance', 'custom_roles', 'dedicated_support'],
                                 ];
                             @endphp

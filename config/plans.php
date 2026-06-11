@@ -28,6 +28,7 @@ return [
         'purchase_returns'  => 'Purchase Returns',
         'hr'                => 'HR Module (Employees, Attendance & Payroll)',
         'cash_flow'         => 'Cash Flow Statement',
+        'quotations'        => 'Quotations',
 
         'sales_forecasting' => 'Sales Forecasting (Holt-Winters)',
         'api_access'        => 'RESTful API Access',
@@ -86,6 +87,9 @@ return [
         'hr' => [
             'admin.hr.*',
         ],
+        'quotations' => [
+            'admin.quotations.*',
+        ],
     ],
 
     'upgrade_messages' => [
@@ -104,6 +108,7 @@ return [
         'audit_compliance'  => 'Audit Trail & Compliance Logging is available on the Enterprise plan.',
         'custom_roles'      => 'Custom Roles & Permissions management is available on the Enterprise plan.',
         'hr'                => 'The HR Module (Employees, Attendance & Payroll) is available on the Professional plan and above.',
+        'quotations'        => 'Quotations are available on the Professional plan and above.',
     ],
 
 ];

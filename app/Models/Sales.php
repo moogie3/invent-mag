@@ -53,6 +53,8 @@ class Sales extends Model
         'sales_opportunity_id',
         'warehouse_id',
         'customer_credit_used',
+        'notes',
+        'terms_conditions',
     ];
 
     protected $guarded = [

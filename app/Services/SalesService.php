@@ -362,6 +362,8 @@ class SalesService
                 'payment_type' => '-',
                 'type' => Sales::TYPE_REGULAR,
                 'customer_credit_used' => 0,
+                'notes' => $data['notes'] ?? null,
+                'terms_conditions' => $data['terms_conditions'] ?? null,
             ]);
 
             // Apply customer credit if provided
@@ -588,6 +590,8 @@ class SalesService
                 'order_discount' => $orderDiscount,
                 'order_discount_type' => $orderDiscountType,
                 'payment_type' => $data['payment_type'] ?? '-',
+                'notes' => $data['notes'] ?? $sale->notes,
+                'terms_conditions' => $data['terms_conditions'] ?? $sale->terms_conditions,
             ]);
 
             foreach ($products as $productData) {

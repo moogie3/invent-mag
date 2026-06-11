@@ -1,8 +1,8 @@
 # Invent-MAG: Technical Specification Document
 
-**Document Version:** 1.8
+**Document Version:** 1.9
 **Last Updated:** June 2026
-**System Version:** 1.8
+**System Version:** 1.9
 
 ---
 
@@ -18,7 +18,7 @@ Invent-MAG is a production-ready, enterprise-grade ERP system built on Laravel 1
 - **Docker + CI/CD** for modern DevOps practices
 - **Service-oriented architecture** with clean separation of concerns
 - **Turbo Drive (Hotwire)** for SPA-like navigation without a frontend framework
-- **Contextual tutorial system** with 40+ page-specific help modals, sub-topic drill-down navigation, and auto-show on sub-topic clicks
+- **Contextual tutorial system** with 50+ page-specific help modals, sub-topic drill-down navigation, and auto-show on sub-topic clicks
 
 ---
 
@@ -646,8 +646,10 @@ Invent-MAG uses **Hotwire Turbo Drive** (`@hotwired/turbo-rails`) to deliver SPA
 **Sales Pipeline:**
 
 - Drag-and-drop kanban
+- Kanban/List view toggle
 - Stage progression
-- Opportunity cards
+- Opportunity cards with notes & terms conditions
+- Currency-formatted amount display in list view
 
 **Contextual Tutorial System:**
 
@@ -658,7 +660,7 @@ Invent-MAG uses **Hotwire Turbo Drive** (`@hotwired/turbo-rails`) to deliver SPA
   3. **Page-Specific Quick Guide** – contextual steps driven by `Route::currentRouteName()` in `tutorial-modal.blade.php`
 - **Sub-topic drill-down navigation** – clicking a topic card (e.g., "Accounting") shows a list of pages in that category (e.g., Chart of Accounts, General Ledger, Trial Balance...). Clicking one navigates to that page and auto-opens its contextual tutorial modal via `sessionStorage` flag and Turbo-aware fetch chain.
 - **Click-outside to close** – removed `data-bs-backdrop="static"`, enabling backdrop click to dismiss the modal
-- 40+ route contexts covered, from Products and Sales Orders to HR (Employee, Attendance, Payroll) and all Accounting and Reports pages
+- 50+ route contexts covered, including Sales Pipeline stages, Quotation lifecycle, Products, Sales Orders, HR (Employee, Attendance, Payroll) and all Accounting and Reports pages
 - **Ordering rule:** Specific `$routeName === '...'` checks must come BEFORE `Str::startsWith()` catch-alls in the Blade file to avoid incorrect context being displayed
 - Page title convention: `<i class="ti ti-{icon} me-2"></i>` → title text → tutorial button (`ms-3`)
 
@@ -777,6 +779,7 @@ class SalesForecastService
 
 | Version | Date          | Changes                                                                                                                                                                                                                                                                                                                                                                                            |
 | ------- | ------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1.9     | June 2026    | Sales Pipeline enhancements: Kanban/List view toggle, currency-formatted list view amounts, notes & terms conditions on opportunities, `onPageLoad` deduplication fix preventing double card rendering. Tutorial expansion: Added pipeline and quotation lifecycle tutorial contexts (50+ total contexts), orphaned lang key cleanup, missing Indonesian translations. |
 | 1.8     | June 2026    | System Notifications: Added product expiry alerts (30/7-day windows), subscription plan expiry warnings (14-day), and backup status notifications. POS, Sales Returns & Purchase Returns now available on Starter plan. Architecture fixes: Split `web.php` into domain route files. Migrated `accounting_settings` to `tenants` table. Set Redis as default cache/queue. Implemented CSP nonces. Encrypted backup passwords. |
 | 1.7     | May 2026     | Tutorial HR Expansion: Added HR & Payroll as step 4 in welcome setup workflow (now 6 steps). Added Employees, Attendance, Payroll to Master Data sub-topics. Master Data topic card description updated. |
 | 1.6     | April 2026    | Tutorial System Enhancements: Topic grid sub-topic drill-down (click category → see all pages in that category → click to navigate). Click-outside closes modal (removed static backdrop). Sub-topic navigation auto-shows contextual tutorial on destination page via sessionStorage flag + Turbo-aware async fetch chain. Fixed sidebar stale nav-click closing bug. Added dashboard tutorial button and context. |
@@ -864,7 +867,8 @@ Common extension points:
 | 1.4     | Mar 2026 | Financial & CRM Integrations: Full integration of Returns into GL, Dashboards, and CRM (Net LTV). `SalesHelper` & `PurchaseHelper` extraction. Opening Balance Module added.  |
 | 1.3     | Mar 2026 | Turbo Drive integration: `onPageLoad` utility, `bootstrap-init.js`, `receipt-page.js`, POS reactivity fix, `DashboardService` extraction, auth error handling improvements.   |
 | 1.5     | Apr 2026 | UI/UX Polish & Tutorial System: Contextual tutorial buttons on all pages. 30+ page-specific help modals. Consistent icon system. Partially Paid status standardization. Sales Return credit note conditions. PO autofill info. Journal entry audit log sidebar badge fix. |
-| 1.8     | May 2026 | Architecture Assessment Fixes: Migrated accounting settings to tenants, implemented CSP nonces, split route files, encrypted backup keys, made Redis the default. |
+| 1.9     | June 2026    | Sales Pipeline enhancements, tutorial contexts expansion, lang cleanup, onPageLoad deduplication fix. |
+| 1.8     | May 2026     | Architecture Assessment Fixes: Migrated accounting settings to tenants, implemented CSP nonces, split route files, encrypted backup keys, made Redis the default. |
 | 1.7     | May 2026     | Tutorial HR Expansion: Added HR & Payroll to welcome setup workflow. Added Employees, Attendance, Payroll to Master Data sub-topics. Tech spec category count updated (6→7), context count updated (30+→40+). |
 
 ---

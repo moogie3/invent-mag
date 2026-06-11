@@ -36,6 +36,13 @@ export function createOpportunityCard(opportunity) {
                 <a href="/admin/sales-pipeline/opportunities/${opportunity.id}/print" target="_blank" class="btn btn-outline-info btn-sm">
                     <i class="ti ti-printer"></i> Print
                 </a>
+                ${
+                    opportunity.status !== "converted" && opportunity.items && opportunity.items.length > 0
+                        ? `<a href="/admin/sales-pipeline/opportunities/${opportunity.id}/generate-quotation" class="btn btn-outline-secondary btn-sm">
+                            <i class="ti ti-file-description"></i> Quote
+                        </a>`
+                        : ""
+                }
                 <button type="button" class="btn btn-outline-primary btn-sm edit-opportunity-btn"
                         data-opportunity-id="${opportunity.id}" ${
         opportunity.status === "converted" ? "disabled" : ""

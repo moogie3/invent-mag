@@ -8,7 +8,7 @@
                 <i class="ti ti-receipt me-2"></i> {{ __('messages.view_receipt') }}
             </a>
         @else
-            <a href="javascript:void(0)" class="dropdown-item view-sales-details-btn" data-id="{{ $sale->id }}">
+            <a href="#" class="dropdown-item view-sales-details-btn" data-id="{{ $sale->id }}">
                 <i class="ti ti-zoom-scan me-2"></i> {{ __('messages.view_details') }}
             </a>
         @endif

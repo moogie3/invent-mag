@@ -1,8 +1,8 @@
 # Invent-MAG: Complete Feature Checklist
 
 **Last Updated:** June 2026  
-**Version:** 1.8  
-**System Version:** 1.8
+**Version:** 1.9  
+**System Version:** 1.9
 
 ---
 
@@ -171,14 +171,31 @@
 - [x] Multiple pipelines support
 - [x] Customizable pipeline stages
 - [x] Drag-and-drop kanban board
+- [x] Kanban/List view toggle
 - [x] Opportunity tracking
-- [x] Opportunity value tracking
+- [x] Opportunity value tracking (with currency formatting)
+- [x] Opportunity notes & terms conditions
 - [x] Probability scoring
 - [x] Expected close dates
 - [x] Quotation / Estimate PDF Generation
 - [x] Pipeline conversion to sales orders
 - [x] Stage progression tracking
 - [x] Opportunity product associations
+
+### 📄 Quotation Management
+
+- [x] Full quotation CRUD (create, edit, view, delete)
+- [x] 6-status lifecycle: Draft → Sent → Accepted → Converted (Rejected/Expired → Draft)
+- [x] Professional PDF generation (DomPDF)
+- [x] Convert Accepted quotation to Sales Order
+- [x] Pipeline integration (generate quotation from opportunity)
+- [x] Notes & terms conditions fields
+- [x] Per-item discount (%/fixed) and tax (exclusive/inclusive/none)
+- [x] Order-level discount (%/fixed) and tax rate
+- [x] Bulk delete and CSV export
+- [x] Quotation auto-numbering (QTN-YYYYMMDD-XXXX)
+- [x] Plan-gated feature (available on Professional & Enterprise)
+- [x] 4 granular permissions (view/create/edit/delete)
 
 ---
 
@@ -477,7 +494,7 @@
 - [x] Sound notifications (optional)
 - [x] **Contextual tutorial button system** - Every page has a tutorial (?) button in the page title that opens a contextual help modal specific to that page
 - [x] **Consistent page title iconography** - All pages use `ti-*` icons before the title text (`ti-plus` for create, `ti-edit` for edit, `ti-eye` for view)
-- [x] **Tutorial modal** - Multi-step modal covering setup workflow, topic grid, and page-specific quick guide with 30+ page contexts covered
+- [x] **Tutorial modal** - Multi-step modal covering setup workflow, topic grid, and page-specific quick guide with 50+ page contexts covered including Sales Pipeline stages and Quotation lifecycle
 - [x] **Sub-topic drill-down navigation** - Topics grid drills into category-specific page lists (Configuration → System Settings, Units, Categories...), clicking navigates to that page and auto-shows its contextual tutorial
 - [x] **Click-outside to close** - Clicking the modal backdrop now closes the tutorial modal (was static before)
 
@@ -538,7 +555,7 @@
 5. **776 Test Files** - Enterprise-grade testing (PHP + JS)
 6. **Docker + CI/CD** - Modern DevOps ready
 7. **Comprehensive Audit Trail** - Security and accounting
-8. **Contextual Tutorial System** - 40+ page-specific help guides with drill-down navigation - users click a topic category, see all pages in that category, click one to navigate there with its contextual tutorial auto-opened
+8. **Contextual Tutorial System** - 50+ page-specific help guides with drill-down navigation - users click a topic category, see all pages in that category, click one to navigate there with its contextual tutorial auto-opened
 
 ---
 

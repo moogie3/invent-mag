@@ -13,6 +13,7 @@ Route::middleware(['plan.feature:crm', 'can:view-sales-pipeline'])->group(functi
         Route::get('/opportunities/{opportunity}', [SalesPipelineController::class, 'showOpportunity'])->name('admin.sales_pipeline.opportunities.show');
         Route::get('/opportunities/{opportunity}/convert', [SalesPipelineController::class, 'showConvertForm'])->name('admin.sales_pipeline.opportunities.convert.show');
         Route::get('/opportunities/{opportunity}/print', [SalesPipelineController::class, 'print'])->name('admin.sales_pipeline.opportunities.print');
+        Route::get('/opportunities/{opportunity}/generate-quotation', [SalesPipelineController::class, 'generateQuotation'])->name('admin.sales_pipeline.opportunities.generate-quotation');
         Route::post('/export', [SalesPipelineController::class, 'exportAll'])->name('admin.sales-pipeline.export');
 
         // Pipeline management routes

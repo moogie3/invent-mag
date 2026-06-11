@@ -126,6 +126,10 @@ export async function loadEditOpportunityModal(opportunityId) {
             opportunity.customer_id;
         document.getElementById("editOpportunityStatus").value =
             opportunity.status;
+        document.getElementById("editOpportunityNotes").value =
+            opportunity.notes || '';
+        document.getElementById("editOpportunityTermsConditions").value =
+            opportunity.terms_conditions || '';
 
         if (!editOpportunityExpectedCloseDateFlatpickr) {
             editOpportunityExpectedCloseDateFlatpickr = flatpickr(

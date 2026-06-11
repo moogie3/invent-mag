@@ -1,6 +1,6 @@
 # Invent-MAG: Enterprise Inventory & Accounting System
 
-**Version:** 1.8  
+**Version:** 1.9  
 **Author:** moogie3  
 **License:** MIT  
 **Development Time:** 1.5+ years (451+ commits)  
@@ -97,6 +97,18 @@ Experience Invent-MAG firsthand:
 - **Invoice Generation:** PDF invoice creation
 - **Consistent Payment Status Labels:** Paid, Partially Paid, Unpaid (Pending / Due Today / Due in X Days / Overdue), Returned
 - **Customer Credit Notes:** Auto-created when return is Completed AND original invoice is Paid
+
+#### Quotation Management **(Professional & Enterprise)**
+
+- **Quotation CRUD:** Create, edit, view, and delete quotations with full line-item management
+- **Status Lifecycle:** Draft → Sent → Accepted → Converted (or Rejected/Expired → Draft recycle)
+- **Quotation PDF Generation:** Professional PDF documents via DomPDF
+- **Convert to Sales Order:** Accepted quotations convert seamlessly to sales orders
+- **Pipeline Integration:** Generate quotations directly from Sales Pipeline opportunities
+- **Notes & Terms Conditions:** Free-text fields for customer-facing instructions and legal terms
+- **Financial Calculations:** Per-item and order-level discounts (%/fixed), tax (exclusive/inclusive/none)
+- **Bulk Operations:** Bulk delete and CSV export
+- **Quotation Number Auto-generation:** Sequential format QTN-YYYYMMDD-XXXX
 
 #### Customer Intelligence
 
@@ -257,7 +269,7 @@ Experience Invent-MAG firsthand:
 #### Contextual Tutorial System
 
 - **Tutorial Button:** Every page title includes a `?` help button (dashboard included)
-- **40+ Page-Specific Guides:** From Products and Sales to HR (Employee, Attendance, Payroll) and all Accounting/Reports pages
+- **50+ Page-Specific Guides:** From Sales Pipeline stages and Quotation lifecycle to Products, Sales, HR (Employee, Attendance, Payroll) and all Accounting/Reports pages
 - **Multi-Step Modal:** 6-step setup workflow overview → topic grid → page-specific quick guide
 - **Topic Drill-Down:** Topics grid (7 categories) → click category → sub-topic list (e.g., Accounting → Chart of Accounts, Ledger, Trial Balance...) → click to navigate with contextual tutorial auto-opened
 - **Click-Outside to Close:** Modal backdrop click now closes the tutorial modal
@@ -538,6 +550,13 @@ docker-compose exec app php artisan migrate --seed
 
 ## 🗺️ Roadmap
 
+### Recently Added (v1.9)
+
+- ✅ **Sales Pipeline Enhancements** — Kanban/List view toggle, opportunity notes & terms conditions, currency-formatted list view amounts
+- ✅ **Full Quotation Module** — Standalone quotation management with status lifecycle (Draft/Sent/Accepted/Rejected/Expired/Converted), professional PDF generation, convert-to-sales workflow, pipeline integration, notes & terms conditions, per-item/order-level discount & tax calculations, bulk operations, and auto-numbering
+- ✅ **Tutorial Expansion** — Added pipeline and quotation lifecycle tutorial contexts (50+ total context pages), orphaned lang key cleanup, missing Indonesian translations filled
+- ✅ **Stability Fix** — `onPageLoad` deduplication fix preventing double card rendering and duplicate event listeners on the pipeline page
+
 ### Recently Added (v1.8)
 
 - ✅ **System Notifications Enhancement** — Dashboard notification center with plan expiry (14-day warning), product expiry (30/7-day alerts), backup status (no backup in 7+ days), trial status, usage limits, and accounting setup reminders
@@ -566,7 +585,7 @@ docker-compose exec app php artisan migrate --seed
 
 ### Previously Added (v1.5)
 
-- ✅ Contextual Tutorial Button System (30+ page-specific help guides)
+- ✅ Contextual Tutorial Button System (50+ page-specific help guides)
 - ✅ Consistent "Partially Paid" status across Sales & Purchase Orders
 - ✅ Sales Return credit note conditions documented and enforced
 - ✅ Purchase Order autofill info label

@@ -54,6 +54,7 @@ export default defineConfig({
                 "resources/js/admin/layouts/global-keyboard-shortcuts.js",
                 "resources/js/admin/layouts/selectable-table.js",
                 "resources/js/admin/tax.js",
+                "resources/js/admin/quotation.js",
                 "resources/js/admin/reports/stock-transfer.js",
                 "resources/js/admin/audit-log.js",
                 "resources/js/admin/plan/checkout.js",

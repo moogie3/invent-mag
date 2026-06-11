@@ -66,6 +66,14 @@
                                                         aria-label="{{ __('messages.new_opportunity') }}">
                                                         <i class="ti ti-plus"></i>
                                                     </button>
+                                                    <div class="btn-group ms-2" role="group">
+                                                        <button type="button" class="btn btn-outline-secondary active" id="viewKanbanBtn" data-view="kanban">
+                                                            <i class="ti ti-layout-kanban"></i>
+                                                        </button>
+                                                        <button type="button" class="btn btn-outline-secondary" id="viewListBtn" data-view="list">
+                                                            <i class="ti ti-list"></i>
+                                                        </button>
+                                                    </div>
                                                 </div>
                                             </div>
 
@@ -143,6 +151,39 @@
                                                     <div id="pipeline-board" class="row flex-nowrap overflow-auto pb-3">
                                                         <!-- Pipeline stages will be loaded here -->
                                                     </div>
+                                                    <div id="pipeline-list-view" class="table-responsive" style="display: none;"
+                                                         data-trans="{{ json_encode([
+                                                            'no_opportunities' => __('messages.no_data'),
+                                                            'error_loading' => __('messages.error_loading_data'),
+                                                            'edit' => __('messages.edit'),
+                                                            'print' => __('messages.print'),
+                                                            'quote' => __('messages.quote'),
+                                                            'convert' => __('messages.convert_to_sales_order'),
+                                                            'delete' => __('messages.delete'),
+                                                            'actions' => __('messages.actions'),
+                                                            'open' => __('messages.open'),
+                                                            'won' => __('messages.won'),
+                                                            'lost' => __('messages.lost'),
+                                                            'converted' => __('messages.converted'),
+                                                        ]) }}">
+                                                        <table class="table card-table table-vcenter" id="pipelineListTable">
+                                                            <thead class="text-center">
+                                                                <tr>
+                                                                    <th>{{ __('messages.table_no') }}</th>
+                                                                    <th>{{ __('messages.opportunity_name') }}</th>
+                                                                    <th>{{ __('messages.customer') }}</th>
+                                                                    <th>{{ __('messages.stage') }}</th>
+                                                                    <th>{{ __('messages.amount') }}</th>
+                                                                    <th>{{ __('messages.expected_close_date') }}</th>
+                                                                    <th>{{ __('messages.status') }}</th>
+                                                                    <th>{{ __('messages.table_action') }}</th>
+                                                                </tr>
+                                                            </thead>
+                                                            <tbody class="text-center" id="pipelineListBody">
+                                                                <tr><td colspan="8" class="text-muted py-4">{{ __('messages.select_pipeline') }}</td></tr>
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
                                                 @endif
                                             </div>
                                         </div>
@@ -212,6 +253,22 @@
                                     <i class="ti ti-notes me-1"></i>{{ __('messages.description') }}
                                 </label>
                                 <textarea class="form-control" id="opportunityDescription" name="description" rows="3"></textarea>
+                            </div>
+                            <div class="mb-3">
+                                <label for="opportunityNotes" class="form-label">
+                                    <i class="ti ti-file-text me-1"></i>{{ __('messages.notes') }}
+                                </label>
+                                <div class="p-3 bg-body-secondary rounded-3">
+                                    <textarea class="form-control" id="opportunityNotes" name="notes" rows="3"></textarea>
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label for="opportunityTermsConditions" class="form-label">
+                                    <i class="ti ti-file-description me-1"></i>{{ __('messages.terms_conditions') }}
+                                </label>
+                                <div class="p-3 bg-body-secondary rounded-3">
+                                    <textarea class="form-control" id="opportunityTermsConditions" name="terms_conditions" rows="3"></textarea>
+                                </div>
                             </div>
                             <input type="hidden" id="newOpportunityPipelineId" name="sales_pipeline_id">
                             <input type="hidden" id="newOpportunityStageId" name="pipeline_stage_id">
@@ -438,6 +495,22 @@
                                 <textarea class="form-control" id="editOpportunityDescription" name="description" rows="3"></textarea>
                             </div>
                             <div class="mb-3">
+                                <label for="editOpportunityNotes" class="form-label">
+                                    <i class="ti ti-file-text me-1"></i>{{ __('messages.notes') }}
+                                </label>
+                                <div class="p-3 bg-body-secondary rounded-3">
+                                    <textarea class="form-control" id="editOpportunityNotes" name="notes" rows="3">{{ old('notes', $opportunity->notes ?? '') }}</textarea>
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label for="editOpportunityTermsConditions" class="form-label">
+                                    <i class="ti ti-file-description me-1"></i>{{ __('messages.terms_conditions') }}
+                                </label>
+                                <div class="p-3 bg-body-secondary rounded-3">
+                                    <textarea class="form-control" id="editOpportunityTermsConditions" name="terms_conditions" rows="3">{{ old('terms_conditions', $opportunity->terms_conditions ?? '') }}</textarea>
+                                </div>
+                            </div>
+                            <div class="mb-3">
                                 <label for="editOpportunityStatus" class="form-label">
                                     <i class="ti ti-flag me-1"></i>{{ __('messages.status') }}
                                 </label>
@@ -465,3 +538,5 @@
     </div>
 @include('admin.layouts.modals.sales.sales-pipeline-modals')
 @endsection
+
+

@@ -10,10 +10,16 @@
         <i class="ti ti-receipt me-1"></i> {{ __('messages.payment_type') }}
         <strong>{{ $sales->payment_type ?? 'N/A' }}</strong>
     </div>
-    @if (property_exists($sales, 'notes') && $sales->notes)
+    @if ($sales->notes)
         <div class="mt-3">
             <h6 class="fw-bold"><i class="ti ti-notes me-1"></i>{{ __('messages.notes') }}</h6>
             <p class="text-muted">{{ $sales->notes }}</p>
+        </div>
+    @endif
+    @if ($sales->terms_conditions)
+        <div class="mt-3">
+            <h6 class="fw-bold"><i class="ti ti-file-text me-1"></i>{{ __('messages.terms_conditions') }}</h6>
+            <p class="text-muted">{{ $sales->terms_conditions }}</p>
         </div>
     @endif
 </div>

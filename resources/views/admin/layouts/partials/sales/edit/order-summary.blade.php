@@ -11,10 +11,12 @@
         <i class="ti ti-receipt me-1"></i> {{ __('messages.payment_type') }}
         <strong>{{ $sales->payment_type }}</strong>
     </div>
-    @if (property_exists($sales, 'notes') || isset($sales->notes))
-        <div class="mt-3">
-            <label class="form-label fw-bold"><i class="ti ti-notes me-1"></i> {{ __('messages.notes') }}</label>
-            <textarea name="notes" class="form-control" rows="3">{{ $sales->notes ?? '' }}</textarea>
-        </div>
-    @endif
+    <div class="mt-3">
+        <label class="form-label fw-bold"><i class="ti ti-notes me-1"></i> {{ __('messages.notes') }}</label>
+        <textarea name="notes" class="form-control" rows="3">{{ $sales->notes ?? '' }}</textarea>
+    </div>
+    <div class="mt-3">
+        <label class="form-label fw-bold"><i class="ti ti-file-text me-1"></i> {{ __('messages.terms_conditions') }}</label>
+        <textarea name="terms_conditions" class="form-control" rows="3">{{ $sales->terms_conditions ?? '' }}</textarea>
+    </div>
 </div>

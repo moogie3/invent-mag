@@ -52,6 +52,15 @@
                         <i class="ti ti-alert-triangle stat-icon text-danger"></i>
                     </div>
                 </div>
+                <div class="col-sm-6 col-lg-3">
+                    <div class="card shadow border-0 rounded-4 stat-card card-hover">
+                        <div class="card-body text-center">
+                            <div class="subheader">Terminated</div>
+                            <div class="h1 mb-0 text-secondary">{{ $stats['terminated'] }}</div>
+                        </div>
+                        <i class="ti ti-ban stat-icon text-secondary"></i>
+                    </div>
+                </div>
             </div>
             <div class="card shadow border-0 rounded-4">
                 <div class="table-responsive">
@@ -64,6 +73,7 @@
                                 <th>Trial Ends</th>
                                 <th>Plan Expires</th>
                                 <th>Billing Period</th>
+                                <th class="w-1"></th>
                             </tr>
                         </thead>
                         <tbody>
@@ -82,6 +92,8 @@
                                 <td>
                                     @if($sub->plan_status === 'active')
                                         <span class="badge bg-success text-white">Active</span>
+                                    @elseif($sub->plan_status === 'terminated')
+                                        <span class="badge bg-secondary text-white">Terminated</span>
                                     @elseif($sub->trialExpired())
                                         <span class="badge bg-danger text-white">Trial Expired</span>
                                     @elseif($sub->onTrial())
@@ -117,10 +129,41 @@
                                         —
                                     @endif
                                 </td>
+                                <td>
+                                    @if($sub->plan_status !== 'terminated')
+                                    <div class="dropdown">
+                                        <button class="btn btn-icon-only btn-ghost" data-bs-toggle="dropdown">
+                                            <i class="ti ti-dots-vertical"></i>
+                                        </button>
+                                        <div class="dropdown-menu dropdown-menu-end">
+                                            <form method="POST" action="{{ route('superadmin.subscriptions.terminate', $sub) }}" onsubmit="return confirm('Are you sure you want to terminate {{ $sub->name }}\'s subscription? This action cannot be undone.')">
+                                                @csrf
+                                                <button type="submit" class="dropdown-item text-danger">
+                                                    <i class="ti ti-ban me-2"></i>Terminate
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </div>
+                                    @else
+                                    <div class="dropdown">
+                                        <button class="btn btn-icon-only btn-ghost" data-bs-toggle="dropdown">
+                                            <i class="ti ti-dots-vertical"></i>
+                                        </button>
+                                        <div class="dropdown-menu dropdown-menu-end">
+                                            <form method="POST" action="{{ route('superadmin.subscriptions.reactivate', $sub) }}" onsubmit="return confirm('Reactivate {{ $sub->name }}\'s subscription?')">
+                                                @csrf
+                                                <button type="submit" class="dropdown-item text-success">
+                                                    <i class="ti ti-refresh me-2"></i>Reactivate
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </div>
+                                    @endif
+                                </td>
                             </tr>
                             @empty
                             <tr>
-                                <td colspan="6" class="text-center py-4 text-muted">No subscriptions found.</td>
+                                <td colspan="7" class="text-center py-4 text-muted">No subscriptions found.</td>
                             </tr>
                             @endforelse
                         </tbody>

@@ -22,6 +22,7 @@ Route::middleware('web')->prefix('admin')->group(function () {
         require __DIR__ . '/admin/hr.php';
         require __DIR__ . '/admin/settings.php';
         require __DIR__ . '/admin/accounting.php';
+        require __DIR__ . '/admin/quotations.php';
     });
 });
 

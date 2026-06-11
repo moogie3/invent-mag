@@ -47,7 +47,7 @@
                                         'Professional Features' => [
                                             'stock_opname', 'accounting', 'crm',
                                             'sales_pipeline', 'financial_reports',
-                                            'multi_currency', 'hr', 'cash_flow',
+                                            'multi_currency', 'hr', 'cash_flow', 'quotations',
                                         ],
                                         'Enterprise Features' => [
                                             'sales_forecasting', 'api_access',

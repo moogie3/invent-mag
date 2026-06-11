@@ -161,6 +161,8 @@ class SalesPipelineControllerTest extends TestCase
             'description' => 'A new sales opportunity.',
             'expected_close_date' => now()->addMonth()->format('Y-m-d'),
             'status' => 'open',
+            'notes' => 'Test notes',
+            'terms_conditions' => 'Test terms',
             'items' => [
                 [
                     'product_id' => $product->id,
@@ -191,6 +193,8 @@ class SalesPipelineControllerTest extends TestCase
             'description' => 'Updated opportunity description.',
             'expected_close_date' => now()->addDays(15)->format('Y-m-d'),
             'status' => 'won',
+            'notes' => 'Updated notes',
+            'terms_conditions' => 'Updated terms',
             'items' => [
                 [
                     'product_id' => $product->id,

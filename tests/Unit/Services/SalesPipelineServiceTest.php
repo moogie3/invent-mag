@@ -141,6 +141,8 @@ class SalesPipelineServiceTest extends TestCase
             'description' => 'Opportunity description',
             'expected_close_date' => now()->addMonth()->toDateString(),
             'status' => 'open',
+            'notes' => 'Test notes',
+            'terms_conditions' => 'Test terms',
             'items' => [
                 ['product_id' => $product->id, 'quantity' => 2, 'price' => 100],
             ],
@@ -168,6 +170,8 @@ class SalesPipelineServiceTest extends TestCase
             'description' => 'Updated description',
             'expected_close_date' => now()->addMonths(2)->toDateString(),
             'status' => 'negotiation',
+            'notes' => 'Updated notes',
+            'terms_conditions' => 'Updated terms',
             'items' => [
                 ['product_id' => $product->id, 'quantity' => 3, 'price' => 150],
             ],

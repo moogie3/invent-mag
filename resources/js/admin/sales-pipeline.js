@@ -25,6 +25,7 @@ import {
 } from "./partials/sales-pipeline/modals/opportunityItems.js";
 
 import { onPageLoad } from './utils/onPageLoad.js';
+import { formatCurrency } from '../utils/currencyFormatter.js';
 
 onPageLoad(function () {
     if (!window.location.pathname.includes("/admin/sales-pipeline")) return;
@@ -59,6 +60,82 @@ onPageLoad(function () {
             loadPipelineBoard(selectedPipelineId);
         }
     });
+
+    // Kanban / List view toggle
+    const kanbanBtn = document.getElementById('viewKanbanBtn');
+    const listBtn = document.getElementById('viewListBtn');
+    const kanbanView = document.getElementById('pipeline-board');
+    const listView = document.getElementById('pipeline-list-view');
+
+    if (kanbanBtn && listBtn && kanbanView && listView) {
+        function setActiveView(view) {
+            if (view === 'list') {
+                kanbanView.style.display = 'none';
+                listView.style.display = '';
+                kanbanBtn.classList.remove('active');
+                listBtn.classList.add('active');
+                populateListView();
+            } else {
+                kanbanView.style.display = '';
+                listView.style.display = 'none';
+                listBtn.classList.remove('active');
+                kanbanBtn.classList.add('active');
+            }
+        }
+
+        async function populateListView() {
+            const pipelineId = document.getElementById('pipelineSelect')?.value;
+            if (!pipelineId) return;
+
+            const listView = document.getElementById('pipeline-list-view');
+            const trans = listView?.dataset?.trans ? JSON.parse(listView.dataset.trans) : {};
+
+            try {
+                const response = await fetch(`/admin/sales-pipeline/opportunities?pipeline_id=${pipelineId}`);
+                if (!response.ok) throw new Error('Failed to fetch');
+                const data = await response.json();
+                const tbody = document.getElementById('pipelineListBody');
+                if (!data.opportunities || data.opportunities.length === 0) {
+                    tbody.innerHTML = `<tr><td colspan="8" class="text-muted py-4">${trans.no_opportunities || 'No data available'}</td></tr>`;
+                    return;
+                }
+                tbody.innerHTML = data.opportunities.map((opp, i) => {
+                    const stageName = opp.stage?.name || 'N/A';
+                    const customerName = opp.customer?.name || 'N/A';
+                    const amount = formatCurrency(opp.amount);
+                    const closeDate = opp.expected_close_date ? new Date(opp.expected_close_date).toLocaleDateString('en-GB') : '-';
+                    const statusText = trans[opp.status] || opp.status.charAt(0).toUpperCase() + opp.status.slice(1);
+                    const statusBadge = opp.status === 'won' ? 'bg-success text-white' : opp.status === 'lost' ? 'bg-danger text-white' : opp.status === 'converted' ? 'bg-info text-white' : 'bg-secondary text-white';
+                    return `<tr>
+                        <td>${i + 1}</td>
+                        <td><a href="#" class="edit-opportunity-btn text-reset fw-semibold" data-opportunity-id="${opp.id}">${opp.name}</a></td>
+                        <td>${customerName}</td>
+                        <td>${stageName}</td>
+                        <td>${amount}</td>
+                        <td>${closeDate}</td>
+                        <td><span class="badge rounded-pill ${statusBadge}">${statusText}</span></td>
+                        <td>
+                            <div class="dropdown">
+                                <button class="btn dropdown-toggle align-text-top" data-bs-toggle="dropdown" data-bs-boundary="viewport">${trans.actions || 'Actions'}</button>
+                                <div class="dropdown-menu">
+                                    <button class="dropdown-item edit-opportunity-btn" data-opportunity-id="${opp.id}"><i class="ti ti-edit me-2"></i>${trans.edit || 'Edit'}</button>
+                                    <a class="dropdown-item" href="/admin/sales-pipeline/opportunities/${opp.id}/print" target="_blank"><i class="ti ti-printer me-2"></i>${trans.print || 'Print'}</a>
+                                    ${opp.status !== 'converted' && opp.items && opp.items.length > 0 ? `<a class="dropdown-item" href="/admin/sales-pipeline/opportunities/${opp.id}/generate-quotation"><i class="ti ti-file-description me-2"></i>${trans.quote || 'Quote'}</a>` : ''}
+                                    ${opp.status === 'won' && !opp.sales_id ? `<button class="dropdown-item text-success convert-opportunity-btn" data-opportunity-id="${opp.id}"><i class="ti ti-check me-2"></i>${trans.convert || 'Convert'}</button>` : ''}
+                                    <button class="dropdown-item text-danger delete-opportunity-btn" data-opportunity-id="${opp.id}"><i class="ti ti-trash me-2"></i>${trans.delete || 'Delete'}</button>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>`;
+                }).join('');
+            } catch {
+                document.getElementById('pipelineListBody').innerHTML = `<tr><td colspan="8" class="text-muted py-4">${trans.error_loading || 'Error loading data'}</td></tr>`;
+            }
+        }
+
+        kanbanBtn.addEventListener('click', () => setActiveView('kanban'));
+        listBtn.addEventListener('click', () => setActiveView('list'));
+    }
 
     document.addEventListener("click", async function (e) {
         if (e.target.closest(".edit-pipeline-btn")) {
@@ -184,4 +261,4 @@ onPageLoad(function () {
         },
         "Save Form"
     );
-});
+}, { id: 'sales-pipeline' });

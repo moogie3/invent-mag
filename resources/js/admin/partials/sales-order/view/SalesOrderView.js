@@ -19,7 +19,8 @@ export class SalesOrderView extends SalesOrderModule {
         document
             .querySelectorAll(".view-sales-details-btn")
             .forEach((button) => {
-                button.addEventListener("click", function () {
+                button.addEventListener("click", function (e) {
+                    e.preventDefault();
                     const salesId = this.dataset.id;
                     window.showSalesDetailsModal(salesId);
                 });

@@ -11,6 +11,8 @@ use App\Models\ProductWarehouse;
 use App\Models\Warehouse;
 use App\Models\Product;
 use App\Models\Tax;
+use App\Models\Quotation;
+use App\Models\QuotationItem;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
@@ -122,8 +124,10 @@ class SalesPipelineService
                 'sales_pipeline_id' => $data['sales_pipeline_id'],
                 'pipeline_stage_id' => $data['pipeline_stage_id'],
                 'name' => $data['name'],
-                'description' => $data['description'] ?? null, // Provide a default value for description
-                'amount' => 0, // Will be calculated from items
+                'description' => $data['description'] ?? null,
+                'notes' => $data['notes'] ?? null,
+                'terms_conditions' => $data['terms_conditions'] ?? null,
+                'amount' => 0,
                 'expected_close_date' => $data['expected_close_date'],
                 'status' => $data['status'],
             ]);
@@ -155,7 +159,9 @@ class SalesPipelineService
                 'sales_pipeline_id' => $data['sales_pipeline_id'],
                 'pipeline_stage_id' => $data['pipeline_stage_id'],
                 'name' => $data['name'],
-                'description' => $data['description'] ?? null, // Provide a default value for description
+                'description' => $data['description'] ?? null,
+                'notes' => $data['notes'] ?? null,
+                'terms_conditions' => $data['terms_conditions'] ?? null,
                 'expected_close_date' => $data['expected_close_date'],
                 'status' => $data['status'],
             ];
@@ -228,6 +234,62 @@ class SalesPipelineService
         return $dompdf->stream('quotation-' . $opportunity->id . '.pdf', ['Attachment' => false]);
     }
 
+    public function generateQuotation(int $opportunityId): Quotation
+    {
+        $opportunity = SalesOpportunity::with('items.product', 'customer')->findOrFail($opportunityId);
+
+        $quotationNumber = 'QTN-' . now()->format('Ymd') . '-' . str_pad(Quotation::where('tenant_id', $opportunity->tenant_id)->count() + 1, 4, '0', STR_PAD_LEFT);
+
+        $subtotal = 0;
+        $items = [];
+
+        foreach ($opportunity->items as $item) {
+            $lineTotal = $item->quantity * $item->price;
+            $subtotal += $lineTotal;
+            $items[] = [
+                'product_id' => $item->product_id,
+                'product_name' => $item->product->name ?? 'Unknown',
+                'quantity' => $item->quantity,
+                'price' => (float) $item->price,
+                'discount' => 0,
+                'discount_type' => 'percentage',
+                'tax_type' => 'none',
+                'tax_rate' => null,
+                'tax_amount' => 0,
+                'subtotal' => round($lineTotal, 2),
+                'total' => round($lineTotal, 2),
+            ];
+        }
+
+        return DB::transaction(function () use ($opportunity, $quotationNumber, $subtotal, $items) {
+            $quotation = Quotation::create([
+                'quotation_number' => $quotationNumber,
+                'customer_id' => $opportunity->customer_id,
+                'user_id' => Auth::id(),
+                'quotation_date' => now(),
+                'valid_until' => now()->addDays(14),
+                'status' => 'draft',
+                'subtotal' => round($subtotal, 2),
+                'tax_type' => 'none',
+                'tax_rate' => null,
+                'tax_amount' => 0,
+                'discount_type' => 'none',
+                'discount_value' => 0,
+                'discount_amount' => 0,
+                'total' => round($subtotal, 2),
+                'sales_opportunity_id' => $opportunity->id,
+                'notes' => $opportunity->notes,
+                'terms_conditions' => $opportunity->terms_conditions,
+            ]);
+
+            foreach ($items as $itemData) {
+                $quotation->items()->create($itemData);
+            }
+
+            return $quotation;
+        });
+    }
+
     public function convertToSalesOrder(SalesOpportunity $opportunity): Sales
     {
         if ($opportunity->status === 'converted' || $opportunity->sales_id) {
@@ -289,6 +351,8 @@ class SalesPipelineService
                 'status' => 'Unpaid',
                 'type' => \App\Models\Sales::TYPE_REGULAR,
                 'sales_opportunity_id' => $opportunity->id,
+                'notes' => $opportunity->notes,
+                'terms_conditions' => $opportunity->terms_conditions,
             ]);
 
             foreach ($opportunityItems as $item) {

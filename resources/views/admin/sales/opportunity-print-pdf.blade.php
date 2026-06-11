@@ -195,5 +195,19 @@
         </div>
     @endif
 
+    @if($opportunity->notes)
+        <div style="margin-top: 20px; border-top: 1px solid #eee; padding-top: 10px;">
+            <strong>{{ __('messages.notes') }}:</strong><br>
+            {{ $opportunity->notes }}
+        </div>
+    @endif
+
+    @if($opportunity->terms_conditions)
+        <div style="margin-top: 20px; border-top: 1px solid #eee; padding-top: 10px;">
+            <strong>{{ __('messages.terms_conditions') }}:</strong><br>
+            {{ $opportunity->terms_conditions }}
+        </div>
+    @endif
+
 </body>
 </html>

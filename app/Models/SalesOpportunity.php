@@ -16,6 +16,8 @@ class SalesOpportunity extends Model
         'pipeline_stage_id',
         'name',
         'description',
+        'notes',
+        'terms_conditions',
         'amount',
         'expected_close_date',
         'status',
@@ -54,6 +56,11 @@ class SalesOpportunity extends Model
     public function items()
     {
         return $this->hasMany(SalesOpportunityItem::class);
+    }
+
+    public function quotations()
+    {
+        return $this->hasMany(Quotation::class, 'sales_opportunity_id');
     }
 
     /**

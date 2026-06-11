@@ -46,6 +46,7 @@ return [
             'icon' => 'ti-shopping-cart',
             'items' => [
                 ['icon' => 'ti-report-money', 'label' => 'Sales Orders', 'route' => 'admin.sales'],
+                ['icon' => 'ti-file-description', 'label' => 'Quotations', 'route' => 'admin.quotations'],
                 ['icon' => 'ti-truck-delivery', 'label' => 'Purchase Orders', 'route' => 'admin.po'],
                 ['icon' => 'ti-cash', 'label' => 'Point of Sale (POS)', 'route' => 'admin.pos'],
                 ['icon' => 'ti-receipt-refund', 'label' => 'Sales Returns', 'route' => 'admin.sales-returns.index'],
@@ -315,11 +316,35 @@ return [
             'desc'  => 'tutorial.purchase_orders_desc',
             'steps' => ['tutorial.create_purchase_order_btn', 'tutorial.view_details_po', 'tutorial.payment_status_po', 'tutorial.returned_indicator_po', 'tutorial.purchase_returns_btn', 'tutorial.accounting_po', 'tutorial.bulk_actions_po', 'tutorial.supplier_association', 'tutorial.goods_receipt', 'tutorial.export_po'],
         ],
+        'admin.quotations.create' => [
+            'title' => 'tutorial.create_quotation',
+            'icon'  => 'ti-plus',
+            'desc'  => 'tutorial.create_quotation_desc',
+            'steps' => ['tutorial.customer_info_qt', 'tutorial.product_selection_qt', 'tutorial.auto_pricing_qt', 'tutorial.quantity_discount_qt', 'tutorial.invoice_discount_qt', 'tutorial.order_summary_qt', 'tutorial.submit_qt'],
+        ],
+        'admin.quotations.edit' => [
+            'title' => 'tutorial.edit_quotation',
+            'icon'  => 'ti-edit',
+            'desc'  => 'tutorial.edit_quotation_desc',
+            'steps' => ['tutorial.qt_info_edit', 'tutorial.customer_info_edit_qt', 'tutorial.edit_items_qt', 'tutorial.order_summary_qt', 'tutorial.invoice_discount_qt_edit', 'tutorial.save_qt'],
+        ],
+        'admin.quotations.show' => [
+            'title' => 'tutorial.view_quotation',
+            'icon'  => 'ti-eye',
+            'desc'  => 'tutorial.view_quotation_desc',
+            'steps' => ['tutorial.qt_info_view', 'tutorial.items_table_qt', 'tutorial.amount_display_qt', 'tutorial.convert_sales_qt', 'tutorial.actions_qt'],
+        ],
+        'admin.quotations*' => [
+            'title' => 'tutorial.quotations',
+            'icon'  => 'ti-file-description',
+            'desc'  => 'tutorial.quotations_desc',
+            'steps' => ['tutorial.create_quotation_btn', 'tutorial.view_details_qt', 'tutorial.quotation_status_qt', 'tutorial.quotation_when_to_use', 'tutorial.quotation_vs_pipeline', 'tutorial.quotation_lifecycle', 'tutorial.convert_to_sales_qt', 'tutorial.bulk_actions_qt', 'tutorial.export_qt'],
+        ],
         'admin.sales_pipeline*' => [
             'title' => 'tutorial.sales_pipeline',
             'icon'  => 'ti-chart-line',
             'desc'  => 'tutorial.sales_pipeline_desc',
-            'steps' => ['tutorial.kanban_intro', 'tutorial.step1_pipeline', 'tutorial.step2_pipeline', 'tutorial.step3_pipeline', 'tutorial.kanban_board', 'tutorial.edit_pipeline_info', 'tutorial.edit_delete_pipeline', 'tutorial.convert_sales'],
+            'steps' => ['tutorial.pipeline_when_to_use', 'tutorial.pipeline_statuses', 'tutorial.pipeline_two_paths', 'tutorial.kanban_intro', 'tutorial.kanban_list_toggle', 'tutorial.step1_pipeline', 'tutorial.step2_pipeline', 'tutorial.step3_pipeline', 'tutorial.kanban_board', 'tutorial.edit_pipeline_info', 'tutorial.edit_delete_pipeline', 'tutorial.convert_sales'],
         ],
         'admin.sales*' => [
             'title' => 'tutorial.sales_orders',

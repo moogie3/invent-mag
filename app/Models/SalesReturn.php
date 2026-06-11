@@ -18,6 +18,8 @@ class SalesReturn extends Model
         'user_id',
         'return_date',
         'reason',
+        'notes',
+        'terms_conditions',
         'total_amount',
         'status',
         'customer_credit_id',

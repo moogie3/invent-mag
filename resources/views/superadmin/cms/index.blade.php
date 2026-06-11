@@ -116,7 +116,7 @@
                 @php
                     $featureCards = [
                         1 => ['Inventory & Product Management', 'Full product cataloging, real-time stock tracking across multiple warehouses, physical stock opname with variance tracking, warehouse-to-warehouse stock transfers, low-stock alerts, barcode support, and expiry tracking.'],
-                        2 => ['Sales & CRM', 'Complete sales order management, Point of Sale (POS), customer database with purchase history, and sales pipeline for opportunity tracking.'],
+                        2 => ['Sales, CRM & Quotations', 'Complete sales order management, Point of Sale (POS), customer database with purchase history, sales pipeline for opportunity tracking, and quotation generation with full lifecycle management including approval workflows, revision history, and seamless conversion to invoices or sales orders.'],
                         3 => ['Purchase & SRM', 'Full purchase order lifecycle, supplier management with historical data, and efficient purchase return processing.'],
                         4 => ['Financial & Accounting Suite', 'Chart of Accounts, General Ledger, Manual Journal Entries, Trial Balance, Income Statement, Balance Sheet, and AR/AP Aging Reports.'],
                         5 => ['HR & Payroll', 'Comprehensive employee attendance tracking, automated salaried proration, customizable allowances, and automated two-step accounting sync.'],

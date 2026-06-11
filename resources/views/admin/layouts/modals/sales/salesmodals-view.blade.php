@@ -57,7 +57,7 @@
                         </div>
                         <div class="d-flex justify-content-between mb-2">
                             <div><strong>{{ __('messages.sales_due_date') }}</strong></div>
-                            <div>{{ $sales->due_date->format('d F Y') }}</div>
+                            <div>{{ $sales->due_date?->format('d F Y') ?? '-' }}</div>
                         </div>
                         <div class="d-flex justify-content-between mb-2">
                             <div><strong>{{ __('messages.sales_payment_type') }}</strong></div>
@@ -96,7 +96,7 @@
                     <thead class="bg-body-secondary">
                         <tr>
                             <th class="text-center" style="width: 60px">{{ __('messages.no') }}</th>
-                            <th>{{ __('messages.table_product') }}</th>
+                            <th class="text-start">{{ __('messages.table_product') }}</th>
                             <th class="text-center" style="width: 100px">{{ __('messages.table_qty') }}</th>
                             <th class="text-end" style="width: 140px">{{ __('messages.table_price') }}</th>
                             <th class="text-end" style="width: 140px">{{ __('messages.table_discount') }}</th>
@@ -183,10 +183,16 @@
                         <div class="mb-2">
                             <i class="ti ti-receipt me-1"></i> {{ __('messages.sales_payment_type') }} <strong>{{ $sales->payment_type ?? __('messages.not_available') }}</strong>
                         </div>
-                        @if (property_exists($sales, 'notes') && $sales->notes)
+                        @if ($sales->notes)
                             <div class="mt-3">
                                 <h6>{{ __('messages.sales_notes') }}</h6>
                                 <p class="text-muted">{{ $sales->notes }}</p>
+                            </div>
+                        @endif
+                        @if ($sales->terms_conditions)
+                            <div class="mt-3">
+                                <h6>{{ __('messages.terms_conditions') }}</h6>
+                                <p class="text-muted">{{ $sales->terms_conditions }}</p>
                             </div>
                         @endif
                     </div>

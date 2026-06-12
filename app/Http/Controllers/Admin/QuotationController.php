@@ -1,0 +1,395 @@
+<?php
+
+namespace App\Http\Controllers\Admin;
+
+use App\Http\Controllers\Controller;
+use App\Models\Customer;
+use App\Models\Product;
+use App\Models\Quotation;
+use App\Models\Sales;
+use App\Services\SalesService;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Validation\Rule;
+
+class QuotationController extends Controller
+{
+    protected $salesService;
+
+    public function __construct(SalesService $salesService)
+    {
+        $this->salesService = $salesService;
+    }
+
+    public function index(Request $request)
+    {
+        $entries = $request->input('entries', 10);
+        $query = Quotation::with('customer');
+
+        if ($search = $request->input('search')) {
+            $query->where(function ($q) use ($search) {
+                $q->where('quotation_number', 'like', "%{$search}%")
+                  ->orWhereHas('customer', fn($cq) => $cq->where('name', 'like', "%{$search}%"));
+            });
+        }
+
+        if ($status = $request->input('status')) {
+            $query->where('status', $status);
+        }
+
+        if ($dateFrom = $request->input('date_from')) {
+            $query->whereDate('quotation_date', '>=', $dateFrom);
+        }
+
+        if ($dateTo = $request->input('date_to')) {
+            $query->whereDate('quotation_date', '<=', $dateTo);
+        }
+
+        $quotations = $query->orderBy('created_at', 'desc')->paginate($entries);
+        $quotations->appends($request->all());
+
+        return view('admin.quotations.index', compact('quotations'));
+    }
+
+    public function create()
+    {
+        $customers = Customer::orderBy('name')->get();
+        $quotation = new Quotation();
+
+        return view('admin.quotations.quotation-create', compact('customers', 'quotation'));
+    }
+
+    public function store(Request $request)
+    {
+        $request->validate([
+            'customer_id' => 'required|exists:customers,id',
+            'quotation_date' => 'required|date',
+            'valid_until' => 'nullable|date',
+            'products' => 'required|json',
+            'notes' => 'nullable|string',
+            'terms_conditions' => 'nullable|string',
+            'discount_total' => 'nullable|numeric|min:0',
+            'discount_total_type' => 'nullable|in:fixed,percentage',
+            'tax_rate' => 'nullable|numeric|min:0',
+            'tax_type' => 'nullable|in:none,exclusive,inclusive',
+        ]);
+
+        try {
+            DB::beginTransaction();
+
+            $products = json_decode($request->products, true);
+            $subtotal = 0;
+            foreach ($products as $item) {
+                $subtotal += ($item['quantity'] ?? 1) * ($item['price'] ?? 0);
+            }
+
+            $discountType = $request->discount_total_type ?? 'percentage';
+            $discountValue = $request->discount_total ?? 0;
+            $discountAmount = $discountType === 'percentage' ? ($subtotal * $discountValue / 100) : $discountValue;
+
+            $taxRate = $request->tax_rate ?? 0;
+            $taxType = $request->tax_type ?? 'none';
+            $afterDiscount = $subtotal - $discountAmount;
+            $taxAmount = 0;
+            if ($taxType === 'exclusive') {
+                $taxAmount = $afterDiscount * ($taxRate / 100);
+            } elseif ($taxType === 'inclusive') {
+                $taxAmount = $afterDiscount - ($afterDiscount / (1 + $taxRate / 100));
+            }
+            $total = $taxType === 'exclusive' ? $afterDiscount + $taxAmount : $afterDiscount;
+
+            $quotation = Quotation::create([
+                'quotation_number' => $this->generateQuotationNumber(),
+                'customer_id' => $request->customer_id,
+                'user_id' => auth()->id(),
+                'quotation_date' => $request->quotation_date,
+                'valid_until' => $request->valid_until,
+                'subtotal' => $subtotal,
+                'discount_type' => $discountType,
+                'discount_value' => $discountValue,
+                'discount_amount' => $discountAmount,
+                'tax_type' => $taxType,
+                'tax_rate' => $taxRate,
+                'tax_amount' => $taxAmount,
+                'total' => max(0, $total),
+                'status' => 'draft',
+                'items' => $products,
+                'notes' => $request->notes,
+                'terms_conditions' => $request->terms_conditions,
+            ]);
+
+            DB::commit();
+
+            return redirect()->route('admin.quotations.show', $quotation->id)
+                ->with('success', 'Quotation created successfully.');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Quotation creation failed: ' . $e->getMessage(), ['exception' => $e]);
+            return back()->withErrors(['error' => 'Something went wrong: ' . $e->getMessage()])->withInput();
+        }
+    }
+
+    public function show($id)
+    {
+        $quotation = Quotation::with('customer', 'user')->findOrFail($id);
+        return view('admin.quotations.show', compact('quotation'));
+    }
+
+    public function edit($id)
+    {
+        $quotation = Quotation::with('customer')->findOrFail($id);
+        $customers = Customer::orderBy('name')->get();
+
+        return view('admin.quotations.quotation-edit', compact('quotation', 'customers'));
+    }
+
+    public function update(Request $request, $id)
+    {
+        $quotation = Quotation::findOrFail($id);
+
+        $request->validate([
+            'customer_id' => 'required|exists:customers,id',
+            'quotation_date' => 'required|date',
+            'valid_until' => 'nullable|date',
+            'products' => 'required|json',
+            'notes' => 'nullable|string',
+            'terms_conditions' => 'nullable|string',
+            'discount_total' => 'nullable|numeric|min:0',
+            'discount_total_type' => 'nullable|in:fixed,percentage',
+            'tax_rate' => 'nullable|numeric|min:0',
+            'tax_type' => 'nullable|in:none,exclusive,inclusive',
+        ]);
+
+        try {
+            DB::beginTransaction();
+
+            $products = json_decode($request->products, true);
+            $subtotal = 0;
+            foreach ($products as $item) {
+                $subtotal += ($item['quantity'] ?? 1) * ($item['price'] ?? 0);
+            }
+
+            $discountType = $request->discount_total_type ?? 'percentage';
+            $discountValue = $request->discount_total ?? 0;
+            $discountAmount = $discountType === 'percentage' ? ($subtotal * $discountValue / 100) : $discountValue;
+
+            $taxRate = $request->tax_rate ?? 0;
+            $taxType = $request->tax_type ?? 'none';
+            $afterDiscount = $subtotal - $discountAmount;
+            $taxAmount = 0;
+            if ($taxType === 'exclusive') {
+                $taxAmount = $afterDiscount * ($taxRate / 100);
+            } elseif ($taxType === 'inclusive') {
+                $taxAmount = $afterDiscount - ($afterDiscount / (1 + $taxRate / 100));
+            }
+            $total = $taxType === 'exclusive' ? $afterDiscount + $taxAmount : $afterDiscount;
+
+            $quotation->update([
+                'customer_id' => $request->customer_id,
+                'quotation_date' => $request->quotation_date,
+                'valid_until' => $request->valid_until,
+                'subtotal' => $subtotal,
+                'discount_type' => $discountType,
+                'discount_value' => $discountValue,
+                'discount_amount' => $discountAmount,
+                'tax_type' => $taxType,
+                'tax_rate' => $taxRate,
+                'tax_amount' => $taxAmount,
+                'total' => max(0, $total),
+                'items' => $products,
+                'notes' => $request->notes,
+                'terms_conditions' => $request->terms_conditions,
+            ]);
+
+            DB::commit();
+
+            return redirect()->route('admin.quotations.show', $quotation->id)
+                ->with('success', 'Quotation updated successfully.');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Quotation update failed: ' . $e->getMessage(), ['exception' => $e]);
+            return back()->withErrors(['error' => 'Something went wrong: ' . $e->getMessage()])->withInput();
+        }
+    }
+
+    public function destroy($id)
+    {
+        $quotation = Quotation::findOrFail($id);
+
+        try {
+            $quotation->delete();
+            return redirect()->route('admin.quotations')
+                ->with('success', 'Quotation deleted successfully.');
+        } catch (\Exception $e) {
+            return redirect()->route('admin.quotations')
+                ->with('error', 'Error deleting quotation. Please try again.');
+        }
+    }
+
+    public function updateStatus(Request $request, $id)
+    {
+        $request->validate([
+            'status' => 'required|in:draft,sent,accepted,rejected,expired,converted',
+        ]);
+
+        $quotation = Quotation::findOrFail($id);
+        $quotation->update(['status' => $request->status]);
+
+        return redirect()->back()->with('success', 'Quotation status updated.');
+    }
+
+    public function convertToSales($id)
+    {
+        $quotation = Quotation::with('customer')->findOrFail($id);
+
+        if ($quotation->status !== 'accepted') {
+            return redirect()->back()->with('error', 'Only accepted quotations can be converted to sales orders.');
+        }
+
+        if ($quotation->converted_to_sales_id) {
+            return redirect()->back()->with('error', 'This quotation has already been converted to a sales order.');
+        }
+
+        try {
+            DB::beginTransaction();
+
+            $items = $quotation->items ?? [];
+            $productsData = [];
+            foreach ($items as $item) {
+                $productsData[] = [
+                    'product_id' => $item['product_id'],
+                    'quantity' => $item['quantity'],
+                    'price' => $item['price'],
+                    'discount' => $item['discount'] ?? 0,
+                ];
+            }
+
+            $sales = Sales::create([
+                'customer_id' => $quotation->customer_id,
+                'user_id' => auth()->id(),
+                'order_date' => now(),
+                'due_date' => now()->addDays(30),
+                'payment_type' => 'credit',
+                'order_discount' => $quotation->discount_amount,
+                'order_discount_type' => $quotation->discount_type,
+                'total' => $quotation->total,
+                'status' => 'pending',
+                'tax_rate' => $quotation->tax_rate,
+                'total_tax' => $quotation->tax_amount,
+                'invoice' => $this->salesService->generateInvoiceNumber(),
+                'type' => Sales::TYPE_REGULAR,
+                'notes' => $quotation->notes,
+                'terms_conditions' => $quotation->terms_conditions,
+            ]);
+
+            $quotation->update([
+                'status' => 'converted',
+                'converted_to_sales_id' => $sales->id,
+            ]);
+
+            DB::commit();
+
+            return redirect()->route('admin.sales.show', $sales->id)
+                ->with('success', 'Quotation converted to sales order successfully.');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Quotation conversion failed: ' . $e->getMessage(), ['exception' => $e]);
+            return redirect()->back()->with('error', 'Failed to convert quotation: ' . $e->getMessage());
+        }
+    }
+
+    public function print($id)
+    {
+        $quotation = Quotation::with('customer', 'user')->findOrFail($id);
+        return view('admin.quotations.quotation-print-pdf', compact('quotation'));
+    }
+
+    public function getProductDetails($id)
+    {
+        $product = Product::findOrFail($id);
+        return response()->json([
+            'price' => $product->selling_price,
+            'name' => $product->name,
+        ]);
+    }
+
+    public function modalViews($id)
+    {
+        try {
+            $quotation = Quotation::with('customer', 'user')->findOrFail($id);
+            return view('admin.layouts.modals.quotations.quotationsmodals-view', compact('quotation'));
+        } catch (\Exception $e) {
+            Log::error("Error loading quotation modal view for ID {$id}: " . $e->getMessage());
+            return response('<div class="alert alert-danger">Error loading quotation details.</div>', 500);
+        }
+    }
+
+    public function bulkDelete(Request $request)
+    {
+        $request->validate([
+            'ids' => 'required|array|min:1',
+            'ids.*' => 'required|integer|exists:quotations,id',
+        ]);
+
+        try {
+            Quotation::whereIn('id', $request->ids)->delete();
+            return response()->json(['success' => true, 'message' => 'Quotations deleted successfully.']);
+        } catch (\Exception $e) {
+            return response()->json(['success' => false, 'message' => 'Error deleting quotations.'], 500);
+        }
+    }
+
+    public function bulkExport(Request $request)
+    {
+        $request->validate([
+            'ids' => 'nullable|array',
+            'ids.*' => 'integer|exists:quotations,id',
+            'export_option' => 'required|string|in:pdf,csv',
+        ]);
+
+        try {
+            $query = Quotation::with('customer');
+            if ($request->ids) {
+                $query->whereIn('id', $request->ids);
+            }
+            $quotations = $query->get();
+
+            if ($request->export_option === 'csv') {
+                $csv = "Quotation Number,Customer,Date,Total,Status\n";
+                foreach ($quotations as $q) {
+                    $csv .= "\"{$q->quotation_number}\",\"{$q->customer?->name}\",\"{$q->quotation_date?->format('Y-m-d')}\",{$q->total},\"{$q->status}\"\n";
+                }
+                return response($csv, 200, [
+                    'Content-Type' => 'text/csv',
+                    'Content-Disposition' => 'attachment; filename="quotations.csv"',
+                ]);
+            }
+
+            $first = $quotations->first();
+            if ($first) {
+                return redirect()->route('admin.quotations.print', $first->id);
+            }
+            return back()->with('error', 'No quotations to export.');
+        } catch (\Exception $e) {
+            return response()->json(['success' => false, 'message' => 'Export failed.'], 500);
+        }
+    }
+
+    private function generateQuotationNumber(): string
+    {
+        $prefix = 'QTN-' . date('Ymd');
+        $last = Quotation::where('quotation_number', 'like', "{$prefix}-%")
+            ->orderBy('id', 'desc')
+            ->first();
+
+        if ($last) {
+            $lastNum = (int) substr($last->quotation_number, -4);
+            $newNum = $lastNum + 1;
+        } else {
+            $newNum = 1;
+        }
+
+        return "{$prefix}-" . str_pad($newNum, 4, '0', STR_PAD_LEFT);
+    }
+}

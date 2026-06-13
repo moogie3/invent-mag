@@ -7,7 +7,12 @@
             <div class="row g-2 align-items-center">
                 <div class="col">
                     <div class="page-pretitle"><i class="ti ti-building-community"></i> Management</div>
-                    <h2 class="page-title">Tenants</h2>
+                    <h2 class="page-title">
+                        Tenants
+                        <a href="#" class="ms-3 text-muted" data-bs-toggle="modal" data-bs-target="#how-it-works-modal" title="How It Works">
+                            <i class="ti ti-help-circle fs-3"></i>
+                        </a>
+                    </h2>
                     <div class="text-muted mt-1">Manage all tenant workspaces on the platform.</div>
                 </div>
                 <div class="col-auto ms-auto d-print-none">

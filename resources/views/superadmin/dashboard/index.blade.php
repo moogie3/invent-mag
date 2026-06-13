@@ -8,7 +8,12 @@
         <div class="container-xl">
             <div class="row g-2 align-items-center">
                 <div class="col">
-                    <h2 class="page-title">Good morning, Super Admin</h2>
+                    <h2 class="page-title">
+                        Good morning, Super Admin
+                        <a href="#" class="ms-3 text-muted" data-bs-toggle="modal" data-bs-target="#how-it-works-modal" title="How It Works">
+                            <i class="ti ti-help-circle fs-3"></i>
+                        </a>
+                    </h2>
                     <div class="text-muted mt-1">Welcome back! Here's an overview of your SaaS platform.</div>
                 </div>
                 <div class="col-auto ms-auto d-print-none">

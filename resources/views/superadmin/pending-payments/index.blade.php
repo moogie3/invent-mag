@@ -7,7 +7,12 @@
             <div class="row g-2 align-items-center">
                 <div class="col">
                     <div class="page-pretitle"><i class="ti ti-clock"></i> Payments</div>
-                    <h2 class="page-title">Pending Payments</h2>
+                    <h2 class="page-title">
+                        Pending Payments
+                        <a href="#" class="ms-3 text-muted" data-bs-toggle="modal" data-bs-target="#how-it-works-modal" title="How It Works">
+                            <i class="ti ti-help-circle fs-3"></i>
+                        </a>
+                    </h2>
                     <div class="text-muted mt-1">Review and approve pending subscription payments.</div>
                 </div>
             </div>

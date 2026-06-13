@@ -12,7 +12,12 @@
                         </a>
                         <div>
                             <div class="page-pretitle"><i class="ti ti-currency-dollar"></i> Configuration / Billing</div>
-                            <h2 class="page-title mb-0">Order #{{ $order->order_number }}</h2>
+                            <h2 class="page-title mb-0">
+                                Order #{{ $order->order_number }}
+                                <a href="#" class="ms-2 text-muted" data-bs-toggle="modal" data-bs-target="#how-it-works-modal" title="How It Works">
+                                    <i class="ti ti-help-circle fs-5"></i>
+                                </a>
+                            </h2>
                         </div>
                     </div>
                 </div>

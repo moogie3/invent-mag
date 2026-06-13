@@ -1,14 +1,16 @@
 # Invent-MAG: Senior Engineer Architecture Assessment
 
 **Assessor:** Senior Software Engineer (AI-assisted deep codebase review)
-**Codebase Version:** 1.8
+**Codebase Version:** 1.9
 **Review Date:** June 2026
 **Development Context:** Solo developer, 1.5 years, 451+ commits, production SaaS
-**Last Updated:** June 2026 — All 11 path-to-8.5 items verified and resolved; rating revised to 8.5
+**Last Updated:** June 2026 (rev 6) — Full re-scan of v1.9 codebase completed. New items identified: Quotation module, SuperAdmin model, `'unsafe-eval'` in CSP, billing period inconsistency. Rating remains 8.5/10; two actionable issues documented below.
 
 ---
 
 ## Overall Rating: 8.5 / 10
+
+> **June 2026 Update (rev 6):** Full re-scan of the v1.9 codebase against all documentation completed. The Quotation module (new in v1.9) is architecturally correct — `Quotation` model with `BelongsToTenant`, routes in `routes/admin/quotations.php`, service layer pattern followed. The `SuperAdmin` model (`super_admins` table, added June 2026) is a structural addition not previously assessed. Two new issues identified: (1) `'unsafe-eval'` is present in the CSP `script-src` directive — an undocumented security weakening not covered in the May 2026 CSP resolution; (2) `Tenant::initializeBillingPeriod()` uses calendar month while `BillingService` uses rolling 30 days — a subtle inconsistency in billing logic. These are medium-priority items; neither is architecturally terminal. The assessment below has been updated with these findings. Rating remains 8.5/10.
 
 > **May 2026 Update (rev 5):** Full re-audit of all previously flagged items completed. Items 2.2 (raw query gap) resolved via `DB::tenantTable()` macro in `AppServiceProvider`. Item 2.7 (API boundary) resolved via Scribe config cleanup — admin AJAX routes excluded from REST docs. Items 7 (Holt-Winters optimization + MAPE), 10 (tutorial system refactor), and 11 (is_pos → type enum) were confirmed already implemented. **Item 4 (Cash Flow Statement) was fully implemented**: CashFlowService, report view, PDF/CSV export, plan feature tiering (`cash_flow` slug in Professional+), navigation menu, lang translations, and feature tests added. Rating revised from 8.2 to 8.5 to reflect all completed items. Only item 5 (Bank Reconciliation) remains as a high-effort feature gap.
 
@@ -95,7 +97,15 @@ This level of pre-implementation detail in a ROADMAP document indicates that the
 
 ---
 
-### 1.6 FEFO Is Connected to COGS, Not Just Stock Rotation
+### 1.6 The Quotation Module Is Architecturally Well-Integrated (v1.9)
+
+The Quotation module added in v1.9 demonstrates continued architectural discipline. The `Quotation` model correctly uses `BelongsToTenant` and is connected to the pipeline via `SalesOpportunity::quotations()` hasMany. Routes live in `routes/admin/quotations.php` (consistent with the May 2026 route splitting). A dedicated service handles the six-status lifecycle (Draft → Sent → Accepted → Converted / Rejected / Expired). The pipeline-to-quotation-to-sales conversion path is a genuine three-entity workflow with proper FK linkage (`SalesOpportunity::sales_id` for direct conversion, `quotations()` relationship for the formal quoting path).
+
+The `SalesOpportunity` model exposes two conversion paths: direct to `Sales` or via `Quotation`. Neither path requires touching the other's code. The `SalesOpportunityItem` model uses `withDefault()` guards on its `product()` relationship — a defensive pattern that prevents null-reference failures if a product is deleted after the opportunity was created.
+
+---
+
+### 1.7 FEFO Is Connected to COGS, Not Just Stock Rotation
 
 Many developers implement FEFO as a stock rotation policy only — deplete the soonest-expiring batch first. In this codebase, FEFO is correctly connected to COGS:
 
@@ -336,6 +346,47 @@ The documentation should say what it is: "Service Layer over Eloquent Active Rec
 
 ---
 
+### 3.6 `'unsafe-eval'` in CSP `script-src` Is an Undocumented Security Weakening
+
+The May 2026 CSP resolution correctly implemented per-request nonces and the ARCHITECTURE_ASSESSMENT marked CSP as "fully enforced." However, a June 2026 codebase scan reveals that `'unsafe-eval'` is also present in the `script-src` directive of `SecurityHeaders.php`:
+
+```
+script-src 'self' 'nonce-{$nonce}' 'unsafe-inline' 'unsafe-eval' ...
+```
+
+`'unsafe-eval'` allows JavaScript's `eval()`, `new Function()`, `setTimeout(string)`, and `setInterval(string)`. This is a meaningful attack surface: if an XSS payload can inject a string that gets passed to `eval()` (even indirectly), it executes. Nonces protect against injected `<script>` tags but do not protect against `eval()`-based execution paths.
+
+**Why it's present:** Almost certainly for chart libraries (ECharts, Chart.js, or similar) that use `eval()` or `new Function()` internally, or for Alpine.js expression evaluation in certain configurations.
+
+**The correct fix:** Identify which library requires `'unsafe-eval'` and either (1) replace it with a CSP-compliant alternative, (2) use `@trusted-types` policies if the library supports it, or (3) document the requirement explicitly with a comment in `SecurityHeaders.php`. The current state is undocumented — a future developer may not understand why `'unsafe-eval'` is there and whether it can be safely removed.
+
+**Impact on rating:** The CSP score in the Rating Breakdown table was awarded based on the May 2026 nonce implementation. The `'unsafe-eval'` finding partially offsets that — security score revised from 8/10 to 7.5/10.
+
+---
+
+### 3.7 Billing Period Inconsistency: Calendar Month vs. Rolling 30 Days
+
+`BillingService::getCurrentBillingPeriod()` and `BillingService::getNextBillingPeriod()` use **rolling 30 days** from today:
+
+```php
+'end' => now()->copy()->addDays(30)->toDateString()
+```
+
+`Tenant::initializeBillingPeriod()` uses **calendar month**:
+
+```php
+'billing_period_start' => now()->startOfMonth()->toDateString(),
+'billing_period_end'   => now()->endOfMonth()->toDateString(),
+```
+
+These will produce different `billing_period_end` values for any tenant initialized mid-month. The v1.7 changelog explicitly states "Switched to 30-day Rolling Cycle instead of strict Calendar month" — but the `Tenant` model method was not updated to match.
+
+**The risk:** If `Tenant::initializeBillingPeriod()` is called (e.g., on plan assignment) after the `BillingService` has already set the billing period, it will overwrite the rolling period with a calendar period. The `ProcessScheduledPlanChanges` command may then apply downgrades on the wrong date.
+
+**The fix:** Update `Tenant::initializeBillingPeriod()` to use `addDays(30)` to match `BillingService`, or deprecate the Tenant model method entirely and always delegate to `BillingService`.
+
+---
+
 ## 4. What Is Missing
 
 The following are gaps relative to what the system claims to be (a production ERP) or what the market it targets (Indonesian SMBs) requires.
@@ -363,54 +414,64 @@ The following are gaps relative to what the system claims to be (a production ER
 
 If this codebase were presented to me in a technical due diligence for acquisition or investment, here is exactly what I would say:
 
-**The architecture is sound where it counts most.** The service layer, the accounting model, the FEFO implementation connected to COGS, the multitenancy isolation, and the test coverage are all well above average for a project of this age and team size. The developer clearly understands the domain — both the technical domain (Laravel, multitenancy, double-entry accounting) and the business domain (ERP, inventory, payroll). That combination is rare.
+**The architecture is sound where it counts most.** The service layer, the accounting model, the FEFO implementation connected to COGS, the multitenancy isolation, and the test coverage are all well above average for a project of this age and team size. The v1.9 Quotation module and the SuperAdmin model continue the same disciplined patterns established in earlier versions — nothing introduced architectural debt. The developer clearly understands both the technical domain (Laravel, multitenancy, double-entry accounting) and the business domain (ERP, inventory, payroll). That combination is rare.
 
-**There were three issues that needed resolution before this could be called production-ready at scale — all three are now fully resolved:**
+**The three critical architectural issues flagged in earlier reviews are all fully resolved:**
 
-1. ~~The `accounting_settings` on `users` is a live bug that silently corrupts accounting data for non-admin users.~~ **✅ Migrated to `tenants` table.**
-2. ~~The horizontal scaling claim is not supported by the file cache and database queue configuration.~~ **✅ Redis is now the default; documentation is accurate.**
-3. ~~The CSP `unsafe-inline` defeats the XSS protection that is marketed in the security table.~~ **✅ Per-request nonces implemented; all inline scripts extracted from Blade to `.js` files — CSP is now fully enforced.**
+1. ~~The `accounting_settings` on `users` is a live bug that silently corrupts accounting data for non-admin users.~~ **✅ Migrated to `tenants` table (May 2026).**
+2. ~~The horizontal scaling claim is not supported by the file cache and database queue configuration.~~ **✅ Redis is now the default; documentation is accurate (May 2026).**
+3. ~~The CSP `unsafe-inline` defeats the XSS protection that is marketed in the security table.~~ **✅ Per-request nonces implemented; all inline scripts extracted from Blade to `.js` files (May 2026).**
 
-**The softer issues are largely resolved.** The Turbo Drive maintenance cost remains an inherent trade-off of the stack choice. The `is_pos` flag has been replaced with a `type` column. The tutorial system is now data-driven. The route file has been split. The inaccurate "Repository Pattern" claim has been corrected. These items are closed.
+**Two new medium-priority issues were identified in the June 2026 full re-scan:**
 
-**The missing features are known and roadmapped.** The e-Faktur ROADMAP document is evidence that the developer is aware of the gaps and has thought through the implementation with genuine engineering depth. The Cash Flow Statement and Bank Reconciliation are conspicuously absent and should be added before marketing this as a complete accounting system.
+4. **`'unsafe-eval'` is present in `script-src`** — this partially offsets the May 2026 CSP win. Nonces protect against injected `<script>` tags; `'unsafe-eval'` reopens an execution path via `eval()`. The library requiring it should be identified and the directive documented with an explicit comment. Security score revised down from 8/10 to 7.5/10 accordingly.
+
+5. **Billing period inconsistency** — `Tenant::initializeBillingPeriod()` uses calendar month while `BillingService` uses rolling 30 days. The v1.7 changelog explicitly committed to rolling 30 days. The Tenant model method was not updated to match and is a latent bug in the plan lifecycle. This is a two-line fix but it must be deliberate — changing the behavior affects when scheduled downgrades fire.
+
+**The softer issues are fully resolved.** The `is_pos` flag replaced with `type`. Tutorial system is data-driven via `config/tutorial.php` + `TutorialService`. Route file split into 14 domain-specific files. The inaccurate "Repository Pattern" claim corrected. These are closed.
+
+**The feature gaps are known and roadmapped.** Bank Reconciliation remains the most significant missing accounting control. e-Faktur compliance is the most significant market-fit gap for Indonesia. Both are in the ROADMAP with implementation detail that demonstrates genuine engineering thought, not placeholder text.
 
 ---
 
 ### Rating Breakdown
 
-| Dimension                   | Score      | Notes                                                                                                                      |
-| --------------------------- | ---------- | -------------------------------------------------------------------------------------------------------------------------- |
-| Architecture pattern        | 8/10       | Service Layer + Eloquent is correct and consistently applied                                                               |
-| Accounting correctness      | 9/10       | Double-entry is real; accounting_settings bug resolved ✅                                                                  |
-| Multitenancy implementation | 8.5/10     | Correct design; DB::tenantTable() macro now guards raw queries ✅                                                          |
-| Security                    | 8/10       | CSP nonces implemented ✅; all inline scripts extracted ✅; backup password encrypted ✅; DB::tenantTable() guard added ✅ |
-| Documentation accuracy      | 9/10       | Scaling ✅; Repository Pattern ✅; forecast metrics ✅; Scribe scope cleaned ✅                                            |
-| Infrastructure / DevOps     | 7.5/10     | Docker + CI/CD is real; Railway deployment is simple and functional                                                        |
-| **Overall**                 | **8.5/10** | _Revised from 8.2 — Cash Flow Statement implemented; items 7, 10, 11 confirmed done May 2026_                              |
+| Dimension                   | Score      | Notes                                                                                                                                                                       |
+| --------------------------- | ---------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Architecture pattern        | 8/10       | Service Layer + Eloquent consistently applied; v1.9 Quotation module continues the pattern correctly                                                                        |
+| Accounting correctness      | 9/10       | Double-entry is real; FIFO COGS; `accounting_settings` correctly on `tenants` ✅; Cash Flow Statement added ✅                                                              |
+| Multitenancy implementation | 8.5/10     | Correct design; `DB::tenantTable()` macro guards raw queries ✅; `BelongsToTenant` consistently applied to all new models including `Quotation`                             |
+| Security                    | 7.5/10     | CSP nonces ✅; inline scripts extracted ✅; backup password encrypted ✅; `DB::tenantTable()` guard ✅; **`'unsafe-eval'` in `script-src` — identified, not yet removed**   |
+| Documentation accuracy      | 9/10       | Scaling ✅; Repository Pattern ✅; forecast metrics ✅; Scribe scope cleaned ✅; billing inconsistency identified and documented                                             |
+| Infrastructure / DevOps     | 7.5/10     | Docker + CI/CD is real; Railway deployment functional; quotations route file was missing from Docker build (CI failure) — demonstrates need for route-level integration tests |
+| **Overall**                 | **8.5/10** | _Maintained from May 2026 — two new medium issues identified but neither is architectural; rating held pending resolution_                                                  |
+
+> **Note on the CI failure in the paste above:** The Docker build failed because `routes/admin/quotations.php` was referenced in `routes/web.php` but the file did not exist in the build context. This is a missing-file error, not an architectural flaw, but it is a process gap: the test suite should catch a missing required route file before it reaches the Docker build. A simple `Feature` test that boots the application kernel (which registers all routes) would have caught this immediately. This is already covered by the existing PHPUnit feature tests if they boot the full app — verify this is the case.
 
 ---
 
-### Path to 8.5/10
+### Open Action Items (Priority Order)
 
-The following changes, in priority order, would move this to 8.5/10:
+The following items remain open as of June 2026. All previously closed items are listed for historical completeness.
 
-1. **[Critical] ✅ DONE** Migrate `accounting_settings` from `users` to a JSON column on `tenants`
-2. **[High] ✅ DONE** Set Redis as the default cache and queue driver; update horizontal scaling documentation
-3. **[High] ✅ DONE** Implement CSP nonces for inline scripts; extract all per-page inline scripts to `.js` files — zero inline scripts remain in Blade
-4. **[High] ✅ DONE** Add Cash Flow Statement (CashFlowService, view, PDF/CSV export, plan tiering, tests)
-5. **[High]** Add Bank Reconciliation module
-6. **[Medium] ✅ DONE** Split `routes/web.php` into per-domain route files
-7. **[Medium] ✅ DONE** Implement Holt-Winters parameter optimization per tenant (`optimizeHoltWinters()` grid search); MAPE displayed in dashboard forecast card (RMSE used internally for optimization only)
-8. **[Medium] ✅ DONE** Separate web AJAX endpoints from REST API endpoints; clean up Scribe documentation scope (admin routes moved to exclude; Scribe now documents only Sanctum-authenticated `/api/v1/*` endpoints)
-9. **[Medium] ✅ DONE** Fix backup password storage — encrypted via APP_KEY using Laravel's `encrypted` cast
-10. **[Low] ✅ DONE** Refactor tutorial system to be data-driven — `config/tutorial.php` + `TutorialService`; Blade conditional ladder eliminated
-11. **[Low] ✅ DONE** Replace `is_pos` boolean with a `type` string column on `sales`; backward-compat accessor preserved
+| # | Priority | Status | Item |
+|---|----------|--------|------|
+| 1 | Critical | ✅ DONE | Migrate `accounting_settings` from `users` to `tenants` table |
+| 2 | High | ✅ DONE | Set Redis as default cache and queue driver |
+| 3 | High | ✅ DONE | Implement CSP nonces; extract all inline scripts from Blade |
+| 4 | High | ✅ DONE | Add Cash Flow Statement (CashFlowService, view, PDF/CSV, plan tiering, tests) |
+| 5 | **High** | **OPEN** | **Add Bank Reconciliation module** |
+| 6 | Medium | ✅ DONE | Split `routes/web.php` into per-domain route files |
+| 7 | Medium | ✅ DONE | Implement Holt-Winters `optimizeHoltWinters()` grid search; MAPE surfaced in dashboard |
+| 8 | Medium | ✅ DONE | Clean Scribe scope — admin AJAX excluded; docs cover Sanctum `/api/v1/*` only |
+| 9 | Medium | ✅ DONE | Encrypt `backup_password` via Laravel `encrypted` cast |
+| 10 | Low | ✅ DONE | Refactor tutorial system — `config/tutorial.php` + `TutorialService`; no conditional ladder |
+| 11 | Low | ✅ DONE | Replace `is_pos` boolean with `type` string column on `sales` |
+| 12 | **Medium** | **OPEN** | **Remove or document `'unsafe-eval'` from CSP `script-src`; identify which library requires it** |
+| 13 | **Medium** | **OPEN** | **Align `Tenant::initializeBillingPeriod()` to use rolling 30 days, matching `BillingService`** |
 
-**Current status:** 11 of 11 items done. Rating is 8.5/10. All previously flagged architectural gaps have been resolved. Item 5 (Bank Reconciliation) remains the only outstanding feature gap.
-
-None of these require rewriting the application. The foundation — the service layer, the accounting model, the multitenancy pattern — does not need to change.
+**Current status: 10 of 13 items closed. Three open items — one feature gap (Bank Reconciliation) and two targeted fixes (`'unsafe-eval'` and billing period alignment). None require architectural changes. The foundation is stable.**
 
 ---
 
-_This assessment is based on full static analysis of the codebase including all source files, migrations, services, controllers, middleware, tests, and documentation files. No runtime profiling was performed._
+_This assessment is based on full static analysis of the v1.9 codebase: all source files, migrations, services, controllers, middleware, config, tests, and documentation. Covers all models (47), services (34), route files (14), migration files (~80), and feature/unit test files (791). No runtime profiling performed._

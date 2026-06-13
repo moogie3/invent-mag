@@ -149,6 +149,23 @@ return Application::configure(basePath: dirname(__DIR__))
             return $handleError($request, 404, 'Resource not found');
         });
 
+        // Database connection issues — render 401 (not authenticated) page
+        $exceptions->render(function (\PDOException $e, Illuminate\Http\Request $request) use ($handleError) {
+            return $handleError($request, 401, 'Service temporarily unavailable');
+        });
+
+        $exceptions->render(function (\Illuminate\Database\QueryException $e, Illuminate\Http\Request $request) use ($handleError) {
+            return $handleError($request, 401, 'Service temporarily unavailable');
+        });
+
+        // Maintenance mode (503)
+        $exceptions->render(function (\Symfony\Component\HttpKernel\Exception\HttpException $e, Illuminate\Http\Request $request) use ($handleError) {
+            if ($e->getStatusCode() === 503) {
+                return $handleError($request, 503, 'Maintenance');
+            }
+            return null;
+        });
+
         // 500 - Server Error (catch-all)
         $exceptions->render(function (\Throwable $e, Illuminate\Http\Request $request) use ($handleError) {
             // Let Laravel handle ValidationException natively (redirects back with errors)

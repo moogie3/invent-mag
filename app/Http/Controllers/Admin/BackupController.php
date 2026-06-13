@@ -122,14 +122,16 @@ class BackupController extends Controller
 
         // Security: Verify file belongs to this tenant
         if (!Storage::disk('local')->exists($path)) {
-            return redirect()->route('admin.setting.backup.index')
-                ->with('error', __('messages.backup_file_not_found'));
+            session()->flash('error', __('messages.backup_file_not_found'));
+            session()->save();
+            return redirect()->route('admin.setting.backup.index');
         }
 
         // Verify filename starts with tenant domain (additional security)
         if (!str_starts_with($filename, $tenant->domain)) {
-            return redirect()->route('admin.setting.backup.index')
-                ->with('error', __('messages.backup_unauthorized'));
+            session()->flash('error', __('messages.backup_unauthorized'));
+            session()->save();
+            return redirect()->route('admin.setting.backup.index');
         }
 
         Log::channel('security')->info('Backup downloaded', [
@@ -147,14 +149,16 @@ class BackupController extends Controller
 
         // Security: Verify file belongs to this tenant
         if (!Storage::disk('local')->exists($path)) {
-            return redirect()->route('admin.setting.backup.index')
-                ->with('error', __('messages.backup_file_not_found'));
+            session()->flash('error', __('messages.backup_file_not_found'));
+            session()->save();
+            return redirect()->route('admin.setting.backup.index');
         }
 
         // Verify filename starts with tenant domain (additional security)
         if (!str_starts_with($filename, $tenant->domain)) {
-            return redirect()->route('admin.setting.backup.index')
-                ->with('error', __('messages.backup_unauthorized'));
+            session()->flash('error', __('messages.backup_unauthorized'));
+            session()->save();
+            return redirect()->route('admin.setting.backup.index');
         }
 
         try {
@@ -165,11 +169,13 @@ class BackupController extends Controller
                 'filename' => $filename,
             ]);
 
-            return redirect()->route('admin.setting.backup.index')
-                ->with('success', __('messages.backup_delete_success'));
+            session()->flash('success', __('messages.backup_delete_success'));
+            session()->save();
+            return redirect()->route('admin.setting.backup.index');
         } catch (\Exception $e) {
-            return redirect()->route('admin.setting.backup.index')
-                ->with('error', __('messages.backup_delete_error'));
+            session()->flash('error', __('messages.backup_delete_error'));
+            session()->save();
+            return redirect()->route('admin.setting.backup.index');
         }
     }
 
@@ -213,7 +219,9 @@ class BackupController extends Controller
         // Verify password for encrypted backup
         if ($tenant->isBackupEncrypted()) {
             if ($password !== $tenant->backup_password) {
-                return redirect()->back()->with('error', __('messages.backup_password_error'))->withInput();
+                session()->flash('error', __('messages.backup_password_error'));
+                session()->save();
+                return redirect()->back()->withInput();
             }
         }
 
@@ -236,9 +244,9 @@ class BackupController extends Controller
             if ($openResult !== true) {
                 Storage::disk('local')->delete($tempPath);
                 Log::error('Restore failed: Invalid ZIP', ['result' => $openResult]);
-                return redirect()->back()
-                    ->with('error', __('messages.backup_restore_error') . ': Invalid or corrupted ZIP file')
-                    ->withInput();
+                session()->flash('error', __('messages.backup_restore_error') . ': Invalid or corrupted ZIP file');
+                session()->save();
+                return redirect()->back()->withInput();
             }
 
             // Find backup.sql inside the ZIP
@@ -246,9 +254,9 @@ class BackupController extends Controller
             if ($sqlIndex === false) {
                 $zip->close();
                 Storage::disk('local')->delete($tempPath);
-                return redirect()->back()
-                    ->with('error', __('messages.backup_restore_error') . ': backup.sql not found inside ZIP')
-                    ->withInput();
+                session()->flash('error', __('messages.backup_restore_error') . ': backup.sql not found inside ZIP');
+                session()->save();
+                return redirect()->back()->withInput();
             }
 
             // Extract SQL content from ZIP
@@ -259,9 +267,9 @@ class BackupController extends Controller
             Storage::disk('local')->delete($tempPath);
 
             if (empty($sqlContent)) {
-                return redirect()->back()
-                    ->with('error', __('messages.backup_restore_error') . ': backup.sql is empty')
-                    ->withInput();
+                session()->flash('error', __('messages.backup_restore_error') . ': backup.sql is empty');
+                session()->save();
+                return redirect()->back()->withInput();
             }
 
             // Execute the SQL to restore tenant data
@@ -305,8 +313,9 @@ class BackupController extends Controller
             if (!$process->isSuccessful()) {
                 $error = $process->getErrorOutput();
                 Log::error('Restore SQL execution failed', ['error' => $error, 'tenant_id' => $tenantId]);
-                return redirect()->route('admin.setting.backup.index')
-                    ->with('error', __('messages.backup_restore_error') . ': ' . $error);
+                session()->flash('error', __('messages.backup_restore_error') . ': ' . $error);
+                session()->save();
+                return redirect()->route('admin.setting.backup.index');
             }
 
             Log::channel('security')->info('Backup restored successfully', [
@@ -314,13 +323,15 @@ class BackupController extends Controller
                 'filename'  => $file->getClientOriginalName(),
             ]);
 
-            return redirect()->route('admin.setting.backup.index')
-                ->with('success', __('messages.backup_restore_success') ?? 'Backup restored successfully. Your data has been replaced with the backup.');
+            session()->flash('success', __('messages.backup_restore_success') ?? 'Backup restored successfully. Your data has been replaced with the backup.');
+            session()->save();
+            return redirect()->route('admin.setting.backup.index');
 
         } catch (\Exception $e) {
             Log::error('Restore exception', ['error' => $e->getMessage(), 'trace' => $e->getTraceAsString()]);
-            return redirect()->route('admin.setting.backup.index')
-                ->with('error', __('messages.backup_restore_error') . ': ' . $e->getMessage());
+            session()->flash('error', __('messages.backup_restore_error') . ': ' . $e->getMessage());
+            session()->save();
+            return redirect()->route('admin.setting.backup.index');
         }
     }
 
@@ -355,7 +366,9 @@ class BackupController extends Controller
                 'email' => $user->email,
                 'reason' => 'Incorrect current password',
             ]);
-            return redirect()->back()->with('error', __('messages.backup_password_error'));
+            session()->flash('error', __('messages.backup_password_error'));
+            session()->save();
+            return redirect()->back();
         }
 
         $newPassword = $request->new_password;
@@ -372,7 +385,8 @@ class BackupController extends Controller
             'user_id' => $user->id,
         ]);
 
-        return redirect()->route('admin.setting.backup.index')
-            ->with('success', __('messages.backup_password_changed'));
+        session()->flash('success', __('messages.backup_password_changed'));
+        session()->save();
+        return redirect()->route('admin.setting.backup.index');
     }
 }

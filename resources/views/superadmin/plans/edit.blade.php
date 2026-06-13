@@ -12,7 +12,12 @@
                         </a>
                         <div>
                             <div class="page-pretitle"><i class="ti ti-packages"></i> Management / Plans</div>
-                            <h2 class="page-title mb-0">Edit Plan: {{ $plan->name }}</h2>
+                            <h2 class="page-title mb-0">
+                                Edit Plan: {{ $plan->name }}
+                                <a href="#" class="ms-2 text-muted" data-bs-toggle="modal" data-bs-target="#how-it-works-modal" title="How It Works">
+                                    <i class="ti ti-help-circle fs-5"></i>
+                                </a>
+                            </h2>
                         </div>
                     </div>
                 </div>

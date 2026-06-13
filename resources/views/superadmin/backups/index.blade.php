@@ -7,7 +7,12 @@
             <div class="row g-2 align-items-center">
                 <div class="col">
                     <div class="page-pretitle"><i class="ti ti-database"></i> System</div>
-                    <h2 class="page-title">Backups</h2>
+                    <h2 class="page-title">
+                        Backups
+                        <a href="#" class="ms-3 text-muted" data-bs-toggle="modal" data-bs-target="#how-it-works-modal" title="How It Works">
+                            <i class="ti ti-help-circle fs-3"></i>
+                        </a>
+                    </h2>
                     <div class="text-muted mt-1">System and per-tenant backup management.</div>
                 </div>
                 <div class="col-auto ms-auto d-print-none">
@@ -23,19 +28,6 @@
     </div>
     <div class="page-body">
         <div class="container-xl">
-            @if(session('success'))
-            <div class="alert alert-success alert-dismissible fade show" role="alert">
-                <i class="ti ti-check me-1"></i>{{ session('success') }}
-                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-            </div>
-            @endif
-            @if(session('error'))
-            <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                <i class="ti ti-alert-triangle me-1"></i>{{ session('error') }}
-                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-            </div>
-            @endif
-
             <div class="row row-deck row-cards mb-4">
                 <div class="col-sm-6 col-lg-3">
                     <div class="card shadow border-0 rounded-4 stat-card card-hover">
@@ -238,7 +230,7 @@
                         </div>
 
                         <div class="tab-pane" id="restore-backup" role="tabpanel">
-                            <form method="POST" action="{{ route('superadmin.backups.restore') }}" enctype="multipart/form-data" onsubmit="return confirm('WARNING: This will REPLACE all tenant data with the backup. This action cannot be undone. Continue?')">
+                            <form method="POST" action="{{ route('superadmin.backups.restore') }}" enctype="multipart/form-data" id="restore-form" onsubmit="return confirm('WARNING: This will REPLACE all tenant data with the backup. This action cannot be undone. Continue?')">
                                 @csrf
                                 <div class="row g-3">
                                     <div class="col-md-5">
@@ -260,8 +252,9 @@
                                         <input type="file" name="backup_file" class="form-control" accept=".zip" required>
                                     </div>
                                     <div class="col-md-3 d-flex align-items-end">
-                                        <button type="submit" class="btn btn-warning w-100">
-                                            <i class="ti ti-rotate-clockwise me-1"></i>Restore
+                                        <button type="submit" class="btn btn-warning w-100" id="restore-btn">
+                                            <span class="btn-text"><i class="ti ti-rotate-clockwise me-1"></i>Restore</span>
+                                            <span class="btn-loading d-none"><span class="spinner-border spinner-border-sm me-1"></span> Restoring...</span>
                                         </button>
                                     </div>
                                 </div>
@@ -283,4 +276,18 @@
         </div>
     </div>
 </div>
+
+@push('scripts')
+<script>
+document.getElementById('restore-form')?.addEventListener('submit', function(e) {
+    if (e.defaultPrevented) return;
+    const btn = document.getElementById('restore-btn');
+    if (btn) {
+        btn.disabled = true;
+        btn.querySelector('.btn-text').classList.add('d-none');
+        btn.querySelector('.btn-loading').classList.remove('d-none');
+    }
+});
+</script>
+@endpush
 @endSection

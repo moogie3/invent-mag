@@ -1,0 +1,246 @@
+<?php
+
+return [
+    'superadmin.dashboard' => [
+        'title' => 'Dashboard Overview',
+        'icon' => 'ti ti-dashboard',
+        'description' => 'Your central command center for monitoring the entire SaaS platform.',
+        'steps' => [
+            'View real-time platform statistics: total tenants, revenue, and active plans.',
+            'Monitor subscription metrics and revenue charts.',
+            'Track pending actions that need your attention.',
+            'Use quick action tiles to jump to common management tasks.',
+        ],
+    ],
+    'superadmin.tenants.index' => [
+        'title' => 'Tenant Management',
+        'icon' => 'ti ti-building-community',
+        'description' => 'Manage all tenant workspaces registered on the platform.',
+        'steps' => [
+            'Browse all tenants with their assigned plan, status, and creation date.',
+            'Click a tenant name to view detailed information and configuration.',
+            'Toggle tenant active status to enable or disable access.',
+            'Use impersonation to log in as a tenant for troubleshooting.',
+        ],
+    ],
+    'superadmin.tenants.show' => [
+        'title' => 'Tenant Details',
+        'icon' => 'ti ti-building-community',
+        'description' => 'View and manage individual tenant settings and information.',
+        'steps' => [
+            'Review tenant profile, domain, and subscription details.',
+            'Update tenant domain if needed.',
+            'View subscription history and current plan status.',
+            'Manage tenant-specific settings and access controls.',
+        ],
+    ],
+    'superadmin.plans.index' => [
+        'title' => 'Subscription Plans',
+        'icon' => 'ti ti-packages',
+        'description' => 'Create and manage pricing plans available to tenants.',
+        'steps' => [
+            'Browse all plans with their pricing, features, and active status.',
+            'Create new plans with custom pricing and billing intervals.',
+            'Edit existing plans to update pricing, features, or limits.',
+            'Deactivate plans that are no longer offered to new tenants.',
+        ],
+    ],
+    'superadmin.plans.create' => [
+        'title' => 'Create Plan',
+        'icon' => 'ti ti-packages',
+        'description' => 'Define a new subscription plan for tenants to choose from.',
+        'steps' => [
+            'Set a plan name, description, and tagline visible to tenants.',
+            'Configure pricing: monthly and yearly amounts.',
+            'Select features and limits available at this tier.',
+            'Set the plan as active to make it available for subscription.',
+        ],
+    ],
+    'superadmin.plans.edit' => [
+        'title' => 'Edit Plan',
+        'icon' => 'ti ti-packages',
+        'description' => 'Modify an existing subscription plan\'s pricing, features, or status.',
+        'steps' => [
+            'Update plan name, description, or pricing details.',
+            'Adjust feature availability for this plan tier.',
+            'Toggle plan active status to enable or disable new subscriptions.',
+            'Changes apply to new subscriptions; existing subscribers retain their current terms until renewal.',
+        ],
+    ],
+    'superadmin.subscriptions.index' => [
+        'title' => 'Subscriptions',
+        'icon' => 'ti ti-receipt',
+        'description' => 'Monitor all tenant subscriptions across the platform.',
+        'steps' => [
+            'View all subscriptions with tenant, plan, status, and billing period.',
+            'Filter by status: active, trialing, past due, cancelled, or terminated.',
+            'Manually terminate tenant subscriptions when needed.',
+            'Reactivate previously terminated subscriptions to restore access.',
+        ],
+    ],
+    'superadmin.features.index' => [
+        'title' => 'Features & Tiers',
+        'icon' => 'ti ti-flag',
+        'description' => 'Toggle feature availability across all subscription plans.',
+        'steps' => [
+            'View all features grouped by tier: Core, Professional, Enterprise.',
+            'Check or uncheck features to enable or disable them per plan.',
+            'Changes take effect immediately for all tenants on the affected plan.',
+            'Use this to customize what each plan tier includes.',
+        ],
+    ],
+    'superadmin.billing.index' => [
+        'title' => 'Billing',
+        'icon' => 'ti ti-currency-dollar',
+        'description' => 'View all subscription orders and revenue information.',
+        'steps' => [
+            'Browse all orders with their status, amount, and tenant details.',
+            'Monitor total revenue, pending payments, and successful transactions.',
+            'Click an order to view detailed information and payment history.',
+            'Track billing cycles and subscription renewals.',
+        ],
+    ],
+    'superadmin.billing.show' => [
+        'title' => 'Order Details',
+        'icon' => 'ti ti-currency-dollar',
+        'description' => 'View detailed information about a specific billing order.',
+        'steps' => [
+            'Review order details including items, amounts, and status.',
+            'Void orders that were created in error.',
+            'View payment history and transaction references.',
+            'Print or export order information as needed.',
+        ],
+    ],
+    'superadmin.transactions.index' => [
+        'title' => 'Transactions',
+        'icon' => 'ti ti-arrows-exchange',
+        'description' => 'View all subscription payment transactions across the platform.',
+        'steps' => [
+            'Browse all payment transactions with amounts, status, and dates.',
+            'Monitor transaction success rates and payment gateway responses.',
+            'Track revenue by time period.',
+            'Identify failed transactions for follow-up.',
+        ],
+    ],
+    'superadmin.pending-payments.index' => [
+        'title' => 'Pending Payments',
+        'icon' => 'ti ti-clock',
+        'description' => 'Review and approve subscription payments awaiting confirmation.',
+        'steps' => [
+            'View all orders waiting for payment approval.',
+            'Review order details before approving or rejecting.',
+            'Approve legitimate payments to complete the subscription process.',
+            'Reject suspicious or unauthorized payment requests.',
+        ],
+    ],
+    'superadmin.payment-overview.index' => [
+        'title' => 'Payment Overview',
+        'icon' => 'ti ti-report-money',
+        'description' => 'Revenue summary and transaction insights across the platform.',
+        'steps' => [
+            'View total revenue, successful transactions, and pending amounts.',
+            'Monitor payment trends over time with summary statistics.',
+            'Track key metrics at a glance for financial reporting.',
+            'Navigate to detailed billing or transaction views for more information.',
+        ],
+    ],
+    'superadmin.invoices.index' => [
+        'title' => 'Invoices',
+        'icon' => 'ti ti-file-invoice',
+        'description' => 'View all paid subscription invoices generated on the platform.',
+        'steps' => [
+            'Browse all invoices with amounts, tenant details, and payment dates.',
+            'Click an invoice to view the full invoice details.',
+            'Print or download invoices as needed for record-keeping.',
+            'Track invoice history per tenant for accounting purposes.',
+        ],
+    ],
+    'superadmin.invoices.show' => [
+        'title' => 'Invoice Details',
+        'icon' => 'ti ti-file-invoice',
+        'description' => 'View a detailed invoice for a completed subscription payment.',
+        'steps' => [
+            'Review the invoice summary, including items, amounts, and taxes.',
+            'Print the invoice for physical record-keeping.',
+            'Verify payment status and transaction references.',
+            'Export invoice data as needed.',
+        ],
+    ],
+    'superadmin.cms.index' => [
+        'title' => 'Landing Page CMS',
+        'icon' => 'ti ti-world',
+        'description' => 'Edit the public-facing website content for the landing page.',
+        'steps' => [
+            'Edit the hero section: headline, subheadline, and call-to-action.',
+            'Update feature cards: titles, descriptions, and icons.',
+            'Configure pricing section display and featured plans.',
+            'Update contact information and footer content.',
+        ],
+    ],
+    'superadmin.permissions.index' => [
+        'title' => 'Permissions',
+        'icon' => 'ti ti-shield-lock',
+        'description' => 'View permissions and roles configured across the system.',
+        'steps' => [
+            'Browse all available permissions grouped by module.',
+            'Review role-to-permission assignments.',
+            'Understand which roles have access to which features.',
+            'Monitor permission changes via the audit log.',
+        ],
+    ],
+    'superadmin.settings.index' => [
+        'title' => 'Application Settings',
+        'icon' => 'ti ti-settings',
+        'description' => 'Configure global application settings written to the .env file.',
+        'steps' => [
+            'Update application name, URL, and environment settings.',
+            'Configure database and mail connection details.',
+            'Set payment gateway API keys and webhook URLs.',
+            'Modify other global configuration values for the platform.',
+        ],
+    ],
+    'superadmin.settings.preferences' => [
+        'title' => 'System Preferences',
+        'icon' => 'ti ti-adjustments',
+        'description' => 'Customize your super admin interface, theme, and preferences.',
+        'steps' => [
+            'Toggle dark mode or light mode theme.',
+            'Configure notification preferences and display options.',
+            'Adjust language and regional settings.',
+            'Save your preferences for a personalized experience.',
+        ],
+    ],
+    'superadmin.audit-log.index' => [
+        'title' => 'Audit Log',
+        'icon' => 'ti ti-file-text',
+        'description' => 'System-wide activity log tracking all significant events.',
+        'steps' => [
+            'Browse all logged events with timestamps, actors, and descriptions.',
+            'Filter logs by user, event type, or date range.',
+            'Click a log entry to view full details.',
+            'Use audit logs for security reviews and compliance tracking.',
+        ],
+    ],
+    'superadmin.audit-log.show' => [
+        'title' => 'Audit Log Entry',
+        'icon' => 'ti ti-file-text',
+        'description' => 'View detailed information about a specific audit log entry.',
+        'steps' => [
+            'Review the event description, actor, and exact timestamp.',
+            'View IP address and user agent of the actor.',
+            'See before/after values for data changes.',
+            'Use this information for security investigations.',
+        ],
+    ],
+    'superadmin.backups.index' => [
+        'title' => 'Backups',
+        'icon' => 'ti ti-database',
+        'description' => 'Manage system and per-tenant backup files.',
+        'steps' => [
+            'Create system backups using the Create System Backup button.',
+            'View and download system backup ZIP files.',
+            'Create tenant-specific backups (database only or full).',
+            'Restore tenant data from a backup ZIP file.',
+        ],
+    ],
+];

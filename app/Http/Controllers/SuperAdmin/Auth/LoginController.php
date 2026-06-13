@@ -34,15 +34,17 @@ class LoginController extends Controller
 
         if (!Auth::guard('super_admin')->attempt($request->only('email', 'password'), $request->boolean('remember'))) {
             RateLimiter::hit($throttleKey, 60);
-            throw ValidationException::withMessages([
-                'email' => __('auth.failed'),
-            ]);
+            return back()->withInput($request->only('email', 'remember'))
+                ->with('error', __('auth.failed'));
         }
 
         RateLimiter::clear($throttleKey);
         $request->session()->regenerate();
 
-        return redirect()->route('superadmin.dashboard');
+        $user = Auth::guard('super_admin')->user();
+
+        return redirect()->route('superadmin.dashboard')
+            ->with('success', 'Welcome back, ' . ($user->name ?? 'Super Admin') . '!');
     }
 
     public function destroy(Request $request)

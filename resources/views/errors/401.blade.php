@@ -3,6 +3,12 @@
 @section('title', 'Error 401')
 
 @section('content')
+    @php
+        $baseDomain = env('APP_URL_BASE', parse_url(env('APP_URL', 'http://localhost'), PHP_URL_HOST) ?? 'localhost');
+        $loginRoute = request()->getHost() === 'super.' . $baseDomain
+            ? route('superadmin.login')
+            : route('admin.login');
+    @endphp
     <div class="page">
         <div class="container-tight py-4">
             <div class="empty">
@@ -16,9 +22,9 @@
                     You need to authenticate to access this resource.
                 </p>
                 <div class="empty-action">
-                    <a href="{{ route('admin.login') }}" class="btn btn-primary">
+                    <a href="{{ $loginRoute }}" class="btn btn-primary">
                         <i class="ti ti-arrow-left me-2"></i>
-                        Go back
+                        Go to Login
                     </a>
                 </div>
             </div>

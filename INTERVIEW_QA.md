@@ -26,6 +26,7 @@
 18. [Middleware Chain](#18-middleware-chain)
 19. [Frontend Architecture](#19-frontend-architecture)
 20. [DevOps & Deployment](#20-devops--deployment)
+21. [Quotation Module & Billing Consistency (v1.9)](#21-quotation-module--billing-consistency-v19)
 
 ---
 
@@ -59,8 +60,8 @@ The Service Layer is critical: controllers are intentionally thin — they valid
 
 A candidate should note:
 - The single database becomes a bottleneck under heavy multi-tenant load
-- The `file` cache driver does not scale horizontally (should be Redis)
-- The `database` queue driver is adequate for small scale but Redis queue is better for production throughput
+- ~~The `file` cache driver does not scale horizontally~~ — **Redis is now the default cache and queue driver (May 2026)**; this is no longer an open issue
+- A candidate who still says "file cache doesn't scale" without knowing it's been fixed is demonstrating they haven't read the current code
 
 ---
 
@@ -186,7 +187,8 @@ The `tenants` table (landlord migration) contains:
 | `billing_period_start` | Current billing cycle start |
 | `billing_period_end` | Current billing cycle end |
 | `proration_credit` | Credit balance from mid-cycle upgrades |
-| `backup_password` | Encrypted backup password |
+| `accounting_settings` | JSON — maps accounting roles to `accounts` table IDs (sales_revenue, AR, COGS, inventory, AP, cash, salary_expense, salary_payable). Migrated from `users` table (May 2026). |
+| `backup_password` | Backup encryption key — stored using Laravel `encrypted` cast |
 | `backup_encrypted` | Whether backup is encrypted |
 
 **Billing logic:**
@@ -601,7 +603,7 @@ outstanding = sales.total - SUM(payments.amount) - sales.customer_credit_used
 
 **Payment status is not stored** as a permanent column — it is **computed dynamically** based on `total`, payments, and credit used. This prevents inconsistency between the stored status and actual payment data.
 
-**POS special case:** POS sales (`is_pos = true`) are always marked as **Paid** at creation time. The POS flow does not support partial payment — the customer must pay in full before completing the transaction.
+**POS special case:** POS sales (`type = 'pos'`) are always marked as **Paid** at creation time. The POS flow does not support partial payment — the customer must pay in full before completing the transaction. Note: the underlying column is now a `type` string (`'regular'` or `'pos'`); the old boolean `is_pos` column was dropped in migration `2026_05_18_075029`. A backward-compat accessor `getIsPosAttribute()` exists so legacy view code using `$sale->is_pos` still works.
 
 ---
 
@@ -841,25 +843,25 @@ a = (ΣY - b×ΣX) / n
 
 **Answer:**
 
-**Current risks:**
+**Implemented improvements (as of May 2026):**
 
-1. **Fixed parameters (α=0.3, β=0.1, γ=0.1):** These values are hardcoded and not optimized for each tenant's specific sales pattern. Optimal parameters vary by business. A proper implementation would use **grid search** or **Nelder-Mead optimization** to minimize Mean Squared Error on historical data.
+1. **Parameter optimization — DONE:** `optimizeHoltWinters()` performs a 125-combination grid search across α, β, γ ∈ `[0.1, 0.3, 0.5, 0.7, 0.9]`, minimizing RMSE on in-sample data. The optimized parameters are used per-forecast call, not hardcoded. MAPE is calculated and surfaced in the dashboard forecast card.
 
-2. **No outlier detection:** Unusual months (COVID lockdowns, one-time bulk orders) distort the seasonal indices and trend. Outlier-robust initialization (e.g., using median instead of mean) would help.
+2. **MAPE metric — DONE:** Both the Holt-Winters path and the linear regression path calculate and return MAPE. Users see it in the dashboard forecast card so they can judge forecast reliability.
 
-3. **Initialization method:** The quality of Holt-Winters forecasts depends heavily on how L₀, b₀, and S₀ are initialized. Poor initialization requires many periods to "warm up."
+**Remaining risks:**
+
+1. **Grid search resolution:** The optimizer uses 5-step resolution (0.1 increments). Optimal parameters may fall between these steps. Nelder-Mead continuous optimization or Bayesian optimization would find more precise parameters at some computational cost.
+
+2. **No outlier detection:** Unusual months (COVID lockdowns, one-time bulk orders) distort seasonal indices and trend. Outlier-robust initialization (e.g., using median instead of mean for seasonal indices) would help.
+
+3. **Initialization sensitivity:** Holt-Winters forecast quality depends heavily on how L₀, b₀, and S₀ are initialized. Poor initialization requires many periods to stabilize.
 
 4. **No prediction intervals:** The system returns point forecasts only. A production-grade system should return confidence intervals (e.g., "forecast $10,000 ± $1,500") so users understand forecast uncertainty.
 
-5. **12-month minimum is arbitrary:** Some seasonal businesses need 24+ months to capture multi-year seasonality patterns.
+5. **24-month window is hardcoded:** The historical window is `subMonths(24)`. Some seasonal businesses need 36+ months to capture multi-year patterns reliably.
 
-6. **No model evaluation metric:** There is no MAPE (Mean Absolute Percentage Error) to tell the user how accurate recent forecasts have been.
-
-**Improvements:**
-- MAPE displayed in dashboard forecast card (RMSE used internally for Holt-Winters parameter optimization via grid search)
-- Prediction intervals using bootstrap or analytical methods
-- Prophet (Facebook) or ARIMA models for more complex patterns
-- Anomaly detection to exclude outlier months from training
+**A strong candidate answer notes:** The grid search (item 1) is already implemented, so "add grid search" is no longer a valid improvement suggestion — the interviewer is testing whether the candidate has actually read the code or is reciting generic Holt-Winters advice.
 
 ---
 
@@ -970,11 +972,15 @@ Permissions-Policy: geolocation=(), microphone=(), camera=()
 Disables access to geolocation, microphone, and camera — APIs that the application has no business needing and that could be exploited by XSS.
 
 ```php
-Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; ...
+Content-Security-Policy: default-src 'self'; script-src 'self' 'nonce-{$nonce}' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://app.midtrans.com ...; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com ...; ...
 ```
 The most powerful header — defines which sources are allowed for scripts, styles, fonts, images, and connections. The Midtrans payment domains are whitelisted in `frame-src` and `connect-src` since the POS payment flow embeds Midtrans forms.
 
-**Notable: `'unsafe-inline'` for scripts** — this is a CSP weakening that allows inline `<script>` tags. This is a trade-off made to allow Alpine.js `x-data` attributes and `@click` handlers to work without nonces. A stricter implementation would use CSP nonces.
+**Per-request nonces (implemented May 2026):** `SecurityHeaders` middleware generates a cryptographically random nonce on each request via `base64_encode(random_bytes(16))` and shares it to all Blade views as `$cspNonce`. The nonce is included in the `script-src` directive. All inline `<script>` blocks in Blade use `nonce="{{ $cspNonce }}"`. In CSP Level 3 browsers, the nonce makes the `'unsafe-inline'` fallback inert for scripts.
+
+**`'unsafe-inline'` (CSP Level 2 fallback):** Retained for browsers that do not support nonces. In CSP Level 3 compliant browsers, the presence of a nonce overrides `'unsafe-inline'`, so effectively inline scripts without the nonce are blocked on modern browsers.
+
+**`'unsafe-eval'` (open issue):** `eval()`, `new Function()`, `setTimeout(string)`, and `setInterval(string)` are permitted. This is almost certainly required by a charting or UI library used in the application. It is an undocumented security weakening — the library requiring it has not been explicitly identified or commented in the source. A candidate who flags this without being prompted is demonstrating genuine security depth.
 
 ---
 
@@ -994,10 +1000,10 @@ Every request resolves a specific tenant context. If the domain doesn't match a 
 **Layer 4 — Authorization checks in controllers:**
 Controllers verify ownership before returning resources. For example, `SalesController::show()` fetches the sale via Eloquent (which applies tenant scope), so a tenant cannot access another tenant's sale ID even by guessing.
 
-**Layer 5 — Raw query safety:**
-`DB::table()` queries manually include `->where('tenant_id', $tenantId)`. Developers are expected to follow this convention. A code review checklist should include: "Does every raw query include tenant_id filter?"
+**Layer 5 — Raw query safety via `DB::tenantTable()` macro:**
+`AppServiceProvider` registers a `DB::tenantTable(string $table)` macro that automatically appends `->where('tenant_id', $tenantId)` and throws a `RuntimeException` if called without a tenant context. Performance-critical aggregation queries (dashboard metrics, aging reports) that cannot use Eloquent now use this macro instead of bare `DB::table()`. Code review should verify any `DB::table()` call either uses `tenantTable()` or has an explicit `where('tenant_id', ...)` clause.
 
-**Weakness:** If a developer uses `DB::table()` without a `tenant_id` filter and the endpoint is reachable by tenants, it would be a data leak. The global scope does not protect raw queries. This is the single most dangerous class of bug in this codebase.
+**Weakness:** The macro is a convention, not a compile-time guarantee. A developer who writes `DB::table('sales')->where(...)` without either the macro or a manual tenant filter will introduce a data leak. The global Eloquent scope does not protect raw queries. This remains the single most dangerous class of bug in the codebase, even with the macro in place.
 
 ---
 
@@ -1058,23 +1064,23 @@ $stockRecords = ProductWarehouse::whereIn('product_id', $productIds)
 
 ---
 
-### Q12.2 — The cache driver is `file` and the queue driver is `database`. What are the scaling implications?
+### Q12.2 — The cache and queue drivers — what are the scaling implications and what is the current configuration?
 
 **Answer:**
 
-**File cache:**
-- Works on a single server. If the application is deployed across multiple containers/nodes (horizontal scaling), each server has its own file cache — cache invalidation on one server does NOT invalidate cache on others.
-- This leads to **stale cache bugs** in a multi-node deployment.
-- **Fix:** Migrate to Redis or Memcached, which provide a shared cache across all nodes.
+**Current configuration (as of May 2026):** Redis is now the default cache and queue driver. The documentation and `config/cache.php` / `config/queue.php` reflect this.
 
-**Database queue:**
-- Uses the `jobs` table in MySQL. Every `Queue::push()` does an INSERT, every worker poll does a SELECT + UPDATE. Under high job volume, this creates significant database load.
-- Does not support delayed job priorities efficiently at scale.
-- **Fix:** Migrate to Redis queue or Amazon SQS for production.
+**Why Redis matters for cache:**
+- File cache works on a single server only. In a multi-node deployment, each server has its own file cache — cache invalidation on one server does NOT propagate to others, leading to stale cache bugs.
+- Redis provides a shared cache across all nodes — one invalidation clears it for all servers.
 
-**Current assessment:** For a single-server XAMPP/Railway deployment with low-to-moderate traffic, these drivers are acceptable. They eliminate operational dependencies (no separate Redis instance needed). For scaling to tens of thousands of tenants, both should be replaced.
+**Why Redis matters for queues:**
+- Database queue uses the `jobs` table in MySQL — every `Queue::push()` does an INSERT, every worker poll does a SELECT + UPDATE. Under high job volume, this creates significant database load.
+- Redis queue (or Amazon SQS) handles high concurrency without database contention.
 
-**Interview insight:** A candidate who says "file cache is fine" without noting the multi-node limitation is missing a critical scaling consideration. A candidate who immediately says "use Redis" without acknowledging the operational trade-off lacks pragmatism.
+**Current assessment:** Redis as default is the correct production decision. For low-traffic single-server deployments (Railway, XAMPP), the file/database drivers were acceptable — they eliminated the operational dependency on a separate Redis instance. The switch to Redis as default means horizontal scaling is now architecturally possible.
+
+**Interview insight:** A candidate who says "file cache is fine" without noting the multi-node limitation is missing a critical scaling consideration. A candidate who says "just use Redis" without acknowledging the operational trade-off (Redis is an additional infrastructure dependency to manage) lacks pragmatism. The ideal answer describes both the problem and the trade-off.
 
 ---
 
@@ -1541,10 +1547,64 @@ This directive reads `manifest.json` in production and injects the correct versi
 7. Sends notification to the tenant admin on completion
 
 **Tenant columns used:**
-- `backup_password` — the encryption key for this tenant's backup
+- `backup_password` — the encryption key for this tenant's backup, stored with Laravel's `encrypted` cast (encrypted via APP_KEY using AES-256-CBC before writing to the database)
 - `backup_encrypted` — boolean flag indicating whether the backup is encrypted
 
-**Security consideration:** `backup_password` should ideally not be stored in the database — it should be held by the tenant and passed in at backup/restore time. Storing it in the DB means anyone with DB access can decrypt backups. This is a design trade-off for convenience vs. security.
+**Security note:** `backup_password` is stored encrypted in the database via Laravel's `encrypted` cast (migration `2026_05_19_000002` widened the column to `TEXT` and re-encrypted all existing values). This means an attacker who obtains a database dump cannot directly read backup passwords without also having `APP_KEY`. However, if `APP_KEY` is also compromised (e.g., via a leaked `.env` file), both the password and the data it protects are exposed. The fundamental trade-off — convenience vs. requiring tenants to supply their own password at backup/restore time — is acknowledged. For most SMB tenants, the current approach is the right balance.
+
+---
+
+## 21. Quotation Module & Billing Consistency (v1.9)
+
+---
+
+### Q21.1 — The v1.9 Quotation module introduces a three-entity pipeline: Opportunity → Quotation → Sales Order. What are the two conversion paths and how does the data model support both?
+
+**Answer:**
+
+The `SalesOpportunity` model supports two distinct conversion paths:
+
+**Path A — Direct conversion (informal):**
+```
+SalesOpportunity → Sales (via sales_id FK on opportunities)
+```
+Used when a deal is won without a formal quote — the opportunity is converted directly to a sales order. `SalesOpportunity::sales_id` is populated, `status` is set to `converted`.
+
+**Path B — Formal quoting:**
+```
+SalesOpportunity → Quotation → Sales (via quotation.sales_id on conversion)
+```
+Used when a formal PDF quote is issued. The `SalesOpportunity::quotations()` hasMany relationship links opportunities to multiple quotations (e.g., a revised quote after negotiation). When a quotation status transitions to `Accepted` and is "Converted", a `Sales` record is created.
+
+**Why both paths are needed:** Some deals are won verbally and then billed directly (no document trail needed). Others require a formal written quote for procurement approval on the customer's side. Forcing all deals through the quotation path would add unnecessary friction to fast-moving sales. Both paths eventually produce a `Sales` record, which is the canonical financial document.
+
+**Data integrity:** The `SalesOpportunityItem` model uses `withDefault(['name' => 'Unknown Product', 'selling_price' => 0])` on its `product()` relationship. This is a defensive pattern — if a product is deleted after an opportunity was created, the system returns a graceful default instead of a null-pointer failure.
+
+---
+
+### Q21.2 — There is an inconsistency between `Tenant::initializeBillingPeriod()` and `BillingService::getCurrentBillingPeriod()`. Describe it and explain the potential impact.
+
+**Answer:**
+
+**The inconsistency:**
+
+`BillingService::getCurrentBillingPeriod()` — implements rolling 30-day billing as described in the v1.7 changelog:
+```php
+'end' => now()->copy()->addDays(30)->toDateString()
+```
+
+`Tenant::initializeBillingPeriod()` — still uses calendar month:
+```php
+'billing_period_start' => now()->startOfMonth()->toDateString(),
+'billing_period_end'   => now()->endOfMonth()->toDateString(),
+```
+
+**When this matters:**
+`Tenant::initializeBillingPeriod()` is called on plan assignment (upgrade flow) if the billing period has not yet been set. If a tenant upgrades on June 12, `initializeBillingPeriod()` would set `billing_period_end = June 30` (calendar month). But `BillingService` would have computed `billing_period_end = July 12` (rolling 30 days). The `ProcessScheduledPlanChanges` command uses `pending_plan_effective_at` which is set from `BillingService::getNextBillingPeriod()` — so the scheduled downgrade fires on the BillingService-computed date. But the `billing_period_end` stored on the tenant reflects the Tenant model's calendar month — creating a mismatch between when the period ends and when the next period starts.
+
+**The fix:** Update `Tenant::initializeBillingPeriod()` to use `addDays(30)` to match `BillingService`. This is a two-line change but requires deliberate care — existing tenants whose billing period was initialized by the old method will have their stored `billing_period_end` unaffected (no re-migration needed, since the BillingService drives the actual scheduling logic).
+
+**Why this is a senior-level finding:** The inconsistency is subtle — it doesn't cause an obvious crash or error. It manifests as a discrepancy between what the UI shows ("your plan renews on [date]") and when the plan lifecycle commands actually fire.
 
 ---
 
@@ -1566,14 +1626,16 @@ This directive reads `manifest.json` in production and injects the correct versi
 - Cannot explain FEFO's connection to COGS calculation
 - Does not understand why Fortify and Sanctum serve different purposes
 - Cannot articulate why the Service Layer exists
-- Does not mention the proration_credit mechanism for plan upgrades
-- Cannot explain why `available_amount` on customer_credits needs an observer to stay in sync
+- Does not mention the `proration_credit` mechanism for plan upgrades
+- Cannot explain why `available_amount` on `customer_credits` needs an observer to stay in sync
+- Claims "Holt-Winters parameters are hardcoded" when the `optimizeHoltWinters()` grid search has been in production since May 2026 — this is a tell that the candidate is reciting documentation rather than reading code
+- Claims "CSP has no nonces" without noting the nonce implementation or the separate `'unsafe-eval'` issue that remains open
 
 ## Green Flags
 
-- Proactively identifies the `DB::table()` raw query security risk
-- Notes that `'unsafe-inline'` in CSP weakens the header and suggests nonces
-- Identifies that Holt-Winters parameters are not optimized and suggests grid search
-- Notes that `file` cache and `database` queue don't scale horizontally
-- Understands why `remaining_quantity` on `po_items` exists separately from `product_warehouse.quantity`
+- Proactively identifies the `DB::table()` raw query risk AND notes that `DB::tenantTable()` macro now mitigates it, but is not a compile-time guarantee
+- Identifies `'unsafe-eval'` in the CSP `script-src` as the remaining open security concern (after nonces were implemented)
+- Understands the billing period inconsistency: `Tenant::initializeBillingPeriod()` uses calendar month while `BillingService` uses rolling 30 days — and can articulate the impact on scheduled downgrades
+- Notes that `remaining_quantity` on `po_items` exists separately from `product_warehouse.quantity` for FEFO batch tracking
 - Can trace a complete sales transaction from HTTP request → service → FEFO → journal entries → observer
+- Identifies that the `SalesOpportunity` model supports two conversion paths (direct to `Sales` or via `Quotation`) and explains why this is the correct CRM design for a system that needs both informal and formal quoting workflows

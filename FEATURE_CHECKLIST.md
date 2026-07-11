@@ -1,7 +1,7 @@
 # Invent-MAG: Complete Feature Checklist
 
-**Last Updated:** June 2026  
-**Version:** 1.9  
+**Last Updated:** July 2026  
+**Version:** 2.0  
 **System Version:** 1.9
 
 ---
@@ -118,6 +118,7 @@
 - [x] Payment tracking
 - [x] Invoice generation (PDF)
 - [x] Sales returns processing (with configurable accounting entries)
+- [x] **Sales return tax breakdown** — return show page displays tax rate and type label in the summary
 - [x] Refund handling
 - [x] **Consistent payment status labels** - Paid, Partially Paid, Unpaid (with sub-states: Pending, Due Today, Due in X Days, Overdue), Returned
 - [x] Customer credit notes (auto-created when return is Completed AND invoice is Paid)
@@ -129,6 +130,8 @@
 - [x] Customer retention analysis
 - [x] Per-customer pricing
 - [x] Historical pricing tracking
+- [x] **Tax auto-sync on page load** — sales create/edit pages recalculate tax automatically on page load and on tax dropdown change
+- [x] **`notes` and `terms_conditions`** columns on sales table (migration `2026_07_09_000001`)
 - [x] Bulk operations (delete, mark paid, export)
 
 ---
@@ -174,6 +177,7 @@
 - [x] Kanban/List view toggle
 - [x] Opportunity tracking
 - [x] Opportunity value tracking (with currency formatting)
+- [x] **Opportunity amount is tax-inclusive grand total** — pipeline opportunity amount reflects the final tax-inclusive total
 - [x] Opportunity notes & terms conditions
 - [x] Probability scoring
 - [x] Expected close dates
@@ -191,6 +195,7 @@
 - [x] Pipeline integration (generate quotation from opportunity)
 - [x] Notes & terms conditions fields
 - [x] Per-item discount (%/fixed) and tax (exclusive/inclusive/none)
+- [x] Per-item discount **type selector** (% vs Fixed) — independent per line item
 - [x] Order-level discount (%/fixed) and tax rate
 - [x] Bulk delete and CSV export
 - [x] Quotation auto-numbering (QTN-YYYYMMDD-XXXX)
@@ -375,6 +380,7 @@
 
 - [x] Currency settings
 - [x] Multi-currency configuration
+- [x] Platform currency setting (Super Admin) — independent from tenant currencies
 - [x] Tax configuration
 - [x] Dynamic tax rates
 - [x] Theme settings (Dark/Light mode)
@@ -383,6 +389,59 @@
 - [x] Unit management
 - [x] Warehouse management
 - [x] Main warehouse designation
+
+---
+
+### 🏢 Super Admin Panel (SaaS Management)
+
+#### Authentication & Access
+- [x] Separate `SuperAdmin` model (table: `super_admins`) — independent from tenant `User` model
+- [x] Dedicated `super_admin` auth guard with its own Eloquent provider
+- [x] Root domain hosting (`invent-mag.web.id`) — fully isolated from tenant subdomains
+- [x] Rate-limited login (5 attempts per email+IP, 60-second lockout)
+
+#### Tenant Management
+- [x] Tenant listing with plan info and status
+- [x] Tenant detail view with domain editing
+- [x] Toggle tenant active/inactive status
+- [x] Tenant impersonation (planned)
+
+#### Plan Management
+- [x] Full plan CRUD (slug, name, price, description, limits, trial days)
+- [x] Feature assignment per plan (matrix view with bulk update)
+- [x] Plan deletion guarded against active subscribers
+- [x] `currency_code` per plan for historical currency tracking
+
+#### Subscription Management
+- [x] Subscription listing with stats (active/trialing/expired/terminated)
+- [x] Terminate subscription (voids pending orders, clears billing)
+- [x] Reactivate terminated subscription (restores billing cycle)
+- [x] Scheduled downgrade support
+
+#### Financial Operations
+- [x] Billing dashboard (revenue totals, order counts)
+- [x] Payment overview (revenue statistics, gateway breakdown)
+- [x] Transaction history (searchable/filterable)
+- [x] Pending payment approval/rejection workflow
+- [x] Paid invoice listing and detail views
+- [x] Order voiding with audit trail
+
+#### System Administration
+- [x] Application settings (.env editor: app name, URL, debug, mail)
+- [x] User preferences (theme, notifications, performance — persisted per super admin)
+- [x] Platform currency configuration (symbol, separators, position, code)
+- [x] Permissions overview (view-only listing of tenant roles and permissions)
+- [x] System-wide and per-tenant backup management
+- [x] Backup restore (with SQL file upload)
+- [x] Platform-level audit log with module/action filtering
+
+#### Landing Page CMS
+- [x] CMS editor for hero section, features, pricing, and contact content
+
+#### Views & Tutorial
+- [x] 28 Blade views in `resources/views/superadmin/`
+- [x] Dedicated tutorial system (`config/superadmin-tutorial.php` — 258 lines)
+- [x] Sidebar navigation with grouped sections (Management, Payments, System, Configuration)
 
 ---
 
@@ -416,14 +475,14 @@
 
 ### 🧪 Testing
 
-- [x] PHPUnit 10+ configured
+- [x] PHPUnit 11+ configured
 - [x] 791 test files (42 Feature + 48 Unit PHP, 171 JS)
 - [x] Feature tests (controllers, routes)
 - [x] Unit tests (services, helpers)
 - [x] Multi-tenancy tests
 - [x] Tenant creation trait
 - [x] Parallel testing support
-- [x] Vitest for frontend (168 JS test files)
+- [x] Vitest for frontend (171 JS test files)
 
 ---
 
@@ -532,7 +591,7 @@
 | **Services**         | 34        |
 | **Models**           | 35        |
 | **Helpers**          | 8         |
-| **Test Files**       | 786       |
+| **Test Files**       | 791       |
 | **API Endpoints**    | 50+       |
 | **Database Tables**  | 38        |
 | **Migrations**       | 44        |
@@ -552,12 +611,12 @@
 2. **Complete Accounting** - Double-entry with manual journal entries
 3. **Multi-tenant SaaS** - True isolation, single codebase
 4. **Sales Pipeline** - Kanban with forecasting
-5. **776 Test Files** - Enterprise-grade testing (PHP + JS)
+5. **791 Test Files** - Enterprise-grade testing (PHP + JS)
 6. **Docker + CI/CD** - Modern DevOps ready
 7. **Comprehensive Audit Trail** - Security and accounting
 8. **Contextual Tutorial System** - 50+ page-specific help guides with drill-down navigation - users click a topic category, see all pages in that category, click one to navigate there with its contextual tutorial auto-opened
 
 ---
 
-**Document Version:** 1.8  
-**Last Updated:** June 2026
+**Document Version:** 2.0  
+**Last Updated:** July 2026

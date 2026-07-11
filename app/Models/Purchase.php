@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use App\Models\Concerns\BelongsToTenant;
+use App\Models\Tax;
 
 /**
  * @property int $id
@@ -32,12 +33,16 @@ class Purchase extends Model
             'invoice',
             'supplier_id',
             'user_id',
-            'warehouse_id', // Added
+            'warehouse_id',
             'order_date',
             'due_date',
             'payment_type',
             'discount_total',
             'discount_total_type',
+            'tax_id',
+            'tax_rate',
+            'total_tax',
+            'tax_type',
             'total',
             'status',
         ];
@@ -91,6 +96,11 @@ class Purchase extends Model
             return $this->hasMany(PurchaseReturn::class);
         }
 
+        public function tax(): BelongsTo
+        {
+            return $this->belongsTo(Tax::class, 'tax_id');
+        }
+
         public function getSubTotalAttribute()
         {
             return $this->items->sum('total');
@@ -113,19 +123,29 @@ class Purchase extends Model
 
                 public function getGrandTotalAttribute()
                 {
-                    // If the items relationship is loaded, calculate precisely.
-                    if ($this->relationLoaded('items')) {
+                    if ($this->relationLoaded('items') && $this->items->isNotEmpty()) {
                         $subTotal = $this->items->sum('total');
                         $orderDiscount = PurchaseHelper::calculateDiscount(
                             $subTotal,
                             $this->discount_total,
                             $this->discount_total_type
                         );
-                        return round($subTotal - $orderDiscount, 2);
+                        $afterDiscount = $subTotal - $orderDiscount;
+                        $taxAmount = $this->total_tax ?? PurchaseHelper::calculateTaxAmount(
+                            $afterDiscount,
+                            $this->tax_rate ?? 0,
+                            $this->tax_type ?? 'none'
+                        );
+                        if (($this->tax_type ?? 'none') === 'inclusive') {
+                            return round($afterDiscount, 2);
+                        }
+                        return round($afterDiscount + $taxAmount, 2);
                     }
 
-                    // Otherwise, fall back to the stored total, which is sufficient for most cases.
-                    return round($this->attributes['total'], 2);
+                    $baseTotal = round($this->attributes['total'] ?? 0, 2);
+                    // 'total' is stored as the complete grand total (after discount + tax) by
+                    // createPurchase() / updatePurchase(). Return as-is for all tax types.
+                    return $baseTotal;
                 }
 
         public function getTotalReturnedAmount(): float
@@ -159,6 +179,8 @@ class Purchase extends Model
                 $this->discount_total ?? 0,
                 $this->discount_total_type ?? 'fixed',
                 $this->relationLoaded('purchaseReturns') ? $this->purchaseReturns : collect(),
+                (float) ($this->tax_rate ?? 0),
+                $this->tax_type ?? 'none'
             );
 
             return $summary['finalTotal'];
@@ -172,6 +194,8 @@ class Purchase extends Model
         protected $casts = [
         'total' => 'float',
         'discount_total' => 'float',
+        'tax_rate' => 'float',
+        'total_tax' => 'float',
         'order_date' => 'datetime',
         'due_date' => 'datetime',
         ];

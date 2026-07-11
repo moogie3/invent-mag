@@ -111,6 +111,14 @@ class PurchaseReturnService
                 $totalReturnAmount += ($itemData['return_price'] ?? $itemData['price']) * $itemData['returned_quantity'];
             }
 
+            // Copy tax information from the purchase.
+            // Compute whenever rate > 0 — tax_id may be null for legacy records.
+            $taxRate   = (float) ($purchase->tax_rate ?? 0);
+            $taxType   = $purchase->tax_type ?? 'none';
+            $taxAmount = $taxRate > 0
+                ? \App\Helpers\PurchaseHelper::calculateTaxAmount($totalReturnAmount, $taxRate, $taxType)
+                : 0.0;
+
             $purchaseReturn = PurchaseReturn::create([
                 'purchase_id' => $purchase->id,
                 'user_id' => Auth::id(),
@@ -118,6 +126,10 @@ class PurchaseReturnService
                 'reason' => $data['reason'] ?? null,
                 'total_amount' => $totalReturnAmount,
                 'status' => $data['status'],
+                'tax_id' => $purchase->tax_id,
+                'tax_rate' => $purchase->tax_rate ?? 0,
+                'tax_amount' => $taxAmount,
+                'tax_type' => $purchase->tax_type ?? 'none',
             ]);
 
             foreach ($returnedItems as $itemData) {
@@ -268,13 +280,28 @@ class PurchaseReturnService
                 $totalReturnAmount += ($itemData['return_price'] ?? $itemData['price'] ?? 0) * $itemData['returned_quantity'];
             }
 
+            $purchase = $purchaseReturn->purchase;
+            $updatedTaxAmount = 0;
+            $updatedTaxRate = (float) ($purchase->tax_rate ?? 0);
+            $updatedTaxType = $purchase->tax_type ?? 'none';
+            if ($updatedTaxRate > 0) {
+                $updatedTaxAmount = \App\Helpers\PurchaseHelper::calculateTaxAmount(
+                    $totalReturnAmount,
+                    $updatedTaxRate,
+                    $updatedTaxType
+                );
+            }
 
             $purchaseReturn->update([
                 'return_date' => $data['return_date'],
-                'reason' => $data['reason'] ?? null, // Add reason field here
+                'reason' => $data['reason'] ?? null,
                 'total_amount' => $totalReturnAmount,
                 'status' => $data['status'],
-                'user_id' => Auth::id(), // Also update the user who last edited it
+                'user_id' => Auth::id(),
+                'tax_id' => $purchase ? $purchase->tax_id : $purchaseReturn->tax_id,
+                'tax_rate' => $updatedTaxRate,
+                'tax_amount' => $updatedTaxAmount,
+                'tax_type' => $updatedTaxType,
             ]);
 
 

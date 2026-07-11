@@ -119,7 +119,7 @@
                                     <a href="{{ route('superadmin.tenants.show', $order->tenant) }}" class="text-reset">{{ $order->tenant?->name ?? 'Deleted' }}</a>
                                 </td>
                                 <td>{{ $order->plan?->name ?? 'N/A' }}</td>
-                                <td class="fw-semibold">${{ number_format($order->amount, 2) }}</td>
+                                <td class="fw-semibold">{{ App\Helpers\CurrencyHelper::formatPlatform($order->amount) }}</td>
                                 <td>
                                     @if($order->status === 'paid')
                                         <span class="badge bg-success text-white">Paid</span>

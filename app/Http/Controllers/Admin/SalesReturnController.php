@@ -48,7 +48,7 @@ class SalesReturnController extends Controller
 
         $this->salesReturnService->createSalesReturn($request->all());
 
-        return redirect()->route('admin.sales-returns.index', ['status' => 'success', 'message' => 'Sales return created successfully.']);
+        return redirect()->route('admin.sales-returns.index')->with('success', 'Sales return created successfully.');
     }
 
     public function update(Request $request, SalesReturn $salesReturn)
@@ -63,13 +63,13 @@ class SalesReturnController extends Controller
 
         $this->salesReturnService->updateSalesReturn($salesReturn, $request->all());
 
-        return redirect()->route('admin.sales-returns.index', ['status' => 'success', 'message' => 'Sales return updated successfully.']);
+        return redirect()->route('admin.sales-returns.index')->with('success', 'Sales return updated successfully.');
     }
 
     public function destroy(SalesReturn $salesReturn)
     {
         $this->salesReturnService->deleteSalesReturn($salesReturn);
-        return redirect()->route('admin.sales-returns.index', ['status' => 'success', 'message' => 'Sales return deleted successfully.']);
+        return redirect()->route('admin.sales-returns.index')->with('success', 'Sales return deleted successfully.');
     }
 
     public function show(SalesReturn $salesReturn)

@@ -176,6 +176,10 @@ return Application::configure(basePath: dirname(__DIR__))
             if ($e instanceof \Illuminate\Session\TokenMismatchException) {
                 return $handleError($request, 419, 'Page expired due to inactivity');
             }
+            // Let AuthenticationException pass through to default handler (redirects to login)
+            if ($e instanceof \Illuminate\Auth\AuthenticationException) {
+                return null;
+            }
             return $handleError($request, 500, 'Internal server error');
         });
     })->create();

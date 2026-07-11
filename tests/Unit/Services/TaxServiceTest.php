@@ -32,9 +32,10 @@ class TaxServiceTest extends TestCase
     #[Test]
     public function it_can_get_tax_data()
     {
-        Tax::factory()->create();
-        $tax = $this->taxService->getTaxData();
-        $this->assertInstanceOf(Tax::class, $tax);
+        Tax::factory()->create(['is_active' => true]);
+        $taxes = $this->taxService->getAllActive();
+        $this->assertNotEmpty($taxes);
+        $this->assertInstanceOf(Tax::class, $taxes->first());
     }
 
     #[Test]
@@ -42,36 +43,44 @@ class TaxServiceTest extends TestCase
     {
         $tax = Tax::factory()->create();
         $data = [
-            'name' => 'VAT',
-            'rate' => 20,
-            'is_active' => true,
+            'name'        => 'VAT',
+            'rate'        => 20,
+            'type'        => 'exclusive',
+            'description' => null,
+            'is_active'   => true,
+            'is_default'  => false,
         ];
 
-        $this->taxService->updateTax($data);
+        $updated = $this->taxService->update($tax, $data);
 
         $this->assertDatabaseHas('taxes', [
-            'id' => $tax->id,
-            'name' => 'VAT',
-            'rate' => 20,
+            'id'        => $tax->id,
+            'name'      => 'VAT',
+            'rate'      => 20,
             'is_active' => true,
         ]);
+        $this->assertInstanceOf(Tax::class, $updated);
     }
 
     #[Test]
     public function it_can_create_tax_settings_if_none_exist()
     {
         $data = [
-            'name' => 'GST',
-            'rate' => 5,
-            'is_active' => true,
+            'name'        => 'GST',
+            'rate'        => 5,
+            'type'        => 'exclusive',
+            'description' => null,
+            'is_active'   => true,
+            'is_default'  => false,
         ];
 
-        $this->taxService->updateTax($data);
+        $tax = $this->taxService->create($data);
 
         $this->assertDatabaseHas('taxes', [
-            'name' => 'GST',
-            'rate' => 5,
+            'name'      => 'GST',
+            'rate'      => 5,
             'is_active' => true,
         ]);
+        $this->assertInstanceOf(Tax::class, $tax);
     }
 }

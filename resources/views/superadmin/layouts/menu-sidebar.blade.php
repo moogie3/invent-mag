@@ -243,12 +243,20 @@
                     </a>
                 </div>
             </div>
-            <a class="sidebar-footer-btn sidebar-footer-btn-danger" href="#" onclick="event.preventDefault(); document.getElementById('sa-logout-form').submit();" title="Logout">
+            <a class="sidebar-footer-btn sidebar-footer-btn-danger" href="#" id="btn-sa-logout" title="Logout">
                 <i class="ti ti-logout"></i>
             </a>
             <form id="sa-logout-form" method="POST" action="{{ route('superadmin.logout') }}" style="display: none;">
                 @csrf
             </form>
+            @push('scripts')
+            <script nonce="{{ $cspNonce }}">
+            document.getElementById('btn-sa-logout')?.addEventListener('click', function(e) {
+                e.preventDefault();
+                document.getElementById('sa-logout-form').submit();
+            });
+            </script>
+            @endpush
         </div>
     </div>
 </aside>

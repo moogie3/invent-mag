@@ -125,8 +125,6 @@ class PlanSeeder extends Seeder
                     'sales_forecasting',
                     'api_access',
                     'audit_compliance',
-                    'custom_roles',
-                    'dedicated_support',
                     'hr',
                 ],
             ],

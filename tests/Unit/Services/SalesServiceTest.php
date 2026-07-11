@@ -302,8 +302,8 @@ class SalesServiceTest extends TestCase
             'warehouse_id' => $warehouse->id,
             'order_date' => now()->toDateString(),
             'due_date' => now()->addMonths(2)->toDateString(),
-            'order_discount' => 5,
-            'order_discount_type' => 'fixed',
+            'discount_total' => 5,
+            'discount_total_type' => 'fixed',
         ];
 
         $this->salesService->updateSale($sale, $data);

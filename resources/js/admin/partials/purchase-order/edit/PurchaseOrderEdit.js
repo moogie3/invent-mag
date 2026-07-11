@@ -66,6 +66,29 @@ export class PurchaseOrderEdit extends PurchaseOrderModule {
                 this.serializeProducts.bind(this),
             );
         }
+
+        const taxSelector = document.getElementById("taxSelector");
+        if (taxSelector) {
+            document.body.addEventListener("change", (e) => {
+                if (e.target && e.target.id === "taxSelector") {
+                    const opt = e.target.options[e.target.selectedIndex];
+                    const typeInput = document.getElementById("taxTypeInput");
+                    const rateInput = document.getElementById("taxRateInput");
+                    if (typeInput) typeInput.value = opt.dataset.type || "none";
+                    if (rateInput) rateInput.value = parseFloat(opt.dataset.rate) || 0;
+                    this.calculateOrderTotal();
+                }
+            });
+
+            // Sync hidden inputs on initial page load from the selected option
+            const initialOpt = taxSelector.options[taxSelector.selectedIndex];
+            if (initialOpt) {
+                const typeInput = document.getElementById("taxTypeInput");
+                const rateInput = document.getElementById("taxRateInput");
+                if (typeInput && initialOpt.dataset.type) typeInput.value = initialOpt.dataset.type;
+                if (rateInput && initialOpt.dataset.rate) rateInput.value = parseFloat(initialOpt.dataset.rate) || 0;
+            }
+        }
     }
 
     calculateAllAmounts() {
@@ -127,7 +150,9 @@ export class PurchaseOrderEdit extends PurchaseOrderModule {
             discountTotalValue,
             discountTotalType,
         );
-        const finalTotal = subtotal - orderDiscountAmount;
+        const taxableAmount = subtotal - orderDiscountAmount;
+        const taxAmount = this.calculateTaxAmount(taxableAmount);
+        const finalTotal = this.getTaxType() === "inclusive" ? taxableAmount : taxableAmount + taxAmount;
 
         if (this.elements.subtotalElement) {
             this.elements.subtotalElement.textContent =
@@ -137,6 +162,10 @@ export class PurchaseOrderEdit extends PurchaseOrderModule {
             this.elements.orderDiscountTotalElement.textContent =
                 this.formatCurrency(orderDiscountAmount);
         }
+        const totalTaxEl = document.getElementById("totalTax");
+        if (totalTaxEl) {
+            totalTaxEl.textContent = this.formatCurrency(taxAmount);
+        }
         if (this.elements.finalTotalElement) {
             this.elements.finalTotalElement.textContent =
                 this.formatCurrency(finalTotal);
@@ -144,6 +173,8 @@ export class PurchaseOrderEdit extends PurchaseOrderModule {
         if (this.elements.totalDiscountInput) {
             this.elements.totalDiscountInput.value = orderDiscountAmount;
         }
+        const taxInput = document.getElementById("taxInput");
+        if (taxInput) taxInput.value = taxAmount;
 
         if (this.elements.productsJsonInput) {
             const products = [];

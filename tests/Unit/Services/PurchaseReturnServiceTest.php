@@ -60,6 +60,61 @@ class PurchaseReturnServiceTest extends TestCase
     }
 
     #[Test]
+    public function test_it_copies_tax_from_parent_purchase_on_create()
+    {
+        // Give the parent purchase explicit tax fields
+        $this->purchase->update([
+            'tax_rate' => 11,
+            'tax_type' => 'exclusive',
+        ]);
+
+        // Create a stock record so the service can decrement
+        \App\Models\ProductWarehouse::firstOrCreate(
+            [
+                'product_id'   => $this->product->id,
+                'warehouse_id' => $this->purchase->warehouse_id,
+                'tenant_id'    => $this->purchase->tenant_id,
+            ],
+            ['quantity' => 50]
+        );
+
+        // Create a POItem so decrementPOItemRemaining has something to work with
+        \App\Models\POItem::firstOrCreate(
+            ['po_id' => $this->purchase->id, 'product_id' => $this->product->id],
+            [
+                'quantity'           => 10,
+                'remaining_quantity' => 10,
+                'price'              => 100,
+                'total'              => 1000,
+                'discount'           => 0,
+                'discount_type'      => 'fixed',
+            ]
+        );
+
+        $this->accountingServiceMock->shouldReceive('createJournalEntry')->once();
+
+        $returnData = [
+            'purchase_id' => $this->purchase->id,
+            'return_date' => now()->format('Y-m-d'),
+            'reason'      => 'Damaged on arrival',
+            'status'      => 'Pending',
+            'items'       => json_encode([
+                ['product_id' => $this->product->id, 'returned_quantity' => 2, 'price' => 100, 'return_price' => 100],
+            ]),
+        ];
+
+        $purchaseReturn = $this->purchaseReturnService->createPurchaseReturn($returnData);
+
+        $this->assertNotNull($purchaseReturn);
+        // Tax fields must be copied from the parent purchase
+        $this->assertEquals($this->purchase->tax_id,   $purchaseReturn->tax_id);
+        $this->assertEquals(11.0,                      $purchaseReturn->tax_rate);
+        $this->assertEquals('exclusive',                $purchaseReturn->tax_type);
+        // tax_amount = 11% of 200 = 22
+        $this->assertEquals(22.0,                      $purchaseReturn->tax_amount);
+    }
+
+    #[Test]
     public function test_it_can_filter_index_data_by_month_and_year()
     {
         PurchaseReturn::factory()->create(['return_date' => '2023-01-15']);

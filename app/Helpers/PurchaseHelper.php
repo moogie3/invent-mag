@@ -4,52 +4,36 @@ namespace App\Helpers;
 
 class PurchaseHelper
 {
-    /**
-     * Calculate total price for a product
-     * @param float $price - Unit price
-     * @param int $quantity - Quantity
-     * @param float $discount - Discount amount/percentage
-     * @param string $discountType - 'fixed' or 'percentage'
-     * @return float Total price after discount
-     */
     public static function calculateTotal($price, $quantity, $discount, $discountType)
     {
         $discountPerUnit = self::calculateDiscountPerUnit($price, $discount, $discountType);
         return ($price - $discountPerUnit) * $quantity;
     }
 
-    /**
-     * Calculate discount per unit based on price and discount
-     * @param float $price - Unit price
-     * @param float $discount - Discount amount/percentage
-     * @param string $discountType - 'fixed' or 'percentage'
-     * @return float Discount amount per unit
-     */
     public static function calculateDiscountPerUnit($price, $discount, $discountType)
     {
         return $discountType === 'percentage' ? ($price * $discount) / 100 : $discount;
     }
 
-    /**
-     * Calculate discount amount based on value and type
-     * @param float $subtotal - Subtotal amount
-     * @param float $discountValue - Discount value
-     * @param string $discountType - 'fixed' or 'percentage'
-     * @return float Calculated discount amount
-     */
     public static function calculateDiscount($subtotal, $discountValue, $discountType)
     {
         return $discountType === 'percentage' ? ($subtotal * $discountValue) / 100 : $discountValue;
     }
 
-    /**
-     * Calculate invoice summary figures
-     * @param array $items - Collection of PO items
-     * @param float $discountTotal - Order discount value
-     * @param string $discountTotalType - Order discount type
-     * @return array Summary figures (subtotal, itemCount, totalProductDiscount, orderDiscount, finalTotal)
-     */
-    public static function calculateInvoiceSummary($items, $discountTotal, $discountTotalType)
+    public static function calculateTaxAmount($amount, $taxRate, $taxType = 'exclusive')
+    {
+        if ($taxType === 'none' || $taxRate <= 0 || $amount <= 0) {
+            return 0.0;
+        }
+
+        if ($taxType === 'inclusive') {
+            return round($amount - ($amount / (1 + $taxRate / 100)), 2);
+        }
+
+        return round($amount * ($taxRate / 100), 2);
+    }
+
+    public static function calculateInvoiceSummary($items, $discountTotal, $discountTotalType, $taxRate = 0, $taxType = 'exclusive')
     {
         $subtotal = 0;
         $totalProductDiscount = 0;
@@ -62,34 +46,32 @@ class PurchaseHelper
             $discount_type = is_object($item) ? $item->discount_type : $item['discount_type'];
 
             $finalAmount = self::calculateTotal($price, $quantity, $discount, $discount_type);
-
             $discountPerUnit = self::calculateDiscountPerUnit($price, $discount, $discount_type);
-
             $subtotal += $finalAmount;
             $totalProductDiscount += $discountPerUnit * $quantity;
         }
 
         $orderDiscount = self::calculateDiscount($subtotal, $discountTotal, $discountTotalType);
-        $finalTotal = $subtotal - $orderDiscount;
+        $taxableAmount = $subtotal - $orderDiscount;
+        $taxAmount = self::calculateTaxAmount($taxableAmount, $taxRate, $taxType);
+
+        if ($taxType === 'inclusive') {
+            $finalTotal = $taxableAmount;
+        } else {
+            $finalTotal = $taxableAmount + $taxAmount;
+        }
 
         return [
             'subtotal' => $subtotal,
             'itemCount' => $itemCount,
             'totalProductDiscount' => $totalProductDiscount,
             'orderDiscount' => $orderDiscount,
+            'taxAmount' => $taxAmount,
             'finalTotal' => $finalTotal,
         ];
     }
 
-    /**
-     * Calculate invoice summary figures accounting for returns
-     * @param array $items - Collection of PO items
-     * @param float $discountTotal - Order discount value
-     * @param string $discountTotalType - Order discount type
-     * @param \Illuminate\Support\Collection|null $purchaseReturns - Collection of purchase returns
-     * @return array Summary figures with adjusted amounts based on returns
-     */
-    public static function calculateInvoiceSummaryWithReturns($items, $discountTotal, $discountTotalType, $purchaseReturns = null)
+    public static function calculateInvoiceSummaryWithReturns($items, $discountTotal, $discountTotalType, $purchaseReturns = null, $taxRate = 0, $taxType = 'exclusive')
     {
         $subtotal = 0;
         $totalProductDiscount = 0;
@@ -101,8 +83,7 @@ class PurchaseHelper
             $originalQty = (int) (is_object($item) ? $item->quantity : $item['quantity']);
             $discount = is_object($item) ? $item->discount : $item['discount'];
             $discount_type = is_object($item) ? $item->discount_type : $item['discount_type'];
-            
-            // Calculate returned quantity for this item
+
             $returnedQty = 0;
             if ($purchaseReturns && $purchaseReturns->isNotEmpty()) {
                 $productId = is_object($item) ? $item->product_id : $item['product_id'];
@@ -112,39 +93,40 @@ class PurchaseHelper
                     ->where('product_id', $productId)
                     ->sum('quantity');
             }
-            
+
             $adjustedQty = max(0, $originalQty - $returnedQty);
             $totalReturnedQty += $returnedQty;
-            
+
             if ($adjustedQty > 0) {
                 $itemCount++;
                 $finalAmount = self::calculateTotal($price, $adjustedQty, $discount, $discount_type);
                 $discountPerUnit = self::calculateDiscountPerUnit($price, $discount, $discount_type);
-                
                 $subtotal += $finalAmount;
                 $totalProductDiscount += $discountPerUnit * $adjustedQty;
             }
         }
 
         $orderDiscount = self::calculateDiscount($subtotal, $discountTotal, $discountTotalType);
-        $finalTotal = $subtotal - $orderDiscount;
+        $taxableAmount = $subtotal - $orderDiscount;
+        $taxAmount = self::calculateTaxAmount($taxableAmount, $taxRate, $taxType);
+
+        if ($taxType === 'inclusive') {
+            $finalTotal = $taxableAmount;
+        } else {
+            $finalTotal = $taxableAmount + $taxAmount;
+        }
 
         return [
             'subtotal' => $subtotal,
             'itemCount' => $itemCount,
             'totalProductDiscount' => $totalProductDiscount,
             'orderDiscount' => $orderDiscount,
+            'taxAmount' => $taxAmount,
             'finalTotal' => $finalTotal,
             'totalReturnedQty' => $totalReturnedQty,
         ];
     }
 
-    /**
-     * Get CSS class for status badge based on status and due date
-     * @param string $status - Current status
-     * @param \DateTime $dueDate - Due date
-     * @return string CSS class for badge
-     */
     public static function getStatusClass($status, $dueDate)
     {
         $dueDate = \Carbon\Carbon::parse($dueDate);
@@ -165,17 +147,11 @@ class PurchaseHelper
         return 'badge bg-blue-lt';
     }
 
-    /**
-     * Get HTML for status text based on status and due date
-     * @param string $status - Current status
-     * @param \DateTime $dueDate - Due date
-     * @return string HTML for status text
-     */
     public static function getStatusText($status, $dueDate)
     {
         $dueDate = \Carbon\Carbon::parse($dueDate);
         $today = now();
-        $diffDays = (int) $today->diffInDays($dueDate, false); // Cast to integer to remove decimals
+        $diffDays = (int) $today->diffInDays($dueDate, false);
 
         if ($status === 'Paid') {
             return '<span class="h4"><i class="ti ti-check me-1 fs-4"></i> ' . __('messages.purchase_status_paid') . '</span>';

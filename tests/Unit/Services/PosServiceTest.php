@@ -8,6 +8,7 @@ use App\Models\Product;
 use App\Models\Sales;
 use App\Models\SalesItem;
 use App\Models\Supplier;
+use App\Models\Tax;
 use App\Models\Unit;
 use App\Models\User;
 use App\Services\PosService;
@@ -28,6 +29,15 @@ class PosServiceTest extends TestCase
         parent::setUp();
         $this->setupTenant();
         $this->posService = new PosService();
+
+        // Create a default tax (10% exclusive) so POS tax calculations work in tests
+        Tax::create([
+            'name'       => 'Test Tax',
+            'rate'       => 10,
+            'type'       => 'exclusive',
+            'is_active'  => true,
+            'is_default' => true,
+        ]);
     }
 
     #[Test]

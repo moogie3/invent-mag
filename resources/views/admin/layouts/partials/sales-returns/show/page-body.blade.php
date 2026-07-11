@@ -133,6 +133,13 @@
                             <div class="card-footer bg-body-secondary">
                                 <div class="d-flex justify-content-end">
                                     <div class="text-end">
+                                        @if(($salesReturn->tax_rate ?? 0) > 0)
+                                        <div class="text-muted mb-1">
+                                            {{ __('messages.tax') }}
+                                            ({{ $salesReturn->tax_rate }}%@if(($salesReturn->tax_type ?? 'none') !== 'none'), {{ $salesReturn->tax_type }}@endif):
+                                            {{ \App\Helpers\CurrencyHelper::formatWithPosition($salesReturn->tax_amount ?? 0) }}
+                                        </div>
+                                        @endif
                                         <div class="fs-5"><strong>{{ __('messages.sr_total_return_amount') }}</strong></div>
                                         <div class="fs-3 fw-bold text-primary">
                                             {{ \App\Helpers\CurrencyHelper::formatWithPosition($salesReturn->total_amount) }}

@@ -33,8 +33,6 @@ return [
         'sales_forecasting' => 'Sales Forecasting (Holt-Winters)',
         'api_access'        => 'RESTful API Access',
         'audit_compliance'  => 'Audit Trail & Compliance Logging',
-        'custom_roles'      => 'Custom Roles & 79 Permissions',
-        'dedicated_support' => 'Dedicated Support',
     ],
 
     'feature_routes' => [
@@ -106,7 +104,6 @@ return [
         'sales_forecasting' => 'Sales Forecasting is available on the Enterprise plan.',
         'api_access'        => 'API Access is available on the Enterprise plan.',
         'audit_compliance'  => 'Audit Trail & Compliance Logging is available on the Enterprise plan.',
-        'custom_roles'      => 'Custom Roles & Permissions management is available on the Enterprise plan.',
         'hr'                => 'The HR Module (Employees, Attendance & Payroll) is available on the Professional plan and above.',
         'quotations'        => 'Quotations are available on the Professional plan and above.',
     ],

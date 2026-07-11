@@ -128,7 +128,7 @@
                                                         <a href="{{ route('superadmin.backups.download', $backup['name']) }}" class="dropdown-item">
                                                             <i class="ti ti-download me-2"></i>Download
                                                         </a>
-                                                        <form method="POST" action="{{ route('superadmin.backups.destroy', $backup['name']) }}" onsubmit="return confirm('Delete backup {{ $backup['name'] }}?')">
+                                                        <form method="POST" action="{{ route('superadmin.backups.destroy', $backup['name']) }}" class="confirm-form" data-message="Delete backup {{ $backup['name'] }}?">
                                                             @csrf @method('DELETE')
                                                             <button type="submit" class="dropdown-item text-danger">
                                                                 <i class="ti ti-trash me-2"></i>Delete
@@ -178,7 +178,7 @@
                                                         <a href="{{ route('superadmin.backups.download', $backup['filename']) }}" class="dropdown-item">
                                                             <i class="ti ti-download me-2"></i>Download
                                                         </a>
-                                                        <form method="POST" action="{{ route('superadmin.backups.destroy', $backup['filename']) }}" onsubmit="return confirm('Delete backup {{ $backup['filename'] }}?')">
+                                                        <form method="POST" action="{{ route('superadmin.backups.destroy', $backup['filename']) }}" class="confirm-form" data-message="Delete backup {{ $backup['filename'] }}?">
                                                             @csrf @method('DELETE')
                                                             <button type="submit" class="dropdown-item text-danger">
                                                                 <i class="ti ti-trash me-2"></i>Delete
@@ -230,7 +230,7 @@
                         </div>
 
                         <div class="tab-pane" id="restore-backup" role="tabpanel">
-                            <form method="POST" action="{{ route('superadmin.backups.restore') }}" enctype="multipart/form-data" id="restore-form" onsubmit="return confirm('WARNING: This will REPLACE all tenant data with the backup. This action cannot be undone. Continue?')">
+                            <form method="POST" action="{{ route('superadmin.backups.restore') }}" enctype="multipart/form-data" id="restore-form" class="confirm-form" data-message="WARNING: This will REPLACE all tenant data with the backup. This action cannot be undone. Continue?">
                                 @csrf
                                 <div class="row g-3">
                                     <div class="col-md-5">
@@ -278,7 +278,14 @@
 </div>
 
 @push('scripts')
-<script>
+<script nonce="{{ $cspNonce }}">
+document.querySelectorAll('.confirm-form').forEach(function(form) {
+    form.addEventListener('submit', function(e) {
+        if (!confirm(form.getAttribute('data-message'))) {
+            e.preventDefault();
+        }
+    });
+});
 document.getElementById('restore-form')?.addEventListener('submit', function(e) {
     if (e.defaultPrevented) return;
     const btn = document.getElementById('restore-btn');

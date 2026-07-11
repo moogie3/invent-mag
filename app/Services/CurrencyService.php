@@ -25,7 +25,7 @@ class CurrencyService
         return ['success' => true, 'message' => 'Currency settings updated successfully.'];
     }
 
-    private function getPredefinedCurrencies()
+    public function getPredefinedCurrencies()
     {
         return [
             ['name' => 'United States Dollar', 'code' => 'USD', 'locale' => 'en-US', 'symbol' => '$'],

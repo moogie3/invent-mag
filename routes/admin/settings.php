@@ -10,7 +10,6 @@ use App\Http\Controllers\Admin\NotificationController;
 use App\Http\Controllers\Admin\PlanController;
 use App\Http\Controllers\Admin\BackupController;
 use App\Http\Controllers\Admin\AccountingController;
-use App\Models\Tax;
 
 Route::get('api/settings', [SettingsController::class, 'getSettings'])->name('admin.api.settings');
 
@@ -33,14 +32,14 @@ Route::prefix('settings')->group(function () {
         });
     });
 
-    // Tax Settings
-    Route::prefix('tax')->group(function () {
+    // Tax Settings - Full CRUD
+    Route::prefix('tax')->middleware('role:superuser')->group(function () {
         Route::get('/', [TaxController::class, 'index'])->name('admin.setting.tax');
-        Route::post('/update', [TaxController::class, 'update'])->name('admin.setting.tax.update');
-        Route::get('/get', function () {
-            $tax = Tax::where('is_active', 1)->first();
-            return response()->json(['tax_rate' => $tax ? $tax->rate : 0]);
-        })->name('admin.setting.tax.get');
+        Route::post('/store', [TaxController::class, 'store'])->name('admin.setting.tax.store');
+        Route::put('/{tax}', [TaxController::class, 'update'])->name('admin.setting.tax.update');
+        Route::delete('/{tax}', [TaxController::class, 'destroy'])->name('admin.setting.tax.destroy');
+        Route::post('/{tax}/default', [TaxController::class, 'setDefault'])->name('admin.setting.tax.default');
+        Route::get('/get', [TaxController::class, 'getTaxRate'])->name('admin.setting.tax.get');
     });
 
     // Category Settings

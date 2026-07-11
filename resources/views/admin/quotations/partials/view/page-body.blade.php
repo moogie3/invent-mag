@@ -185,7 +185,7 @@
                                     <div class="mb-2 pb-2 border-bottom border-primary border-opacity-25"></div>
                                     <div class="d-flex justify-content-between align-items-center">
                                         <span class="fw-bold fs-5">{{ __('messages.quotation_total') }}</span>
-                                        <strong class="fs-2 text-primary">{{ \App\Helpers\CurrencyHelper::format(max(0, $quotation->subtotal - $quotation->discount_amount + ($quotation->tax_type === 'exclusive' ? $quotation->tax_amount : 0))) }}</strong>
+                                        <strong class="fs-2 text-primary">{{ \App\Helpers\CurrencyHelper::format($quotation->total) }}</strong>
                                     </div>
                                     @if($quotation->tax_type === 'inclusive' && $quotation->tax_amount > 0)
                                     <div class="text-muted small text-end mt-1">

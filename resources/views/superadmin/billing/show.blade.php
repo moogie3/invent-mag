@@ -21,6 +21,13 @@
                         </div>
                     </div>
                 </div>
+                @if($order->status !== 'voided')
+                <div class="col-auto">
+                    <button type="button" class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#void-confirm-modal">
+                        <i class="ti ti-ban me-2"></i>Void Order
+                    </button>
+                </div>
+                @endif
             </div>
         </div>
     </div>
@@ -50,7 +57,7 @@
                                 <dd class="col-7"><code>{{ $order->order_number }}</code></dd>
 
                                 <dt class="col-5">Amount</dt>
-                                <dd class="col-7 fw-bold fs-4">${{ number_format($order->amount, 2) }}</dd>
+                                <dd class="col-7 fw-bold fs-4">{{ App\Helpers\CurrencyHelper::formatPlatform($order->amount) }}</dd>
 
                                 <dt class="col-5">Status</dt>
                                 <dd class="col-7">
@@ -75,22 +82,14 @@
 
                                 <dt class="col-5">Created</dt>
                                 <dd class="col-7">{{ $order->created_at->format('M d, Y H:i') }}</dd>
-                            </dl>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-lg-6">
-                    <div class="card shadow border-0 rounded-4">
-                        <div class="card-header">
-                            <h3 class="card-title"><i class="ti ti-users me-2 text-muted"></i>Related Records</h3>
-                        </div>
-                        <div class="card-body">
-                            <dl class="row">
-                                <dt class="col-5">Tenant</dt>
+
+                                <dt class="col-12"><hr class="my-2"></dt>
+
+                                <dt class="col-5"><i class="ti ti-building-community me-1 text-muted"></i>Tenant</dt>
                                 <dd class="col-7">{{ $order->tenant?->name ?? 'Deleted' }}</dd>
 
-                                <dt class="col-5">Tenant Email</dt>
-                                <dd class="col-7">{{ $order->tenant?->email ?? 'N/A' }}</dd>
+                                <dt class="col-5">Email</dt>
+                                <dd class="col-7">{{ $order->tenant?->users()->first()?->email ?? 'N/A' }}</dd>
 
                                 <dt class="col-5">Plan</dt>
                                 <dd class="col-7">{{ $order->plan?->name ?? 'N/A' }}</dd>
@@ -100,27 +99,31 @@
                             </dl>
                         </div>
                     </div>
+                </div>
+                <div class="col-lg-6">
 
                     @if($order->payment_info)
-                    <div class="card shadow border-0 rounded-4 mt-3">
+                    @php
+                        $rawPayment = is_array($order->payment_info) ? $order->payment_info : json_decode(json_encode($order->payment_info), true);
+                        $skipKeys = ['payment_proof_raw'];
+                    @endphp
+                    <div class="card shadow border-0 rounded-4">
                         <div class="card-header">
-                            <h3 class="card-title"><i class="ti ti-credit-card me-2 text-muted"></i>Payment Info</h3>
+                            <h3 class="card-title"><i class="ti ti-credit-card me-2 text-muted"></i>Payment Details</h3>
                         </div>
                         <div class="card-body">
-                            <pre class="m-0" style="max-height: 200px; overflow: auto;">{{ json_encode($order->payment_info, JSON_PRETTY_PRINT) }}</pre>
-                        </div>
-                    </div>
-                    @endif
-
-                    @if($order->status !== 'voided')
-                    <div class="card shadow border-0 rounded-4 mt-3">
-                        <div class="card-body">
-                            <form method="POST" action="{{ route('superadmin.billing.void', $order) }}" onsubmit="return confirm('Void order #{{ $order->order_number }} for ${{ number_format($order->amount, 2) }}? This action cannot be undone.')">
-                                @csrf
-                                <button type="submit" class="btn btn-outline-danger w-100">
-                                    <i class="ti ti-ban me-2"></i>Void Order
-                                </button>
-                            </form>
+                            <dl class="row mb-0">
+                                @foreach($rawPayment as $key => $value)
+                                    @if(in_array($key, $skipKeys)) @continue @endif
+                                    @if(is_string($value) || is_numeric($value))
+                                    <dt class="col-5 text-capitalize">{{ str_replace('_', ' ', $key) }}</dt>
+                                    <dd class="col-7">{{ $value }}</dd>
+                                    @elseif(is_array($value))
+                                    <dt class="col-5 text-capitalize">{{ str_replace('_', ' ', $key) }}</dt>
+                                    <dd class="col-7"><code>{{ json_encode($value) }}</code></dd>
+                                    @endif
+                                @endforeach
+                            </dl>
                         </div>
                     </div>
                     @endif
@@ -129,4 +132,32 @@
         </div>
     </div>
 </div>
+
+@if($order->status !== 'voided')
+<div class="modal modal-blur fade" id="void-confirm-modal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-sm modal-dialog-centered" role="document">
+        <div class="modal-content rounded-4 border-0 shadow-lg">
+            <div class="modal-body text-center py-4">
+                <span class="avatar avatar-lg mb-3 bg-danger-lt rounded-3">
+                    <i class="ti ti-alert-triangle fs-2 text-danger"></i>
+                </span>
+                <h4 class="fw-bold mb-2">Void Order #{{ $order->order_number }}?</h4>
+                <p class="text-muted mb-0">
+                    Void order for <strong>{{ App\Helpers\CurrencyHelper::formatPlatform($order->amount) }}</strong>.
+                    This action cannot be undone.
+                </p>
+            </div>
+            <div class="modal-footer border-0 justify-content-center pt-0">
+                <button type="button" class="btn btn-ghost" data-bs-dismiss="modal">Cancel</button>
+                <form method="POST" action="{{ route('superadmin.billing.void', $order) }}" class="d-inline">
+                    @csrf
+                    <button type="submit" class="btn btn-danger">
+                        <i class="ti ti-ban me-1"></i>Void Order
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+@endif
 @endSection

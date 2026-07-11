@@ -1,7 +1,7 @@
 # Invent-MAG — Product Roadmap
 
-> **Last updated:** June 3, 2026  
-> **Version:** 1.8  
+> **Last updated:** July 2026  
+> **Version:** 2.1  
 > **Stack:** Laravel 11 · Blade/Alpine.js · MySQL · Redis · Dompdf · Spatie Multitenancy · Spatie Permission  
 > **Deployment:** Docker · DigitalOcean (backend) · Vercel (frontend/marketing)  
 > **Domain:** https://invent-mag.web.id
@@ -67,7 +67,7 @@ What looks like an "invoice" in the UI is the `Sales` model (`app/Models/Sales.p
 | `total_tax` | decimal(10,2) | Pre-calculated tax amount |
 | `total` | decimal(15,2) | Grand total including tax |
 | `status` | enum | Unpaid/Paid/Partial/Returned |
-| `is_pos` | boolean | POS vs regular sale |
+| `type` | enum | `'regular'` or `'pos'` (POS vs regular sale; replaced `is_pos` boolean in May 2026, backward-compat accessor `getIsPosAttribute()` still available) |
 | `customer_credit_used` | decimal | Credit applied |
 | `sales_opportunity_id` | FK | CRM linkage |
 
@@ -78,7 +78,7 @@ Line items are in `sales_items` table via `SalesItem` model. Fields: `sales_id`,
 - `accounts` table: CoA. Fields: `tenant_id`, `parent_id`, `name`, `code`, `type` (asset/liability/equity/revenue/expense), `is_active`, `is_contra`, `normal_balance`, `tax_type` (PPN_IN/PPN_OUT/PPH — field exists but not yet used)
 - `journal_entries` table: `tenant_id`, `date`, `description`, `sourceable_id`, `sourceable_type` (polymorphic), `status` (draft/posted/void), `entry_type` (standard/opening/reversal/adjusting/closing)
 - `transactions` table: `tenant_id`, `journal_entry_id`, `account_id`, `type` (debit/credit), `amount`
-- **Accounting settings stored per User** (not per Tenant): `users.accounting_settings` JSON column. Contains: `sales_revenue_account_id`, `accounts_receivable_account_id`, `cost_of_goods_sold_account_id`, `inventory_account_id`, `accounts_payable_account_id`, `cash_account_id`
+- **Accounting settings stored per Tenant:** `tenants.accounting_settings` JSON column (migrated from `users` table, May 2026). Contains: `sales_revenue_account_id`, `accounts_receivable_account_id`, `cost_of_goods_sold_account_id`, `inventory_account_id`, `accounts_payable_account_id`, `cash_account_id`
 - **`AccountingService`** (`app/Services/AccountingService.php`) is the single entry point for all journal entry creation:
 
 ```php

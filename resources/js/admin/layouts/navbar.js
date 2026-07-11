@@ -353,7 +353,7 @@ onPageLoad(function () {
                 const dropdown = toggle.closest(".nav-item.dropdown");
                 
                 // Add hybrid animation listeners
-                if (dropdown && (dropdown.id === "reports-nav-item" || dropdown.id === "accounting-nav-item" || dropdown.id === "administration-nav-item")) {
+                if (dropdown && (dropdown.id === "reports-nav-item" || dropdown.id === "accounting-nav-item" || dropdown.id === "administration-nav-item" || dropdown.id === "sales-nav-item" || dropdown.id === "purchasing-nav-item")) {
                     if (!dropdown.dataset.animationInitialized) {
                         dropdown.addEventListener("shown.bs.dropdown", function () {
                             const dropdownMenu = this.querySelector(".dropdown-menu");

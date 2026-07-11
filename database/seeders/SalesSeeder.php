@@ -8,6 +8,8 @@ use App\Models\Customer;
 use App\Models\User;
 use App\Models\Product;
 use App\Models\SalesItem;
+use App\Models\Tax;
+use App\Helpers\SalesHelper;
 use App\Models\Warehouse;
 use App\Models\ProductWarehouse;
 use App\Services\AccountingService;
@@ -51,6 +53,13 @@ class SalesSeeder extends Seeder
         $this->command->info("Seeding Sales data for tenant: " . app('currentTenant')->name);
         $this->command->info("Available: {$customers->count()} customers, {$users->count()} users, {$products->count()} products, " . count($warehouseIds) . " warehouses");
 
+        // Resolve default tax once — TaxSeeder must run before SalesSeeder
+        $defaultTax = Tax::where('tenant_id', $tenantId)->where('is_default', true)->first()
+            ?? Tax::where('tenant_id', $tenantId)->where('is_active', true)->first();
+        $taxId   = $defaultTax?->id;
+        $taxRate = $defaultTax ? (float) $defaultTax->rate : 0.0;
+        $taxType = $defaultTax ? $defaultTax->type : 'none';
+
         for ($i = 0; $i < 50; $i++) { // Create 50 sample sales
             $customer = $customers->random();
             $user = $users->random();
@@ -64,21 +73,23 @@ class SalesSeeder extends Seeder
             $invoice = 'INV-' . str_pad($invoiceNumber, 5, '0', STR_PAD_LEFT) . '-' . $tenantId;
 
             $sales = Sales::create([
-                'invoice' => $invoice,
-                'customer_id' => $customer->id,
-                'user_id' => $user->id,
-                'warehouse_id' => $warehouseId, // Added warehouse
-                'order_date' => $orderDate,
-                'due_date' => $dueDate,
-                'payment_type' => $paymentType,
-                'order_discount' => rand(0, 20),
+                'invoice'             => $invoice,
+                'customer_id'         => $customer->id,
+                'user_id'             => $user->id,
+                'warehouse_id'        => $warehouseId,
+                'order_date'          => $orderDate,
+                'due_date'            => $dueDate,
+                'payment_type'        => $paymentType,
+                'order_discount'      => rand(0, 20),
                 'order_discount_type' => collect(['percentage', 'fixed'])->random(),
-                'tax_rate' => 10,
-                'total_tax' => 0,
-                'total' => 0,
-                'status' => $status,
-                'type' => \App\Models\Sales::TYPE_REGULAR,
-                'tenant_id' => $tenantId,
+                'tax_id'              => $taxId,
+                'tax_rate'            => $taxRate,
+                'tax_type'            => $taxType,
+                'total_tax'           => 0,
+                'total'               => 0,
+                'status'              => $status,
+                'type'                => \App\Models\Sales::TYPE_REGULAR,
+                'tenant_id'           => $tenantId,
             ]);
 
             $totalSalesAmount = 0;
@@ -122,9 +133,9 @@ class SalesSeeder extends Seeder
                 }
                 $netSales = $totalSalesAmount - $discountAmount;
 
-                // Apply tax (tax-exclusive: added on top)
-                $totalTaxAmount = ($netSales * $sales->tax_rate) / 100;
-                $grandTotal = $netSales + $totalTaxAmount;
+                // Apply tax consistently using SalesHelper (respects exclusive/inclusive/none)
+                $totalTaxAmount = SalesHelper::calculateTaxAmount($netSales, $taxRate, $taxType);
+                $grandTotal     = ($taxType === 'inclusive') ? $netSales : ($netSales + $totalTaxAmount);
 
                 $attempts++;
             } while (($grandTotal < 100 || $grandTotal > 10000 || $netSales < $totalCostOfGoods) && $attempts < $maxAttempts);
@@ -134,14 +145,14 @@ class SalesSeeder extends Seeder
                 $scaleFactor = rand(100, 1000) / $grandTotal;
                 $netSales *= $scaleFactor;
                 $totalCostOfGoods *= $scaleFactor;
-                $totalTaxAmount = ($netSales * $sales->tax_rate) / 100;
-                $grandTotal = $netSales + $totalTaxAmount;
+                $totalTaxAmount = SalesHelper::calculateTaxAmount($netSales, $taxRate, $taxType);
+                $grandTotal     = ($taxType === 'inclusive') ? $netSales : ($netSales + $totalTaxAmount);
             } elseif ($grandTotal > 10000) {
                 $scaleFactor = rand(8000, 10000) / $grandTotal;
                 $netSales *= $scaleFactor;
                 $totalCostOfGoods *= $scaleFactor;
-                $totalTaxAmount = ($netSales * $sales->tax_rate) / 100;
-                $grandTotal = $netSales + $totalTaxAmount;
+                $totalTaxAmount = SalesHelper::calculateTaxAmount($netSales, $taxRate, $taxType);
+                $grandTotal     = ($taxType === 'inclusive') ? $netSales : ($netSales + $totalTaxAmount);
             }
 
             $finalCalculatedTotal = $grandTotal;

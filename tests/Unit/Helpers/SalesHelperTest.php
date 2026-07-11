@@ -97,7 +97,30 @@ class SalesHelperTest extends TestCase
     #[Test]
     public function it_calculates_tax_amount_with_negative_amount()
     {
-        $this->assertEquals(-10.0, SalesHelper::calculateTaxAmount(-100.0, 10));
+        // Negative amounts are invalid input; guard returns 0 to prevent negative tax
+        $this->assertEquals(0.0, SalesHelper::calculateTaxAmount(-100.0, 10));
+    }
+
+    #[Test]
+    public function it_calculates_exclusive_tax_amount()
+    {
+        // Exclusive: tax is added ON TOP of the amount
+        $this->assertEquals(10.0, SalesHelper::calculateTaxAmount(100.0, 10, 'exclusive'));
+    }
+
+    #[Test]
+    public function it_calculates_inclusive_tax_amount()
+    {
+        // Inclusive: tax is embedded; extract = amount - amount/(1 + rate/100)
+        // 110 with 10% inclusive => 110 - 110/1.10 = 110 - 100 = 10
+        $this->assertEquals(10.0, SalesHelper::calculateTaxAmount(110.0, 10, 'inclusive'));
+    }
+
+    #[Test]
+    public function it_calculates_none_tax_amount_as_zero()
+    {
+        // 'none' tax type must always return 0, regardless of rate
+        $this->assertEquals(0.0, SalesHelper::calculateTaxAmount(100.0, 15, 'none'));
     }
 
     // Test cases for calculateInvoiceSummary

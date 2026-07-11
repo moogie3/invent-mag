@@ -7,7 +7,9 @@ use App\Models\Customer;
 use App\Models\Product;
 use App\Models\Quotation;
 use App\Models\Sales;
+use App\Models\Tax;
 use App\Services\SalesService;
+use App\Helpers\SalesHelper;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -71,8 +73,7 @@ class QuotationController extends Controller
             'terms_conditions' => 'nullable|string',
             'discount_total' => 'nullable|numeric|min:0',
             'discount_total_type' => 'nullable|in:fixed,percentage',
-            'tax_rate' => 'nullable|numeric|min:0',
-            'tax_type' => 'nullable|in:none,exclusive,inclusive',
+            'tax_id' => 'nullable|exists:taxes,id',
         ]);
 
         try {
@@ -88,16 +89,18 @@ class QuotationController extends Controller
             $discountValue = $request->discount_total ?? 0;
             $discountAmount = $discountType === 'percentage' ? ($subtotal * $discountValue / 100) : $discountValue;
 
-            $taxRate = $request->tax_rate ?? 0;
-            $taxType = $request->tax_type ?? 'none';
+            $taxId = $request->tax_id;
+            $tax = $taxId ? Tax::find($taxId) : (Tax::default()->first() ?? Tax::active()->first());
+            $taxRate = $tax ? (float) $tax->rate : 0;
+            $taxType = $tax ? $tax->type : 'none';
             $afterDiscount = $subtotal - $discountAmount;
-            $taxAmount = 0;
-            if ($taxType === 'exclusive') {
-                $taxAmount = $afterDiscount * ($taxRate / 100);
-            } elseif ($taxType === 'inclusive') {
-                $taxAmount = $afterDiscount - ($afterDiscount / (1 + $taxRate / 100));
+            $taxAmount = SalesHelper::calculateTaxAmount($afterDiscount, $taxRate, $taxType);
+
+            if ($taxType === 'inclusive') {
+                $total = $afterDiscount;
+            } else {
+                $total = $afterDiscount + $taxAmount;
             }
-            $total = $taxType === 'exclusive' ? $afterDiscount + $taxAmount : $afterDiscount;
 
             $quotation = Quotation::create([
                 'quotation_number' => $this->generateQuotationNumber(),
@@ -109,6 +112,7 @@ class QuotationController extends Controller
                 'discount_type' => $discountType,
                 'discount_value' => $discountValue,
                 'discount_amount' => $discountAmount,
+                'tax_id' => $tax?->id,
                 'tax_type' => $taxType,
                 'tax_rate' => $taxRate,
                 'tax_amount' => $taxAmount,
@@ -157,8 +161,7 @@ class QuotationController extends Controller
             'terms_conditions' => 'nullable|string',
             'discount_total' => 'nullable|numeric|min:0',
             'discount_total_type' => 'nullable|in:fixed,percentage',
-            'tax_rate' => 'nullable|numeric|min:0',
-            'tax_type' => 'nullable|in:none,exclusive,inclusive',
+            'tax_id' => 'nullable|exists:taxes,id',
         ]);
 
         try {
@@ -174,16 +177,18 @@ class QuotationController extends Controller
             $discountValue = $request->discount_total ?? 0;
             $discountAmount = $discountType === 'percentage' ? ($subtotal * $discountValue / 100) : $discountValue;
 
-            $taxRate = $request->tax_rate ?? 0;
-            $taxType = $request->tax_type ?? 'none';
+            $taxId = $request->tax_id;
+            $tax = $taxId ? Tax::find($taxId) : (Tax::default()->first() ?? Tax::active()->first());
+            $taxRate = $tax ? (float) $tax->rate : 0;
+            $taxType = $tax ? $tax->type : 'none';
             $afterDiscount = $subtotal - $discountAmount;
-            $taxAmount = 0;
-            if ($taxType === 'exclusive') {
-                $taxAmount = $afterDiscount * ($taxRate / 100);
-            } elseif ($taxType === 'inclusive') {
-                $taxAmount = $afterDiscount - ($afterDiscount / (1 + $taxRate / 100));
+            $taxAmount = SalesHelper::calculateTaxAmount($afterDiscount, $taxRate, $taxType);
+
+            if ($taxType === 'inclusive') {
+                $total = $afterDiscount;
+            } else {
+                $total = $afterDiscount + $taxAmount;
             }
-            $total = $taxType === 'exclusive' ? $afterDiscount + $taxAmount : $afterDiscount;
 
             $quotation->update([
                 'customer_id' => $request->customer_id,
@@ -193,6 +198,7 @@ class QuotationController extends Controller
                 'discount_type' => $discountType,
                 'discount_value' => $discountValue,
                 'discount_amount' => $discountAmount,
+                'tax_id' => $tax?->id,
                 'tax_type' => $taxType,
                 'tax_rate' => $taxRate,
                 'tax_amount' => $taxAmount,
@@ -273,10 +279,12 @@ class QuotationController extends Controller
                 'payment_type' => 'credit',
                 'order_discount' => $quotation->discount_amount,
                 'order_discount_type' => $quotation->discount_type,
-                'total' => $quotation->total,
-                'status' => 'pending',
+                'tax_id' => $quotation->tax_id,
                 'tax_rate' => $quotation->tax_rate,
                 'total_tax' => $quotation->tax_amount,
+                'tax_type' => $quotation->tax_type,
+                'total' => $quotation->total,
+                'status' => 'pending',
                 'invoice' => $this->salesService->generateInvoiceNumber(),
                 'type' => Sales::TYPE_REGULAR,
                 'notes' => $quotation->notes,

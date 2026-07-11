@@ -11,7 +11,7 @@
         <span id="orderDiscountTotal" class="fw-bold">Rp 0</span>
     </div>
     <div class="d-flex justify-content-between mb-2">
-        <span class="text-muted">{{ __('messages.tax') }} ({{ $tax->rate ?? 0 }}%)</span>
+        <span class="text-muted">{{ __('messages.tax') }} (<span id="taxRateLabel">{{ $defaultTax->rate ?? 0 }}</span>%)</span>
         <span id="taxTotal" class="fw-bold">Rp 0</span>
     </div>
     <div class="d-flex justify-content-between mb-2 text-info" id="creditUsedRow" style="display: none;">
@@ -24,5 +24,6 @@
         <span id="finalTotal" class="fs-4 fw-bold text-primary">Rp 0</span>
     </div>
     <input type="hidden" id="taxInput" name="tax_amount" value="0">
+    <input type="hidden" id="taxTypeInput" name="tax_type" value="{{ $defaultTax->type ?? 'exclusive' }}">
     <input type="hidden" id="creditUsedInput" name="credit_used" value="0">
 </div>

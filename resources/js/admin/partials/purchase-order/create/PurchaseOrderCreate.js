@@ -148,6 +148,32 @@ export class PurchaseOrderCreate extends PurchaseOrderModule {
                 this.sessionJustSubmitted = true;
             });
         }
+
+        const taxSelector = document.getElementById("taxSelector");
+        if (taxSelector) {
+            document.body.addEventListener("change", (e) => {
+                if (e.target && e.target.id === "taxSelector") {
+                    const opt = e.target.options[e.target.selectedIndex];
+                    const rate = parseFloat(opt.dataset.rate) || 0;
+                    const type = opt.dataset.type || "none";
+                    const rateLabel = document.getElementById("taxRateLabel");
+                    const typeInput = document.getElementById("taxTypeInput");
+                    if (rateLabel) rateLabel.textContent = rate;
+                    if (typeInput) typeInput.value = type;
+                    this.updateTotalPrice();
+                }
+            });
+            if (taxSelector.options.length > 0 && taxSelector.selectedIndex >= 0) {
+                const initialOpt = taxSelector.options[taxSelector.selectedIndex];
+                if (initialOpt) {
+                    const rate = parseFloat(initialOpt.dataset.rate) || 0;
+                    const typeInput = document.getElementById("taxTypeInput");
+                    const rateLabel = document.getElementById("taxRateLabel");
+                    if (rateLabel) rateLabel.textContent = rate;
+                    if (typeInput) typeInput.value = initialOpt.dataset.type || "none";
+                }
+            }
+        }
     }
 
     calculateDueDate() {
@@ -284,22 +310,28 @@ export class PurchaseOrderCreate extends PurchaseOrderModule {
             this.orderDiscount.type
         );
 
-        const finalTotal = subtotal - orderDiscountAmount;
+        const taxableAmount = subtotal - orderDiscountAmount;
+        const taxAmount = this.calculateTaxAmount(taxableAmount);
+        const finalTotal = this.getTaxType() === "inclusive" ? taxableAmount : taxableAmount + taxAmount;
 
         const subtotalEl = document.getElementById("subtotal");
         const orderDiscountTotalEl =
             document.getElementById("orderDiscountTotal");
+        const taxTotalEl = document.getElementById("taxTotal");
         const finalTotalEl = document.getElementById("finalTotal");
         const totalDiscountInputEl =
             document.getElementById("totalDiscountInput");
+        const taxInputEl = document.getElementById("taxInput");
 
         if (subtotalEl) subtotalEl.innerText = formatCurrency(subtotal);
         if (orderDiscountTotalEl)
             orderDiscountTotalEl.innerText =
                 formatCurrency(orderDiscountAmount);
+        if (taxTotalEl) taxTotalEl.innerText = formatCurrency(taxAmount);
         if (finalTotalEl) finalTotalEl.innerText = formatCurrency(finalTotal);
         if (totalDiscountInputEl)
             totalDiscountInputEl.value = orderDiscountAmount;
+        if (taxInputEl) taxInputEl.value = taxAmount;
 
         if (this.elements.productsField) {
             this.elements.productsField.value = JSON.stringify(this.products);

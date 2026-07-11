@@ -1,61 +1,149 @@
-<!-- Confirm Modal -->
-<div class="modal fade" id="confirmModal" tabindex="-1" aria-labelledby="confirmModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
+{{-- DELETE MODAL --}}
+<div class="modal modal-blur fade" id="deleteTaxModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-sm modal-dialog-centered" role="document">
         <div class="modal-content border-0 shadow-lg rounded-3">
             <div class="modal-header">
-                <h5 class="modal-title" id="confirmModalLabel">
-                    <i class="ti ti-receipt-tax me-2"></i>{{ __('messages.tax_modal_confirm_tax_settings_title') }}
-                </h5>
+                <h5 class="modal-title">{{ __('messages.tax_modal_delete_title') }}</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <div class="modal-body">
-                <div class="mb-3">
-                    <p class="mb-2">{{ __('messages.tax_modal_confirm_tax_settings_message') }}
-                    </p>
-                </div>
-
-                <!-- Preview of settings -->
-                <div class="alert alert-light border">
-                    <div class="row g-2">
-                        <div class="col-6">
-                            <small class="text-muted d-block">{{ __('messages.tax_modal_tax_name') }}</small>
-                            <span id="previewTaxName" class="fw-medium text-body">-</span>
-                        </div>
-                        <div class="col-6">
-                            <small class="text-muted d-block">{{ __('messages.tax_modal_tax_rate') }}</small>
-                            <span id="previewTaxRate" class="fw-medium text-body">-</span>%
-                        </div>
-                        <div class="col-12 mt-2">
-                            <small class="text-muted d-block">{{ __('messages.tax_modal_status') }}</small>
-                            <span id="previewTaxStatus" class="badge">-</span>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="alert alert-warning mb-0">
-                    <div class="d-flex align-items-center">
-                        <i class="ti ti-alert-triangle me-2"></i>
-                        <div>
-                            <small><strong>{{ __('messages.tax_modal_note') }}</strong>
-                                {{ __('messages.tax_modal_note_message') }}</small>
-                        </div>
-                    </div>
-                </div>
+            <div class="modal-status bg-danger"></div>
+            <div class="modal-body text-center py-4">
+                <i class="ti ti-alert-triangle text-danger" style="font-size: 3rem;"></i>
+                <h3>{{ __('messages.are_you_sure') }}</h3>
+                <div class="text-muted">{{ __('messages.tax_modal_delete_warning') }} <strong id="deleteTaxName"></strong></div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-                    <i class="ti ti-x me-1"></i>{{ __('messages.cancel') }}
-                </button>
-                <button type="submit" form="taxSettingsForm" class="btn btn-primary">
-                    <i class="ti ti-check me-1"></i>{{ __('messages.tax_modal_yes_save_settings') }}
-                </button>
+                <div class="w-100">
+                    <div class="row">
+                        <div class="col">
+                            <button type="button" class="btn w-100" data-bs-dismiss="modal">
+                                {{ __('messages.cancel') }}
+                            </button>
+                        </div>
+                        <div class="col">
+                            <form id="deleteTaxForm" method="POST">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" class="btn btn-danger w-100">{{ __('messages.delete') }}</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 </div>
 
-<div id="tax-modal-config"
-     data-not-specified="{{ __('messages.tax_modal_not_specified') }}"
-     data-active="{{ __('messages.tax_modal_active') }}"
-     data-inactive="{{ __('messages.tax_modal_inactive') }}"
-     class="d-none"></div>
+{{-- CREATE MODAL --}}
+<div class="modal fade" id="createTaxModal" tabindex="-1" aria-labelledby="createTaxModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg rounded-3">
+            <div class="modal-header">
+                <h5 class="modal-title" id="createTaxModalLabel">
+                    <i class="ti ti-plus me-1"></i>{{ __('messages.tax_modal_create_title') }}</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="createTaxForm" action="{{ route('admin.setting.tax.store') }}" method="POST">
+                @csrf
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="createTaxName" class="form-label">{{ __('messages.tax_name') }}</label>
+                        <input type="text" class="form-control" id="createTaxName" name="name" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="createTaxRate" class="form-label">{{ __('messages.tax_rate') }}</label>
+                        <input type="number" class="form-control" id="createTaxRate" name="rate" step="0.01" min="0" max="100" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="createTaxType" class="form-label">{{ __('messages.tax_type') }}</label>
+                        <select class="form-select" id="createTaxType" name="type" required>
+                            <option value="exclusive">{{ __('messages.tax_type_exclusive') }}</option>
+                            <option value="inclusive">{{ __('messages.tax_type_inclusive') }}</option>
+                            <option value="none">{{ __('messages.tax_type_none') }}</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="createTaxDescription" class="form-label">{{ __('messages.tax_description') }}</label>
+                        <textarea class="form-control" id="createTaxDescription" name="description" rows="2"></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" name="is_active" id="createTaxActive" value="1" checked>
+                            <label class="form-check-label" for="createTaxActive">{{ __('messages.tax_active') }}</label>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" name="is_default" id="createTaxDefault" value="1">
+                            <label class="form-check-label" for="createTaxDefault">{{ __('messages.tax_set_as_default') }}</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary"
+                        data-bs-dismiss="modal">{{ __('messages.cancel') }}</button>
+                    <button type="submit" class="btn btn-primary">{{ __('messages.save') }}</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+{{-- EDIT MODAL --}}
+<div class="modal fade" id="editTaxModal" tabindex="-1" aria-labelledby="editTaxModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg rounded-3">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editTaxModalLabel"><i class="ti ti-edit me-1"></i> {{ __('messages.tax_modal_edit_title') }}
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="editTaxForm" method="POST">
+                @csrf
+                @method('PUT')
+                <div class="modal-body">
+                    <input type="hidden" id="editTaxId" name="id">
+                    <div class="mb-3">
+                        <label for="editTaxName" class="form-label">{{ __('messages.tax_name') }}</label>
+                        <input type="text" class="form-control" id="editTaxName" name="name" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="editTaxRate" class="form-label">{{ __('messages.tax_rate') }}</label>
+                        <input type="number" class="form-control" id="editTaxRate" name="rate" step="0.01" min="0" max="100" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="editTaxType" class="form-label">{{ __('messages.tax_type') }}</label>
+                        <select class="form-select" id="editTaxType" name="type" required>
+                            <option value="exclusive">{{ __('messages.tax_type_exclusive') }}</option>
+                            <option value="inclusive">{{ __('messages.tax_type_inclusive') }}</option>
+                            <option value="none">{{ __('messages.tax_type_none') }}</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="editTaxDescription" class="form-label">{{ __('messages.tax_description') }}</label>
+                        <textarea class="form-control" id="editTaxDescription" name="description" rows="2"></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" name="is_active" id="editTaxActive" value="1">
+                            <label class="form-check-label" for="editTaxActive">{{ __('messages.tax_active') }}</label>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" name="is_default" id="editTaxDefault" value="1">
+                            <label class="form-check-label" for="editTaxDefault">{{ __('messages.tax_set_as_default') }}</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary"
+                        data-bs-dismiss="modal">{{ __('messages.cancel') }}</button>
+                    <button type="submit" class="btn btn-primary">{{ __('messages.save') }}</button>
+                </div>
+                <input type="hidden" id="updateTaxRouteBase" value="{{ route('admin.setting.tax.update', '') }}">
+            </form>
+        </div>
+    </div>
+</div>
+

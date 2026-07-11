@@ -5,6 +5,7 @@ namespace App\Http\Controllers\SuperAdmin;
 use App\Http\Controllers\SuperAdmin\FeatureController;
 use App\Http\Controllers\Controller;
 use App\Models\Plan;
+use App\Services\CurrencyService;
 use Illuminate\Http\Request;
 
 class PlanController extends Controller
@@ -18,7 +19,8 @@ class PlanController extends Controller
     public function create()
     {
         $allFeatures = FeatureController::getAllFeatures();
-        return view('superadmin.plans.create', compact('allFeatures'));
+        $predefinedCurrencies = (new CurrencyService)->getPredefinedCurrencies();
+        return view('superadmin.plans.create', compact('allFeatures', 'predefinedCurrencies'));
     }
 
     public function store(Request $request)
@@ -27,6 +29,7 @@ class PlanController extends Controller
             'slug' => 'required|string|unique:plans,slug',
             'name' => 'required|string|max:255',
             'price' => 'required|numeric|min:0',
+            'currency_code' => 'nullable|string|max:3',
             'billing_cycle' => 'required|in:monthly,yearly',
             'description' => 'nullable|string',
             'max_users' => 'required|integer|min:-1',
@@ -34,7 +37,7 @@ class PlanController extends Controller
             'max_products' => 'required|integer|min:-1',
             'features' => 'nullable|array',
             'trial_days' => 'required|integer|min:0',
-            'is_active' => 'boolean',
+            'is_active' => 'nullable|boolean',
             'sort_order' => 'integer|min:0',
         ]);
 
@@ -50,7 +53,8 @@ class PlanController extends Controller
     public function edit(Plan $plan)
     {
         $allFeatures = FeatureController::getAllFeatures();
-        return view('superadmin.plans.edit', compact('plan', 'allFeatures'));
+        $predefinedCurrencies = (new CurrencyService)->getPredefinedCurrencies();
+        return view('superadmin.plans.edit', compact('plan', 'allFeatures', 'predefinedCurrencies'));
     }
 
     public function update(Request $request, Plan $plan)
@@ -59,6 +63,7 @@ class PlanController extends Controller
             'slug' => 'required|string|unique:plans,slug,' . $plan->id,
             'name' => 'required|string|max:255',
             'price' => 'required|numeric|min:0',
+            'currency_code' => 'nullable|string|max:3',
             'billing_cycle' => 'required|in:monthly,yearly',
             'description' => 'nullable|string',
             'max_users' => 'required|integer|min:-1',
@@ -66,7 +71,7 @@ class PlanController extends Controller
             'max_products' => 'required|integer|min:-1',
             'features' => 'nullable|array',
             'trial_days' => 'required|integer|min:0',
-            'is_active' => 'boolean',
+            'is_active' => 'nullable|boolean',
             'sort_order' => 'integer|min:0',
         ]);
 

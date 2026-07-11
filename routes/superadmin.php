@@ -68,6 +68,8 @@ Route::middleware('auth:super_admin')->group(function () {
     Route::get('/settings/preferences', [SettingController::class, 'preferences'])->name('superadmin.settings.preferences');
     Route::post('/settings/preferences', [SettingController::class, 'updatePreferences'])->name('superadmin.settings.preferences.update');
     Route::post('/settings/update-theme-mode', [SettingController::class, 'updateThemeMode'])->name('superadmin.settings.update-theme-mode');
+    Route::get('/settings/platform-currency', [SettingController::class, 'platformCurrency'])->name('superadmin.settings.platform-currency');
+    Route::post('/settings/platform-currency', [SettingController::class, 'updatePlatformCurrency'])->name('superadmin.settings.platform-currency.update');
 
     // Features
     Route::get('/features', [FeatureController::class, 'index'])->name('superadmin.features.index');

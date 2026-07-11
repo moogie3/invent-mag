@@ -22,7 +22,7 @@
                     </div>
                 </div>
                 <div class="col-auto">
-                    <button class="btn btn-primary" onclick="window.print()">
+                    <button class="btn btn-primary" id="btn-print-invoice">
                         <i class="ti ti-printer me-1"></i>Print
                     </button>
                 </div>
@@ -48,7 +48,7 @@
                         <div class="col-6">
                             <strong>Bill To:</strong>
                             <p class="mb-0">{{ $order->tenant?->name ?? 'N/A' }}</p>
-                            <p class="mb-0 text-muted">{{ $order->tenant?->email ?? '' }}</p>
+                            <p class="mb-0 text-muted">{{ $order->tenant?->users()->first()?->email ?? '' }}</p>
                         </div>
                         <div class="col-6 text-end">
                             <strong>Plan:</strong>
@@ -71,13 +71,13 @@
                                     <br><small class="text-muted text-capitalize">{{ $order->change_type }}</small>
                                     @endif
                                 </td>
-                                <td class="text-end fw-bold">${{ number_format($order->amount, 2) }}</td>
+                                <td class="text-end fw-bold">{{ App\Helpers\CurrencyHelper::formatPlatform($order->amount) }}</td>
                             </tr>
                         </tbody>
                         <tfoot>
                             <tr>
                                 <th class="text-end">Total</th>
-                                <th class="text-end fs-4">${{ number_format($order->amount, 2) }}</th>
+                                <th class="text-end fs-4">{{ App\Helpers\CurrencyHelper::formatPlatform($order->amount) }}</th>
                             </tr>
                         </tfoot>
                     </table>
@@ -97,4 +97,11 @@
         </div>
     </div>
 </div>
+@push('scripts')
+<script nonce="{{ $cspNonce }}">
+document.getElementById('btn-print-invoice')?.addEventListener('click', function() {
+    window.print();
+});
+</script>
+@endpush
 @endsection

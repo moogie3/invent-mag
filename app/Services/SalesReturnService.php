@@ -14,6 +14,7 @@ use App\Models\Product;
 use App\Models\Account;
 use Dompdf\Dompdf;
 use App\Helpers\CurrencyHelper;
+use App\Helpers\SalesHelper;
 use App\Models\JournalEntry;
 use App\Models\ProductWarehouse;
 use App\Models\POItem;
@@ -145,13 +146,25 @@ class SalesReturnService
                 }
             }
 
+            // Copy tax data from the original sale.
+            // Compute whenever rate > 0 — tax_id may be null for legacy records.
+            $taxRate   = (float) ($sale->tax_rate ?? 0);
+            $taxType   = $sale->tax_type ?? 'none';
+            $taxAmount = $taxRate > 0
+                ? SalesHelper::calculateTaxAmount($totalAmount, $taxRate, $taxType)
+                : 0.0;
+
             $salesReturn = SalesReturn::create([
                 'sales_id' => $data['sales_id'],
                 'return_date' => $data['return_date'],
                 'reason' => $data['reason'] ?? null,
                 'status' => $data['status'],
                 'total_amount' => $totalAmount,
-                'user_id' => Auth::id(),
+                'tax_id' => $sale->tax_id,
+                'tax_rate' => $sale->tax_rate ?? 0,
+                'tax_amount' => $taxAmount,
+                'tax_type' => $sale->tax_type ?? 'none',
+                'user_id'  => Auth::id(),
             ]);
 
             // Create return items - each item tracks which sales line item it came from
@@ -310,12 +323,24 @@ class SalesReturnService
                 $totalReturnAmount += ($itemData['price'] ?? 0) * $itemData['returned_quantity'];
             }
 
+            // Recalculate tax for updated return amount.
+            // Compute whenever rate > 0 — tax_id may be null for legacy records.
+            $sale->load('tax');
+            $updatedTaxRate   = (float) ($sale->tax_rate ?? 0);
+            $updatedTaxType   = $sale->tax_type ?? 'none';
+            $updatedTaxAmount = $updatedTaxRate > 0
+                ? SalesHelper::calculateTaxAmount($totalReturnAmount, $updatedTaxRate, $updatedTaxType)
+                : 0.0;
+
             $salesReturn->update([
-                'return_date' => $data['return_date'],
-                'reason' => $data['reason'],
+                'return_date'  => $data['return_date'],
+                'reason'       => $data['reason'],
                 'total_amount' => $totalReturnAmount,
-                'status' => $data['status'],
-                'user_id' => Auth::id(),
+                'tax_amount'   => $updatedTaxAmount,
+                'tax_rate'     => $updatedTaxRate,
+                'tax_type'     => $updatedTaxType,
+                'status'       => $data['status'],
+                'user_id'      => Auth::id(),
             ]);
 
             // Update return items - each item tracks which sales line item it came from

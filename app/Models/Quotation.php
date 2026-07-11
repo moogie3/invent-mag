@@ -16,6 +16,12 @@ class Quotation extends Model
         'quotation_date' => 'datetime',
         'valid_until' => 'datetime',
         'items' => 'array',
+        'tax_amount' => 'float',
+        'tax_rate' => 'float',
+        'subtotal' => 'float',
+        'discount_amount' => 'float',
+        'discount_value' => 'float',
+        'total' => 'float',
     ];
 
     public function customer()
@@ -31,5 +37,10 @@ class Quotation extends Model
     public function convertedToSales()
     {
         return $this->belongsTo(Sales::class, 'converted_to_sales_id');
+    }
+
+    public function tax()
+    {
+        return $this->belongsTo(Tax::class, 'tax_id');
     }
 }

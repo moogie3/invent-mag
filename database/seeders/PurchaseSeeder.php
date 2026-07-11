@@ -9,6 +9,8 @@ use App\Models\Product;
 use App\Models\POItem;
 use App\Models\Warehouse;
 use App\Models\ProductWarehouse;
+use App\Models\Tax;
+use App\Helpers\PurchaseHelper;
 use App\Services\AccountingService;
 use Carbon\Carbon;
 
@@ -42,6 +44,13 @@ class PurchaseSeeder extends Seeder
         $this->command->info("Seeding Purchase Orders for tenant: " . app('currentTenant')->name);
         $this->command->info("Available: {$suppliers->count()} suppliers, {$products->count()} products, " . count($warehouseIds) . " warehouses");
 
+        // Resolve default tax once — TaxSeeder must run before PurchaseSeeder
+        $defaultTax = Tax::where('tenant_id', $tenantId)->where('is_default', true)->first()
+            ?? Tax::where('tenant_id', $tenantId)->where('is_active', true)->first();
+        $taxId   = $defaultTax?->id;
+        $taxRate = $defaultTax ? (float) $defaultTax->rate : 0.0;
+        $taxType = $defaultTax ? $defaultTax->type : 'none';
+
         for ($i = 0; $i < 50; $i++) {
             $supplier = $suppliers->random();
             $warehouseId = collect($warehouseIds)->random();
@@ -51,17 +60,21 @@ class PurchaseSeeder extends Seeder
             $status = collect(['Unpaid', 'Paid', 'Partial'])->random();
 
             $purchase = Purchase::create([
-                'invoice' => 'PO-' . str_pad(Purchase::where('tenant_id', $tenantId)->count() + 1, 5, '0', STR_PAD_LEFT),
-                'supplier_id' => $supplier->id,
-                'warehouse_id' => $warehouseId, // Added
-                'order_date' => $orderDate,
-                'due_date' => $dueDate,
-                'payment_type' => $paymentType,
-                'discount_total' => rand(0, 50),
+                'invoice'             => 'PO-' . str_pad(Purchase::where('tenant_id', $tenantId)->count() + 1, 5, '0', STR_PAD_LEFT),
+                'supplier_id'         => $supplier->id,
+                'warehouse_id'        => $warehouseId,
+                'order_date'          => $orderDate,
+                'due_date'            => $dueDate,
+                'payment_type'        => $paymentType,
+                'discount_total'      => rand(0, 50),
                 'discount_total_type' => collect(['percentage', 'fixed'])->random(),
-                'total' => 0,
-                'status' => $status,
-                'tenant_id' => $tenantId,
+                'tax_id'              => $taxId,
+                'tax_rate'            => $taxRate,
+                'tax_type'            => $taxType,
+                'total'               => 0,
+                'total_tax'           => 0,
+                'status'              => $status,
+                'tenant_id'           => $tenantId,
             ]);
 
             $totalPurchaseAmount = 0;
@@ -137,6 +150,17 @@ class PurchaseSeeder extends Seeder
 
             $purchase->update(['total' => $totalPurchaseAmount]);
             
+            // Compute tax and store the true grand total
+            $orderDiscount   = PurchaseHelper::calculateDiscount($totalPurchaseAmount, $purchase->discount_total, $purchase->discount_total_type);
+            $afterDiscount   = $totalPurchaseAmount - $orderDiscount;
+            $totalTaxAmount  = PurchaseHelper::calculateTaxAmount($afterDiscount, $taxRate, $taxType);
+            $grandTotal      = ($taxType === 'inclusive') ? $afterDiscount : ($afterDiscount + $totalTaxAmount);
+
+            $purchase->update([
+                'total'     => $grandTotal,
+                'total_tax' => $totalTaxAmount,
+            ]);
+
             $paidAmount = 0;
 
             // Add payment logic
@@ -167,22 +191,22 @@ class PurchaseSeeder extends Seeder
             $transactions = [];
             $description = "Purchase of goods, invoice {$purchase->invoice}";
 
-            // Debit Inventory for the full purchase amount
-            $transactions[] = ['account_code' => '1140-' . $tenantId, 'type' => 'debit', 'amount' => $totalPurchaseAmount];
+            // Debit Inventory for the grand total (includes tax for exclusive)
+            $transactions[] = ['account_code' => '1140-' . $tenantId, 'type' => 'debit', 'amount' => $grandTotal];
 
             if ($status === 'Paid') {
                 // Credit Cash for the full amount
-                $transactions[] = ['account_code' => '1110-' . $tenantId, 'type' => 'credit', 'amount' => $totalPurchaseAmount];
+                $transactions[] = ['account_code' => '1110-' . $tenantId, 'type' => 'credit', 'amount' => $grandTotal];
             } elseif ($status === 'Unpaid') {
                 // Credit Accounts Payable for the full amount
-                $transactions[] = ['account_code' => '2110-' . $tenantId, 'type' => 'credit', 'amount' => $totalPurchaseAmount];
+                $transactions[] = ['account_code' => '2110-' . $tenantId, 'type' => 'credit', 'amount' => $grandTotal];
             } elseif ($status === 'Partial') {
                 // Credit Cash for the paid amount
                 if ($paidAmount > 0) {
                     $transactions[] = ['account_code' => '1110-' . $tenantId, 'type' => 'credit', 'amount' => $paidAmount];
                 }
                 // Credit Accounts Payable for the remaining balance
-                $remainingBalance = $totalPurchaseAmount - $paidAmount;
+                $remainingBalance = $grandTotal - $paidAmount;
                 if ($remainingBalance > 0) {
                     $transactions[] = ['account_code' => '2110-' . $tenantId, 'type' => 'credit', 'amount' => $remainingBalance];
                 }

@@ -44,6 +44,16 @@
                                 <input type="number" step="0.01" name="price" class="form-control" value="{{ old('price') }}" required>
                             </div>
                             <div class="col-md-2">
+                                <label class="form-label">Currency</label>
+                                <select name="currency_code" class="form-select">
+                                    @foreach ($predefinedCurrencies as $currency)
+                                        <option value="{{ $currency['code'] }}" {{ old('currency_code', 'USD') == $currency['code'] ? 'selected' : '' }}>
+                                            {{ $currency['code'] }} ({{ $currency['symbol'] }})
+                                        </option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            <div class="col-md-2">
                                 <label class="form-label">Billing Cycle <span class="text-danger">*</span></label>
                                 <select name="billing_cycle" class="form-select">
                                     <option value="monthly">Monthly</option>
@@ -58,16 +68,16 @@
                         <div class="row mb-3">
                             <div class="col-md-3">
                                 <label class="form-label">Max Users</label>
-                                <input type="number" name="max_users" class="form-control" value="{{ old('max_users', -1) }}">
+                                <input type="number" name="max_users" class="form-control" value="{{ old('max_users', 0) }}">
                                 <small class="text-muted">-1 for unlimited</small>
                             </div>
                             <div class="col-md-3">
                                 <label class="form-label">Max Warehouses</label>
-                                <input type="number" name="max_warehouses" class="form-control" value="{{ old('max_warehouses', -1) }}">
+                                <input type="number" name="max_warehouses" class="form-control" value="{{ old('max_warehouses', 0) }}">
                             </div>
                             <div class="col-md-3">
                                 <label class="form-label">Max Products</label>
-                                <input type="number" name="max_products" class="form-control" value="{{ old('max_products', -1) }}">
+                                <input type="number" name="max_products" class="form-control" value="{{ old('max_products', 0) }}">
                             </div>
                             <div class="col-md-3">
                                 <label class="form-label">Trial Days</label>
@@ -81,7 +91,7 @@
                             </div>
                             <div class="col-md-4 d-flex align-items-end">
                                 <label class="form-check">
-                                    <input type="checkbox" name="is_active" class="form-check-input" checked>
+                                    <input type="checkbox" name="is_active" value="1" class="form-check-input" checked>
                                     <span class="form-check-label">Active</span>
                                 </label>
                             </div>
@@ -92,7 +102,7 @@
                                 $sections = [
                                     'Core Features' => ['products', 'inventory', 'sales', 'purchases', 'invoices', 'dashboard', 'basic_reports', 'customers', 'suppliers', 'pos', 'sales_returns', 'purchase_returns'],
                                     'Professional Features' => ['stock_opname', 'accounting', 'crm', 'sales_pipeline', 'financial_reports', 'multi_currency', 'hr', 'cash_flow', 'quotations'],
-                                    'Enterprise Features' => ['sales_forecasting', 'api_access', 'audit_compliance', 'custom_roles', 'dedicated_support'],
+                                    'Enterprise Features' => ['sales_forecasting', 'api_access', 'audit_compliance'],
                                 ];
                             @endphp
                             @foreach($sections as $sectionLabel => $sectionKeys)

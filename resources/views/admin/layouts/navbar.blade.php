@@ -43,7 +43,7 @@
                         {{-- For all other items, apply the original permission check --}}
                         @can($item['permission'] ?? null)
                             @if (isset($item['children']))
-                                <li class="nav-item dropdown">
+                                <li class="nav-item dropdown" @if(isset($item['key'])) id="{{ $item['key'] }}-nav-item" @endif>
                                     <a class="nav-link dropdown-toggle" href="#navbar-{{ Str::slug($item['title']) }}"
                                         data-bs-toggle="dropdown" data-bs-auto-close="outside" role="button"
                                         aria-expanded="false">
@@ -58,7 +58,8 @@
                                                 @foreach ($item['children'] as $child)
                                                     @can($child['permission'] ?? null)
                                                         <a class="dropdown-item" href="{{ route($child['route']) }}" data-turbo="true">
-                                                            {{ __($child['title']) }}
+                                                            <i class="{{ $child['icon'] ?? 'ti ti-point' }}"></i>
+                                                            <span>{{ __($child['title']) }}</span>
                                                         </a>
                                                     @endcan
                                                 @endforeach

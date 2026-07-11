@@ -105,7 +105,9 @@ class GeneralLedgerServiceTest extends TestCase
             'amount' => 50,
         ]);
 
-        $transactions = Transaction::where('account_id', $account->id)->get();
+        $transactions = Transaction::where('account_id', $account->id)
+            ->where('journal_entry_id', $journalEntry->id)
+            ->get();
         $periodChange = $this->service->calculatePeriodChange($transactions);
 
         $this->assertEquals(50, $periodChange);

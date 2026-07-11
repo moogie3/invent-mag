@@ -47,6 +47,8 @@ class Sales extends Model
         'status',
         'tax_rate',
         'total_tax',
+        'tax_id',
+        'tax_type',
         'amount_received',
         'change_amount',
         'type',
@@ -122,11 +124,6 @@ class Sales extends Model
         return $this->hasMany(SalesReturn::class);
     }
 
-    public function product(): BelongsTo
-    {
-        return $this->belongsTo(Product::class, 'product_id');
-    }
-
     public function tax(): BelongsTo
     {
         return $this->belongsTo(Tax::class, 'tax_id');
@@ -149,13 +146,19 @@ class Sales extends Model
 
     public function getGrandTotalAttribute()
     {
-        // If the items relationship is loaded, calculate precisely from items + order-level tax/discount.
-        if ($this->relationLoaded('salesItems')) {
-            $summary = SalesHelper::calculateInvoiceSummary($this->salesItems, $this->order_discount, $this->order_discount_type, $this->tax_rate);
+        if ($this->relationLoaded('salesItems') && $this->salesItems->isNotEmpty()) {
+            $summary = SalesHelper::calculateInvoiceSummary(
+                $this->salesItems,
+                $this->order_discount,
+                $this->order_discount_type,
+                $this->tax_rate,
+                $this->tax_type ?? 'exclusive'
+            );
             return round($summary['finalTotal'], 2);
         }
 
-        // Otherwise, fall back to the stored total.
+        // 'total' is always stored as the complete grand total (taxable + tax for exclusive,
+        // or just taxable for inclusive/none) by createSale() and updateSale(). Return as-is.
         return round(($this->attributes['total'] ?? 0), 2);
     }
 
@@ -213,6 +216,7 @@ class Sales extends Model
             $this->order_discount_type ?? 'fixed',
             $this->tax_rate ?? 0,
             $this->relationLoaded('salesReturns') ? $this->salesReturns : collect(),
+            $this->tax_type ?? 'exclusive'
         );
 
         return $summary['finalTotal'];

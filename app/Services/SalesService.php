@@ -35,7 +35,7 @@ class SalesService
     public function getSalesIndexData(array $filters, int $entries)
     {
         $tenantId = app('currentTenant')->id ?? null;
-        $query = Sales::with(['product', 'customer', 'user', 'warehouse', 'salesReturns']); // Added warehouse and salesReturns
+        $query = Sales::with(['customer', 'user', 'warehouse', 'salesReturns']); // Added warehouse and salesReturns
 
         if ($tenantId) {
             $query->where('tenant_id', $tenantId);
@@ -134,15 +134,16 @@ class SalesService
 
     public function getSalesCreateData()
     {
-        // Don't load ALL sales, products, and items into memory!
         $customers = Customer::select('id', 'name', 'email', 'phone_number', 'payment_terms')->get();
         $products = Product::select('id', 'name', 'code', 'selling_price')->get()->each->setAppends(['main_warehouse_stock']);
-        $tax = Tax::where('is_active', 1)->first();
-        // Remove empty items and all sales memory footprint
+        $taxes = Tax::active()->orderBy('name')->get();
+        $defaultTax = Tax::default()->first() ?? $taxes->first();
         $sales = [];
         $items = [];
 
-        return compact('sales', 'customers', 'products', 'items', 'tax');
+        $tax = $defaultTax;
+
+        return compact('sales', 'customers', 'products', 'items', 'taxes', 'defaultTax', 'tax');
     }
 
     public function getActiveCustomerCredits(int $customerId)
@@ -212,10 +213,12 @@ class SalesService
     {
         $sales = Sales::with(['salesItems', 'customer', 'payments', 'warehouse', 'salesReturns.items'])->find($id);
         $customers = Customer::all();
-        $tax = Tax::where('is_active', 1)->first();
+        $taxes = Tax::active()->orderBy('name')->get();
+        $defaultTax = Tax::default()->first() ?? $taxes->first();
         $isPaid = $sales->status == 'Paid';
+        $tax = $defaultTax;
 
-        return compact('sales', 'customers', 'tax', 'isPaid');
+        return compact('sales', 'customers', 'taxes', 'defaultTax', 'tax', 'isPaid');
     }
 
     public function getSalesViewData($id)
@@ -224,7 +227,7 @@ class SalesService
         $sales = Sales::with(['salesItems', 'customer', 'payments', 'salesReturns.items'])->find($id);
 
         $customer = Customer::all();
-        $tax = Tax::first();
+        $tax = Tax::find($sales->tax_id);
 
         $itemCount = $sales->salesItems->count();
 
@@ -233,7 +236,8 @@ class SalesService
             $sales->order_discount ?? 0,
             $sales->order_discount_type ?? 'fixed',
             $sales->tax_rate ?? 0,
-            $sales->relationLoaded('salesReturns') ? $sales->salesReturns : collect()
+            $sales->relationLoaded('salesReturns') ? $sales->salesReturns : collect(),
+            $sales->tax_type ?? 'exclusive'
         );
 
         $subtotal = $summary['subtotal'];
@@ -333,11 +337,18 @@ class SalesService
             $orderDiscountType = $data['discount_total_type'] ?? 'fixed';
             $orderDiscountAmount = SalesHelper::calculateDiscount($subTotal, $orderDiscount, $orderDiscountType);
 
-            $tax = Tax::where('is_active', 1)->first();
-            $taxRate = $tax ? $tax->rate : 0;
-            $taxAmount = SalesHelper::calculateTaxAmount($subTotal - $orderDiscountAmount, $taxRate);
+            $taxId = $data['tax_id'] ?? null;
+            $tax = $taxId ? Tax::find($taxId) : (Tax::default()->first() ?? Tax::active()->first());
+            $taxRate = $tax ? (float) $tax->rate : 0;
+            $taxType = $tax ? $tax->type : 'none';
+            $taxableAmount = $subTotal - $orderDiscountAmount;
+            $taxAmount = SalesHelper::calculateTaxAmount($taxableAmount, $taxRate, $taxType);
 
-            $grandTotal = ($subTotal - $orderDiscountAmount) + $taxAmount;
+            if ($taxType === 'inclusive') {
+                $grandTotal = $taxableAmount;
+            } else {
+                $grandTotal = $taxableAmount + $taxAmount;
+            }
 
             $invoice = $data['invoice'] ?? $this->generateInvoiceNumber();
             
@@ -353,8 +364,10 @@ class SalesService
                 'warehouse_id' => $warehouseId,
                 'order_date' => $data['order_date'],
                 'due_date' => $data['due_date'],
+                'tax_id' => $tax?->id,
                 'tax_rate' => $taxRate,
                 'total_tax' => $taxAmount,
+                'tax_type' => $taxType,
                 'total' => $grandTotal,
                 'order_discount' => $orderDiscount,
                 'order_discount_type' => $orderDiscountType,
@@ -570,22 +583,31 @@ class SalesService
                 $subtotalBeforeDiscounts += $productData['customer_price'] * $productData['quantity'];
             }
 
-            $orderDiscount = $data['order_discount'] ?? 0;
-            $orderDiscountType = $data['order_discount_type'] ?? 'fixed';
+            $orderDiscount = $data['discount_total'] ?? 0;
+            $orderDiscountType = $data['discount_total_type'] ?? 'fixed';
             $orderDiscountAmount = SalesHelper::calculateDiscount($subTotal, $orderDiscount, $orderDiscountType);
 
-            $tax = Tax::where('is_active', 1)->first();
-            $taxRate = $tax ? $tax->rate : 0;
-            $taxAmount = SalesHelper::calculateTaxAmount($subTotal - $orderDiscountAmount, $taxRate);
+            $taxId = $data['tax_id'] ?? null;
+            $tax = $taxId ? Tax::find($taxId) : (Tax::default()->first() ?? Tax::active()->first());
+            $taxRate = $tax ? (float) $tax->rate : 0;
+            $taxType = $tax ? $tax->type : 'none';
+            $taxableAmount = $subTotal - $orderDiscountAmount;
+            $taxAmount = SalesHelper::calculateTaxAmount($taxableAmount, $taxRate, $taxType);
 
-            $grandTotal = ($subTotal - $orderDiscountAmount) + $taxAmount;
+            if ($taxType === 'inclusive') {
+                $grandTotal = $taxableAmount;
+            } else {
+                $grandTotal = $taxableAmount + $taxAmount;
+            }
 
             $sale->update([
                 'customer_id' => $data['customer_id'],
                 'order_date' => $data['order_date'],
                 'due_date' => $data['due_date'],
+                'tax_id' => $tax?->id,
                 'tax_rate' => $taxRate,
                 'total_tax' => $taxAmount,
+                'tax_type' => $taxType,
                 'total' => $grandTotal,
                 'order_discount' => $orderDiscount,
                 'order_discount_type' => $orderDiscountType,

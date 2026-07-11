@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use App\Models\Concerns\BelongsToTenant;
-
+use App\Models\Tax;
 class SalesReturn extends Model
 {
     use HasFactory, BelongsToTenant;
@@ -21,6 +21,10 @@ class SalesReturn extends Model
         'notes',
         'terms_conditions',
         'total_amount',
+        'tax_id',
+        'tax_rate',
+        'tax_amount',
+        'tax_type',
         'status',
         'customer_credit_id',
     ];
@@ -33,7 +37,7 @@ class SalesReturn extends Model
     public static array $statuses = [
         'Pending',
         'Completed',
-        'Cancelled',
+        'Canceled',
     ];
     
     /**
@@ -81,8 +85,18 @@ class SalesReturn extends Model
         return $this->belongsTo(CustomerCredit::class, 'customer_credit_id');
     }
 
+    /**
+     * Get the tax applied to this sales return (mirrors the parent sale's tax).
+     */
+    public function tax(): BelongsTo
+    {
+        return $this->belongsTo(Tax::class, 'tax_id');
+    }
+
     protected $casts = [
-        'return_date' => 'date',
+        'return_date'  => 'date',
         'total_amount' => 'float',
+        'tax_rate'     => 'float',
+        'tax_amount'   => 'float',
     ];
 }

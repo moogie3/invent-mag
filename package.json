@@ -21,6 +21,7 @@
         "vitest": "^4.0.9"
     },
     "dependencies": {
-        "@hotwired/turbo": "^8.0.23"
+        "@hotwired/turbo": "^8.0.23",
+        "chart.js": "^4.5.1"
     }
 }

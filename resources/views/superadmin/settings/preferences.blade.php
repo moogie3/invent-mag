@@ -36,6 +36,10 @@
                                     class="list-group-item list-group-item-action d-flex align-items-center {{ request()->routeIs('superadmin.settings.index') ? 'active' : '' }}">
                                     <i class="ti ti-settings fs-2 me-2"></i> Application
                                 </a>
+                                <a href="{{ route('superadmin.settings.platform-currency') }}"
+                                    class="list-group-item list-group-item-action d-flex align-items-center {{ request()->routeIs('superadmin.settings.platform-currency') ? 'active' : '' }}">
+                                    <i class="ti ti-currency-dollar fs-2 me-2"></i> Platform Currency
+                                </a>
                                 <a href="{{ route('superadmin.settings.preferences') }}"
                                     class="list-group-item list-group-item-action d-flex align-items-center {{ request()->routeIs('superadmin.settings.preferences') ? 'active' : '' }}">
                                     <i class="ti ti-adjustments fs-2 me-2"></i> Preferences

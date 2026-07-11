@@ -11,7 +11,7 @@ Your payment has been successfully processed. Here are the details of your subsc
 | **Invoice Number** | {{ $order->order_number }} |
 | **Date** | {{ $order->paid_at->format('F d, Y - H:i') }} |
 | **Plan** | {{ $planName }} |
-| **Amount (USD)** | ${{ number_format($priceUsd, 0) }} |
+| **Amount (USD)** | {{ App\Helpers\CurrencyHelper::formatPlatform($priceUsd) }} |
 | **Amount Charged (IDR)** | Rp {{ number_format($priceIdr, 0, ',', '.') }} |
 | **Status** | Paid |
 </x-mail::table>

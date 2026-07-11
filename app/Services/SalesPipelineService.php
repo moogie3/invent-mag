@@ -19,6 +19,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 
 use App\Models\Customer;
+use App\Helpers\SalesHelper;
 
 class SalesPipelineService
 {
@@ -142,7 +143,13 @@ class SalesPipelineService
             }
             \Log::debug('createOpportunity: Items processed, totalAmount', ['totalAmount' => $totalAmount]);
 
-            $opportunity->update(['amount' => round($totalAmount, 2)]);
+            $defaultTax = Tax::default()->first() ?? Tax::active()->first();
+            $defaultTaxRate = $defaultTax ? (float) $defaultTax->rate : 0;
+            $defaultTaxType = $defaultTax ? $defaultTax->type : 'none';
+            $defaultTaxAmount = SalesHelper::calculateTaxAmount($totalAmount, $defaultTaxRate, $defaultTaxType);
+            $grandTotal = $defaultTaxType === 'inclusive' ? $totalAmount : $totalAmount + $defaultTaxAmount;
+
+            $opportunity->update(['amount' => round($grandTotal, 2)]);
             \Log::debug('createOpportunity: Opportunity amount updated', ['amount' => $opportunity->amount]);
 
             return $opportunity;
@@ -187,7 +194,13 @@ class SalesPipelineService
             }
             \Log::debug('updateOpportunity: Items processed, totalAmount', ['totalAmount' => $totalAmount]);
 
-            $updateData['amount'] = round($totalAmount, 2);
+            $defaultTax = Tax::default()->first() ?? Tax::active()->first();
+            $defaultTaxRate = $defaultTax ? (float) $defaultTax->rate : 0;
+            $defaultTaxType = $defaultTax ? $defaultTax->type : 'none';
+            $defaultTaxAmount = SalesHelper::calculateTaxAmount($totalAmount, $defaultTaxRate, $defaultTaxType);
+            $grandTotal = $defaultTaxType === 'inclusive' ? $totalAmount : $totalAmount + $defaultTaxAmount;
+
+            $updateData['amount'] = round($grandTotal, 2);
             \Log::debug('updateOpportunity: Opportunity amount updated in updateData', ['amount' => $updateData['amount']]);
 
             $opportunity->update($updateData);
@@ -262,6 +275,12 @@ class SalesPipelineService
         }
 
         return DB::transaction(function () use ($opportunity, $quotationNumber, $subtotal, $items) {
+            $tax = Tax::default()->first() ?? Tax::active()->first();
+            $taxRate = $tax ? (float) $tax->rate : 0;
+            $taxType = $tax ? $tax->type : 'none';
+            $taxAmount = SalesHelper::calculateTaxAmount($subtotal, $taxRate, $taxType);
+            $grandTotal = $taxType === 'inclusive' ? $subtotal : $subtotal + $taxAmount;
+
             $quotation = Quotation::create([
                 'quotation_number' => $quotationNumber,
                 'customer_id' => $opportunity->customer_id,
@@ -270,13 +289,13 @@ class SalesPipelineService
                 'valid_until' => now()->addDays(14),
                 'status' => 'draft',
                 'subtotal' => round($subtotal, 2),
-                'tax_type' => 'none',
-                'tax_rate' => null,
-                'tax_amount' => 0,
+                'tax_type' => $taxType,
+                'tax_rate' => $taxRate ?: null,
+                'tax_amount' => round($taxAmount, 2),
                 'discount_type' => 'none',
                 'discount_value' => 0,
                 'discount_amount' => 0,
-                'total' => round($subtotal, 2),
+                'total' => round($grandTotal, 2),
                 'sales_opportunity_id' => $opportunity->id,
                 'notes' => $opportunity->notes,
                 'terms_conditions' => $opportunity->terms_conditions,
@@ -318,12 +337,18 @@ class SalesPipelineService
             }
             $invoice = 'PL-' . str_pad($invoiceNumber, 4, '0', STR_PAD_LEFT);
 
-            $tax = Tax::where('is_active', 1)->first();
-            $taxRate = $tax ? $tax->rate : 0;
+            $tax = Tax::default()->first() ?? Tax::active()->first();
+            $taxRate = $tax ? (float) $tax->rate : 0;
+            $taxType = $tax ? $tax->type : 'none';
 
             $subTotal = round($opportunityItems->reduce(fn($carry, $item) => $carry + ($item->quantity * $item->price), 0));
-            $taxAmount = round($subTotal * ($taxRate / 100));
-            $grandTotal = round($subTotal + $taxAmount);
+            $taxAmount = SalesHelper::calculateTaxAmount($subTotal, $taxRate, $taxType);
+
+            if ($taxType === 'inclusive') {
+                $grandTotal = $subTotal;
+            } else {
+                $grandTotal = $subTotal + $taxAmount;
+            }
 
             // Assign to Main Warehouse by default for pipeline conversions
             $mainWarehouse = Warehouse::where('is_main', true)->first();
@@ -339,14 +364,16 @@ class SalesPipelineService
                 'invoice' => $invoice,
                 'customer_id' => $opportunity->customer_id,
                 'user_id' => Auth::id(),
-                'warehouse_id' => $mainWarehouse->id, // Added
+                'warehouse_id' => $mainWarehouse->id,
                 'order_date' => now(),
                 'due_date' => $opportunity->expected_close_date ?? now()->addDays(30),
                 'payment_type' => '-',
                 'order_discount' => 0,
                 'order_discount_type' => 'fixed',
+                'tax_id' => $tax?->id,
                 'tax_rate' => $taxRate,
                 'total_tax' => $taxAmount,
+                'tax_type' => $taxType,
                 'total' => $grandTotal,
                 'status' => 'Unpaid',
                 'type' => \App\Models\Sales::TYPE_REGULAR,

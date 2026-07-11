@@ -10,9 +10,16 @@
         <span class="text-muted">{{ __('messages.po_order_discount') }}</span>
         <span id="orderDiscountTotal" class="fw-bold">Rp 0</span>
     </div>
+    <div class="d-flex justify-content-between mb-2">
+        <span class="text-muted">{{ __('messages.tax') }} (<span id="taxRateLabel">{{ $defaultTax->rate ?? 0 }}</span>%)</span>
+        <span id="taxTotal" class="fw-bold">Rp 0</span>
+    </div>
     <hr class="my-2 border-primary">
     <div class="d-flex justify-content-between">
         <span class="fs-4 fw-bold">{{ __('messages.po_grand_total') }}</span>
         <span id="finalTotal" class="fs-4 fw-bold text-primary">Rp 0</span>
     </div>
+    <input type="hidden" id="taxInput" name="tax_amount" value="0">
+    <input type="hidden" id="taxRateInput" name="tax_rate" value="{{ $defaultTax->rate ?? 0 }}">
+    <input type="hidden" id="taxTypeInput" name="tax_type" value="{{ $defaultTax->type ?? 'none' }}">
 </div>

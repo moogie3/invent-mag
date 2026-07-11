@@ -18,4 +18,21 @@
     <input type="hidden" id="totalDiscountInput" name="total_discount" value="0">
     <input type="hidden" id="orderDiscountInput" name="order_discount" value="0">
     <input type="hidden" id="orderDiscountTypeInput" name="order_discount_type" value="fixed">
+
+    <hr class="my-3">
+    <h4 class="card-title mb-3">
+        <i class="ti ti-receipt-tax me-2 text-primary"></i> {{ __('messages.tax') }}
+    </h4>
+    <div class="mb-2">
+        <select class="form-select" id="taxSelector" name="tax_id">
+            @foreach($taxes as $taxOption)
+                <option value="{{ $taxOption->id }}"
+                        data-rate="{{ $taxOption->rate }}"
+                        data-type="{{ $taxOption->type }}"
+                        {{ $defaultTax && $defaultTax->id === $taxOption->id ? 'selected' : '' }}>
+                    {{ $taxOption->name }} ({{ $taxOption->rate }}%{{ $taxOption->type !== 'none' ? ', ' . ucfirst($taxOption->type) : '' }})
+                </option>
+            @endforeach
+        </select>
+    </div>
 </div>

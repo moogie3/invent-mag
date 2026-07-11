@@ -78,6 +78,31 @@ class PurchaseHelperTest extends TestCase
         $this->assertEquals(20.0, PurchaseHelper::calculateDiscount(200.0, 10, 'percentage'));
     }
 
+    // ---------------------------------------------------------------------------
+    // Tax-amount type tests — exclusive, inclusive, none
+    // ---------------------------------------------------------------------------
+
+    #[Test]
+    public function it_calculates_exclusive_tax_amount()
+    {
+        // Exclusive: tax is added ON TOP — 10% of 100 = 10
+        $this->assertEquals(10.0, PurchaseHelper::calculateTaxAmount(100.0, 10, 'exclusive'));
+    }
+
+    #[Test]
+    public function it_calculates_inclusive_tax_amount()
+    {
+        // Inclusive: embedded tax extract = 110 - 110/1.10 = 10
+        $this->assertEquals(10.0, PurchaseHelper::calculateTaxAmount(110.0, 10, 'inclusive'));
+    }
+
+    #[Test]
+    public function it_calculates_none_tax_amount_as_zero()
+    {
+        // 'none' always returns 0 regardless of rate
+        $this->assertEquals(0.0, PurchaseHelper::calculateTaxAmount(100.0, 15, 'none'));
+    }
+
     #[Test]
     public function it_calculates_zero_order_discount_for_zero_subtotal()
     {
@@ -90,11 +115,12 @@ class PurchaseHelperTest extends TestCase
     {
         $summary = PurchaseHelper::calculateInvoiceSummary([], 0, 'fixed');
         $this->assertEquals([
-            'subtotal' => 0.0,
-            'itemCount' => 0,
+            'subtotal'             => 0.0,
+            'itemCount'            => 0,
             'totalProductDiscount' => 0.0,
-            'orderDiscount' => 0.0,
-            'finalTotal' => 0.0,
+            'orderDiscount'        => 0.0,
+            'taxAmount'            => 0.0,
+            'finalTotal'           => 0.0,
         ], $summary);
     }
 
@@ -106,11 +132,12 @@ class PurchaseHelperTest extends TestCase
         ];
         $summary = PurchaseHelper::calculateInvoiceSummary($items, 0, 'fixed');
         $this->assertEquals([
-            'subtotal' => 100.0,
-            'itemCount' => 1,
+            'subtotal'             => 100.0,
+            'itemCount'            => 1,
             'totalProductDiscount' => 0.0,
-            'orderDiscount' => 0.0,
-            'finalTotal' => 100.0,
+            'orderDiscount'        => 0.0,
+            'taxAmount'            => 0.0,
+            'finalTotal'           => 100.0,
         ], $summary);
     }
 
@@ -119,15 +146,16 @@ class PurchaseHelperTest extends TestCase
     {
         $items = [
             (object)['price' => 100, 'quantity' => 1, 'discount' => 10, 'discount_type' => 'percentage'], // 90
-            (object)['price' => 50, 'quantity' => 2, 'discount' => 5, 'discount_type' => 'fixed'], // (50-5)*2 = 90
+            (object)['price' => 50, 'quantity' => 2, 'discount' => 5, 'discount_type' => 'fixed'],        // (50-5)*2 = 90
         ]; // Subtotal = 90 + 90 = 180
-        $summary = PurchaseHelper::calculateInvoiceSummary($items, 10, 'percentage'); // 10% of 180 = 18
+        $summary = PurchaseHelper::calculateInvoiceSummary($items, 10, 'percentage'); // 10% of 180 = 18; no tax
         $this->assertEquals([
-            'subtotal' => 180.0,
-            'itemCount' => 2,
+            'subtotal'             => 180.0,
+            'itemCount'            => 2,
             'totalProductDiscount' => 10.0 + 10.0, // 10% of 100 = 10, fixed 5 * 2 = 10
-            'orderDiscount' => 18.0,
-            'finalTotal' => 162.0, // 180 - 18
+            'orderDiscount'        => 18.0,
+            'taxAmount'            => 0.0,          // taxRate defaults to 0
+            'finalTotal'           => 162.0,        // 180 - 18 + 0 tax
         ], $summary);
     }
 
@@ -139,11 +167,66 @@ class PurchaseHelperTest extends TestCase
         ];
         $summary = PurchaseHelper::calculateInvoiceSummary($items, 0, 'fixed');
         $this->assertEquals([
-            'subtotal' => 100.0,
-            'itemCount' => 1,
+            'subtotal'             => 100.0,
+            'itemCount'            => 1,
             'totalProductDiscount' => 0.0,
-            'orderDiscount' => 0.0,
-            'finalTotal' => 100.0,
+            'orderDiscount'        => 0.0,
+            'taxAmount'            => 0.0,
+            'finalTotal'           => 100.0,
+        ], $summary);
+    }
+
+    // ---------------------------------------------------------------------------
+    // Tax-type coverage — exclusive, inclusive, none
+    // ---------------------------------------------------------------------------
+
+    #[Test]
+    public function it_calculates_invoice_summary_with_exclusive_tax()
+    {
+        // Subtotal 100, no discount, exclusive 10% tax => finalTotal = 100 + 10 = 110
+        $items = [(object)['price' => 100, 'quantity' => 1, 'discount' => 0, 'discount_type' => 'fixed']];
+        $summary = PurchaseHelper::calculateInvoiceSummary($items, 0, 'fixed', 10, 'exclusive');
+        $this->assertEquals([
+            'subtotal'             => 100.0,
+            'itemCount'            => 1,
+            'totalProductDiscount' => 0.0,
+            'orderDiscount'        => 0.0,
+            'taxAmount'            => 10.0,
+            'finalTotal'           => 110.0,
+        ], $summary);
+    }
+
+    #[Test]
+    public function it_calculates_invoice_summary_with_inclusive_tax()
+    {
+        // Subtotal 110 (price already includes 10% tax).
+        // Embedded tax portion = 110 - (110 / 1.10) = 110 - 100 = 10
+        // finalTotal = 110 (no addition; tax is already inside)
+        $items = [(object)['price' => 110, 'quantity' => 1, 'discount' => 0, 'discount_type' => 'fixed']];
+        $summary = PurchaseHelper::calculateInvoiceSummary($items, 0, 'fixed', 10, 'inclusive');
+        $this->assertEquals([
+            'subtotal'             => 110.0,
+            'itemCount'            => 1,
+            'totalProductDiscount' => 0.0,
+            'orderDiscount'        => 0.0,
+            'taxAmount'            => 10.0,
+            'finalTotal'           => 110.0,
+        ], $summary);
+    }
+
+    #[Test]
+    public function it_calculates_invoice_summary_with_none_tax()
+    {
+        // taxType 'none' => taxAmount = 0, finalTotal = subtotal
+        $items = [(object)['price' => 100, 'quantity' => 1, 'discount' => 0, 'discount_type' => 'fixed']];
+        $summary = PurchaseHelper::calculateInvoiceSummary($items, 0, 'fixed', 15, 'none');
+        $this->assertEquals([
+            'subtotal'             => 100.0,
+            'itemCount'            => 1,
+            'totalProductDiscount' => 0.0,
+            'orderDiscount'        => 0.0,
+            'taxAmount'            => 0.0,
+            'finalTotal'           => 100.0,
         ], $summary);
     }
 

@@ -285,12 +285,57 @@ Experience Invent-MAG firsthand:
 
 #### System Configuration
 
-- **Currency Settings:** Multi-currency configuration
+- **Currency Settings (Tenant):** Per-tenant multi-currency configuration via `CurrencySetting`
+- **Platform Currency Settings (Super Admin):** Independent platform-wide currency via `PlatformCurrencySetting` — does not affect tenant currencies
 - **Tax Configuration:** Dynamic tax rate management
 - **Theme Settings:** Dark/light mode with persistence
 - **Notification Settings:** Email and in-app notifications
 - **Category Management:** Product categorization
 - **Unit Management:** Units of measure
+
+### **🏢 Super Admin Panel (SaaS Management)**
+
+A fully separate admin panel for platform operators, running on the root domain with its own authentication guard and model.
+
+#### Core Management
+
+- **Tenant Management:** List, view, toggle active/inactive, edit domain, impersonate (planned)
+- **Plan Management:** Full CRUD for subscription plans with feature toggles, pricing, usage limits
+- **Subscription Management:** Terminate and reactivate tenant subscriptions, view status (active/trialing/expired/terminated)
+- **Feature Management:** Assign feature slugs (accounting, pos, crm, forecasting, api, etc.) per plan tier
+
+#### Financial Operations
+
+- **Billing Dashboard:** Revenue totals, paid/pending order counts, subscription order listing
+- **Payment Overview:** Revenue statistics and gateway breakdown
+- **Transactions:** Searchable/filterable transaction history
+- **Pending Payments:** Approve or reject incoming subscription payments
+- **Invoices:** Paid invoice listing with detail views
+- **Order Voiding:** Void subscription orders with audit trail
+
+#### System Administration
+
+- **Application Settings:** .env editor (app name, URL, debug mode, mail config)
+- **User Preferences:** Theme mode, notification settings, performance options (persisted per super admin)
+- **Platform Currency:** Configure currency symbol, separators, decimal places, position — used across all super admin monetary displays
+- **Permissions Overview:** View-only listing of all tenant roles and permissions
+- **Backups:** System-wide and per-tenant backup creation, restore, download, and delete
+- **Audit Log:** Platform-level activity log with module/action filtering
+
+#### Landing Page CMS
+
+- **CMS Editor:** Edit hero section, features list, pricing display, and contact information for the marketing site
+
+#### Architecture
+
+| Aspect | Super Admin | Tenant Admin |
+|--------|-------------|--------------|
+| **Model** | `App\Models\SuperAdmin` (table: `super_admins`) | `App\Models\User` (table: `users`) |
+| **Auth Guard** | `super_admin` | `web` |
+| **Domain** | Root domain (`invent-mag.web.id`) | Subdomain (`tenant.invent-mag.web.id`) |
+| **Routes** | `routes/superadmin.php` (39 routes) | `routes/admin/*.php` (14 domain files) |
+| **Currency** | `PlatformCurrencySetting` (global) | `CurrencySetting` (per-tenant) |
+| **Roles** | None needed (full access) | Spatie RBAC (superuser, staff, pos) |
 
 #### Security & Compliance
 
@@ -396,7 +441,7 @@ Data:
 - **Permissions:** Spatie Laravel Permission
 - **Multi-tenancy:** Spatie Laravel Multitenancy
 - **PDF Generation:** DomPDF
-- **Testing:** PHPUnit 10+ + Paratest
+- **Testing:** PHPUnit 11+ + Paratest
 
 ### Frontend
 
@@ -554,8 +599,15 @@ docker-compose exec app php artisan migrate --seed
 
 - ✅ **Sales Pipeline Enhancements** — Kanban/List view toggle, opportunity notes & terms conditions, currency-formatted list view amounts
 - ✅ **Full Quotation Module** — Standalone quotation management with status lifecycle (Draft/Sent/Accepted/Rejected/Expired/Converted), professional PDF generation, convert-to-sales workflow, pipeline integration, notes & terms conditions, per-item/order-level discount & tax calculations, bulk operations, and auto-numbering
-- ✅ **Tutorial Expansion** — Added pipeline and quotation lifecycle tutorial contexts (50+ total context pages), orphaned lang key cleanup, missing Indonesian translations filled
+- ✅ **Per-Item Discount Type on Quotations** — Quotation line items support % vs Fixed discount type selector (independent per line)
+- ✅ **Tax Auto-Sync** — Sales create/edit pages auto-recalculate tax on page load and on tax dropdown change (no manual recalculation needed)
+- ✅ **Sales Returns Tax Breakdown** — Sales return show page displays tax rate and type label in the summary
+- ✅ **Pipeline Opportunity Amount** — Opportunity amount in sales pipeline is now the tax-inclusive grand total
+- ✅ **Sales & Opportunity Notes/Terms** — `notes` and `terms_conditions` columns added to `sales` and `sales_opportunities` tables (migration `2026_07_09_000001`)
+- ✅ **Platform Currency System** — Super Admin panel uses independent `PlatformCurrencySetting` (does not affect tenant currencies)
+- ✅ **Tutorial Expansion** — Added 4 new tutorial step keys (`tax_auto_sync`, `tax_breakdown_ret`, `opportunity_amount_tax`, `item_discount_type_qt`) to English and Indonesian translations
 - ✅ **Stability Fix** — `onPageLoad` deduplication fix preventing double card rendering and duplicate event listeners on the pipeline page
+- ✅ **Test Suite Hardening** — Fixed 17 previously failing unit tests; 528 passing, 0 failures
 
 ### Recently Added (v1.8)
 
@@ -623,6 +675,7 @@ invent-mag/
 │   │   │       ├── Accounting/  # Chart of Accounts, Journal, Reports
 │   │   │       ├── Hr/          # Employee, Attendance, Payroll, Payslip
 │   │   │       └── ...          # Product, Sales, Purchase, POS, etc.
+│   │   │   └── SuperAdmin/      # 16 controllers (Dashboard, Tenants, Plans, Billing, etc.)
 │   │   └── Middleware/          # plan.feature, role, permission middleware
 │   ├── Models/                  # Eloquent models (multitenant-scoped)
 │   └── Services/                # Business logic layer (Dompdf exports, etc.)
@@ -642,13 +695,23 @@ invent-mag/
 │   │       ├── hr.js            # HR module JS
 │   │       └── reports/         # Stock transfer, adjustment log JS
 │   └── views/
-│       └── admin/
-│           ├── hr/              # employee, attendance, payroll views
-│           ├── reports/         # stock-transfer, adjustment-log views
-│           ├── layouts/         # menu, sidebar, modals, partials
-│           └── settings/        # backup, plan settings
+│       ├── admin/                   # Tenant admin views (Blade)
+│       │   ├── hr/                  # employee, attendance, payroll views
+│       │   ├── reports/             # stock-transfer, adjustment-log views
+│       │   ├── layouts/             # menu, sidebar, modals, partials
+│       │   └── settings/            # backup, plan settings
+│       └── superadmin/              # Super admin views (28 Blade files)
+│           ├── auth/                # Login
+│           ├── dashboard/           # Dashboard with ApexCharts
+│           ├── tenants/             # Tenant management
+│           ├── plans/               # Plan CRUD
+│           ├── billing/             # Subscription orders
+│           ├── settings/            # .env editor, platform currency, preferences
+│           └── ...                  # subscriptions, backups, audit-log, CMS, etc.
 ├── routes/
-│   └── web.php                  # All web routes (750+ lines)
+│   ├── web.php                      # Orchestrator (includes admin/*.php)
+│   ├── superadmin.php               # Super admin routes (39 routes, auth:super_admin guard)
+│   └── admin/                       # 14 domain-specific tenant route files
 ├── tests/
 │   └── Feature/
 │       ├── Admin/               # StockTransferControllerTest, etc.

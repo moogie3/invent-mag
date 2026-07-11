@@ -34,7 +34,7 @@
                     <div class="card shadow border-0 rounded-4 stat-card card-hover">
                         <div class="card-body text-center">
                             <div class="subheader">Total Pending Amount</div>
-                            <div class="h1 mb-0 text-warning">${{ number_format($stats['total_amount'], 2) }}</div>
+                            <div class="h1 mb-0 text-warning">{{ App\Helpers\CurrencyHelper::formatPlatform($stats['total_amount']) }}</div>
                         </div>
                         <i class="ti ti-currency-dollar stat-icon text-warning"></i>
                     </div>
@@ -62,19 +62,19 @@
                                     <a href="{{ route('superadmin.tenants.show', $order->tenant) }}" class="text-reset">{{ $order->tenant?->name ?? 'Deleted' }}</a>
                                 </td>
                                 <td>{{ $order->plan?->name ?? 'N/A' }}</td>
-                                <td class="fw-semibold">${{ number_format($order->amount, 2) }}</td>
+                                <td class="fw-semibold">{{ App\Helpers\CurrencyHelper::formatPlatform($order->amount) }}</td>
                                 <td class="text-muted">{{ $order->created_at->format('M d, Y H:i') }}</td>
                                 <td>
                                     <div class="d-flex gap-1">
-                                        <form method="POST" action="{{ route('superadmin.pending-payments.approve', $order) }}" class="d-inline">
+                                        <form method="POST" action="{{ route('superadmin.pending-payments.approve', $order) }}" class="d-inline confirm-form" data-message="Approve this payment? The tenant plan will be activated.">
                                             @csrf
-                                            <button type="submit" class="btn btn-success btn-sm" onclick="return confirm('Approve this payment? The tenant plan will be activated.')">
+                                            <button type="submit" class="btn btn-success btn-sm">
                                                 <i class="ti ti-check me-1"></i>Approve
                                             </button>
                                         </form>
-                                        <form method="POST" action="{{ route('superadmin.pending-payments.reject', $order) }}" class="d-inline">
+                                        <form method="POST" action="{{ route('superadmin.pending-payments.reject', $order) }}" class="d-inline confirm-form" data-message="Reject this payment? It will be marked as canceled.">
                                             @csrf
-                                            <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Reject this payment? It will be marked as canceled.')">
+                                            <button type="submit" class="btn btn-danger btn-sm">
                                                 <i class="ti ti-x me-1"></i>Reject
                                             </button>
                                         </form>
@@ -101,4 +101,15 @@
         </div>
     </div>
 </div>
+@push('scripts')
+<script nonce="{{ $cspNonce }}">
+document.querySelectorAll('.confirm-form').forEach(function(form) {
+    form.addEventListener('submit', function(e) {
+        if (!confirm(form.getAttribute('data-message'))) {
+            e.preventDefault();
+        }
+    });
+});
+</script>
+@endpush
 @endSection

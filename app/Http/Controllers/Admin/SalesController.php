@@ -90,6 +90,7 @@ class SalesController extends Controller
             'products' => 'required|json',
             'discount_total' => 'nullable|numeric|min:0',
             'discount_total_type' => 'nullable|in:fixed,percentage',
+            'tax_id' => 'nullable|exists:taxes,id',
         ]);
 
         try {
@@ -115,6 +116,7 @@ class SalesController extends Controller
             'products' => 'required|json',
             'discount_total' => 'nullable|numeric|min:0',
             'discount_total_type' => 'nullable|in:fixed,percentage',
+            'tax_id' => 'nullable|exists:taxes,id',
         ]);
 
         try {

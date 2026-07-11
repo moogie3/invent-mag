@@ -25,7 +25,7 @@
                     <div class="card shadow border-0 rounded-4 stat-card card-hover">
                         <div class="card-body text-center">
                             <div class="subheader">Total Revenue</div>
-                            <div class="h1 mb-0 text-success">${{ number_format($stats['totalRevenue'], 2) }}</div>
+                            <div class="h1 mb-0 text-success">{{ App\Helpers\CurrencyHelper::formatPlatform($stats['totalRevenue']) }}</div>
                         </div>
                         <i class="ti ti-currency-dollar stat-icon text-success"></i>
                     </div>
@@ -94,7 +94,7 @@
                                 <div class="d-flex align-items-center justify-content-between mb-2">
                                     <span class="text-muted small text-capitalize">{{ $gateway->gateway }}</span>
                                     <div class="text-end">
-                                        <div class="fw-semibold">${{ number_format($gateway->total, 2) }}</div>
+                                        <div class="fw-semibold">{{ App\Helpers\CurrencyHelper::formatPlatform($gateway->total) }}</div>
                                         <div class="text-muted small">{{ $gateway->count }} transactions</div>
                                     </div>
                                 </div>
@@ -134,7 +134,7 @@
                                 <td><code>{{ $order->order_number }}</code></td>
                                 <td>{{ $order->tenant?->name ?? 'Deleted' }}</td>
                                 <td>{{ $order->plan?->name ?? 'N/A' }}</td>
-                                <td class="fw-semibold">${{ number_format($order->amount, 2) }}</td>
+                                <td class="fw-semibold">{{ App\Helpers\CurrencyHelper::formatPlatform($order->amount) }}</td>
                                 <td>
                                     @if($order->status === 'paid')
                                         <span class="badge bg-success text-white">Paid</span>
@@ -160,75 +160,10 @@
         </div>
     </div>
 </div>
+<span id="paymentOverviewChartData"
+    data-chart='{!! json_encode([
+        'monthlyRevenue' => $monthlyRevenue->count() > 0 ? ['labels' => $chartMonths, 'data' => $chartRevenue] : [],
+        'revenueByGateway' => $revenueByGateway->count() > 0 ? ['labels' => $gatewayLabels, 'data' => $gatewayData] : [],
+    ]) !!}' class="d-none"></span>
+@vite('resources/js/superadmin/payment-overview.js')
 @endsection
-
-@push('head-scripts')
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
-@endpush
-
-@push('scripts')
-@if($monthlyRevenue->count() > 0)
-<script>
-document.addEventListener('turbo:load', function initChart() {
-    if (typeof Chart === 'undefined') {
-        setTimeout(initChart, 500);
-        return;
-    }
-
-    new Chart(document.getElementById('monthlyRevenueChart'), {
-        type: 'bar',
-        data: {
-            labels: {!! json_encode($chartMonths) !!},
-            datasets: [{
-                label: 'Revenue',
-                data: {!! json_encode($chartRevenue) !!},
-                backgroundColor: '#2563eb',
-                borderRadius: 6,
-                barPercentage: 0.6,
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: { legend: { display: false } },
-            scales: {
-                y: {
-                    beginAtZero: true,
-                    ticks: { callback: v => '$' + v.toLocaleString() }
-                }
-            }
-        }
-    });
-});
-</script>
-@endif
-
-@if($revenueByGateway->count() > 0)
-<script>
-document.addEventListener('turbo:load', function initGateway() {
-    if (typeof Chart === 'undefined') {
-        setTimeout(initGateway, 500);
-        return;
-    }
-
-    new Chart(document.getElementById('gatewayChart'), {
-        type: 'doughnut',
-        data: {
-            labels: {!! json_encode($gatewayLabels) !!},
-            datasets: [{
-                data: {!! json_encode($gatewayData) !!},
-                backgroundColor: ['#2563eb', '#16a34a', '#d97706', '#dc2626', '#8b5cf6'],
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                legend: { position: 'bottom', labels: { boxWidth: 12, padding: 12 } }
-            }
-        }
-    });
-});
-</script>
-@endif
-@endpush

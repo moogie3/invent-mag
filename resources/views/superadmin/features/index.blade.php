@@ -56,7 +56,7 @@
                                         ],
                                         'Enterprise Features' => [
                                             'sales_forecasting', 'api_access',
-                                            'audit_compliance', 'custom_roles', 'dedicated_support',
+                                            'audit_compliance',
                                         ],
                                     ];
                                     $sectionColors = [

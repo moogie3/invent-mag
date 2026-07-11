@@ -33,6 +33,36 @@ export class SalesOrderModule {
         return totalInCents / 100;
     }
 
+    getTaxType() {
+        const selector = document.getElementById("taxSelector");
+        if (selector && selector.selectedIndex >= 0) {
+            const opt = selector.options[selector.selectedIndex];
+            return opt.dataset.type || "exclusive";
+        }
+        return document.getElementById("taxTypeInput")?.value || "exclusive";
+    }
+
+    getEffectiveTaxRate() {
+        const selector = document.getElementById("taxSelector");
+        if (selector && selector.selectedIndex >= 0) {
+            const opt = selector.options[selector.selectedIndex];
+            return parseFloat(opt.dataset.rate) || 0;
+        }
+        return this.taxRate;
+    }
+
+    calculateTaxAmount(taxableAmount) {
+        const rate = this.getEffectiveTaxRate();
+        const type = this.getTaxType();
+        if (type === "none" || rate <= 0 || taxableAmount <= 0) {
+            return 0;
+        }
+        if (type === "inclusive") {
+            return Math.round((taxableAmount - (taxableAmount / (1 + rate / 100))) * 100) / 100;
+        }
+        return Math.round((taxableAmount * (rate / 100)) * 100) / 100;
+    }
+
     calculateOrderDiscount(subtotal, discountValue, discountType) {
         if (discountType === "percentage") {
             return (subtotal * discountValue) / 100;

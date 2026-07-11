@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Models\Product;
 use App\Models\Sales;
 use App\Models\SalesItem;
+use App\Models\Tax;
 use App\Helpers\SalesHelper;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -113,10 +114,16 @@ class PosService
         $orderDiscountType = $data['discount_total_type'] ?? 'fixed';
         $orderDiscountAmount = SalesHelper::calculateDiscount($totalBeforeDiscounts, $orderDiscount, $orderDiscountType);
 
+        // POS uses the default tax (no selector needed for quick-serve UX)
+        $defaultTax = Tax::default()->first() ?? Tax::active()->first();
+        $taxId = $defaultTax?->id;
+        $taxType = $defaultTax?->type ?? 'none';
+        $taxRateVal = $defaultTax?->rate ?? 0;
+
         $taxable = $subTotal - $orderDiscountAmount;
-        $taxRate = $data['tax_rate'] ?? 0;
-        $taxAmount = $data['tax_amount'] ?? SalesHelper::calculateTaxAmount($taxable, $taxRate);
-        $grandTotal = $data['grand_total'] ?? $taxable + $taxAmount;
+        $taxAmount = SalesHelper::calculateTaxAmount($taxable, $taxRateVal, $taxType);
+        // For inclusive tax the price already contains tax; do NOT add taxAmount again.
+        $grandTotal = ($taxType === 'inclusive') ? $taxable : ($taxable + $taxAmount);
 
         $lastPosInvoice = Sales::where('invoice', 'like', 'POS-%')
                             ->latest()
@@ -168,7 +175,7 @@ class PosService
             throw new \Exception('Insufficient stock for: ' . $productList . '. Please adjust quantities or restock.');
         }
 
-        return DB::transaction(function () use ($data, $products, $dbProducts, $grandTotal, $orderDiscount, $orderDiscountType, $taxAmount, $taxRate, $subTotal, $mainWarehouse, $invoice) {
+        return DB::transaction(function () use ($data, $products, $dbProducts, $grandTotal, $orderDiscount, $orderDiscountType, $taxAmount, $taxRateVal, $taxId, $taxType, $subTotal, $mainWarehouse, $invoice) {
             $sale = Sales::create([
                 'invoice' => $invoice,
                 'customer_id' => $data['customer_id'],
@@ -176,8 +183,10 @@ class PosService
                 'warehouse_id' => $mainWarehouse->id,
                 'order_date' => $data['transaction_date'],
                 'due_date' => $data['transaction_date'],
-                'tax_rate' => $taxRate,
+                'tax_id' => $taxId,
+                'tax_rate' => $taxRateVal,
                 'total_tax' => $taxAmount,
+                'tax_type' => $taxType,
                 'total' => $grandTotal,
                 'order_discount' => $orderDiscount,
                 'order_discount_type' => $orderDiscountType,
@@ -261,8 +270,9 @@ class PosService
 
         $taxableAmount = $subTotal - $orderDiscountAmount;
         $taxRate = $sale->tax_rate ?? 0;
-        $taxAmount = SalesHelper::calculateTaxAmount($taxableAmount, $taxRate);
-        $grandTotal = $taxableAmount + $taxAmount;
+        $taxType = $sale->tax_type ?? 'exclusive';
+        $taxAmount = SalesHelper::calculateTaxAmount($taxableAmount, $taxRate, $taxType);
+        $grandTotal = $taxType === 'inclusive' ? $taxableAmount : $taxableAmount + $taxAmount;
         $amountReceived = $sale->amount_received ?? $grandTotal;
         $change = $amountReceived - $grandTotal;
 
@@ -271,6 +281,7 @@ class PosService
             'subTotal' => $subTotal,
             'orderDiscountAmount' => $orderDiscountAmount,
             'taxRate' => $taxRate,
+            'taxType' => $taxType,
             'taxAmount' => $taxAmount,
             'grandTotal' => $grandTotal,
             'amountReceived' => $amountReceived,

@@ -317,7 +317,8 @@ class ManualJournalEntryServiceTest extends TestCase
         $filters = [];
         $result = $this->service->getPostedEntries($filters);
 
-        $this->assertEquals(4, $result->total());
+        // AccountSeeder creates 1 posted opening-balance entry; we create 4 more = 5 total
+        $this->assertEquals(5, $result->total());
     }
 
     #[Test]

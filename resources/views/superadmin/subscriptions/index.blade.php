@@ -141,7 +141,7 @@
                                             <i class="ti ti-dots-vertical"></i>
                                         </button>
                                         <div class="dropdown-menu dropdown-menu-end">
-                                            <form method="POST" action="{{ route('superadmin.subscriptions.terminate', $sub) }}" onsubmit="return confirm('Are you sure you want to terminate {{ $sub->name }}\'s subscription? This action cannot be undone.')">
+                                            <form method="POST" action="{{ route('superadmin.subscriptions.terminate', $sub) }}" class="confirm-form" data-message="Are you sure you want to terminate {{ $sub->name }}'s subscription? This action cannot be undone.">
                                                 @csrf
                                                 <button type="submit" class="dropdown-item text-danger">
                                                     <i class="ti ti-ban me-2"></i>Terminate
@@ -155,7 +155,7 @@
                                             <i class="ti ti-dots-vertical"></i>
                                         </button>
                                         <div class="dropdown-menu dropdown-menu-end">
-                                            <form method="POST" action="{{ route('superadmin.subscriptions.reactivate', $sub) }}" onsubmit="return confirm('Reactivate {{ $sub->name }}\'s subscription?')">
+                                            <form method="POST" action="{{ route('superadmin.subscriptions.reactivate', $sub) }}" class="confirm-form" data-message="Reactivate {{ $sub->name }}'s subscription?">
                                                 @csrf
                                                 <button type="submit" class="dropdown-item text-success">
                                                     <i class="ti ti-refresh me-2"></i>Reactivate
@@ -183,4 +183,15 @@
         </div>
     </div>
 </div>
+@push('scripts')
+<script nonce="{{ $cspNonce }}">
+document.querySelectorAll('.confirm-form').forEach(function(form) {
+    form.addEventListener('submit', function(e) {
+        if (!confirm(form.getAttribute('data-message'))) {
+            e.preventDefault();
+        }
+    });
+});
+</script>
+@endpush
 @endSection

@@ -47,7 +47,7 @@
                                 @endif
                             </div>
                             <div class="mb-3 pb-2 border-bottom">
-                                <span class="plan-price">${{ number_format($plan->price, 2) }}</span>
+                                <span class="plan-price">{{ App\Helpers\CurrencyHelper::formatPlatform($plan->price) }}</span>
                                 <span class="plan-period">/ {{ $plan->billing_cycle }}</span>
                             </div>
                             <p class="text-muted mb-3">{{ $plan->description ?: 'No description provided.' }}</p>
@@ -79,7 +79,7 @@
                                 <a href="{{ route('superadmin.plans.edit', $plan) }}" class="btn btn-primary flex-grow-1">
                                     <i class="ti ti-edit me-1"></i>Edit Plan
                                 </a>
-                                <form method="POST" action="{{ route('superadmin.plans.destroy', $plan) }}" onsubmit="return confirm('Delete this plan? This cannot be undone.')">
+                                <form method="POST" action="{{ route('superadmin.plans.destroy', $plan) }}" class="confirm-form" data-message="Delete this plan? This cannot be undone.">
                                     @csrf @method('DELETE')
                                     <button type="submit" class="btn btn-outline-danger" title="Delete plan">
                                         <i class="ti ti-trash"></i>
@@ -100,4 +100,15 @@
         </div>
     </div>
 </div>
+@push('scripts')
+<script nonce="{{ $cspNonce }}">
+document.querySelectorAll('.confirm-form').forEach(function(form) {
+    form.addEventListener('submit', function(e) {
+        if (!confirm(form.getAttribute('data-message'))) {
+            e.preventDefault();
+        }
+    });
+});
+</script>
+@endpush
 @endSection

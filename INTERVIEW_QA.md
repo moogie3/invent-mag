@@ -27,6 +27,7 @@
 19. [Frontend Architecture](#19-frontend-architecture)
 20. [DevOps & Deployment](#20-devops--deployment)
 21. [Quotation Module & Billing Consistency (v1.9)](#21-quotation-module--billing-consistency-v19)
+22. [Super Admin Panel (SaaS Management)](#22-super-admin-panel-saas-management)
 
 ---
 
@@ -347,7 +348,7 @@ The navigation config (`config/navigation.php`) has a `plan_feature` key per men
 |---|---|---|---|
 | `products, inventory, sales, purchases, invoices, dashboard, basic_reports, customers, suppliers` | ✓ | ✓ | ✓ |
 | `pos, stock_opname, accounting, crm, sales_pipeline, financial_reports, multi_currency, sales_returns, purchase_returns` | ✗ | ✓ | ✓ |
-| `sales_forecasting, api_access, audit_compliance, custom_roles, dedicated_support` | ✗ | ✗ | ✓ |
+| `sales_forecasting, api_access, audit_compliance` | ✗ | ✗ | ✓ |
 
 **Backward compatibility:** Tenants without a plan assigned (legacy tenants) get enterprise-level access. The config key `plans.legacy_full_access = true` controls this behavior.
 
@@ -560,13 +561,26 @@ discounted_subtotal = subtotal - order_discount_amount
 
 **Step 4 — Tax:**
 ```
+# For exclusive tax (tax added on top):
 tax_amount = discounted_subtotal × (tax_rate / 100)
+grand_total = discounted_subtotal + tax_amount
+
+# For inclusive tax (tax already in price):
+tax_amount = discounted_subtotal - (discounted_subtotal / (1 + tax_rate / 100))
+grand_total = discounted_subtotal  (unchanged — tax is already inside the price)
+
+# For none (exempt):
+tax_amount = 0
+grand_total = discounted_subtotal
 ```
-Note: Tax is applied **after** the order discount, not on the gross subtotal.
+Note: Tax type (`exclusive`/`inclusive`/`none`) is determined by the selected `Tax` record's `type` field. Tax is applied **after** the order discount, not on the gross subtotal.
 
 **Step 5 — Grand total:**
 ```
+# For exclusive tax:
 grand_total = discounted_subtotal + tax_amount
+# For inclusive tax or none:
+grand_total = discounted_subtotal
 ```
 
 **Step 6 — Payment status determination:**
@@ -808,10 +822,11 @@ The `AttendanceService` enforces this: any attempt to create/update/delete an `A
 3. **Seasonality (γ = 0.1)** — repeating patterns over a fixed seasonal period (12 months for monthly sales data)
 
 **Parameters used in this system:**
-- α = 0.3 (level smoothing factor)
-- β = 0.1 (trend smoothing factor)
-- γ = 0.1 (seasonal smoothing factor)
+- α = 0.3 (level smoothing factor) — initial seed, optimized per-call via grid search
+- β = 0.1 (trend smoothing factor) — initial seed, optimized per-call via grid search
+- γ = 0.1 (seasonal smoothing factor) — initial seed, optimized per-call via grid search
 - Season length (`m`) = 12 months
+- **Optimization:** `optimizeHoltWinters()` performs a 125-combination grid search across α, β, γ ∈ `[0.1, 0.3, 0.5, 0.7, 0.9]` minimizing RMSE on in-sample data. The optimized parameters are used per-forecast call, not the hardcoded seeds above.
 
 **Update equations:**
 ```
@@ -912,13 +927,13 @@ The system uses **`spatie/laravel-permission`** with a custom `Role` model that 
 - Users are assigned roles
 
 **Default roles (seeded on tenant creation):**
-- `Super Admin` — all permissions
+- `Superuser` — all permissions within the tenant scope (note: this is a tenant-level Spatie role, NOT the same as the `SuperAdmin` model which is a separate platform-level entity)
 - `Manager` — most permissions except user/role management
 - `Staff` — limited permissions (view + basic CRUD)
 - `Accountant` — accounting-focused permissions
 - `HR` — HR module permissions
 
-**Custom roles** are an Enterprise plan feature (`custom_roles` feature slug). The `UserController` checks `plan.feature:custom_roles` before allowing role creation.
+Custom role management (creating new roles with custom permission sets) is available to Enterprise plan tenants via permission-based access control.
 
 **Permission checking:**
 ```php
@@ -1582,29 +1597,29 @@ Used when a formal PDF quote is issued. The `SalesOpportunity::quotations()` has
 
 ---
 
-### Q21.2 — There is an inconsistency between `Tenant::initializeBillingPeriod()` and `BillingService::getCurrentBillingPeriod()`. Describe it and explain the potential impact.
+### Q21.2 — There was an inconsistency between `Tenant::initializeBillingPeriod()` and `BillingService::getCurrentBillingPeriod()`. Describe it and explain the potential impact. Is it still open?
 
 **Answer:**
 
-**The inconsistency:**
+**The inconsistency (now resolved in June 2026):**
 
 `BillingService::getCurrentBillingPeriod()` — implements rolling 30-day billing as described in the v1.7 changelog:
 ```php
 'end' => now()->copy()->addDays(30)->toDateString()
 ```
 
-`Tenant::initializeBillingPeriod()` — still uses calendar month:
+`Tenant::initializeBillingPeriod()` — originally used calendar month:
 ```php
 'billing_period_start' => now()->startOfMonth()->toDateString(),
 'billing_period_end'   => now()->endOfMonth()->toDateString(),
 ```
 
-**When this matters:**
+**When this mattered:**
 `Tenant::initializeBillingPeriod()` is called on plan assignment (upgrade flow) if the billing period has not yet been set. If a tenant upgrades on June 12, `initializeBillingPeriod()` would set `billing_period_end = June 30` (calendar month). But `BillingService` would have computed `billing_period_end = July 12` (rolling 30 days). The `ProcessScheduledPlanChanges` command uses `pending_plan_effective_at` which is set from `BillingService::getNextBillingPeriod()` — so the scheduled downgrade fires on the BillingService-computed date. But the `billing_period_end` stored on the tenant reflects the Tenant model's calendar month — creating a mismatch between when the period ends and when the next period starts.
 
-**The fix:** Update `Tenant::initializeBillingPeriod()` to use `addDays(30)` to match `BillingService`. This is a two-line change but requires deliberate care — existing tenants whose billing period was initialized by the old method will have their stored `billing_period_end` unaffected (no re-migration needed, since the BillingService drives the actual scheduling logic).
+**The fix (applied June 2026):** `Tenant::initializeBillingPeriod()` now uses `addDays(30)` to match `BillingService`. `getNextBillingPeriod()` was also updated to use rolling 30-day periods. Both methods are now consistent with the v1.7 changelog commitment.
 
-**Why this is a senior-level finding:** The inconsistency is subtle — it doesn't cause an obvious crash or error. It manifests as a discrepancy between what the UI shows ("your plan renews on [date]") and when the plan lifecycle commands actually fire.
+**Why this is a senior-level finding:** The inconsistency was subtle — it didn't cause an obvious crash or error. It manifested as a discrepancy between what the UI shows ("your plan renews on [date]") and when the plan lifecycle commands actually fire.
 
 ---
 
@@ -1629,13 +1644,124 @@ Used when a formal PDF quote is issued. The `SalesOpportunity::quotations()` has
 - Does not mention the `proration_credit` mechanism for plan upgrades
 - Cannot explain why `available_amount` on `customer_credits` needs an observer to stay in sync
 - Claims "Holt-Winters parameters are hardcoded" when the `optimizeHoltWinters()` grid search has been in production since May 2026 — this is a tell that the candidate is reciting documentation rather than reading code
-- Claims "CSP has no nonces" without noting the nonce implementation or the separate `'unsafe-eval'` issue that remains open
+- Claims "CSP has no nonces" without noting the nonce implementation or that `'unsafe-eval'` is documented with rationale in `SecurityHeaders.php`
 
 ## Green Flags
 
 - Proactively identifies the `DB::table()` raw query risk AND notes that `DB::tenantTable()` macro now mitigates it, but is not a compile-time guarantee
-- Identifies `'unsafe-eval'` in the CSP `script-src` as the remaining open security concern (after nonces were implemented)
-- Understands the billing period inconsistency: `Tenant::initializeBillingPeriod()` uses calendar month while `BillingService` uses rolling 30 days — and can articulate the impact on scheduled downgrades
+- Identifies `'unsafe-eval'` in the CSP `script-src` as a security concern and can articulate why it's needed (jQuery `$.globalEval`, Chart.js dynamic renderers) — or suggests alternative libraries that are CSP-compliant
+- Knows the billing period inconsistency between `Tenant::initializeBillingPeriod()` and `BillingService` was resolved in June 2026 and can describe the pre-fix impact on scheduled downgrades
 - Notes that `remaining_quantity` on `po_items` exists separately from `product_warehouse.quantity` for FEFO batch tracking
 - Can trace a complete sales transaction from HTTP request → service → FEFO → journal entries → observer
 - Identifies that the `SalesOpportunity` model supports two conversion paths (direct to `Sales` or via `Quotation`) and explains why this is the correct CRM design for a system that needs both informal and formal quoting workflows
+- Understands the distinction between the `SuperAdmin` model (platform-level, separate auth guard) and the `superuser` Spatie role (tenant-level, all permissions within a tenant) — and can explain why both are architecturally correct
+
+---
+
+## 22. Super Admin Panel (SaaS Management)
+
+---
+
+### Q22.1 — What is the difference between the `SuperAdmin` model and the tenant-level "superuser" role? Why are both needed?
+
+**Answer:**
+
+This is a critical architectural distinction that candidates often confuse.
+
+**`SuperAdmin` model (`app/Models/SuperAdmin.php`):**
+- Lives in the `super_admins` table (NOT the `users` table)
+- Has its own authentication guard (`super_admin`) and provider (`super_admins`) in `config/auth.php`
+- Runs on the **root domain** (`invent-mag.web.id`) — not on tenant subdomains
+- Has **no tenant context** — it manages tenants, plans, subscriptions, and billing across the entire platform
+- Has no Spatie roles — full access by design (there is only one or very few super admin users)
+- Uses `PlatformCurrencySetting` for monetary formatting (independent from tenant currencies)
+- Routes in `routes/superadmin.php`, protected by `auth:super_admin` middleware
+
+**Tenant-level "superuser" role (`spatie/laravel-permission`):**
+- A Spatie `Role` assigned to `User` records within a tenant
+- Lives in the `roles` table with `guard_name = 'web'`
+- Has all 79 permissions within the tenant scope
+- Runs on **tenant subdomains** (`tenant.invent-mag.web.id`)
+- Uses `CurrencySetting` for monetary formatting (per-tenant)
+- Routes in `routes/admin/*.php`, protected by `auth`, `verified`, `subscription.active` middleware
+
+**Why both are needed:** A SaaS platform needs two levels of access:
+1. **Platform operator** — manages the business side (tenants, plans, billing, system config). This is the `SuperAdmin`.
+2. **Tenant administrator** — manages their own business data (sales, purchases, accounting, HR). This is the `superuser` role on the `User` model.
+
+Collapsing these into one model would either (a) expose platform management to tenant users, or (b) require complex permission checks to prevent tenants from accessing other tenants' data. The separate model + guard approach eliminates both risks at the framework level.
+
+---
+
+### Q22.2 — How does the super admin panel authenticate users? What middleware protects it?
+
+**Answer:**
+
+The super admin panel uses Laravel's built-in auth middleware with a dedicated guard:
+
+```php
+// routes/superadmin.php
+Route::middleware('guest:super_admin')->group(function () {
+    Route::get('/login', [LoginController::class, 'create']);
+    Route::post('/login', [LoginController::class, 'store']);
+});
+
+Route::middleware('auth:super_admin')->group(function () {
+    // All super admin routes here
+});
+```
+
+The `auth:super_admin` middleware tells Laravel to resolve the user from the `super_admin` guard (which uses the `super_admins` Eloquent provider → `SuperAdmin` model). This is a completely separate authentication path from the tenant `web` guard.
+
+**Rate limiting:** The `LoginController::store()` method uses `RateLimiter::tooManyAttempts()` with a composite key of `superadmin_login|{email}|{ip}`, allowing 5 attempts per minute. This is independent from the tenant login rate limiter.
+
+**Session isolation:** The `SESSION_DOMAIN` setting ensures super admin sessions (on the root domain) are never sent to tenant subdomains.
+
+---
+
+### Q22.3 — Explain the Platform Currency System. How does it differ from tenant currency?
+
+**Answer:**
+
+There are two completely independent currency systems:
+
+**`PlatformCurrencySetting` (super admin):**
+- Model: `App\Models\PlatformCurrencySetting` — no `BelongsToTenant` trait, no `tenant_id`
+- Table: `platform_currency_settings` (single global row)
+- Used by: `CurrencyHelper::formatPlatform($amount)`
+- Affects: Plan prices, subscription order amounts, billing totals — anything displayed in the super admin panel
+- Configurable at: Super admin → Settings → Platform Currency
+
+**`CurrencySetting` (tenant):**
+- Model: `App\Models\CurrencySetting` — uses `BelongsToTenant` trait
+- Table: `currency_settings` (one row per tenant)
+- Used by: `CurrencyHelper::format($amount)`
+- Affects: Invoice totals, POS receipts, sales amounts — anything displayed in the tenant admin panel
+- Configurable at: Tenant admin → Settings → Currency
+
+**Key property:** Changing the platform currency (e.g., from USD to IDR) has **zero impact** on tenant currency settings. The `currency_code` column on `plans` and `subscription_orders` records the currency at time of creation, preserving historical accuracy even if the platform currency changes later.
+
+---
+
+### Q22.4 — What does the super admin panel manage? List all major functional areas.
+
+**Answer:**
+
+The super admin panel (16 controllers, 28 Blade views, 39 routes) manages:
+
+1. **Tenants** — list, view, toggle active/inactive, edit domain, impersonate (planned)
+2. **Plans** — full CRUD with feature toggles, pricing, usage limits, trial days
+3. **Subscriptions** — terminate, reactivate, view stats (active/trialing/expired/terminated)
+4. **Features** — assign feature slugs per plan tier via matrix view
+5. **Billing** — subscription order listing, detail, void
+6. **Payment Overview** — revenue statistics and gateway breakdown
+7. **Transactions** — searchable/filterable transaction history
+8. **Pending Payments** — approve or reject incoming subscription payments
+9. **Invoices** — paid invoice listing and detail
+10. **Backups** — system-wide and per-tenant backup, restore, download, delete
+11. **Permissions** — view-only listing of all tenant roles and permissions
+12. **Audit Log** — platform-level activity log with module/action filtering
+13. **Settings** — .env editor, user preferences, platform currency config
+14. **CMS** — landing page content editor (hero, features, pricing, contact)
+
+All operations are audit-logged via `activity()` (Spatie Activity Log).

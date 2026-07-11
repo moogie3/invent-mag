@@ -90,15 +90,19 @@ class SalesReturnSeeder extends Seeder
                 continue; // Skip if no items were selected to return
             }
 
-            // Create the SalesReturn
+            // Create the SalesReturn — copy tax fields from the parent sale
             $salesReturn = SalesReturn::create([
-                'sales_id' => $sale->id,
-                'user_id' => $user->id,
-                'return_date' => $returnDate,
-                'reason' => $faker->sentence(),
+                'sales_id'     => $sale->id,
+                'user_id'      => $user->id,
+                'return_date'  => $returnDate,
+                'reason'       => $faker->sentence(),
                 'total_amount' => $totalReturnAmount,
-                'status' => $status,
-                'tenant_id' => $tenantId,
+                'status'       => $status,
+                'tax_id'       => $sale->tax_id,
+                'tax_rate'     => $sale->tax_rate ?? 0,
+                'tax_type'     => $sale->tax_type ?? 'none',
+                'tax_amount'   => round($totalReturnAmount * (($sale->tax_rate ?? 0) / 100), 2),
+                'tenant_id'    => $tenantId,
             ]);
 
             // Create SalesReturnItems

@@ -29,6 +29,24 @@
             </div>
         </div>
     </div>
+    <div class="d-flex justify-content-between mb-2 align-items-center">
+        <div>{{ __('messages.tax') }}</div>
+        <div class="d-flex align-items-center">
+            <select class="form-select me-2" id="taxSelector" name="tax_id" style="width: auto;">
+                @foreach($taxes as $taxOption)
+                    <option value="{{ $taxOption->id }}"
+                            data-rate="{{ $taxOption->rate }}"
+                            data-type="{{ $taxOption->type }}"
+                            {{ ($pos->tax_id ?? $defaultTax?->id) == $taxOption->id ? 'selected' : '' }}>
+                        {{ $taxOption->name }} ({{ $taxOption->rate }}%{{ $taxOption->type !== 'none' ? ', ' . ucfirst($taxOption->type) : '' }})
+                    </option>
+                @endforeach
+            </select>
+            <div class="text-muted" id="totalTax">
+                {{ \App\Helpers\CurrencyHelper::format($summary['taxAmount']) }}
+            </div>
+        </div>
+    </div>
     <hr class="border-primary">
     <div class="d-flex justify-content-between align-items-center mb-3">
         <div class="fs-4"><strong>{{ __('messages.original_total') }}</strong></div>
@@ -63,4 +81,7 @@
         </span>
     </div>
     <input type="hidden" id="totalDiscountInput" name="total_discount" value="{{ $summary['orderDiscount'] }}">
+    <input type="hidden" id="taxInput" name="tax_amount" value="{{ $summary['taxAmount'] }}">
+    <input type="hidden" id="taxTypeInput" name="tax_type" value="{{ $pos->tax_type ?? ($defaultTax->type ?? 'none') }}">
+    <input type="hidden" id="taxRateInput" name="tax_rate" value="{{ $pos->tax_rate ?? 0 }}">
 </div>

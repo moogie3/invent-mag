@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use App\Models\Concerns\BelongsToTenant;
+use App\Models\Tax;
 
 class PurchaseReturn extends Model
 {
@@ -20,6 +21,10 @@ class PurchaseReturn extends Model
         'reason',
         'total_amount',
         'status',
+        'tax_id',
+        'tax_rate',
+        'tax_amount',
+        'tax_type',
     ];
 
     protected $guarded = [
@@ -30,7 +35,7 @@ class PurchaseReturn extends Model
     public static array $statuses = [
         'Pending',
         'Completed',
-        'Cancelled',
+        'Canceled',   // single-L, consistent with SalesReturn::$statuses
     ];
 
 
@@ -58,6 +63,11 @@ class PurchaseReturn extends Model
         return $this->hasMany(PurchaseReturnItem::class);
     }
 
+    public function tax(): BelongsTo
+    {
+        return $this->belongsTo(Tax::class, 'tax_id');
+    }
+
     /**
      * Get all of the payments for the purchase return.
      */
@@ -77,5 +87,7 @@ class PurchaseReturn extends Model
     protected $casts = [
         'return_date' => 'date',
         'total_amount' => 'float',
+        'tax_rate' => 'float',
+        'tax_amount' => 'float',
     ];
 }

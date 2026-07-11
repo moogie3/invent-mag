@@ -224,13 +224,13 @@ return [
             'title' => 'tutorial.create_sales_order',
             'icon'  => 'ti-plus',
             'desc'  => 'tutorial.create_sales_order_desc',
-            'steps' => ['tutorial.sales_info', 'tutorial.customer_credit', 'tutorial.product_selection', 'tutorial.auto_pricing', 'tutorial.quantity_discount', 'tutorial.invoice_discount', 'tutorial.order_summary', 'tutorial.credit_applied', 'tutorial.submit_sales'],
+            'steps' => ['tutorial.sales_info', 'tutorial.customer_credit', 'tutorial.product_selection', 'tutorial.auto_pricing', 'tutorial.quantity_discount', 'tutorial.invoice_discount', 'tutorial.tax_auto_sync', 'tutorial.order_summary', 'tutorial.credit_applied', 'tutorial.submit_sales'],
         ],
         'admin.sales.edit' => [
             'title' => 'tutorial.edit_sales_order',
             'icon'  => 'ti-edit',
             'desc'  => 'tutorial.edit_sales_order_desc',
-            'steps' => ['tutorial.sales_info_edit', 'tutorial.customer_info_edit', 'tutorial.customer_credit', 'tutorial.fully_paid_warning', 'tutorial.edit_items', 'tutorial.invoice_discount', 'tutorial.record_payment', 'tutorial.payment_info', 'tutorial.track_returns_sales', 'tutorial.save_sales'],
+            'steps' => ['tutorial.sales_info_edit', 'tutorial.customer_info_edit', 'tutorial.customer_credit', 'tutorial.fully_paid_warning', 'tutorial.edit_items', 'tutorial.invoice_discount', 'tutorial.tax_auto_sync', 'tutorial.record_payment', 'tutorial.payment_info', 'tutorial.track_returns_sales', 'tutorial.save_sales'],
         ],
         'admin.sales.show' => [
             'title' => 'tutorial.view_sales_order',
@@ -254,7 +254,7 @@ return [
             'title' => 'tutorial.sales_return_details',
             'icon' => 'ti-eye',
             'desc'  => 'tutorial.sales_return_details_desc',
-            'steps' => ['tutorial.return_details', 'tutorial.items_ret', 'tutorial.status_ret_view', 'tutorial.credit_info', 'tutorial.print_ret'],
+            'steps' => ['tutorial.return_details', 'tutorial.items_ret', 'tutorial.tax_breakdown_ret', 'tutorial.status_ret_view', 'tutorial.credit_info', 'tutorial.print_ret'],
         ],
         'admin.sales-returns*' => [
             'title' => 'tutorial.sales_returns_list',
@@ -320,13 +320,13 @@ return [
             'title' => 'tutorial.create_quotation',
             'icon'  => 'ti-plus',
             'desc'  => 'tutorial.create_quotation_desc',
-            'steps' => ['tutorial.customer_info_qt', 'tutorial.product_selection_qt', 'tutorial.auto_pricing_qt', 'tutorial.quantity_discount_qt', 'tutorial.invoice_discount_qt', 'tutorial.order_summary_qt', 'tutorial.submit_qt'],
+            'steps' => ['tutorial.customer_info_qt', 'tutorial.product_selection_qt', 'tutorial.auto_pricing_qt', 'tutorial.quantity_discount_qt', 'tutorial.item_discount_type_qt', 'tutorial.invoice_discount_qt', 'tutorial.order_summary_qt', 'tutorial.submit_qt'],
         ],
         'admin.quotations.edit' => [
             'title' => 'tutorial.edit_quotation',
             'icon'  => 'ti-edit',
             'desc'  => 'tutorial.edit_quotation_desc',
-            'steps' => ['tutorial.qt_info_edit', 'tutorial.customer_info_edit_qt', 'tutorial.edit_items_qt', 'tutorial.order_summary_qt', 'tutorial.invoice_discount_qt_edit', 'tutorial.save_qt'],
+            'steps' => ['tutorial.qt_info_edit', 'tutorial.customer_info_edit_qt', 'tutorial.edit_items_qt', 'tutorial.item_discount_type_qt', 'tutorial.order_summary_qt', 'tutorial.invoice_discount_qt_edit', 'tutorial.save_qt'],
         ],
         'admin.quotations.show' => [
             'title' => 'tutorial.view_quotation',
@@ -344,7 +344,7 @@ return [
             'title' => 'tutorial.sales_pipeline',
             'icon'  => 'ti-chart-line',
             'desc'  => 'tutorial.sales_pipeline_desc',
-            'steps' => ['tutorial.pipeline_when_to_use', 'tutorial.pipeline_statuses', 'tutorial.pipeline_two_paths', 'tutorial.kanban_intro', 'tutorial.kanban_list_toggle', 'tutorial.step1_pipeline', 'tutorial.step2_pipeline', 'tutorial.step3_pipeline', 'tutorial.kanban_board', 'tutorial.edit_pipeline_info', 'tutorial.edit_delete_pipeline', 'tutorial.convert_sales'],
+            'steps' => ['tutorial.pipeline_when_to_use', 'tutorial.pipeline_statuses', 'tutorial.pipeline_two_paths', 'tutorial.kanban_intro', 'tutorial.kanban_list_toggle', 'tutorial.step1_pipeline', 'tutorial.step2_pipeline', 'tutorial.step3_pipeline', 'tutorial.opportunity_amount_tax', 'tutorial.kanban_board', 'tutorial.edit_pipeline_info', 'tutorial.edit_delete_pipeline', 'tutorial.convert_sales'],
         ],
         'admin.sales*' => [
             'title' => 'tutorial.sales_orders',

@@ -67,6 +67,29 @@ export class SalesOrderEdit extends SalesOrderModule {
                 this.serializeProducts.bind(this),
             );
         }
+
+        const taxSelector = document.getElementById("taxSelector");
+        if (taxSelector) {
+            document.body.addEventListener("change", (e) => {
+                if (e.target && e.target.id === "taxSelector") {
+                    const opt = e.target.options[e.target.selectedIndex];
+                    const typeInput = document.getElementById("taxTypeInput");
+                    const rateInput = document.getElementById("taxRateInput");
+                    if (typeInput) typeInput.value = opt.dataset.type || "exclusive";
+                    if (rateInput) rateInput.value = parseFloat(opt.dataset.rate) || 0;
+                    this.calculateTotals();
+                }
+            });
+
+            // Sync hidden inputs on initial page load from the selected option
+            const initialOpt = taxSelector.options[taxSelector.selectedIndex];
+            if (initialOpt) {
+                const typeInput = document.getElementById("taxTypeInput");
+                const rateInput = document.getElementById("taxRateInput");
+                if (typeInput && initialOpt.dataset.type) typeInput.value = initialOpt.dataset.type;
+                if (rateInput && initialOpt.dataset.rate) rateInput.value = parseFloat(initialOpt.dataset.rate) || 0;
+            }
+        }
     }
 
     calculateDueDate() {
@@ -137,7 +160,7 @@ export class SalesOrderEdit extends SalesOrderModule {
                 );
 
                 const discountValue = parseFloat(discountInput?.value) || 0;
-                const discountType = discountTypeSelect?.value || "percentage";
+                const discountType = discountTypeSelect?.value || "fixed";
 
                 const itemTotal = this.calculateTotal(
                     price,
@@ -169,8 +192,8 @@ export class SalesOrderEdit extends SalesOrderModule {
         }
 
         const totalAfterAllDiscounts = subtotal - orderDiscountAmount;
-        const taxAmount = totalAfterAllDiscounts * (this.taxRate / 100);
-        const grandTotal = totalAfterAllDiscounts + taxAmount;
+        const taxAmount = this.calculateTaxAmount(totalAfterAllDiscounts);
+        const grandTotal = this.getTaxType() === "inclusive" ? totalAfterAllDiscounts : totalAfterAllDiscounts + taxAmount;
 
         document.getElementById("subtotal").innerText =
             formatCurrency(subtotal);

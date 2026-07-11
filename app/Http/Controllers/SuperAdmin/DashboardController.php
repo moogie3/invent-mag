@@ -24,8 +24,19 @@ class DashboardController extends Controller
         $activePlans = Plan::where('is_active', true)->count();
         
         $totalSubscriptions = Tenant::whereNotNull('plan_id')->count();
-        $activeSubscriptions = $activeTenants;
-        $trialSubscriptions = $trialTenants;
+        $trialSubscriptions = Tenant::whereNotNull('trial_ends_at')
+            ->where('trial_ends_at', '>', now())
+            ->count();
+        $activeSubscriptions = Tenant::whereNotNull('plan_id')
+            ->where(function($q) {
+                $q->whereNull('plan_expires_at')
+                  ->orWhere('plan_expires_at', '>', now());
+            })
+            ->where(function($q) {
+                $q->whereNull('trial_ends_at')
+                  ->orWhere('trial_ends_at', '<=', now());
+            })
+            ->count();
 
         // Tenants created over last 6 months (chart)
         $tenantsCreatedChart = [];

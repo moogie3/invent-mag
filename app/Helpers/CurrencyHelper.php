@@ -3,10 +3,12 @@
 namespace App\Helpers;
 
 use App\Models\CurrencySetting;
+use App\Models\PlatformCurrencySetting;
 
 class CurrencyHelper
 {
     protected static $settings = null;
+    protected static $platformSettings = null;
 
     /**
      * Format amount with currency settings
@@ -87,6 +89,81 @@ class CurrencyHelper
 
         $formatted = number_format(
             (float) $absoluteAmount, // Use absolute amount here
+            $settings->decimal_places,
+            $settings->decimal_separator,
+            $settings->thousand_separator
+        );
+
+        $result = $settings->position === 'prefix'
+            ? $settings->currency_symbol . ' ' . $formatted
+            : $formatted . ' ' . $settings->currency_symbol;
+
+        return $isNegative ? '-' . $result : $result;
+    }
+
+    /**
+     * Format amount with platform currency settings (super admin context)
+     * Completely independent from tenant currency settings
+     */
+    public static function formatPlatform($amount)
+    {
+        return self::formatWithPositionPlatform($amount);
+    }
+
+    /**
+     * Get platform currency settings with caching
+     */
+    public static function getPlatformSettings()
+    {
+        if (self::$platformSettings === null) {
+            self::$platformSettings = PlatformCurrencySetting::first() ?? self::getDefaultPlatformSettings();
+        }
+
+        return self::$platformSettings;
+    }
+
+    /**
+     * Default platform settings (USD)
+     */
+    public static function getDefaultPlatformSettings()
+    {
+        return (object) [
+            'currency_code' => 'USD',
+            'currency_symbol' => '$',
+            'decimal_places' => 2,
+            'decimal_separator' => '.',
+            'thousand_separator' => ',',
+            'position' => 'prefix',
+        ];
+    }
+
+    /**
+     * Clear the cached platform settings for testing purposes.
+     */
+    public static function clearPlatformSettingsCache()
+    {
+        self::$platformSettings = null;
+    }
+
+    /**
+     * Set platform settings for testing purposes.
+     */
+    public static function setPlatformSettingsForTesting($settings)
+    {
+        self::$platformSettings = $settings;
+    }
+
+    /**
+     * Format amount with platform currency symbol in correct position
+     */
+    public static function formatWithPositionPlatform($amount)
+    {
+        $settings = self::getPlatformSettings();
+        $isNegative = $amount < 0;
+        $absoluteAmount = abs($amount);
+
+        $formatted = number_format(
+            (float) $absoluteAmount,
             $settings->decimal_places,
             $settings->decimal_separator,
             $settings->thousand_separator

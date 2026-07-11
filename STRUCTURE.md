@@ -56,6 +56,10 @@ invent-mag/
 │   ├── Http/
 │   │   ├── Controllers/
 │   │   │   ├── Controller.php
+│   │   │   ├── SuperAdmin/
+│   │   │   │   ├── SettingController.php   # Also handles platform-currency settings
+│   │   │   │   ├── PlanController.php      # Now handles currency_code on plans
+│   │   │   │   └── ... (16 super admin controllers)
 │   │   │   ├── Admin/
 │   │   │   │   ├── AccountingController.php
 │   │   │   │   ├── AuditLogController.php
@@ -140,7 +144,8 @@ invent-mag/
 │   │   ├── AttendancePeriod.php
 │   │   ├── AttendanceRecord.php
 │   │   ├── Categories.php
-│   │   ├── CurrencySetting.php
+│   │   ├── CurrencySetting.php             # Per-tenant currency settings
+│   │   ├── PlatformCurrencySetting.php     # Super admin (platform) currency settings
 │   │   ├── Customer.php
 │   │   ├── CustomerCredit.php
 │   │   ├── CustomerInteraction.php
@@ -283,6 +288,9 @@ invent-mag/
 │   │   ├── 2026_05_12_035444_add_allowances_deductions_to_employees_table.php
 │   │   ├── 2026_05_25_000001_add_cash_flow_feature_to_plans_table.php
 │   │   └── 2026_05_12_045741_add_working_days_to_attendance_periods_table.php
+│   │   │   ├── 2026_07_06_000001_create_platform_currency_settings_table.php
+│   │   │   ├── 2026_07_06_000002_add_currency_code_to_plans_table.php
+│   │   │   └── 2026_07_06_000003_add_currency_code_to_subscription_orders_table.php
 │   │
 │   └── seeders/
 │       ├── DatabaseSeeder.php

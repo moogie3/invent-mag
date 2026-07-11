@@ -57,6 +57,47 @@ class SalesReturnServiceTest extends TestCase
         $this->assertEquals(5, $data['total_returns']);
     }
 
+    public function test_it_copies_tax_from_parent_sale_on_create()
+    {
+        // Give the parent sale explicit tax fields (exclusive 10%)
+        $this->sale->update([
+            'tax_rate' => 10,
+            'tax_type' => 'exclusive',
+        ]);
+
+        $this->sale->salesItems()->create([
+            'product_id'     => $this->product->id,
+            'quantity'       => 5,
+            'price'          => 100,
+            'customer_price' => 100,
+            'discount'       => 0,
+            'total'          => 500,
+        ]);
+
+        $this->accountingServiceMock->shouldReceive('createJournalEntry')->once();
+
+        $returnData = [
+            'sales_id'     => $this->sale->id,
+            'return_date'  => Carbon::now()->format('Y-m-d'),
+            'reason'       => 'Defective product',
+            'status'       => 'Pending',
+            'items'        => json_encode([
+                ['product_id' => $this->product->id, 'returned_quantity' => 2, 'price' => 100, 'return_price' => 100],
+            ]),
+            'total_amount' => 200,
+        ];
+
+        $salesReturn = $this->salesReturnService->createSalesReturn($returnData);
+
+        $this->assertNotNull($salesReturn);
+        // Tax fields must be copied from the parent sale
+        $this->assertEquals($this->sale->tax_id, $salesReturn->tax_id);
+        $this->assertEquals(10.0,                $salesReturn->tax_rate);
+        $this->assertEquals('exclusive',          $salesReturn->tax_type);
+        // tax_amount = 10% of 200 = 20
+        $this->assertEquals(20.0,                $salesReturn->tax_amount);
+    }
+
     public function test_it_can_filter_index_data_by_month_and_year()
     {
         SalesReturn::factory()->create(['return_date' => '2023-01-15']);

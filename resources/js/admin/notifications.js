@@ -148,7 +148,7 @@ function initClearAll(config) {
 }
 
 onPageLoad(function () {
-    if (!window.location.pathname.includes('/admin/notifications')) return;
+    if (!window.location.pathname.includes('/notifications')) return;
 
     const config = getConfig();
     if (!config) return;

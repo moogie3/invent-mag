@@ -16,7 +16,8 @@ use Carbon\Carbon;
 use App\Models\Account;
 use App\Models\PurchaseReturn;
 use App\Models\PurchaseReturnItem;
-use App\Models\Warehouse; // Added
+use App\Models\Warehouse;
+use App\Models\Tax;
 use Dompdf\Dompdf;
 
 class PurchaseService
@@ -117,9 +118,11 @@ class PurchaseService
         $suppliers = Supplier::select('id', 'name', 'email', 'phone_number', 'location')->get();
         $products = Product::select('id', 'name', 'code', 'price')->get()->each->setAppends(['main_warehouse_stock']);
         $warehouses = Warehouse::all();
+        $taxes = Tax::active()->get();
+        $defaultTax = Tax::default()->first() ?? Tax::active()->first();
         $pos = []; // Don't load all purchases
 
-        return compact('pos', 'suppliers', 'products', 'warehouses');
+        return compact('pos', 'suppliers', 'products', 'warehouses', 'taxes', 'defaultTax');
     }
 
     public function getPurchaseEditData($id)
@@ -134,9 +137,11 @@ class PurchaseService
         $products = Product::all();
         $items = POItem::all();
         $isPaid = $pos->status == 'Paid';
-        $warehouses = Warehouse::all(); // Added
+        $warehouses = Warehouse::all();
+        $taxes = Tax::active()->get();
+        $defaultTax = Tax::default()->first() ?? Tax::active()->first();
 
-        return compact('pos', 'suppliers', 'products', 'items', 'isPaid', 'warehouses');
+        return compact('pos', 'suppliers', 'products', 'items', 'isPaid', 'warehouses', 'taxes', 'defaultTax');
     }
 
     public function getPurchaseViewData($id)
@@ -153,15 +158,18 @@ class PurchaseService
             $pos->items,
             $pos->discount_total,
             $pos->discount_total_type,
-            $pos->relationLoaded('purchaseReturns') ? $pos->purchaseReturns : collect()
+            $pos->relationLoaded('purchaseReturns') ? $pos->purchaseReturns : collect(),
+            (float) ($pos->tax_rate ?? 0),
+            $pos->tax_type ?? 'none'
         );
         $subtotal = $summary['subtotal'];
         $itemCount = $summary['itemCount'];
         $totalProductDiscount = $summary['totalProductDiscount'];
         $orderDiscount = $summary['orderDiscount'];
+        $taxAmount = $summary['taxAmount'];
         $finalTotal = $summary['finalTotal'];
 
-        return compact('pos', 'suppliers', 'items', 'itemCount', 'subtotal', 'orderDiscount', 'finalTotal', 'totalProductDiscount');
+        return compact('pos', 'suppliers', 'items', 'itemCount', 'subtotal', 'orderDiscount', 'finalTotal', 'totalProductDiscount', 'taxAmount');
     }
 
     public function getPurchaseForModal($id)
@@ -177,17 +185,26 @@ class PurchaseService
                 throw new \Exception('Invalid product data');
             }
 
+            $taxId = $data['tax_id'] ?? null;
+            $tax = $taxId ? Tax::find($taxId) : (Tax::default()->first() ?? Tax::active()->first());
+            $taxRate = $tax ? (float) $tax->rate : 0;
+            $taxType = $tax ? $tax->type : 'none';
+
             $purchase = Purchase::create([
                 'invoice' => $data['invoice'],
                 'supplier_id' => $data['supplier_id'],
                 'user_id' => Auth::id(),
-                'warehouse_id' => $data['warehouse_id'], // Added
+                'warehouse_id' => $data['warehouse_id'],
                 'order_date' => $data['order_date'],
                 'due_date' => $data['due_date'],
                 'discount_total' => $data['discount_total'] ?? 0,
                 'discount_total_type' => $data['discount_total_type'] ?? 'fixed',
+                'tax_id' => $tax?->id,
+                'tax_rate' => $taxRate,
+                'tax_type' => $taxType,
                 'status' => 'Unpaid',
                 'total' => 0,
+                'total_tax' => 0,
             ]);
 
             $totalAmount = 0;
@@ -220,8 +237,19 @@ class PurchaseService
             }
 
             $orderDiscount = PurchaseHelper::calculateDiscount($totalAmount, $purchase->discount_total, $purchase->discount_total_type);
-            $finalTotal = $totalAmount - $orderDiscount;
-            $purchase->update(['total' => $finalTotal]);
+            $afterDiscount = $totalAmount - $orderDiscount;
+            $taxAmount = PurchaseHelper::calculateTaxAmount($afterDiscount, $taxRate, $taxType);
+
+            if ($taxType === 'inclusive') {
+                $finalTotal = $afterDiscount;
+            } else {
+                $finalTotal = $afterDiscount + $taxAmount;
+            }
+
+            $purchase->update([
+                'total'     => $finalTotal,   // grand total: subtotal − discount ± tax
+                'total_tax' => $taxAmount,
+            ]);
 
             // Get accounting settings from tenant
             $accountingSettings = app('currentTenant')->accounting_settings ?? [];
@@ -280,16 +308,24 @@ class PurchaseService
             }
             $purchase->items()->delete();
 
+            $taxId = $data['tax_id'] ?? null;
+            $tax = $taxId ? Tax::find($taxId) : (Tax::default()->first() ?? Tax::active()->first());
+            $taxRate = $tax ? (float) $tax->rate : 0;
+            $taxType = $tax ? $tax->type : 'none';
+
             // Update the main purchase details
             $purchase->update([
                 'invoice' => $data['invoice'],
                 'supplier_id' => $data['supplier_id'],
-                'warehouse_id' => $data['warehouse_id'], // Update warehouse
+                'warehouse_id' => $data['warehouse_id'],
                 'order_date' => $data['order_date'],
                 'due_date' => $data['due_date'],
                 'discount_total' => $data['discount_total'] ?? 0,
                 'discount_total_type' => $data['discount_total_type'] ?? 'fixed',
                 'payment_type' => $data['payment_type'] ?? '-',
+                'tax_id' => $tax?->id,
+                'tax_rate' => $taxRate,
+                'tax_type' => $taxType,
             ]);
 
             $totalAmount = 0;
@@ -321,8 +357,19 @@ class PurchaseService
             }
 
             $orderDiscount = PurchaseHelper::calculateDiscount($totalAmount, $purchase->discount_total, $purchase->discount_total_type);
-            $finalTotal = $totalAmount - $orderDiscount;
-            $purchase->update(['total' => $finalTotal]);
+            $afterDiscount = $totalAmount - $orderDiscount;
+            $taxAmount = PurchaseHelper::calculateTaxAmount($afterDiscount, $taxRate, $taxType);
+
+            if ($taxType === 'inclusive') {
+                $finalTotal = $afterDiscount;
+            } else {
+                $finalTotal = $afterDiscount + $taxAmount;
+            }
+
+            $purchase->update([
+                'total'     => $finalTotal,   // grand total: subtotal − discount ± tax
+                'total_tax' => $taxAmount,
+            ]);
 
             // Refresh model to get grand_total attribute updated
             $purchase->refresh();

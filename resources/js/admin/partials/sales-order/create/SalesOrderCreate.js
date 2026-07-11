@@ -225,6 +225,42 @@ export class SalesOrderCreate extends SalesOrderModule {
                 this.handleSubmit(e),
             );
         }
+
+        const taxSelector = document.getElementById("taxSelector");
+        if (taxSelector) {
+            // Use event delegation in case it gets re-rendered
+            document.body.addEventListener("change", (e) => {
+                if (e.target && e.target.id === "taxSelector") {
+                    const opt = e.target.options[e.target.selectedIndex];
+                    const rate = parseFloat(opt.dataset.rate) || 0;
+                    const type = opt.dataset.type || "exclusive";
+                    const rateLabel = document.getElementById("taxRateLabel");
+                    const typeInput = document.getElementById("taxTypeInput");
+                    const rateInput = document.getElementById("taxRateInput");
+                    
+                    if (rateLabel) rateLabel.textContent = rate;
+                    if (typeInput) typeInput.value = type;
+                    if (rateInput) rateInput.value = rate;
+                    
+                    this.updateTotalPrice();
+                }
+            });
+
+            // Trigger initial display
+            if (taxSelector.options.length > 0 && taxSelector.selectedIndex >= 0) {
+                const initialOpt = taxSelector.options[taxSelector.selectedIndex];
+                if (initialOpt) {
+                    const rate = parseFloat(initialOpt.dataset.rate) || 0;
+                    const typeInput = document.getElementById("taxTypeInput");
+                    const rateInput = document.getElementById("taxRateInput");
+                    const rateLabel = document.getElementById("taxRateLabel");
+                    
+                    if (rateLabel) rateLabel.textContent = rate;
+                    if (typeInput) typeInput.value = initialOpt.dataset.type || "exclusive";
+                    if (rateInput) rateInput.value = rate;
+                }
+            }
+        }
     }
 
     calculateDueDate() {
@@ -550,8 +586,8 @@ export class SalesOrderCreate extends SalesOrderModule {
         );
         const totalDiscount = itemDiscount + orderDiscountAmount;
         const taxableAmount = subtotal - orderDiscountAmount;
-        const taxAmount = taxableAmount * (this.taxRate / 100);
-        const grandTotal = taxableAmount + taxAmount;
+        const taxAmount = this.calculateTaxAmount(taxableAmount);
+        const grandTotal = this.getTaxType() === "inclusive" ? taxableAmount : taxableAmount + taxAmount;
 
         // Get credit amount directly from DOM (not from cached elements)
         const creditInputEl = document.getElementById("customerCreditAmount");
@@ -606,7 +642,7 @@ export class SalesOrderCreate extends SalesOrderModule {
         const orderDiscountTypeInput = document.getElementById("orderDiscountTypeInput");
         const taxInput = document.getElementById("taxInput");
 
-        if (totalDiscountInput) totalDiscountInput.value = itemDiscount;
+        if (totalDiscountInput) totalDiscountInput.value = (itemDiscount + orderDiscountAmount).toFixed(2);
         if (orderDiscountInput) orderDiscountInput.value = this.orderDiscount;
         if (orderDiscountTypeInput) orderDiscountTypeInput.value = this.orderDiscountType;
         if (taxInput) taxInput.value = taxAmount;

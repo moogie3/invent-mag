@@ -34,7 +34,7 @@
                     <div class="card shadow border-0 rounded-4 stat-card card-hover">
                         <div class="card-body text-center">
                             <div class="subheader">Total Revenue</div>
-                            <div class="h1 mb-0 text-success">${{ number_format($stats['total_revenue'], 2) }}</div>
+                            <div class="h1 mb-0 text-success">{{ App\Helpers\CurrencyHelper::formatPlatform($stats['total_revenue']) }}</div>
                         </div>
                         <i class="ti ti-currency-dollar stat-icon text-success"></i>
                     </div>
@@ -79,7 +79,7 @@
                                 <td><code>{{ $order->order_number }}</code></td>
                                 <td>{{ $order->tenant?->name ?? 'Deleted' }}</td>
                                 <td>{{ $order->plan?->name ?? 'N/A' }}</td>
-                                <td class="fw-semibold">${{ number_format($order->amount, 2) }}</td>
+                                <td class="fw-semibold">{{ App\Helpers\CurrencyHelper::formatPlatform($order->amount) }}</td>
                                 <td class="text-muted">{{ $order->paid_at?->format('M d, Y H:i') ?? 'N/A' }}</td>
                                 <td>
                                     <a href="{{ route('superadmin.invoices.show', $order) }}" class="btn btn-icon-only btn-ghost" title="View invoice">

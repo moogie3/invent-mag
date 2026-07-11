@@ -172,6 +172,91 @@ Internet → [DNS: invent-mag.web.id]
 2. **Production Stage:** PHP environment set up, Nginx installed, assets copied.
 3. **Execution:** `start.sh` runs migrations, caches config, starts both PHP-FPM and Nginx.
 
+### 1.5 Super Admin Panel (SaaS Management)
+
+**Purpose:** A fully separate admin panel for platform operators to manage tenants, plans, subscriptions, billing, and system configuration.
+
+#### Authentication & Isolation
+
+| Component | Implementation |
+|-----------|----------------|
+| **Model** | `App\Models\SuperAdmin` — extends `Authenticatable`, table `super_admins` |
+| **Guard** | `super_admin` (session-based, defined in `config/auth.php`) |
+| **Provider** | `super_admins` Eloquent provider |
+| **Domain** | Root domain (`invent-mag.web.id`) — not on tenant subdomains |
+| **Routes** | `routes/superadmin.php` — 39 routes, all behind `auth:super_admin` middleware |
+| **Currency** | `PlatformCurrencySetting` — global, no `tenant_id`, independent from `CurrencySetting` |
+
+**Default credentials:** `superadmin@invent-mag.com` / `password` (seeded via `SuperAdminSeeder`)
+
+#### Route Groups
+
+```php
+// routes/superadmin.php
+Route::middleware('guest:super_admin')->group(function () {
+    // Login only
+});
+
+Route::middleware('auth:super_admin')->group(function () {
+    // Dashboard, Tenants, Plans, Subscriptions, Features,
+    // Billing, PaymentOverview, Transactions, PendingPayments,
+    // Invoices, Backups, AuditLog, Settings, Permissions, CMS
+});
+```
+
+#### Controllers (16 files in `app/Http/Controllers/SuperAdmin/`)
+
+| Controller | Responsibility |
+|------------|----------------|
+| `DashboardController` | Platform KPIs: tenant counts, plan distribution, growth chart |
+| `Auth/LoginController` | Login/logout with rate limiting (5 attempts per email+IP) |
+| `TenantController` | List, show, toggle active, update domain, impersonate (planned) |
+| `PlanController` | Full CRUD for plans (slug, name, price, features, limits, trial days) |
+| `SubscriptionController` | Terminate/reactivate subscriptions, view stats |
+| `FeatureController` | Assign feature slugs per plan tier (view matrix + bulk update) |
+| `BillingController` | Subscription order listing, detail, void |
+| `PaymentOverviewController` | Revenue statistics and gateway breakdown |
+| `TransactionController` | Searchable/filterable transaction history |
+| `PendingPaymentController` | Approve or reject incoming subscription payments |
+| `InvoiceController` | Paid invoice listing and detail |
+| `BackupController` | System-wide and per-tenant backup, restore, download, delete |
+| `PermissionController` | View-only listing of all tenant roles and permissions |
+| `AuditLogController` | Platform-level activity log with module/action filtering |
+| `SettingController` | .env editor, user preferences, platform currency config |
+| `CmsController` | Landing page content editor (hero, features, pricing, contact) |
+
+#### Platform Currency System
+
+`PlatformCurrencySetting` is a standalone model (no `BelongsToTenant`) stored in `platform_currency_settings`. It controls how monetary amounts are formatted across all super admin pages — plan prices, subscription orders, billing totals.
+
+```php
+// Super admin panel
+CurrencyHelper::formatPlatform($amount);  // Uses PlatformCurrencySetting
+
+// Tenant admin panel
+CurrencyHelper::format($amount);           // Uses CurrencySetting (per-tenant)
+```
+
+Changing the platform currency has zero impact on tenant currencies. The `currency_code` column on `plans` and `subscription_orders` records the currency at time of creation for historical accuracy.
+
+#### Views (28 Blade files in `resources/views/superadmin/`)
+
+Layout: `base.blade.php` → `menu-sidebar.blade.php` + `navbar.blade.php` + content area
+
+Sections: auth, dashboard, tenants, plans, subscriptions, billing, payment-overview, transactions, pending-payments, invoices, backups, audit-log, permissions, settings, features, cms
+
+Tutorial: `config/superadmin-tutorial.php` — 258 lines of route-specific tutorial content displayed via the "How It Works" modal in the super admin base layout.
+
+#### Migrations
+
+| Migration | Purpose |
+|-----------|---------|
+| `2026_06_04_000001_create_super_admins_table` | Core super_admins table (id, name, email, password, timestamps) |
+| `2026_06_09_000002_add_system_settings_to_super_admins_table` | JSON `system_settings` column for user preferences |
+| `2026_07_06_000001_create_platform_currency_settings_table` | Platform currency config (symbol, separators, position, code) |
+| `2026_07_06_000002_add_currency_code_to_plans_table` | `currency_code` on plans for historical currency tracking |
+| `2026_07_06_000003_add_currency_code_to_subscription_orders_table` | `currency_code` on subscription orders |
+
 ---
 
 ## 2. Code Quality & Testing
@@ -661,7 +746,7 @@ Invent-MAG uses **Hotwire Turbo Drive** (`@hotwired/turbo-rails`) to deliver SPA
 - **Sub-topic drill-down navigation** – clicking a topic card (e.g., "Accounting") shows a list of pages in that category (e.g., Chart of Accounts, General Ledger, Trial Balance...). Clicking one navigates to that page and auto-opens its contextual tutorial modal via `sessionStorage` flag and Turbo-aware fetch chain.
 - **Click-outside to close** – removed `data-bs-backdrop="static"`, enabling backdrop click to dismiss the modal
 - 50+ route contexts covered, including Sales Pipeline stages, Quotation lifecycle, Products, Sales Orders, HR (Employee, Attendance, Payroll) and all Accounting and Reports pages
-- **Ordering rule:** Specific `$routeName === '...'` checks must come BEFORE `Str::startsWith()` catch-alls in the Blade file to avoid incorrect context being displayed
+- **Ordering rule:** More specific route patterns must come BEFORE wildcard catch-alls in `config/tutorial.php` — uses `Str::is()` for matching, not Blade conditional branching
 - Page title convention: `<i class="ti ti-{icon} me-2"></i>` → title text → tutorial button (`ms-3`)
 
 ---
@@ -779,6 +864,7 @@ class SalesForecastService
 
 | Version | Date          | Changes                                                                                                                                                                                                                                                                                                                                                                                            |
 | ------- | ------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 2.1     | Jul 2026     | Tax UX improvements: per-item discount type selector (% vs Fixed) on quotations, tax auto-sync on sales create/edit page load, tax breakdown row on sales-returns show page, pipeline opportunity amount now tax-inclusive grand total. Migration: `notes` & `terms_conditions` columns on `sales` and `sales_opportunities`. Tutorial: 4 new step keys (`tax_auto_sync`, `tax_breakdown_ret`, `opportunity_amount_tax`, `item_discount_type_qt`) with EN/ID translations. Test suite: fixed 17 failing unit tests (528 passed, 0 failed). |
 | 1.9     | June 2026    | Sales Pipeline enhancements: Kanban/List view toggle, currency-formatted list view amounts, notes & terms conditions on opportunities, `onPageLoad` deduplication fix preventing double card rendering. Tutorial expansion: Added pipeline and quotation lifecycle tutorial contexts (50+ total contexts), orphaned lang key cleanup, missing Indonesian translations. |
 | 1.8     | June 2026    | System Notifications: Added product expiry alerts (30/7-day windows), subscription plan expiry warnings (14-day), and backup status notifications. POS, Sales Returns & Purchase Returns now available on Starter plan. Architecture fixes: Split `web.php` into domain route files. Migrated `accounting_settings` to `tenants` table. Set Redis as default cache/queue. Implemented CSP nonces. Encrypted backup passwords. |
 | 1.7     | May 2026     | Tutorial HR Expansion: Added HR & Payroll as step 4 in welcome setup workflow (now 6 steps). Added Employees, Attendance, Payroll to Master Data sub-topics. Master Data topic card description updated. |
@@ -870,6 +956,8 @@ Common extension points:
 | 1.9     | June 2026    | Sales Pipeline enhancements, tutorial contexts expansion, lang cleanup, onPageLoad deduplication fix. |
 | 1.8     | May 2026     | Architecture Assessment Fixes: Migrated accounting settings to tenants, implemented CSP nonces, split route files, encrypted backup keys, made Redis the default. |
 | 1.7     | May 2026     | Tutorial HR Expansion: Added HR & Payroll to welcome setup workflow. Added Employees, Attendance, Payroll to Master Data sub-topics. Tech spec category count updated (6→7), context count updated (30+→40+). |
+| 2.0     | Jul 2026     | Platform Currency System: Added `PlatformCurrencySetting` model for super admin panel, `CurrencyHelper::formatPlatform()` method, `currency_code` columns on `plans` and `subscription_orders` tables. Super admin currency is now fully independent from tenant `CurrencySetting`. All hardcoded `$` displays replaced with dynamic `formatPlatform()`. |
+| 2.1     | Jul 2026     | Tax UX improvements and tutorial expansion (per-item discount type on quotations, tax auto-sync on sales, sales return tax breakdown, pipeline opportunity amount tax-inclusive, notes/terms columns migration, 4 new tutorial step keys, 17 failing unit tests fixed — 528 passing, 0 failed). |
 
 ---
 

@@ -24,7 +24,7 @@
         <div>
             {{ __('messages.tax') }}
             <small class="text-muted">
-                ({{ $sales->tax_rate ?? 0 }}%)
+                ({{ $sales->tax_rate ?? 0 }}%@if(($sales->tax_type ?? 'none') !== 'none'), {{ $sales->tax_type }}@endif)
             </small>
         </div>
         <div>

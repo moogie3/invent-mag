@@ -78,6 +78,14 @@ class Tenant extends BaseTenant
     }
 
     /**
+     * Get the users belonging to this tenant.
+     */
+    public function users()
+    {
+        return $this->hasMany(User::class);
+    }
+
+    /**
      * Get the pending plan (for scheduled downgrades).
      */
     public function pendingPlan()
@@ -398,29 +406,29 @@ class Tenant extends BaseTenant
     // -------------------------------------------------------------------------
 
     /**
-     * Initialize billing period (calendar-based: 1st to last day of month).
+     * Initialize billing period (rolling 30-day period, consistent with BillingService).
      */
     public function initializeBillingPeriod(): self
     {
         $now = now();
-        $this->billing_period_start = $now->startOfMonth()->toDateString();
-        $this->billing_period_end = $now->endOfMonth()->toDateString();
+        $this->billing_period_start = $now->toDateString();
+        $this->billing_period_end = $now->copy()->addDays(30)->toDateString();
         $this->save();
 
         return $this;
     }
 
     /**
-     * Get the next billing period dates.
+     * Get the next billing period dates (rolling 30-day).
      */
     public function getNextBillingPeriod(): array
     {
         $now = now();
-        $nextMonth = $now->copy()->addMonth()->startOfMonth();
+        $nextStart = $now->copy()->addDays(30);
 
         return [
-            'start' => $nextMonth->toDateString(),
-            'end' => $nextMonth->endOfMonth()->toDateString(),
+            'start' => $nextStart->toDateString(),
+            'end' => $nextStart->copy()->addDays(30)->toDateString(),
         ];
     }
 

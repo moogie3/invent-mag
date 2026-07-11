@@ -199,6 +199,17 @@ return [
             'Modify other global configuration values for the platform.',
         ],
     ],
+    'superadmin.settings.platform-currency' => [
+        'title' => 'Platform Currency',
+        'icon' => 'ti ti-currency-dollar',
+        'description' => 'Configure the currency symbol and formatting used across the super admin panel.',
+        'steps' => [
+            'Select the platform currency for billing, revenue, and pricing displays.',
+            'Configure the currency symbol position (prefix or suffix).',
+            'Set decimal and thousand separators for number formatting.',
+            'Changes apply to the entire super admin panel without affecting tenant currency settings.',
+        ],
+    ],
     'superadmin.settings.preferences' => [
         'title' => 'System Preferences',
         'icon' => 'ti ti-adjustments',

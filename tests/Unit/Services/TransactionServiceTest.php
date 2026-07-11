@@ -133,7 +133,7 @@ class TransactionServiceTest extends TestCase
         $sale = Sales::factory()->create(['status' => 'Unpaid', 'amount_received' => 0, 'total' => 100]);
         \App\Models\SalesItem::factory()->create(['sales_id' => $sale->id, 'product_id' => $product->id, 'quantity' => 1, 'total' => 100]);
         
-        $purchase = Purchase::factory()->create(['status' => 'Unpaid']);
+        $purchase = Purchase::factory()->create(['status' => 'Unpaid', 'total' => 0]);
 
         $this->transactionService->bulkMarkAsPaid([
             ['id' => $sale->id, 'type' => 'sale'],

@@ -89,15 +89,19 @@ class PurchaseReturnSeeder extends Seeder
                 continue; // Skip if no items were selected to return
             }
 
-            // Create the PurchaseReturn
+            // Create the PurchaseReturn — copy tax fields from the parent purchase
             $purchaseReturn = PurchaseReturn::create([
-                'purchase_id' => $purchase->id,
-                'user_id' => $user->id,
-                'return_date' => $returnDate,
-                'reason' => $faker->sentence(),
+                'purchase_id'  => $purchase->id,
+                'user_id'      => $user->id,
+                'return_date'  => $returnDate,
+                'reason'       => $faker->sentence(),
                 'total_amount' => $totalReturnAmount,
-                'status' => $status,
-                'tenant_id' => $tenantId,
+                'status'       => $status,
+                'tax_id'       => $purchase->tax_id,
+                'tax_rate'     => $purchase->tax_rate ?? 0,
+                'tax_type'     => $purchase->tax_type ?? 'none',
+                'tax_amount'   => round($totalReturnAmount * (($purchase->tax_rate ?? 0) / 100), 2),
+                'tenant_id'    => $tenantId,
             ]);
 
             // Create PurchaseReturnItems

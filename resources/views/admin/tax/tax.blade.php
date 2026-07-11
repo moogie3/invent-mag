@@ -2,6 +2,10 @@
 
 @section('title', __('messages.tax_page_title'))
 
+@section('header')
+<meta name="turbo-cache-control" content="no-cache">
+@endsection
+
 @section('content')
     <div class="page-wrapper">
         <div class="page-body">
@@ -19,102 +23,149 @@
                                 @include('admin.layouts.menu')
                             </div>
                             <div class="col-12 col-md-9 d-flex flex-column">
-                                <div class="card-body">
-                                    <form id="taxSettingsForm" action="{{ route('admin.setting.tax.update') }}"
-                                        method="POST">
-                                        @csrf
-
-                                        <!-- Tax Configuration Section -->
-                                        <div class="settings-section mb-5">
-                                            <div class="settings-section-header">
-                                                <div class="settings-icon-wrapper">
-                                                    <i class="ti ti-calculator"></i>
-                                                </div>
-                                                <div class="settings-section-title">
-                                                    <h3 class="mb-1">{{ __('messages.tax_configuration_title') }}</h3>
-                                                    <p class="text-muted mb-0 small">{{ __('messages.tax_configuration_description') }}</p>
-                                                </div>
-                                            </div>
-                                            <div class="settings-section-content">
-                                                <div class="row g-3">
-                                                    <div class="col-md-6">
-                                                        <div class="form-label">{{ __('messages.tax_configuration_tax_name') }}</div>
-                                                        <input type="text" name="name" class="form-control"
-                                                            value="{{ optional($tax)->name ?? '' }}" required
-                                                            placeholder="e.g., VAT, Sales Tax, GST">
-                                                        <small class="text-muted">{{ __('messages.tax_configuration_tax_name_description') }}</small>
-                                                    </div>
-                                                    <div class="col-md-6">
-                                                        <div class="form-label">{{ __('messages.tax_configuration_tax_rate') }}</div>
-                                                        <input type="number" name="rate" class="form-control"
-                                                            value="{{ optional($tax)->rate ?? '' }}" step="0.01" required
-                                                            placeholder="e.g., 10.00" min="0" max="100">
-                                                        <small class="text-muted">{{ __('messages.tax_configuration_tax_rate_description') }}</small>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        <!-- Tax Activation Section -->
-                                        <div class="settings-section mb-4">
-                                            <div class="settings-section-header">
-                                                <div class="settings-icon-wrapper">
-                                                    <i class="ti ti-toggle-left"></i>
-                                                </div>
-                                                <div class="settings-section-title">
-                                                    <h3 class="mb-1">{{ __('messages.tax_activation_title') }}</h3>
-                                                    <p class="text-muted mb-0 small">{{ __('messages.tax_activation_description') }}</p>
-                                                </div>
-                                            </div>
-                                            <div class="settings-section-content">
-                                                <div class="row g-3">
-                                                    <div class="col-md-6">
-                                                        <div class="form-label mb-2">{{ __('messages.tax_activation_activate_tax') }}</div>
-                                                        <div class="form-check form-switch">
-                                                            <!-- Hidden input ensures '0' is sent if unchecked -->
-                                                            <input type="hidden" name="is_active" value="0">
-                                                            <input class="form-check-input" type="checkbox" name="is_active"
-                                                                id="taxSwitch" value="1"
-                                                                {{ optional($tax)->is_active ? 'checked' : '' }}>
-                                                            <label class="form-check-label" for="taxSwitch">{{ __('messages.tax_activation_enable_tax') }}</label>
-                                                        </div>
-                                                        <small class="text-muted">{{ __('messages.tax_activation_enable_tax_description') }}</small>
-                                                    </div>
-                                                    <!-- Replace the tax status alert section in your blade template -->
-                                                    <div class="col-md-6">
-                                                        <div class="d-flex align-items-center h-100">
-                                                            <div class="alert alert-info mb-0 w-100">
-                                                                <div class="d-flex align-items-center">
-                                                                    <i class="ti ti-info-circle me-2"></i>
-                                                                    <div>
-                                                                        <strong>{{ __('messages.tax_activation_tax_status') }}</strong>
-                                                                        @if (optional($tax)->is_active)
-                                                                            <span
-                                                                                class="badge bg-success text-white ms-2">{{ __('messages.tax_activation_status_active') }}</span>
-                                                                        @else
-                                                                            <span
-                                                                                class="badge bg-danger text-white ms-2">{{ __('messages.tax_activation_status_inactive') }}</span>
-                                                                        @endif
-                                                                    </div>
-                                                                </div>
-                                                                @if (optional($tax)->is_active)
-                                                                    <small class="text-muted mt-1 d-block">{{ __('messages.tax_activation_status_active_description') }}</small>
-                                                                @else
-                                                                    <small class="text-muted mt-1 d-block">{{ __('messages.tax_activation_status_inactive_description') }}</small>
-                                                                @endif
+                                <div class="row row-deck row-cards">
+                                <div class="col-md-12">
+                                    <div class="card border-0 shadow-none rounded-3">
+                                        <div class="card-body border-bottom py-3">
+                                                <div class="d-flex justify-content-between align-items-center">
+                                                    <div class="d-flex align-items-center">
+                                                        <i class="ti ti-receipt-tax fs-1 me-3 text-primary"></i>
+                                                        <div>
+                                                            <h2 class="mb-1">
+                                                                {{ __('messages.tax_settings_title') }}
+                                                            </h2>
+                                                            <div class="text-muted">
+                                                                {{ __('messages.tax_total_taxes') }} <strong id="totalTaxCount">{{ $totalTaxes }}</strong>
                                                             </div>
                                                         </div>
                                                     </div>
+                                                    <div class="btn-list">
+                                                        <button type="button"
+                                                            class="btn btn-primary d-none d-sm-inline-block"
+                                                            data-bs-toggle="modal" data-bs-target="#createTaxModal">
+                                                            <i class="ti ti-plus fs-4"></i> {{ __('messages.tax_create') }}
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div id="invoiceTableContainer">
+                                                <div class="table-responsive">
+                                                    <table class="table card-table table-vcenter">
+                                                        <thead style="font-size: large">
+                                                            <tr>
+                                                                <th style="width: 100px;"><button
+                                                                        class="table-sort fs-4 py-3" data-sort="sort-no">{{ __('messages.table_no') }}
+                                                                </th>
+                                                                <th style="width: 200px;"><button
+                                                                        class="table-sort fs-4 py-3"
+                                                                        data-sort="sort-name">{{ __('messages.table_name') }}</th>
+                                                                <th style="width: 120px;"><button
+                                                                        class="table-sort fs-4 py-3"
+                                                                        data-sort="sort-rate">{{ __('messages.tax_rate') }}</th>
+                                                                <th style="width: 120px;"><button
+                                                                        class="table-sort fs-4 py-3"
+                                                                        data-sort="sort-type">{{ __('messages.tax_type') }}</th>
+                                                                <th style="width: 100px;">{{ __('messages.tax_status') }}</th>
+                                                                <th style="width: 100px;">{{ __('messages.tax_default') }}</th>
+                                                                <th style="width:180px;text-align:center" class="fs-4 py-3">
+                                                                    {{ __('messages.table_action') }}</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody id="invoiceTableBody" class="table-tbody">
+                                                            @forelse ($taxes as $index => $tax)
+                                                                <tr>
+                                                                    <td class="sort-no">
+                                                                        {{ $taxes->firstItem() + $index }}</td>
+                                                                    <td class="sort-name">{{ $tax->name }}</td>
+                                                                    <td class="sort-rate">{{ $tax->rate }}%</td>
+                                                                    <td class="sort-type">
+                                                                        @if ($tax->type === 'exclusive')
+                                                                            <span class="badge bg-info text-white rounded-pill">{{ __('messages.tax_type_exclusive') }}</span>
+                                                                        @elseif ($tax->type === 'inclusive')
+                                                                            <span class="badge bg-warning text-white rounded-pill">{{ __('messages.tax_type_inclusive') }}</span>
+                                                                        @else
+                                                                            <span class="badge bg-secondary text-white rounded-pill">{{ __('messages.tax_type_none') }}</span>
+                                                                        @endif
+                                                                    </td>
+                                                                    <td>
+                                                                        @if ($tax->is_active)
+                                                                            <span class="badge bg-success text-white rounded-pill">{{ __('messages.active') }}</span>
+                                                                        @else
+                                                                            <span class="badge bg-danger text-white rounded-pill">{{ __('messages.inactive') }}</span>
+                                                                        @endif
+                                                                    </td>
+                                                                    <td>
+                                                                        @if ($tax->is_default)
+                                                                            <span class="badge bg-primary text-white rounded-pill">{{ __('messages.default') }}</span>
+                                                                        @endif
+                                                                    </td>
+                                                                    <td style="text-align:center">
+                                                                        <div class="btn-list flex-nowrap justify-content-center">
+                                                                            <button type="button" class="btn btn-icon btn-ghost-primary"
+                                                                                data-bs-toggle="modal"
+                                                                                data-bs-target="#editTaxModal"
+                                                                                data-id="{{ $tax->id }}"
+                                                                                data-name="{{ $tax->name }}"
+                                                                                data-rate="{{ $tax->rate }}"
+                                                                                data-type="{{ $tax->type }}"
+                                                                                data-description="{{ $tax->description }}"
+                                                                                data-is-active="{{ $tax->is_active ? '1' : '0' }}"
+                                                                                data-is-default="{{ $tax->is_default ? '1' : '0' }}"
+                                                                                title="{{ __('messages.edit') }}">
+                                                                                <i class="ti ti-edit"></i>
+                                                                            </button>
+
+                                                                            @if (!$tax->is_default)
+                                                                             <button type="button" class="btn btn-icon btn-ghost-success"
+                                                                                data-onclick="setDefaultTax('{{ $tax->id }}')"
+                                                                                title="{{ __('messages.tax_set_default') }}">
+                                                                                <i class="ti ti-star"></i>
+                                                                            </button>
+                                                                            @endif
+
+                                                                            <button type="button" class="btn btn-icon btn-ghost-danger"
+                                                                                data-bs-toggle="modal"
+                                                                                data-bs-target="#deleteTaxModal"
+                                                                                data-onclick="setDeleteTaxFormAction('{{ route('admin.setting.tax.destroy', $tax->id) }}', '{{ $tax->name }}')"
+                                                                                title="{{ __('messages.delete') }}">
+                                                                                <i class="ti ti-trash"></i>
+                                                                            </button>
+                                                                        </div>
+                                                                    </td>
+                                                                </tr>
+                                                            @empty
+                                                                <tr>
+                                                                    <td colspan="7">
+                                                                        <div class="empty">
+                                                                            <div class="empty-img">
+                                                                                <i class="ti ti-mood-sad" style="font-size: 5rem; color: #ccc;"></i>
+                                                                            </div>
+                                                                            <p class="empty-title">{{ __('messages.no_taxes_found') }}</p>
+                                                                            <p class="empty-subtitle text-muted">
+                                                                                {{ __('messages.tax_no_taxes_description') }}
+                                                                            </p>
+                                                                        </div>
+                                                                    </td>
+                                                                </tr>
+                                                            @endforelse
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                            <div class="card-footer d-flex align-items-center">
+                                                <p class="m-0 text-secondary">
+                                                    {{ __('messages.pagination_showing_entries', [
+                                                        'first' => $taxes->firstItem(),
+                                                        'last' => $taxes->lastItem(),
+                                                        'total' => $taxes->total(),
+                                                    ]) }}
+                                                </p>
+                                                <div class="ms-auto">
+                                                    {{ $taxes->appends(request()->query())->links('vendor.pagination.tabler') }}
                                                 </div>
                                             </div>
                                         </div>
-
-                                    </form>
-                                </div>
-                                <div class="card-footer bg-transparent mt-auto">
-                                    <div class="btn-list justify-content-end">
-                                        <button type="button" class="btn btn-primary" data-bs-toggle="modal"
-                                            data-bs-target="#confirmModal">{{ __('messages.save_settings') }}</button>
                                     </div>
                                 </div>
                             </div>
@@ -124,6 +175,11 @@
             </div>
         </div>
     </div>
-
     @include('admin.layouts.modals.tax.taxmodals')
+
+    <form id="setDefaultTaxForm" method="POST" style="display:none;"
+        data-base="{{ url('admin/settings/tax') }}"
+        data-confirm-msg="{{ __('messages.tax_confirm_set_default') }}">
+        @csrf
+    </form>
 @endsection

@@ -3,6 +3,9 @@
 namespace App\Http\Controllers\SuperAdmin;
 
 use App\Http\Controllers\Controller;
+use App\Helpers\CurrencyHelper;
+use App\Models\PlatformCurrencySetting;
+use App\Services\CurrencyService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Artisan;
@@ -151,5 +154,38 @@ class SettingController extends Controller
             'message' => 'Theme mode updated.',
             'theme_mode' => $validated['theme_mode'],
         ]);
+    }
+
+    public function platformCurrency()
+    {
+        $settings = CurrencyHelper::getPlatformSettings();
+        $predefinedCurrencies = (new CurrencyService)->getPredefinedCurrencies();
+
+        return view('superadmin.settings.platform-currency', compact('settings', 'predefinedCurrencies'));
+    }
+
+    public function updatePlatformCurrency(Request $request)
+    {
+        $validated = $request->validate([
+            'currency_code' => 'required|string|max:3',
+            'currency_symbol' => 'required|string|max:10',
+            'decimal_separator' => 'required|string|max:1',
+            'thousand_separator' => 'required|string|max:1',
+            'decimal_places' => 'required|integer|min:0|max:10',
+            'position' => 'required|in:prefix,suffix',
+        ]);
+
+        $settings = PlatformCurrencySetting::first();
+
+        if ($settings) {
+            $settings->update($validated);
+        } else {
+            PlatformCurrencySetting::create($validated);
+        }
+
+        CurrencyHelper::clearPlatformSettingsCache();
+
+        return redirect()->route('superadmin.settings.platform-currency')
+            ->with('success', 'Platform currency settings updated successfully.');
     }
 }

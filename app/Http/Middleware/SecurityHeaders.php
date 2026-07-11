@@ -37,6 +37,9 @@ class SecurityHeaders
         // 'nonce-{value}' allows the specific inline scripts tagged with this nonce.
         // 'unsafe-inline' is kept as a fallback for browsers without nonce support (CSP Level 2).
         // In CSP Level 3 browsers, 'unsafe-inline' is ignored when a nonce is present.
+        // 'unsafe-eval' is required by jQuery (used for $.globalEval which internally calls eval())
+        // and by Chart.js / ECharts for certain dynamic renderers. If these libraries are replaced,
+        // 'unsafe-eval' can be removed. See ARCHITECTURE_ASSESSMENT.md section 3.6.
         $response->headers->set('Content-Security-Policy', 
             "default-src 'self'; " .
             "script-src 'self' 'nonce-{$nonce}' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://code.jquery.com https://cdnjs.cloudflare.com{$midtransSources}{$localSources}; " .

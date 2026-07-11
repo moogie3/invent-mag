@@ -5,6 +5,7 @@ namespace Tests\Unit\Services;
 use App\Models\Account;
 use App\Models\JournalEntry;
 use App\Models\Sales;
+use App\Models\Transaction;
 use App\Services\AccountingService;
 use App\Services\AccountingAuditService;
 use Exception;
@@ -91,11 +92,15 @@ class AccountingServiceTest extends TestCase
             ['account_name' => 'Sales Revenue', 'type' => 'credit', 'amount' => 90.00], // Unbalanced
         ];
 
+        $entriesBefore     = JournalEntry::count();
+        $txCountBefore     = Transaction::count();
+
         try {
             $this->accountingService->createJournalEntry("Unbalanced Entry", $date, $transactions, $sale);
         } finally {
-            $this->assertDatabaseCount('journal_entries', 0);
-            $this->assertDatabaseCount('transactions', 0);
+            // No new journal entry or transaction should have been created
+            $this->assertEquals($entriesBefore, JournalEntry::count());
+            $this->assertEquals($txCountBefore, Transaction::count());
         }
     }
 
@@ -113,11 +118,15 @@ class AccountingServiceTest extends TestCase
             ['account_name' => 'Sales Revenue', 'type' => 'credit', 'amount' => 100.00],
         ];
 
+        $entriesBefore = JournalEntry::count();
+        $txCountBefore = Transaction::count();
+
         try {
             $this->accountingService->createJournalEntry("Invalid Account Entry", $date, $transactions, $sale);
         } finally {
-            $this->assertDatabaseCount('journal_entries', 0);
-            $this->assertDatabaseCount('transactions', 0);
+            // DB transaction should have rolled back — no new entries
+            $this->assertEquals($entriesBefore, JournalEntry::count());
+            $this->assertEquals($txCountBefore, Transaction::count());
         }
     }
 }

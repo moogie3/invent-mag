@@ -17,7 +17,7 @@ function initQuotationForm() {
     const addItemBtn = form.querySelector("#addItemBtn");
     const subtotalEl = form.querySelector("#subtotalDisplay");
     const discountInput = form.querySelector("#orderDiscount");
-    const discountTypeSelect = form.querySelector("#discountType");
+    const discountTypeSelect = form.querySelector("#orderDiscountType");
     const taxRateInput = form.querySelector("#taxRate");
     const taxTypeSelect = form.querySelector("#taxType");
     const totalEl = form.querySelector("#totalDisplay");
@@ -27,13 +27,13 @@ function initQuotationForm() {
     }
 
     form.addEventListener("change", (e) => {
-        if (e.target.closest(".item-quantity, .item-price, .item-discount")) {
+        if (e.target.closest(".item-quantity, .item-price, .item-discount, .item-discount-type")) {
             recalcQuotationTotals(form);
         }
     });
 
     form.addEventListener("input", (e) => {
-        if (e.target.closest(".item-quantity, .item-price, .item-discount")) {
+        if (e.target.closest(".item-quantity, .item-price, .item-discount, .item-discount-type")) {
             recalcQuotationTotals(form);
         }
     });
@@ -62,7 +62,13 @@ function addQuotationItemRow(container) {
             <input type="number" step="0.01" name="items[${index}][price]" class="form-control item-price" min="0" value="0" required>
         </div>
         <div class="col-md-2">
-            <input type="number" step="0.01" name="items[${index}][discount]" class="form-control item-discount" min="0" value="0">
+            <div class="input-group">
+                <input type="number" step="0.01" name="items[${index}][discount]" class="form-control item-discount" min="0" value="0">
+                <select name="items[${index}][discount_type]" class="form-select item-discount-type" style="max-width:80px">
+                    <option value="fixed">Rp</option>
+                    <option value="percentage">%</option>
+                </select>
+            </div>
         </div>
         <div class="col-md-1">
             <span class="item-subtotal d-block mt-2 fw-semibold">0.00</span>
@@ -87,7 +93,9 @@ function recalcQuotationTotals(form) {
         const qty = parseFloat(row.querySelector(".item-quantity")?.value) || 0;
         const price = parseFloat(row.querySelector(".item-price")?.value) || 0;
         const disc = parseFloat(row.querySelector(".item-discount")?.value) || 0;
-        const lineTotal = qty * price - disc;
+        const discType = row.querySelector(".item-discount-type")?.value || "fixed";
+        const lineDiscount = discType === "percentage" ? (qty * price * disc) / 100 : disc;
+        const lineTotal = qty * price - lineDiscount;
         const subEl = row.querySelector(".item-subtotal");
         if (subEl) subEl.textContent = lineTotal.toFixed(2);
         subtotal += lineTotal;
@@ -97,7 +105,7 @@ function recalcQuotationTotals(form) {
     if (subtotalEl) subtotalEl.textContent = subtotal.toFixed(2);
 
     const discount = parseFloat(form.querySelector("#orderDiscount")?.value) || 0;
-    const discountType = form.querySelector("#discountType")?.value || "percentage";
+    const discountType = form.querySelector("#orderDiscountType")?.value || "percentage";
     const discountAmount = discountType === "percentage" ? (subtotal * discount) / 100 : discount;
 
     const afterDiscount = subtotal - discountAmount;

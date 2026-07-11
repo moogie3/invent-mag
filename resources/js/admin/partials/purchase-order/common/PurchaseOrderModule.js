@@ -5,7 +5,9 @@ export class PurchaseOrderModule {
         this.config = {
             ...config,
         };
-        this.formatCurrency = formatCurrency; // Add this line
+        this.formatCurrency = formatCurrency;
+        this.taxRate =
+            parseFloat(document.getElementById("taxRateInput")?.value) || 0;
     }
 
     calculateTotal(price, quantity, discount, discountType) {
@@ -28,11 +30,35 @@ export class PurchaseOrderModule {
         return discountValue;
     }
 
+    getTaxType() {
+        return document.getElementById("taxTypeInput")?.value || "none";
+    }
+
+    getEffectiveTaxRate() {
+        const selector = document.getElementById("taxSelector");
+        if (selector && selector.selectedIndex >= 0) {
+            const opt = selector.options[selector.selectedIndex];
+            return parseFloat(opt.dataset.rate) || 0;
+        }
+        return this.taxRate;
+    }
+
+    calculateTaxAmount(taxableAmount) {
+        const rate = this.getEffectiveTaxRate();
+        const type = this.getTaxType();
+        if (type === "none" || rate <= 0 || taxableAmount <= 0) {
+            return 0;
+        }
+        if (type === "inclusive") {
+            return Math.round((taxableAmount - (taxableAmount / (1 + rate / 100))) * 100) / 100;
+        }
+        return Math.round((taxableAmount * (rate / 100)) * 100) / 100;
+    }
+
     safeGetElement(id) {
         try {
             return document.getElementById(id);
         } catch (error) {
-            // console.warn(`Element with ID '${id}' not found:`, error);
             return null;
         }
     }

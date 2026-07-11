@@ -24,7 +24,10 @@ class TaxFactory extends Factory
         return [
             'name' => $this->faker->word,
             'rate' => $this->faker->randomFloat(2, 0, 20),
-            'is_active' => $this->faker->boolean,
+            'type' => $this->faker->randomElement(['exclusive', 'inclusive', 'none']),
+            'description' => $this->faker->optional()->sentence,
+            'is_active' => true,
+            'is_default' => false,
         ];
     }
 }

@@ -1,5 +1,6 @@
 @php
     $themeMode = 'light';
+    $platformCurrency = App\Helpers\CurrencyHelper::getPlatformSettings();
 @endphp
 
 <!DOCTYPE html>

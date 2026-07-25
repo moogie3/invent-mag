@@ -69,6 +69,7 @@ invent-mag/
 │   │   │   │   ├── CustomerController.php
 │   │   │   │   ├── CustomerCrmController.php
 │   │   │   │   ├── DashboardController.php
+│   │   │   │   ├── EFakturController.php       ← NEW (July 2026)
 │   │   │   │   ├── JournalEntryController.php
 │   │   │   │   ├── NotificationController.php
 │   │   │   │   ├── OpeningBalanceController.php
@@ -109,6 +110,7 @@ invent-mag/
 │   │   │       └── LoginController.php
 │   │   │
 │   │   ├── Middleware/
+│   │   │   ├── CaptureImpersonation.php        ← Decrypts impersonation token, logs in tenant user
 │   │   │   ├── CheckPlanFeature.php
 │   │   │   ├── CheckPlanLimit.php
 │   │   │   ├── CheckSubscriptionStatus.php
@@ -150,7 +152,10 @@ invent-mag/
 │   │   ├── CustomerCredit.php
 │   │   ├── CustomerInteraction.php
 │   │   ├── Employee.php
+│   │   ├── FakturPajak.php                 ← NEW (July 2026)
+│   │   ├── FakturPajakItem.php             ← NEW (July 2026)
 │   │   ├── JournalEntry.php
+│   │   ├── NsfpPool.php                    ← NEW (July 2026)
 │   │   ├── OpeningBalance.php
 │   │   ├── Payment.php
 │   │   ├── PayrollItem.php
@@ -172,6 +177,7 @@ invent-mag/
 │   │   ├── SalesPipeline.php
 │   │   ├── SalesReturn.php
 │   │   ├── SalesReturnItem.php
+│   │   ├── Quotation.php
 │   │   ├── StockAdjustment.php
 │   │   ├── StockOpname.php
 │   │   ├── StockOpnameItem.php
@@ -217,6 +223,7 @@ invent-mag/
 │   │   ├── CurrencyService.php
 │   │   ├── CustomerService.php
 │   │   ├── DashboardService.php
+│   │   ├── EFakturService.php              ← NEW (July 2026)
 │   │   ├── EmployeeService.php
 │   │   ├── FinancialReportingService.php
 │   │   ├── GeneralLedgerService.php
@@ -290,7 +297,12 @@ invent-mag/
 │   │   └── 2026_05_12_045741_add_working_days_to_attendance_periods_table.php
 │   │   │   ├── 2026_07_06_000001_create_platform_currency_settings_table.php
 │   │   │   ├── 2026_07_06_000002_add_currency_code_to_plans_table.php
-│   │   │   └── 2026_07_06_000003_add_currency_code_to_subscription_orders_table.php
+│   │   │   ├── 2026_07_06_000003_add_currency_code_to_subscription_orders_table.php
+│   │   │   ├── 2026_07_17_000001_create_faktur_pajak_table.php          ← NEW
+│   │   │   ├── 2026_07_17_000002_create_faktur_pajak_items_table.php    ← NEW
+│   │   │   ├── 2026_07_17_000003_create_nsfp_pool_table.php             ← NEW
+│   │   │   ├── 2026_07_17_000004_add_ppn_fields_to_tenants_customers_sales.php ← NEW
+│   │   │   └── 2026_07_17_000005_add_ppn_feature_to_plans.php           ← NEW
 │   │
 │   └── seeders/
 │       ├── DatabaseSeeder.php
@@ -380,6 +392,12 @@ invent-mag/
 │       │   ├── dashboard.blade.php
 │       │   ├── notifications.blade.php
 │       │   │
+│       │   ├── efaktur/                        ← NEW (July 2026)
+│       │   │   ├── index.blade.php             # Period filter, summary cards, faktur table
+│       │   │   ├── show.blade.php              # Faktur Pajak detail view
+│       │   │   ├── settings.blade.php          # PKP/NPWP settings, NSFP import
+│       │   │   └── faktur-pdf.blade.php        # DJP-compliant A4 PDF
+│       │   │
 │       │   ├── accounting/
 │       │   │   ├── chart-of-accounts.blade.php
 │       │   │   ├── journal.blade.php
@@ -428,13 +446,14 @@ invent-mag/
 │       │   ├── plan/{index,upgrade,checkout,upgrade-required}.blade.php
 │       │   ├── po/{index,show,purchase-create,purchase-edit}.blade.php
 │       │   ├── por/{index,show,create,edit}.blade.php  # Purchase Returns
-│       │   ├── pos/{index,receipt}.blade.php
+│       │   ├── pos/{index,receipt,print}.blade.php
 │       │   ├── product/{index,product-create,product-edit}.blade.php
 │       │   ├── profile/profile-edit.blade.php
 │       │   ├── reports/  (income-statement, balance-sheet, cash-flow, aged-*, etc.)
 │       │   ├── sales/{index,show,sales-create,sales-edit,pipeline}.blade.php
 │       │   ├── sales-returns/{index,show,create,edit}.blade.php
-│       │   ├── settings/{settings,backup}.blade.php
+│       │   ├── quotations/{index,show,create,edit}.blade.php
+│       │   ├── settings/{settings,backup}.blade.php  # Tax Region card on settings
 │       │   ├── stock-opname/{index,create,show}.blade.php
 │       │   ├── tax/tax.blade.php
 │       │   ├── unit/index.blade.php
@@ -448,6 +467,9 @@ invent-mag/
 │
 ├── routes/
 │   ├── api.php
+│   ├── admin/
+│   │   ├── efaktur.php                     ← NEW (July 2026) — e-Faktur routes
+│   │   ├── quotations.php                  ← Quotation routes
 │   ├── console.php
 │   ├── turbo.php
 │   └── web.php                     # Main route file (admin + auth)

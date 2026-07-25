@@ -19,7 +19,12 @@ class Customer extends Model
         'phone_number',
         'payment_terms',
         'email',
-        'image'
+        'image',
+        // e-Faktur / PPN fields
+        'npwp',
+        'pkp_status',
+        'pkp_date',
+        'alamat_npwp',
     ];
 
     protected $guarded = [

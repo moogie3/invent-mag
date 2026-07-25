@@ -18,6 +18,9 @@
                 <th class="sortable" data-sort="total">
                     <button class="table-sort">{{ __('messages.quotation_total') }}</button>
                 </th>
+                <th class="sortable" data-sort="tax_amount">
+                    <button class="table-sort">{{ __('messages.tax') }}</button>
+                </th>
                 <th class="sortable" data-sort="status">
                     <button class="table-sort">{{ __('messages.quotation_status') }}</button>
                 </th>
@@ -37,6 +40,13 @@
                 <td>{{ $q->quotation_date?->format('d M Y') }}</td>
                 <td>{{ $q->valid_until?->format('d M Y') ?? '-' }}</td>
                 <td>{{ \App\Helpers\CurrencyHelper::format($q->total) }}</td>
+                <td>
+                    @if(($q->tax_rate ?? 0) > 0)
+                        <span class="text-muted">{{ $q->tax_rate }}% ({{ ucfirst($q->tax_type ?? 'exclusive') }})</span>
+                    @else
+                        <span class="text-muted">-</span>
+                    @endif
+                </td>
                 <td>
                     @php
                         $statusClasses = [
@@ -99,7 +109,7 @@
             </tr>
             @empty
             <tr>
-                <td colspan="8" class="py-4 text-muted">{{ __('messages.no_data') }}</td>
+                <td colspan="9" class="py-4 text-muted">{{ __('messages.no_data') }}</td>
             </tr>
             @endforelse
         </tbody>

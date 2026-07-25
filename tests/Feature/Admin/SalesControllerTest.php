@@ -170,8 +170,8 @@ class SalesControllerTest extends TestCase
             'warehouse_id' => $this->warehouse->id, // Added
             'order_date' => Carbon::now()->format('Y-m-d'),
             'due_date' => Carbon::now()->addDays(14)->format('Y-m-d'),
-            'order_discount' => 5, // Changed from 'discount_total'
-            'order_discount_type' => 'percentage', // Changed from 'discount_total_type'
+            'discount_total' => 5,
+            'discount_total_type' => 'percentage',
             'products' => json_encode([
                 [
                     'product_id' => $newProduct->id,

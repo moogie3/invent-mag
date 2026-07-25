@@ -20,6 +20,17 @@
             {{ \App\Helpers\CurrencyHelper::format($orderDiscount) }}
         </div>
     </div>
+    <div class="d-flex justify-content-between mb-2">
+        <div>
+            {{ __('messages.tax') }}
+            <small class="text-muted">
+                ({{ $pos->tax_rate ?? 0 }}%@if(($pos->tax_type ?? 'none') !== 'none'), {{ $pos->tax_type }}@endif)
+            </small>
+        </div>
+        <div>
+            {{ \App\Helpers\CurrencyHelper::format($taxAmount) }}
+        </div>
+    </div>
     <hr class="border-primary">
 
     <div class="d-flex justify-content-between align-items-center mb-3">

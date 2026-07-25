@@ -8,6 +8,24 @@ onPageLoad(function () {
     var chartData = JSON.parse(chartDataEl.getAttribute('data-chart') || 'null');
     if (!chartData) return;
 
+    var currencySymbol = chartDataEl.getAttribute('data-currency-symbol') || '$';
+    var currencyPosition = chartDataEl.getAttribute('data-currency-position') || 'prefix';
+    var currencyDecimals = parseInt(chartDataEl.getAttribute('data-currency-decimals') || '2', 10);
+    var currencyDecimalSep = chartDataEl.getAttribute('data-currency-decimal-sep') || '.';
+    var currencyThousandSep = chartDataEl.getAttribute('data-currency-thousand-sep') || ',';
+
+    function formatCurrency(value) {
+        var formatted = Number(value).toLocaleString(undefined, {
+            minimumFractionDigits: currencyDecimals,
+            maximumFractionDigits: currencyDecimals,
+        });
+        formatted = formatted.replace(/,/g, currencyThousandSep);
+        if (currencyPosition === 'suffix') {
+            return formatted + ' ' + currencySymbol;
+        }
+        return currencySymbol + ' ' + formatted;
+    }
+
     if (chartData.monthlyRevenue && chartData.monthlyRevenue.labels && chartData.monthlyRevenue.labels.length > 0) {
         var ctx = document.getElementById('monthlyRevenueChart');
         if (ctx) {
@@ -30,7 +48,7 @@ onPageLoad(function () {
                     scales: {
                         y: {
                             beginAtZero: true,
-                            ticks: { callback: function (v) { return '$' + v.toLocaleString(); } }
+                            ticks: { callback: function (v) { return formatCurrency(v); } }
                         }
                     }
                 }

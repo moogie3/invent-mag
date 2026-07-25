@@ -91,6 +91,9 @@ class SalesController extends Controller
             'discount_total' => 'nullable|numeric|min:0',
             'discount_total_type' => 'nullable|in:fixed,percentage',
             'tax_id' => 'nullable|exists:taxes,id',
+            'ppn_enabled' => 'nullable|boolean',
+            'ppn_rate' => 'nullable|numeric|min:0|max:100',
+            'ppn_amount' => 'nullable|numeric|min:0',
         ]);
 
         try {
@@ -117,6 +120,9 @@ class SalesController extends Controller
             'discount_total' => 'nullable|numeric|min:0',
             'discount_total_type' => 'nullable|in:fixed,percentage',
             'tax_id' => 'nullable|exists:taxes,id',
+            'ppn_enabled' => 'nullable|boolean',
+            'ppn_rate' => 'nullable|numeric|min:0|max:100',
+            'ppn_amount' => 'nullable|numeric|min:0',
         ]);
 
         try {

@@ -156,6 +156,11 @@ class PermissionSeeder extends Seeder
             'create-quotations',
             'edit-quotations',
             'delete-quotations',
+
+            // e-Faktur PPN
+            'view-efaktur',
+            'create-efaktur',
+            'manage-efaktur-settings',
         ];
 
         $this->command->info("Creating " . count($permissions) . " permissions...");
@@ -232,6 +237,11 @@ class PermissionSeeder extends Seeder
             'manage-employees',
             'manage-attendance',
             'manage-payroll',
+
+            // e-Faktur PPN
+            'view-efaktur',
+            'create-efaktur',
+            'manage-efaktur-settings',
         ];
         $role->syncPermissions($permissions);
     }

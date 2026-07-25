@@ -76,7 +76,10 @@
             </tr>
         </thead>
         <tbody>
-            @foreach($quotation->items as $index => $item)
+            @php
+                $items = collect($quotation->items)->map(fn($item) => is_array($item) ? (object) $item : $item);
+            @endphp
+            @foreach($items as $index => $item)
             <tr>
                 <td>{{ $index + 1 }}</td>
                 <td class="text-left">{{ $item->product_name ?? $item->product?->name ?? __('messages.not_available') }}</td>

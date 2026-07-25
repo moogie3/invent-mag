@@ -242,7 +242,7 @@ class SalesReturnService
             $proportionalCOGS = $originalCOGSAmount * $returnRatio;
 
             // Create comprehensive journal entry for sales return
-            // This reverses: AR, Sales Revenue, and COGS; while recording Inventory
+            // This reverses: AR, Sales Revenue, COGS, and PPN Keluaran (if applicable)
             $transactions = [
                 // Reverse Accounts Receivable (customer no longer owes this much)
                 ['account_name' => $accountsReceivableAccount->name, 'type' => 'credit', 'amount' => $totalAmount],
@@ -253,6 +253,26 @@ class SalesReturnService
                 // Add inventory back (items returned to stock)
                 ['account_name' => $inventoryAccount->name, 'type' => 'debit', 'amount' => $proportionalCOGS],
             ];
+
+            // PPN reversal: if the original sale had PPN enabled and a Faktur Pajak,
+            // reverse the PPN Keluaran journal entry proportionally
+            if ($sale->isPpn() && $sale->ppn_amount > 0 && $sale->fakturPajak) {
+                $ppnKeluaranAccountId = $accountingSettings['ppn_keluaran_account_id'] ?? null;
+                if ($ppnKeluaranAccountId) {
+                    $ppnKeluaranAccount = Account::find($ppnKeluaranAccountId);
+                    if ($ppnKeluaranAccount) {
+                        $returnRatio = $totalAmount > 0 && $sale->total > 0 ? $totalAmount / $sale->total : 0;
+                        $proportionalPpn = round($sale->ppn_amount * $returnRatio, 2);
+
+                        if ($proportionalPpn > 0) {
+                            // Dr. PPN Keluaran (reduce VAT liability)
+                            $transactions[] = ['account_name' => $ppnKeluaranAccount->name, 'type' => 'debit', 'amount' => $proportionalPpn];
+                            // Cr. AR (reduce what customer owes for PPN)
+                            $transactions[] = ['account_name' => $accountsReceivableAccount->name, 'type' => 'credit', 'amount' => $proportionalPpn];
+                        }
+                    }
+                }
+            }
 
             $this->accountingService->createJournalEntry(
                 "Sales Return for SO #{$sale->invoice}",
@@ -572,19 +592,187 @@ class SalesReturnService
 
     public function bulkCompleteSalesReturns(array $ids): void
     {
-        SalesReturn::whereIn('id', $ids)->update(['status' => 'Completed']);
+        $salesReturns = SalesReturn::whereIn('id', $ids)->with(['sale.salesItems', 'sale.payments', 'items.salesItem'])->get();
+        foreach ($salesReturns as $salesReturn) {
+            $this->completeSalesReturn($salesReturn);
+        }
+    }
+
+    public function completeSalesReturn(SalesReturn $salesReturn): void
+    {
+        if ($salesReturn->status === 'Completed') {
+            return;
+        }
+
+        DB::transaction(function () use ($salesReturn) {
+            $sale = $salesReturn->sale;
+            $sale->load('payments');
+            $wasPaid = $sale->total_paid >= $sale->grand_total;
+
+            // Stock was already incremented in createSalesReturn() when the return
+            // was first created (Pending). completeSalesReturn() only needs to post
+            // the journal entry and issue the customer credit — NOT touch stock again.
+
+            $this->createSalesReturnJournalEntry($salesReturn, $sale);
+
+            if ($wasPaid) {
+                $credit = CustomerCredit::create([
+                    'tenant_id' => $sale->tenant_id,
+                    'customer_id' => $sale->customer_id,
+                    'sales_return_id' => $salesReturn->id,
+                    'amount' => $salesReturn->total_amount,
+                    'used_amount' => 0,
+                    'available_amount' => $salesReturn->total_amount,
+                    'reason' => 'Sales Return for Invoice #' . $sale->invoice,
+                    'status' => 'active',
+                ]);
+                $salesReturn->update(['customer_credit_id' => $credit->id]);
+            }
+
+            $salesReturn->update(['status' => 'Completed']);
+
+            $sale->load('payments');
+            $this->salesService->updateSaleStatus($sale);
+        });
+    }
+
+    private function createSalesReturnJournalEntry(SalesReturn $salesReturn, Sales $sale): void
+    {
+        $accountingSettings = app('currentTenant')->accounting_settings ?? [];
+        if (empty($accountingSettings) || !isset($accountingSettings['accounts_receivable_account_id'])) {
+            return;
+        }
+
+        $salesRevenueAccount = Account::find($accountingSettings['sales_revenue_account_id'] ?? null);
+        $accountsReceivableAccount = Account::find($accountingSettings['accounts_receivable_account_id']);
+        $costOfGoodsSoldAccount = Account::find($accountingSettings['cost_of_goods_sold_account_id'] ?? null);
+        $inventoryAccount = Account::find($accountingSettings['inventory_account_id'] ?? null);
+
+        if (!$salesRevenueAccount || !$accountsReceivableAccount || !$costOfGoodsSoldAccount || !$inventoryAccount) {
+            return;
+        }
+
+        $totalAmount = $salesReturn->total_amount;
+
+        $originalJournalEntries = JournalEntry::where('sourceable_type', Sales::class)
+            ->where('sourceable_id', $sale->id)
+            ->where('status', 'posted')
+            ->get();
+
+        $originalSalesRevenueAmount = 0;
+        $originalCOGSAmount = 0;
+
+        foreach ($originalJournalEntries as $journalEntry) {
+            foreach ($journalEntry->transactions as $transaction) {
+                if ($transaction->account_name === $salesRevenueAccount->name && $transaction->type === 'credit') {
+                    $originalSalesRevenueAmount = $transaction->amount;
+                }
+                if ($transaction->account_name === $costOfGoodsSoldAccount->name && $transaction->type === 'debit') {
+                    $originalCOGSAmount = $transaction->amount;
+                }
+            }
+        }
+
+        $returnRatio = $totalAmount > 0 && $originalSalesRevenueAmount > 0 ? $totalAmount / $originalSalesRevenueAmount : 0;
+        $proportionalCOGS = $originalCOGSAmount * $returnRatio;
+
+        $transactions = [
+            ['account_name' => $accountsReceivableAccount->name, 'type' => 'credit', 'amount' => $totalAmount],
+            ['account_name' => $salesRevenueAccount->name, 'type' => 'debit', 'amount' => $totalAmount],
+            ['account_name' => $costOfGoodsSoldAccount->name, 'type' => 'credit', 'amount' => $proportionalCOGS],
+            ['account_name' => $inventoryAccount->name, 'type' => 'debit', 'amount' => $proportionalCOGS],
+        ];
+
+        // PPN reversal: if the original sale had PPN enabled and a Faktur Pajak,
+        // reverse the PPN Keluaran journal entry proportionally
+        if ($sale->isPpn() && $sale->ppn_amount > 0 && $sale->fakturPajak) {
+            $ppnKeluaranAccountId = $accountingSettings['ppn_keluaran_account_id'] ?? null;
+            if ($ppnKeluaranAccountId) {
+                $ppnKeluaranAccount = Account::find($ppnKeluaranAccountId);
+                if ($ppnKeluaranAccount) {
+                    $returnRatio = $totalAmount > 0 && $sale->total > 0 ? $totalAmount / $sale->total : 0;
+                    $proportionalPpn = round($sale->ppn_amount * $returnRatio, 2);
+
+                    if ($proportionalPpn > 0) {
+                        $transactions[] = ['account_name' => $ppnKeluaranAccount->name, 'type' => 'debit', 'amount' => $proportionalPpn];
+                        $transactions[] = ['account_name' => $accountsReceivableAccount->name, 'type' => 'credit', 'amount' => $proportionalPpn];
+                    }
+                }
+            }
+        }
+
+        $this->accountingService->createJournalEntry(
+            "Sales Return for SO #{$sale->invoice}",
+            Carbon::parse($salesReturn->return_date),
+            $transactions,
+            $salesReturn
+        );
     }
 
     public function bulkCancelSalesReturns(array $ids): void
     {
-        SalesReturn::whereIn('id', $ids)->update(['status' => 'Canceled']);
+        $salesReturns = SalesReturn::with(['items.product', 'sale.payments'])->whereIn('id', $ids)->get();
+        foreach ($salesReturns as $salesReturn) {
+            $this->cancelSalesReturn($salesReturn);
+        }
+    }
+
+    public function cancelSalesReturn(SalesReturn $salesReturn): void
+    {
+        if ($salesReturn->status === 'Canceled') {
+            return;
+        }
+
+        DB::transaction(function () use ($salesReturn) {
+            if ($salesReturn->status === 'Completed') {
+                $sale = $salesReturn->sale;
+                $sale->load('payments');
+
+                foreach ($salesReturn->items as $item) {
+                    $product = Product::find($item->product_id);
+                    if ($product) {
+                        $warehouseId = $sale->warehouse_id ?? Product::getMainWarehouseId();
+                        $stockRecord = ProductWarehouse::where('product_id', $product->id)
+                            ->where('warehouse_id', $warehouseId)
+                            ->first();
+                        if ($stockRecord) {
+                            $stockRecord->decrement('quantity', $item->quantity);
+                        }
+                        $this->decrementPOItemRemaining($product->id, $item->quantity);
+                    }
+                }
+
+                $journalEntries = JournalEntry::where('sourceable_type', get_class($salesReturn))
+                    ->where('sourceable_id', $salesReturn->id)
+                    ->get();
+                foreach ($journalEntries as $entry) {
+                    if ($entry->status === JournalEntry::STATUS_POSTED && $entry->canBeReversed()) {
+                        $this->accountingService->reverseJournalEntry($entry, "Reversal due to canceled Sales Return #{$salesReturn->id}");
+                    }
+                }
+
+                if ($salesReturn->customer_credit_id) {
+                    $credit = $salesReturn->credit;
+                    if ($credit) {
+                        $credit->update(['status' => 'canceled', 'available_amount' => 0]);
+                    }
+                }
+            }
+
+            $salesReturn->update(['status' => 'Canceled']);
+
+            $sale = $salesReturn->sale;
+            $sale->load('payments');
+            $this->salesService->updateSaleStatus($sale);
+        });
     }
 
     public function printReturn($id)
     {
         $salesReturn = SalesReturn::with(['sale.customer', 'items.product', 'user'])->findOrFail($id);
-        $shopname = User::whereNotNull('shopname')->value('shopname');
-        $address = User::whereNotNull('address')->value('address');
+        $tenantId = app('currentTenant')->id ?? null;
+        $shopname = User::where('tenant_id', $tenantId)->whereNotNull('shopname')->value('shopname');
+        $address = User::where('tenant_id', $tenantId)->whereNotNull('address')->value('address');
 
         $html = view('admin.sales-returns.print-pdf', compact('salesReturn', 'shopname', 'address'))->render();
         $dompdf = new Dompdf();

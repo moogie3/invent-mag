@@ -39,7 +39,7 @@ class SalesReturnControllerTest extends TestCase
             'cash_account_id' => Account::where('code', '1110-' . $tenantId)->first()->id,
             'accounts_receivable_account_id' => Account::where('code', '1130-' . $tenantId)->first()->id,
             'sales_revenue_account_id' => Account::where('code', '4100-' . $tenantId)->first()->id,
-            'sales_returns_account_id' => Account::where('code', '4200-' . $tenantId)->first()->id ?? 1, // Fallback if seeder differs
+            'sales_returns_account_id' => Account::where('code', '4200-' . $tenantId)->first()?->id ?? 1, // Fallback if seeder differs
             'cost_of_goods_sold_account_id' => Account::where('code', '5200-' . $tenantId)->first()->id,
             'inventory_account_id' => Account::where('code', '1140-' . $tenantId)->first()->id,
         ];
@@ -127,7 +127,8 @@ class SalesReturnControllerTest extends TestCase
 
         $response = $this->post(route('admin.sales-returns.store'), $returnData);
 
-        $response->assertRedirect(route('admin.sales-returns.index', ['status' => 'success', 'message' => 'Sales return created successfully.']));
+        $response->assertRedirect(route('admin.sales-returns.index'));
+        $response->assertSessionHas('success', 'Sales return created successfully.');
         $this->assertDatabaseHas('sales_returns', ['sales_id' => $this->sale->id]);
     }
 
@@ -203,7 +204,8 @@ class SalesReturnControllerTest extends TestCase
 
         $response = $this->put(route('admin.sales-returns.update', $salesReturn->id), $updateData);
 
-        $response->assertRedirect(route('admin.sales-returns.index', ['status' => 'success', 'message' => 'Sales return updated successfully.']));
+        $response->assertRedirect(route('admin.sales-returns.index'));
+        $response->assertSessionHas('success', 'Sales return updated successfully.');
         $this->assertDatabaseHas('sales_returns', [
             'id' => $salesReturn->id,
             'status' => 'Pending'
@@ -216,7 +218,8 @@ class SalesReturnControllerTest extends TestCase
 
         $response = $this->delete(route('admin.sales-returns.destroy', $salesReturn->id));
 
-        $response->assertRedirect(route('admin.sales-returns.index', ['status' => 'success', 'message' => 'Sales return deleted successfully.']));
+        $response->assertRedirect(route('admin.sales-returns.index'));
+        $response->assertSessionHas('success', 'Sales return deleted successfully.');
         $this->assertDatabaseMissing('sales_returns', ['id' => $salesReturn->id]);
     }
 

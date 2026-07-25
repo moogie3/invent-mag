@@ -4,36 +4,32 @@ namespace App\Http\Controllers\SuperAdmin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Tenant;
-use App\Models\Plan;
 use App\Models\SubscriptionOrder;
-use Illuminate\Http\Request;
 
 class SubscriptionController extends Controller
 {
     public function index()
     {
         $subscriptions = Tenant::with('plan')
-            ->whereNotNull('plan_id')
             ->latest()
             ->paginate(20);
 
-        $plans = Plan::all();
+        $allTenants = Tenant::all();
+        $isDemo = fn(Tenant $t) => str_starts_with($t->name, 'Demo ');
 
         $stats = [
-            'total' => Tenant::whereNotNull('plan_id')->count(),
-            'active' => Tenant::whereNotNull('plan_id')
-                ->where(function($q) {
-                    $q->whereNull('plan_expires_at')
-                      ->orWhere('plan_expires_at', '>', now());
-                })->count(),
-            'trialing' => Tenant::whereNotNull('trial_ends_at')
-                ->where('trial_ends_at', '>', now())->count(),
-            'expired' => Tenant::whereNotNull('plan_id')
-                ->where('plan_expires_at', '<', now())->count(),
-            'terminated' => Tenant::where('plan_status', 'terminated')->count(),
+            'total' => $allTenants->count(),
+            'active' => $allTenants->filter(fn(Tenant $t) => $t->plan_status === 'active')->count(),
+            'trialing' => $allTenants->filter(fn(Tenant $t) => ! $isDemo($t) && $t->plan_status === 'trialing' && $t->onTrial())->count(),
+            'expired' => $allTenants->filter(fn(Tenant $t) => ! $isDemo($t)
+                && $t->plan_status !== 'active'
+                && $t->plan_status !== 'terminated'
+                && $t->planInactive()
+            )->count(),
+            'terminated' => $allTenants->filter(fn(Tenant $t) => ! $isDemo($t) && $t->plan_status === 'terminated')->count(),
         ];
 
-        return view('superadmin.subscriptions.index', compact('subscriptions', 'plans', 'stats'));
+        return view('superadmin.subscriptions.index', compact('subscriptions', 'stats'));
     }
 
     public function terminate(Tenant $tenant)

@@ -42,16 +42,24 @@ class NavigationServiceProvider extends ServiceProvider
 
         return array_values(array_filter(
             array_map(function (array $item) use ($tenant) {
+                // Check parent-level jurisdiction
+                if (isset($item['jurisdiction']) && ! $this->tenantMatchesJurisdiction($tenant, $item['jurisdiction'])) {
+                    return null;
+                }
+
                 // Check parent-level plan_feature
                 if (isset($item['plan_feature']) && ! $this->tenantHasFeature($tenant, $item['plan_feature'])) {
                     return null;
                 }
 
-                // Filter children by plan_feature
+                // Filter children by plan_feature and jurisdiction
                 if (isset($item['children'])) {
                     $item['children'] = array_values(array_filter(
                         $item['children'],
                         function (array $child) use ($tenant) {
+                            if (isset($child['jurisdiction']) && ! $this->tenantMatchesJurisdiction($tenant, $child['jurisdiction'])) {
+                                return false;
+                            }
                             if (isset($child['plan_feature'])) {
                                 return $this->tenantHasFeature($tenant, $child['plan_feature']);
                             }
@@ -95,5 +103,18 @@ class NavigationServiceProvider extends ServiceProvider
         }
 
         return $tenant->hasFeature($feature);
+    }
+
+    /**
+     * Check if a tenant matches the required jurisdiction.
+     * Returns true if no tenant context or no jurisdiction requirement.
+     */
+    protected function tenantMatchesJurisdiction(?Tenant $tenant, string $jurisdiction): bool
+    {
+        if ($tenant === null) {
+            return true;
+        }
+
+        return $tenant->tax_jurisdiction === $jurisdiction;
     }
 }

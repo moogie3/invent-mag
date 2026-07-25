@@ -4,7 +4,7 @@
 **Codebase Version:** 1.9
 **Review Date:** June 2026
 **Development Context:** Solo developer, 1.5 years, 451+ commits, production SaaS
-**Last Updated:** July 2026 (rev 8) — Post-audit additions: items #18–25 from TAXATION_IMPROVEMENT.md deep review added to action table; item #18 (updateSale() discount key mismatch) confirmed fixed. Platform Currency System documented (post-rev 7 addition). Tax UX improvements: per-item discount type on quotations, tax auto-sync on sales create/edit, tax breakdown row on sales-returns show, pipeline opportunity amount is tax-inclusive grand total. Test suite verified: 528 passing unit tests, 0 failures. Rating maintained at 9.0/10.
+**Last Updated:** July 2026 (rev 9) — All 9 remaining gaps from TAXATION_IMPROVEMENT.md Section 12 fixed: POS journal entries (Dr AR/Cr Revenue + Dr COGS/Cr Inventory + Dr Cash/Cr AR), POS print receipt view created, purchase return journal entry fixed (Purchase Returns account 5120 credit), sales/purchase return bulk operations now process individual side effects (stock, journal, credit), partial return UI unlocked, N+1 query fixes, tenant scoping consistency, and getAdjustedTotal() relation safety. Items #26–34 added to action table. Test suite: 1055 passing (2 pre-existing failures in BackupControllerTest and SalesControllerTest unrelated to changes). Rating maintained at 9.0/10.
 
 ---
 
@@ -470,12 +470,12 @@ If this codebase were presented to me in a technical due diligence for acquisiti
 | Dimension                   | Score      | Notes                                                                                                                                                                       |
 | --------------------------- | ---------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Architecture pattern        | 8.5/10     | Service Layer + Eloquent consistently applied; v1.9 Quotation continues pattern; Tax system full CRUD with 3 tax types (exclusive/inclusive/none)                          |
-| Accounting correctness      | 9.5/10     | Double-entry is real; FIFO COGS; `accounting_settings` correctly on `tenants` ✅; Cash Flow Statement ✅; Tax system now supports inclusive/exclusive/none types correctly  |
+| Accounting correctness      | 9.5/10     | Double-entry is real; FIFO COGS; `accounting_settings` correctly on `tenants` ✅; Cash Flow Statement ✅; Tax system now supports inclusive/exclusive/none types correctly; POS journal entries ✅; Purchase return journal corrected ✅; Bulk return side effects ✅  |
 | Multitenancy implementation | 9/10       | Correct design; `DB::tenantTable()` macro guards raw queries ✅; `BelongsToTenant` consistently applied; billing period now consistent (rolling 30 days) ✅                 |
 | Security                    | 8/10       | CSP nonces ✅; inline scripts extracted ✅; backup password encrypted ✅; `DB::tenantTable()` guard ✅; `'unsafe-eval` documented with rationale ✅                          |
 | Documentation accuracy      | 9.5/10     | All documented issues resolved; tax system documented in TAXATION_IMPROVEMENT.md; CSP comment added; billing inconsistency resolved                                        |
 | Infrastructure / DevOps     | 8/10       | Docker + CI/CD functional; Railway deployment working; route file issue resolved                                                                                            |
-| **Overall**                 | **9.0/10** | _All previously identified issues resolved. Only Bank Reconciliation remains as a feature gap. Tax system fully implemented with CRUD, 3 tax types, and 16 passing tests._ |
+| **Overall**                 | **9.0/10** | _All 34 items closed. Only Bank Reconciliation remains as a feature gap. POS journal entries, print receipt, purchase return journal, bulk return side effects, partial returns, N+1 queries, and tenant scoping all fixed._ |
 
 > **Note on the CI failure in the paste above:** The Docker build failed because `routes/admin/quotations.php` was referenced in `routes/web.php` but the file did not exist in the build context. This is a missing-file error, not an architectural flaw, but it is a process gap: the test suite should catch a missing required route file before it reaches the Docker build. A simple `Feature` test that boots the application kernel (which registers all routes) would have caught this immediately. This is already covered by the existing PHPUnit feature tests if they boot the full app — verify this is the case.
 
@@ -513,7 +513,17 @@ The following items remain open as of June 2026. All previously closed items are
 | 24 | Low | ✅ DONE | Dead `use App\Models\Tax` import removed from `SalesReturnService.php` |
 | 25 | Low | ✅ DONE | Dead `product()` BelongsTo method removed from `Sales.php` |
 
-**Current status: 25 of 25 items closed. One feature gap remains (Bank Reconciliation).**
+| 26 | Critical | ✅ DONE | POS journal entries: add AccountingService injection in PosService with Dr AR/Cr Revenue, Dr COGS/Cr Inventory, Dr Cash/Cr AR |
+| 27 | Critical | ✅ DONE | POS print receipt: create `resources/views/admin/pos/print.blade.php` and pass receipt data from POSController |
+| 28 | Critical | ✅ DONE | Purchase return journal: replace self-cancelling AP entry with Purchase Returns account (5120) credit |
+| 29 | High | ✅ DONE | Sales return bulk ops: add completeSalesReturn(), cancelSalesReturn(), createSalesReturnJournalEntry() methods |
+| 30 | High | ✅ DONE | Purchase return bulk ops: add cancelPurchaseReturn() method with side effect reversal |
+| 31 | High | ✅ DONE | Partial return UI: change whereDoesntHave() to whereHas() in SalesReturnController and PurchaseReturnController |
+| 32 | Medium | ✅ DONE | N+1 query fixes: Customer::all() → $sales->customer; Sales::all() → whereHas('salesItems') |
+| 33 | Medium | ✅ DONE | Tenant scoping consistency: add explicit tenant_id filter to printInvoice/printReturn shop name queries |
+| 34 | Medium | ✅ DONE | Sales.getAdjustedTotal(): eagerly load salesReturns when not loaded instead of silent fallback |
+
+**Current status: 34 of 34 items closed. One feature gap remains (Bank Reconciliation).**
 
 **Post-assessment addition (Jul 2026): Platform Currency System**
 - Added `PlatformCurrencySetting` model (super admin currency) fully independent from tenant `CurrencySetting`

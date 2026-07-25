@@ -3,6 +3,31 @@
 use Illuminate\Support\Facades\Route;
 use Illuminate\Http\Request;
 
+// Stop-impersonating route — accessible from the tenant subdomain while logged in as a tenant user.
+// Uses the 'auth' middleware (web guard) since we are logged in as a tenant user at this point.
+Route::middleware(['web', 'auth'])->prefix('admin')->group(function () {
+    Route::post('/stop-impersonating', function (\Illuminate\Http\Request $request) {
+        $returnUrl = session('superadmin_return_url');
+
+        session()->forget([
+            'impersonating_tenant_id',
+            'impersonating_tenant_name',
+            'impersonating_user_name',
+            'superadmin_return_url',
+        ]);
+
+        \Illuminate\Support\Facades\Auth::guard('web')->logout();
+        $request->session()->regenerate();
+
+        // Redirect to superadmin if we have the URL, otherwise to the app root
+        if ($returnUrl) {
+            return redirect()->away($returnUrl)->with('success', 'Impersonation ended. Welcome back.');
+        }
+
+        return redirect()->to(config('app.superadmin_url', '/superadmin'))->with('success', 'Impersonation ended.');
+    })->name('admin.stop-impersonating');
+});
+
 // Admin routes - all under /admin prefix with web middleware
 Route::middleware('web')->prefix('admin')->group(function () {
     // Auth routes (login, logout, password reset, email verification)
@@ -23,6 +48,7 @@ Route::middleware('web')->prefix('admin')->group(function () {
         require __DIR__ . '/admin/settings.php';
         require __DIR__ . '/admin/accounting.php';
         require __DIR__ . '/admin/quotations.php';
+        require __DIR__ . '/admin/efaktur.php';
     });
 });
 

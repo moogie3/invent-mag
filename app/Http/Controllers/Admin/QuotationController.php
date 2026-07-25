@@ -8,6 +8,7 @@ use App\Models\Product;
 use App\Models\Quotation;
 use App\Models\Sales;
 use App\Models\Tax;
+use App\Models\User;
 use App\Services\SalesService;
 use App\Helpers\SalesHelper;
 use Illuminate\Http\Request;
@@ -51,15 +52,28 @@ class QuotationController extends Controller
         $quotations = $query->orderBy('created_at', 'desc')->paginate($entries);
         $quotations->appends($request->all());
 
-        return view('admin.quotations.index', compact('quotations'));
+        $allQuotations = Quotation::all();
+        $statusCounts = [
+            'draft' => $allQuotations->where('status', 'draft')->count(),
+            'sent' => $allQuotations->where('status', 'sent')->count(),
+            'accepted' => $allQuotations->where('status', 'accepted')->count(),
+            'rejected' => $allQuotations->where('status', 'rejected')->count(),
+            'expired' => $allQuotations->where('status', 'expired')->count(),
+            'converted' => $allQuotations->where('status', 'converted')->count(),
+        ];
+        $totalAmount = $allQuotations->sum('total');
+
+        return view('admin.quotations.index', compact('quotations', 'statusCounts', 'totalAmount'));
     }
 
     public function create()
     {
         $customers = Customer::orderBy('name')->get();
+        $products = Product::orderBy('name')->get();
+        $taxes = Tax::active()->orderBy('name')->get();
         $quotation = new Quotation();
 
-        return view('admin.quotations.quotation-create', compact('customers', 'quotation'));
+        return view('admin.quotations.quotation-create', compact('customers', 'products', 'taxes', 'quotation'));
     }
 
     public function store(Request $request)
@@ -127,7 +141,7 @@ class QuotationController extends Controller
 
             return redirect()->route('admin.quotations.show', $quotation->id)
                 ->with('success', 'Quotation created successfully.');
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             DB::rollBack();
             Log::error('Quotation creation failed: ' . $e->getMessage(), ['exception' => $e]);
             return back()->withErrors(['error' => 'Something went wrong: ' . $e->getMessage()])->withInput();
@@ -136,7 +150,7 @@ class QuotationController extends Controller
 
     public function show($id)
     {
-        $quotation = Quotation::with('customer', 'user')->findOrFail($id);
+        $quotation = Quotation::with('customer', 'user', 'convertedToSales')->findOrFail($id);
         return view('admin.quotations.show', compact('quotation'));
     }
 
@@ -144,8 +158,10 @@ class QuotationController extends Controller
     {
         $quotation = Quotation::with('customer')->findOrFail($id);
         $customers = Customer::orderBy('name')->get();
+        $products = Product::orderBy('name')->get();
+        $taxes = Tax::active()->orderBy('name')->get();
 
-        return view('admin.quotations.quotation-edit', compact('quotation', 'customers'));
+        return view('admin.quotations.quotation-edit', compact('quotation', 'customers', 'products', 'taxes'));
     }
 
     public function update(Request $request, $id)
@@ -212,7 +228,7 @@ class QuotationController extends Controller
 
             return redirect()->route('admin.quotations.show', $quotation->id)
                 ->with('success', 'Quotation updated successfully.');
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             DB::rollBack();
             Log::error('Quotation update failed: ' . $e->getMessage(), ['exception' => $e]);
             return back()->withErrors(['error' => 'Something went wrong: ' . $e->getMessage()])->withInput();
@@ -227,7 +243,7 @@ class QuotationController extends Controller
             $quotation->delete();
             return redirect()->route('admin.quotations')
                 ->with('success', 'Quotation deleted successfully.');
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             return redirect()->route('admin.quotations')
                 ->with('error', 'Error deleting quotation. Please try again.');
         }
@@ -274,6 +290,7 @@ class QuotationController extends Controller
             $sales = Sales::create([
                 'customer_id' => $quotation->customer_id,
                 'user_id' => auth()->id(),
+                'warehouse_id' => Product::getMainWarehouseId(),
                 'order_date' => now(),
                 'due_date' => now()->addDays(30),
                 'payment_type' => 'credit',
@@ -300,7 +317,7 @@ class QuotationController extends Controller
 
             return redirect()->route('admin.sales.show', $sales->id)
                 ->with('success', 'Quotation converted to sales order successfully.');
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             DB::rollBack();
             Log::error('Quotation conversion failed: ' . $e->getMessage(), ['exception' => $e]);
             return redirect()->back()->with('error', 'Failed to convert quotation: ' . $e->getMessage());
@@ -310,7 +327,9 @@ class QuotationController extends Controller
     public function print($id)
     {
         $quotation = Quotation::with('customer', 'user')->findOrFail($id);
-        return view('admin.quotations.quotation-print-pdf', compact('quotation'));
+        $shopname = User::whereNotNull('shopname')->value('shopname');
+        $address = User::whereNotNull('address')->value('address');
+        return view('admin.quotations.quotation-print-pdf', compact('quotation', 'shopname', 'address'));
     }
 
     public function getProductDetails($id)
@@ -327,7 +346,7 @@ class QuotationController extends Controller
         try {
             $quotation = Quotation::with('customer', 'user')->findOrFail($id);
             return view('admin.layouts.modals.quotations.quotationsmodals-view', compact('quotation'));
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             Log::error("Error loading quotation modal view for ID {$id}: " . $e->getMessage());
             return response('<div class="alert alert-danger">Error loading quotation details.</div>', 500);
         }
@@ -343,7 +362,7 @@ class QuotationController extends Controller
         try {
             Quotation::whereIn('id', $request->ids)->delete();
             return response()->json(['success' => true, 'message' => 'Quotations deleted successfully.']);
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             return response()->json(['success' => false, 'message' => 'Error deleting quotations.'], 500);
         }
     }
@@ -379,7 +398,7 @@ class QuotationController extends Controller
                 return redirect()->route('admin.quotations.print', $first->id);
             }
             return back()->with('error', 'No quotations to export.');
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             return response()->json(['success' => false, 'message' => 'Export failed.'], 500);
         }
     }

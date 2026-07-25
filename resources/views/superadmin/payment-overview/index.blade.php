@@ -160,10 +160,19 @@
         </div>
     </div>
 </div>
+@php
+    $platformCurrency = App\Helpers\CurrencyHelper::getPlatformSettings();
+@endphp
 <span id="paymentOverviewChartData"
     data-chart='{!! json_encode([
         'monthlyRevenue' => $monthlyRevenue->count() > 0 ? ['labels' => $chartMonths, 'data' => $chartRevenue] : [],
         'revenueByGateway' => $revenueByGateway->count() > 0 ? ['labels' => $gatewayLabels, 'data' => $gatewayData] : [],
-    ]) !!}' class="d-none"></span>
+    ]) !!}'
+    data-currency-symbol="{{ $platformCurrency->currency_symbol }}"
+    data-currency-position="{{ $platformCurrency->position }}"
+    data-currency-decimals="{{ $platformCurrency->decimal_places }}"
+    data-currency-decimal-sep="{{ $platformCurrency->decimal_separator }}"
+    data-currency-thousand-sep="{{ $platformCurrency->thousand_separator }}"
+    class="d-none"></span>
 @vite('resources/js/superadmin/payment-overview.js')
 @endsection

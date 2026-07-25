@@ -31,8 +31,7 @@ class SalesReturnController extends Controller
 
     public function create()
     {
-        // Get sales that do NOT have any associated sales returns
-        $sales = Sales::whereDoesntHave('salesReturns')->get();
+        $sales = Sales::whereHas('salesItems')->get();
         return view('admin.sales-returns.create', compact('sales'));
     }
 
@@ -85,7 +84,7 @@ class SalesReturnController extends Controller
     public function edit(SalesReturn $salesReturn)
     {
         $salesReturn->load('items.salesItem');
-        $sales = Sales::all();
+        $sales = Sales::whereHas('salesItems')->get();
         $isCompletedOrCanceled = in_array($salesReturn->status, ['Completed', 'Canceled']);
         return view('admin.sales-returns.edit', compact('salesReturn', 'sales', 'isCompletedOrCanceled'));
     }

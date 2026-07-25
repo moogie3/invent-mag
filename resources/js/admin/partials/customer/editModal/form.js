@@ -7,6 +7,10 @@ export function populateEditModalForm(button) {
     const customerPayment =
         button.getAttribute("data-payment_terms") || "";
     const customerEmail = button.getAttribute("data-email") || "";
+    const customerNpwp = button.getAttribute("data-npwp") || "";
+    const customerPkpStatus = button.getAttribute("data-pkp_status") || "0";
+    const customerPkpDate = button.getAttribute("data-pkp_date") || "";
+    const customerAlamatNpwp = button.getAttribute("data-alamat_npwp") || "";
 
     // Populate form fields
     const customerIdEl = document.getElementById("customerId");
@@ -21,6 +25,16 @@ export function populateEditModalForm(button) {
     if (customerPaymentEl) customerPaymentEl.value = customerPayment;
     const customerEmailEl = document.getElementById("customerEmailEdit");
     if (customerEmailEl) customerEmailEl.value = customerEmail;
+
+    // NPWP/PKP fields (may not exist if ppn feature is disabled)
+    const customerNpwpEl = document.getElementById("customerNpwpEdit");
+    if (customerNpwpEl) customerNpwpEl.value = customerNpwp;
+    const customerPkpStatusEl = document.getElementById("customerPkpStatusEdit");
+    if (customerPkpStatusEl) customerPkpStatusEl.checked = customerPkpStatus === "1";
+    const customerPkpDateEl = document.getElementById("customerPkpDateEdit");
+    if (customerPkpDateEl) customerPkpDateEl.value = customerPkpDate;
+    const customerAlamatNpwpEl = document.getElementById("customerAlamatNpwpEdit");
+    if (customerAlamatNpwpEl) customerAlamatNpwpEl.value = customerAlamatNpwp;
 
     // Set form action
     const routeBase = document.getElementById("updateRouteBase")?.value;

@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Concerns\BelongsToTenant;
 
@@ -57,6 +58,10 @@ class Sales extends Model
         'customer_credit_used',
         'notes',
         'terms_conditions',
+        // PPN / e-Faktur
+        'ppn_enabled',
+        'ppn_rate',
+        'ppn_amount',
     ];
 
     protected $guarded = [
@@ -124,9 +129,27 @@ class Sales extends Model
         return $this->hasMany(SalesReturn::class);
     }
 
+    public function fakturPajak(): HasOne
+    {
+        return $this->hasOne(FakturPajak::class, 'sales_id');
+    }
+
     public function tax(): BelongsTo
     {
         return $this->belongsTo(Tax::class, 'tax_id');
+    }
+
+    /**
+     * Determine if this sale uses a PPN (Indonesian VAT) tax.
+     * Source of truth is the Tax model's is_ppn flag via the relationship.
+     * Falls back to the snapshot ppn_enabled field if tax relationship is not loaded.
+     */
+    public function isPpn(): bool
+    {
+        if ($this->relationLoaded('tax') && $this->tax) {
+            return $this->tax->is_ppn;
+        }
+        return (bool) $this->ppn_enabled;
     }
 
     public function payments()
@@ -210,12 +233,16 @@ class Sales extends Model
             $this->load('salesItems');
         }
 
+        if (!$this->relationLoaded('salesReturns')) {
+            $this->load('salesReturns');
+        }
+
         $summary = SalesHelper::calculateInvoiceSummaryWithReturns(
             $this->salesItems,
             $this->order_discount ?? 0,
             $this->order_discount_type ?? 'fixed',
             $this->tax_rate ?? 0,
-            $this->relationLoaded('salesReturns') ? $this->salesReturns : collect(),
+            $this->salesReturns,
             $this->tax_type ?? 'exclusive'
         );
 
@@ -235,6 +262,10 @@ class Sales extends Model
         'amount_received' => 'float',
         'change_amount' => 'float',
         'customer_credit_used' => 'float',
+        // PPN / e-Faktur
+        'ppn_enabled' => 'boolean',
+        'ppn_rate'    => 'float',
+        'ppn_amount'  => 'float',
     ];
 
     // Explicitly define the factory for the model

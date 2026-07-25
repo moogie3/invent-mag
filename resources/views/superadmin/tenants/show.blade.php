@@ -46,6 +46,15 @@
                                     <span class="badge bg-secondary text-white fs-6">{{ $tenant->plan_status ?? 'N/A' }}</span>
                                 @endif
                             </div>
+                            <div class="mt-3">
+                                <form method="POST" action="{{ route('superadmin.tenants.impersonate', $tenant) }}"
+                                    onsubmit="return confirm('Log in as {{ addslashes($tenant->name) }}\'s admin user? You will be redirected to their dashboard.')">
+                                    @csrf
+                                    <button type="submit" class="btn btn-outline-warning btn-sm">
+                                        <i class="ti ti-eye me-1"></i>Impersonate Tenant
+                                    </button>
+                                </form>
+                            </div>
                         </div>
                     </div>
                 </div>

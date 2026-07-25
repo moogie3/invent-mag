@@ -20,11 +20,7 @@ return new class extends Migration
             $table->string('tax_type', 20)->nullable()->after('total_tax');
         });
 
-        if (Schema::hasTable('quotations')) {
-            Schema::table('quotations', function (Blueprint $table) {
-                $table->foreignId('tax_id')->nullable()->constrained('taxes')->nullOnDelete()->after('tax_amount');
-            });
-        }
+        // quotations table already has tax_id in its base migration
 
         Schema::table('sales_returns', function (Blueprint $table) {
             $table->foreignId('tax_id')->nullable()->constrained('taxes')->nullOnDelete()->after('total_amount');
@@ -46,12 +42,7 @@ return new class extends Migration
             $t->dropColumn(['tax_id', 'tax_rate', 'total_tax', 'tax_type']);
         });
 
-        if (Schema::hasTable('quotations')) {
-            Schema::table('quotations', function (Blueprint $t) {
-                $t->dropForeign(['tax_id']);
-                $t->dropColumn(['tax_id']);
-            });
-        }
+        // quotations table already has tax_id in its base migration
 
         Schema::table('sales_returns', function (Blueprint $t) {
             $t->dropForeign(['tax_id']);

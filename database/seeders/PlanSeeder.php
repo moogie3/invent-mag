@@ -12,9 +12,9 @@ class PlanSeeder extends Seeder
      *
      * Feature slugs correspond to config/plans.php feature definitions.
      * Limits match the pricing page exactly:
-     *   Starter:      $19/mo, 3 users, 1 warehouse, 100 products, 7-day trial
-     *   Professional:  $59/mo, 10 users, unlimited warehouses, 500 products, 7-day trial
-     *   Enterprise:    $109/mo, unlimited users, unlimited warehouses, unlimited products, 7-day trial
+     *   Starter:      $19/mo, 3 users, 1 warehouse, 100 products, 30-day trial
+     *   Professional:  $59/mo, 10 users, unlimited warehouses, 500 products, 30-day trial
+     *   Enterprise:    $109/mo, unlimited users, unlimited warehouses, unlimited products, 30-day trial
      *
      * Pricing Updated: April 2026 (Stock Opname feature added to Professional)
      */
@@ -30,7 +30,7 @@ class PlanSeeder extends Seeder
                 'max_users' => 3,
                 'max_warehouses' => 1,
                 'max_products' => 100,
-                'trial_days' => 7,
+                'trial_days' => 30,
                 'is_active' => true,
                 'sort_order' => 1,
                 'features' => [
@@ -57,7 +57,7 @@ class PlanSeeder extends Seeder
                 'max_users' => 10,
                 'max_warehouses' => -1, // unlimited
                 'max_products' => 500,
-                'trial_days' => 7,
+                'trial_days' => 30,
                 'is_active' => true,
                 'sort_order' => 2,
                 'features' => [
@@ -84,6 +84,7 @@ class PlanSeeder extends Seeder
                     'hr',
                     'cash_flow',
                     'quotations',
+                    'ppn',
                 ],
             ],
             [
@@ -95,7 +96,7 @@ class PlanSeeder extends Seeder
                 'max_users' => -1, // unlimited
                 'max_warehouses' => -1, // unlimited
                 'max_products' => -1, // unlimited
-                'trial_days' => 7,
+                'trial_days' => 30,
                 'is_active' => true,
                 'sort_order' => 3,
                 'features' => [
@@ -121,6 +122,7 @@ class PlanSeeder extends Seeder
                     'purchase_returns',
                     'cash_flow',
                     'quotations',
+                    'ppn',
                     // Enterprise-only features
                     'sales_forecasting',
                     'api_access',

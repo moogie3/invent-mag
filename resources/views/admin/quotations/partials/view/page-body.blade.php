@@ -112,14 +112,14 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        @foreach($quotation->items as $index => $item)
+                                        @php
+                                            $items = collect($quotation->items)->map(fn($item) => is_array($item) ? (object) $item : $item);
+                                        @endphp
+                                        @foreach($items as $index => $item)
                                         <tr>
                                             <td class="text-center">{{ $index + 1 }}</td>
                                             <td>
-                                                <div class="fw-bold">{{ $item->product_name ?? $item->product?->name ?? __('messages.not_available') }}</div>
-                                                @if($item->product?->sku)
-                                                    <small class="text-muted">{{ __('messages.sku_colon') }} {{ $item->product->sku }}</small>
-                                                @endif
+                                                <div class="fw-bold">{{ $item->product_name ?? $item->name ?? __('messages.not_available') }}</div>
                                             </td>
                                             <td class="text-center">{{ $item->quantity }}</td>
                                             <td class="text-end">{{ \App\Helpers\CurrencyHelper::format($item->price) }}</td>

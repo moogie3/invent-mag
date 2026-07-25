@@ -156,9 +156,7 @@ export class PurchaseOrderCreate extends PurchaseOrderModule {
                     const opt = e.target.options[e.target.selectedIndex];
                     const rate = parseFloat(opt.dataset.rate) || 0;
                     const type = opt.dataset.type || "none";
-                    const rateLabel = document.getElementById("taxRateLabel");
                     const typeInput = document.getElementById("taxTypeInput");
-                    if (rateLabel) rateLabel.textContent = rate;
                     if (typeInput) typeInput.value = type;
                     this.updateTotalPrice();
                 }
@@ -166,10 +164,7 @@ export class PurchaseOrderCreate extends PurchaseOrderModule {
             if (taxSelector.options.length > 0 && taxSelector.selectedIndex >= 0) {
                 const initialOpt = taxSelector.options[taxSelector.selectedIndex];
                 if (initialOpt) {
-                    const rate = parseFloat(initialOpt.dataset.rate) || 0;
                     const typeInput = document.getElementById("taxTypeInput");
-                    const rateLabel = document.getElementById("taxRateLabel");
-                    if (rateLabel) rateLabel.textContent = rate;
                     if (typeInput) typeInput.value = initialOpt.dataset.type || "none";
                 }
             }
@@ -317,7 +312,6 @@ export class PurchaseOrderCreate extends PurchaseOrderModule {
         const subtotalEl = document.getElementById("subtotal");
         const orderDiscountTotalEl =
             document.getElementById("orderDiscountTotal");
-        const taxTotalEl = document.getElementById("taxTotal");
         const finalTotalEl = document.getElementById("finalTotal");
         const totalDiscountInputEl =
             document.getElementById("totalDiscountInput");
@@ -327,7 +321,6 @@ export class PurchaseOrderCreate extends PurchaseOrderModule {
         if (orderDiscountTotalEl)
             orderDiscountTotalEl.innerText =
                 formatCurrency(orderDiscountAmount);
-        if (taxTotalEl) taxTotalEl.innerText = formatCurrency(taxAmount);
         if (finalTotalEl) finalTotalEl.innerText = formatCurrency(finalTotal);
         if (totalDiscountInputEl)
             totalDiscountInputEl.value = orderDiscountAmount;

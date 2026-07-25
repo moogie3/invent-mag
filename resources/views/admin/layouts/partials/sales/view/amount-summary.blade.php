@@ -33,6 +33,27 @@
     </div>
     <hr class="border-primary">
 
+    @php
+        $currentTenant = app('currentTenant');
+        $showPpnLine = $currentTenant instanceof \App\Models\Tenant && $currentTenant->isIndonesian() && $currentTenant->hasFeature('ppn');
+    @endphp
+    @if($showPpnLine)
+    @if($sales->ppn_enabled)
+    <div class="d-flex justify-content-between mb-2 text-danger">
+        <div>
+            PPN
+            <small class="text-muted">({{ $sales->ppn_rate ?? app('currentTenant')->ppn_rate ?? 11 }}%)</small>
+        </div>
+        <div>{{ \App\Helpers\CurrencyHelper::format($sales->ppn_amount) }}</div>
+    </div>
+    @else
+    <div class="d-flex justify-content-between mb-2 text-muted">
+        <div><small>PPN (belum diaktifkan)</small></div>
+        <div><small>—</small></div>
+    </div>
+    @endif
+    @endif
+
     <div class="d-flex justify-content-between align-items-center mb-3">
         <div class="fs-4"><strong>{{ __('messages.grand_total') }}</strong></div>
         <div class="fs-3 fw-bold text-primary">

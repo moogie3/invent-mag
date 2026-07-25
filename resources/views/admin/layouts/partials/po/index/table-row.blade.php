@@ -23,6 +23,13 @@
         @endif
         <span class="raw-amount" style="display: none;">{{ $adjustedTotal }}</span>
     </td>
+    <td class="sort-tax">
+        @if(($po->tax_rate ?? 0) > 0)
+            <span class="text-muted">{{ $po->tax_rate }}% ({{ ucfirst($po->tax_type ?? 'exclusive') }})</span>
+        @else
+            <span class="text-muted">-</span>
+        @endif
+    </td>
     <td class="sort-payment no-print">{{ $po->payment_type }}</td>
     <td class="sort-status">
         <span class="{{ \App\Helpers\PurchaseHelper::getStatusClass($po->status, $po->due_date) }}">

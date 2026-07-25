@@ -153,6 +153,14 @@ return [
             ],
         ],
         [
+            'title'        => 'messages.efaktur',
+            'icon'         => 'ti ti-file-invoice',
+            'route'        => 'admin.efaktur.index',
+            'permission'   => 'view-efaktur',
+            'plan_feature' => 'ppn',  // Professional+ only
+            'jurisdiction' => 'ID',   // Only visible for Indonesian tenants
+        ],
+        [
             'title' => 'messages.reports',
             'icon' => 'ti ti-report',
             'permission' => 'view-reports',

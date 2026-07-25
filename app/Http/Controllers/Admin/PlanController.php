@@ -95,8 +95,8 @@ class PlanController extends Controller
         // because a trial countdown should not be conflated with a paid subscription expiry
         $isOnActiveTrial = $tenant ? $tenant->isOnActiveTrial() : false;
 
-        // Check if plan is expiring soon (within 7 days) — only for paid subscriptions.
-        // Active trials are excluded because their 7-day trial window should not
+         // Check if plan is expiring soon (within 7 days) — only for paid subscriptions.
+         // Active trials are excluded because their trial window should not
         // trigger the "renew" workflow.
         $expiringSoon = false;
         $expiryDays = null;
@@ -275,83 +275,19 @@ class PlanController extends Controller
                 $order->update([
                     'status' => 'paid',
                     'paid_at' => now(),
-                    'payment_info' => (array) $status
+                    'payment_info' => (array) $status,
                 ]);
 
-                $newPlan = $order->plan;
-                $currentPlan = $tenant->getCurrentPlan();
-                $changeType = $order->change_type ?? $this->billingService->getPlanChangeType($currentPlan, $newPlan);
+                $result = $this->billingService->confirmPayment($order, (array) $status);
 
-                if (!$tenant->billing_period_start) {
-                    $period = $this->billingService->getCurrentBillingPeriod();
-                    $tenant->billing_period_start = $period['start'];
-                    $tenant->billing_period_end = $period['end'];
-                }
-
-if ($changeType === 'upgrade') {
-                    $daysRemaining = $this->billingService->getDaysRemainingInPeriod($tenant);
-                    $prorationAmount = $this->billingService->calculateUpgradeProration($currentPlan, $newPlan, $daysRemaining);
-
-                    $tenant->plan_id = $newPlan->id;
-                    $tenant->plan_status = 'active';
-                    $tenant->trial_ends_at = null; // Clear any remaining trial when upgrading to paid plan
-                    $tenant->plan_changed_at = now();
-                    $tenant->save();
-
-                    \Illuminate\Support\Facades\Log::info("Payment confirmed for order {$order->order_number}. Upgrade: {$currentPlan?->name} -> {$newPlan->name}. Proration: \${$prorationAmount}");
-
-                    return response()->json([
-                        'message' => 'Payment confirmed successfully',
-                        'plan' => $newPlan->name,
-                        'type' => 'upgrade',
-                        'proration_amount' => $prorationAmount,
-                    ]);
-                } elseif ($changeType === 'same') {
-                    // Same tier renewal - extend the subscription
-                    $tenant->plan_status = 'active';
-                    $tenant->trial_ends_at = null; // Clear trial since we're now on a paid plan
-                    $tenant->plan_changed_at = now();
-
-                    if ($tenant->billing_period_end && \Carbon\Carbon::parse($tenant->billing_period_end)->isFuture()) {
-                        // Stack the days if not yet expired, preserving the exact time
-                        $tenant->billing_period_end = \Carbon\Carbon::parse($tenant->billing_period_end)->addDays(30);
-                    } else {
-                        // Reset if already expired
-                        $period = $this->billingService->getCurrentBillingPeriod();
-                        $tenant->billing_period_start = $period['start'];
-                        $tenant->billing_period_end = $period['end'];
-                    }
-
-                    $tenant->save();
-
-                    \Illuminate\Support\Facades\Log::info("Payment confirmed for order {$order->order_number}. Renewal: {$newPlan->name}. Extended until: {$tenant->billing_period_end}");
-
-                    return response()->json([
-                        'message' => 'Payment confirmed successfully',
-                        'plan' => $newPlan->name,
-                        'type' => 'renewal',
-                    ]);
-                } else {
-                    $nextPeriod = $this->billingService->getNextBillingPeriod();
-                    $daysRemaining = $this->billingService->getDaysRemainingInPeriod($tenant);
-                    $creditAmount = $this->billingService->calculateDowngradeCredit($currentPlan, $newPlan, $daysRemaining);
-
-                    $tenant->pending_plan_id = $newPlan->id;
-                    $tenant->pending_plan_effective_at = $nextPeriod['start'] . ' 00:00:00';
-                    $tenant->proration_credit = $creditAmount;
-                    $tenant->trial_ends_at = null; // Clear trial - downgrade will take effect in next period
-                    $tenant->save();
-
-                    \Illuminate\Support\Facades\Log::info("Payment confirmed for order {$order->order_number}. Downgrade scheduled: {$currentPlan?->name} -> {$newPlan->name}. Effective: {$nextPeriod['start']}. Credit: \${$creditAmount}");
-
-                    return response()->json([
-                        'message' => 'Payment confirmed successfully',
-                        'plan' => $newPlan->name,
-                        'type' => 'downgrade',
-                        'effective_date' => $nextPeriod['start'],
-                        'credit_amount' => $creditAmount,
-                    ]);
-                }
+                return response()->json([
+                    'message' => $result['message'],
+                    'plan' => $result['plan'],
+                    'type' => $result['type'],
+                    'proration_amount' => $result['proration_amount'] ?? null,
+                    'effective_date' => $result['effective_date'] ?? null,
+                    'credit_amount' => $result['credit_amount'] ?? null,
+                ]);
             } else {
                 return response()->json([
                     'message' => 'Payment not completed',

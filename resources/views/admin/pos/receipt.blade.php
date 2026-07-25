@@ -111,6 +111,7 @@
                                             <span>{{ \App\Helpers\CurrencyHelper::formatWithPosition($grandTotal) }}</span>
                                         </div>
 
+                                        @if ($sale->payment_type === 'Cash')
                                         <div class="payment-rows">
                                             <div class="total-row">
                                                 <span>{{ __('messages.amount_received') }}</span>
@@ -121,6 +122,7 @@
                                                 <span>{{ \App\Helpers\CurrencyHelper::formatWithPosition($change) }}</span>
                                             </div>
                                         </div>
+                                        @endif
                                     </div>
 
                                     {{-- Footer --}}

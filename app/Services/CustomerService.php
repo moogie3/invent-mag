@@ -35,6 +35,10 @@ class CustomerService
                 'max:255',
                 Rule::unique('customers', 'name')->where('tenant_id', auth()->user()->tenant_id),
             ],
+            'npwp' => 'nullable|string|max:20',
+            'pkp_status' => 'nullable|boolean',
+            'pkp_date' => 'nullable|date',
+            'alamat_npwp' => 'nullable|string|max:500',
         ])->validate();
 
         if (isset($data['image'])) {
@@ -55,6 +59,10 @@ class CustomerService
                 'max:255',
                 Rule::unique('customers', 'name')->where('tenant_id', auth()->user()->tenant_id),
             ],
+            'npwp' => 'nullable|string|max:20',
+            'pkp_status' => 'nullable|boolean',
+            'pkp_date' => 'nullable|date',
+            'alamat_npwp' => 'nullable|string|max:500',
         ])->validate();
 
         if (isset($data['image'])) {
@@ -75,6 +83,10 @@ class CustomerService
                 'max:255',
                 Rule::unique('customers', 'name')->where('tenant_id', auth()->user()->tenant_id)->ignore($customer->id),
             ],
+            'npwp' => 'nullable|string|max:20',
+            'pkp_status' => 'nullable|boolean',
+            'pkp_date' => 'nullable|date',
+            'alamat_npwp' => 'nullable|string|max:500',
         ])->validate();
 
         if (isset($data['image'])) {
@@ -148,6 +160,10 @@ class CustomerService
                     'Phone Number',
                     'Payment Terms',
                     'Email',
+                    'NPWP',
+                    'PKP Status',
+                    'PKP Date',
+                    'Alamat NPWP',
                 ]);
 
                 foreach ($customers as $customer) {
@@ -157,6 +173,10 @@ class CustomerService
                         $customer->phone_number,
                         $customer->payment_terms,
                         $customer->email,
+                        $customer->npwp,
+                        $customer->pkp_status ? 'Yes' : 'No',
+                        $customer->pkp_date?->format('Y-m-d'),
+                        $customer->alamat_npwp,
                     ]);
                 }
 

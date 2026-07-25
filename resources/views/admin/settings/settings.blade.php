@@ -334,6 +334,39 @@
 
                                         
 
+                                        <!-- Tax Region -->
+                                        @if(($tenant->plan->slug ?? '') !== 'starter')
+                                        <div class="settings-section mb-5">
+                                            <div class="settings-section-header">
+                                                <div class="settings-icon-wrapper">
+                                                    <i class="ti ti-world"></i>
+                                                </div>
+                                                <div class="settings-section-title">
+                                                    <h3 class="mb-1">{{ __('messages.tax_region') }}</h3>
+                                                    <p class="text-muted mb-0 small">
+                                                        {{ __('messages.tax_region_description') }}
+                                                    </p>
+                                                </div>
+                                            </div>
+                                            <div class="settings-section-content">
+                                                <div class="row g-3">
+                                                    <div class="col-md-6">
+                                                        <div class="form-label">{{ __('messages.tax_jurisdiction') }}</div>
+                                                        <select id="taxJurisdictionSelect" class="form-control">
+                                                            <option value="" {{ ($tenant->tax_jurisdiction ?? '') === '' ? 'selected' : '' }}>
+                                                                {{ __('messages.tax_jurisdiction_none') }}
+                                                            </option>
+                                                            <option value="ID" {{ ($tenant->tax_jurisdiction ?? '') === 'ID' ? 'selected' : '' }}>
+                                                                {{ __('messages.tax_jurisdiction_id') }}
+                                                            </option>
+                                                        </select>
+                                                        <div class="form-text">{{ __('messages.tax_jurisdiction_hint') }}</div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        @endif
+
                                         <!-- Advanced Settings -->
                                         <div class="settings-section mb-4">
                                             <div class="settings-section-header">
@@ -403,3 +436,32 @@
         </div>
     </div>
 @endsection
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    var taxJurisdictionSelect = document.getElementById('taxJurisdictionSelect');
+    if (taxJurisdictionSelect) {
+        taxJurisdictionSelect.addEventListener('change', function() {
+            var jurisdiction = this.value;
+            fetch('{{ route("admin.setting.update-tax-jurisdiction") }}', {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                body: JSON.stringify({ tax_jurisdiction: jurisdiction })
+            })
+            .then(function(response) { return response.json(); })
+            .then(function(data) {
+                if (data.success) {
+                    window.location.reload();
+                } else {
+                    alert(data.message || 'Failed to update tax jurisdiction.');
+                }
+            })
+            .catch(function() { alert('An error occurred while updating tax jurisdiction.'); });
+        });
+    }
+});
+</script>

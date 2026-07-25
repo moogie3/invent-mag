@@ -81,6 +81,7 @@ class CreateNewUser implements CreatesNewUsers
             $salesRevenueAccount = Account::where('code', '4100-' . $tenantId)->first();
             $accountsReceivableAccount = Account::where('code', '1130-' . $tenantId)->first();
             $costOfGoodsSoldAccount = Account::where('code', '5200-' . $tenantId)->first();
+            $outputVatAccount = Account::where('code', '2130-' . $tenantId)->first();
 
             if ($cashAccount && $accountsPayableAccount && $inventoryAccount && $salesRevenueAccount && $accountsReceivableAccount && $costOfGoodsSoldAccount) {
                 $tenant->accounting_settings = [
@@ -90,6 +91,7 @@ class CreateNewUser implements CreatesNewUsers
                     'sales_revenue_account_id' => $salesRevenueAccount->id,
                     'accounts_receivable_account_id' => $accountsReceivableAccount->id,
                     'cost_of_goods_sold_account_id' => $costOfGoodsSoldAccount->id,
+                    'ppn_keluaran_account_id' => $outputVatAccount?->id,
                 ];
                 $tenant->save();
             }

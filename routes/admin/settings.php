@@ -67,6 +67,7 @@ Route::prefix('settings')->group(function () {
     Route::get('/', [SettingsController::class, 'index'])->name('admin.setting.index');
     Route::put('/', [SettingsController::class, 'update'])->name('admin.setting.update');
     Route::put('/update-theme-mode', [SettingsController::class, 'updateThemeMode'])->name('admin.setting.update-theme-mode');
+    Route::put('/update-tax-jurisdiction', [SettingsController::class, 'updateTaxJurisdiction'])->name('admin.setting.update-tax-jurisdiction');
 
     Route::middleware('plan.feature:accounting')->group(function () {
         Route::get('/accounting', [AccountingController::class, 'accounting'])->name('admin.setting.accounting');

@@ -192,6 +192,10 @@
                                                                 data-payment_terms="{{ $customer->payment_terms }}"
                                                                 data-email="{{ $customer->email }}"
                                                                 data-image="{{ $customer->image }}"
+                                                                data-npwp="{{ $customer->npwp }}"
+                                                                data-pkp_status="{{ $customer->pkp_status ? '1' : '0' }}"
+                                                                data-pkp_date="{{ $customer->pkp_date?->format('Y-m-d') ?? '' }}"
+                                                                data-alamat_npwp="{{ $customer->alamat_npwp }}"
                                                                 title="{{ __('messages.edit') }}">
                                                                 <i class="ti ti-edit"></i>
                                                             </button>

@@ -35,7 +35,7 @@ class SalesService
     public function getSalesIndexData(array $filters, int $entries)
     {
         $tenantId = app('currentTenant')->id ?? null;
-        $query = Sales::with(['customer', 'user', 'warehouse', 'salesReturns']); // Added warehouse and salesReturns
+        $query = Sales::with(['customer', 'user', 'warehouse', 'salesReturns', 'fakturPajak']);
 
         if ($tenantId) {
             $query->where('tenant_id', $tenantId);
@@ -224,9 +224,9 @@ class SalesService
     public function getSalesViewData($id)
     {
         /** @var \App\Models\Sales $sales */
-        $sales = Sales::with(['salesItems', 'customer', 'payments', 'salesReturns.items'])->find($id);
+        $sales = Sales::with(['salesItems', 'customer', 'payments', 'salesReturns.items', 'fakturPajak'])->find($id);
 
-        $customer = Customer::all();
+        $customer = $sales->customer;
         $tax = Tax::find($sales->tax_id);
 
         $itemCount = $sales->salesItems->count();
@@ -364,19 +364,23 @@ class SalesService
                 'warehouse_id' => $warehouseId,
                 'order_date' => $data['order_date'],
                 'due_date' => $data['due_date'],
-                'tax_id' => $tax?->id,
-                'tax_rate' => $taxRate,
-                'total_tax' => $taxAmount,
-                'tax_type' => $taxType,
-                'total' => $grandTotal,
-                'order_discount' => $orderDiscount,
+                'tax_id'              => $tax?->id,
+                'tax_rate'            => $taxRate,
+                'total_tax'           => $taxAmount,
+                'tax_type'            => $taxType,
+                'total'               => $grandTotal,
+                'order_discount'      => $orderDiscount,
                 'order_discount_type' => $orderDiscountType,
-                'status' => 'Unpaid',
-                'payment_type' => '-',
-                'type' => Sales::TYPE_REGULAR,
-                'customer_credit_used' => 0,
-                'notes' => $data['notes'] ?? null,
-                'terms_conditions' => $data['terms_conditions'] ?? null,
+                'status'              => 'Unpaid',
+                'payment_type'        => '-',
+                'type'                => Sales::TYPE_REGULAR,
+                'customer_credit_used'=> 0,
+                'notes'               => $data['notes'] ?? null,
+                'terms_conditions'    => $data['terms_conditions'] ?? null,
+                // PPN / e-Faktur fields — derived from selected tax's is_ppn flag
+                'ppn_enabled'         => $tax?->is_ppn ?? false,
+                'ppn_rate'            => $tax?->is_ppn ? $taxRate : null,
+                'ppn_amount'          => $tax?->is_ppn ? $taxAmount : 0,
             ]);
 
             // Apply customer credit if provided
@@ -601,19 +605,23 @@ class SalesService
             }
 
             $sale->update([
-                'customer_id' => $data['customer_id'],
-                'order_date' => $data['order_date'],
-                'due_date' => $data['due_date'],
-                'tax_id' => $tax?->id,
-                'tax_rate' => $taxRate,
-                'total_tax' => $taxAmount,
-                'tax_type' => $taxType,
-                'total' => $grandTotal,
-                'order_discount' => $orderDiscount,
+                'customer_id'         => $data['customer_id'],
+                'order_date'          => $data['order_date'],
+                'due_date'            => $data['due_date'],
+                'tax_id'              => $tax?->id,
+                'tax_rate'            => $taxRate,
+                'total_tax'           => $taxAmount,
+                'tax_type'            => $taxType,
+                'total'               => $grandTotal,
+                'order_discount'      => $orderDiscount,
                 'order_discount_type' => $orderDiscountType,
-                'payment_type' => $data['payment_type'] ?? '-',
-                'notes' => $data['notes'] ?? $sale->notes,
-                'terms_conditions' => $data['terms_conditions'] ?? $sale->terms_conditions,
+                'payment_type'        => $data['payment_type'] ?? '-',
+                'notes'               => $data['notes'] ?? $sale->notes,
+                'terms_conditions'    => $data['terms_conditions'] ?? $sale->terms_conditions,
+                // PPN / e-Faktur fields — derived from selected tax's is_ppn flag
+                'ppn_enabled'         => $tax?->is_ppn ?? false,
+                'ppn_rate'            => $tax?->is_ppn ? $taxRate : null,
+                'ppn_amount'          => $tax?->is_ppn ? $taxAmount : 0,
             ]);
 
             foreach ($products as $productData) {
@@ -801,6 +809,25 @@ class SalesService
                 }
             }
 
+            // Also reverse FakturPajak journal entries (PPN Keluaran)
+            $fakturPajak = $sale->fakturPajak()->first();
+            if ($fakturPajak) {
+                $fpJournalEntries = \App\Models\JournalEntry::where('sourceable_type', get_class($fakturPajak))
+                    ->where('sourceable_id', $fakturPajak->id)
+                    ->get();
+
+                foreach ($fpJournalEntries as $entry) {
+                    if ($entry->status === \App\Models\JournalEntry::STATUS_POSTED && $entry->canBeReversed()) {
+                        $this->accountingService->reverseJournalEntry($entry, "Auto-reversal due to deleted Sale #{$sale->invoice} (Faktur Pajak {$fakturPajak->nsfp})");
+                    }
+                }
+
+                // Mark NSFP as cancelled and delete FakturPajak
+                \App\Models\NsfpPool::where('nsfp', $fakturPajak->nsfp)->update(['status' => 'cancelled']);
+                $fakturPajak->items()->delete();
+                $fakturPajak->delete();
+            }
+
             foreach ($sale->salesItems as $item) {
                 // Revert stock to the warehouse it was sold from
                 $stockRecord = ProductWarehouse::where('product_id', $item->product_id)
@@ -934,8 +961,9 @@ class SalesService
     public function printInvoice($id)
     {
         $sales = Sales::with(['customer', 'salesItems.product', 'payments'])->findOrFail($id);
-        $shopname = User::whereNotNull('shopname')->value('shopname');
-        $address = User::whereNotNull('address')->value('address');
+        $tenantId = app('currentTenant')->id ?? null;
+        $shopname = User::where('tenant_id', $tenantId)->whereNotNull('shopname')->value('shopname');
+        $address = User::where('tenant_id', $tenantId)->whereNotNull('address')->value('address');
 
         $html = view('admin.sales.print-pdf', compact('sales', 'shopname', 'address'))->render();
         $dompdf = new Dompdf();
@@ -972,7 +1000,7 @@ class SalesService
         return $pastPrice;
     }
 
-    private function generateInvoiceNumber(): string
+    public function generateInvoiceNumber(): string
     {
         $tenantId = auth()->user()->tenant_id ?? null;
         

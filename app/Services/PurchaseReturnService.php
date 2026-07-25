@@ -210,17 +210,20 @@ class PurchaseReturnService
             $accountsPayableAccountName = $accountsPayableAccount->name;
             $purchaseAccountName = $purchaseAccount->name;
 
+            $purchaseReturnsAccount = Account::where('code', 'like', '5120-%')->first();
+            $purchaseReturnsAccountName = $purchaseReturnsAccount?->name ?? $purchaseAccountName;
+
             // Create comprehensive journal entry for purchase return
-            // This reverses: AP, Purchase (COGS); while reducing Inventory
+            // Debit AP (reduce what we owe), Credit Purchase Returns (contra-COGS)
             $transactions = [
-                // Reverse Accounts Payable (we no longer owe this much)
+                // Reduce Accounts Payable (we no longer owe this much)
                 ['account_name' => $accountsPayableAccountName, 'type' => 'debit', 'amount' => $totalReturnAmount],
+                // Record purchase return (contra-COGS)
+                ['account_name' => $purchaseReturnsAccountName, 'type' => 'credit', 'amount' => $totalReturnAmount],
                 // Reverse Purchase/COGS (reduce expense)
                 ['account_name' => $purchaseAccountName, 'type' => 'debit', 'amount' => $proportionalPurchase],
                 // Reduce Inventory (items returned from stock)
                 ['account_name' => $inventoryAccountName, 'type' => 'credit', 'amount' => $proportionalPurchase],
-                // Offset the AP debit to balance the entry
-                ['account_name' => $accountsPayableAccountName, 'type' => 'credit', 'amount' => $totalReturnAmount],
             ];
 
             $this->accountingService->createJournalEntry(
@@ -486,11 +489,70 @@ class PurchaseReturnService
         });
     }
 
+    public function cancelPurchaseReturn(PurchaseReturn $purchaseReturn): void
+    {
+        if ($purchaseReturn->status === 'Canceled') {
+            return;
+        }
+
+        DB::transaction(function () use ($purchaseReturn) {
+            if ($purchaseReturn->status === 'Completed') {
+                $purchase = $purchaseReturn->purchase;
+
+                foreach ($purchaseReturn->items as $item) {
+                    $product = Product::find($item->product_id);
+                    if ($product) {
+                        $warehouseId = $purchase->warehouse_id ?? Product::getMainWarehouseId();
+                        $stockRecord = ProductWarehouse::where('product_id', $product->id)
+                            ->where('warehouse_id', $warehouseId)
+                            ->first();
+                        if ($stockRecord) {
+                            $stockRecord->increment('quantity', $item->quantity);
+                        }
+                        $this->incrementPOItemRemaining($purchase->id, $product->id, $item->quantity);
+                    }
+                }
+
+                $journalEntries = JournalEntry::where('sourceable_type', get_class($purchaseReturn))
+                    ->where('sourceable_id', $purchaseReturn->id)
+                    ->get();
+                foreach ($journalEntries as $entry) {
+                    if ($entry->status === JournalEntry::STATUS_POSTED && $entry->canBeReversed()) {
+                        $this->accountingService->reverseJournalEntry($entry, "Reversal due to canceled Purchase Return #{$purchaseReturn->id}");
+                    }
+                }
+            }
+
+            $purchaseReturn->update(['status' => 'Canceled']);
+
+            $purchase = $purchaseReturn->purchase;
+            if ($purchase) {
+                $totalPurchasedQuantity = $purchase->items()->sum('quantity');
+                $totalQuantityReturnedSoFar = $purchase->purchaseReturns()->with('items')->get()->flatMap(function ($pr) {
+                    return $pr->items;
+                })->sum('quantity');
+
+                if ($totalQuantityReturnedSoFar <= 0) {
+                    if ($purchase->total_paid >= $purchase->total) {
+                        $purchase->update(['status' => 'Paid']);
+                    } elseif ($purchase->total_paid > 0) {
+                        $purchase->update(['status' => 'Partial']);
+                    } else {
+                        $purchase->update(['status' => 'Unpaid']);
+                    }
+                } elseif ($totalQuantityReturnedSoFar < $totalPurchasedQuantity) {
+                    $purchase->update(['status' => 'Partial']);
+                }
+            }
+        });
+    }
+
     public function printReturn($id)
     {
         $por = PurchaseReturn::with(['purchase.supplier', 'items.product', 'user'])->findOrFail($id);
-        $shopname = User::whereNotNull('shopname')->value('shopname');
-        $address = User::whereNotNull('address')->value('address');
+        $tenantId = app('currentTenant')->id ?? null;
+        $shopname = User::where('tenant_id', $tenantId)->whereNotNull('shopname')->value('shopname');
+        $address = User::where('tenant_id', $tenantId)->whereNotNull('address')->value('address');
 
         $html = view('admin.por.print-pdf', compact('por', 'shopname', 'address'))->render();
         $dompdf = new Dompdf();

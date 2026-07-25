@@ -18,8 +18,7 @@ function initQuotationForm() {
     const subtotalEl = form.querySelector("#subtotalDisplay");
     const discountInput = form.querySelector("#orderDiscount");
     const discountTypeSelect = form.querySelector("#orderDiscountType");
-    const taxRateInput = form.querySelector("#taxRate");
-    const taxTypeSelect = form.querySelector("#taxType");
+    const taxSelector = form.querySelector("#taxSelector");
     const totalEl = form.querySelector("#totalDisplay");
 
     if (addItemBtn && itemsContainer) {
@@ -40,8 +39,7 @@ function initQuotationForm() {
 
     if (discountInput) discountInput.addEventListener("input", () => recalcQuotationTotals(form));
     if (discountTypeSelect) discountTypeSelect.addEventListener("change", () => recalcQuotationTotals(form));
-    if (taxRateInput) taxRateInput.addEventListener("input", () => recalcQuotationTotals(form));
-    if (taxTypeSelect) taxTypeSelect.addEventListener("change", () => recalcQuotationTotals(form));
+    if (taxSelector) taxSelector.addEventListener("change", () => recalcQuotationTotals(form));
 }
 
 function addQuotationItemRow(container) {
@@ -110,8 +108,10 @@ function recalcQuotationTotals(form) {
 
     const afterDiscount = subtotal - discountAmount;
 
-    const taxRate = parseFloat(form.querySelector("#taxRate")?.value) || 0;
-    const taxType = form.querySelector("#taxType")?.value || "none";
+    const taxSelector = form.querySelector("#taxSelector");
+    const selectedOption = taxSelector?.options[taxSelector.selectedIndex];
+    const taxRate = parseFloat(selectedOption?.dataset.rate || 0);
+    const taxType = selectedOption?.dataset.type || "none";
     let taxAmount = 0;
     if (taxType === "exclusive") {
         taxAmount = afterDiscount * (taxRate / 100);

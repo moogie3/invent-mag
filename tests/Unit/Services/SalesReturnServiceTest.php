@@ -7,6 +7,7 @@ use App\Models\Sales;
 use App\Models\Product;
 use App\Models\SalesReturn;
 use App\Models\SalesReturnItem;
+use App\Models\Tax;
 use App\Services\SalesReturnService;
 use App\Services\AccountingService;
 use App\Services\SalesService;
@@ -59,9 +60,19 @@ class SalesReturnServiceTest extends TestCase
 
     public function test_it_copies_tax_from_parent_sale_on_create()
     {
-        // Give the parent sale explicit tax fields (exclusive 10%)
+        // Create a tax record and link it to the parent sale
+        $tax = Tax::create([
+            'name' => 'PPN 11%',
+            'rate' => 11,
+            'type' => 'exclusive',
+            'is_active' => true,
+            'is_default' => true,
+        ]);
+
+        // Give the parent sale explicit tax fields
         $this->sale->update([
-            'tax_rate' => 10,
+            'tax_id' => $tax->id,
+            'tax_rate' => 11,
             'tax_type' => 'exclusive',
         ]);
 
@@ -91,11 +102,11 @@ class SalesReturnServiceTest extends TestCase
 
         $this->assertNotNull($salesReturn);
         // Tax fields must be copied from the parent sale
-        $this->assertEquals($this->sale->tax_id, $salesReturn->tax_id);
-        $this->assertEquals(10.0,                $salesReturn->tax_rate);
+        $this->assertEquals($tax->id, $salesReturn->tax_id);
+        $this->assertEquals(11.0,                $salesReturn->tax_rate);
         $this->assertEquals('exclusive',          $salesReturn->tax_type);
-        // tax_amount = 10% of 200 = 20
-        $this->assertEquals(20.0,                $salesReturn->tax_amount);
+        // tax_amount = 11% of 200 = 22
+        $this->assertEquals(22.0,                $salesReturn->tax_amount);
     }
 
     public function test_it_can_filter_index_data_by_month_and_year()

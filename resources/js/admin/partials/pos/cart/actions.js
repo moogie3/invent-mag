@@ -244,7 +244,7 @@ export function initCartActions() {
     // Listen for discount and tax input changes to recalculate totals
     const orderDiscountInput = document.getElementById("orderDiscount");
     const discountTypeSelect = document.getElementById("discountType");
-    const taxRateInput = document.getElementById("taxRate");
+    const taxSelector = document.getElementById("taxSelector");
 
     if (orderDiscountInput) {
         orderDiscountInput.addEventListener("input", calculateTotals);
@@ -253,8 +253,7 @@ export function initCartActions() {
     if (discountTypeSelect) {
         discountTypeSelect.addEventListener("change", calculateTotals);
     }
-    if (taxRateInput) {
-        taxRateInput.addEventListener("input", calculateTotals);
-        taxRateInput.addEventListener("change", calculateTotals);
+    if (taxSelector) {
+        taxSelector.addEventListener("change", calculateTotals);
     }
 }

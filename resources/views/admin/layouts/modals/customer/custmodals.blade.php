@@ -71,6 +71,33 @@
                         <label for="customerPaymentTerms" class="form-label">{{ __('messages.table_payment_terms') }}</label>
                         <input type="text" class="form-control" id="customerPaymentTerms" name="payment_terms">
                     </div>
+                    @php
+                        $currentTenant = app('currentTenant');
+                        $showPpnFields = $currentTenant instanceof \App\Models\Tenant && $currentTenant->isIndonesian() && $currentTenant->hasFeature('ppn');
+                    @endphp
+                    @if($showPpnFields)
+                    <hr class="my-3">
+                    <h6 class="mb-3 text-muted"><i class="ti ti-file-invoice me-1"></i>{{ __('messages.customer_tax_data') }}</h6>
+                    <div class="mb-3">
+                        <label for="customerNpwp" class="form-label">{{ __('messages.customer_npwp') }}</label>
+                        <input type="text" class="form-control" id="customerNpwp" name="npwp" placeholder="00.000.000.0-000.000" maxlength="20">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">{{ __('messages.customer_pkp_status') }}</label>
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" id="customerPkpStatus" name="pkp_status" value="1">
+                            <label class="form-check-label" for="customerPkpStatus">{{ __('messages.customer_pkp_registered') }}</label>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="customerPkpDate" class="form-label">{{ __('messages.customer_pkp_date') }}</label>
+                        <input type="date" class="form-control" id="customerPkpDate" name="pkp_date">
+                    </div>
+                    <div class="mb-3">
+                        <label for="customerAlamatNpwp" class="form-label">{{ __('messages.customer_alamat_npwp') }}</label>
+                        <textarea class="form-control" id="customerAlamatNpwp" name="alamat_npwp" rows="2"></textarea>
+                    </div>
+                    @endif
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ __('messages.cancel') }}</button>
@@ -122,6 +149,29 @@
                         <input type="text" class="form-control" id="customerPaymentTermsEdit"
                             name="payment_terms">
                     </div>
+                    @if($showPpnFields)
+                    <hr class="my-3">
+                    <h6 class="mb-3 text-muted"><i class="ti ti-file-invoice me-1"></i>{{ __('messages.customer_tax_data') }}</h6>
+                    <div class="mb-3">
+                        <label for="customerNpwpEdit" class="form-label">{{ __('messages.customer_npwp') }}</label>
+                        <input type="text" class="form-control" id="customerNpwpEdit" name="npwp" placeholder="00.000.000.0-000.000" maxlength="20">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">{{ __('messages.customer_pkp_status') }}</label>
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" id="customerPkpStatusEdit" name="pkp_status" value="1">
+                            <label class="form-check-label" for="customerPkpStatusEdit">{{ __('messages.customer_pkp_registered') }}</label>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="customerPkpDateEdit" class="form-label">{{ __('messages.customer_pkp_date') }}</label>
+                        <input type="date" class="form-control" id="customerPkpDateEdit" name="pkp_date">
+                    </div>
+                    <div class="mb-3">
+                        <label for="customerAlamatNpwpEdit" class="form-label">{{ __('messages.customer_alamat_npwp') }}</label>
+                        <textarea class="form-control" id="customerAlamatNpwpEdit" name="alamat_npwp" rows="2"></textarea>
+                    </div>
+                    @endif
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ __('messages.cancel') }}</button>

@@ -41,6 +41,13 @@ function completePayment() {
     if (taxRateInput) taxRateInput.value = taxRateValue;
 
     if (paymentMethod.value === "cash") {
+        const received = parseFloat(amountReceived.value || 0);
+        if (received < grandTotal) {
+            InventMagApp.showToast("Error", "Amount received must be greater than or equal to the grand total.", "error");
+            completePaymentBtn.disabled = false;
+            return;
+        }
+
         const amountReceivedInput = document.createElement("input");
         amountReceivedInput.type = "hidden";
         amountReceivedInput.name = "amount_received";

@@ -722,6 +722,38 @@ return [
     'quotation_vs_pipeline' => 'Penawaran vs Pipeline: Pipeline Penjualan untuk tim internal melacak deal. Penawaran adalah dokumen untuk pelanggan. Anda dapat membuat Penawaran dari peluang Pipeline, atau secara mandiri. Penawaran dapat dikonversi ke Pesanan Penjualan saat diterima.',
     'quotation_lifecycle' => 'Siklus Status: Draft (baru, bisa diedit) → Terkirim (pelanggan menerima) → Diterima (pelanggan menyetujui) → Dikonversi ke Penjualan (terminal). Ditolak atau Kedaluwarsa dapat dikembalikan ke Draft. Edit hanya diizinkan pada status Draft atau Terkirim.',
 
+    // e-Faktur — Halaman Index
+    'efaktur_index_title' => 'e-Faktur',
+    'efaktur_index_desc' => 'Kelola dan lihat Faktur Pajak Anda untuk kepatuhan DJP e-Faktur.',
+    'efaktur_period_filter' => 'Filter Periode: Pilih masa pajak (bulan dan tahun) untuk melihat Faktur Pajak pada periode tersebut. Default ke bulan saat ini.',
+    'efaktur_summary_cards' => 'Kartu Ringkasan: Lihat jumlah total Faktur Pajak, total DPP (dasar pengenaan pajak), total PPN (PPN keluaran), dan jumlah NSFP tersedia untuk periode yang dipilih.',
+    'efaktur_faktur_table' => 'Tabel Faktur: Setiap baris menampilkan Faktur Pajak dengan nomor NSFP, tanggal, informasi pembeli, DPP, PPN, dan status. Klik NSFP untuk melihat detail.',
+    'efaktur_actions' => 'Aksi: Gunakan ikon mata untuk melihat detail dan ikon printer untuk mencetak Faktur Pajak sebagai dokumen PDF.',
+    'efaktur_pkp_warning' => 'Peringatan PKP: Jika tenant Anda belum terdaftar sebagai PKP (Pengusaha Kena Pajak), Anda akan melihat peringatan. Konfigurasi status PKP Anda di Pengaturan e-Faktur.',
+    'efaktur_csv_export' => 'Export CSV: Klik "Export CSV DJP" untuk mengunduh file CSV yang diformat untuk aplikasi desktop DJP e-Faktur. File menggunakan format baris FK/OF dengan UTF-8 BOM.',
+
+    // e-Faktur — Halaman Detail
+    'efaktur_detail_title' => 'Detail Faktur Pajak',
+    'efaktur_detail_desc' => 'Lihat detail lengkap Faktur Pajak termasuk informasi penjual/pembeli, ringkasan pajak, dan rincian item.',
+    'efaktur_faktur_info' => 'Informasi Faktur: Lihat nomor NSFP, tanggal faktur, masa pajak, invoice referensi, dan tarif PPN untuk Faktur Pajak ini.',
+    'efaktur_seller_buyer' => 'Penjual & Pembeli: Informasi penjual (perusahaan Anda) dan pembeli di-snapshot saat Faktur Pajak dibuat dan tidak dapat diubah.',
+    'efaktur_tax_summary' => 'Ringkasan Pajak: Lihat DPP (dasar pengenaan pajak), PPN (PPN keluaran), PPnBM (pajak barang mewah jika berlaku), dan total tagihan.',
+    'efaktur_djp_tracking' => 'Status DJP: Jika Faktur Pajak sudah disubmit ke DJP, Anda akan melihat tanggal submission dan nomor referensi DJP di sini.',
+    'efaktur_items_table' => 'Tabel Item: Setiap item dari invoice penjualan asli ditampilkan dengan nama produk, harga satuan, jumlah, diskon, DPP, dan PPN.',
+    'efaktur_print_cancel' => 'Cetak & Batalkan: Gunakan "Cetak PDF" untuk menghasilkan dokumen PDF yang sesuai standar DJP. "Batalkan" hanya tersedia untuk Faktur Pajak draft dan akan mengembalikan NSFP ke pool.',
+
+    // e-Faktur — Halaman Pengaturan
+    'efaktur_settings_title' => 'Pengaturan e-Faktur',
+    'efaktur_settings_desc' => 'Konfigurasi yurisdiksi pajak, data PKP, NPWP, tarif PPN, dan impor nomor NSFP untuk kepatuhan e-Faktur.',
+    'efaktur_tax_jurisdiction' => 'Yurisdiksi Pajak: Pilih yurisdiksi pajak negara Anda. Pilih "Indonesia" untuk mengaktifkan fitur PPN dan e-Faktur.',
+    'efaktur_pkp_data' => 'Data PKP: Masukkan NPWP perusahaan (nomor identifikasi pajak), toggle status registrasi PKP, set tanggal pengukuhan PKP, dan konfigurasi tarif PPN.',
+    'efaktur_npwp' => 'NPWP: Nomor identifikasi pajak 15 digit perusahaan Anda dalam format XX.XXX.XXX.X-XXX.XXX. Digunakan sebagai NPWP penjual pada semua Faktur Pajak.',
+    'efaktur_pkp_toggle' => 'Status PKP: Aktifkan jika perusahaan Anda terdaftar sebagai Pengusaha Kena Pajak (PKP) di DJP. Pembuatan Faktur Pajak memerlukan status PKP.',
+    'efaktur_ppn_rate' => 'Tarif PPN: Tarif PPN saat ini adalah 11% (berlaku sejak 1 April 2022). Ubah field ini jika DJP mengubah tarif di masa mendatang.',
+    'efaktur_nsfp_pool' => 'Pool NSFP: NSFP (Nomor Seri Faktur Pajak) diperlukan untuk setiap Faktur Pajak. Impor dari portal DJP dalam jumlah banyak.',
+    'efaktur_nsfp_import' => 'Import NSFP: Tempel nomor NSFP satu per baris dalam format XXX.XXX-YY.XXXXXXXX. Nomor duplikat dilewati otomatis. Impor NSFP sebelum membuat Faktur Pajak.',
+    'efaktur_klikpajak' => 'Klikpajak API (Segera Hadir): Phase 2 akan menambahkan submission langsung ke DJP via PJAP Klikpajak, sehingga tidak perlu mengunduh file CSV atau menggunakan aplikasi desktop.',
+
     // General / Welcome
     'general_navigation' => 'Navigasi: Gunakan menu sidebar di kiri untuk menavigasi.',
     'general_settings' => 'Pengaturan: Konfigurasi pengaturan dasar melalui menu Pengaturan.',

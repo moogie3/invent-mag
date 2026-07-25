@@ -1,8 +1,8 @@
 # Invent-MAG: Technical Specification Document
 
-**Document Version:** 1.9
-**Last Updated:** June 2026
-**System Version:** 1.9
+**Document Version:** 2.1
+**Last Updated:** July 2026
+**System Version:** 2.1
 
 ---
 
@@ -13,7 +13,7 @@ Invent-MAG is a production-ready, enterprise-grade ERP system built on Laravel 1
 ### Key Technical Highlights
 
 - **Multi-tenant SaaS architecture** with row-level database isolation
-- **791 test files** ensuring code reliability
+- **1066 test files** ensuring code reliability
 - **451+ commits** demonstrating sustained development
 - **Docker + CI/CD** for modern DevOps practices
 - **Service-oriented architecture** with clean separation of concerns
@@ -98,10 +98,10 @@ class Product extends Model
 | Tier         | Users     | Warehouses | Products  | Price  | Features                                   |
 | ------------ | --------- | ---------- | ---------|--------| ------------------------------------------ |
 | Starter      | 3         | 1          | 100      | $19/mo | Inventory, Sales/Purchases, POS, Returns, Stock Transfer |
-| Professional | 10        | Unlimited  | 500      | $59/mo | + Stock Opname, Accounting, CRM, HR & Payroll |
-| Enterprise   | Unlimited | Unlimited  | Unlimited | $109/mo| + Forecasting, API, Audit Trail, Custom Roles |
+| Professional | 10        | Unlimited  | 500      | $59/mo | + Stock Opname, Accounting, CRM, HR & Payroll, **e-Faktur PPN** |
+| Enterprise   | Unlimited | Unlimited  | Unlimited | $109/mo| + Forecasting, API, Audit Trail, Custom Roles, **e-Faktur PPN** |
 
-*(Updated: April 2026 - Stock Opname added to Professional tier)*
+*(Updated: July 2026 - e-Faktur PPN added to Professional & Enterprise tiers)*
 
 #### Payment Flow
 
@@ -267,7 +267,7 @@ Tutorial: `config/superadmin-tutorial.php` — 258 lines of route-specific tutor
 | ----------------- | ----- | ------------------------------- |
 | **Feature Tests** | 42+   | Controllers, Routes, End-to-end |
 | **Unit Tests**    | 48+   | Services, Helpers, DTOs         |
-| **Total Tests**   | 791   | test files                      |
+| **Total Tests**   | 1066  | test files                      |
 
 ### 2.2 Test Structure
 
@@ -375,6 +375,16 @@ class SalesHelper
 }
 ```
 
+#### Model Helpers
+
+```php
+// Tenant model — jurisdiction-based feature visibility
+$tenant->isIndonesian();  // Returns true if tax_jurisdiction === 'indonesia'
+
+// Tax model — PPN (VAT) identification
+$tax->isPpn();  // Returns true if is_ppn === true
+```
+
 **Benefits:**
 
 - Eliminates calculation discrepancies between different modules (e.g. Dashboard vs CRM vs POS)
@@ -394,6 +404,7 @@ routes/
     ├── contacts.php        # Customers, suppliers, CRM/SRM details
     ├── crm.php             # Sales pipeline and opportunities
     ├── dashboard.php       # Dashboard and tutorial context
+    ├── efaktur.php         # e-Faktur PPN (DJP tax invoice, NSFP, CSV export)
     ├── hr.php              # Employees, attendance, payroll, payslips
     ├── inventory.php       # Warehouses, POS, stock opname
     ├── notifications.php   # System notifications, users, audit log
@@ -503,6 +514,8 @@ Tenant (1)
 ├── Sales Orders (N)
 │   └── SalesItems (N)
 │   └── Payments (N)
+├── Quotations (N)
+│   └── QuotationItems (N)
 ├── Purchase Orders (N)
 │   └── POItems (N)
 │   └── Payments (N)
@@ -523,14 +536,16 @@ Tenant (1)
 | Table                 | Purpose           | Records            |
 | --------------------- | ----------------- | ------------------ |
 | **users**             | Authentication    | Per tenant         |
-| **tenants**           | Multi-tenancy + accounting settings | Master table |
+| **tenants**           | Multi-tenancy + accounting settings + `tax_jurisdiction` | Master table |
 | **products**          | Product catalog   | 1000s per tenant   |
 | **product_warehouse** | Stock levels      | 1000s per tenant   |
 | **sales**             | Sales orders      | 10000s per tenant  |
+| **quotations**        | Quotation management (Draft/Sent/Accepted/Rejected/Expired/Converted) | Per tenant  |
 | **purchase_orders**   | POs               | 10000s per tenant  |
 | **accounts**          | Chart of accounts | 35+ per tenant     |
 | **journal_entries**   | Accounting        | 10000s per tenant  |
 | **transactions**      | Accounting lines  | 100000s per tenant |
+| **taxes**             | Tax rate/label definitions with `is_ppn` flag | Per tenant |
 
 ### 4.3 Performance Optimizations
 
@@ -827,6 +842,34 @@ class SalesForecastService
 - E-commerce platforms (Shopify, WooCommerce)
 - Shipping providers
 - SMS/WhatsApp notifications
+- **PJAP API (Klikpajak)** — Phase 2: Direct DJP submission (enterprise only)
+
+### 9.3 e-Faktur PPN Compliance (Implemented July 2026)
+
+Indonesia's DJP (Direktorat Jenderal Pajak) requires PKP businesses to issue electronic Faktur Pajak for every taxable sale. Invent-MAG implements Phase 1 compliance:
+
+**Database Schema:**
+- `faktur_pajak` — Faktur header: NSFP, seller/buyer data (snapshotted), DPP/PPN/PPnBM, DJP submission tracking, status lifecycle (draft → submitted → approved/rejected)
+- `faktur_pajak_items` — Line items from `sales_items`, with BKP/JKP classification
+- `nsfp_pool` — Available NSFP numbers imported from DJP, allocated FIFO with `lockForUpdate()` for race condition safety
+
+**Service Layer (`EFakturService`):**
+- `generateFakturPajak(Sales)` — Atomic: NSFP allocation → FakturPajak + items → PPN Keluaran journal entry via `AccountingService`
+- `exportCsvForDjp(masa, tahun)` — Streamed CSV with UTF-8 BOM, DJP FK/OF row format, amounts in cents
+- `importNsfpPool(string)` — Idempotent import, format validation (`XXX.XXX-YY.XXXXXXXX`)
+- `getSptMasaSummary(masa, tahun)` — SPT Masa PPN monthly totals
+
+**Plan Gating:**
+- Feature slug: `ppn` (Professional & Enterprise)
+- Route middleware: `plan.feature:ppn`
+- Permission: `view-efaktur`, `create-efaktur`, `manage-efaktur-settings`
+- Nav item filtered by `NavigationServiceProvider` plan feature check
+- The e-Faktur system is jurisdiction-gated via NavigationServiceProvider. The `tax_jurisdiction` field on Tenant controls feature visibility. Routes remain accessible via direct URL for Professional+ tenants regardless of jurisdiction.
+
+**Future (Phase 2):**
+- PJAP API direct submission via Klikpajak (`PjapInterface` contract)
+- Real-time approval/rejection status from DJP
+- Enterprise-only premium automation
 
 ---
 

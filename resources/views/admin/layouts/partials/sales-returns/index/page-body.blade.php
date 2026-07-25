@@ -25,6 +25,9 @@
                                         <th class="sticky-top bg-body fs-4 py-3" style="z-index: 1020;">
                                             {{ __('messages.table_total') }}
                                         </th>
+                                        <th class="sticky-top bg-body fs-4 py-3" style="z-index: 1020;">
+                                            {{ __('messages.tax') }}
+                                        </th>
                                         <th class="sticky-top bg-body fs-4 py-3 text-center" style="z-index: 1020;">
                                             {{ __('messages.status') }}
                                         </th>
@@ -53,6 +56,13 @@
                                             </td>
                                             <td class="py-3">{{ $return->return_date->format('d F Y') }}</td>
                                             <td class="fw-bold py-3">{{ App\Helpers\CurrencyHelper::format($return->total_amount) }}</td>
+                                            <td class="py-3">
+                                                @if(($return->tax_rate ?? 0) > 0)
+                                                    <span class="text-muted">{{ $return->tax_rate }}% ({{ ucfirst($return->tax_type ?? 'exclusive') }})</span>
+                                                @else
+                                                    <span class="text-muted">-</span>
+                                                @endif
+                                            </td>
                                             <td class="text-center py-3">
                                                 @php
                                                     $statusClass = match($return->status) {
@@ -98,7 +108,7 @@
                                         </tr>
                                     @empty
                                         <tr>
-                                            <td colspan="8" class="text-center py-5">
+                                            <td colspan="9" class="text-center py-5">
                                                 <div class="empty-state">
                                                     <i class="ti ti-receipt-refund fs-1 text-muted mb-3 d-block"></i>
                                                     <h4 class="text-muted">{{ __('messages.no_sales_returns_found') }}</h4>

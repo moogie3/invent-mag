@@ -41,6 +41,10 @@ class CustomerController extends Controller
             'payment_terms' => 'required',
             'email' => 'nullable|email',
             'image' => 'nullable|image|mimes:jpeg,jpg,png',
+            'npwp' => 'nullable|string|max:20',
+            'pkp_status' => 'nullable|boolean',
+            'pkp_date' => 'nullable|date',
+            'alamat_npwp' => 'nullable|string|max:500',
         ]);
 
         $result = $this->customerService->createCustomer($request->all());
@@ -67,6 +71,10 @@ class CustomerController extends Controller
             'payment_terms' => 'required',
             'email' => 'nullable|email',
             'image' => 'nullable|image|mimes:jpeg,jpg,png',
+            'npwp' => 'nullable|string|max:20',
+            'pkp_status' => 'nullable|boolean',
+            'pkp_date' => 'nullable|date',
+            'alamat_npwp' => 'nullable|string|max:500',
         ]);
 
         $result = $this->customerService->quickCreateCustomer($request->all());
@@ -91,6 +99,10 @@ class CustomerController extends Controller
             'payment_terms' => 'required',
             'email' => 'nullable|email',
             'image' => 'nullable|image|mimes:jpeg,jpg,png',
+            'npwp' => 'nullable|string|max:20',
+            'pkp_status' => 'nullable|boolean',
+            'pkp_date' => 'nullable|date',
+            'alamat_npwp' => 'nullable|string|max:500',
         ]);
 
         $customer = Customer::findOrFail($id);

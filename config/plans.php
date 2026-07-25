@@ -29,6 +29,7 @@ return [
         'hr'                => 'HR Module (Employees, Attendance & Payroll)',
         'cash_flow'         => 'Cash Flow Statement',
         'quotations'        => 'Quotations',
+        'ppn'               => 'e-Faktur PPN (Indonesian Tax Invoice)',
 
         'sales_forecasting' => 'Sales Forecasting (Holt-Winters)',
         'api_access'        => 'RESTful API Access',
@@ -88,6 +89,9 @@ return [
         'quotations' => [
             'admin.quotations.*',
         ],
+        'ppn' => [
+            'admin.efaktur.*',
+        ],
     ],
 
     'upgrade_messages' => [
@@ -106,6 +110,7 @@ return [
         'audit_compliance'  => 'Audit Trail & Compliance Logging is available on the Enterprise plan.',
         'hr'                => 'The HR Module (Employees, Attendance & Payroll) is available on the Professional plan and above.',
         'quotations'        => 'Quotations are available on the Professional plan and above.',
+        'ppn'               => 'e-Faktur PPN compliance is available on the Professional plan and above.',
     ],
 
 ];

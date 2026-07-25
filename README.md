@@ -13,7 +13,7 @@
 | Metric               | Value                                        |
 | -------------------- | -------------------------------------------- |
 | **🏗️ Architecture**  | Multi-tenant SaaS                            |
-| **🧪 Test Coverage** | 791 test files                               |
+| **🧪 Test Coverage** | 1066 test files                              |
 | **💻 Codebase**      | 451+ commits, 1.5 years development          |
 | **🔐 Security**      | RBAC with 79 permissions, audit logging      |
 | **🐳 DevOps**        | Docker + GitHub Actions CI/CD                |
@@ -394,7 +394,7 @@ Data:
 
 #### Testing
 
-- **786 Test Files:** 40 Feature + 45 Unit PHP + 171 JS Vitest
+- **1066 Test Files:** 40 Feature + 45 Unit PHP + 171 JS Vitest
 - **PHPUnit 11+:** Modern PHP testing
 - **Parallel Testing:** `php artisan test --parallel`
 - **Multi-tenancy Tests:** Tenant isolation testing
@@ -471,7 +471,7 @@ Data:
 
 ## 🧪 Test Coverage
 
-**786 Test Files Covering:**
+**1066 Test Files Covering:**
 
 ### Feature Tests (40)
 
@@ -600,7 +600,12 @@ docker-compose exec app php artisan migrate --seed
 - ✅ **Sales Pipeline Enhancements** — Kanban/List view toggle, opportunity notes & terms conditions, currency-formatted list view amounts
 - ✅ **Full Quotation Module** — Standalone quotation management with status lifecycle (Draft/Sent/Accepted/Rejected/Expired/Converted), professional PDF generation, convert-to-sales workflow, pipeline integration, notes & terms conditions, per-item/order-level discount & tax calculations, bulk operations, and auto-numbering
 - ✅ **Per-Item Discount Type on Quotations** — Quotation line items support % vs Fixed discount type selector (independent per line)
-- ✅ **Tax Auto-Sync** — Sales create/edit pages auto-recalculate tax on page load and on tax dropdown change (no manual recalculation needed)
+- ✅ **POS Tax Model Integration** — POS now uses dedicated Tax model for rate/label lookups
+- ✅ **Quotation Tax Model Integration** — Quotations use Tax model instead of inline tax rate/type
+- ✅ **PO Tax Removed from Create** — Purchase order create no longer includes inline tax fields
+- ✅ **Navigation Jurisdiction Filtering** — Navigation items filtered by tenant jurisdiction via NavigationServiceProvider
+- ✅ **Tax Region in Settings** — Settings page now includes Tax Region card for jurisdiction configuration
+- ✅ **Index Tax Columns** — Index pages display tax rate/type columns from the Tax model
 - ✅ **Sales Returns Tax Breakdown** — Sales return show page displays tax rate and type label in the summary
 - ✅ **Pipeline Opportunity Amount** — Opportunity amount in sales pipeline is now the tax-inclusive grand total
 - ✅ **Sales & Opportunity Notes/Terms** — `notes` and `terms_conditions` columns added to `sales` and `sales_opportunities` tables (migration `2026_07_09_000001`)
@@ -643,6 +648,7 @@ docker-compose exec app php artisan migrate --seed
 - ✅ Purchase Order autofill info label
 - ✅ Consistent `ti-*` icon system across all page headers
 - ✅ Journal Entry audit log sidebar badge fix
+- ✅ **e-Faktur PPN (Phase 1)** — Faktur Pajak generation, DJP CSV export, NSFP pool management, PDF printing
 
 ### Previously Added (v1.4)
 
@@ -657,7 +663,7 @@ docker-compose exec app php artisan migrate --seed
 
 - 🔄 Bank Reconciliation
 - 🔄 Advanced Multi-Currency
-- 🔄 Indonesian Tax Compliance (PPN, e-Faktur)
+- 🔄 PJAP API Direct DJP Submission (e-Faktur Phase 2)
 - 🔄 Mobile Application
 
 ---

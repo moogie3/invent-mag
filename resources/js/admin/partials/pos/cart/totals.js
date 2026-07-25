@@ -20,14 +20,17 @@ export function calculateTotals() {
     const processPaymentBtn = document.getElementById("processPaymentBtn");
     const orderDiscountElement = document.getElementById("orderDiscount");
     const discountTypeElement = document.getElementById("discountType");
-    const taxRateElement = document.getElementById("taxRate");
+    const taxSelector = document.getElementById("taxSelector");
 
     const products = getProducts();
     subtotal = products.reduce((sum, product) => sum + product.total, 0);
 
     const discountValue = parseFloat(orderDiscountElement?.value || 0);
     const discountType = discountTypeElement?.value ?? 'fixed';
-    const taxRate = parseFloat(taxRateElement?.value || 0);
+
+    const selectedTaxOption = taxSelector?.options[taxSelector.selectedIndex];
+    const taxRate = parseFloat(selectedTaxOption?.dataset.rate || 0);
+    const taxType = selectedTaxOption?.dataset.type || 'none';
 
     if (discountType === "percentage") {
         orderDiscount = (subtotal * discountValue) / 100;
@@ -36,8 +39,13 @@ export function calculateTotals() {
     }
 
     const taxableAmount = subtotal - orderDiscount;
-    taxAmount = taxableAmount * (taxRate / 100);
-    grandTotal = taxableAmount + taxAmount;
+    if (taxType === "inclusive") {
+        taxAmount = taxableAmount - taxableAmount / (1 + taxRate / 100);
+        grandTotal = taxableAmount;
+    } else {
+        taxAmount = taxableAmount * (taxRate / 100);
+        grandTotal = taxableAmount + taxAmount;
+    }
 
     if (subtotalElement) subtotalElement.innerText = formatCurrency(subtotal);
     if (finalTotalElement) finalTotalElement.innerText = formatCurrency(grandTotal);

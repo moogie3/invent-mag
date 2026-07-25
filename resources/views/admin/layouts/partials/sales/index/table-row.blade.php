@@ -43,6 +43,25 @@
             {!! \App\Helpers\SalesHelper::getStatusText($sale->status, $sale->due_date) !!}
         </span>
     </td>
+    @php
+        $currentTenant = app('currentTenant');
+        $showPpnCol = $currentTenant instanceof \App\Models\Tenant && $currentTenant->isIndonesian() && $currentTenant->hasFeature('ppn');
+    @endphp
+    @if($showPpnCol)
+    <td class="sort-ppn">
+        @if($sale->fakturPajak)
+            <span class="badge bg-{{ $sale->fakturPajak->statusColor() }}">
+                <i class="ti ti-file-invoice"></i> {{ $sale->fakturPajak->statusLabel() }}
+            </span>
+        @elseif($sale->ppn_enabled)
+            <span class="badge bg-warning-lt">
+                <i class="ti ti-alert-triangle"></i> {{ __('messages.efaktur_not_issued') }}
+            </span>
+        @else
+            <span class="text-muted">—</span>
+        @endif
+    </td>
+    @endif
     <td class="no-print" style="text-align:center">
         @include('admin.layouts.partials.sales.index.table-actions', ['sale' => $sale])
     </td>

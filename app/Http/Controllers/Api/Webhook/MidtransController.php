@@ -5,7 +5,7 @@ namespace App\Http\Controllers\Api\Webhook;
 use App\Http\Controllers\Controller;
 use App\Mail\SubscriptionInvoiceMail;
 use App\Models\SubscriptionOrder;
-use App\Services\PlanService;
+use App\Services\BillingService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
@@ -15,11 +15,11 @@ require_once base_path('vendor/midtrans/midtrans-php/Midtrans.php');
 
 class MidtransController extends Controller
 {
-    protected PlanService $planService;
+    protected BillingService $billingService;
 
-    public function __construct(PlanService $planService)
+    public function __construct(BillingService $billingService)
     {
-        $this->planService = $planService;
+        $this->billingService = $billingService;
         \Midtrans\Config::$isProduction = config('midtrans.is_production', false);
         \Midtrans\Config::$serverKey = config('midtrans.server_key');
     }
@@ -64,81 +64,27 @@ class MidtransController extends Controller
         }
 
         if ($transactionStatus == 'capture' || $transactionStatus == 'settlement') {
-            // Check if this is a new payment (not already processed by PaymentController)
+            $tenant = $order->tenant;
+            $tenant->makeCurrent();
+
             $order->update([
                 'status' => 'paid',
                 'paid_at' => now(),
-                'payment_info' => $payload
+                'payment_info' => $payload,
             ]);
 
-            // Upgrade the tenant's plan (only if not already done via frontend)
-            $tenant = $order->tenant;
-            $newPlan = $order->plan;
-            
-            // Explicitly set tenant context for database operations
-            $tenant->makeCurrent();
+            $this->billingService->confirmPayment($order, $payload);
 
-            $currentPlan = $tenant->getCurrentPlan();
-            $billingService = app(\App\Services\BillingService::class);
-            
-            // If no current plan, treat as a fresh upgrade
-            if ($currentPlan === null) {
-                $changeType = 'upgrade';
-            } else {
-                $changeType = $order->change_type ?? $billingService->getPlanChangeType($currentPlan, $newPlan);
-            }
-
-            if (!$tenant->billing_period_start) {
-                $period = $billingService->getCurrentBillingPeriod();
-                $tenant->billing_period_start = $period['start'];
-                $tenant->billing_period_end = $period['end'];
-            }
-
-            if ($changeType === 'upgrade') {
-                $tenant->plan_id = $newPlan->id;
-                $tenant->plan_status = 'active';
-                $tenant->trial_ends_at = null;
-                $tenant->plan_changed_at = now();
-                $tenant->save();
-                Log::info("Order {$orderId} marked as paid. Tenant {$tenant->name} upgraded to {$newPlan->name}.");
-            } elseif ($changeType === 'same') {
-                $tenant->plan_status = 'active';
-                $tenant->trial_ends_at = null;
-                $tenant->plan_changed_at = now();
-                
-                if ($tenant->billing_period_end && \Carbon\Carbon::parse($tenant->billing_period_end)->isFuture()) {
-                    $tenant->billing_period_end = \Carbon\Carbon::parse($tenant->billing_period_end)->addDays(30);
-                } else {
-                    $period = $billingService->getCurrentBillingPeriod();
-                    $tenant->billing_period_start = $period['start'];
-                    $tenant->billing_period_end = $period['end'];
-                }
-                
-                $tenant->save();
-                Log::info("Order {$orderId} marked as paid. Tenant {$tenant->name} renewed {$newPlan->name}.");
-            } else {
-                $nextPeriod = $billingService->getNextBillingPeriod();
-                $daysRemaining = $billingService->getDaysRemainingInPeriod($tenant);
-                $creditAmount = $billingService->calculateDowngradeCredit($currentPlan, $newPlan, $daysRemaining);
-                
-                $tenant->pending_plan_id = $newPlan->id;
-                $tenant->pending_plan_effective_at = $nextPeriod['start'] . ' 00:00:00';
-                $tenant->proration_credit = $creditAmount;
-                $tenant->trial_ends_at = null;
-                $tenant->save();
-                Log::info("Order {$orderId} marked as paid. Tenant {$tenant->name} scheduled downgrade to {$newPlan->name}.");
-            }
-
-            // Send invoice email to the first user (usually the owner/admin)
+            // Send invoice email
             $order->refresh();
-            $recipientEmail = \App\Models\User::first()?->email;
+            $recipientEmail = $tenant->users()->first()?->email;
             if ($recipientEmail) {
                 Mail::to($recipientEmail)->send(new SubscriptionInvoiceMail($order));
                 Log::info("Invoice email sent to {$recipientEmail} for order {$orderId}.");
             }
 
             \Spatie\Multitenancy\Models\Tenant::forgetCurrent();
-            
+
         } elseif ($transactionStatus == 'cancel' || $transactionStatus == 'deny' || $transactionStatus == 'expire') {
             $order->update([
                 'status' => 'failed',

@@ -1,10 +1,7 @@
 <tr class="product-row" data-product-id="{{ $item->product_id }}" data-row-id="{{ $item->id ?? $index }}">
     <td class="text-center">{{ $index + 1 }}</td>
     <td>
-        <div class="strong">{{ $item->product_name ?? $item->product?->name ?? __('messages.not_available') }}</div>
-        @if($item->product?->sku)
-            <small class="text-muted">{{ __('messages.sku_colon') }} {{ $item->product->sku }}</small>
-        @endif
+        <div class="strong">{{ $item->product_name ?? $item->name ?? __('messages.not_available') }}</div>
     </td>
     <td>
         <input type="number" name="items[{{ $item->id ?? $index }}][quantity]" value="{{ $item->quantity }}"

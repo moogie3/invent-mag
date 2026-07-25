@@ -164,9 +164,9 @@ class PurchaseSeeder extends Seeder
             $paidAmount = 0;
 
             // Add payment logic
-            if ($totalPurchaseAmount > 0) { // Ensure there's an amount to pay
+            if ($grandTotal > 0) {
                 if ($status === 'Paid') {
-                    $paidAmount = $totalPurchaseAmount;
+                    $paidAmount = $grandTotal;
                     $purchase->payments()->create([
                         'amount' => $paidAmount,
                         'payment_date' => $orderDate->copy()->addDays(rand(0, 5)),
@@ -175,7 +175,7 @@ class PurchaseSeeder extends Seeder
                         'tenant_id' => $tenantId,
                     ]);
                 } elseif ($status === 'Partial') {
-                    $paidAmount = rand(1, (int)($totalPurchaseAmount * 0.8)); // Pay between 1 and 80%
+                    $paidAmount = rand(1, (int)($grandTotal * 0.8)); // Pay between 1 and 80%
                     $purchase->payments()->create([
                         'amount' => $paidAmount,
                         'payment_date' => $orderDate->copy()->addDays(rand(0, 5)),

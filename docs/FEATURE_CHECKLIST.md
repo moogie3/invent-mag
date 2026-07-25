@@ -1,8 +1,8 @@
 # Invent-MAG: Complete Feature Checklist
 
 **Last Updated:** July 2026  
-**Version:** 2.0  
-**System Version:** 1.9
+**Version:** 2.2  
+**System Version:** 2.1
 
 ---
 
@@ -118,6 +118,7 @@
 - [x] Payment tracking
 - [x] Invoice generation (PDF)
 - [x] Sales returns processing (with configurable accounting entries)
+- [x] **Sales return bulk operations with full side effects** — bulk complete creates journal entries + issues credits; bulk cancel reverses stock + journal entries
 - [x] **Sales return tax breakdown** — return show page displays tax rate and type label in the summary
 - [x] Refund handling
 - [x] **Consistent payment status labels** - Paid, Partially Paid, Unpaid (with sub-states: Pending, Due Today, Due in X Days, Overdue), Returned
@@ -145,12 +146,16 @@
 - [x] **Consistent payment status labels** - Paid, Partially Paid, Pending (with sub-states: Due Today, Due in X Days, Overdue), Returned
 - [x] **Autofill info label on create** - past price & due date based on supplier; supplier price based on supplier
 - [x] Purchase returns processing (with stock adjustment and accounting entries)
+- [x] **Purchase return bulk operations with full side effects** — bulk complete updates status; bulk cancel reverses stock + journal entries via cancelPurchaseReturn()
+- [x] **Purchase return journal entry correctness** — uses Purchase Returns account (5120) credit instead of self-cancelling AP entry
 - [x] Supplier database (CRUD)
 - [x] Supplier interaction tracking
 - [x] Purchase history per supplier
 - [x] Supplier analytics
 - [x] Product expiry tracking (PO items)
 - [x] Bulk operations (delete, mark paid, export)
+- [x] Purchase Order create page does not show tax (Accurate Online approach)
+- [x] PO, Sales Returns, and Quotation index pages display tax column
 
 ---
 
@@ -165,6 +170,8 @@
 - [x] Receipt generation
 - [x] Receipt printing
 - [x] Quick product search
+- [x] **POS accounting journal entries** — Dr AR/Cr Revenue, Dr COGS/Cr Inventory, Dr Cash/Cr AR automatically posted on POS sale
+- [x] POS uses Tax model dropdown instead of manual tax rate input
 
 ---
 
@@ -201,6 +208,7 @@
 - [x] Quotation auto-numbering (QTN-YYYYMMDD-XXXX)
 - [x] Plan-gated feature (available on Professional & Enterprise)
 - [x] 4 granular permissions (view/create/edit/delete)
+- [x] Quotation uses Tax model dropdown instead of manual tax_type/tax_rate inputs
 
 ---
 
@@ -404,7 +412,7 @@
 - [x] Tenant listing with plan info and status
 - [x] Tenant detail view with domain editing
 - [x] Toggle tenant active/inactive status
-- [x] Tenant impersonation (planned)
+- [x] **Tenant impersonation** — encrypted token cross-domain handoff via `CaptureImpersonation` middleware; super admin redirected to `{tenant.domain}/admin/dashboard?impersonation_token=...`; yellow banner with "Stop Impersonating" shown on tenant side
 
 #### Plan Management
 - [x] Full plan CRUD (slug, name, price, description, limits, trial days)
@@ -442,6 +450,43 @@
 - [x] 28 Blade views in `resources/views/superadmin/`
 - [x] Dedicated tutorial system (`config/superadmin-tutorial.php` — 258 lines)
 - [x] Sidebar navigation with grouped sections (Management, Payments, System, Configuration)
+
+---
+
+### 🧾 e-Faktur PPN (Professional+ — feature slug: `ppn`)
+
+- [x] **Phase 1 — COMPLETE** (July 2026)
+- [x] DB migrations: `faktur_pajak`, `faktur_pajak_items`, `nsfp_pool` tables
+- [x] DB migrations: `ppn`/`npwp`/`pkp_*` fields on `tenants`, `customers`, `sales`
+- [x] `ppn` feature slug added to Professional & Enterprise plans
+- [x] `FakturPajak` model with `BelongsToTenant`, full relationships, helpers
+- [x] `FakturPajakItem` model with `BelongsToTenant`
+- [x] `NsfpPool` model with `BelongsToTenant` + `scopeAvailable()`
+- [x] `Sales::fakturPajak()` HasOne relationship
+- [x] `EFakturService` — generate, cancel, NSFP import, DJP CSV export, SPT Masa summary
+- [x] Atomic NSFP allocation with `lockForUpdate()` (race condition safe)
+- [x] PPN Keluaran journal entry via `AccountingService` on faktur generation
+- [x] `EFakturController` — index, show, generate, cancel, print (Dompdf PDF), exportCsv, settings, saveSettings, importNsfp
+- [x] Routes in `routes/admin/efaktur.php` under `plan.feature:ppn` middleware
+- [x] Blade views: `efaktur/index.blade.php`, `show.blade.php`, `settings.blade.php`, `faktur-pdf.blade.php`
+- [x] DJP-compliant A4 PDF layout (NSFP, penjual/pembeli, BKP items, DPP/PPN totals, signature block)
+- [x] DJP CSV export: FK header + OF item rows, UTF-8 BOM, amounts in cents
+- [x] PPN determined by tax dropdown selection (`Tax.is_ppn`) + PPN line on sales view/amount-summary
+- [x] "Buat Faktur Pajak" / "Lihat Faktur Pajak" button on sales view page
+- [x] e-Faktur nav menu entry (Professional+ only)
+- [x] Tax Region configurable from Settings page (no e-Faktur access required)
+- [x] Navigation jurisdiction filtering — e-Faktur menu hidden for non-Indonesian tenants
+- [ ] **Phase 2 — PLANNED:** Klikpajak PJAP API direct DJP submission (Enterprise only)
+
+---
+
+### 🔑 Tenant Impersonation (Super Admin)
+
+- [x] "Impersonate Tenant" button on superadmin tenant detail page
+- [x] `TenantController::impersonate()` — encrypts payload, redirects to `{tenant.domain}/admin/dashboard?impersonation_token=...`
+- [x] `CaptureImpersonation` middleware — decrypts token, logs in tenant user, sets impersonation session, strips token from URL
+- [x] Yellow impersonation banner on tenant admin panel with "Stop Impersonating" button
+- [x] `stopImpersonating()` — clears session, logs out, redirects to superadmin return URL
 
 ---
 
@@ -568,8 +613,8 @@
 
 ### Medium Priority
 
-- [ ] Indonesian tax compliance (PPN 11%/12%)
-- [ ] e-Faktur CSV export
+- [x] **Indonesian tax compliance (PPN 11%)** — Phase 1 complete (see e-Faktur section below)
+- [x] **e-Faktur CSV export** — DJP FK/OF format with UTF-8 BOM, amounts in cents
 - [ ] SPT report templates
 - [ ] Bank integrations (BCA, BNI, Mandiri)
 
@@ -586,18 +631,18 @@
 
 | Metric               | Value     |
 | -------------------- | --------- |
-| **Total Features**   | 200+      |
-| **Controllers**      | 30        |
-| **Services**         | 34        |
-| **Models**           | 35        |
+| **Total Features**   | 220+      |
+| **Controllers**      | 32        |
+| **Services**         | 35        |
+| **Models**           | 38        |
 | **Helpers**          | 8         |
 | **Test Files**       | 791       |
 | **API Endpoints**    | 50+       |
-| **Database Tables**  | 38        |
-| **Migrations**       | 44        |
+| **Database Tables**  | 43        |
+| **Migrations**       | 49        |
 | **Seeders**          | 26        |
 | **Permissions**      | 79        |
-| **Routes**           | 200+      |
+| **Routes**           | 220+      |
 | **JavaScript Files** | 161       |
 | **Languages**        | 2 (EN/ID) |
 | **Development Time** | 1.5 years |
@@ -618,5 +663,5 @@
 
 ---
 
-**Document Version:** 2.0  
+**Document Version:** 2.2  
 **Last Updated:** July 2026

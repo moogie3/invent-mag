@@ -538,6 +538,25 @@ return [
             'desc'  => 'tutorial.notifications_desc',
             'steps' => ['tutorial.po_sales_notif', 'tutorial.low_stock_notif', 'tutorial.expiring_notif', 'tutorial.system_notif', 'tutorial.clear_all_notif', 'tutorial.clear_individual'],
         ],
+        // e-Faktur PPN
+        'admin.efaktur.settings' => [
+            'title' => 'tutorial.efaktur_settings_title',
+            'icon'  => 'ti-settings',
+            'desc'  => 'tutorial.efaktur_settings_desc',
+            'steps' => ['tutorial.efaktur_tax_jurisdiction', 'tutorial.efaktur_pkp_data', 'tutorial.efaktur_npwp', 'tutorial.efaktur_pkp_toggle', 'tutorial.efaktur_ppn_rate', 'tutorial.efaktur_nsfp_pool', 'tutorial.efaktur_nsfp_import', 'tutorial.efaktur_klikpajak'],
+        ],
+        'admin.efaktur.show' => [
+            'title' => 'tutorial.efaktur_detail_title',
+            'icon'  => 'ti-eye',
+            'desc'  => 'tutorial.efaktur_detail_desc',
+            'steps' => ['tutorial.efaktur_faktur_info', 'tutorial.efaktur_seller_buyer', 'tutorial.efaktur_tax_summary', 'tutorial.efaktur_djp_tracking', 'tutorial.efaktur_items_table', 'tutorial.efaktur_print_cancel'],
+        ],
+        'admin.efaktur*' => [
+            'title' => 'tutorial.efaktur_index_title',
+            'icon'  => 'ti-file-invoice',
+            'desc'  => 'tutorial.efaktur_index_desc',
+            'steps' => ['tutorial.efaktur_period_filter', 'tutorial.efaktur_summary_cards', 'tutorial.efaktur_faktur_table', 'tutorial.efaktur_actions', 'tutorial.efaktur_pkp_warning', 'tutorial.efaktur_csv_export'],
+        ],
         // Default catch-all
         '*' => [
             'title' => 'tutorial.help_tutorial',

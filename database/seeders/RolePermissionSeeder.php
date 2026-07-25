@@ -45,6 +45,11 @@ class RolePermissionSeeder extends Seeder
             'manage-employees',
             'manage-attendance',
             'manage-payroll',
+
+            // e-Faktur PPN
+            'view-efaktur',
+            'create-efaktur',
+            'manage-efaktur-settings',
         ]);
 
         // Create POS Role and assign permissions

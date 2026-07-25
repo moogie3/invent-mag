@@ -1,9 +1,13 @@
 <tbody id="invoiceTableBody" class="table-tbody">
+    @php
+        $currentTenant = app('currentTenant');
+        $ppnColCount = ($currentTenant instanceof \App\Models\Tenant && $currentTenant->isIndonesian() && $currentTenant->hasFeature('ppn')) ? 1 : 0;
+    @endphp
     @forelse ($sales as $index => $sale)
         @include('admin.layouts.partials.sales.index.table-row', ['sale' => $sale, 'index' => $index])
     @empty
         <tr>
-            <td colspan="12">
+            <td colspan="{{ 12 + $ppnColCount }}">
                 <div class="empty">
                     <div class="empty-img">
                         <i class="ti ti-mood-sad" style="font-size: 5rem; color: #ccc;"></i>

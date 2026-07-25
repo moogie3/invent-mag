@@ -157,6 +157,7 @@ class AccountSeeder extends Seeder
             'inventory_account_id'           => Account::where('tenant_id', $tenantId)->where('code', '1140-' . $codePrefix)->value('id'),
             'accounts_payable_account_id'    => Account::where('tenant_id', $tenantId)->where('code', '2110-' . $codePrefix)->value('id'),
             'cash_account_id'                => Account::where('tenant_id', $tenantId)->where('code', '1110-' . $codePrefix)->value('id'),
+            'ppn_keluaran_account_id'        => Account::where('tenant_id', $tenantId)->where('code', '2130-' . $codePrefix)->value('id'),
         ];
 
         $tenant->accounting_settings = $accountSettings;

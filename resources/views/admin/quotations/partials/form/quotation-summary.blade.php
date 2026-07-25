@@ -43,15 +43,17 @@
                 <div class="d-flex justify-content-between mb-3 pb-2 border-bottom border-primary border-opacity-25">
                     <span class="text-muted">
                         {{ __('messages.quotation_tax') }}
-                        <select name="tax_type" class="form-select d-inline-block ms-1" style="width: auto; min-width: 100px;" id="taxType">
-                            <option value="none" {{ (old('tax_type', $quotation->tax_type ?? 'none')) == 'none' ? 'selected' : '' }}>{{ __('messages.none') }}</option>
-                            <option value="exclusive" {{ (old('tax_type', $quotation->tax_type ?? '')) == 'exclusive' ? 'selected' : '' }}>{{ __('messages.exclusive') }}</option>
-                            <option value="inclusive" {{ (old('tax_type', $quotation->tax_type ?? '')) == 'inclusive' ? 'selected' : '' }}>{{ __('messages.inclusive') }}</option>
-                        </select>
                     </span>
                     <span class="d-flex align-items-center gap-2">
-                        <input type="number" name="tax_rate" class="form-control text-end" step="1" min="0" max="100"
-                            value="{{ old('tax_rate', $quotation->tax_rate ?? 0) }}" id="taxRate" placeholder="%" style="width: 80px;">
+                        <select name="tax_id" class="form-select" id="taxSelector" style="width: auto; min-width: 160px;">
+                            <option value="">{{ __('messages.none') }} (0%)</option>
+                            @foreach($taxes as $tax)
+                                <option value="{{ $tax->id }}" data-rate="{{ $tax->rate }}" data-type="{{ $tax->type }}"
+                                    {{ ($quotation->tax_id ?? '') == $tax->id ? 'selected' : ($tax->is_default ? 'selected' : '') }}>
+                                    {{ $tax->name }} ({{ $tax->rate }}%)
+                                </option>
+                            @endforeach
+                        </select>
                         <span class="text-muted fw-semibold" id="displayTax">0</span>
                     </span>
                 </div>

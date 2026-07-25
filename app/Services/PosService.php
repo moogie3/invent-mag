@@ -9,6 +9,7 @@ use App\Models\Tax;
 use App\Helpers\SalesHelper;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Carbon\Carbon;
 
 use App\Models\Categories;
 use App\Models\Customer;
@@ -16,9 +17,18 @@ use App\Models\Supplier;
 use App\Models\Unit;
 use App\Models\Warehouse;
 use App\Models\ProductWarehouse;
+use App\Models\Account;
+use App\Services\AccountingService;
 
 class PosService
 {
+    protected AccountingService $accountingService;
+
+    public function __construct(AccountingService $accountingService)
+    {
+        $this->accountingService = $accountingService;
+    }
+
     public function getPosIndexData()
     {
         $products = Product::with(['unit', 'productWarehouses'])->get();
@@ -114,16 +124,28 @@ class PosService
         $orderDiscountType = $data['discount_total_type'] ?? 'fixed';
         $orderDiscountAmount = SalesHelper::calculateDiscount($totalBeforeDiscounts, $orderDiscount, $orderDiscountType);
 
-        // POS uses the default tax (no selector needed for quick-serve UX)
+        // POS uses the tax selection from the frontend dropdown.  Fall back to the
+        // default active tax when the client omits the selection.
         $defaultTax = Tax::default()->first() ?? Tax::active()->first();
-        $taxId = $defaultTax?->id;
-        $taxType = $defaultTax?->type ?? 'none';
-        $taxRateVal = $defaultTax?->rate ?? 0;
+        $taxId = $data['tax_id'] ?? $defaultTax?->id;
+        $tax = $taxId ? Tax::find($taxId) : $defaultTax;
+        $taxType = $tax?->type ?? 'none';
+        $taxRateVal = $tax?->rate ?? 0;
 
         $taxable = $subTotal - $orderDiscountAmount;
         $taxAmount = SalesHelper::calculateTaxAmount($taxable, $taxRateVal, $taxType);
         // For inclusive tax the price already contains tax; do NOT add taxAmount again.
         $grandTotal = ($taxType === 'inclusive') ? $taxable : ($taxable + $taxAmount);
+
+        // Validate cash payment covers the total
+        $paymentMethod = $data['payment_method'] ?? 'Cash';
+        $amountReceived = (float) ($data['amount_received'] ?? $grandTotal);
+        if (strtoupper($paymentMethod) === 'CASH' && $amountReceived < $grandTotal) {
+            throw new \Exception(
+                'Amount received (' . number_format($amountReceived, 2, '.', '') . ') ' .
+                'must be greater than or equal to the grand total (' . number_format($grandTotal, 2, '.', '') . ').'
+            );
+        }
 
         $lastPosInvoice = Sales::where('invoice', 'like', 'POS-%')
                             ->latest()
@@ -175,7 +197,8 @@ class PosService
             throw new \Exception('Insufficient stock for: ' . $productList . '. Please adjust quantities or restock.');
         }
 
-        return DB::transaction(function () use ($data, $products, $dbProducts, $grandTotal, $orderDiscount, $orderDiscountType, $taxAmount, $taxRateVal, $taxId, $taxType, $subTotal, $mainWarehouse, $invoice) {
+        return DB::transaction(function () use ($data, $products, $dbProducts, $grandTotal, $orderDiscount, $orderDiscountType, $taxAmount, $taxRateVal, $taxId, $taxType, $subTotal, $mainWarehouse, $invoice, $amountReceived) {
+            $changeAmount = max(0, $amountReceived - $grandTotal);
             $sale = Sales::create([
                 'invoice' => $invoice,
                 'customer_id' => $data['customer_id'],
@@ -192,8 +215,8 @@ class PosService
                 'order_discount_type' => $orderDiscountType,
                 'status' => 'Paid',
                 'payment_type' => $data['payment_method'],
-                'amount_received' => $data['amount_received'] ?? $grandTotal,
-                'change_amount' => $data['change_amount'] ?? 0,
+                'amount_received' => $amountReceived,
+                'change_amount' => $changeAmount,
                 'type' => Sales::TYPE_POS,
             ]);
 
@@ -229,6 +252,52 @@ class PosService
 
                 if (isset($stockRecords[$product['id']])) {
                     $stockRecords[$product['id']]->decrement('quantity', $product['quantity']);
+                }
+            }
+
+            $totalCostOfGoods = 0;
+            foreach ($dbProducts as $productModel) {
+                $totalCostOfGoods += ($productModel->cost_price ?? 0) * ($products[array_search($productModel->id, array_column($products, 'id'))]['quantity'] ?? 0);
+            }
+
+            $accountingSettings = app('currentTenant')->accounting_settings ?? [];
+            if (!empty($accountingSettings) && isset($accountingSettings['sales_revenue_account_id'], $accountingSettings['accounts_receivable_account_id'], $accountingSettings['cost_of_goods_sold_account_id'], $accountingSettings['inventory_account_id'])) {
+                $salesRevenueAccount = Account::find($accountingSettings['sales_revenue_account_id']);
+                $accountsReceivableAccount = Account::find($accountingSettings['accounts_receivable_account_id']);
+                $costOfGoodsSoldAccount = Account::find($accountingSettings['cost_of_goods_sold_account_id']);
+                $inventoryAccount = Account::find($accountingSettings['inventory_account_id']);
+
+                if ($salesRevenueAccount && $accountsReceivableAccount && $costOfGoodsSoldAccount && $inventoryAccount) {
+                    $transactions = [
+                        ['account_name' => $accountsReceivableAccount->name, 'type' => 'debit', 'amount' => $grandTotal],
+                        ['account_name' => $salesRevenueAccount->name, 'type' => 'credit', 'amount' => $grandTotal],
+                        ['account_name' => $costOfGoodsSoldAccount->name, 'type' => 'debit', 'amount' => $totalCostOfGoods],
+                        ['account_name' => $inventoryAccount->name, 'type' => 'credit', 'amount' => $totalCostOfGoods],
+                    ];
+
+                    $this->accountingService->createJournalEntry(
+                        "POS Sale Invoice #{$sale->invoice}",
+                        Carbon::parse($data['transaction_date']),
+                        $transactions,
+                        $sale
+                    );
+
+                    if (isset($accountingSettings['cash_account_id'], $accountingSettings['accounts_receivable_account_id'])) {
+                        $cashAccount = Account::find($accountingSettings['cash_account_id']);
+                        if ($cashAccount && $accountsReceivableAccount) {
+                            $paymentTransactions = [
+                                ['account_name' => $cashAccount->name, 'type' => 'debit', 'amount' => $grandTotal],
+                                ['account_name' => $accountsReceivableAccount->name, 'type' => 'credit', 'amount' => $grandTotal],
+                            ];
+
+                            $this->accountingService->createJournalEntry(
+                                "POS Payment for Invoice #{$sale->invoice}",
+                                Carbon::parse($data['transaction_date']),
+                                $paymentTransactions,
+                                $sale
+                            );
+                        }
+                    }
                 }
             }
 
@@ -274,7 +343,7 @@ class PosService
         $taxAmount = SalesHelper::calculateTaxAmount($taxableAmount, $taxRate, $taxType);
         $grandTotal = $taxType === 'inclusive' ? $taxableAmount : $taxableAmount + $taxAmount;
         $amountReceived = $sale->amount_received ?? $grandTotal;
-        $change = $amountReceived - $grandTotal;
+        $change = max(0, $amountReceived - $grandTotal);
 
         return [
             'sale' => $sale,

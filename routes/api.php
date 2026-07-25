@@ -1,6 +1,7 @@
 <?php
 use App\Http\Controllers\Api\Auth\AuthController;
 use App\Http\Controllers\Api\Auth\RegisteredUserController;
+use App\Http\Controllers\Api\CmsController;
 use App\Http\Controllers\Api\TenantLookupController;
 use App\Models\Plan;
 use App\Services\PlanService;
@@ -19,6 +20,9 @@ use App\Http\Controllers\Api\PaymentController;
 | authentication. All other functionality uses the web admin panel.
 |
 */
+
+// CMS content (public, no auth required)
+Route::get('/cms', [CmsController::class, 'show'])->name('api.cms.show');
 
 // Webhooks (Must be outside of CSRF and auth middleware)
 Route::post('/webhooks/midtrans', [MidtransController::class, 'handle'])->name('api.webhooks.midtrans');

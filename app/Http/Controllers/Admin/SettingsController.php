@@ -15,7 +15,8 @@ class SettingsController extends Controller
 {
     public function index()
     {
-        return view('admin.settings.settings');
+        $tenant = app('currentTenant');
+        return view('admin.settings.settings', ['tenant' => $tenant]);
     }
 
     public function update(Request $request)
@@ -132,6 +133,47 @@ class SettingsController extends Controller
         $settings = array_merge($defaults, $settings);
 
         return response()->json($settings);
+    }
+
+    public function updateTaxJurisdiction(Request $request)
+    {
+        $tenant = app('currentTenant');
+
+        $validated = $request->validate([
+            'tax_jurisdiction' => 'nullable|string|max:10',
+        ]);
+
+        $jurisdiction = $validated['tax_jurisdiction'] ?: null;
+
+        // Block switching away from ID if draft FakturPajak or unissued PPN sales exist
+        if ($tenant->tax_jurisdiction === 'ID' && $jurisdiction !== 'ID') {
+            $hasDraftFaktur = \App\Models\FakturPajak::where('tenant_id', $tenant->id)
+                ->where('status', 'draft')
+                ->exists();
+            $hasUnissuedPpn = \App\Models\Sales::where('tenant_id', $tenant->id)
+                ->where('ppn_enabled', true)
+                ->where('ppn_amount', '>', 0)
+                ->where('faktur_pajak_id', null)
+                ->exists();
+
+            if ($hasDraftFaktur || $hasUnissuedPpn) {
+                return response()->json([
+                    'success' => false,
+                    'message' => __('messages.efaktur_cannot_disable_with_drafts'),
+                ], 422);
+            }
+        }
+
+        $tenant->update(['tax_jurisdiction' => $jurisdiction]);
+
+        if ($request->ajax()) {
+            return response()->json([
+                'success' => true,
+                'message' => __('messages.tax_jurisdiction_saved'),
+            ]);
+        }
+
+        return redirect()->route('admin.setting.index')->with('success', __('messages.tax_jurisdiction_saved'));
     }
 
     public function updateThemeMode(Request $request)

@@ -5,7 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Mail\SubscriptionInvoiceMail;
 use App\Models\SubscriptionOrder;
-use App\Services\PlanService;
+use App\Services\BillingService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
@@ -15,11 +15,11 @@ require_once base_path('vendor/midtrans/midtrans-php/Midtrans.php');
 
 class PaymentController extends Controller
 {
-    protected PlanService $planService;
+    protected BillingService $billingService;
 
-    public function __construct(PlanService $planService)
+    public function __construct(BillingService $billingService)
     {
-        $this->planService = $planService;
+        $this->billingService = $billingService;
         \Midtrans\Config::$isProduction = config('midtrans.is_production', false);
         \Midtrans\Config::$serverKey = config('midtrans.server_key');
     }
@@ -40,10 +40,8 @@ class PaymentController extends Controller
         $orderId = $request->input('order_id');
         $transactionResult = $request->input('transaction_result');
 
-        // Get current tenant
         $currentTenant = app('currentTenant');
         
-        // Find order and verify it belongs to current tenant
         $order = SubscriptionOrder::where('order_number', $orderId)
             ->where('tenant_id', $currentTenant->id)
             ->first();
@@ -53,22 +51,33 @@ class PaymentController extends Controller
             return response()->json(['message' => 'Order not found'], 404);
         }
 
-        // Check if already processed
         if ($order->status === 'paid') {
             return response()->json(['message' => 'Order already processed', 'plan' => $order->plan->name]);
         }
 
-        // Verify the transaction status with Midtrans API
         try {
             $status = \Midtrans\Transaction::status($orderId);
             
-            // Only process if payment is successful
             if ($status->transaction_status === 'settlement' || $status->transaction_status === 'capture') {
-                $this->processSuccessfulPayment($order, (array) $status);
-                
+                $order->update([
+                    'status' => 'paid',
+                    'paid_at' => now(),
+                    'payment_info' => (array) $status,
+                ]);
+
+                $tenant = $order->tenant;
+                $result = $this->billingService->confirmPayment($order, (array) $status);
+
+                // Send invoice email
+                $order->refresh();
+                $recipientEmail = $tenant->users()->first()?->email;
+                if ($recipientEmail) {
+                    Mail::to($recipientEmail)->send(new SubscriptionInvoiceMail($order));
+                }
+
                 return response()->json([
-                    'message' => 'Payment confirmed successfully',
-                    'plan' => $order->plan->name
+                    'message' => $result['message'],
+                    'plan' => $result['plan'],
                 ]);
             } else {
                 return response()->json([
@@ -81,44 +90,5 @@ class PaymentController extends Controller
             
             return response()->json(['message' => 'Payment verification failed. Please try again later.'], 500);
         }
-    }
-
-    /**
-     * Process successful payment - shared logic to avoid duplication.
-     */
-    private function processSuccessfulPayment(SubscriptionOrder $order, array $paymentInfo): void
-    {
-        // Double-check status to prevent race conditions
-        if ($order->status === 'paid') {
-            return;
-        }
-
-        $order->update([
-            'status' => 'paid',
-            'paid_at' => now(),
-            'payment_info' => $paymentInfo
-        ]);
-
-        // Upgrade the tenant's plan
-        $tenant = $order->tenant;
-        $plan = $order->plan;
-        
-        Log::info("Processing payment for order {$order->order_number}. Current plan_id: {$tenant->plan_id}, New plan_id: {$plan->id}");
-        
-        // False for trial because they actually paid
-        $this->planService->assignPlanToTenant($tenant, $plan->slug, false);
-
-        // Refresh tenant to verify plan was changed
-        $tenant->refresh();
-        Log::info("After payment, tenant {$tenant->name} now has plan_id: {$tenant->plan_id}, plan_name: {$tenant->plan?->name}");
-
-        // Send invoice email
-        $order->refresh();
-        $recipientEmail = $tenant->users()->first()?->email;
-        if ($recipientEmail) {
-            Mail::to($recipientEmail)->send(new SubscriptionInvoiceMail($order));
-        }
-
-        Log::info("Payment confirmed for order {$order->order_number}. Tenant {$tenant->name} upgraded to {$plan->name}.");
     }
 }

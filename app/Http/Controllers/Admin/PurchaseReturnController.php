@@ -33,8 +33,7 @@ class PurchaseReturnController extends Controller
 
     public function create()
     {
-        // Get purchases that do NOT have any associated purchase returns
-        $purchases = Purchase::whereDoesntHave('purchaseReturns')->get();
+        $purchases = Purchase::whereHas('items')->get();
         return view('admin.por.create', compact('purchases'));
     }
 
@@ -119,8 +118,8 @@ class PurchaseReturnController extends Controller
     {
         $ids = $request->input('ids');
         $purchaseReturns = PurchaseReturn::whereIn('id', $ids)->get();
-        PurchaseReturn::whereIn('id', $ids)->update(['status' => 'Completed']);
         foreach ($purchaseReturns as $pr) {
+            $pr->update(['status' => 'Completed']);
             app(ActivityLogService::class)->logUpdate(
                 ActivityLog::MODULE_PURCHASE_RETURN,
                 "Bulk marked purchase return #{$pr->id} as Completed",
@@ -134,8 +133,8 @@ class PurchaseReturnController extends Controller
     {
         $ids = $request->input('ids');
         $purchaseReturns = PurchaseReturn::whereIn('id', $ids)->get();
-        PurchaseReturn::whereIn('id', $ids)->update(['status' => 'Canceled']);
         foreach ($purchaseReturns as $pr) {
+            $this->purchaseReturnService->cancelPurchaseReturn($pr);
             app(ActivityLogService::class)->logUpdate(
                 ActivityLog::MODULE_PURCHASE_RETURN,
                 "Bulk canceled purchase return #{$pr->id}",

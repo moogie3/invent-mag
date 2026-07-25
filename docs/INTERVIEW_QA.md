@@ -617,7 +617,7 @@ outstanding = sales.total - SUM(payments.amount) - sales.customer_credit_used
 
 **Payment status is not stored** as a permanent column — it is **computed dynamically** based on `total`, payments, and credit used. This prevents inconsistency between the stored status and actual payment data.
 
-**POS special case:** POS sales (`type = 'pos'`) are always marked as **Paid** at creation time. The POS flow does not support partial payment — the customer must pay in full before completing the transaction. Note: the underlying column is now a `type` string (`'regular'` or `'pos'`); the old boolean `is_pos` column was dropped in migration `2026_05_18_075029`. A backward-compat accessor `getIsPosAttribute()` exists so legacy view code using `$sale->is_pos` still works.
+**POS special case:** POS sales (`type = 'pos'`) are always marked as **Paid** at creation time. The POS flow does not support partial payment — the customer must pay in full before completing the transaction. Note: the underlying column is now a `type` string (`'regular'` or `'pos'`); the old boolean `is_pos` column was dropped in migration `2026_05_18_075029`. A backward-compat accessor `getIsPosAttribute()` exists so legacy view code using `$sale->is_pos` still works. **POS sales now create accounting journal entries through AccountingService (July 2026): Dr AR/Cr Revenue, Dr COGS/Cr Inventory, Dr Cash/Cr AR — identical to regular sales.**
 
 ---
 
@@ -681,6 +681,8 @@ CREDIT: Inventory (Asset)             $600     [reduce inventory value]
 
 Note: The COGS amount comes from the actual batch cost calculated during FEFO processing.
 
+**POS sales** (July 2026) use the exact same journal entry pattern as regular sales. PosService injects AccountingService and posts all three entries (AR/Revenue, COGS/Inventory, Cash/AR) at creation time since POS sales are always paid in full.
+
 **On payment received:**
 
 ```
@@ -699,6 +701,20 @@ CREDIT: Cost of Goods Sold (Expense)                 $180   [reverse COGS]
 ```
 
 **The `sourceable` polymorphic link** on `journal_entries` (`sourceable_type = 'App\Models\Sales'`, `sourceable_id = 123`) ensures that every journal entry can be traced back to the business event that created it.
+
+**On purchase return:**
+
+```
+DEBIT:  Accounts Payable (Liability)              $300   [reduce what we owe supplier]
+CREDIT: Purchase Returns & Allowances (contra-COGS) $300   [reduce cost]
+
+DEBIT:  Cost of Goods Sold (Expense)              $180   [reverse COGS]
+CREDIT: Inventory (Asset)                         $180   [restore inventory]
+```
+
+Purchase returns use the Purchase Returns account (code 5120) for the credit side, not the AP account directly (which would create a self-cancelling entry).
+
+**Bulk return operations (July 2026):** Both `bulkCompleteSalesReturns()` and `bulkCancelSalesReturns()` process each return individually through `completeSalesReturn()` / `cancelSalesReturn()`, creating journal entries, adjusting stock, and issuing/reversing credits as needed. Purchase return bulk operations similarly use `cancelPurchaseReturn()` for reversal side effects.
 
 ---
 

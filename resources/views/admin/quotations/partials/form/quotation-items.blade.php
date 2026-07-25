@@ -42,8 +42,8 @@
                 data-lang-percentage="{{ __('messages.percentage') }}"
                 data-lang-fixed="{{ __('messages.fixed') }}"
                 data-lang-delete="{{ __('messages.delete') }}">
-                @if(isset($quotation) && $quotation->items->isNotEmpty())
-                    @foreach($quotation->items as $index => $item)
+                @if(isset($quotation) && !empty($quotation->items))
+                    @foreach(collect($quotation->items)->map(fn($item) => is_array($item) ? (object) $item : $item) as $index => $item)
                         @include('admin.quotations.partials.form.quotation-item-row', ['item' => $item, 'index' => $index])
                     @endforeach
                 @endif

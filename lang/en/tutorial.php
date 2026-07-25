@@ -733,4 +733,36 @@ return [
     'got_it' => 'Got it!',
     'quick_guide' => 'Quick Guide',
     'back_to_categories' => 'Back to Categories',
+
+    // e-Faktur — Index page
+    'efaktur_index_title' => 'e-Faktur',
+    'efaktur_index_desc' => 'Manage and view your Faktur Pajak (tax invoices) for DJP e-Faktur compliance.',
+    'efaktur_period_filter' => 'Period Filter: Select the tax period (month and year) to view Faktur Pajak for that period. Defaults to the current month.',
+    'efaktur_summary_cards' => 'Summary Cards: View the total number of Faktur Pajak, total DPP (tax base), total PPN (output VAT), and available NSFP numbers for the selected period.',
+    'efaktur_faktur_table' => 'Faktur Table: Each row shows a Faktur Pajak with its NSFP number, date, buyer info, DPP, PPN, and status. Click NSFP to view details.',
+    'efaktur_actions' => 'Actions: Use the eye icon to view details and the printer icon to print the Faktur Pajak as a PDF document.',
+    'efaktur_pkp_warning' => 'PKP Warning: If your tenant is not registered as PKP (Taxable Entrepreneur), you will see a warning banner. Configure your PKP status in e-Faktur Settings.',
+    'efaktur_csv_export' => 'CSV Export: Click "Export CSV DJP" to download a CSV file formatted for the DJP e-Faktur desktop application. The file uses the FK/OF row format with UTF-8 BOM.',
+
+    // e-Faktur — Detail page
+    'efaktur_detail_title' => 'Faktur Pajak Detail',
+    'efaktur_detail_desc' => 'View the complete details of a Faktur Pajak including seller/buyer info, tax summary, and line items.',
+    'efaktur_faktur_info' => 'Invoice Information: View the NSFP number, invoice date, tax period, reference invoice, and PPN rate for this Faktur Pajak.',
+    'efaktur_seller_buyer' => 'Seller & Buyer: Both the seller (your company) and buyer information are snapshotted at the time of Faktur Pajak creation and cannot be changed.',
+    'efaktur_tax_summary' => 'Tax Summary: View the DPP (tax base), PPN (output VAT), PPnBM (luxury goods tax if applicable), and total billing amount.',
+    'efaktur_djp_tracking' => 'DJP Status: If the Faktur Pajak has been submitted to DJP, you will see the submission date and DJP reference number here.',
+    'efaktur_items_table' => 'Items Table: Each line item from the original sales invoice is listed with product name, unit price, quantity, discount, DPP, and PPN.',
+    'efaktur_print_cancel' => 'Print & Cancel: Use "Print PDF" to generate a DJP-compliant PDF document. "Cancel" is only available for draft Faktur Pajak and will release the NSFP back to the pool.',
+
+    // e-Faktur — Settings page
+    'efaktur_settings_title' => 'e-Faktur Settings',
+    'efaktur_settings_desc' => 'Configure your tax jurisdiction, PKP data, NPWP, VAT rate, and import NSFP numbers for e-Faktur compliance.',
+    'efaktur_tax_jurisdiction' => 'Tax Jurisdiction: Select your country\'s tax jurisdiction. Choose "Indonesia" to enable PPN and e-Faktur features.',
+    'efaktur_pkp_data' => 'PKP Data: Enter your company NPWP (tax identification number), toggle PKP registration status, set the PKP confirmation date, and configure the VAT rate.',
+    'efaktur_npwp' => 'NPWP: Your company\'s 15-digit tax identification number in the format XX.XXX.XXX.X-XXX.XXX. This is used as the seller NPWP on all Faktur Pajak.',
+    'efaktur_pkp_toggle' => 'PKP Status: Toggle this on if your company is registered as a Pengusaha Kena Pajak (PKP) with DJP. Faktur Pajak generation requires PKP status.',
+    'efaktur_ppn_rate' => 'VAT Rate: The current PPN rate is 11% (effective since April 1, 2022). Update this field if DJP changes the rate in the future.',
+    'efaktur_nsfp_pool' => 'NSFP Pool: NSFP (Nomor Seri Faktur Pajak) numbers are required for each Faktur Pajak. Import them from the DJP portal in bulk.',
+    'efaktur_nsfp_import' => 'NSFP Import: Paste NSFP numbers one per line in the format XXX.XXX-YY.XXXXXXXX. Duplicate numbers are automatically skipped. Import NSFP before generating Faktur Pajak.',
+    'efaktur_klikpajak' => 'Klikpajak API (Coming Soon): Phase 2 will add direct DJP submission via Klikpajak PJAP, eliminating the need to download CSV files or use the desktop application.',
 ];

@@ -89,6 +89,7 @@ class PurchaseController extends Controller
             'products' => 'required|json',
             'discount_total' => 'nullable|numeric',
             'discount_total_type' => 'nullable|in:fixed,percentage',
+            'tax_id' => 'nullable|exists:taxes,id',
         ]);
 
         try {
@@ -115,6 +116,7 @@ class PurchaseController extends Controller
             'products' => 'required|json',
             'discount_total' => 'nullable|numeric',
             'discount_total_type' => 'nullable|in:fixed,percentage',
+            'tax_id' => 'nullable|exists:taxes,id',
         ]);
 
         try {

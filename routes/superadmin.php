@@ -31,6 +31,7 @@ Route::middleware('auth:super_admin')->group(function () {
     Route::get('/tenants', [TenantController::class, 'index'])->name('superadmin.tenants.index');
     Route::get('/tenants/{tenant}', [TenantController::class, 'show'])->name('superadmin.tenants.show');
     Route::post('/tenants/{tenant}/impersonate', [TenantController::class, 'impersonate'])->name('superadmin.tenants.impersonate');
+    Route::post('/tenants/stop-impersonating', [TenantController::class, 'stopImpersonating'])->name('superadmin.stop-impersonating');
     Route::post('/tenants/{tenant}/toggle-active', [TenantController::class, 'toggleActive'])->name('superadmin.tenants.toggle-active');
     Route::put('/tenants/{tenant}/domain', [TenantController::class, 'updateDomain'])->name('superadmin.tenants.update-domain');
 

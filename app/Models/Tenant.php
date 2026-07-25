@@ -282,7 +282,41 @@ class Tenant extends BaseTenant
         }
 
         return in_array($this->plan_status, ['active', 'trialing'])
-            && ! $this->trialExpired();
+            && ! $this->trialExpired()
+            && ! $this->subscriptionExpired();
+    }
+
+    /**
+     * Check if the tenant's paid subscription has expired (billing period passed).
+     * Only applies to active paid subscriptions, not trials.
+     */
+    public function subscriptionExpired(): bool
+    {
+        if (! $this->hasPlan()) {
+            return false;
+        }
+
+        if (! in_array($this->plan_status, ['active'])) {
+            return false;
+        }
+
+        if ($this->onTrial() || $this->trialExpired()) {
+            return false;
+        }
+
+        if ($this->billing_period_end) {
+            return \Carbon\Carbon::parse($this->billing_period_end)->isPast();
+        }
+
+        if ($this->plan_changed_at) {
+            $plan = $this->getCurrentPlan();
+            if ($plan) {
+                $expiryDate = $this->plan_changed_at->copy()->addDays($plan->getBillingPeriodDays());
+                return $expiryDate->isPast();
+            }
+        }
+
+        return false;
     }
 
     /**
@@ -295,7 +329,8 @@ class Tenant extends BaseTenant
         }
 
         return in_array($this->plan_status, ['expired', 'cancelled'])
-            || $this->trialExpired();
+            || $this->trialExpired()
+            || $this->subscriptionExpired();
     }
 
     // -------------------------------------------------------------------------
@@ -315,6 +350,15 @@ class Tenant extends BaseTenant
         }
 
         return $plan->hasFeature($feature);
+    }
+
+    /**
+     * Check if this tenant operates under Indonesian tax jurisdiction.
+     * Controls visibility of PPN, Faktur Pajak, NPWP, and all DJP compliance features.
+     */
+    public function isIndonesian(): bool
+    {
+        return $this->tax_jurisdiction === 'ID';
     }
 
     /**
@@ -404,33 +448,6 @@ class Tenant extends BaseTenant
     // -------------------------------------------------------------------------
     // Billing Period Management
     // -------------------------------------------------------------------------
-
-    /**
-     * Initialize billing period (rolling 30-day period, consistent with BillingService).
-     */
-    public function initializeBillingPeriod(): self
-    {
-        $now = now();
-        $this->billing_period_start = $now->toDateString();
-        $this->billing_period_end = $now->copy()->addDays(30)->toDateString();
-        $this->save();
-
-        return $this;
-    }
-
-    /**
-     * Get the next billing period dates (rolling 30-day).
-     */
-    public function getNextBillingPeriod(): array
-    {
-        $now = now();
-        $nextStart = $now->copy()->addDays(30);
-
-        return [
-            'start' => $nextStart->toDateString(),
-            'end' => $nextStart->copy()->addDays(30)->toDateString(),
-        ];
-    }
 
     /**
      * Get the current billing period info.

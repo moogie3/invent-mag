@@ -11,8 +11,20 @@
         <span id="orderDiscountTotal" class="fw-bold">Rp 0</span>
     </div>
     <div class="d-flex justify-content-between mb-2">
-        <span class="text-muted">{{ __('messages.tax') }} (<span id="taxRateLabel">{{ $defaultTax->rate ?? 0 }}</span>%)</span>
-        <span id="taxTotal" class="fw-bold">Rp 0</span>
+        <span class="text-muted">{{ __('messages.tax') }}</span>
+        <div class="d-flex align-items-center">
+            <select class="form-select form-select-sm me-2" id="taxSelector" name="tax_id" style="width: auto;">
+                @foreach($taxes as $taxOption)
+                    <option value="{{ $taxOption->id }}"
+                            data-rate="{{ $taxOption->rate }}"
+                            data-type="{{ $taxOption->type }}"
+                            {{ ($defaultTax?->id ?? '') == $taxOption->id ? 'selected' : '' }}>
+                        {{ $taxOption->name }} ({{ $taxOption->rate }}%{{ $taxOption->type !== 'none' ? ', ' . ucfirst($taxOption->type) : '' }})
+                    </option>
+                @endforeach
+            </select>
+            <span id="taxTotal" class="fw-bold">Rp 0</span>
+        </div>
     </div>
     <div class="d-flex justify-content-between mb-2 text-info" id="creditUsedRow" style="display: none;">
         <span><i class="ti ti-credit-card me-1"></i>{{ __('messages.credit_used') }}</span>
@@ -25,5 +37,6 @@
     </div>
     <input type="hidden" id="taxInput" name="tax_amount" value="0">
     <input type="hidden" id="taxTypeInput" name="tax_type" value="{{ $defaultTax->type ?? 'exclusive' }}">
+    <input type="hidden" id="taxRateInput" name="tax_rate" value="{{ $defaultTax->rate ?? 0 }}">
     <input type="hidden" id="creditUsedInput" name="credit_used" value="0">
 </div>

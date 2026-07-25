@@ -67,16 +67,20 @@ class CheckSubscriptionStatus
         }
 
         if ($tenant->hasPlan() && $tenant->planInactive()) {
+            $messageKey = $tenant->subscriptionExpired()
+                ? 'plan.notif_subscription_expired_desc'
+                : 'plan.notif_trial_expired_desc';
+
             if ($request->expectsJson() || $request->ajax()) {
                 return response()->json([
-                    'message' => __('plan.notif_trial_expired_desc'),
+                    'message' => __($messageKey),
                     'error' => 'subscription_expired',
                     'redirect' => route('admin.setting.plan.upgrade')
                 ], 403);
             }
 
             return redirect()->route('admin.setting.plan.upgrade')
-                ->with('error', __('plan.notif_trial_expired_desc'));
+                ->with('error', __($messageKey));
         }
 
         return $next($request);

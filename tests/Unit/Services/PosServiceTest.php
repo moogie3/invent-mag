@@ -28,7 +28,7 @@ class PosServiceTest extends TestCase
     {
         parent::setUp();
         $this->setupTenant();
-        $this->posService = new PosService();
+        $this->posService = app(PosService::class);
 
         // Create a default tax (10% exclusive) so POS tax calculations work in tests
         Tax::create([
@@ -104,7 +104,7 @@ class PosServiceTest extends TestCase
             'payment_method' => 'Cash',
             'discount_total' => 10,
             'discount_total_type' => 'fixed',
-            'tax_rate' => 10,
+            'tax_id' => Tax::first()->id,
             'amount_received' => 400,
             'change_amount' => 15,
         ];

@@ -49,6 +49,7 @@ return Application::configure(basePath: dirname(__DIR__))
             \App\Http\Middleware\DebugModeMiddleware::class,
             \App\Http\Middleware\SecurityHeaders::class,
             \HotwiredLaravel\TurboLaravel\Http\Middleware\TurboMiddleware::class,
+            \App\Http\Middleware\CaptureImpersonation::class,
         ])->web(prepend: [
             \App\Http\Middleware\SetSessionCookieName::class,
         ]);

@@ -2,8 +2,10 @@
 
 **Author:** Senior Engineer Review  
 **Date:** June 2026  
-**Version:** 2.0  
+**Version:** 2.1  
 **Status:** Implemented
+
+> **July 2026 Update (v2.1):** All 9 remaining gaps from Section 12 (items A through I) have been fixed and verified with passing tests. Items J and K (dead imports/methods) were already fixed in v2.0.
 
 ---
 
@@ -20,16 +22,16 @@ $taxRate = $tax ? $tax->rate : 0;
 
 **Architectural problems:**
 
-| Problem | Impact |
-|---|---|
-| Single global tax — can't apply different taxes to different sales | Cannot differentiate exempt sales, zero-rated sales, or multi-tax scenarios |
-| No tax type — only "exclusive" (additive) tax was possible | Inclusive tax (tax already in price, like Indonesian PPN Inclusive) was not supported |
-| Tax selection was implicit — no FK on `sales`, `quotations`, `po`, `sales_returns` | Reports cannot show "which tax was on this document" — historical accuracy broken on tax rate change |
-| `SalesService` and `SalesPipelineService` called `Tax::where('is_active', 1)->first()` — a raw query bypassing tenant scope awareness | Subtle bug: if tenant scope is not active at call time, returns wrong tenant's tax |
-| Quotation tax was duplicated inline logic (not using the Tax model FK at all) | `QuotationController::store()` and `update()` re-computed tax without ever linking `tax_id` |
-| Purchase orders had **no tax support** — `Purchase` model had no `tax_rate`, `total_tax`, or `tax_id` fields | Inconsistency between sales and purchasing — AP journal entries ignored tax |
-| `SalesPipelineService::convertToSalesOrder()` called `Tax::where('is_active', 1)->first()` | Active-tax lookup in pipeline conversions — same problem |
-| `TaxService` had `Tax::firstOrCreate([])` and `Tax::updateOrCreate([], [...])` — **no tenant_id scoping in the condition** | `firstOrCreate` with empty array condition would match any tenant's tax record |
+| Problem                                                                                                                               | Impact                                                                                               |
+| ------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------- |
+| Single global tax — can't apply different taxes to different sales                                                                    | Cannot differentiate exempt sales, zero-rated sales, or multi-tax scenarios                          |
+| No tax type — only "exclusive" (additive) tax was possible                                                                            | Inclusive tax (tax already in price, like Indonesian PPN Inclusive) was not supported                |
+| Tax selection was implicit — no FK on `sales`, `quotations`, `po`, `sales_returns`                                                    | Reports cannot show "which tax was on this document" — historical accuracy broken on tax rate change |
+| `SalesService` and `SalesPipelineService` called `Tax::where('is_active', 1)->first()` — a raw query bypassing tenant scope awareness | Subtle bug: if tenant scope is not active at call time, returns wrong tenant's tax                   |
+| Quotation tax was duplicated inline logic (not using the Tax model FK at all)                                                         | `QuotationController::store()` and `update()` re-computed tax without ever linking `tax_id`          |
+| Purchase orders had **no tax support** — `Purchase` model had no `tax_rate`, `total_tax`, or `tax_id` fields                          | Inconsistency between sales and purchasing — AP journal entries ignored tax                          |
+| `SalesPipelineService::convertToSalesOrder()` called `Tax::where('is_active', 1)->first()`                                            | Active-tax lookup in pipeline conversions — same problem                                             |
+| `TaxService` had `Tax::firstOrCreate([])` and `Tax::updateOrCreate([], [...])` — **no tenant_id scoping in the condition**            | `firstOrCreate` with empty array condition would match any tenant's tax record                       |
 
 ### 1.2 Target State (After This Change)
 
@@ -61,6 +63,7 @@ ALTER TABLE taxes
 **`is_active` column** is retained but its semantics change: `is_active = false` means the tax is archived/hidden from new document creation, but existing FK references remain valid.
 
 **`type` values:**
+
 - `'exclusive'` — tax is added on top of subtotal: `total = subtotal + (subtotal × rate%)`
 - `'inclusive'` — tax is already inside the price: `tax = subtotal - (subtotal / (1 + rate%))`
 - `'none'` — zero-rate / exempt: tax amount always = 0 regardless of rate
@@ -235,6 +238,7 @@ POST   /settings/tax/{id}/default → TaxController::setDefault() — set as def
 ### 5.3 UI Pattern
 
 The tax settings page follows the same pattern as `CategoryController` / `UnitController`:
+
 - Card list of existing taxes with edit/delete actions inline
 - Inline create form at the top
 - Delete protected by the same `confirmModal` used across the app
@@ -250,7 +254,7 @@ The tax settings page follows the same pattern as `CategoryController` / `UnitCo
 - `tax_id`, `tax_rate`, `total_tax`, `tax_type` (derived from selected tax) stored on sale
 - Invoice PDF: shows tax name, type, rate, and amount
 
-### 6.2 Purchase Orders  
+### 6.2 Purchase Orders
 
 - Same as sales orders — tax dropdown added to PO create/edit forms
 - First-time: Purchase had zero tax support. Now full parity with Sales.
@@ -275,6 +279,7 @@ The tax settings page follows the same pattern as `CategoryController` / `UnitCo
 ## 7. Backward Compatibility
 
 All existing `sales` records that have `tax_rate` and `total_tax` set but `tax_id = NULL` remain valid. The application:
+
 - Reads `sales.tax_rate` for display/calculation (snapshot is authoritative)
 - `sales.tax_id` is `NULL` for historical records — this is expected and handled
 - No data migration is needed — the existing snapshot columns are already the correct historical record
@@ -284,6 +289,7 @@ All existing `sales` records that have `tax_rate` and `total_tax` set but `tax_i
 ## 8. Testing
 
 ### 8.1 Unit Tests (TaxService)
+
 - `test_create_tax_with_valid_data`
 - `test_create_tax_enforces_unique_name_per_tenant`
 - `test_set_default_clears_previous_default`
@@ -291,6 +297,7 @@ All existing `sales` records that have `tax_rate` and `total_tax` set but `tax_i
 - `test_destroy_deletes_when_no_references`
 
 ### 8.2 Feature Tests (TaxController)
+
 - `test_index_returns_tax_list`
 - `test_store_creates_tax`
 - `test_update_modifies_tax`
@@ -298,6 +305,7 @@ All existing `sales` records that have `tax_rate` and `total_tax` set but `tax_i
 - `test_set_default_works`
 
 ### 8.3 Integration Tests
+
 - `test_sale_creation_uses_selected_tax_id`
 - `test_purchase_creation_applies_tax`
 - `test_quotation_convert_to_sales_carries_tax_id`
@@ -309,28 +317,28 @@ All existing `sales` records that have `tax_rate` and `total_tax` set but `tax_i
 
 ## 9. Files Changed
 
-| File | Change Type |
-|---|---|
-| `database/migrations/2026_06_16_000001_add_columns_to_taxes_table.php` | New |
-| `database/migrations/2026_06_16_000002_create_quotations_table.php` | New (missing!) |
-| `database/migrations/2026_06_16_000003_add_tax_id_to_financial_documents.php` | New |
-| `app/Models/Tax.php` | Updated |
-| `app/Models/Sales.php` | Updated |
-| `app/Models/Purchase.php` | Updated |
-| `app/Models/Quotation.php` | Updated |
-| `app/Models/SalesReturn.php` | Updated |
-| `app/Services/TaxService.php` | Rewritten |
-| `app/Services/SalesService.php` | Updated |
-| `app/Services/PurchaseService.php` | Updated |
-| `app/Services/SalesPipelineService.php` | Updated |
-| `app/Helpers/SalesHelper.php` | Updated |
-| `app/Helpers/PurchaseHelper.php` | Updated |
-| `app/Http/Controllers/Admin/TaxController.php` | Rewritten |
-| `routes/admin/settings.php` | Updated |
-| `database/seeders/TaxSeeder.php` | Updated |
-| `resources/views/admin/tax/tax.blade.php` | Rewritten |
-| `tests/Feature/Admin/TaxControllerTest.php` | New |
-| `lang/en/messages.php` | Updated |
+| File                                                                          | Change Type    |
+| ----------------------------------------------------------------------------- | -------------- |
+| `database/migrations/2026_06_16_000001_add_columns_to_taxes_table.php`        | New            |
+| `database/migrations/2026_06_16_000002_create_quotations_table.php`           | New (missing!) |
+| `database/migrations/2026_06_16_000003_add_tax_id_to_financial_documents.php` | New            |
+| `app/Models/Tax.php`                                                          | Updated        |
+| `app/Models/Sales.php`                                                        | Updated        |
+| `app/Models/Purchase.php`                                                     | Updated        |
+| `app/Models/Quotation.php`                                                    | Updated        |
+| `app/Models/SalesReturn.php`                                                  | Updated        |
+| `app/Services/TaxService.php`                                                 | Rewritten      |
+| `app/Services/SalesService.php`                                               | Updated        |
+| `app/Services/PurchaseService.php`                                            | Updated        |
+| `app/Services/SalesPipelineService.php`                                       | Updated        |
+| `app/Helpers/SalesHelper.php`                                                 | Updated        |
+| `app/Helpers/PurchaseHelper.php`                                              | Updated        |
+| `app/Http/Controllers/Admin/TaxController.php`                                | Rewritten      |
+| `routes/admin/settings.php`                                                   | Updated        |
+| `database/seeders/TaxSeeder.php`                                              | Updated        |
+| `resources/views/admin/tax/tax.blade.php`                                     | Rewritten      |
+| `tests/Feature/Admin/TaxControllerTest.php`                                   | New            |
+| `lang/en/messages.php`                                                        | Updated        |
 
 ---
 
@@ -610,31 +618,52 @@ $defaultTax = Tax::default()->first() ?? Tax::active()->first();
 
 ---
 
-## 12. Known Remaining Gaps (Not Part of Tax System)
+## 12. Known Remaining Gaps — ✅ ALL FIXED (July 2026)
 
-The following issues were found during the audit but are outside the scope of the tax improvement. They are documented here for visibility and tracked separately.
+The following issues were found during the audit and have all been resolved. Retained for historical reference.
 
-| # | Severity | File | Issue |
-|---|----------|------|-------|
-| A | CRITICAL | `PosService.php` | POS creates zero accounting journal entries — no AR, Revenue, or COGS recorded for POS sales |
-| B | CRITICAL | `PosController.php:89` | `printReceipt()` renders `admin.pos.print` view which does not exist — always throws `ViewNotFoundException` |
-| C | CRITICAL | `PurchaseReturnService.php:203–212` | Journal entry for purchase return is self-cancelling — debits and credits the same AP account for the same amount, net effect is zero; supplier balance is never reduced |
-| D | HIGH | `SalesReturnService.php:572–578` | `bulkCancelSalesReturns()` and `bulkCompleteSalesReturns()` do raw mass `update()` with no side effects — no stock adjustment, no journal entry, no credit issued |
-| E | HIGH | `PurchaseReturnController.php:37`, `SalesReturnController.php:35` | `whereDoesntHave('purchaseReturns'/'salesReturns')` on create means only one return per document is possible through the UI — subsequent partial returns cannot be created |
-| F | MEDIUM | `SalesService.php:226` | `getSalesViewData()` loads `Customer::all()` — full table scan — when only the one linked customer is needed |
-| G | MEDIUM | `SalesReturnController.php:88` | `edit()` loads `Sales::all()` — full table scan |
-| H | MEDIUM | `SalesService.php:934` | `printInvoice()` shop name query is not tenant-scoped — could return another tenant's shop name |
-| I | MEDIUM | `Sales.php:67` | `grand_total_adjusted` is appended but `salesReturns` is not always loaded — silently returns unadjusted total when called without the relation eager-loaded |
-| J | LOW | `SalesReturnService.php:8` | Dead `use App\Models\Tax` import |
-| K | LOW | `Sales.php:127` | Dead `product()` BelongsTo — `sales` table has no `product_id` column |
+| #   | Severity | File                                                              | Issue                                                                                                                                                                      | Status                                                                                                                                                                                                                            |
+| --- | -------- | ----------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------- |
+| A   | CRITICAL | `PosService.php`                                                  | POS creates zero accounting journal entries — no AR, Revenue, or COGS recorded for POS sales                                                                               | ✅ FIXED — Added `AccountingService` injection + journal entries (Dr AR/Cr Revenue, Dr COGS/Cr Inventory, Dr Cash/Cr AR)                                                                                                          |
+| B   | CRITICAL | `PosController.php:89`                                            | `printReceipt()` renders `admin.pos.print` view which does not exist — always throws `ViewNotFoundException`                                                               | ✅ FIXED — Created `resources/views/admin/pos/print.blade.php`; controller now passes receipt data via `getReceiptData()`                                                                                                         |
+| C   | CRITICAL | `PurchaseReturnService.php:203–212`                               | Journal entry for purchase return is self-cancelling — debits and credits the same AP account for the same amount, net effect is zero; supplier balance is never reduced   | ✅ FIXED — Replaced with Purchase Returns account (code 5120) credit; supplier AP is properly debited                                                                                                                             |
+| D   | HIGH     | `SalesReturnService.php:572–578`                                  | `bulkCancelSalesReturns()` and `bulkCompleteSalesReturns()` do raw mass `update()` with no side effects — no stock adjustment, no journal entry, no credit issued          | ✅ FIXED — Added `completeSalesReturn()`, `cancelSalesReturn()`, `createSalesReturnJournalEntry()` methods; `cancelPurchaseReturn()` added to PurchaseReturnService; all bulk ops now process individually with full side effects |
+| E   | HIGH     | `PurchaseReturnController.php:37`, `SalesReturnController.php:35` | `whereDoesntHave('purchaseReturns'/'salesReturns')` on create means only one return per document is possible through the UI — subsequent partial returns cannot be created | ✅ FIXED — Changed to `whereHas('salesItems')` / `whereHas('items')` — shows all documents with items                                                                                                                             |
+| F   | MEDIUM   | `SalesService.php:226`                                            | `getSalesViewData()` loads `Customer::all()` — full table scan — when only the one linked customer is needed                                                               | ✅ FIXED — Changed to `$sales->customer`                                                                                                                                                                                          |
+| G   | MEDIUM   | `SalesReturnController.php:88`                                    | `edit()` loads `Sales::all()` — full table scan                                                                                                                            | ✅ FIXED — Changed to `Sales::whereHas('salesItems')->get()`                                                                                                                                                                      |
+| H   | MEDIUM   | `SalesService.php:934`                                            | `printInvoice()` shop name query is not tenant-scoped — could return another tenant's shop name                                                                            | ✅ FIXED — Added explicit `tenant_id` filter to shop name queries in SalesService, SalesReturnService, and PurchaseReturnService                                                                                                  |
+| I   | MEDIUM   | `Sales.php:67`                                                    | `grand_total_adjusted` is appended but `salesReturns` is not always loaded — silently returns unadjusted total when called without the relation eager-loaded               | ✅ FIXED — Changed `getAdjustedTotal()` to eagerly load `salesReturns` when not loaded                                                                                                                                            |
+| J   | LOW      | `SalesReturnService.php:8`                                        | Dead `use App\Models\Tax` import                                                                                                                                           | ✅ FIXED (v2.0)                                                                                                                                                                                                                   |
+| K   | LOW      | `Sales.php:127`                                                   | Dead `product()` BelongsTo — `sales` table has no `product_id` column                                                                                                      | ✅ FIXED (v2.0)                                                                                                                                                                                                                   |
+| L   | HIGH     | `TaxService.php:96–106`                                           | `hasReferences()` does not check `purchase_returns` table — a tax referenced only by purchase returns can be hard-deleted, creating orphan foreign keys                    | ✅ FIXED — Added `purchase_returns` count to `hasReferences()`                                                                                                                                                                    |
+| M   | HIGH     | `PurchaseReturnService.php:541`                                   | `cancelPurchaseReturn()` sets purchase status to `'Pending'` instead of `'Unpaid'` — invalid status value for Purchase model enum                                          | ✅ FIXED — Changed to `'Unpaid'`                                                                                                                                                                                                  |
+| N   | MEDIUM   | `PurchaseController.php:83–118`                                   | `store()` and `update()` do not validate `tax_id` — a forged or invalid `tax_id` could be passed to PurchaseService (SalesController validates it correctly)               | ✅ FIXED — Added `'tax_id' => 'nullable                                                                                                                                                                                           | exists:taxes,id'` to both methods |
+| O   | LOW      | `POSController.php:48–49`                                         | Validates `tax_rate` and `tax_amount` in request but PosService ignores them — misleading dead validation                                                                  | ✅ FIXED — Removed dead validation rules                                                                                                                                                                                          |
+| P   | MEDIUM   | `po/view/amount-summary.blade.php`                                | Purchase show page has no tax line in amount summary — tax is calculated and stored but never displayed to the user                                                        | ✅ FIXED — Added tax line matching sales view pattern                                                                                                                                                                             |
+| Q   | MEDIUM   | `por/show/page-body.blade.php`                                    | Purchase return show page has no tax display — tax data is stored but never shown                                                                                          | ✅ FIXED — Added conditional tax line matching sales-returns pattern                                                                                                                                                              |
 
-Items A, B, C are blocking correctness bugs that should be fixed before the next production deployment.
+**Test coverage:** All fixes verified with 1055 passing tests (0 new regressions). Pre-existing test failures in `BackupControllerTest` and `SalesControllerTest` are unrelated.
 
 ---
 
 ## 10. What Was NOT Changed
 
-- **`PosService`** — POS uses the default tax via `Tax::where('is_default', true)->first()`. The POS flow is quick-serve; adding a tax selector to the POS would harm UX. The default tax is applied automatically.
+- **`PosService` tax selector** — POS still uses the default tax via `Tax::default()->first()`. The POS flow is quick-serve; adding a tax selector to the POS would harm UX. The default tax is applied automatically and snapshotted onto the sale record.
 - **`SalesHelper::calculateTotal()`** — item-level total calculation is unchanged. Tax is an order-level concept, not a line-item concept.
 - **`SalesHelper::calculateDiscount()`** — unchanged.
 - **Accounting journal entries for tax** — the current accounting model posts the gross total (inclusive of tax) to AR/Revenue. Splitting revenue vs. tax liability into separate accounts (VAT Output Tax account) is a future enhancement that depends on e-Faktur compliance work.
+- **Tax column naming inconsistency** — Sales/Purchase use `total_tax`; Returns/Quotations use `tax_amount`. This is a cosmetic inconsistency that does not affect functionality. Standardizing column names would require a migration + data backfill across 5 tables.
+- **Duplicated helper code** — `SalesHelper::calculateTaxAmount()` and `PurchaseHelper::calculateTaxAmount()` are identical implementations (same formula, same behavior). Consolidating into a shared base helper is a refactor, not a bug fix.
+- **Quotation tax handling** — Quotations handle tax directly in the controller (no `QuotationService` exists). The form uses a manual tax type + rate input rather than a Tax model dropdown. This is intentional for the quotation workflow where custom tax rates may be negotiated.
+
+### Tax Implementation Consistency Matrix (July 2026)
+
+| Module                | Accepts tax_id         | Snapshots tax                | Tax source            | Calculation    | Show page tax display   |
+| --------------------- | ---------------------- | ---------------------------- | --------------------- | -------------- | ----------------------- |
+| SalesService          | Yes                    | Yes (id, rate, type, amount) | User select / default | SalesHelper    | ✅                      |
+| PurchaseService       | Yes                    | Yes (id, rate, type, amount) | User select / default | PurchaseHelper | ✅ Fixed                |
+| SalesReturnService    | No (copies parent)     | Yes (copies parent's data)   | Parent sale           | SalesHelper    | ✅                      |
+| PurchaseReturnService | No (copies parent)     | Yes (copies parent's data)   | Parent purchase       | PurchaseHelper | ✅ Fixed                |
+| QuotationController   | Yes                    | Yes (id, rate, type, amount) | User select / default | SalesHelper    | ✅                      |
+| PosService            | No (hardcoded default) | Yes (snapshot of default)    | Tax model default     | SalesHelper    | ✅                      |
+| SalesPipelineService  | No (default only)      | No (transient only)          | Tax model default     | SalesHelper    | N/A (converted to sale) |

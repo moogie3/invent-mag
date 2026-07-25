@@ -17,11 +17,15 @@ class QuotationSeeder extends Seeder
      */
     public function run(): void
     {
-        $customers = Customer::all();
-        $products = Product::all();
-        $tax = Tax::where('is_default', true)->first() ?? Tax::where('is_active', true)->first();
+        $tenantId = app('currentTenant')->id;
+
+        $customers = Customer::where('tenant_id', $tenantId)->get();
+        $products = Product::where('tenant_id', $tenantId)->get();
+        $tax = Tax::where('tenant_id', $tenantId)->where('is_default', true)->first()
+            ?? Tax::where('tenant_id', $tenantId)->where('is_active', true)->first();
 
         if ($customers->isEmpty() || $products->isEmpty()) {
+            $this->command?->warn('Skipping QuotationSeeder for tenant ' . app('currentTenant')->name . ': Missing customers or products.');
             return;
         }
 
@@ -63,9 +67,16 @@ class QuotationSeeder extends Seeder
             }
 
             $quotationDate = Carbon::now()->subDays(rand(1, 60));
+            $prefix = 'QTN-' . $quotationDate->format('Ymd');
+            $last = Quotation::withoutGlobalScopes()
+                ->where('quotation_number', 'like', "{$prefix}-%")
+                ->orderBy('id', 'desc')
+                ->first();
+            $newNum = $last ? (int) substr($last->quotation_number, -4) + 1 : 1;
+            $quotationNumber = "{$prefix}-" . str_pad($newNum, 4, '0', STR_PAD_LEFT);
 
             Quotation::create([
-                'quotation_number'    => 'QTN-' . $quotationDate->format('Ymd') . '-' . str_pad($i, 4, '0', STR_PAD_LEFT),
+                'quotation_number'    => $quotationNumber,
                 'customer_id'         => $customer->id,
                 'user_id'             => User::first()?->id,
                 'quotation_date'      => $quotationDate,

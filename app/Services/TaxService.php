@@ -101,7 +101,8 @@ class TaxService
         $poCount = DB::table('po')->where('tax_id', $tax->id)->where('tenant_id', $tenantId)->count();
         $quotationCount = DB::table('quotations')->where('tax_id', $tax->id)->where('tenant_id', $tenantId)->count();
         $returnCount = DB::table('sales_returns')->where('tax_id', $tax->id)->where('tenant_id', $tenantId)->count();
+        $purchaseReturnCount = DB::table('purchase_returns')->where('tax_id', $tax->id)->where('tenant_id', $tenantId)->count();
 
-        return ($salesCount + $poCount + $quotationCount + $returnCount) > 0;
+        return ($salesCount + $poCount + $quotationCount + $returnCount + $purchaseReturnCount) > 0;
     }
 }

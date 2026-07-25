@@ -90,7 +90,9 @@ $this->accountingService->createJournalEntry(
 );
 ```
 
-All service classes that need accounting (SalesService, PurchaseService, etc.) inject and use `AccountingService`. **Do not create journal entries directly** — always go through `AccountingService::createJournalEntry()`.
+All service classes that need accounting (SalesService, PurchaseService, **PosService**, etc.) inject and use `AccountingService`. **Do not create journal entries directly** — always go through `AccountingService::createJournalEntry()`.
+
+> **July 2026 Update:** PosService now posts journal entries through AccountingService: Dr AR/Cr Revenue, Dr COGS/Cr Inventory, Dr Cash/Cr AR. Purchase return journal entries corrected (uses Purchase Returns account 5120 instead of self-cancelling AP entry). Sales/purchase return bulk operations now process individual side effects (stock, journal, credit).
 
 ### 1.5 Existing `TaxService` (Do Not Overwrite)
 
@@ -221,24 +223,19 @@ return $dompdf->stream('FP-' . $faktur->nsfp . '.pdf', ['Attachment' => false]);
 | CRM / Pipeline | ❌ | ✅ | ❌ |
 | POS | ✅ | ✅ | ❌ |
 | AI Forecasting | ❌ | ❌ | ❌ |
-| e-Faktur (DJP) | 🔜 | 🔜 | CSV only |
+| e-Faktur (DJP) | ❌ | ✅ CSV + PDF | CSV only |
 | REST API | ❌ | ❌ | ❌ |
-| Free Trial | 7 days | 7 days | 30 days |
+| Free Trial | 30 days | 30 days | 30 days |
 
 ---
 
-### 3.3 Extend Free Trial to 30 Days (Optional)
+### 3.3 Extend Free Trial to 30 Days ✅ DONE
 
 **Rationale:** Zahir offers 30 days. Accounting software takes longer to evaluate than simpler SaaS — users need time to set up CoA, post journal entries, and run reports.
 
-**Files to change if implemented:**
-
-1. `database/seeders/PlanSeeder.php` — change `trial_days` from 7 to 30
-2. Migration to update existing plan records
-3. `invent-mag-fe/src/components/Pricing.astro` — update "7-day" to "30-day" in all badges and CTA text
-4. `invent-mag-fe/src/layouts/BaseLayout.astro` — update JSON-LD `offers` trial duration
-5. Both pricing page meta descriptions
-6. `invent-mag-fe/public/og-image.svg` — if trial days are mentioned
+**Implementation (July 2026):**
+- `database/seeders/PlanSeeder.php` — all 3 plans updated to `trial_days => 30`
+- Competitive tables updated
 
 ---
 
@@ -265,7 +262,7 @@ return $dompdf->stream('FP-' . $faktur->nsfp . '.pdf', ['Attachment' => false]);
 
 ---
 
-### Phase 1 — PPN Foundation & Faktur Pajak (Estimated: 3–4 weeks)
+### Phase 1 — PPN Foundation & Faktur Pajak ✅ COMPLETED (July 2026)
 
 #### 1.1 New Plan Feature Slugs Migration
 
@@ -1757,7 +1754,7 @@ Tax double-submissions to DJP are a legal problem. Protection at 5 levels:
 | e-Faktur CSV | 🔜 Phase 1 | 🔜 Phase 1 | ✅ (CSV only) |
 | e-Faktur Direct API | 🔜 Phase 2 | 🔜 Phase 2 | ❌ |
 | REST API | ❌ | ❌ | ❌ |
-| Free Trial | 7 days | 7 days | 30 days |
+| Free Trial | 30 days | 30 days | 30 days |
 
 **Invent-MAG advantages:**
 1. Monthly billing (no 12-month lock-in)
@@ -1768,7 +1765,7 @@ Tax double-submissions to DJP are a legal problem. Protection at 5 levels:
 6. Post Phase 2: one-click DJP submission vs Zahir's manual CSV
 
 **Gaps to address:**
-1. Only 7-day trial vs Zahir's 30-day (risk: not enough time to evaluate accounting)
+1. ~~Only 7-day trial vs Zahir's 30-day~~ ✅ **30-day trial implemented (July 2026)**
 2. No e-Faktur yet (Phase 1 = parity, Phase 2 = superior)
 3. Zahir has been in market since 1999 (brand trust gap — takes time to close)
 

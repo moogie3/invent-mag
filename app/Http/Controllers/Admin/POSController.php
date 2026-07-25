@@ -9,6 +9,7 @@ use App\Models\Sales;
 use App\Models\Categories;
 use App\Models\Supplier;
 use App\Models\Unit;
+use App\Models\Tax;
 use App\Services\PosService;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
@@ -26,6 +27,7 @@ class POSController extends Controller
     public function index()
     {
         $data = $this->posService->getPosIndexData();
+        $data['taxes'] = Tax::active()->orderBy('name')->get();
         return view('admin.pos.index', $data);
     }
 
@@ -45,8 +47,6 @@ class POSController extends Controller
                 'products' => 'required|json',
                 'discount_total' => 'nullable|numeric|min:0',
                 'discount_total_type' => 'nullable|in:fixed,percentage',
-                'tax_rate' => 'nullable|numeric|min:0',
-                'tax_amount' => 'nullable|numeric|min:0',
                 'grand_total' => 'required|numeric|min:0',
                 'payment_method' => 'required|string|in:Cash,Card,Transfer,eWallet',
                 'amount_received' => 'nullable|numeric|min:0|required_if:payment_method,Cash',
@@ -89,7 +89,9 @@ class POSController extends Controller
     public function printReceipt($id)
     {
         $sale = Sales::with(['salesItems.product', 'customer'])->findOrFail($id);
-        return view('admin.pos.print', compact('sale'));
+        $receiptData = $this->posService->getReceiptData($sale);
+
+        return view('admin.pos.print', $receiptData);
     }
     
     public function validateStock(Request $request)

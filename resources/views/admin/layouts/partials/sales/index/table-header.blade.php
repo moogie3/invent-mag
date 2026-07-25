@@ -33,6 +33,15 @@
         <th class="sticky-top " style="z-index: 1020;">
             <button class="table-sort fs-4 py-3" data-sort="sort-status">{{ __('messages.status') }}</button>
         </th>
+        @php
+            $currentTenant = app('currentTenant');
+            $showPpnCol = $currentTenant instanceof \App\Models\Tenant && $currentTenant->isIndonesian() && $currentTenant->hasFeature('ppn');
+        @endphp
+        @if($showPpnCol)
+        <th class="sticky-top " style="z-index: 1020;">
+            <span class="fs-4 py-3">{{ __('messages.ppn_status') }}</span>
+        </th>
+        @endif
         <th style="width:180px;text-align:center" class="fs-4 py-3 no-print sticky-top " style="z-index: 1020;">
             {{ __('messages.action') }}
         </th>

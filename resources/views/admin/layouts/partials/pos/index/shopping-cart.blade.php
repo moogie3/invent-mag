@@ -37,11 +37,16 @@
             </div>
 
             <div class="d-flex justify-content-between align-items-center mb-2">
-                <span class="text-nowrap">{{ __('messages.tax_rate') }}:</span>
-                <div class="input-group" style="max-width: 100px; flex-wrap: nowrap;">
-                    <input type="number" id="taxRate" class="form-control form-control-sm" value="0" min="0">
-                    <span class="input-group-text">%</span>
-                </div>
+                <span class="text-nowrap">{{ __('messages.tax') }}:</span>
+                <select id="taxSelector" class="form-select form-select-sm" style="max-width: 160px;" name="tax_id">
+                    <option value="">{{ __('messages.none') }} (0%)</option>
+                    @foreach($taxes as $tax)
+                        <option value="{{ $tax->id }}" data-rate="{{ $tax->rate }}" data-type="{{ $tax->type }}"
+                            {{ $tax->is_default ? 'selected' : '' }}>
+                            {{ $tax->name }} ({{ $tax->rate }}%)
+                        </option>
+                    @endforeach
+                </select>
             </div>
 
             <hr>

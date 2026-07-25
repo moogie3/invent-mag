@@ -96,6 +96,10 @@ return [
     'notif_trial_expired_title' => 'Trial Expired',
     'notif_trial_expired_desc' => 'Your free trial has ended. Please upgrade to continue using all features.',
 
+    // Subscription Expiry (paid plan billing period ended)
+    'notif_subscription_expired_title' => 'Subscription Expired',
+    'notif_subscription_expired_desc' => 'Your subscription has expired. Please renew to continue using all features.',
+
     // System Notification - Plan Expiry
     'notif_plan_expiring_title' => 'Plan Expiring Soon',
     'notif_plan_expiring_desc' => 'Your :plan plan expires in :days days. Renew to avoid interruption.',

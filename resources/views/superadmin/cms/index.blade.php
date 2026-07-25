@@ -187,7 +187,7 @@
                                     <input type="text" name="pricing_no_credit_badge" class="form-control" value="{{ $content['pricing_no_credit_badge'] }}" maxlength="255" placeholder="e.g. No credit card required">
                                 </div>
                                 <div class="col-md-4">
-                                    <input type="text" name="pricing_trial_badge" class="form-control" value="{{ $content['pricing_trial_badge'] }}" maxlength="255" placeholder="e.g. 7-day free trial">
+                                    <input type="text" name="pricing_trial_badge" class="form-control" value="{{ $content['pricing_trial_badge'] }}" maxlength="255" placeholder="e.g. 30-day free trial">
                                 </div>
                                 <div class="col-md-4">
                                     <input type="text" name="pricing_cancel_badge" class="form-control" value="{{ $content['pricing_cancel_badge'] }}" maxlength="255" placeholder="e.g. Cancel anytime">
@@ -201,7 +201,7 @@
                                     <input type="text" name="pricing_most_popular_badge" class="form-control" value="{{ $content['pricing_most_popular_badge'] }}" maxlength="255" placeholder="e.g. most popular">
                                 </div>
                                 <div class="col-md-4">
-                                    <input type="text" name="pricing_trial_included" class="form-control" value="{{ $content['pricing_trial_included'] }}" maxlength="255" placeholder="e.g. 7 days free trial included">
+                                    <input type="text" name="pricing_trial_included" class="form-control" value="{{ $content['pricing_trial_included'] }}" maxlength="255" placeholder="e.g. 30 days free trial included">
                                 </div>
                                 <div class="col-md-4">
                                     <input type="text" name="pricing_enterprise_support" class="form-control" value="{{ $content['pricing_enterprise_support'] }}" maxlength="255" placeholder="e.g. Enterprise support & SLA">

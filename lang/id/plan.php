@@ -95,6 +95,10 @@ return [
     'notif_trial_expired_title' => 'Uji Coba Berakhir',
     'notif_trial_expired_desc' => 'Uji coba gratis Anda telah berakhir. Harap tingkatkan untuk terus menggunakan semua fitur.',
 
+    // Kedaluwarsa Langganan (periode penagihan paket berbayar berakhir)
+    'notif_subscription_expired_title' => 'Langganan Kedaluwarsa',
+    'notif_subscription_expired_desc' => 'Langganan Anda telah kedaluwarsa. Harap perpanjang untuk terus menggunakan semua fitur.',
+
     // Notifikasi Sistem - Masa Berlaku Paket
     'notif_plan_expiring_title' => 'Paket Segera Kedaluwarsa',
     'notif_plan_expiring_desc' => 'Paket :plan Anda kedaluwarsa dalam :days hari. Perpanjang untuk menghindari gangguan.',

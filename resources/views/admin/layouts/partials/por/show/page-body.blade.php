@@ -116,6 +116,17 @@
                                 </table>
                             </div>
                             <div class="card-footer bg-body-secondary">
+                                @if(($por->tax_rate ?? 0) > 0)
+                                <div class="d-flex justify-content-between text-muted mb-2 border-bottom border-light pb-2">
+                                    <div>
+                                        {{ __('messages.tax') }}
+                                        <small class="text-muted">
+                                            ({{ $por->tax_rate }}%@if(($por->tax_type ?? 'none') !== 'none'), {{ $por->tax_type }}@endif)
+                                        </small>
+                                    </div>
+                                    <div>{{ \App\Helpers\CurrencyHelper::formatWithPosition($por->tax_amount ?? 0) }}</div>
+                                </div>
+                                @endif
                                 <div class="d-flex justify-content-end">
                                     <div class="text-end">
                                         <div class="fs-5"><strong>{{ __('messages.pr_total_return_amount') }}</strong></div>

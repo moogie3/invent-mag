@@ -155,6 +155,19 @@
                                                             @endforeach
                                                         </select>
                                                     </div>
+                                                    <div class="col-md-6">
+                                                        <label class="form-label">{{ __('messages.ppn_keluaran_account') }}</label>
+                                                        <select name="ppn_keluaran_account_id" class="form-select">
+                                                            <option value="">{{ __('messages.select_account') }}
+                                                            </option>
+                                                            @foreach ($accounts['liability'] ?? [] as $account)
+                                                                <option value="{{ $account->id }}"
+                                                                    @if (($settings['ppn_keluaran_account_id'] ?? null) == $account->id) selected @endif>
+                                                                    {{ __($account->name) }} ({{ $account->code }})
+                                                                </option>
+                                                            @endforeach
+                                                        </select>
+                                                    </div>
 
                                                 </div>
                                             </div>

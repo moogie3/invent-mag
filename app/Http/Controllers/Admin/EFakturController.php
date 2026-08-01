@@ -159,20 +159,10 @@ class EFakturController extends Controller
 
         // Safeguard: block disabling Indonesian jurisdiction if draft FakturPajak exist
         if ($wasIndonesian && ! $willBeIndonesian) {
-            $draftCount = FakturPajak::where('status', 'draft')->count();
-            if ($draftCount > 0) {
+            $check = $tenant->canDisableIndonesianJurisdiction();
+            if (! $check['safe']) {
                 return back()->withErrors([
-                    'tax_jurisdiction' => __('messages.efaktur_cannot_disable_with_drafts', ['count' => $draftCount]),
-                ])->withInput();
-            }
-
-            // Warn (but allow) if there are sales with PPN enabled but no FakturPajak
-            $unissuedCount = Sales::where('ppn_enabled', true)
-                ->whereDoesntHave('fakturPajak')
-                ->count();
-            if ($unissuedCount > 0) {
-                return back()->withErrors([
-                    'tax_jurisdiction' => __('messages.efaktur_cannot_disable_with_unissued', ['count' => $unissuedCount]),
+                    'tax_jurisdiction' => $check['message'],
                 ])->withInput();
             }
         }

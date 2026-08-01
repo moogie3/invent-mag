@@ -256,4 +256,9 @@ export function initCartActions() {
     if (taxSelector) {
         taxSelector.addEventListener("change", calculateTotals);
     }
+
+    const pphSelector = document.getElementById("pphSelector");
+    if (pphSelector) {
+        pphSelector.addEventListener("change", calculateTotals);
+    }
 }

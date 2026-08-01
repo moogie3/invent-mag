@@ -43,16 +43,18 @@
                     <i class="ti ti-plus me-1"></i>{{ __('messages.category_create_category') }}</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <form id="createCategoryForm" action="{{ route('admin.setting.category.store') }}" method="POST">
+            <form id="createCategoryForm" action="{{ route('admin.setting.category.store') }}" method="POST" novalidate data-validate-form>
                 @csrf
                 <div class="modal-body">
                     <div class="mb-3">
                         <label for="name" class="form-label">{{ __('messages.table_name') }}</label>
-                        <input type="text" class="form-control" id="name" name="name">
+                        <input type="text" class="form-control @error('name') is-invalid @enderror" id="name" name="name" required>
+                        @error('name')<div class="invalid-feedback">{{ $message }}</div>@enderror
                     </div>
                     <div class="mb-3">
                         <label for="description" class="form-label">{{ __('messages.table_description') }}</label>
-                        <input type="text" class="form-control" id="description" name="description">
+                        <input type="text" class="form-control @error('description') is-invalid @enderror" id="description" name="description">
+                        @error('description')<div class="invalid-feedback">{{ $message }}</div>@enderror
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -72,18 +74,20 @@
                 <h5 class="modal-title" id="editCategoryModalLabel"><i class="ti ti-edit me-1"></i> {{ __('messages.category_modal_edit_title') }}</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <form id="editCategoryForm" method="POST">
+            <form id="editCategoryForm" method="POST" novalidate data-validate-form>
                 @csrf
                 @method('PUT')
                 <div class="modal-body">
                     <input type="hidden" id="categoryId" name="id">
                     <div class="mb-3">
                         <label for="categoryNameEdit" class="form-label">{{ __('messages.table_name') }}</label>
-                        <input type="text" class="form-control" id="categoryNameEdit" name="name">
+                        <input type="text" class="form-control @error('name') is-invalid @enderror" id="categoryNameEdit" name="name" required>
+                        @error('name')<div class="invalid-feedback">{{ $message }}</div>@enderror
                     </div>
                     <div class="mb-3">
                         <label for="categoryDescriptionEdit" class="form-label">{{ __('messages.table_description') }}</label>
-                        <input type="text" class="form-control" id="categoryDescriptionEdit" name="description">
+                        <input type="text" class="form-control @error('description') is-invalid @enderror" id="categoryDescriptionEdit" name="description">
+                        @error('description')<div class="invalid-feedback">{{ $message }}</div>@enderror
                     </div>
                 </div>
                 <div class="modal-footer">

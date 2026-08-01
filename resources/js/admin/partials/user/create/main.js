@@ -32,6 +32,7 @@ export function setupCreateUserModal() {
         createUserForm.dataset.ajaxHandlerAttached = 'true';
         
         createUserForm.addEventListener("submit", function(e) {
+            if (e.defaultPrevented) return;
             e.preventDefault();
             
             const formData = new FormData(this);
@@ -67,9 +68,9 @@ export function setupCreateUserModal() {
                         Object.keys(data.errors).forEach(key => {
                             errorMsg += data.errors[key].join(', ') + '\n';
                         });
-                        InventMagApp.showToast('Error', errorMsg, 'error');
+                        InventMagApp.showToast('Warning', errorMsg, 'warning');
                     } else {
-                        InventMagApp.showToast('Error', data.message || 'Failed to create user', 'error');
+                        InventMagApp.showToast('Warning', data.message || 'Failed to create user', 'warning');
                     }
                 }
             })

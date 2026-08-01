@@ -573,6 +573,7 @@ export function handleInteractionForm() {
     interactionForm.dataset.handlerAttached = 'true';
     
     interactionForm.addEventListener("submit", function (event) {
+        if (event.defaultPrevented) return;
         event.preventDefault();
         const form = event.target;
         const formData = new FormData(form);

@@ -23,42 +23,47 @@
         <div class="page-body mt-4">
             <div class="card">
                 <div class="card-body">
-                    <form action="{{ route('admin.accounting.accounts.store') }}" method="POST">
+                    <form action="{{ route('admin.accounting.accounts.store') }}" method="POST" novalidate data-validate-form>
                         @csrf
                         <div class="mb-3">
-                            <label class="form-label">{{ __('messages.name') }}</label>
-                            <input type="text" name="name" class="form-control" value="{{ old('name') }}" required>
+                            <label class="form-label" for="name">{{ __('messages.name') }}</label>
+                            <input type="text" name="name" id="name" class="form-control @error('name') is-invalid @enderror" value="{{ old('name') }}" required>
+                            @error('name')<div class="invalid-feedback">{{ $message }}</div>@enderror
                         </div>
                         <div class="mb-3">
-                            <label class="form-label">{{ __('messages.code') }}</label>
-                            <input type="text" name="code" class="form-control" value="{{ old('code') }}" required>
+                            <label class="form-label" for="code">{{ __('messages.code') }}</label>
+                            <input type="text" name="code" id="code" class="form-control @error('code') is-invalid @enderror" value="{{ old('code') }}" required>
+                            @error('code')<div class="invalid-feedback">{{ $message }}</div>@enderror
                         </div>
                         <div class="mb-3">
-                            <label class="form-label">{{ __('messages.type') }}</label>
-                            <select name="type" class="form-select" required>
-                                <option value="asset">{{ __('messages.asset') }}</option>
-                                <option value="liability">{{ __('messages.liability') }}</option>
-                                <option value="equity">{{ __('messages.equity') }}</option>
-                                <option value="revenue">{{ __('messages.revenue') }}</option>
-                                <option value="expense">{{ __('messages.expense') }}</option>
+                            <label class="form-label" for="type">{{ __('messages.type') }}</label>
+                            <select name="type" id="type" class="form-select @error('type') is-invalid @enderror" required>
+                                <option value="asset" {{ old('type') == 'asset' ? 'selected' : '' }}>{{ __('messages.asset') }}</option>
+                                <option value="liability" {{ old('type') == 'liability' ? 'selected' : '' }}>{{ __('messages.liability') }}</option>
+                                <option value="equity" {{ old('type') == 'equity' ? 'selected' : '' }}>{{ __('messages.equity') }}</option>
+                                <option value="revenue" {{ old('type') == 'revenue' ? 'selected' : '' }}>{{ __('messages.revenue') }}</option>
+                                <option value="expense" {{ old('type') == 'expense' ? 'selected' : '' }}>{{ __('messages.expense') }}</option>
                             </select>
+                            @error('type')<div class="invalid-feedback">{{ $message }}</div>@enderror
                         </div>
                         <div class="mb-3">
-                            <label class="form-label">{{ __('messages.parent_account') }}</label>
-                            <select name="parent_id" class="form-select">
+                            <label class="form-label" for="parent_id">{{ __('messages.parent_account') }}</label>
+                            <select name="parent_id" id="parent_id" class="form-select @error('parent_id') is-invalid @enderror">
                                 <option value="">{{ __('messages.none') }}</option>
                                 @foreach ($accounts as $account)
-                                    <option value="{{ $account->id }}">{{ __($account->name) }}</option>
+                                    <option value="{{ $account->id }}" {{ old('parent_id') == $account->id ? 'selected' : '' }}>{{ __($account->name) }}</option>
                                 @endforeach
                             </select>
+                            @error('parent_id')<div class="invalid-feedback">{{ $message }}</div>@enderror
                         </div>
                         <div class="mb-3">
-                            <label class="form-label">{{ __('messages.description') }}</label>
-                            <textarea name="description" class="form-control" rows="3">{{ old('description') }}</textarea>
+                            <label class="form-label" for="description">{{ __('messages.description') }}</label>
+                            <textarea name="description" id="description" class="form-control @error('description') is-invalid @enderror" rows="3">{{ old('description') }}</textarea>
+                            @error('description')<div class="invalid-feedback">{{ $message }}</div>@enderror
                         </div>
                         <div class="form-check mb-3">
-                            <input class="form-check-input" type="checkbox" name="is_active" value="1" checked>
-                            <label class="form-check-label">
+                            <input class="form-check-input" type="checkbox" name="is_active" id="is_active" value="1" {{ old('is_active', '1') == '1' ? 'checked' : '' }}>
+                            <label class="form-check-label" for="is_active">
                                 {{ __('messages.active') }}
                             </label>
                         </div>

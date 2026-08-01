@@ -124,6 +124,7 @@ function initCustomerForms() {
     if (createForm && !createForm.dataset.handlerAttached) {
         createForm.dataset.handlerAttached = 'true';
         createForm.addEventListener("submit", function(e) {
+            if (e.defaultPrevented) return;
             e.preventDefault();
             handleFormSubmit(this, document.getElementById("createCustomerModal"));
         });
@@ -132,6 +133,7 @@ function initCustomerForms() {
     if (editForm && !editForm.dataset.handlerAttached) {
         editForm.dataset.handlerAttached = 'true';
         editForm.addEventListener("submit", function(e) {
+            if (e.defaultPrevented) return;
             e.preventDefault();
             handleFormSubmit(this, document.getElementById("editCustomerModal"));
         });
@@ -193,7 +195,7 @@ function handleFormSubmit(form, modal) {
                 errorMsg = 'Operation failed';
             }
             
-            InventMagApp.showToast('Error', errorMsg, 'error');
+            InventMagApp.showToast('Warning', errorMsg, 'warning');
         }
     })
     .catch(error => {

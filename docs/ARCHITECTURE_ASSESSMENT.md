@@ -1,10 +1,10 @@
 # Invent-MAG: Senior Engineer Architecture Assessment
 
 **Assessor:** Senior Software Engineer (AI-assisted deep codebase review)
-**Codebase Version:** 1.9
+**Codebase Version:** 2.1
 **Review Date:** June 2026
-**Development Context:** Solo developer, 1.5 years, 451+ commits, production SaaS
-**Last Updated:** July 2026 (rev 9) — All 9 remaining gaps from TAXATION_IMPROVEMENT.md Section 12 fixed: POS journal entries (Dr AR/Cr Revenue + Dr COGS/Cr Inventory + Dr Cash/Cr AR), POS print receipt view created, purchase return journal entry fixed (Purchase Returns account 5120 credit), sales/purchase return bulk operations now process individual side effects (stock, journal, credit), partial return UI unlocked, N+1 query fixes, tenant scoping consistency, and getAdjustedTotal() relation safety. Items #26–34 added to action table. Test suite: 1055 passing (2 pre-existing failures in BackupControllerTest and SalesControllerTest unrelated to changes). Rating maintained at 9.0/10.
+**Development Context:** Solo developer, 1.5 years, 527+ commits, production SaaS
+**Last Updated:** July 2026 (rev 11) — e-Faktur Phase 1 complete. Tax jurisdiction toggling, navigation filtering, POS/Quotation tax model integration, PPN backward compatibility enforced via snapshot pattern, PPh (Withholding Tax) implemented. Test suite: 552 PHP tests / 2541 PHP assertions + 169 JS Vitest files. Rating maintained at 9.0/10.
 
 ---
 
@@ -75,7 +75,7 @@ The backward compatibility for legacy tenants (`plans.legacy_full_access = true`
 
 ### 1.4 The Test Coverage Is Honest
 
-791 test files with 40 feature + 48 unit PHP tests + 171 JS Vitest tests is real coverage for an ERP domain. The `CreatesTenant` trait in `tests/Traits/` makes tenant-scoped tests composable without boilerplate. `MultiTenancyTest.php` is a direct test of the most dangerous failure mode in the entire system.
+552 PHP test methods (2541 PHP assertions) across 267 test files (42 Feature + 56 Unit PHP + 169 JS Vitest) is real coverage for an ERP domain. The `CreatesTenant` trait in `tests/Traits/` makes tenant-scoped tests composable without boilerplate. `MultiTenancyTest.php` is a direct test of the most dangerous failure mode in the entire system.
 
 The existence of `MidtransWebhookTest.php` is particularly good — it tests the payment callback path including signature verification, which is easy to skip in testing and catastrophic to get wrong in production.
 
@@ -426,7 +426,8 @@ The following are gaps relative to what the system claims to be (a production ER
 | ---------------------------------------------- | ------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Cash Flow Statement                            | **✅ DONE**  | Implemented May 2026: CashFlowService, report view, PDF/CSV export, plan tiering, lang translations, feature tests.                                                                                                                                     |
 | Bank Reconciliation                            | High         | Without bank reconciliation, the Cash/Bank account balance in the system is unverified. Any discrepancy between the bank statement and the system's cash account is invisible. This is a fundamental internal control gap.                              |
-| e-Faktur / PPN Compliance                      | High         | For the Indonesian market, any business registered as PKP (which is any medium/large business) cannot use this as their primary system without e-Faktur. The ROADMAP has a detailed implementation plan — this is a known gap being actively addressed. |
+| ~~e-Faktur / PPN Compliance~~                      | ~~High~~      | ~~For the Indonesian market, any business registered as PKP (which is any medium/large business) cannot use this as their primary system without e-Faktur.~~ **✅ Phase 1 DONE July 2026.** Phase 2 (PJAP API direct DJP submission) remains planned. |
+| ~~PPh (Withholding Tax)~~                      | ~~High~~      | ~~Indonesian businesses require PPh 21, 22, 23, 26 withholding tax support for compliance.~~ **✅ DONE July 2026.** PPh types implemented alongside PPN tax system. |
 | ~~CSP Nonces~~                                 | ~~Medium~~   | ~~Required to make the CSP header actually effective against XSS.~~ **✅ Resolved May 2026**                                                                                                                                                            |
 | ~~`tenant_accounting_settings` migration~~     | ~~Critical~~ | ~~The `accounting_settings` on `users` is a live data integrity bug, not a missing feature. It must be migrated.~~ **✅ Resolved May 2026**                                                                                                             |
 | ~~Forecast accuracy metrics (MAPE/RMSE)~~      | ~~Medium~~   | ~~The feature is listed as implemented in the feature checklist but does not exist in the codebase.~~ **✅ Resolved May 2026**                                                                                                                          |
@@ -470,7 +471,7 @@ If this codebase were presented to me in a technical due diligence for acquisiti
 | Dimension                   | Score      | Notes                                                                                                                                                                       |
 | --------------------------- | ---------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Architecture pattern        | 8.5/10     | Service Layer + Eloquent consistently applied; v1.9 Quotation continues pattern; Tax system full CRUD with 3 tax types (exclusive/inclusive/none)                          |
-| Accounting correctness      | 9.5/10     | Double-entry is real; FIFO COGS; `accounting_settings` correctly on `tenants` ✅; Cash Flow Statement ✅; Tax system now supports inclusive/exclusive/none types correctly; POS journal entries ✅; Purchase return journal corrected ✅; Bulk return side effects ✅  |
+| Accounting correctness      | 9.5/10     | Double-entry is real; FIFO COGS; `accounting_settings` correctly on `tenants` ✅; Cash Flow Statement ✅; Tax system now supports inclusive/exclusive/none types correctly; PPh (Withholding Tax) implemented ✅; POS journal entries ✅; Purchase return journal corrected ✅; Bulk return side effects ✅  |
 | Multitenancy implementation | 9/10       | Correct design; `DB::tenantTable()` macro guards raw queries ✅; `BelongsToTenant` consistently applied; billing period now consistent (rolling 30 days) ✅                 |
 | Security                    | 8/10       | CSP nonces ✅; inline scripts extracted ✅; backup password encrypted ✅; `DB::tenantTable()` guard ✅; `'unsafe-eval` documented with rationale ✅                          |
 | Documentation accuracy      | 9.5/10     | All documented issues resolved; tax system documented in TAXATION_IMPROVEMENT.md; CSP comment added; billing inconsistency resolved                                        |
@@ -534,4 +535,4 @@ The following items remain open as of June 2026. All previously closed items are
 
 ---
 
-_This assessment is based on full static analysis of the v1.9 codebase: all source files, migrations, services, controllers, middleware, config, tests, and documentation. Covers all models (47), services (34), route files (14), migration files (~82+), and feature/unit test files (791). No runtime profiling performed._
+_This assessment is based on full static analysis of the v2.1 codebase: all source files, migrations, services, controllers, middleware, config, tests, and documentation. Covers all models (51), services (46), route files (15 admin + api + web + console + turbo), migration files (100+), and 552 test methods (2541 assertions) across 267 test files (42 Feature + 56 Unit PHP + 169 JS Vitest). No runtime profiling performed._

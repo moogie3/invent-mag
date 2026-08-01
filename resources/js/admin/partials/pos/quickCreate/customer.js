@@ -32,6 +32,7 @@ function setupQuickCreateCustomerForm() {
     if (!customerForm) return;
 
     customerForm.addEventListener("submit", function (e) {
+        if (e.defaultPrevented) return;
         e.preventDefault();
 
         const form = this;

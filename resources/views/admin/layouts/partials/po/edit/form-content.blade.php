@@ -1,4 +1,4 @@
-<form id="edit-po-form" enctype="multipart/form-data" method="POST" action="{{ route('admin.po.update', $pos->id) }}">
+<form id="edit-po-form" enctype="multipart/form-data" method="POST" action="{{ route('admin.po.update', $pos->id) }}" novalidate data-validate-form>
     @csrf
     @method('PUT')
     <div class="card-body p-4">
@@ -59,28 +59,32 @@
             <h4 class="card-title mb-4">
                 <i class="ti ti-plus me-2 text-primary"></i>{{ __('messages.add_payment') }}
             </h4>
-            <form action="{{ route('admin.po.add-payment', $pos->id) }}" method="POST" id="add-payment-form">
+            <form action="{{ route('admin.po.add-payment', $pos->id) }}" method="POST" id="add-payment-form" novalidate data-validate-form>
                 @csrf
                 <div class="mb-3">
                     <label for="amount" class="form-label">{{ __('messages.amount') }}</label>
-                    <input type="number" class="form-control" id="amount" name="amount" step="0.01" min="0.01" max="{{ $pos->balance }}" required>
+                    <input type="number" class="form-control @error('amount') is-invalid @enderror" id="amount" name="amount" step="0.01" min="0.01" max="{{ $pos->balance }}" value="{{ old('amount') }}" required>
+                    @error('amount')<div class="invalid-feedback">{{ $message }}</div>@enderror
                 </div>
                 <div class="mb-3">
                     <label for="payment_date" class="form-label">{{ __('messages.payment_date') }}</label>
-                    <input type="date" class="form-control" id="payment_date" name="payment_date" value="{{ date('Y-m-d') }}" required>
+                    <input type="date" class="form-control @error('payment_date') is-invalid @enderror" id="payment_date" name="payment_date" value="{{ old('payment_date', date('Y-m-d')) }}" required>
+                    @error('payment_date')<div class="invalid-feedback">{{ $message }}</div>@enderror
                 </div>
                 <div class="mb-3">
                     <label for="payment_method" class="form-label">{{ __('messages.pos_payment_method') }}</label>
-                    <select class="form-select" id="payment_method" name="payment_method" required>
-                        <option value="Cash">{{ __('messages.payment_method_cash') }}</option>
-                        <option value="Card">{{ __('messages.pos_payment_method_card') }}</option>
-                        <option value="Transfer">{{ __('messages.payment_method_transfer') }}</option>
-                        <option value="eWallet">{{ __('messages.pos_payment_method_ewallet') }}</option>
+                    <select class="form-select @error('payment_method') is-invalid @enderror" id="payment_method" name="payment_method" required>
+                        <option value="Cash" {{ old('payment_method') == 'Cash' ? 'selected' : '' }}>{{ __('messages.payment_method_cash') }}</option>
+                        <option value="Card" {{ old('payment_method') == 'Card' ? 'selected' : '' }}>{{ __('messages.pos_payment_method_card') }}</option>
+                        <option value="Transfer" {{ old('payment_method') == 'Transfer' ? 'selected' : '' }}>{{ __('messages.payment_method_transfer') }}</option>
+                        <option value="eWallet" {{ old('payment_method') == 'eWallet' ? 'selected' : '' }}>{{ __('messages.pos_payment_method_ewallet') }}</option>
                     </select>
+                    @error('payment_method')<div class="invalid-feedback">{{ $message }}</div>@enderror
                 </div>
                 <div class="mb-3">
                     <label for="notes" class="form-label">{{ __('messages.po_notes') }}</label>
-                    <textarea class="form-control" id="notes" name="notes" rows="3"></textarea>
+                    <textarea class="form-control @error('notes') is-invalid @enderror" id="notes" name="notes" rows="3">{{ old('notes') }}</textarea>
+                    @error('notes')<div class="invalid-feedback">{{ $message }}</div>@enderror
                 </div>
                 <button type="submit" class="btn btn-primary">
                     <i class="ti ti-plus me-1"></i> {{ __('messages.add_payment') }}

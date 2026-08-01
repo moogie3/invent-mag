@@ -1,6 +1,6 @@
 <div class="page-body mt-4">
     <div class="{{ $containerClass ?? "container-xl" }}">
-        <form id="journalEntryForm" action="{{ route('admin.accounting.journal-entries.store') }}" method="POST" data-row-counter="{{ $accounts->count() + 2 }}">
+        <form id="journalEntryForm" action="{{ route('admin.accounting.journal-entries.store') }}" method="POST" data-row-counter="{{ $accounts->count() + 2 }}" novalidate data-validate-form>
             @csrf
             <input type="hidden" name="transactions" id="transactionsInput">
             

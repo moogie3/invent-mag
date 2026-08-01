@@ -33,7 +33,20 @@ class PurchaseHelper
         return round($amount * ($taxRate / 100), 2);
     }
 
-    public static function calculateInvoiceSummary($items, $discountTotal, $discountTotalType, $taxRate = 0, $taxType = 'exclusive')
+    /**
+     * Calculate PPh (withholding tax) amount.
+     * PPh is always exclusive — it is deducted from the taxable amount, never added.
+     */
+    public static function calculatePphAmount($taxableAmount, $pphRate = 0)
+    {
+        if ($pphRate <= 0 || $taxableAmount <= 0) {
+            return 0.0;
+        }
+
+        return round($taxableAmount * ($pphRate / 100), 2);
+    }
+
+    public static function calculateInvoiceSummary($items, $discountTotal, $discountTotalType, $taxRate = 0, $taxType = 'exclusive', $pphRate = 0)
     {
         $subtotal = 0;
         $totalProductDiscount = 0;
@@ -61,17 +74,21 @@ class PurchaseHelper
             $finalTotal = $taxableAmount + $taxAmount;
         }
 
+        $pphAmount = self::calculatePphAmount($taxableAmount, $pphRate);
+        $finalTotal = max(0, $finalTotal - $pphAmount);
+
         return [
             'subtotal' => $subtotal,
             'itemCount' => $itemCount,
             'totalProductDiscount' => $totalProductDiscount,
             'orderDiscount' => $orderDiscount,
             'taxAmount' => $taxAmount,
+            'pphAmount' => $pphAmount,
             'finalTotal' => $finalTotal,
         ];
     }
 
-    public static function calculateInvoiceSummaryWithReturns($items, $discountTotal, $discountTotalType, $purchaseReturns = null, $taxRate = 0, $taxType = 'exclusive')
+    public static function calculateInvoiceSummaryWithReturns($items, $discountTotal, $discountTotalType, $purchaseReturns = null, $taxRate = 0, $taxType = 'exclusive', $pphRate = 0)
     {
         $subtotal = 0;
         $totalProductDiscount = 0;
@@ -116,12 +133,16 @@ class PurchaseHelper
             $finalTotal = $taxableAmount + $taxAmount;
         }
 
+        $pphAmount = self::calculatePphAmount($taxableAmount, $pphRate);
+        $finalTotal = max(0, $finalTotal - $pphAmount);
+
         return [
             'subtotal' => $subtotal,
             'itemCount' => $itemCount,
             'totalProductDiscount' => $totalProductDiscount,
             'orderDiscount' => $orderDiscount,
             'taxAmount' => $taxAmount,
+            'pphAmount' => $pphAmount,
             'finalTotal' => $finalTotal,
             'totalReturnedQty' => $totalReturnedQty,
         ];

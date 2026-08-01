@@ -31,7 +31,8 @@
                             </span>
                         @endif
                         <div class="d-flex flex-column gap-2">
-                            <input type="file" name="avatar" class="form-control" id="avatarInput" accept="image/*">
+                            <input type="file" name="avatar" class="form-control @error('avatar') is-invalid @enderror" id="avatarInput" accept="image/*">
+                            @error('avatar')<div class="invalid-feedback">{{ $message }}</div>@enderror
                             <input type="hidden" name="delete_avatar" id="deleteAvatarInput" value="0">
 
                             <button type="button" class="btn btn-sm btn-outline-danger" id="removeAvatarBtn"
@@ -60,9 +61,10 @@
             <div class="settings-section-content">
                 <div class="row g-3">
                     <div class="col-md-4">
-                        <div class="form-label">{{ __('messages.user_name') }}</div>
-                        <input type="text" name="name" class="form-control" value="{{ auth()->user()->name }}"
+                        <label class="form-label" for="name">{{ __('messages.user_name') }}</label>
+                        <input type="text" name="name" id="name" class="form-control @error('name') is-invalid @enderror" value="{{ old('name', auth()->user()->name) }}"
                             required>
+                        @error('name')<div class="invalid-feedback">{{ $message }}</div>@enderror
                     </div>
                     <div class="col-md-4">
                         <div class="form-label">{{ __('messages.business_name') }}</div>
@@ -71,17 +73,18 @@
                             readonly>
                     </div>
                     <div class="col-md-4">
-                        <div class="form-label">{{ __('messages.address') }}</div>
-                        <input type="text" name="address" class="form-control" value="{{ auth()->user()->address }}"
+                        <label class="form-label" for="address">{{ __('messages.address') }}</label>
+                        <input type="text" name="address" id="address" class="form-control @error('address') is-invalid @enderror" value="{{ old('address', auth()->user()->address) }}"
                             required>
+                        @error('address')<div class="invalid-feedback">{{ $message }}</div>@enderror
                     </div>
                 </div>
                 <div class="row g-3 mt-2">
                     <div class="col-md-6">
-                        <div class="form-label">{{ __('messages.email') }}</div>
+                        <label class="form-label" for="email">{{ __('messages.email') }}</label>
                         <div class="input-group">
-                            <input type="email" name="email" class="form-control"
-                                value="{{ auth()->user()->email }}" required
+                            <input type="email" name="email" id="email" class="form-control @error('email') is-invalid @enderror"
+                                value="{{ old('email', auth()->user()->email) }}" required
                                 @if (auth()->user()->hasVerifiedEmail()) disabled @endif>
                             <span class="input-group-text">
                                 @if (auth()->user()->hasVerifiedEmail())
@@ -93,6 +96,7 @@
                                 @endif
                             </span>
                         </div>
+                        @error('email')<div class="invalid-feedback d-block">{{ $message }}</div>@enderror
                         @if (!auth()->user()->hasVerifiedEmail())
                             <small class="form-text text-muted mt-1">
                                 {{ __('messages.email_not_verified_action') }}
@@ -109,15 +113,16 @@
                         @endif
                     </div>
                     <div class="col-md-6">
-                        <div class="form-label">{{ __('messages.timezone') }}</div>
-                        <select name="timezone" class="form-control" required>
+                        <label class="form-label" for="timezone">{{ __('messages.timezone') }}</label>
+                        <select name="timezone" id="timezone" class="form-control @error('timezone') is-invalid @enderror" required>
                             @foreach (timezone_identifiers_list() as $tz)
                                 <option value="{{ $tz }}"
-                                    {{ auth()->user()->timezone === $tz ? 'selected' : '' }}>
+                                    {{ old('timezone', auth()->user()->timezone) === $tz ? 'selected' : '' }}>
                                     {{ $tz }}
                                 </option>
                             @endforeach
                         </select>
+                        @error('timezone')<div class="invalid-feedback">{{ $message }}</div>@enderror
                     </div>
                 </div>
         </div>

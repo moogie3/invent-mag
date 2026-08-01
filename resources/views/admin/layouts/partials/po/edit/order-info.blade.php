@@ -21,15 +21,16 @@
         </div>
         <div class="col-md-6">
             <div class="mb-2">
-                <label class="form-label fw-bold">{{ __('messages.warehouse') }}</label>
-                <select class="form-select" name="warehouse_id" id="warehouse_id">
+                <label class="form-label fw-bold" for="warehouse_id">{{ __('messages.warehouse') }}</label>
+                <select class="form-select @error('warehouse_id') is-invalid @enderror" name="warehouse_id" id="warehouse_id">
                     @foreach ($warehouses as $warehouse)
                         <option value="{{ $warehouse->id }}"
-                            {{ $pos->warehouse_id == $warehouse->id ? 'selected' : '' }}>
+                            {{ old('warehouse_id', $pos->warehouse_id) == $warehouse->id ? 'selected' : '' }}>
                             {{ $warehouse->name }}
                         </option>
                     @endforeach
                 </select>
+                @error('warehouse_id')<div class="invalid-feedback">{{ $message }}</div>@enderror
             </div>
             <div class="mb-2">
                 <label class="form-label fw-bold">{{ __('messages.po_payment_type') }}</label>

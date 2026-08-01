@@ -24,6 +24,7 @@ export function initNewOpportunityForm() {
     newOpportunityFormListenerAttached = true;
 
     newOpportunityForm.addEventListener("submit", async function (e) {
+        if (e.defaultPrevented) return;
         e.preventDefault();
 
         const selectedPipelineId = pipelineSelect.value;
@@ -34,18 +35,18 @@ export function initNewOpportunityForm() {
 
         if (!selectedPipeline) {
             InventMagApp.showToast(
-                "Error",
+                "Warning",
                 "Please select a pipeline first.",
-                "error"
+                "warning"
             );
             return;
         }
 
         if (!selectedPipeline.stages || selectedPipeline.stages.length === 0) {
             InventMagApp.showToast(
-                "Error",
+                "Warning",
                 "The selected pipeline has no stages. Please add stages to the pipeline first.",
-                "error"
+                "warning"
             );
             return;
         }

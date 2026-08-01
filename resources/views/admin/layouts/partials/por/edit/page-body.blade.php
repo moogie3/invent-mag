@@ -4,7 +4,7 @@
             <div class="col-12">
                 <div class="card shadow-sm border-0 rounded-3">
                     <div class="card-body">
-                        <form id="purchase-return-edit-form" action="{{ route('admin.por.update', $por) }}" method="POST"
+                        <form id="purchase-return-edit-form" action="{{ route('admin.por.update', $por) }}" method="POST" novalidate data-validate-form
                             data-is-completed-or-canceled="{{ $isCompletedOrCanceled ? 'true' : 'false' }}"
                             data-status="{{ $por->status }}">
                             @csrf
@@ -34,7 +34,7 @@
                                         <label class="form-label fw-bold required">{{ __('messages.return_date') }}</label>
                                         <input type="date" name="return_date"
                                             class="form-control @error('return_date') is-invalid @enderror"
-                                            value="{{ old('return_date', $por->return_date->format('Y-m-d')) }}">
+                                            value="{{ old('return_date', $por->return_date->format('Y-m-d')) }}" required>
                                         @error('return_date')
                                             <div class="invalid-feedback">{{ $message }}</div>
                                         @enderror
@@ -91,7 +91,7 @@
                                         </div>
                                         <div class="mb-3">
                                             <label class="form-label fw-bold required">{{ __('messages.status') }}</label>
-                                            <select name="status" class="form-select @error('status') is-invalid @enderror">
+                                            <select name="status" class="form-select @error('status') is-invalid @enderror" required>
                                                 @foreach (\App\Models\PurchaseReturn::$statuses as $status)
                                                     <option value="{{ $status }}"
                                                         {{ old('status', $por->status) == $status ? 'selected' : '' }}>

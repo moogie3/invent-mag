@@ -4,7 +4,7 @@
             <div class="col-12">
                 <div class="card shadow-sm border-0 rounded-3">
                     <div class="card-body">
-                        <form id="purchase-return-form" action="{{ route('admin.por.store') }}" method="POST">
+                        <form id="purchase-return-form" action="{{ route('admin.por.store') }}" method="POST" novalidate data-validate-form>
                             @csrf
 
                             {{-- Return Information Section --}}
@@ -16,7 +16,7 @@
                                     <div class="col-lg-6">
                                         <label class="form-label fw-bold required">{{ __('messages.purchase_invoice') }}</label>
                                         <select name="purchase_id" id="purchase-select"
-                                            class="form-select @error('purchase_id') is-invalid @enderror">
+                                            class="form-select @error('purchase_id') is-invalid @enderror" required>
                                             <option value="">{{ __('messages.select_purchase') }}</option>
                                             @foreach ($purchases as $purchase)
                                                 <option value="{{ $purchase->id }}"
@@ -35,7 +35,7 @@
                                         <label class="form-label fw-bold required">{{ __('messages.return_date') }}</label>
                                         <input type="date" name="return_date"
                                             class="form-control @error('return_date') is-invalid @enderror"
-                                            value="{{ old('return_date', date('Y-m-d')) }}">
+                                            value="{{ old('return_date', date('Y-m-d')) }}" required>
                                         @error('return_date')
                                             <div class="invalid-feedback">{{ $message }}</div>
                                         @enderror
@@ -95,7 +95,7 @@
                                         </div>
                                         <div class="mb-3">
                                             <label class="form-label fw-bold required">{{ __('messages.status') }}</label>
-                                            <select name="status" class="form-select @error('status') is-invalid @enderror">
+                                            <select name="status" class="form-select @error('status') is-invalid @enderror" required>
                                                 @foreach (\App\Models\PurchaseReturn::$statuses as $status)
                                                     <option value="{{ $status }}"
                                                         {{ old('status', 'Pending') == $status ? 'selected' : '' }}>

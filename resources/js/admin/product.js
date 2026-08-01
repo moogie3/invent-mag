@@ -1,4 +1,5 @@
 import { initProductPage } from "./partials/product/main.js";
+import { validateForm } from "./utils/formValidator.js";
 
 import {
     initProductModal,
@@ -66,6 +67,7 @@ function initProductForms() {
     if (createForm && !createForm.dataset.handlerAttached) {
         createForm.dataset.handlerAttached = 'true';
         createForm.addEventListener("submit", function(e) {
+            if (e.defaultPrevented) return;
             e.preventDefault();
             handleProductFormSubmit(this, 'create');
         });
@@ -75,6 +77,7 @@ function initProductForms() {
     if (editForm && !editForm.dataset.handlerAttached) {
         editForm.dataset.handlerAttached = 'true';
         editForm.addEventListener("submit", function(e) {
+            if (e.defaultPrevented) return;
             e.preventDefault();
             handleProductFormSubmit(this, 'edit');
         });
@@ -157,7 +160,7 @@ function handleProductFormSubmit(form, formType) {
                 errorMsg = 'Validation failed. Please check your inputs.';
             }
             
-            InventMagApp.showToast('Error', errorMsg, 'error');
+            InventMagApp.showToast('Warning', errorMsg, 'warning');
         }
     })
     .catch(error => {

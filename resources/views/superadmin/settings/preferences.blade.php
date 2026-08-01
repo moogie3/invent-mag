@@ -93,11 +93,12 @@
                                 </div>
                                 <div class="row g-3 mb-4">
                                     <div class="col-md-6">
-                                        <div class="form-label">Theme Mode</div>
-                                        <select name="theme_mode" class="form-control" required>
-                                            <option value="light" {{ $userSettings['theme_mode'] === 'light' ? 'selected' : '' }}>Light Theme</option>
-                                            <option value="dark" {{ $userSettings['theme_mode'] === 'dark' ? 'selected' : '' }}>Dark Theme</option>
+                                        <label class="form-label" for="theme_mode">Theme Mode</label>
+                                        <select name="theme_mode" id="theme_mode" class="form-control @error('theme_mode') is-invalid @enderror" required>
+                                            <option value="light" {{ old('theme_mode', $userSettings['theme_mode']) === 'light' ? 'selected' : '' }}>Light Theme</option>
+                                            <option value="dark" {{ old('theme_mode', $userSettings['theme_mode']) === 'dark' ? 'selected' : '' }}>Dark Theme</option>
                                         </select>
+                                        @error('theme_mode')<div class="invalid-feedback">{{ $message }}</div>@enderror
                                     </div>
                                     <div class="col-md-6">
                                         <div class="form-label">Theme Toggle Visibility</div>
@@ -137,13 +138,14 @@
                                         </div>
                                     </div>
                                     <div class="col-md-6">
-                                        <div class="form-label">Notification Duration (seconds)</div>
-                                        <select name="notification_duration" class="form-control" required>
-                                            <option value="3" {{ $userSettings['notification_duration'] == 3 ? 'selected' : '' }}>3 seconds</option>
-                                            <option value="5" {{ $userSettings['notification_duration'] == 5 ? 'selected' : '' }}>5 seconds</option>
-                                            <option value="10" {{ $userSettings['notification_duration'] == 10 ? 'selected' : '' }}>10 seconds</option>
-                                            <option value="0" {{ $userSettings['notification_duration'] == 0 ? 'selected' : '' }}>Manual dismiss</option>
+                                        <label class="form-label" for="notification_duration">Notification Duration (seconds)</label>
+                                        <select name="notification_duration" id="notification_duration" class="form-control @error('notification_duration') is-invalid @enderror" required>
+                                            <option value="3" {{ old('notification_duration', $userSettings['notification_duration']) == 3 ? 'selected' : '' }}>3 seconds</option>
+                                            <option value="5" {{ old('notification_duration', $userSettings['notification_duration']) == 5 ? 'selected' : '' }}>5 seconds</option>
+                                            <option value="10" {{ old('notification_duration', $userSettings['notification_duration']) == 10 ? 'selected' : '' }}>10 seconds</option>
+                                            <option value="0" {{ old('notification_duration', $userSettings['notification_duration']) == 0 ? 'selected' : '' }}>Manual dismiss</option>
                                         </select>
+                                        @error('notification_duration')<div class="invalid-feedback">{{ $message }}</div>@enderror
                                     </div>
                                 </div>
 
@@ -161,14 +163,15 @@
                                 </div>
                                 <div class="row g-3 mb-4">
                                     <div class="col-md-6">
-                                        <div class="form-label">Auto Logout Time (minutes)</div>
-                                        <select name="auto_logout_time" class="form-control" required>
-                                            <option value="0" {{ $userSettings['auto_logout_time'] == 0 ? 'selected' : '' }}>Disabled</option>
-                                            <option value="15" {{ $userSettings['auto_logout_time'] == 15 ? 'selected' : '' }}>15 minutes</option>
-                                            <option value="30" {{ $userSettings['auto_logout_time'] == 30 ? 'selected' : '' }}>30 minutes</option>
-                                            <option value="60" {{ $userSettings['auto_logout_time'] == 60 ? 'selected' : '' }}>1 hour</option>
-                                            <option value="120" {{ $userSettings['auto_logout_time'] == 120 ? 'selected' : '' }}>2 hours</option>
+                                        <label class="form-label" for="auto_logout_time">Auto Logout Time (minutes)</label>
+                                        <select name="auto_logout_time" id="auto_logout_time" class="form-control @error('auto_logout_time') is-invalid @enderror" required>
+                                            <option value="0" {{ old('auto_logout_time', $userSettings['auto_logout_time']) == 0 ? 'selected' : '' }}>Disabled</option>
+                                            <option value="15" {{ old('auto_logout_time', $userSettings['auto_logout_time']) == 15 ? 'selected' : '' }}>15 minutes</option>
+                                            <option value="30" {{ old('auto_logout_time', $userSettings['auto_logout_time']) == 30 ? 'selected' : '' }}>30 minutes</option>
+                                            <option value="60" {{ old('auto_logout_time', $userSettings['auto_logout_time']) == 60 ? 'selected' : '' }}>1 hour</option>
+                                            <option value="120" {{ old('auto_logout_time', $userSettings['auto_logout_time']) == 120 ? 'selected' : '' }}>2 hours</option>
                                         </select>
+                                        @error('auto_logout_time')<div class="invalid-feedback">{{ $message }}</div>@enderror
                                     </div>
                                     <div class="col-md-6">
                                         <div class="form-check form-switch" style="margin-top: 1.7rem;">
@@ -206,14 +209,15 @@
                                         </div>
                                     </div>
                                     <div class="col-md-6">
-                                        <div class="form-label">Data Refresh Rate (seconds)</div>
-                                        <select name="data_refresh_rate" class="form-control" required>
-                                            <option value="0" {{ $userSettings['data_refresh_rate'] == 0 ? 'selected' : '' }}>Manual only</option>
-                                            <option value="15" {{ $userSettings['data_refresh_rate'] == 15 ? 'selected' : '' }}>15 seconds</option>
-                                            <option value="30" {{ $userSettings['data_refresh_rate'] == 30 ? 'selected' : '' }}>30 seconds</option>
-                                            <option value="60" {{ $userSettings['data_refresh_rate'] == 60 ? 'selected' : '' }}>1 minute</option>
-                                            <option value="300" {{ $userSettings['data_refresh_rate'] == 300 ? 'selected' : '' }}>5 minutes</option>
+                                        <label class="form-label" for="data_refresh_rate">Data Refresh Rate (seconds)</label>
+                                        <select name="data_refresh_rate" id="data_refresh_rate" class="form-control @error('data_refresh_rate') is-invalid @enderror" required>
+                                            <option value="0" {{ old('data_refresh_rate', $userSettings['data_refresh_rate']) == 0 ? 'selected' : '' }}>Manual only</option>
+                                            <option value="15" {{ old('data_refresh_rate', $userSettings['data_refresh_rate']) == 15 ? 'selected' : '' }}>15 seconds</option>
+                                            <option value="30" {{ old('data_refresh_rate', $userSettings['data_refresh_rate']) == 30 ? 'selected' : '' }}>30 seconds</option>
+                                            <option value="60" {{ old('data_refresh_rate', $userSettings['data_refresh_rate']) == 60 ? 'selected' : '' }}>1 minute</option>
+                                            <option value="300" {{ old('data_refresh_rate', $userSettings['data_refresh_rate']) == 300 ? 'selected' : '' }}>5 minutes</option>
                                         </select>
+                                        @error('data_refresh_rate')<div class="invalid-feedback">{{ $message }}</div>@enderror
                                     </div>
                                 </div>
 
@@ -231,11 +235,12 @@
                                 </div>
                                 <div class="row g-3 mb-4">
                                     <div class="col-md-4">
-                                        <div class="form-label">System Language</div>
-                                        <select name="system_language" class="form-control" required>
-                                            <option value="en" {{ $userSettings['system_language'] === 'en' ? 'selected' : '' }}>English</option>
-                                            <option value="id" {{ $userSettings['system_language'] === 'id' ? 'selected' : '' }}>Bahasa Indonesia</option>
+                                        <label class="form-label" for="system_language">System Language</label>
+                                        <select name="system_language" id="system_language" class="form-control @error('system_language') is-invalid @enderror" required>
+                                            <option value="en" {{ old('system_language', $userSettings['system_language']) === 'en' ? 'selected' : '' }}>English</option>
+                                            <option value="id" {{ old('system_language', $userSettings['system_language']) === 'id' ? 'selected' : '' }}>Bahasa Indonesia</option>
                                         </select>
+                                        @error('system_language')<div class="invalid-feedback">{{ $message }}</div>@enderror
                                     </div>
                                 </div>
 

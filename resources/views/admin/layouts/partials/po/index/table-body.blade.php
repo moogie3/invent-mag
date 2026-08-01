@@ -3,7 +3,7 @@
         @include('admin.layouts.partials.po.index.table-row', ['po' => $po, 'index' => $index])
     @empty
         <tr>
-            <td colspan="13">
+            <td colspan="14">
                 <div class="empty">
                     <div class="empty-img">
                         <i class="ti ti-mood-sad" style="font-size: 5rem; color: #ccc;"></i>

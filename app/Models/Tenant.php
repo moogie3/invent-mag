@@ -362,6 +362,38 @@ class Tenant extends BaseTenant
     }
 
     /**
+     * Check if switching away from Indonesian jurisdiction is safe.
+     * Blocks the switch if there are draft Faktur Pajak or unissued PPN sales.
+     *
+     * @return array{safe: bool, message: string|null, count: int}
+     */
+    public function canDisableIndonesianJurisdiction(): array
+    {
+        $draftCount = \App\Models\FakturPajak::where('status', 'draft')->count();
+        if ($draftCount > 0) {
+            return [
+                'safe' => false,
+                'message' => __('messages.efaktur_cannot_disable_with_drafts', ['count' => $draftCount]),
+                'count' => $draftCount,
+            ];
+        }
+
+        $unissuedCount = \App\Models\Sales::where('ppn_enabled', true)
+            ->where('ppn_amount', '>', 0)
+            ->where('faktur_pajak_id', null)
+            ->count();
+        if ($unissuedCount > 0) {
+            return [
+                'safe' => false,
+                'message' => __('messages.efaktur_cannot_disable_with_unissued', ['count' => $unissuedCount]),
+                'count' => $unissuedCount,
+            ];
+        }
+
+        return ['safe' => true, 'message' => null, 'count' => 0];
+    }
+
+    /**
      * Check if the tenant can add more users based on plan limits.
      * Backward compatible: tenants without a plan have no limits.
      */

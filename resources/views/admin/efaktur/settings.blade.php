@@ -52,23 +52,25 @@
                         <form method="POST" action="{{ route('admin.efaktur.settings.save') }}">
                             @csrf
                             <div class="mb-3">
-                                <label class="form-label fw-semibold">{{ __('messages.tax_jurisdiction') }}</label>
-                                <select name="tax_jurisdiction" class="form-select" id="taxJurisdictionSelect">
+                                <label class="form-label fw-semibold" for="taxJurisdictionSelect">{{ __('messages.tax_jurisdiction') }}</label>
+                                <select name="tax_jurisdiction" class="form-select @error('tax_jurisdiction') is-invalid @enderror" id="taxJurisdictionSelect">
                                     <option value="">{{ __('messages.tax_jurisdiction_none') }}</option>
-                                    <option value="ID" {{ ($tenant->tax_jurisdiction ?? '') === 'ID' ? 'selected' : '' }}>
+                                    <option value="ID" {{ old('tax_jurisdiction', $tenant->tax_jurisdiction ?? '') === 'ID' ? 'selected' : '' }}>
                                         {{ __('messages.tax_jurisdiction_id') }}
                                     </option>
                                 </select>
+                                @error('tax_jurisdiction')<div class="invalid-feedback">{{ $message }}</div>@enderror
                                 <div class="form-text">{!! __('messages.tax_jurisdiction_hint') !!}</div>
                             </div>
 
                             <div id="indonesianTaxFields" style="{{ ($tenant->tax_jurisdiction ?? '') === 'ID' ? '' : 'display:none' }}">
                                 <div class="mb-3">
-                                    <label class="form-label fw-semibold">{{ __('messages.efaktur_company_npwp') }}</label>
-                                    <input type="text" name="npwp" class="form-control font-monospace"
+                                    <label class="form-label fw-semibold" for="npwp">{{ __('messages.efaktur_company_npwp') }}</label>
+                                    <input type="text" name="npwp" id="npwp" class="form-control font-monospace @error('npwp') is-invalid @enderror"
                                         value="{{ old('npwp', $tenant->npwp) }}"
                                         placeholder="XX.XXX.XXX.X-XXX.XXX"
                                         maxlength="20">
+                                    @error('npwp')<div class="invalid-feedback">{{ $message }}</div>@enderror
                                     <div class="form-text">{!! __('messages.efaktur_npwp_format_hint') !!}</div>
                                 </div>
 
@@ -76,7 +78,7 @@
                                     <div class="form-check form-switch">
                                         <input class="form-check-input" type="checkbox" name="pkp_status"
                                             id="pkp_status" value="1"
-                                            {{ $tenant->pkp_status ? 'checked' : '' }}>
+                                            {{ old('pkp_status', $tenant->pkp_status) ? 'checked' : '' }}>
                                         <label class="form-check-label fw-semibold" for="pkp_status">
                                             {{ __('messages.efaktur_pkp_registered') }}
                                         </label>
@@ -85,16 +87,18 @@
                                 </div>
 
                                 <div class="mb-3">
-                                    <label class="form-label fw-semibold">{{ __('messages.efaktur_pkp_date') }}</label>
-                                    <input type="date" name="pkp_date" class="form-control"
+                                    <label class="form-label fw-semibold" for="pkp_date">{{ __('messages.efaktur_pkp_date') }}</label>
+                                    <input type="date" name="pkp_date" id="pkp_date" class="form-control @error('pkp_date') is-invalid @enderror"
                                         value="{{ old('pkp_date', $tenant->pkp_date?->format('Y-m-d')) }}">
+                                    @error('pkp_date')<div class="invalid-feedback">{{ $message }}</div>@enderror
                                 </div>
 
                                 <div class="mb-3">
-                                    <label class="form-label fw-semibold">{{ __('messages.efaktur_ppn_rate_label') }}</label>
-                                    <input type="number" name="ppn_rate" class="form-control"
+                                    <label class="form-label fw-semibold" for="ppn_rate">{{ __('messages.efaktur_ppn_rate_label') }}</label>
+                                    <input type="number" name="ppn_rate" id="ppn_rate" class="form-control @error('ppn_rate') is-invalid @enderror"
                                         value="{{ old('ppn_rate', $tenant->ppn_rate ?? 11.00) }}"
                                         step="0.01" min="0" max="100">
+                                    @error('ppn_rate')<div class="invalid-feedback">{{ $message }}</div>@enderror
                                     <div class="form-text">{{ __('messages.efaktur_ppn_rate_hint') }}</div>
                                 </div>
                             </div>
@@ -142,10 +146,11 @@
                         <form method="POST" action="{{ route('admin.efaktur.nsfp.import') }}">
                             @csrf
                             <div class="mb-3">
-                                <label class="form-label fw-semibold">{{ __('messages.efaktur_import_nsfp') }}</label>
-                                <textarea name="nsfp_list" class="form-control font-monospace"
+                                <label class="form-label fw-semibold" for="nsfp_list">{{ __('messages.efaktur_import_nsfp') }}</label>
+                                <textarea name="nsfp_list" id="nsfp_list" class="form-control font-monospace @error('nsfp_list') is-invalid @enderror"
                                     rows="8"
                                     placeholder="{{ __('messages.efaktur_nsfp_placeholder') }}&#10;010.000-26.00000001&#10;010.000-26.00000002&#10;010.000-26.00000003"></textarea>
+                                @error('nsfp_list')<div class="invalid-feedback">{{ $message }}</div>@enderror
                                 <div class="form-text">
                                     {!! __('messages.efaktur_nsfp_format_hint') !!}
                                 </div>

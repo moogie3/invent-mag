@@ -6,6 +6,7 @@ use App\Models\POItem; // Added
 use App\Models\Product;
 use App\Models\Purchase;
 use App\Models\Supplier;
+use App\Models\Tax;
 use App\Models\User;
 use App\Models\Account;
 use App\Models\Warehouse; // Added
@@ -482,6 +483,95 @@ class PurchaseServiceTest extends TestCase
         $expiringPurchases = $this->purchaseService->getExpiringPurchases();
 
         $this->assertCount(1, $expiringPurchases);
+    }
+
+    #[Test]
+    public function test_it_creates_pph_journal_entry_on_purchase_with_pph()
+    {
+        $this->tenant->update(['tax_jurisdiction' => 'ID']);
+
+        $pphTax = Tax::create([
+            'name' => 'PPh 23',
+            'rate' => 2,
+            'type' => 'exclusive',
+            'is_active' => true,
+            'is_pph' => true,
+        ]);
+
+        $pphPayableAccount = Account::where('code', '2150-' . $this->tenant->id)->first();
+        $this->assertNotNull($pphPayableAccount, 'PPh Payable account not found in seeder.');
+
+        $this->tenant->update([
+            'accounting_settings' => array_merge(
+                $this->tenant->accounting_settings ?? [],
+                ['pph_payable_account_id' => $pphPayableAccount->id]
+            ),
+        ]);
+
+        $supplier = Supplier::factory()->create();
+        $warehouse = Warehouse::factory()->create();
+        $product = Product::factory()->create();
+
+        ProductWarehouse::updateOrCreate(
+            ['product_id' => $product->id, 'warehouse_id' => $warehouse->id, 'tenant_id' => $product->tenant_id],
+            ['quantity' => 0]
+        );
+
+        // Create a non-PPh default tax so PPh tax isn't picked up as the default
+        $regularTax = Tax::create([
+            'name' => 'PPN 11%',
+            'rate' => 11,
+            'type' => 'exclusive',
+            'is_active' => true,
+            'is_default' => true,
+            'is_pph' => false,
+        ]);
+
+        $purchaseData = [
+            'invoice' => 'PO-PPh-001',
+            'supplier_id' => $supplier->id,
+            'warehouse_id' => $warehouse->id,
+            'order_date' => now()->toDateString(),
+            'due_date' => now()->addDays(30)->toDateString(),
+            'discount_total' => 0,
+            'discount_total_type' => 'fixed',
+            'tax_id' => $regularTax->id,
+            'pph_tax_id' => $pphTax->id,
+            'products' => json_encode([
+                ['product_id' => $product->id, 'quantity' => 2, 'price' => 100],
+            ]),
+        ];
+
+        $accountingSettings = app('currentTenant')->accounting_settings;
+        $inventoryAccountName = Account::find($accountingSettings['inventory_account_id'])->name;
+        $accountsPayableAccountName = Account::find($accountingSettings['accounts_payable_account_id'])->name;
+        $pphPayableAccountName = $pphPayableAccount->name;
+
+        // Subtotal 200, PPN 11% exclusive = 22, PPh 2% of 200 = 4
+        // grossTotal = 200 + 22 = 222, finalTotal = 222 - 4 = 218
+        // Inventory debited at 222 (gross), AP credited at 218, PPh Payable credited at 4
+        $this->accountingServiceMock
+            ->shouldReceive('createJournalEntry')
+            ->once()
+            ->with(
+                "Purchase Order #PO-PPh-001",
+                Mockery::any(),
+                Mockery::on(function ($transactions) use ($inventoryAccountName, $accountsPayableAccountName, $pphPayableAccountName) {
+                    $this->assertCount(3, $transactions);
+                    $this->assertEquals(222, $this->findTransactionAmount($transactions, $inventoryAccountName, 'debit'));
+                    $this->assertEquals(218, $this->findTransactionAmount($transactions, $accountsPayableAccountName, 'credit'));
+                    $this->assertEquals(4, $this->findTransactionAmount($transactions, $pphPayableAccountName, 'credit'));
+                    return true;
+                }),
+                Mockery::type(Purchase::class)
+            );
+
+        $purchase = $this->purchaseService->createPurchase($purchaseData);
+
+        $this->assertEquals(1, $purchase->fresh()->pph_enabled);
+        $this->assertEquals(2.0, $purchase->fresh()->pph_rate);
+        $this->assertEquals(4.0, $purchase->fresh()->pph_amount);
+        $this->assertEquals(218.0, $purchase->fresh()->total);
     }
 
     private function findTransactionAmount(array $transactions, string $accountName, string $type): ?float

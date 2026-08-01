@@ -11,19 +11,27 @@ invent-mag/
 ├── composer.json
 ├── docker-compose.yml
 ├── Dockerfile
-├── FEATURE_CHECKLIST.md
 ├── graph.png                        # ERD diagram
 ├── LICENSE
 ├── package.json
 ├── phpunit.xml
 ├── postcss.config.js
 ├── README.md
-├── ROADMAP.md
 ├── screenshot.png
-├── STRUCTURE.md
 ├── tailwind.config.js
-├── TECHNICAL_SPECIFICATION.md
 ├── vite.config.js
+│
+├── docs/                            # All documentation (no markdown at repo root)
+│   ├── ACCOUNTING_SETUP_GUIDE.md
+│   ├── ARCHITECTURE_ASSESSMENT.md
+│   ├── FEATURE_CHECKLIST.md
+│   ├── INTERVIEW_QA.md
+│   ├── LANDING_PAGE_CMS.md
+│   ├── PPN_EVOLUTION.md
+│   ├── ROADMAP.md
+│   ├── STRUCTURE.md
+│   ├── TAXATION_IMPROVEMENT.md
+│   └── TECHNICAL_SPECIFICATION.md
 │
 ├── app/
 │   ├── Actions/Fortify/
@@ -80,6 +88,7 @@ invent-mag/
 │   │   │   │   ├── ProfileController.php
 │   │   │   │   ├── PurchaseController.php
 │   │   │   │   ├── PurchaseReturnController.php
+│   │   │   │   ├── QuotationController.php
 │   │   │   │   ├── ReportController.php
 │   │   │   │   ├── SalesController.php
 │   │   │   │   ├── SalesPipelineController.php
@@ -182,6 +191,7 @@ invent-mag/
 │   │   ├── StockOpname.php
 │   │   ├── StockOpnameItem.php
 │   │   ├── SubscriptionOrder.php
+│   │   ├── SuperAdmin.php
 │   │   ├── Supplier.php
 │   │   ├── SupplierInteraction.php
 │   │   ├── Tax.php
@@ -249,6 +259,7 @@ invent-mag/
 │   │   ├── TaxService.php
 │   │   ├── TenantSetupService.php
 │   │   ├── TransactionService.php
+│   │   ├── TutorialService.php
 │   │   ├── UnitService.php
 │   │   ├── UserService.php
 │   │   └── WarehouseService.php
@@ -290,19 +301,21 @@ invent-mag/
 │   │   │
 │   │   ├── 0000_01_01_000000_create_tenants_table.php
 │   │   ├── 0001_01_01_000001_create_users_table.php
-│   │   ├── ... (65+ tenant migrations)
+│   │   ├── ... (100+ tenant migrations)
 │   │   ├── 2026_05_07_081251_add_hr_feature_to_plans_table.php
 │   │   ├── 2026_05_12_035444_add_allowances_deductions_to_employees_table.php
+│   │   ├── 2026_05_12_045741_add_working_days_to_attendance_periods_table.php
 │   │   ├── 2026_05_25_000001_add_cash_flow_feature_to_plans_table.php
-│   │   └── 2026_05_12_045741_add_working_days_to_attendance_periods_table.php
-│   │   │   ├── 2026_07_06_000001_create_platform_currency_settings_table.php
-│   │   │   ├── 2026_07_06_000002_add_currency_code_to_plans_table.php
-│   │   │   ├── 2026_07_06_000003_add_currency_code_to_subscription_orders_table.php
-│   │   │   ├── 2026_07_17_000001_create_faktur_pajak_table.php          ← NEW
-│   │   │   ├── 2026_07_17_000002_create_faktur_pajak_items_table.php    ← NEW
-│   │   │   ├── 2026_07_17_000003_create_nsfp_pool_table.php             ← NEW
-│   │   │   ├── 2026_07_17_000004_add_ppn_fields_to_tenants_customers_sales.php ← NEW
-│   │   │   └── 2026_07_17_000005_add_ppn_feature_to_plans.php           ← NEW
+│   │   ├── 2026_07_06_000001_create_platform_currency_settings_table.php
+│   │   ├── 2026_07_06_000002_add_currency_code_to_plans_table.php
+│   │   ├── 2026_07_06_000003_add_currency_code_to_subscription_orders_table.php
+│   │   ├── 2026_07_17_000001_create_faktur_pajak_table.php              ← NEW
+│   │   ├── 2026_07_17_000002_create_faktur_pajak_items_table.php        ← NEW
+│   │   ├── 2026_07_17_000003_create_nsfp_pool_table.php                 ← NEW
+│   │   ├── 2026_07_17_000004_add_ppn_fields_to_tenants_customers_sales.php ← NEW
+│   │   ├── 2026_07_17_000005_add_ppn_feature_to_plans.php               ← NEW
+│   │   ├── 2026_07_25_000001_backfill_ppn_keluaran_account_setting.php  ← NEW
+│   │   └── 2026_07_25_000002_add_tax_jurisdiction_to_tenants_and_is_ppn_to_taxes.php ← NEW
 │   │
 │   └── seeders/
 │       ├── DatabaseSeeder.php
@@ -316,7 +329,7 @@ invent-mag/
 │       ├── EmployeeSeeder.php / AttendanceSeeder.php / PayrollSeeder.php
 │       ├── StockOpnameSeeder.php / StockTransferSeeder.php
 │       ├── SalesReturnSeeder.php / PurchaseReturnSeeder.php
-│       └── (30 seeders total)
+│       └── (36 seeders total)
 │
 ├── docker/
 │   ├── nginx.conf
@@ -380,6 +393,7 @@ invent-mag/
 │   │   │   │   ├── recentts/{bulkActions,modals,utils}/
 │   │   │   │   └── (50+ partial JS files)
 │   │   │   └── utils/
+│   │   │       ├── formValidator.js       # Global form validation (novalidate + data-validate-form)
 │   │   │       ├── midtrans.js
 │   │   │       ├── onPageLoad.js
 │   │   │       └── sound.js
@@ -408,6 +422,9 @@ invent-mag/
 │       │   │   ├── journal-entries/{create,edit,index,show}.blade.php
 │       │   │   └── opening-balance/index.blade.php
 │       │   │
+│       │   ├── audit-log/                     # Audit Log UI (superuser-only)
+│       │   │   └── index.blade.php
+│       │   │
 │       │   ├── auth/   (login, register, forgot-password, etc.)
 │       │   ├── category/index.blade.php
 │       │   ├── currency/currency-edit.blade.php
@@ -432,8 +449,11 @@ invent-mag/
 │       │   │       ├── supplier/suppmodals.blade.php
 │       │   │       ├── users/usersmodals.blade.php
 │       │   │       ├── warehouse/waremodals.blade.php
+│       │   │       ├── audit-log/  category/  crm/  currency/
+│       │   │       ├── journal-entries/  quotations/  recentts/
+│       │   │       ├── stock-opname/  tax/  unit/  profile/
 │       │   │       ├── general/ (tutorial, keyboard-shortcuts, notifications)
-│       │   │       └── (20+ modal files)
+│       │   │       └── (21 modal subdirectories, 30+ modal files)
 │       │   │
 │       │   ├── layouts/partials/    # Reusable blade partials
 │       │   │   ├── sales/{create,edit,index,view}/   (50+ partials)
@@ -441,7 +461,12 @@ invent-mag/
 │       │   │   ├── product/{create,edit,index}/       (30+ partials)
 │       │   │   ├── dashboard/                         (20+ partials)
 │       │   │   ├── warehouse/index/                   (8 partials)
-│       │   │   └── (100+ total partials across all modules)
+│       │   │   ├── accounts/  audit-log/  journal-entries/  notification/
+│       │   │   ├── por/  pos/  profile/  sales-returns/
+│       │   │   ├── error-actions.blade.php  global-loader.blade.php
+│       │   │   ├── impersonation-banner.blade.php  session-notifications.blade.php
+│       │   │   ├── trial-banner.blade.php
+│       │   │   └── (14 partial subdirectories, 120+ total partials)
 │       │   │
 │       │   ├── plan/{index,upgrade,checkout,upgrade-required}.blade.php
 │       │   ├── po/{index,show,purchase-create,purchase-edit}.blade.php
@@ -467,9 +492,22 @@ invent-mag/
 │
 ├── routes/
 │   ├── api.php
-│   ├── admin/
-│   │   ├── efaktur.php                     ← NEW (July 2026) — e-Faktur routes
-│   │   ├── quotations.php                  ← Quotation routes
+│   ├── admin/                          # Modular admin route groups (15 files)
+│   │   ├── accounting.php
+│   │   ├── auth.php
+│   │   ├── contacts.php
+│   │   ├── crm.php
+│   │   ├── dashboard.php
+│   │   ├── efaktur.php                 ← NEW (July 2026) — e-Faktur routes
+│   │   ├── hr.php
+│   │   ├── inventory.php
+│   │   ├── notifications.php
+│   │   ├── products.php
+│   │   ├── purchases.php
+│   │   ├── quotations.php
+│   │   ├── reports.php
+│   │   ├── sales.php
+│   │   └── settings.php
 │   ├── console.php
 │   ├── turbo.php
 │   └── web.php                     # Main route file (admin + auth)
@@ -494,25 +532,34 @@ invent-mag/
     │       ├── PrintTest.php
     │       ├── SalesReturnControllerTest.php
     │       ├── PurchaseReturnControllerTest.php
-    │       ├── SalesPipelineControllerTest.php
-    │       ├── StockOpnameControllerTest.php
-    │       ├── ReportControllerTest.php
-    │       ├── BackupControllerTest.php
-    │       ├── AuditLogControllerTest.php
-    │       ├── (25+ controller test files)
-    │   ├── Api/TenantLookupControllerTest.php
-    │   └── Auth/
-    │       ├── AuthenticationTest.php
-    │       ├── EmailVerificationTest.php
-    │       ├── PasswordConfirmationTest.php
-    │       ├── PasswordResetTest.php
-    │       └── PasswordUpdateTest.php
-    │
-    └── Unit/
-        ├── DTOs/TransactionDTOTest.php
-        ├── Helpers/   (Currency, Product, Purchase, Sales helpers)
-        ├── Http/Middleware/SetLocaleTest.php
-        ├── Http/Requests/ProfileUpdateRequestTest.php
-        ├── Models/ProductStockTest.php
-        └── Services/   (CashFlowServiceTest + 20+ service tests)
+│       ├── SalesPipelineControllerTest.php
+│       ├── StockOpnameControllerTest.php
+│       ├── ReportControllerTest.php
+│       ├── BackupControllerTest.php
+│       ├── AuditLogControllerTest.php
+│       ├── (25+ controller test files)
+│   ├── Api/TenantLookupControllerTest.php
+│   └── Auth/
+│       ├── AuthenticationTest.php
+│       ├── EmailVerificationTest.php
+│       ├── PasswordConfirmationTest.php
+│       ├── PasswordResetTest.php
+│       └── PasswordUpdateTest.php
+│
+│   └── Unit/
+│       ├── DTOs/TransactionDTOTest.php
+│       ├── Helpers/   (Currency, Product, Purchase, Sales helpers)
+│       ├── Http/Middleware/SetLocaleTest.php
+│       ├── Http/Requests/ProfileUpdateRequestTest.php
+│       ├── Models/ProductStockTest.php
+│       └── Services/   (CashFlowServiceTest + 20+ service tests)
+│
+    └── js/                       # Vitest frontend tests (169 files)
+        ├── app.test.js, auth.test.js, category.test.js, currency.test.js
+        ├── customer*.test.js     # customer, customer-crm-{api,main,state,ui}, customer-edit-*
+        ├── helpers-notification.test.js
+        ├── layouts-*.test.js     # navbar, sidebar, theme-*, settings, tutorial-modal, etc.
+        ├── partials-*.test.js    # per-module partial specs (50+)
+        ├── pos-*.test.js         # cart, payment, quickCreate
+        └── (169 Vitest test files total)
 ```

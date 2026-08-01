@@ -256,4 +256,55 @@ class SalesReturnServiceTest extends TestCase
         Mockery::close();
         parent::tearDown();
     }
+
+    public function test_it_reverses_pph_on_return()
+    {
+        $this->tenant->update(['tax_jurisdiction' => 'ID']);
+
+        $pphReceivableAccount = \App\Models\Account::create([
+            'name' => 'PPh Receivable ' . $this->tenant->id,
+            'code' => '1170-' . $this->tenant->id,
+            'type' => 'asset',
+            'tenant_id' => $this->tenant->id,
+        ]);
+        $this->tenant->update([
+            'accounting_settings' => array_merge(
+                $this->tenant->accounting_settings ?? [],
+                ['pph_receivable_account_id' => $pphReceivableAccount->id]
+            ),
+        ]);
+
+        // Create sale with PPh
+        $this->sale->update([
+            'pph_enabled' => true,
+            'pph_rate' => 2.0,
+            'pph_amount' => 4.0,
+        ]);
+
+        $this->sale->salesItems()->create([
+            'product_id'     => $this->product->id,
+            'quantity'       => 5,
+            'price'          => 100,
+            'customer_price' => 100,
+            'discount'       => 0,
+            'total'          => 500,
+        ]);
+
+        $this->accountingServiceMock->shouldReceive('createJournalEntry')->once();
+
+        $returnData = [
+            'sales_id'     => $this->sale->id,
+            'return_date'  => Carbon::now()->format('Y-m-d'),
+            'reason'       => 'PPh reversal test',
+            'status'       => 'Pending',
+            'items'        => json_encode([
+                ['product_id' => $this->product->id, 'returned_quantity' => 2, 'price' => 100],
+            ]),
+        ];
+
+        $salesReturn = $this->salesReturnService->createSalesReturn($returnData);
+
+        $this->assertNotNull($salesReturn);
+        $this->assertEquals(200, $salesReturn->total_amount);
+    }
 }

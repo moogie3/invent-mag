@@ -45,6 +45,11 @@ class Purchase extends Model
             'tax_type',
             'total',
             'status',
+            // PPh / Withholding Tax
+            'pph_enabled',
+            'pph_rate',
+            'pph_amount',
+            'pph_tax_id',
         ];
 
         protected $guarded = [
@@ -99,6 +104,11 @@ class Purchase extends Model
         public function tax(): BelongsTo
         {
             return $this->belongsTo(Tax::class, 'tax_id');
+        }
+
+        public function isPph(): bool
+        {
+            return (bool) $this->pph_enabled;
         }
 
         public function getSubTotalAttribute()
@@ -196,6 +206,7 @@ class Purchase extends Model
         'discount_total' => 'float',
         'tax_rate' => 'float',
         'total_tax' => 'float',
+        'pph_amount' => 'float',
         'order_date' => 'datetime',
         'due_date' => 'datetime',
         ];

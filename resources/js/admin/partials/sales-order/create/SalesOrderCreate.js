@@ -1,5 +1,6 @@
 import { SalesOrderModule } from "../common/SalesOrderModule.js";
 import { formatCurrency } from "../../../../utils/currencyFormatter.js";
+import { validateForm } from "../../../utils/formValidator.js";
 
 export class SalesOrderCreate extends SalesOrderModule {
     formatPrice(amount) {
@@ -61,6 +62,12 @@ export class SalesOrderCreate extends SalesOrderModule {
             elements[id] = this.safeGetElement(id);
         });
 
+        // Include explicit element IDs for form validation
+        const formId = "invoiceForm";
+
+        elements.form = document.getElementById(formId);
+        elements.invoiceForm = elements.form;
+
         elements.orderDate = elements.order_date;
         elements.dueDate = elements.due_date;
         elements.customerSelect = elements.customer_id;
@@ -71,7 +78,6 @@ export class SalesOrderCreate extends SalesOrderModule {
         elements.sellingPriceField = elements.selling_price;
         elements.addProductBtn = elements.addProduct;
         elements.clearProductsBtn = elements.clearProducts;
-        elements.form = document.querySelector("form");
 
         // Ensure form exists before returning
         if (!elements.form) {
@@ -221,9 +227,12 @@ export class SalesOrderCreate extends SalesOrderModule {
         }
 
         if (this.elements.form) {
-            this.elements.form.addEventListener("submit", (e) =>
-                this.handleSubmit(e),
-            );
+            if (this.elements.form._salesSubmitHandler) {
+                this.elements.form.removeEventListener('submit', this.elements.form._salesSubmitHandler);
+            }
+            const handler = (e) => this.handleSubmit(e);
+            this.elements.form._salesSubmitHandler = handler;
+            this.elements.form.addEventListener("submit", handler);
         }
 
         const taxSelector = document.getElementById("taxSelector");
@@ -234,10 +243,16 @@ export class SalesOrderCreate extends SalesOrderModule {
                     const opt = e.target.options[e.target.selectedIndex];
                     const rate = parseFloat(opt.dataset.rate) || 0;
                     const type = opt.dataset.type || "exclusive";
+                    const taxLabel = document.getElementById("taxLabel");
                     const rateLabel = document.getElementById("taxRateLabel");
                     const typeInput = document.getElementById("taxTypeInput");
                     const rateInput = document.getElementById("taxRateInput");
                     
+                    if (taxLabel) {
+                        const base = taxLabel.dataset.base || taxLabel.textContent;
+                        const rate = parseFloat(opt.dataset.rate) || 0;
+                        taxLabel.textContent = opt.value && opt.dataset.name ? base + ' (' + opt.dataset.name + ' ' + rate + '%)' : base;
+                    }
                     if (rateLabel) rateLabel.textContent = rate;
                     if (typeInput) typeInput.value = type;
                     if (rateInput) rateInput.value = rate;
@@ -251,16 +266,41 @@ export class SalesOrderCreate extends SalesOrderModule {
                 const initialOpt = taxSelector.options[taxSelector.selectedIndex];
                 if (initialOpt) {
                     const rate = parseFloat(initialOpt.dataset.rate) || 0;
+                    const taxLabel = document.getElementById("taxLabel");
                     const typeInput = document.getElementById("taxTypeInput");
                     const rateInput = document.getElementById("taxRateInput");
                     const rateLabel = document.getElementById("taxRateLabel");
                     
+                    if (taxLabel) {
+                        const base = taxLabel.dataset.base || taxLabel.textContent;
+                        const rate = parseFloat(initialOpt.dataset.rate) || 0;
+                        taxLabel.textContent = initialOpt.value && initialOpt.dataset.name ? base + ' (' + initialOpt.dataset.name + ' ' + rate + '%)' : base;
+                    }
                     if (rateLabel) rateLabel.textContent = rate;
                     if (typeInput) typeInput.value = initialOpt.dataset.type || "exclusive";
                     if (rateInput) rateInput.value = rate;
                 }
             }
         }
+
+        document.body.addEventListener("change", (e) => {
+            if (e.target.id === "pphSelector") {
+                const pphInput = document.getElementById("pphEnabledInput");
+                const pphRateInput = document.getElementById("pphRateInput");
+                const pphTaxIdInput = document.getElementById("pphTaxIdInput");
+                if (e.target.value) {
+                    const opt = e.target.options[e.target.selectedIndex];
+                    pphInput.value = "1";
+                    pphRateInput.value = opt.dataset.rate;
+                    if (pphTaxIdInput) pphTaxIdInput.value = e.target.value;
+                } else {
+                    pphInput.value = "0";
+                    pphRateInput.value = "0";
+                    if (pphTaxIdInput) pphTaxIdInput.value = "";
+                }
+                this.updateTotalPrice();
+            }
+        });
     }
 
     calculateDueDate() {
@@ -589,6 +629,13 @@ export class SalesOrderCreate extends SalesOrderModule {
         const taxAmount = this.calculateTaxAmount(taxableAmount);
         const grandTotal = this.getTaxType() === "inclusive" ? taxableAmount : taxableAmount + taxAmount;
 
+        const pphAmount = this.calculatePphAmount(taxableAmount);
+        const pphAmountInput = document.getElementById("pphAmountInput");
+        if (pphAmountInput) pphAmountInput.value = pphAmount;
+        const pphTotalDisplay = document.getElementById("pphTotal");
+        if (pphTotalDisplay) pphTotalDisplay.textContent = formatCurrency(pphAmount);
+        const totalAfterPph = grandTotal - pphAmount;
+
         // Get credit amount directly from DOM (not from cached elements)
         const creditInputEl = document.getElementById("customerCreditAmount");
         const creditInputValue = parseFloat(creditInputEl?.value) || 0;
@@ -606,7 +653,7 @@ export class SalesOrderCreate extends SalesOrderModule {
         }
 
         this.customerCreditUsed = creditAmount;
-        const finalTotal = Math.max(0, grandTotal - creditAmount);
+        const finalTotal = Math.max(0, totalAfterPph - creditAmount);
 
         // Update credit display in summary
         const creditRow = document.getElementById("creditUsedRow");
@@ -651,6 +698,15 @@ export class SalesOrderCreate extends SalesOrderModule {
         const creditHiddenInput = document.getElementById("customerCreditInput");
         if (creditHiddenInput) {
             creditHiddenInput.value = creditAmount;
+        }
+
+        // Update discount label with type info
+        const discountLabel = document.getElementById('discountLabel');
+        if (discountLabel) {
+            const base = discountLabel.dataset.base || 'Order Discount';
+            discountLabel.textContent = this.orderDiscount > 0
+                ? (this.orderDiscountType === 'percentage' ? base + ' (' + this.orderDiscount + '%)' : base + ' (Rp ' + this.orderDiscount.toLocaleString() + ')')
+                : base;
         }
 
         if (this.elements.productsField) {
@@ -777,17 +833,26 @@ export class SalesOrderCreate extends SalesOrderModule {
     }
 
     handleSubmit(e) {
-        if (this.products.length === 0) {
+        if (e.defaultPrevented) return false;
+
+        try {
+            if (this.products.length === 0) {
+                e.preventDefault();
+                e.stopPropagation();
+                InventMagApp.showToast(
+                    "Warning",
+                    "Please add at least one product before submitting.",
+                    "warning",
+                );
+                return false;
+            }
+
+            this.sessionJustSubmitted = true;
+        } catch (error) {
             e.preventDefault();
-            InventMagApp.showToast(
-                "Warning",
-                "Please add at least one product before submitting.",
-                "warning",
-            );
+            e.stopPropagation();
             return false;
         }
-
-        this.sessionJustSubmitted = true;
     }
 
     renderTable() {

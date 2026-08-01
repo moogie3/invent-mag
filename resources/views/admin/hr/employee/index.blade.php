@@ -183,7 +183,7 @@
                     <h5 class="modal-title">{{ __('messages.hr_employee_new') }}</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
-                <form method="POST" action="{{ route('admin.hr.employee.store') }}">
+                <form method="POST" action="{{ route('admin.hr.employee.store') }}" novalidate data-validate-form>
                     @csrf
                     <div class="modal-body">
                         <div class="row">
@@ -301,7 +301,7 @@
                     <h5 class="modal-title">{{ __('messages.edit') }} {{ __('messages.hr_employee') }}</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
-                <form method="POST" id="editEmployeeForm">
+                <form method="POST" id="editEmployeeForm" novalidate data-validate-form>
                     @csrf
                     @method('PUT')
                     <div class="modal-body">

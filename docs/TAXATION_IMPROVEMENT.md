@@ -642,7 +642,7 @@ The following issues were found during the audit and have all been resolved. Ret
 | P   | MEDIUM   | `po/view/amount-summary.blade.php`                                | Purchase show page has no tax line in amount summary — tax is calculated and stored but never displayed to the user                                                        | ✅ FIXED — Added tax line matching sales view pattern                                                                                                                                                                             |
 | Q   | MEDIUM   | `por/show/page-body.blade.php`                                    | Purchase return show page has no tax display — tax data is stored but never shown                                                                                          | ✅ FIXED — Added conditional tax line matching sales-returns pattern                                                                                                                                                              |
 
-**Test coverage:** All fixes verified with 1055 passing tests (0 new regressions). Pre-existing test failures in `BackupControllerTest` and `SalesControllerTest` are unrelated.
+**Test coverage:** All fixes verified with 1066 passing tests (0 new regressions).
 
 ---
 
@@ -667,3 +667,316 @@ The following issues were found during the audit and have all been resolved. Ret
 | QuotationController   | Yes                    | Yes (id, rate, type, amount) | User select / default | SalesHelper    | ✅                      |
 | PosService            | No (hardcoded default) | Yes (snapshot of default)    | Tax model default     | SalesHelper    | ✅                      |
 | SalesPipelineService  | No (default only)      | No (transient only)          | Tax model default     | SalesHelper    | N/A (converted to sale) |
+
+---
+
+## 13. PPh (Withholding Tax) — Second Independent Tax Dropdown
+
+### 13.1 Concept
+
+PPh (Pajak Penghasilan / Income Tax) is a **withholding tax** that is fundamentally different from PPN (the output VAT tax). In Indonesian accounting:
+
+- **PPN** (Pajak Pertambahan Nilai) = output VAT, added on top of the sale amount — collected from the buyer and remitted to the tax office
+- **PPh** = income tax **withheld** from the seller's revenue — the buyer deducts it at source and remits it to the tax office on the seller's behalf
+
+PPh is **not a replacement or alternative** to PPN — both can appear on the same invoice. Therefore, PPh requires its own **independent dropdown** on every financial document, completely separate from the existing PPN tax selector.
+
+### 13.2 Database — `is_pph` Flag on `taxes` Table
+
+Migration: `2026_07_XX_000001_add_is_pph_to_taxes_table.php`
+
+```sql
+ALTER TABLE taxes
+  ADD COLUMN is_pph BOOLEAN NOT NULL DEFAULT FALSE
+       COMMENT 'TRUE = withholding tax (PPh). FALSE = output VAT (PPN) or exempt.';
+```
+
+The existing `taxes` table now serves **two independent tax categories**:
+
+| `is_pph` | `type`      | Meaning                                        |
+| --------- | ----------- | ---------------------------------------------- |
+| `FALSE`   | `exclusive` | Standard PPN exclusive — tax added on top       |
+| `FALSE`   | `inclusive` | PPN inclusive — tax embedded in price           |
+| `FALSE`   | `none`      | Tax exempt / zero-rated                        |
+| `TRUE`    | `exclusive` | PPh withheld — deducted from seller's revenue  |
+
+The `is_pph` flag is **not** a third tax type — it is a boolean category selector. A PPh tax record is always exclusive (withholding reduces the amount the seller receives), so the `type` column for PPh records is always `'exclusive'`.
+
+**Model update (`Tax.php`):**
+
+```php
+// Add to $fillable and $casts:
+protected $fillable = [
+    // ... existing fields ...
+    'is_pph',
+];
+
+protected $casts = [
+    // ... existing casts ...
+    'is_pph' => 'boolean',
+];
+```
+
+### 13.3 Two Independent Dropdowns on Documents
+
+Every financial document form (Sales, Purchase, Quotation, Sales Return, Purchase Return) now has **two tax dropdowns**:
+
+```
+┌─────────────────────────────────────────────────┐
+│  PPN Tax (Output VAT)    [Dropdown ▼]           │  ← existing dropdown, filtered: is_pph = FALSE
+│  PPh Tax (Withholding)   [Dropdown ▼]           │  ← NEW dropdown, filtered: is_pph = TRUE
+└─────────────────────────────────────────────────┘
+```
+
+**Filtering logic in controllers/services:**
+
+```php
+// PPN taxes (output VAT) — existing dropdown
+$ppnTaxes = Tax::where('is_active', true)
+    ->where('is_pph', false)
+    ->orderBy('name')
+    ->get();
+
+// PPh taxes (withholding) — new dropdown
+$pphTaxes = Tax::where('is_active', true)
+    ->where('is_pph', true)
+    ->orderBy('name')
+    ->get();
+```
+
+Each dropdown is **independent** — selecting a PPN tax does not affect the PPh selection, and vice versa. Both can be `null` (no tax applied for that category).
+
+### 13.4 FK Columns on Financial Documents
+
+Migration: `2026_07_XX_000002_add_pph_tax_id_to_financial_documents.php`
+
+```sql
+-- sales: add pph_tax_id, pph_tax_rate, pph_tax_amount
+ALTER TABLE sales ADD COLUMN pph_tax_id     BIGINT UNSIGNED NULL;
+ALTER TABLE sales ADD COLUMN pph_tax_rate   DECIMAL(5,2) NOT NULL DEFAULT 0;
+ALTER TABLE sales ADD COLUMN pph_tax_amount DECIMAL(15,2) NOT NULL DEFAULT 0;
+ALTER TABLE sales ADD FOREIGN KEY (pph_tax_id) REFERENCES taxes(id) ON DELETE SET NULL;
+
+-- po: same pattern
+ALTER TABLE po ADD COLUMN pph_tax_id     BIGINT UNSIGNED NULL;
+ALTER TABLE po ADD COLUMN pph_tax_rate   DECIMAL(5,2) NOT NULL DEFAULT 0;
+ALTER TABLE po ADD COLUMN pph_tax_amount DECIMAL(15,2) NOT NULL DEFAULT 0;
+ALTER TABLE po ADD FOREIGN KEY (pph_tax_id) REFERENCES taxes(id) ON DELETE SET NULL;
+
+-- quotations: same pattern
+ALTER TABLE quotations ADD COLUMN pph_tax_id     BIGINT UNSIGNED NULL;
+ALTER TABLE quotations ADD COLUMN pph_tax_rate   DECIMAL(5,2) NOT NULL DEFAULT 0;
+ALTER TABLE quotations ADD COLUMN pph_tax_amount DECIMAL(15,2) NOT NULL DEFAULT 0;
+ALTER TABLE quotations ADD FOREIGN KEY (pph_tax_id) REFERENCES taxes(id) ON DELETE SET NULL;
+
+-- sales_returns: same pattern
+ALTER TABLE sales_returns ADD COLUMN pph_tax_id     BIGINT UNSIGNED NULL;
+ALTER TABLE sales_returns ADD COLUMN pph_tax_rate   DECIMAL(5,2) NOT NULL DEFAULT 0;
+ALTER TABLE sales_returns ADD COLUMN pph_tax_amount DECIMAL(15,2) NOT NULL DEFAULT 0;
+ALTER TABLE sales_returns ADD FOREIGN KEY (pph_tax_id) REFERENCES taxes(id) ON DELETE SET NULL;
+```
+
+**Column naming convention:** PPh columns use the `pph_` prefix to clearly distinguish them from PPN columns (`tax_id`, `tax_rate`, `tax_amount` / `total_tax`).
+
+### 13.5 Snapshot Pattern
+
+PPh follows the **exact same snapshot pattern** as PPN:
+
+- `pph_tax_id` — FK to the `taxes` row (for reference and display of tax name/rate)
+- `pph_tax_rate` — **snapshotted** rate at time of document creation (survives tax record edits)
+- `pph_tax_amount` — **snapshotted** calculated amount at time of document creation
+
+This means if a PPh tax record's rate is later changed, existing documents retain the correct historical rate and amount.
+
+**Why both `pph_tax_id` and `pph_tax_rate`?**  
+The `pph_tax_id` FK enables JOIN-based reporting ("show all sales where PPh tax = X"). The `pph_tax_rate` snapshot ensures the displayed and calculated values are always correct even if the Tax record is modified or deleted (`ON DELETE SET NULL`).
+
+### 13.6 Calculation
+
+PPh is always calculated as a **deduction from the grand total** (exclusive type). The formula is:
+
+```
+pph_tax_amount = grand_total × (pph_tax_rate / 100)
+net_total      = grand_total - pph_tax_amount  (if PPh applies)
+```
+
+**For exclusive PPN + PPh together:**
+
+```
+subtotal_after_discount = 1,000,000
+PPN rate (exclusive)    = 11%
+ppn_tax_amount          = 1,000,000 × 0.11 = 110,000
+grand_total             = 1,000,000 + 110,000 = 1,110,000
+
+PPh rate                = 2%
+pph_tax_amount          = 1,110,000 × 0.02 = 22,200
+net_total               = 1,110,000 - 22,200 = 1,087,800
+```
+
+**Important:** PPh is calculated on the **grand total including PPN**, not on the pre-tax subtotal. This matches standard Indonesian withholding tax practice.
+
+**SalesHelper update:**
+
+```php
+public static function calculatePPhAmount(float $grandTotal, float $pphRate): float
+{
+    if ($pphRate <= 0 || $grandTotal <= 0) {
+        return 0.0;
+    }
+    return round($grandTotal * ($pphRate / 100), 2);
+}
+```
+
+### 13.7 Journal Entries
+
+PPh creates an additional **withholding tax payable** journal entry. The accounting treatment:
+
+**Standard PPN-only sale (existing):**
+
+```
+Dr  Accounts Receivable     1,110,000
+    Cr  Revenue                        1,000,000
+    Cr  PPN Output Tax Payable           110,000
+```
+
+**Sale with PPh applied (new):**
+
+```
+Dr  Accounts Receivable     1,110,000
+    Cr  Revenue                        1,000,000
+    Cr  PPN Output Tax Payable           110,000
+
+Dr  PPh Receivable (Tax Prepaid)  22,200
+    Cr  Revenue                          22,200
+```
+
+Alternatively, PPh can be recorded as a **reduction in revenue**:
+
+```
+Dr  Accounts Receivable     1,110,000
+Dr  PPh Withheld Payable     22,200
+    Cr  Revenue                        1,032,200
+    Cr  PPN Output Tax Payable           110,000
+```
+
+**Account codes for PPh:**
+
+| Code   | Account Name                     | Type     |
+| ------ | -------------------------------- | -------- |
+| 1350   | PPh Receivable (Tax Prepaid)     | Asset    |
+| 2150   | PPh Withheld Payable             | Liability |
+
+**Implementation in `AccountingService`:**
+
+```php
+// After standard PPN journal entry:
+if ($pphTaxAmount > 0) {
+    // Option A: PPh as receivable (asset)
+    AccountingService::createJournalEntry(
+        tenantId: $tenantId,
+        date: $documentDate,
+        description: "PPh withholding on sale #{$saleId}",
+        debits: [
+            ['account_code' => '1350', 'amount' => $pphTaxAmount],
+        ],
+        credits: [
+            ['account_code' => '4100', 'amount' => $pphTaxAmount], // Revenue
+        ],
+        referenceType: Sale::class,
+        referenceId: $saleId
+    );
+}
+```
+
+### 13.8 Feature Gating
+
+PPh is an **opt-in feature** controlled by a tenant-level setting. Not all tenants need PPh (e.g., non-Indonesian tenants, tenants without withholding tax obligations).
+
+**Feature flag in `settings` table:**
+
+```sql
+-- Tenant settings row (per-tenant)
+INSERT INTO settings (tenant_id, key, value)
+VALUES (1, 'pph_enabled', '1');  -- '1' = enabled, '0' = disabled
+```
+
+**Accessor in `SettingService`:**
+
+```php
+public static function isPphEnabled(): bool
+{
+    return (bool) Setting::where('key', 'pph_enabled')->value('value');
+}
+```
+
+**UI gating — tax dropdowns:**
+
+```blade
+@if(\App\Services\SettingService::isPphEnabled())
+<div class="form-group">
+    <label>PPh Tax (Withholding)</label>
+    <select name="pph_tax_id">
+        <option value="">None</option>
+        @foreach($pphTaxes as $tax)
+            <option value="{{ $tax->id }}">{{ $tax->name }} ({{ $tax->rate }}%)</option>
+        @endforeach
+    </select>
+</div>
+@endif
+```
+
+**Service-layer gating:**
+
+```php
+// In SalesService::createSale():
+$pphTaxId = null;
+$pphTaxRate = 0;
+$pphTaxAmount = 0;
+
+if (SettingService::isPphEnabled() && !empty($data['pph_tax_id'])) {
+    $pphTax = Tax::find($data['pph_tax_id']);
+    $pphTaxRate = $pphTax ? (float) $pphTax->rate : 0;
+    $pphTaxAmount = SalesHelper::calculatePPhAmount($grandTotal, $pphTaxRate);
+    $pphTaxId = $pphTax?->id;
+}
+
+$sale->pph_tax_id = $pphTaxId;
+$sale->pph_tax_rate = $pphTaxRate;
+$sale->pph_tax_amount = $pphTaxAmount;
+```
+
+**Report gating:** All reports that display tax breakdowns check `SettingService::isPphEnabled()` before rendering the PPh column. When disabled, the column is hidden entirely (not shown as zero).
+
+### 13.9 Tax CRUD — PPh in Settings
+
+The Tax settings page now includes the `is_pph` checkbox:
+
+- **Create form:** checkbox labeled "This is a withholding tax (PPh)"
+- **Edit form:** same checkbox, with a warning if the tax is already referenced by documents
+- **List view:** a badge/tag on each tax row showing "PPh" or "PPN" based on `is_pph`
+- **Default tax logic:** `is_default` is scoped per category — one default PPN tax and one default PPh tax can coexist
+
+```php
+// TaxService: separate defaults per category
+public static function getDefaultPpn(): ?Tax
+{
+    return Tax::where('is_pph', false)->where('is_default', true)->first();
+}
+
+public static function getDefaultPph(): ?Tax
+{
+    return Tax::where('is_pph', true)->where('is_default', true)->first();
+}
+```
+
+### 13.10 Updated Consistency Matrix
+
+| Module                | Accepts pph_tax_id     | Snapshots PPh                | PPh source              | PPh calculation    |
+| --------------------- | ---------------------- | ---------------------------- | ----------------------- | ------------------ |
+| SalesService          | Yes (if enabled)       | Yes (id, rate, amount)       | User select / default   | SalesHelper        |
+| PurchaseService       | Yes (if enabled)       | Yes (id, rate, amount)       | User select / default   | PurchaseHelper     |
+| SalesReturnService    | No (copies parent)     | Yes (copies parent's data)   | Parent sale             | SalesHelper        |
+| PurchaseReturnService | No (copies parent)     | Yes (copies parent's data)   | Parent purchase         | PurchaseHelper     |
+| QuotationController   | Yes (if enabled)       | Yes (id, rate, amount)       | User select / default   | SalesHelper        |
+| PosService            | No (PPH not applicable)| N/A                          | N/A                     | N/A                |
+| SalesPipelineService  | No (default only)      | No (transient only)          | Tax model default       | SalesHelper        |

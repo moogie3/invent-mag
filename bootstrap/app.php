@@ -79,14 +79,33 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
+        // Turbo Drive sends X-Requested-With: XMLHttpRequest with Accept: */*,
+        // which causes expectsJson() to return true. Fix: return HTML for Turbo
+        // form submissions so @error directives render correctly and prevent logout.
+        $exceptions->shouldRenderJsonWhen(function ($request, $e) {
+            if ($request->is('api/*')) {
+                return true;
+            }
+            if ($request->isXmlHttpRequest() && $request->accepts('text/html')) {
+                return false;
+            }
+            return $request->expectsJson();
+        });
+
         // Helper function to handle errors consistently with Turbo Laravel support
-        $handleError = function ($request, $code, $message) {
-            // For API requests - return JSON
-            if ($request->expectsJson() || $request->is('api/*')) {
+        $shouldJson = function ($request) {
+            if ($request->is('api/*')) {
+                return true;
+            }
+            if ($request->isXmlHttpRequest() && $request->accepts('text/html')) {
+                return false;
+            }
+            return $request->expectsJson();
+        };
+        $handleError = function ($request, $code, $message) use ($shouldJson) {
+            if ($shouldJson($request)) {
                 return response()->json(['message' => $message], $code);
             }
-            
-            // Always return HTML view (works with Turbo Drive)
             return response()->view("errors.{$code}", [], $code);
         };
 
@@ -128,8 +147,8 @@ return Application::configure(basePath: dirname(__DIR__))
         });
 
         // NoCurrentTenant - Multitenancy (must be before Throwable catch-all)
-        $exceptions->render(function (\Spatie\Multitenancy\Exceptions\NoCurrentTenant $e, Illuminate\Http\Request $request) {
-            if ($request->expectsJson() || $request->is('api/*')) {
+        $exceptions->render(function (\Spatie\Multitenancy\Exceptions\NoCurrentTenant $e, Illuminate\Http\Request $request) use ($shouldJson) {
+            if ($shouldJson($request)) {
                 return response()->json(['message' => 'Workspace not found or no tenant specified.'], 404);
             }
 
@@ -167,15 +186,32 @@ return Application::configure(basePath: dirname(__DIR__))
             return null;
         });
 
+        // ValidationException — check raw Accept header directly (not expectsJson)
+        // Turbo 8 sends: Accept: text/html, application/xhtml+xml (no X-Requested-With)
+        // expectsJson() depends on Symfony's content negotiation which can misclassify.
+        $exceptions->render(function (\Illuminate\Validation\ValidationException $e, \Illuminate\Http\Request $request) {
+            $accept = $request->header('Accept', '');
+            \Illuminate\Support\Facades\Log::info('ValidationException caught', ['accept' => $accept]);
+            if (str_contains($accept, 'text/html')) {
+                return redirect()->back()
+                    ->withErrors($e->errors())
+                    ->withInput();
+            }
+            if ($request->is('api/*')) {
+                return response()->json(['message' => $e->getMessage(), 'errors' => $e->errors()], 422);
+            }
+            return response()->json(['message' => $e->getMessage(), 'errors' => $e->errors()], 422);
+        });
+
         // 500 - Server Error (catch-all)
         $exceptions->render(function (\Throwable $e, Illuminate\Http\Request $request) use ($handleError) {
-            // Let Laravel handle ValidationException natively (redirects back with errors)
-            if ($e instanceof \Illuminate\Validation\ValidationException) {
-                return null;
-            }
             // Don't handle TokenMismatch here (handled above)
             if ($e instanceof \Illuminate\Session\TokenMismatchException) {
                 return $handleError($request, 419, 'Page expired due to inactivity');
+            }
+            // Don't handle ValidationException here (handled above)
+            if ($e instanceof \Illuminate\Validation\ValidationException) {
+                return null;
             }
             // Let AuthenticationException pass through to default handler (redirects to login)
             if ($e instanceof \Illuminate\Auth\AuthenticationException) {

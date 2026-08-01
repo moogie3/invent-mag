@@ -69,104 +69,140 @@
                                             <div class="settings-section-content">
                                                 <div class="row g-3">
                                                     <div class="col-md-6">
-                                                        <label
-                                                            class="form-label">{{ __('messages.sales_revenue_account') }}</label>
-                                                        <select name="sales_revenue_account_id" class="form-select"
+                                                        <label class="form-label"
+                                                            for="sales_revenue_account_id">{{ __('messages.sales_revenue_account') }}</label>
+                                                        <select name="sales_revenue_account_id" id="sales_revenue_account_id" class="form-select @error('sales_revenue_account_id') is-invalid @enderror"
                                                             required>
                                                             <option value="">{{ __('messages.select_account') }}
                                                             </option>
                                                             @foreach ($accounts['revenue'] ?? [] as $account)
                                                                 <option value="{{ $account->id }}"
-                                                                    @if (($settings['sales_revenue_account_id'] ?? null) == $account->id) selected @endif>
+                                                                    @if (old('sales_revenue_account_id', $settings['sales_revenue_account_id'] ?? null) == $account->id) selected @endif>
                                                                     {{ __($account->name) }} ({{ $account->code }})
                                                                 </option>
                                                             @endforeach
                                                         </select>
+                                                        @error('sales_revenue_account_id')<div class="invalid-feedback">{{ $message }}</div>@enderror
                                                     </div>
                                                     <div class="col-md-6">
-                                                        <label
-                                                            class="form-label">{{ __('messages.accounts_receivable_account') }}</label>
-                                                        <select name="accounts_receivable_account_id" class="form-select"
+                                                        <label class="form-label"
+                                                            for="accounts_receivable_account_id">{{ __('messages.accounts_receivable_account') }}</label>
+                                                        <select name="accounts_receivable_account_id" id="accounts_receivable_account_id" class="form-select @error('accounts_receivable_account_id') is-invalid @enderror"
                                                             required>
                                                             <option value="">{{ __('messages.select_account') }}
                                                             </option>
                                                             @foreach ($accounts['asset'] ?? [] as $account)
                                                                 <option value="{{ $account->id }}"
-                                                                    @if (($settings['accounts_receivable_account_id'] ?? null) == $account->id) selected @endif>
+                                                                    @if (old('accounts_receivable_account_id', $settings['accounts_receivable_account_id'] ?? null) == $account->id) selected @endif>
                                                                     {{ __($account->name) }} ({{ $account->code }})
                                                                 </option>
                                                             @endforeach
                                                         </select>
+                                                        @error('accounts_receivable_account_id')<div class="invalid-feedback">{{ $message }}</div>@enderror
                                                     </div>
                                                     <div class="col-md-6">
-                                                        <label
-                                                            class="form-label">{{ __('messages.cost_of_goods_sold_account') }}</label>
-                                                        <select name="cost_of_goods_sold_account_id" class="form-select"
+                                                        <label class="form-label"
+                                                            for="cost_of_goods_sold_account_id">{{ __('messages.cost_of_goods_sold_account') }}</label>
+                                                        <select name="cost_of_goods_sold_account_id" id="cost_of_goods_sold_account_id" class="form-select @error('cost_of_goods_sold_account_id') is-invalid @enderror"
                                                             required>
                                                             <option value="">{{ __('messages.select_account') }}
                                                             </option>
                                                             @foreach ($accounts['expense'] ?? [] as $account)
                                                                 <option value="{{ $account->id }}"
-                                                                    @if (($settings['cost_of_goods_sold_account_id'] ?? null) == $account->id) selected @endif>
+                                                                    @if (old('cost_of_goods_sold_account_id', $settings['cost_of_goods_sold_account_id'] ?? null) == $account->id) selected @endif>
                                                                     {{ __($account->name) }} ({{ $account->code }})
                                                                 </option>
                                                             @endforeach
                                                         </select>
+                                                        @error('cost_of_goods_sold_account_id')<div class="invalid-feedback">{{ $message }}</div>@enderror
                                                     </div>
                                                     <div class="col-md-6">
-                                                        <label
-                                                            class="form-label">{{ __('messages.inventory_account') }}</label>
-                                                        <select name="inventory_account_id" class="form-select" required>
+                                                        <label class="form-label"
+                                                            for="inventory_account_id">{{ __('messages.inventory_account') }}</label>
+                                                        <select name="inventory_account_id" id="inventory_account_id" class="form-select @error('inventory_account_id') is-invalid @enderror" required>
                                                             <option value="">{{ __('messages.select_account') }}
                                                             </option>
                                                             @foreach ($accounts['asset'] ?? [] as $account)
                                                                 <option value="{{ $account->id }}"
-                                                                    @if (($settings['inventory_account_id'] ?? null) == $account->id) selected @endif>
+                                                                    @if (old('inventory_account_id', $settings['inventory_account_id'] ?? null) == $account->id) selected @endif>
                                                                     {{ __($account->name) }} ({{ $account->code }})
                                                                 </option>
                                                             @endforeach
                                                         </select>
+                                                        @error('inventory_account_id')<div class="invalid-feedback">{{ $message }}</div>@enderror
                                                     </div>
                                                     <div class="col-md-6">
-                                                        <label
-                                                            class="form-label">{{ __('messages.accounts_payable_account') }}</label>
-                                                        <select name="accounts_payable_account_id" class="form-select"
+                                                        <label class="form-label"
+                                                            for="accounts_payable_account_id">{{ __('messages.accounts_payable_account') }}</label>
+                                                        <select name="accounts_payable_account_id" id="accounts_payable_account_id" class="form-select @error('accounts_payable_account_id') is-invalid @enderror"
                                                             required>
                                                             <option value="">{{ __('messages.select_account') }}
                                                             </option>
                                                             @foreach ($accounts['liability'] ?? [] as $account)
                                                                 <option value="{{ $account->id }}"
-                                                                    @if (($settings['accounts_payable_account_id'] ?? null) == $account->id) selected @endif>
+                                                                    @if (old('accounts_payable_account_id', $settings['accounts_payable_account_id'] ?? null) == $account->id) selected @endif>
                                                                     {{ __($account->name) }} ({{ $account->code }})
                                                                 </option>
                                                             @endforeach
                                                         </select>
+                                                        @error('accounts_payable_account_id')<div class="invalid-feedback">{{ $message }}</div>@enderror
                                                     </div>
                                                     <div class="col-md-6">
-                                                        <label class="form-label">{{ __('messages.cash_account') }}</label>
-                                                        <select name="cash_account_id" class="form-select" required>
+                                                        <label class="form-label"
+                                                            for="cash_account_id">{{ __('messages.cash_account') }}</label>
+                                                        <select name="cash_account_id" id="cash_account_id" class="form-select @error('cash_account_id') is-invalid @enderror" required>
                                                             <option value="">{{ __('messages.select_account') }}
                                                             </option>
                                                             @foreach ($accounts['asset'] ?? [] as $account)
                                                                 <option value="{{ $account->id }}"
-                                                                    @if (($settings['cash_account_id'] ?? null) == $account->id) selected @endif>
+                                                                    @if (old('cash_account_id', $settings['cash_account_id'] ?? null) == $account->id) selected @endif>
                                                                     {{ __($account->name) }} ({{ $account->code }})
                                                                 </option>
                                                             @endforeach
                                                         </select>
+                                                        @error('cash_account_id')<div class="invalid-feedback">{{ $message }}</div>@enderror
                                                     </div>
                                                     <div class="col-md-6">
-                                                        <label class="form-label">{{ __('messages.ppn_keluaran_account') }}</label>
-                                                        <select name="ppn_keluaran_account_id" class="form-select">
+                                                        <label class="form-label" for="ppn_keluaran_account_id">{{ __('messages.ppn_keluaran_account') }}</label>
+                                                        <select name="ppn_keluaran_account_id" id="ppn_keluaran_account_id" class="form-select @error('ppn_keluaran_account_id') is-invalid @enderror">
                                                             <option value="">{{ __('messages.select_account') }}
                                                             </option>
                                                             @foreach ($accounts['liability'] ?? [] as $account)
                                                                 <option value="{{ $account->id }}"
-                                                                    @if (($settings['ppn_keluaran_account_id'] ?? null) == $account->id) selected @endif>
+                                                                    @if (old('ppn_keluaran_account_id', $settings['ppn_keluaran_account_id'] ?? null) == $account->id) selected @endif>
                                                                     {{ __($account->name) }} ({{ $account->code }})
                                                                 </option>
                                                             @endforeach
                                                         </select>
+                                                        @error('ppn_keluaran_account_id')<div class="invalid-feedback">{{ $message }}</div>@enderror
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <label class="form-label" for="pph_receivable_account_id">{{ __('messages.pph_receivable_account') }}</label>
+                                                        <select name="pph_receivable_account_id" id="pph_receivable_account_id" class="form-select @error('pph_receivable_account_id') is-invalid @enderror">
+                                                            <option value="">{{ __('messages.select_account') }}
+                                                            </option>
+                                                            @foreach ($accounts['asset'] ?? [] as $account)
+                                                                <option value="{{ $account->id }}"
+                                                                    @if (old('pph_receivable_account_id', $settings['pph_receivable_account_id'] ?? null) == $account->id) selected @endif>
+                                                                    {{ __($account->name) }} ({{ $account->code }})
+                                                                </option>
+                                                            @endforeach
+                                                        </select>
+                                                        @error('pph_receivable_account_id')<div class="invalid-feedback">{{ $message }}</div>@enderror
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <label class="form-label" for="pph_payable_account_id">{{ __('messages.pph_payable_account') }}</label>
+                                                        <select name="pph_payable_account_id" id="pph_payable_account_id" class="form-select @error('pph_payable_account_id') is-invalid @enderror">
+                                                            <option value="">{{ __('messages.select_account') }}
+                                                            </option>
+                                                            @foreach ($accounts['liability'] ?? [] as $account)
+                                                                <option value="{{ $account->id }}"
+                                                                    @if (old('pph_payable_account_id', $settings['pph_payable_account_id'] ?? null) == $account->id) selected @endif>
+                                                                    {{ __($account->name) }} ({{ $account->code }})
+                                                                </option>
+                                                            @endforeach
+                                                        </select>
+                                                        @error('pph_payable_account_id')<div class="invalid-feedback">{{ $message }}</div>@enderror
                                                     </div>
 
                                                 </div>

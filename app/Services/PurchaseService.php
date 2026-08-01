@@ -190,6 +190,10 @@ class PurchaseService
             $taxRate = $tax ? (float) $tax->rate : 0;
             $taxType = $tax ? $tax->type : 'none';
 
+            $pphTaxId = $data['pph_tax_id'] ?? null;
+            $pphTax = $pphTaxId ? Tax::find($pphTaxId) : null;
+            $pphTaxRate = $pphTax ? (float) $pphTax->rate : 0;
+
             $purchase = Purchase::create([
                 'invoice' => $data['invoice'],
                 'supplier_id' => $data['supplier_id'],
@@ -246,9 +250,16 @@ class PurchaseService
                 $finalTotal = $afterDiscount + $taxAmount;
             }
 
+            $pphAmount = PurchaseHelper::calculatePphAmount($afterDiscount, $pphTaxRate);
+            $finalTotal = max(0, $finalTotal - $pphAmount);
+
             $purchase->update([
-                'total'     => $finalTotal,   // grand total: subtotal − discount ± tax
+                'total'     => $finalTotal,
                 'total_tax' => $taxAmount,
+                'pph_enabled' => app('currentTenant')->isIndonesian() && ($pphTax?->is_pph ?? false),
+                'pph_rate'    => app('currentTenant')->isIndonesian() && ($pphTax?->is_pph ?? false) ? $pphTaxRate : null,
+                'pph_amount'  => app('currentTenant')->isIndonesian() && ($pphTax?->is_pph ?? false) ? $pphAmount : 0,
+                'pph_tax_id'  => app('currentTenant')->isIndonesian() && ($pphTax?->is_pph ?? false) ? $pphTax?->id : null,
             ]);
 
             // Get accounting settings from tenant
@@ -270,11 +281,23 @@ class PurchaseService
             $inventoryAccountName = $inventoryAccount->name;
             $accountsPayableAccountName = $accountsPayableAccount->name;
 
-            // Create Journal Entry for the purchase
+            // Journal entry: Dr Inventory (gross), Cr AP (net after PPh), Cr PPh Payable (withholding)
+            $inventoryAmount = $taxType === 'inclusive' ? $afterDiscount : ($afterDiscount + $taxAmount);
+
             $transactions = [
-                ['account_name' => $inventoryAccountName, 'type' => 'debit', 'amount' => $finalTotal],
+                ['account_name' => $inventoryAccountName, 'type' => 'debit', 'amount' => $inventoryAmount],
                 ['account_name' => $accountsPayableAccountName, 'type' => 'credit', 'amount' => $finalTotal],
             ];
+
+            if ($pphAmount > 0 && app('currentTenant')->isIndonesian() && ($pphTax?->is_pph ?? false)) {
+                $pphPayableAccountId = $accountingSettings['pph_payable_account_id'] ?? null;
+                if ($pphPayableAccountId) {
+                    $pphPayableAccount = Account::find($pphPayableAccountId);
+                    if ($pphPayableAccount) {
+                        $transactions[] = ['account_name' => $pphPayableAccount->name, 'type' => 'credit', 'amount' => $pphAmount];
+                    }
+                }
+            }
 
             $this->accountingService->createJournalEntry(
                 "Purchase Order #{$purchase->invoice}",
@@ -312,6 +335,10 @@ class PurchaseService
             $tax = $taxId ? Tax::find($taxId) : (Tax::default()->first() ?? Tax::active()->first());
             $taxRate = $tax ? (float) $tax->rate : 0;
             $taxType = $tax ? $tax->type : 'none';
+
+            $pphTaxId = $data['pph_tax_id'] ?? null;
+            $pphTax = $pphTaxId ? Tax::find($pphTaxId) : null;
+            $pphTaxRate = $pphTax ? (float) $pphTax->rate : 0;
 
             // Update the main purchase details
             $purchase->update([
@@ -366,9 +393,16 @@ class PurchaseService
                 $finalTotal = $afterDiscount + $taxAmount;
             }
 
+            $pphAmount = PurchaseHelper::calculatePphAmount($afterDiscount, $pphTaxRate);
+            $finalTotal = max(0, $finalTotal - $pphAmount);
+
             $purchase->update([
-                'total'     => $finalTotal,   // grand total: subtotal − discount ± tax
+                'total'     => $finalTotal,
                 'total_tax' => $taxAmount,
+                'pph_enabled' => app('currentTenant')->isIndonesian() && ($pphTax?->is_pph ?? false),
+                'pph_rate'    => app('currentTenant')->isIndonesian() && ($pphTax?->is_pph ?? false) ? $pphTaxRate : null,
+                'pph_amount'  => app('currentTenant')->isIndonesian() && ($pphTax?->is_pph ?? false) ? $pphAmount : 0,
+                'pph_tax_id'  => app('currentTenant')->isIndonesian() && ($pphTax?->is_pph ?? false) ? $pphTax?->id : null,
             ]);
 
             // Refresh model to get grand_total attribute updated

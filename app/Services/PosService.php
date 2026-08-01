@@ -197,7 +197,14 @@ class PosService
             throw new \Exception('Insufficient stock for: ' . $productList . '. Please adjust quantities or restock.');
         }
 
-        return DB::transaction(function () use ($data, $products, $dbProducts, $grandTotal, $orderDiscount, $orderDiscountType, $taxAmount, $taxRateVal, $taxId, $taxType, $subTotal, $mainWarehouse, $invoice, $amountReceived) {
+        return DB::transaction(function () use ($data, $products, $dbProducts, $grandTotal, $orderDiscount, $orderDiscountType, $taxAmount, $taxRateVal, $taxId, $taxType, $subTotal, $mainWarehouse, $invoice, $amountReceived, $taxable) {
+            $pphTaxId = $data['pph_tax_id'] ?? null;
+            $pphTax = $pphTaxId ? Tax::find($pphTaxId) : null;
+            $pphTaxRate = $pphTax ? (float) $pphTax->rate : 0;
+            $pphAmount = SalesHelper::calculatePphAmount($taxable, $pphTaxRate);
+            // Update grandTotal to subtract PPh
+            $grandTotal = max(0, $grandTotal - $pphAmount);
+
             $changeAmount = max(0, $amountReceived - $grandTotal);
             $sale = Sales::create([
                 'invoice' => $invoice,
@@ -218,6 +225,10 @@ class PosService
                 'amount_received' => $amountReceived,
                 'change_amount' => $changeAmount,
                 'type' => Sales::TYPE_POS,
+                'pph_enabled' => app('currentTenant')->isIndonesian() && ($pphTax?->is_pph ?? false),
+                'pph_rate'    => app('currentTenant')->isIndonesian() && ($pphTax?->is_pph ?? false) ? $pphTaxRate : null,
+                'pph_amount'  => app('currentTenant')->isIndonesian() && ($pphTax?->is_pph ?? false) ? $pphAmount : 0,
+                'pph_tax_id'  => app('currentTenant')->isIndonesian() && ($pphTax?->is_pph ?? false) ? $pphTax?->id : null,
             ]);
 
             $sale->payments()->create([
@@ -298,6 +309,25 @@ class PosService
                             );
                         }
                     }
+
+                    if ($pphAmount > 0 && app('currentTenant')->isIndonesian() && ($pphTax?->is_pph ?? false)) {
+                        $pphReceivableAccountId = $accountingSettings['pph_receivable_account_id'] ?? null;
+                        if ($pphReceivableAccountId) {
+                            $pphReceivableAccount = Account::find($pphReceivableAccountId);
+                            if ($pphReceivableAccount) {
+                                $pphTransactions = [
+                                    ['account_name' => $pphReceivableAccount->name, 'type' => 'debit', 'amount' => $pphAmount],
+                                    ['account_name' => $accountsReceivableAccount->name, 'type' => 'credit', 'amount' => $pphAmount],
+                                ];
+                                $this->accountingService->createJournalEntry(
+                                    "PPh Withholding on POS Sale #{$sale->invoice}",
+                                    Carbon::parse($data['transaction_date']),
+                                    $pphTransactions,
+                                    $sale
+                                );
+                            }
+                        }
+                    }
                 }
             }
 
@@ -342,6 +372,8 @@ class PosService
         $taxType = $sale->tax_type ?? 'exclusive';
         $taxAmount = SalesHelper::calculateTaxAmount($taxableAmount, $taxRate, $taxType);
         $grandTotal = $taxType === 'inclusive' ? $taxableAmount : $taxableAmount + $taxAmount;
+        $pphAmount = $sale->pph_amount ?? 0;
+        $grandTotal = max(0, $grandTotal - $pphAmount);
         $amountReceived = $sale->amount_received ?? $grandTotal;
         $change = max(0, $amountReceived - $grandTotal);
 
@@ -352,6 +384,7 @@ class PosService
             'taxRate' => $taxRate,
             'taxType' => $taxType,
             'taxAmount' => $taxAmount,
+            'pphAmount' => $pphAmount,
             'grandTotal' => $grandTotal,
             'amountReceived' => $amountReceived,
             'change' => $change,

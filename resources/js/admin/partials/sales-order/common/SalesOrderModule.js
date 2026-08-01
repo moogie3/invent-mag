@@ -63,6 +63,26 @@ export class SalesOrderModule {
         return Math.round((taxableAmount * (rate / 100)) * 100) / 100;
     }
 
+    calculatePphAmount(taxableAmount) {
+        const pphRate = this.getPphRate();
+        if (pphRate <= 0 || taxableAmount <= 0) return 0;
+        return Math.round(taxableAmount * (pphRate / 100) * 100) / 100;
+    }
+
+    getPphRate() {
+        const selector = document.getElementById('pphSelector');
+        if (selector && selector.value) {
+            const selected = selector.options[selector.selectedIndex];
+            return parseFloat(selected.dataset.rate) || 0;
+        }
+        return 0;
+    }
+
+    isPphEnabled() {
+        const selector = document.getElementById('pphSelector');
+        return selector && selector.value !== '';
+    }
+
     calculateOrderDiscount(subtotal, discountValue, discountType) {
         if (discountType === "percentage") {
             return (subtotal * discountValue) / 100;
@@ -71,23 +91,30 @@ export class SalesOrderModule {
     }
 
     initFlatpickr(orderDateElement, dueDateElement) {
+        const flatpickrConfig = {
+            dateFormat: "Y-m-d",
+            altInput: true,
+            altFormat: "d-m-Y",
+            allowInput: true,
+        };
+
         if (orderDateElement) {
-            flatpickr(orderDateElement, {
-                dateFormat: "Y-m-d",
-                altInput: true,
-                altFormat: "d-m-Y",
-                defaultDate: new Date(),
-                allowInput: true,
-            });
+            try {
+                orderDateElement._flatpickr = flatpickr(orderDateElement, {
+                    ...flatpickrConfig,
+                    defaultDate: new Date(),
+                });
+            } catch (error) {
+                // Flatpickr init failed — field will fall back to native validation
+            }
         }
 
         if (dueDateElement) {
-            flatpickr(dueDateElement, {
-                dateFormat: "Y-m-d",
-                altInput: true,
-                altFormat: "d-m-Y",
-                allowInput: true,
-            });
+            try {
+                dueDateElement._flatpickr = flatpickr(dueDateElement, flatpickrConfig);
+            } catch (error) {
+                // Flatpickr init failed — field will fall back to native validation
+            }
         }
     }
 

@@ -94,6 +94,7 @@ class SalesController extends Controller
             'ppn_enabled' => 'nullable|boolean',
             'ppn_rate' => 'nullable|numeric|min:0|max:100',
             'ppn_amount' => 'nullable|numeric|min:0',
+            'pph_tax_id' => 'nullable|exists:taxes,id',
         ]);
 
         try {
@@ -123,6 +124,7 @@ class SalesController extends Controller
             'ppn_enabled' => 'nullable|boolean',
             'ppn_rate' => 'nullable|numeric|min:0|max:100',
             'ppn_amount' => 'nullable|numeric|min:0',
+            'pph_tax_id' => 'nullable|exists:taxes,id',
         ]);
 
         try {

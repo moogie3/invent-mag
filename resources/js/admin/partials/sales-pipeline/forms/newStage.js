@@ -20,15 +20,16 @@ export function initNewStageForm() {
     newStageFormListenerAttached = true;
 
     newStageForm.addEventListener("submit", async function (e) {
+        if (e.defaultPrevented) return;
         e.preventDefault();
 
         const pipelineId = newStagePipelineId.value;
 
         if (!pipelineId) {
             InventMagApp.showToast(
-                "Error",
+                "Warning",
                 "Pipeline ID is missing. Please close and reopen the modal.",
-                "error"
+                "warning"
             );
             return;
         }
@@ -39,9 +40,9 @@ export function initNewStageForm() {
 
         if (!data.name) {
             InventMagApp.showToast(
-                "Error",
+                "Warning",
                 "Please fill in all required fields.",
-                "error"
+                "warning"
             );
             return;
         }

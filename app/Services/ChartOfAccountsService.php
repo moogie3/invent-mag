@@ -62,6 +62,8 @@ class ChartOfAccountsService
             'accounts_payable_account_id' => 'required|exists:accounts,id',
             'cash_account_id' => 'required|exists:accounts,id',
             'ppn_keluaran_account_id' => 'nullable|exists:accounts,id',
+            'pph_receivable_account_id' => 'nullable|exists:accounts,id',
+            'pph_payable_account_id'    => 'nullable|exists:accounts,id',
         ];
     }
 

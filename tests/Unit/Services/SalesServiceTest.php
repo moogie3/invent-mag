@@ -8,6 +8,7 @@ use App\Models\Sales;
 use App\Models\SalesItem;
 use App\Models\User;
 use App\Models\Account;
+use App\Models\Tax;
 use App\Models\Warehouse; // Added
 use App\Models\ProductWarehouse;
 use App\Services\AccountingService;
@@ -487,5 +488,352 @@ class SalesServiceTest extends TestCase
             }
         }
         return null;
+    }
+
+    #[Test]
+    public function it_stores_pph_snapshot_when_creating_sale_with_pph_tax()
+    {
+        $this->tenant->update(['tax_jurisdiction' => 'ID']);
+
+        // Create a separate regular tax so it doesn't get auto-selected as PPh
+        $regularTax = Tax::create([
+            'name' => 'PPN 11%',
+            'rate' => 11,
+            'type' => 'exclusive',
+            'is_active' => true,
+            'is_default' => true,
+            'is_pph' => false,
+        ]);
+
+        $pphTax = Tax::create([
+            'name' => 'PPh 23',
+            'rate' => 2,
+            'type' => 'exclusive',
+            'is_active' => true,
+            'is_pph' => true,
+        ]);
+
+        // Create a PPh receivable account for journal entries
+        $pphReceivableAccount = Account::create([
+            'name' => 'PPh Receivable ' . $this->tenant->id,
+            'code' => '1150' . $this->tenant->id,
+            'type' => 'asset',
+            'tenant_id' => $this->tenant->id,
+        ]);
+        $this->tenant->update([
+            'accounting_settings' => array_merge(
+                $this->tenant->accounting_settings ?? [],
+                ['pph_receivable_account_id' => $pphReceivableAccount->id]
+            ),
+        ]);
+
+        $customer = Customer::factory()->create();
+        $warehouse = Warehouse::factory()->create(['is_main' => true]);
+        $product = Product::factory()->create(['price' => 50]);
+        ProductWarehouse::updateOrCreate(
+            ['product_id' => $product->id, 'warehouse_id' => $warehouse->id, 'tenant_id' => $product->tenant_id],
+            ['quantity' => 10]
+        );
+
+        $products = json_encode([
+            ['product_id' => $product->id, 'quantity' => 2, 'customer_price' => 100, 'discount' => 0, 'discount_type' => 'fixed'],
+        ]);
+        $data = [
+            'products' => $products,
+            'customer_id' => $customer->id,
+            'warehouse_id' => $warehouse->id,
+            'order_date' => now()->toDateString(),
+            'due_date' => now()->addMonth()->toDateString(),
+            'tax_id' => $regularTax->id,
+            'pph_tax_id' => $pphTax->id,
+        ];
+
+        $this->accountingServiceMock->shouldReceive('createJournalEntry')->times(2);
+
+        $sale = $this->salesService->createSale($data);
+
+        $this->assertTrue($sale->fresh()->pph_enabled);
+        $this->assertEquals(2.0, $sale->fresh()->pph_rate);
+        // PPh = 200 * 2% = 4.00
+        $this->assertEquals(4.0, $sale->fresh()->pph_amount);
+        $this->assertEquals($pphTax->id, $sale->fresh()->pph_tax_id);
+
+        // Subtotal 200, PPN 11% = 22, PPh 2% = 4
+        // Grand total = 200 + 22 - 4 = 218
+        $this->assertEquals(218.0, $sale->fresh()->total);
+    }
+
+    #[Test]
+    public function it_does_not_store_pph_when_tenant_not_indonesian()
+    {
+        $pphTax = Tax::create([
+            'name' => 'PPh 23',
+            'rate' => 2,
+            'type' => 'exclusive',
+            'is_active' => true,
+            'is_pph' => true,
+        ]);
+
+        $customer = Customer::factory()->create();
+        $warehouse = Warehouse::factory()->create(['is_main' => true]);
+        $product = Product::factory()->create(['price' => 50]);
+        ProductWarehouse::updateOrCreate(
+            ['product_id' => $product->id, 'warehouse_id' => $warehouse->id, 'tenant_id' => $product->tenant_id],
+            ['quantity' => 10]
+        );
+
+        $products = json_encode([
+            ['product_id' => $product->id, 'quantity' => 2, 'customer_price' => 100, 'discount' => 0, 'discount_type' => 'fixed'],
+        ]);
+        $data = [
+            'products' => $products,
+            'customer_id' => $customer->id,
+            'warehouse_id' => $warehouse->id,
+            'order_date' => now()->toDateString(),
+            'due_date' => now()->addMonth()->toDateString(),
+            'pph_tax_id' => $pphTax->id,
+        ];
+
+        $this->accountingServiceMock->shouldReceive('createJournalEntry')->once();
+
+        $sale = $this->salesService->createSale($data);
+
+        $this->assertFalse($sale->fresh()->pph_enabled);
+        $this->assertEquals(0.0, $sale->fresh()->pph_amount);
+        $this->assertNull($sale->fresh()->pph_tax_id);
+
+        // Grand total = 200 (no PPh subtracted)
+        $this->assertEquals(200.0, $sale->fresh()->total);
+    }
+
+    #[Test]
+    public function it_creates_pph_journal_entry_when_pph_applied()
+    {
+        $this->tenant->update(['tax_jurisdiction' => 'ID']);
+
+        $pphTax = Tax::create([
+            'name' => 'PPh 23',
+            'rate' => 2,
+            'type' => 'exclusive',
+            'is_active' => true,
+            'is_pph' => true,
+        ]);
+
+        $pphReceivableAccount = Account::create([
+            'name' => 'PPh Receivable ' . $this->tenant->id,
+            'code' => '1150' . $this->tenant->id,
+            'type' => 'asset',
+            'tenant_id' => $this->tenant->id,
+        ]);
+        $this->tenant->update([
+            'accounting_settings' => array_merge(
+                $this->tenant->accounting_settings ?? [],
+                ['pph_receivable_account_id' => $pphReceivableAccount->id]
+            ),
+        ]);
+
+        $customer = Customer::factory()->create();
+        $warehouse = Warehouse::factory()->create(['is_main' => true]);
+        $product = Product::factory()->create(['price' => 50]);
+        ProductWarehouse::updateOrCreate(
+            ['product_id' => $product->id, 'warehouse_id' => $warehouse->id, 'tenant_id' => $product->tenant_id],
+            ['quantity' => 10]
+        );
+
+        $products = json_encode([
+            ['product_id' => $product->id, 'quantity' => 2, 'customer_price' => 100, 'discount' => 0, 'discount_type' => 'fixed'],
+        ]);
+        $data = [
+            'products' => $products,
+            'customer_id' => $customer->id,
+            'warehouse_id' => $warehouse->id,
+            'order_date' => now()->toDateString(),
+            'due_date' => now()->addMonth()->toDateString(),
+            'pph_tax_id' => $pphTax->id,
+        ];
+
+        $this->accountingServiceMock
+            ->shouldReceive('createJournalEntry')
+            ->times(2);
+
+        $this->salesService->createSale($data);
+    }
+
+    #[Test]
+    public function it_does_not_create_pph_journal_entry_without_pph_receivable_account()
+    {
+        $this->tenant->update(['tax_jurisdiction' => 'ID']);
+
+        $pphTax = Tax::create([
+            'name' => 'PPh 23',
+            'rate' => 2,
+            'type' => 'exclusive',
+            'is_active' => true,
+            'is_pph' => true,
+        ]);
+
+        // Do NOT create pph_receivable_account_id setting
+        $customer = Customer::factory()->create();
+        $warehouse = Warehouse::factory()->create(['is_main' => true]);
+        $product = Product::factory()->create(['price' => 50]);
+        ProductWarehouse::updateOrCreate(
+            ['product_id' => $product->id, 'warehouse_id' => $warehouse->id, 'tenant_id' => $product->tenant_id],
+            ['quantity' => 10]
+        );
+
+        $products = json_encode([
+            ['product_id' => $product->id, 'quantity' => 2, 'customer_price' => 100, 'discount' => 0, 'discount_type' => 'fixed'],
+        ]);
+        $data = [
+            'products' => $products,
+            'customer_id' => $customer->id,
+            'warehouse_id' => $warehouse->id,
+            'order_date' => now()->toDateString(),
+            'due_date' => now()->addMonth()->toDateString(),
+            'pph_tax_id' => $pphTax->id,
+        ];
+
+        // Only main sale journal entry, no PPh journal entry
+        $this->accountingServiceMock->shouldReceive('createJournalEntry')->once();
+
+        $sale = $this->salesService->createSale($data);
+
+        // PPh snapshot is still stored
+        $this->assertTrue($sale->fresh()->pph_enabled);
+        $this->assertEquals(4.0, $sale->fresh()->pph_amount);
+    }
+
+    #[Test]
+    public function it_stores_pph_snapshot_when_updating_sale_with_pph_tax()
+    {
+        $this->tenant->update(['tax_jurisdiction' => 'ID']);
+
+        $pphTax = Tax::create([
+            'name' => 'PPh 23',
+            'rate' => 2,
+            'type' => 'exclusive',
+            'is_active' => true,
+            'is_pph' => true,
+        ]);
+
+        $pphReceivableAccount = Account::create([
+            'name' => 'PPh Receivable ' . $this->tenant->id,
+            'code' => '1150' . $this->tenant->id,
+            'type' => 'asset',
+            'tenant_id' => $this->tenant->id,
+        ]);
+        $this->tenant->update([
+            'accounting_settings' => array_merge(
+                $this->tenant->accounting_settings ?? [],
+                ['pph_receivable_account_id' => $pphReceivableAccount->id]
+            ),
+        ]);
+
+        $warehouse = Warehouse::factory()->create(['is_main' => true]);
+        $product = Product::factory()->create(['price' => 50]);
+        ProductWarehouse::updateOrCreate(
+            ['product_id' => $product->id, 'warehouse_id' => $warehouse->id, 'tenant_id' => $product->tenant_id],
+            ['quantity' => 10]
+        );
+
+        $sale = Sales::factory()->create([
+            'warehouse_id' => $warehouse->id,
+            'pph_enabled' => false,
+            'pph_amount' => 0,
+        ]);
+        SalesItem::factory()->create([
+            'sales_id' => $sale->id,
+            'product_id' => $product->id,
+            'quantity' => 1,
+            'customer_price' => 100,
+            'total' => 100,
+        ]);
+
+        $products = json_encode([
+            ['product_id' => $product->id, 'quantity' => 2, 'customer_price' => 100, 'discount' => 0, 'discount_type' => 'fixed'],
+        ]);
+        $data = [
+            'products' => $products,
+            'customer_id' => $sale->customer_id,
+            'warehouse_id' => $warehouse->id,
+            'order_date' => now()->toDateString(),
+            'due_date' => now()->addMonth()->toDateString(),
+            'pph_tax_id' => $pphTax->id,
+        ];
+
+        $this->salesService->updateSale($sale, $data);
+
+        $sale->refresh();
+        $this->assertTrue($sale->pph_enabled);
+        $this->assertEquals(2.0, $sale->pph_rate);
+        $this->assertEquals(4.0, $sale->pph_amount);
+        $this->assertEquals($pphTax->id, $sale->pph_tax_id);
+    }
+
+    #[Test]
+    public function it_pph_reduces_grand_total_correctly_in_snapshot()
+    {
+        $this->tenant->update(['tax_jurisdiction' => 'ID']);
+
+        // Regular tax 10% + PPh 2%
+        $regularTax = Tax::create([
+            'name' => 'PPN 10%',
+            'rate' => 10,
+            'type' => 'exclusive',
+            'is_active' => true,
+            'is_pph' => false,
+        ]);
+        $pphTax = Tax::create([
+            'name' => 'PPh 23',
+            'rate' => 2,
+            'type' => 'exclusive',
+            'is_active' => true,
+            'is_pph' => true,
+        ]);
+
+        $pphReceivableAccount = Account::create([
+            'name' => 'PPh Receivable ' . $this->tenant->id,
+            'code' => '1150' . $this->tenant->id,
+            'type' => 'asset',
+            'tenant_id' => $this->tenant->id,
+        ]);
+        $this->tenant->update([
+            'accounting_settings' => array_merge(
+                $this->tenant->accounting_settings ?? [],
+                ['pph_receivable_account_id' => $pphReceivableAccount->id]
+            ),
+        ]);
+
+        $customer = Customer::factory()->create();
+        $warehouse = Warehouse::factory()->create(['is_main' => true]);
+        $product = Product::factory()->create(['price' => 50]);
+        ProductWarehouse::updateOrCreate(
+            ['product_id' => $product->id, 'warehouse_id' => $warehouse->id, 'tenant_id' => $product->tenant_id],
+            ['quantity' => 10]
+        );
+
+        $products = json_encode([
+            ['product_id' => $product->id, 'quantity' => 2, 'customer_price' => 100, 'discount' => 0, 'discount_type' => 'fixed'],
+        ]);
+        $data = [
+            'products' => $products,
+            'customer_id' => $customer->id,
+            'warehouse_id' => $warehouse->id,
+            'order_date' => now()->toDateString(),
+            'due_date' => now()->addMonth()->toDateString(),
+            'tax_id' => $regularTax->id,
+            'pph_tax_id' => $pphTax->id,
+        ];
+
+        $this->accountingServiceMock->shouldReceive('createJournalEntry')->times(2);
+
+        $sale = $this->salesService->createSale($data);
+
+        // Subtotal = 200, PPN = 20, PPh = 4
+        // Grand total = 200 + 20 - 4 = 216
+        $this->assertEquals(216.0, $sale->fresh()->total);
+        $this->assertEquals(20.0, $sale->fresh()->total_tax);
+        $this->assertEquals(4.0, $sale->fresh()->pph_amount);
+        $this->assertTrue($sale->fresh()->pph_enabled);
     }
 }

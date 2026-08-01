@@ -937,7 +937,7 @@ Fortify is a backend authentication implementation — it provides the authentic
 The system uses **`spatie/laravel-permission`** with a custom `Role` model that extends Spatie's.
 
 **Structure:**
-- There are **79 permissions** defined (the exact list is seeded via `PermissionSeeder`)
+- There are **101 permissions** defined (the exact list is seeded via `PermissionSeeder`)
 - Permissions follow the pattern: `{action}-{resource}` (e.g., `create-products`, `view-accounting`, `delete-users`, `manage-roles`)
 - Roles are created per-tenant and assigned permissions
 - Users are assigned roles
@@ -1696,7 +1696,7 @@ This is a critical architectural distinction that candidates often confuse.
 **Tenant-level "superuser" role (`spatie/laravel-permission`):**
 - A Spatie `Role` assigned to `User` records within a tenant
 - Lives in the `roles` table with `guard_name = 'web'`
-- Has all 79 permissions within the tenant scope
+- Has all 101 permissions within the tenant scope
 - Runs on **tenant subdomains** (`tenant.invent-mag.web.id`)
 - Uses `CurrencySetting` for monetary formatting (per-tenant)
 - Routes in `routes/admin/*.php`, protected by `auth`, `verified`, `subscription.active` middleware

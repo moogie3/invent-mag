@@ -36,6 +36,10 @@ return [
             'name' => 'PPN Masukan',
             'description' => 'Pajak Pertambahan Nilai yang dibayar atas pembelian.',
         ],
+        'pph_receivable' => [
+            'name' => 'Piutang PPh',
+            'description' => 'Piutang pajak penghasilan dipotong dari pelanggan (kredit pajak yang akan diklaim ke DJP).',
+        ],
         'fixed_assets' => [
             'name' => 'Aset Tetap',
         ],
@@ -182,6 +186,10 @@ return [
         'salary_payable' => [
             'name' => 'Utang Gaji',
             'description' => 'Liabilitas gaji accrued kepada karyawan.',
+        ],
+        'pph_payable' => [
+            'name' => 'Utang PPh 23',
+            'description' => 'Pajak penghasilan dipotong yang terutang ke DJP (pajak dipotong dari pembayaran vendor).',
         ],
     ],
 ];

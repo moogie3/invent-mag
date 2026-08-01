@@ -40,6 +40,9 @@ function initQuotationForm() {
     if (discountInput) discountInput.addEventListener("input", () => recalcQuotationTotals(form));
     if (discountTypeSelect) discountTypeSelect.addEventListener("change", () => recalcQuotationTotals(form));
     if (taxSelector) taxSelector.addEventListener("change", () => recalcQuotationTotals(form));
+
+    const pphSelector = form.querySelector("#pphSelector");
+    if (pphSelector) pphSelector.addEventListener("change", () => recalcQuotationTotals(form));
 }
 
 function addQuotationItemRow(container) {
@@ -106,6 +109,15 @@ function recalcQuotationTotals(form) {
     const discountType = form.querySelector("#orderDiscountType")?.value || "percentage";
     const discountAmount = discountType === "percentage" ? (subtotal * discount) / 100 : discount;
 
+    // Update discount label with type info
+    const discountLabel = document.getElementById('discountLabel');
+    if (discountLabel) {
+        const base = discountLabel.dataset.base || 'Discount';
+        discountLabel.textContent = discount > 0
+            ? (discountType === 'percentage' ? base + ' (' + discount + '%)' : base + ' (Rp ' + discount.toLocaleString() + ')')
+            : base;
+    }
+
     const afterDiscount = subtotal - discountAmount;
 
     const taxSelector = form.querySelector("#taxSelector");
@@ -121,8 +133,24 @@ function recalcQuotationTotals(form) {
 
     const total = taxType === "exclusive" ? afterDiscount + taxAmount : afterDiscount;
 
+    const pphSelector = document.getElementById('pphSelector');
+    let pphAmount = 0;
+    if (pphSelector && pphSelector.value) {
+        const pphOpt = pphSelector.options[pphSelector.selectedIndex];
+        const pphRate = parseFloat(pphOpt.dataset.rate) || 0;
+        pphAmount = Math.round(afterDiscount * (pphRate / 100) * 100) / 100;
+    }
+    const finalTotal = Math.max(0, total - pphAmount);
+
+    const taxLabel = document.getElementById("taxLabel");
+    if (taxLabel && selectedOption) {
+        const base = taxLabel.dataset.base || 'Quotation Tax';
+        const rate = parseFloat(selectedOption.dataset.rate) || 0;
+        taxLabel.textContent = selectedOption.value && selectedOption.dataset.name ? base + ' (' + selectedOption.dataset.name + ' ' + rate + '%)' : base;
+    }
+
     const totalEl = form.querySelector("#totalDisplay");
-    if (totalEl) totalEl.textContent = Math.max(0, total).toFixed(2);
+    if (totalEl) totalEl.textContent = finalTotal.toFixed(2);
 }
 
 function initQuotationTable() {

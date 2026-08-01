@@ -88,6 +88,7 @@ class QuotationController extends Controller
             'discount_total' => 'nullable|numeric|min:0',
             'discount_total_type' => 'nullable|in:fixed,percentage',
             'tax_id' => 'nullable|exists:taxes,id',
+            'pph_tax_id' => 'nullable|exists:taxes,id',
         ]);
 
         try {
@@ -116,6 +117,14 @@ class QuotationController extends Controller
                 $total = $afterDiscount + $taxAmount;
             }
 
+            $taxableAmount = $afterDiscount;
+
+            $pphTaxId = $request->pph_tax_id ?? null;
+            $pphTax = $pphTaxId ? \App\Models\Tax::find($pphTaxId) : null;
+            $pphRate = $pphTax ? (float) $pphTax->rate : 0;
+            $pphAmount = \App\Helpers\SalesHelper::calculatePphAmount($taxableAmount, $pphRate);
+            $total = max(0, $total - $pphAmount);
+
             $quotation = Quotation::create([
                 'quotation_number' => $this->generateQuotationNumber(),
                 'customer_id' => $request->customer_id,
@@ -135,6 +144,10 @@ class QuotationController extends Controller
                 'items' => $products,
                 'notes' => $request->notes,
                 'terms_conditions' => $request->terms_conditions,
+                'pph_enabled' => app('currentTenant')->isIndonesian() && ($pphTax?->is_pph ?? false),
+                'pph_rate'    => app('currentTenant')->isIndonesian() && ($pphTax?->is_pph ?? false) ? $pphRate : null,
+                'pph_amount'  => app('currentTenant')->isIndonesian() && ($pphTax?->is_pph ?? false) ? $pphAmount : 0,
+                'pph_tax_id'  => app('currentTenant')->isIndonesian() && ($pphTax?->is_pph ?? false) ? $pphTax?->id : null,
             ]);
 
             DB::commit();
@@ -178,6 +191,7 @@ class QuotationController extends Controller
             'discount_total' => 'nullable|numeric|min:0',
             'discount_total_type' => 'nullable|in:fixed,percentage',
             'tax_id' => 'nullable|exists:taxes,id',
+            'pph_tax_id' => 'nullable|exists:taxes,id',
         ]);
 
         try {
@@ -206,6 +220,14 @@ class QuotationController extends Controller
                 $total = $afterDiscount + $taxAmount;
             }
 
+            $taxableAmount = $afterDiscount;
+
+            $pphTaxId = $request->pph_tax_id ?? null;
+            $pphTax = $pphTaxId ? \App\Models\Tax::find($pphTaxId) : null;
+            $pphRate = $pphTax ? (float) $pphTax->rate : 0;
+            $pphAmount = \App\Helpers\SalesHelper::calculatePphAmount($taxableAmount, $pphRate);
+            $total = max(0, $total - $pphAmount);
+
             $quotation->update([
                 'customer_id' => $request->customer_id,
                 'quotation_date' => $request->quotation_date,
@@ -222,6 +244,10 @@ class QuotationController extends Controller
                 'items' => $products,
                 'notes' => $request->notes,
                 'terms_conditions' => $request->terms_conditions,
+                'pph_enabled' => app('currentTenant')->isIndonesian() && ($pphTax?->is_pph ?? false),
+                'pph_rate'    => app('currentTenant')->isIndonesian() && ($pphTax?->is_pph ?? false) ? $pphRate : null,
+                'pph_amount'  => app('currentTenant')->isIndonesian() && ($pphTax?->is_pph ?? false) ? $pphAmount : 0,
+                'pph_tax_id'  => app('currentTenant')->isIndonesian() && ($pphTax?->is_pph ?? false) ? $pphTax?->id : null,
             ]);
 
             DB::commit();

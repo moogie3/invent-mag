@@ -120,6 +120,7 @@ class PurchaseHelperTest extends TestCase
             'totalProductDiscount' => 0.0,
             'orderDiscount'        => 0.0,
             'taxAmount'            => 0.0,
+            'pphAmount'            => 0.0,
             'finalTotal'           => 0.0,
         ], $summary);
     }
@@ -137,6 +138,7 @@ class PurchaseHelperTest extends TestCase
             'totalProductDiscount' => 0.0,
             'orderDiscount'        => 0.0,
             'taxAmount'            => 0.0,
+            'pphAmount'            => 0.0,
             'finalTotal'           => 100.0,
         ], $summary);
     }
@@ -155,6 +157,7 @@ class PurchaseHelperTest extends TestCase
             'totalProductDiscount' => 10.0 + 10.0, // 10% of 100 = 10, fixed 5 * 2 = 10
             'orderDiscount'        => 18.0,
             'taxAmount'            => 0.0,          // taxRate defaults to 0
+            'pphAmount'            => 0.0,
             'finalTotal'           => 162.0,        // 180 - 18 + 0 tax
         ], $summary);
     }
@@ -172,6 +175,7 @@ class PurchaseHelperTest extends TestCase
             'totalProductDiscount' => 0.0,
             'orderDiscount'        => 0.0,
             'taxAmount'            => 0.0,
+            'pphAmount'            => 0.0,
             'finalTotal'           => 100.0,
         ], $summary);
     }
@@ -192,6 +196,7 @@ class PurchaseHelperTest extends TestCase
             'totalProductDiscount' => 0.0,
             'orderDiscount'        => 0.0,
             'taxAmount'            => 10.0,
+            'pphAmount'            => 0.0,
             'finalTotal'           => 110.0,
         ], $summary);
     }
@@ -210,6 +215,7 @@ class PurchaseHelperTest extends TestCase
             'totalProductDiscount' => 0.0,
             'orderDiscount'        => 0.0,
             'taxAmount'            => 10.0,
+            'pphAmount'            => 0.0,
             'finalTotal'           => 110.0,
         ], $summary);
     }
@@ -226,6 +232,7 @@ class PurchaseHelperTest extends TestCase
             'totalProductDiscount' => 0.0,
             'orderDiscount'        => 0.0,
             'taxAmount'            => 0.0,
+            'pphAmount'            => 0.0,
             'finalTotal'           => 100.0,
         ], $summary);
     }
@@ -298,6 +305,44 @@ class PurchaseHelperTest extends TestCase
         Carbon::setTestNow(Carbon::create(2025, 1, 5));
         $this->assertEquals('<span class="h4"><i class="ti ti-alert-circle me-1 fs-4"></i> Overdue</span>', PurchaseHelper::getStatusText('Pending', Carbon::create(2025, 1, 1)));
         Carbon::setTestNow();
+    }
+
+    // ---------------------------------------------------------------------------
+    // PPh (Withholding Tax) tests
+    // ---------------------------------------------------------------------------
+
+    #[Test]
+    public function it_calculates_pph_amount_with_zero_rate()
+    {
+        $this->assertEquals(0.0, PurchaseHelper::calculatePphAmount(1000, 0));
+    }
+
+    #[Test]
+    public function it_calculates_pph_amount_with_rate()
+    {
+        $this->assertEquals(20.0, PurchaseHelper::calculatePphAmount(1000, 2));
+    }
+
+    #[Test]
+    public function it_calculates_pph_amount_with_zero_amount()
+    {
+        $this->assertEquals(0.0, PurchaseHelper::calculatePphAmount(0, 2));
+    }
+
+    #[Test]
+    public function it_includes_pph_amount_in_invoice_summary()
+    {
+        $items = [(object)['price' => 100, 'quantity' => 1, 'discount' => 0, 'discount_type' => 'fixed']];
+        $summary = PurchaseHelper::calculateInvoiceSummary($items, 0, 'fixed', 0, 'exclusive', 2);
+        $this->assertEquals(2.0, $summary['pphAmount']);
+    }
+
+    #[Test]
+    public function it_subtracts_pph_from_final_total()
+    {
+        $items = [(object)['price' => 100, 'quantity' => 1, 'discount' => 0, 'discount_type' => 'fixed']];
+        $summary = PurchaseHelper::calculateInvoiceSummary($items, 0, 'fixed', 0, 'exclusive', 2);
+        $this->assertEquals(98.0, $summary['finalTotal']);
     }
 
     #[Test]

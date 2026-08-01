@@ -17,6 +17,10 @@ Alpine.start();
 // Admin-specific scripts are now conditionally loaded in script.blade.php
 import "./admin/global-event-delegator.js";
 
+// Initialize global form validation
+import { initFormValidation } from "./admin/utils/formValidator.js";
+initFormValidation();
+
 // Read currency settings from body data attribute
 document.addEventListener('turbo:load', function() {
     var body = document.body;

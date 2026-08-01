@@ -62,6 +62,15 @@
         @endif
     </td>
     @endif
+    @if($showPpnCol)
+    <td>
+        @if($sale->isPph())
+            <span class="badge bg-orange-lt">{{ __('messages.withholding_tax') }} {{ $sale->pph_rate }}%</span>
+        @else
+            <span class="text-muted">-</span>
+        @endif
+    </td>
+    @endif
     <td class="no-print" style="text-align:center">
         @include('admin.layouts.partials.sales.index.table-actions', ['sale' => $sale])
     </td>

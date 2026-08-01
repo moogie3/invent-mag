@@ -11,8 +11,9 @@
                 <p class="text-secondary mb-4">Enter your email address and password reset form will be emailed to you.
                 </p>
                 <div class="mb-3">
-                    <label class="form-label">Email address</label>
-                    <input type="email" class="form-control" name="email" placeholder="Enter email" required>
+                    <label class="form-label" for="email">Email address</label>
+                    <input type="email" class="form-control @error('email') is-invalid @enderror" name="email" id="email" placeholder="Enter email" required>
+                    @error('email')<div class="invalid-feedback">{{ $message }}</div>@enderror
                 </div>
                 <div class="form-footer">
                     <button type="submit" class="btn btn-primary w-100">

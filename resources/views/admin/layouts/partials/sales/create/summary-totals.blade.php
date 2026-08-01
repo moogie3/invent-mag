@@ -7,25 +7,37 @@
         <span id="subtotal" class="fw-bold">Rp 0</span>
     </div>
     <div class="d-flex justify-content-between mb-2">
-        <span class="text-muted">{{ __('messages.sales_order_discount') }}</span>
+        <span class="text-muted" id="discountLabel" data-base="{{ __('messages.sales_order_discount') }}">{{ __('messages.sales_order_discount') }}</span>
         <span id="orderDiscountTotal" class="fw-bold">Rp 0</span>
     </div>
     <div class="d-flex justify-content-between mb-2">
-        <span class="text-muted">{{ __('messages.tax') }}</span>
+        <span class="text-muted" id="taxLabel" data-base="{{ __('messages.tax') }}">{{ __('messages.tax') }}</span>
+        <span id="taxTotal" class="fw-bold">Rp 0</span>
+    </div>
+    @php $currentTenant = app('currentTenant'); @endphp
+    @if($currentTenant->isIndonesian() && $currentTenant->hasFeature('ppn'))
+    <div class="d-flex justify-content-between mb-2">
+        <span class="text-muted">{{ __('messages.withholding_tax') }}</span>
         <div class="d-flex align-items-center">
-            <select class="form-select form-select-sm me-2" id="taxSelector" name="tax_id" style="width: auto;">
-                @foreach($taxes as $taxOption)
-                    <option value="{{ $taxOption->id }}"
-                            data-rate="{{ $taxOption->rate }}"
-                            data-type="{{ $taxOption->type }}"
-                            {{ ($defaultTax?->id ?? '') == $taxOption->id ? 'selected' : '' }}>
-                        {{ $taxOption->name }} ({{ $taxOption->rate }}%{{ $taxOption->type !== 'none' ? ', ' . ucfirst($taxOption->type) : '' }})
+            <select class="form-select form-select-sm me-2 @error('pph_tax_id') is-invalid @enderror" id="pphSelector" name="pph_tax_id" style="width: auto;">
+                <option value="">{{ __('messages.no_pph') }}</option>
+                @foreach($taxes->where('is_pph', true) as $pphOption)
+                    <option value="{{ $pphOption->id }}"
+                            data-rate="{{ $pphOption->rate }}"
+                            data-type="{{ $pphOption->type }}"
+                            {{ old('pph_tax_id') == $pphOption->id ? 'selected' : '' }}>
+                        {{ $pphOption->name }} ({{ $pphOption->rate }}%)
                     </option>
                 @endforeach
             </select>
-            <span id="taxTotal" class="fw-bold">Rp 0</span>
+            @error('pph_tax_id')<div class="invalid-feedback d-block">{{ $message }}</div>@enderror
+            <span id="pphTotal" class="fw-bold text-danger">Rp 0</span>
         </div>
     </div>
+    <input type="hidden" id="pphEnabledInput" name="pph_enabled" value="0">
+    <input type="hidden" id="pphRateInput" name="pph_rate" value="0">
+    <input type="hidden" id="pphAmountInput" name="pph_amount" value="0">
+    @endif
     <div class="d-flex justify-content-between mb-2 text-info" id="creditUsedRow" style="display: none;">
         <span><i class="ti ti-credit-card me-1"></i>{{ __('messages.credit_used') }}</span>
         <span id="creditUsedAmount" class="fw-bold">Rp 0</span>

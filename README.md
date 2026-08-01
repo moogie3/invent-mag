@@ -1,6 +1,6 @@
 # Invent-MAG: Enterprise Inventory & Accounting System
 
-**Version:** 1.9  
+**Version:** 2.1  
 **Author:** moogie3  
 **License:** MIT  
 **Development Time:** 1.5+ years (451+ commits)  
@@ -13,7 +13,7 @@
 | Metric               | Value                                        |
 | -------------------- | -------------------------------------------- |
 | **🏗️ Architecture**  | Multi-tenant SaaS                            |
-| **🧪 Test Coverage** | 1066 test files                              |
+| **🧪 Test Coverage** | 1099 tests / 3317 assertions                |
 | **💻 Codebase**      | 451+ commits, 1.5 years development          |
 | **🔐 Security**      | RBAC with 79 permissions, audit logging      |
 | **🐳 DevOps**        | Docker + GitHub Actions CI/CD                |
@@ -222,6 +222,7 @@ Experience Invent-MAG firsthand:
 
 #### Advanced Accounting Features
 
+- **PPh (Withholding Tax):** Support for PPh 21, 22, 23, and 25 withholding tax calculations and reporting.
 - **Double-Entry Bookkeeping:** Strict automated journal entry creation with dynamic **FIFO (First-In, First-Out) Cost of Goods Sold (COGS)** calculation.
 - **Automated Reversals:** Deleting a Sale, Purchase, or Return automatically reverses the associated Journal Entries to maintain a perfectly balanced General Ledger.
 - **Accurate GL Summaries:** Real-time dashboards correctly deduct Sales Returns and Purchase Returns from Revenue and Expense totals.
@@ -299,7 +300,7 @@ A fully separate admin panel for platform operators, running on the root domain 
 
 #### Core Management
 
-- **Tenant Management:** List, view, toggle active/inactive, edit domain, impersonate (planned)
+- **Tenant Management:** List, view, toggle active/inactive, edit domain, impersonate (superadmin)
 - **Plan Management:** Full CRUD for subscription plans with feature toggles, pricing, usage limits
 - **Subscription Management:** Terminate and reactivate tenant subscriptions, view status (active/trialing/expired/terminated)
 - **Feature Management:** Assign feature slugs (accounting, pos, crm, forecasting, api, etc.) per plan tier
@@ -394,7 +395,7 @@ Data:
 
 #### Testing
 
-- **1066 Test Files:** 40 Feature + 45 Unit PHP + 171 JS Vitest
+- **1099 Tests / 3317 Assertions:** 42 Feature + 53 Unit PHP + 173 JS Vitest (268 test files)
 - **PHPUnit 11+:** Modern PHP testing
 - **Parallel Testing:** `php artisan test --parallel`
 - **Multi-tenancy Tests:** Tenant isolation testing
@@ -471,7 +472,7 @@ Data:
 
 ## 🧪 Test Coverage
 
-**1066 Test Files Covering:**
+**1099 Tests / 3317 Assertions Covering:**
 
 ### Feature Tests (40)
 
@@ -612,7 +613,7 @@ docker-compose exec app php artisan migrate --seed
 - ✅ **Platform Currency System** — Super Admin panel uses independent `PlatformCurrencySetting` (does not affect tenant currencies)
 - ✅ **Tutorial Expansion** — Added 4 new tutorial step keys (`tax_auto_sync`, `tax_breakdown_ret`, `opportunity_amount_tax`, `item_discount_type_qt`) to English and Indonesian translations
 - ✅ **Stability Fix** — `onPageLoad` deduplication fix preventing double card rendering and duplicate event listeners on the pipeline page
-- ✅ **Test Suite Hardening** — Fixed 17 previously failing unit tests; 528 passing, 0 failures
+- ✅ **Test Suite Hardening** — Fixed 17 previously failing unit tests; 1099 passing, 0 failures
 
 ### Recently Added (v1.8)
 
@@ -662,9 +663,16 @@ docker-compose exec app php artisan migrate --seed
 ### Planned Features
 
 - 🔄 Bank Reconciliation
-- 🔄 Advanced Multi-Currency
+- 🔄 Advanced Multi-Currency (real-time rates)
 - 🔄 PJAP API Direct DJP Submission (e-Faktur Phase 2)
+- 🔄 SPT Report Templates (SPT Masa PPN)
+- 🔄 Bank Integrations (BCA, BNI, Mandiri API)
+- 🔄 WhatsApp Invoice Delivery
+- 🔄 Midtrans Payment Links on Invoices
+- 🔄 Pricing Comparison Table vs Zahir Online
+- 🔄 PPh Support (21, 22, 23, 25)
 - 🔄 Mobile Application
+- 🔄 Advanced BI Dashboards
 
 ---
 

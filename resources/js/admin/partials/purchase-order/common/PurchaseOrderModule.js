@@ -55,6 +55,26 @@ export class PurchaseOrderModule {
         return Math.round((taxableAmount * (rate / 100)) * 100) / 100;
     }
 
+    calculatePphAmount(taxableAmount) {
+        const pphRate = this.getPphRate();
+        if (pphRate <= 0 || taxableAmount <= 0) return 0;
+        return Math.round(taxableAmount * (pphRate / 100) * 100) / 100;
+    }
+
+    getPphRate() {
+        const selector = document.getElementById('pphSelector');
+        if (selector && selector.value) {
+            const selected = selector.options[selector.selectedIndex];
+            return parseFloat(selected.dataset.rate) || 0;
+        }
+        return 0;
+    }
+
+    isPphEnabled() {
+        const selector = document.getElementById('pphSelector');
+        return selector && selector.value !== '';
+    }
+
     safeGetElement(id) {
         try {
             return document.getElementById(id);

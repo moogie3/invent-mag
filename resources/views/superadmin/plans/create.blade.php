@@ -32,66 +32,77 @@
                         @csrf
                         <div class="row mb-3">
                             <div class="col-md-4">
-                                <label class="form-label">Name <span class="text-danger">*</span></label>
-                                <input type="text" name="name" class="form-control" value="{{ old('name') }}" required>
+                                <label class="form-label" for="name">Name <span class="text-danger">*</span></label>
+                                <input type="text" name="name" id="name" class="form-control @error('name') is-invalid @enderror" value="{{ old('name') }}" required>
+                                @error('name')<div class="invalid-feedback">{{ $message }}</div>@enderror
                             </div>
                             <div class="col-md-4">
-                                <label class="form-label">Slug <span class="text-danger">*</span></label>
-                                <input type="text" name="slug" class="form-control" value="{{ old('slug') }}" required>
+                                <label class="form-label" for="slug">Slug <span class="text-danger">*</span></label>
+                                <input type="text" name="slug" id="slug" class="form-control @error('slug') is-invalid @enderror" value="{{ old('slug') }}" required>
+                                @error('slug')<div class="invalid-feedback">{{ $message }}</div>@enderror
                             </div>
                             <div class="col-md-2">
-                                <label class="form-label">Price <span class="text-danger">*</span></label>
-                                <input type="number" step="0.01" name="price" class="form-control" value="{{ old('price') }}" required>
+                                <label class="form-label" for="price">Price <span class="text-danger">*</span></label>
+                                <input type="number" step="0.01" name="price" id="price" class="form-control @error('price') is-invalid @enderror" value="{{ old('price') }}" required>
+                                @error('price')<div class="invalid-feedback">{{ $message }}</div>@enderror
                             </div>
                             <div class="col-md-2">
-                                <label class="form-label">Currency</label>
-                                <select name="currency_code" class="form-select">
+                                <label class="form-label" for="currency_code">Currency</label>
+                                <select name="currency_code" id="currency_code" class="form-select @error('currency_code') is-invalid @enderror">
                                     @foreach ($predefinedCurrencies as $currency)
                                         <option value="{{ $currency['code'] }}" {{ old('currency_code', 'USD') == $currency['code'] ? 'selected' : '' }}>
                                             {{ $currency['code'] }} ({{ $currency['symbol'] }})
                                         </option>
                                     @endforeach
                                 </select>
+                                @error('currency_code')<div class="invalid-feedback">{{ $message }}</div>@enderror
                             </div>
                             <div class="col-md-2">
-                                <label class="form-label">Billing Cycle <span class="text-danger">*</span></label>
-                                <select name="billing_cycle" class="form-select">
-                                    <option value="monthly">Monthly</option>
-                                    <option value="yearly">Yearly</option>
+                                <label class="form-label" for="billing_cycle">Billing Cycle <span class="text-danger">*</span></label>
+                                <select name="billing_cycle" id="billing_cycle" class="form-select @error('billing_cycle') is-invalid @enderror">
+                                    <option value="monthly" {{ old('billing_cycle') == 'monthly' ? 'selected' : '' }}>Monthly</option>
+                                    <option value="yearly" {{ old('billing_cycle') == 'yearly' ? 'selected' : '' }}>Yearly</option>
                                 </select>
+                                @error('billing_cycle')<div class="invalid-feedback">{{ $message }}</div>@enderror
                             </div>
                         </div>
                         <div class="mb-3">
-                            <label class="form-label">Description</label>
-                            <textarea name="description" class="form-control" rows="2">{{ old('description') }}</textarea>
+                            <label class="form-label" for="description">Description</label>
+                            <textarea name="description" id="description" class="form-control @error('description') is-invalid @enderror" rows="2">{{ old('description') }}</textarea>
+                            @error('description')<div class="invalid-feedback">{{ $message }}</div>@enderror
                         </div>
                         <div class="row mb-3">
                             <div class="col-md-3">
-                                <label class="form-label">Max Users</label>
-                                <input type="number" name="max_users" class="form-control" value="{{ old('max_users', 0) }}">
+                                <label class="form-label" for="max_users">Max Users</label>
+                                <input type="number" name="max_users" id="max_users" class="form-control @error('max_users') is-invalid @enderror" value="{{ old('max_users', 0) }}">
+                                @error('max_users')<div class="invalid-feedback">{{ $message }}</div>@enderror
                                 <small class="text-muted">-1 for unlimited</small>
                             </div>
                             <div class="col-md-3">
-                                <label class="form-label">Max Warehouses</label>
-                                <input type="number" name="max_warehouses" class="form-control" value="{{ old('max_warehouses', 0) }}">
+                                <label class="form-label" for="max_warehouses">Max Warehouses</label>
+                                <input type="number" name="max_warehouses" id="max_warehouses" class="form-control @error('max_warehouses') is-invalid @enderror" value="{{ old('max_warehouses', 0) }}">
+                                @error('max_warehouses')<div class="invalid-feedback">{{ $message }}</div>@enderror
                             </div>
                             <div class="col-md-3">
-                                <label class="form-label">Max Products</label>
-                                <input type="number" name="max_products" class="form-control" value="{{ old('max_products', 0) }}">
+                                <label class="form-label" for="max_products">Max Products</label>
+                                <input type="number" name="max_products" id="max_products" class="form-control @error('max_products') is-invalid @enderror" value="{{ old('max_products', 0) }}">
+                                @error('max_products')<div class="invalid-feedback">{{ $message }}</div>@enderror
                             </div>
                             <div class="col-md-3">
-                                <label class="form-label">Trial Days</label>
-                                <input type="number" name="trial_days" class="form-control" value="{{ old('trial_days', 0) }}">
+                                <label class="form-label" for="trial_days">Trial Days</label>
+                                <input type="number" name="trial_days" id="trial_days" class="form-control @error('trial_days') is-invalid @enderror" value="{{ old('trial_days', 0) }}">
+                                @error('trial_days')<div class="invalid-feedback">{{ $message }}</div>@enderror
                             </div>
                         </div>
                         <div class="row mb-3">
                             <div class="col-md-4">
-                                <label class="form-label">Sort Order</label>
-                                <input type="number" name="sort_order" class="form-control" value="{{ old('sort_order', 0) }}">
+                                <label class="form-label" for="sort_order">Sort Order</label>
+                                <input type="number" name="sort_order" id="sort_order" class="form-control @error('sort_order') is-invalid @enderror" value="{{ old('sort_order', 0) }}">
+                                @error('sort_order')<div class="invalid-feedback">{{ $message }}</div>@enderror
                             </div>
                             <div class="col-md-4 d-flex align-items-end">
                                 <label class="form-check">
-                                    <input type="checkbox" name="is_active" value="1" class="form-check-input" checked>
+                                    <input type="checkbox" name="is_active" value="1" class="form-check-input" {{ old('is_active', '1') == '1' ? 'checked' : '' }}>
                                     <span class="form-check-label">Active</span>
                                 </label>
                             </div>

@@ -1,4 +1,4 @@
-<form id="edit-sales-form" enctype="multipart/form-data" method="POST" action="{{ route('admin.sales.update', $sales->id) }}">
+<form id="edit-sales-form" enctype="multipart/form-data" method="POST" action="{{ route('admin.sales.update', $sales->id) }}" novalidate data-validate-form>
     @csrf
     @method('PUT')
     <div class="card-body p-4">
@@ -59,11 +59,12 @@
             <h4 class="card-title mb-4">
                 <i class="ti ti-plus me-2 text-primary"></i>{{ __('messages.add_payment') }}
             </h4>
-            <form action="{{ route('admin.sales.add-payment', $sales->id) }}" method="POST" id="add-payment-form">
+            <form action="{{ route('admin.sales.add-payment', $sales->id) }}" method="POST" id="add-payment-form" novalidate data-validate-form>
                 @csrf
                 <div class="mb-3">
-                    <label class="form-label fw-bold">{{ __('messages.cash_amount') }}</label>
-                    <input type="number" class="form-control" id="amount" name="amount" step="0.01" min="0" value="0">
+                    <label class="form-label fw-bold" for="amount">{{ __('messages.cash_amount') }}</label>
+                    <input type="number" class="form-control @error('amount') is-invalid @enderror" id="amount" name="amount" step="0.01" min="0" value="{{ old('amount', '0') }}">
+                    @error('amount')<div class="invalid-feedback">{{ $message }}</div>@enderror
                     <small class="text-muted">{{ __('messages.balance') }}: {{ \App\Helpers\CurrencyHelper::format($sales->balance) }}</small>
                 </div>
                 
@@ -73,36 +74,40 @@
                 
                 @if($availableCredit > 0)
                 <div class="mb-3 p-3 bg-info-lt rounded">
-                    <label class="form-label fw-bold">
+                    <label class="form-label fw-bold" for="credit_amount">
                         <i class="ti ti-credit-card me-1"></i>{{ __('messages.use_credit') }}
                     </label>
                     <div class="d-flex align-items-center mb-2">
                         <span class="text-success fw-bold fs-5">{{ \App\Helpers\CurrencyHelper::format($availableCredit) }}</span>
                         <span class="text-muted ms-2">{{ __('messages.available_credits') }}</span>
                     </div>
-                    <input type="number" class="form-control" id="credit_amount" name="credit_amount" 
+                    <input type="number" class="form-control @error('credit_amount') is-invalid @enderror" id="credit_amount" name="credit_amount" 
                            step="0.01" min="0" max="{{ min($availableCredit, $sales->balance) }}" 
-                           placeholder="0" value="0">
+                           placeholder="0" value="{{ old('credit_amount', '0') }}">
+                    @error('credit_amount')<div class="invalid-feedback">{{ $message }}</div>@enderror
                     <small class="text-muted">{{ __('messages.credit_will_be_applied_to_balance') }}</small>
                 </div>
                 @endif
                 
                 <div class="mb-3">
                     <label for="payment_date" class="form-label fw-bold">{{ __('messages.payment_date') }}</label>
-                    <input type="date" class="form-control" id="payment_date" name="payment_date" value="{{ date('Y-m-d') }}" required>
+                    <input type="date" class="form-control @error('payment_date') is-invalid @enderror" id="payment_date" name="payment_date" value="{{ old('payment_date', date('Y-m-d')) }}" required>
+                    @error('payment_date')<div class="invalid-feedback">{{ $message }}</div>@enderror
                 </div>
                 <div class="mb-3">
                     <label for="payment_method" class="form-label fw-bold">{{ __('messages.payment_type') }}</label>
-                    <select class="form-select" id="payment_method" name="payment_method" required>
-                        <option value="Cash">{{ __('messages.payment_method_cash') }}</option>
-                        <option value="Card">{{ __('messages.payment_method_card') }}</option>
-                        <option value="Transfer">{{ __('messages.payment_method_transfer') }}</option>
-                        <option value="eWallet">{{ __('messages.payment_method_ewallet') }}</option>
+                    <select class="form-select @error('payment_method') is-invalid @enderror" id="payment_method" name="payment_method" required>
+                        <option value="Cash" {{ old('payment_method') == 'Cash' ? 'selected' : '' }}>{{ __('messages.payment_method_cash') }}</option>
+                        <option value="Card" {{ old('payment_method') == 'Card' ? 'selected' : '' }}>{{ __('messages.payment_method_card') }}</option>
+                        <option value="Transfer" {{ old('payment_method') == 'Transfer' ? 'selected' : '' }}>{{ __('messages.payment_method_transfer') }}</option>
+                        <option value="eWallet" {{ old('payment_method') == 'eWallet' ? 'selected' : '' }}>{{ __('messages.payment_method_ewallet') }}</option>
                     </select>
+                    @error('payment_method')<div class="invalid-feedback">{{ $message }}</div>@enderror
                 </div>
                 <div class="mb-3">
                     <label for="notes" class="form-label fw-bold">{{ __('messages.notes') }}</label>
-                    <textarea class="form-control" id="notes" name="notes" rows="3"></textarea>
+                    <textarea class="form-control @error('notes') is-invalid @enderror" id="notes" name="notes" rows="3">{{ old('notes') }}</textarea>
+                    @error('notes')<div class="invalid-feedback">{{ $message }}</div>@enderror
                 </div>
                 <button type="submit" class="btn btn-primary">
                     <i class="ti ti-plus me-1"></i> {{ __('messages.add_payment') }}

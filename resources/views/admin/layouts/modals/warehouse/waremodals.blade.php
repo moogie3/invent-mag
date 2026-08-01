@@ -141,20 +141,23 @@
                 <h5 class="modal-title" id="createWarehouseModalLabel"><i class="ti ti-plus me-1"></i> {{ __('messages.warehouse_create_warehouse') }}</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <form id="createWarehouseForm" action="{{ route('admin.warehouse.store') }}" method="POST">
+            <form id="createWarehouseForm" action="{{ route('admin.warehouse.store') }}" method="POST" novalidate data-validate-form>
                 @csrf
                 <div class="modal-body">
                     <div class="mb-3">
                         <label for="warehouseName" class="form-label">{{ __('messages.table_name') }}</label>
-                        <input type="text" class="form-control" id="warehouseName" name="name">
+                        <input type="text" class="form-control @error('name') is-invalid @enderror" id="warehouseName" name="name" required>
+                        @error('name')<div class="invalid-feedback">{{ $message }}</div>@enderror
                     </div>
                     <div class="mb-3">
                         <label for="warehouseAddress" class="form-label">{{ __('messages.table_address') }}</label>
-                        <input type="text" class="form-control" id="warehouseAddress" name="address">
+                        <input type="text" class="form-control @error('address') is-invalid @enderror" id="warehouseAddress" name="address">
+                        @error('address')<div class="invalid-feedback">{{ $message }}</div>@enderror
                     </div>
                     <div class="mb-3">
                         <label for="warehouseDescription" class="form-label">{{ __('messages.table_description') }}</label>
-                        <textarea class="form-control" id="warehouseDescription" name="description" rows="3"></textarea>
+                        <textarea class="form-control @error('description') is-invalid @enderror" id="warehouseDescription" name="description" rows="3"></textarea>
+                        @error('description')<div class="invalid-feedback">{{ $message }}</div>@enderror
                     </div>
                     <div class="mb-3 form-check">
                         <input type="checkbox" class="form-check-input" id="isMainWarehouse" name="is_main"
@@ -180,7 +183,7 @@
                 <h5 class="modal-title" id="editWarehouseModalLabel"><i class="ti ti-edit me-1"></i> {{ __('messages.warehouse_modal_edit_title') }}</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <form id="editWarehouseForm" method="POST">
+            <form id="editWarehouseForm" method="POST" novalidate data-validate-form>
                 @csrf
                 @method('PUT')
                 <div class="modal-body">
@@ -188,15 +191,18 @@
 
                     <div class="mb-3">
                         <label for="warehouseNameEdit" class="form-label">{{ __('messages.table_name') }}</label>
-                        <input type="text" class="form-control" id="warehouseNameEdit" name="name">
+                        <input type="text" class="form-control @error('name') is-invalid @enderror" id="warehouseNameEdit" name="name" required>
+                        @error('name')<div class="invalid-feedback">{{ $message }}</div>@enderror
                     </div>
                     <div class="mb-3">
                         <label for="warehouseAddressEdit" class="form-label">{{ __('messages.table_address') }}</label>
-                        <input type="text" class="form-control" id="warehouseAddressEdit" name="address">
+                        <input type="text" class="form-control @error('address') is-invalid @enderror" id="warehouseAddressEdit" name="address">
+                        @error('address')<div class="invalid-feedback">{{ $message }}</div>@enderror
                     </div>
                     <div class="mb-3">
                         <label for="warehouseDescriptionEdit" class="form-label">{{ __('messages.table_description') }}</label>
-                        <textarea class="form-control" id="warehouseDescriptionEdit" name="description" rows="3"></textarea>
+                        <textarea class="form-control @error('description') is-invalid @enderror" id="warehouseDescriptionEdit" name="description" rows="3"></textarea>
+                        @error('description')<div class="invalid-feedback">{{ $message }}</div>@enderror
                     </div>
                     <div class="mb-3 form-check">
                         <input type="checkbox" class="form-check-input" id="isMainWarehouseEdit" name="is_main"

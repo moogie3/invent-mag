@@ -17,6 +17,7 @@ export function initEditPipelineForm() {
     editPipelineFormListenerAttached = true;
 
     editPipelineForm.addEventListener("submit", async function (e) {
+        if (e.defaultPrevented) return;
         e.preventDefault();
 
         if (isEditPipelineSubmitting) {

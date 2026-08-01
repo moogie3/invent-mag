@@ -4,7 +4,7 @@
             <div class="col-12">
                 <div class="card shadow-sm border-0 rounded-3">
                     <div class="card-body">
-                        <form enctype="multipart/form-data" method="POST" action="{{ route('admin.sales.store') }}" id="invoiceForm">
+                        <form enctype="multipart/form-data" method="POST" action="{{ route('admin.sales.store') }}" id="invoiceForm" novalidate data-validate-form>
                             @csrf
                             @include('admin.layouts.partials.sales.create.sales-information')
                             @include('admin.layouts.partials.sales.create.order-items')

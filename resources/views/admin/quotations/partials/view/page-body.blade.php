@@ -182,6 +182,16 @@
                                         <strong>{{ \App\Helpers\CurrencyHelper::format($quotation->tax_amount) }}</strong>
                                     </div>
                                     @endif
+                                    @php
+                                        $currentTenant = app('currentTenant');
+                                        $showPph = $currentTenant instanceof \App\Models\Tenant && $currentTenant->isIndonesian() && $currentTenant->hasFeature('ppn');
+                                    @endphp
+                                    @if($showPph && ($quotation->pph_enabled ?? false) && ($quotation->pph_amount ?? 0) > 0)
+                                    <div class="d-flex justify-content-between mb-2 pb-2 border-bottom border-primary border-opacity-25">
+                                        <span class="text-muted">{{ __('messages.withholding_tax') }} ({{ $quotation->pph_rate }}%)</span>
+                                        <strong class="text-danger">-{{ \App\Helpers\CurrencyHelper::format($quotation->pph_amount) }}</strong>
+                                    </div>
+                                    @endif
                                     <div class="mb-2 pb-2 border-bottom border-primary border-opacity-25"></div>
                                     <div class="d-flex justify-content-between align-items-center">
                                         <span class="fw-bold fs-5">{{ __('messages.quotation_total') }}</span>

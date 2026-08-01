@@ -24,6 +24,7 @@ class Tax extends Model
         'is_active',
         'is_default',
         'is_ppn',
+        'is_pph',
     ];
 
     protected $guarded = [
@@ -38,6 +39,7 @@ class Tax extends Model
             'is_active' => 'boolean',
             'is_default' => 'boolean',
             'is_ppn' => 'boolean',
+            'is_pph' => 'boolean',
         ];
     }
 

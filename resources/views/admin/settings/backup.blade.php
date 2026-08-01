@@ -165,12 +165,14 @@
                                                         @csrf
                                                         <div class="mb-3">
                                                             <label class="form-label fw-semibold">{{ __('messages.backup_file') }}</label>
-                                                            <input type="file" name="backup_file" class="form-control" accept=".zip" required>
+                                                            <input type="file" name="backup_file" class="form-control @error('backup_file') is-invalid @enderror" accept=".zip" required>
+                                                            @error('backup_file')<div class="invalid-feedback">{{ $message }}</div>@enderror
                                                             <small class="text-muted">{{ __('messages.backup_file_format') ?? 'Upload a .zip backup file' }}</small>
                                                         </div>
                                                         <div class="mb-4">
                                                             <label class="form-label fw-semibold">{{ __('messages.backup_restore_password') }}</label>
-                                                            <input type="password" name="password" class="form-control">
+                                                            <input type="password" name="password" class="form-control @error('password') is-invalid @enderror">
+                                                            @error('password')<div class="invalid-feedback">{{ $message }}</div>@enderror
                                                             @if(!$tenant?->backup_password)
                                                                 <small class="text-muted">{{ __('tutorial.backup_password_first_time') ?? 'No password set — leave blank.' }}</small>
                                                             @else
@@ -206,22 +208,25 @@
                                             </div>
 
                                             {{-- Password Form --}}
-                                            <div class="settings-section">
+                                                    <div class="settings-section">
                                                 <form action="{{ route('admin.setting.backup.password') }}" method="POST" id="passwordForm">
                                                     @csrf
                                                     <div class="settings-section-content">
                                                         <div class="mb-3">
                                                             <label class="form-label fw-semibold">{{ __('messages.backup_password_current') }}</label>
-                                                            <input type="password" name="current_password" class="form-control" required>
+                                                            <input type="password" name="current_password" class="form-control @error('current_password') is-invalid @enderror" required>
+                                                            @error('current_password')<div class="invalid-feedback">{{ $message }}</div>@enderror
                                                         </div>
                                                         <div class="mb-3">
                                                             <label class="form-label fw-semibold">{{ __('messages.backup_password_new') }}</label>
-                                                            <input type="password" name="new_password" class="form-control" required minlength="16">
+                                                            <input type="password" name="new_password" class="form-control @error('new_password') is-invalid @enderror" required minlength="16">
+                                                            @error('new_password')<div class="invalid-feedback">{{ $message }}</div>@enderror
                                                             <small class="text-muted">{{ __('messages.backup_password_min') }} — {{ __('messages.backup_password_strength') }}</small>
                                                         </div>
                                                         <div class="mb-3">
                                                             <label class="form-label fw-semibold">{{ __('messages.backup_password_confirm') }}</label>
-                                                            <input type="password" name="new_password_confirmation" class="form-control" required>
+                                                            <input type="password" name="new_password_confirmation" class="form-control @error('new_password_confirmation') is-invalid @enderror" required>
+                                                            @error('new_password_confirmation')<div class="invalid-feedback">{{ $message }}</div>@enderror
                                                         </div>
                                                         <div class="mb-4">
                                                             <label class="form-check">

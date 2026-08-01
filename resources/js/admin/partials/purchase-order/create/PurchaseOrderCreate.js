@@ -1,5 +1,6 @@
 import { PurchaseOrderModule } from "../common/PurchaseOrderModule.js";
 import { formatCurrency } from "../../../../utils/currencyFormatter.js";
+import { validateForm } from "../../../utils/formValidator.js";
 
 export class PurchaseOrderCreate extends PurchaseOrderModule {
     constructor(config = {}) {
@@ -135,6 +136,7 @@ export class PurchaseOrderCreate extends PurchaseOrderModule {
 
         if (this.elements.invoiceForm) {
             this.elements.invoiceForm.addEventListener("submit", (e) => {
+                if (e.defaultPrevented) return false;
                 if (this.elements.productsField) {
                     const productsToSerialize = this.products.map(product => {
                         const newProduct = { ...product };
@@ -156,7 +158,13 @@ export class PurchaseOrderCreate extends PurchaseOrderModule {
                     const opt = e.target.options[e.target.selectedIndex];
                     const rate = parseFloat(opt.dataset.rate) || 0;
                     const type = opt.dataset.type || "none";
+                    const taxLabel = document.getElementById("taxLabel");
                     const typeInput = document.getElementById("taxTypeInput");
+                    if (taxLabel) {
+                        const base = taxLabel.dataset.base || taxLabel.textContent;
+                        const rate = parseFloat(opt.dataset.rate) || 0;
+                        taxLabel.textContent = opt.value && opt.dataset.name ? base + ' (' + opt.dataset.name + ' ' + rate + '%)' : base;
+                    }
                     if (typeInput) typeInput.value = type;
                     this.updateTotalPrice();
                 }
@@ -164,11 +172,36 @@ export class PurchaseOrderCreate extends PurchaseOrderModule {
             if (taxSelector.options.length > 0 && taxSelector.selectedIndex >= 0) {
                 const initialOpt = taxSelector.options[taxSelector.selectedIndex];
                 if (initialOpt) {
+                    const taxLabel = document.getElementById("taxLabel");
                     const typeInput = document.getElementById("taxTypeInput");
+                    if (taxLabel) {
+                        const base = taxLabel.dataset.base || taxLabel.textContent;
+                        const rate = parseFloat(initialOpt.dataset.rate) || 0;
+                        taxLabel.textContent = initialOpt.value && initialOpt.dataset.name ? base + ' (' + initialOpt.dataset.name + ' ' + rate + '%)' : base;
+                    }
                     if (typeInput) typeInput.value = initialOpt.dataset.type || "none";
                 }
             }
         }
+
+        document.body.addEventListener("change", (e) => {
+            if (e.target.id === "pphSelector") {
+                const pphInput = document.getElementById("pphEnabledInput");
+                const pphRateInput = document.getElementById("pphRateInput");
+                const pphTaxIdInput = document.getElementById("pphTaxIdInput");
+                if (e.target.value) {
+                    const opt = e.target.options[e.target.selectedIndex];
+                    if (pphInput) pphInput.value = "1";
+                    if (pphRateInput) pphRateInput.value = opt.dataset.rate;
+                    if (pphTaxIdInput) pphTaxIdInput.value = e.target.value;
+                } else {
+                    if (pphInput) pphInput.value = "0";
+                    if (pphRateInput) pphRateInput.value = "0";
+                    if (pphTaxIdInput) pphTaxIdInput.value = "";
+                }
+                this.updateTotalPrice();
+            }
+        });
     }
 
     calculateDueDate() {
@@ -307,7 +340,14 @@ export class PurchaseOrderCreate extends PurchaseOrderModule {
 
         const taxableAmount = subtotal - orderDiscountAmount;
         const taxAmount = this.calculateTaxAmount(taxableAmount);
-        const finalTotal = this.getTaxType() === "inclusive" ? taxableAmount : taxableAmount + taxAmount;
+        const baseTotal = this.getTaxType() === "inclusive" ? taxableAmount : taxableAmount + taxAmount;
+
+        const pphAmount = this.calculatePphAmount(taxableAmount);
+        const pphAmountInput = document.getElementById("pphAmountInput");
+        if (pphAmountInput) pphAmountInput.value = pphAmount;
+        const pphTotalDisplay = document.getElementById("pphTotal");
+        if (pphTotalDisplay) pphTotalDisplay.textContent = formatCurrency(pphAmount);
+        const finalTotal = baseTotal - pphAmount;
 
         const subtotalEl = document.getElementById("subtotal");
         const orderDiscountTotalEl =
@@ -325,6 +365,17 @@ export class PurchaseOrderCreate extends PurchaseOrderModule {
         if (totalDiscountInputEl)
             totalDiscountInputEl.value = orderDiscountAmount;
         if (taxInputEl) taxInputEl.value = taxAmount;
+
+        // Update discount label with type info
+        const discountLabel = document.getElementById('discountLabel');
+        if (discountLabel) {
+            const base = discountLabel.dataset.base || 'Order Discount';
+            const val = this.orderDiscount.value;
+            const type = this.orderDiscount.type;
+            discountLabel.textContent = val > 0
+                ? (type === 'percentage' ? base + ' (' + val + '%)' : base + ' (Rp ' + val.toLocaleString() + ')')
+                : base;
+        }
 
         if (this.elements.productsField) {
             this.elements.productsField.value = JSON.stringify(this.products);

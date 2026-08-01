@@ -70,6 +70,6 @@ return [
      |
      */
     'redirect_guessing_exceptions' => [
-        // '/some-page'
+        '*',
     ],
 ];

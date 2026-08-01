@@ -1,4 +1,5 @@
 export function handleFormSubmission(event, modalElement, isCreate = false) {
+    if (event.defaultPrevented) return;
     event.preventDefault();
 
     const form = event.target;
@@ -50,7 +51,7 @@ export function handleFormSubmission(event, modalElement, isCreate = false) {
         } else {
             if (!InventMagApp.toastShown) {
                 InventMagApp.toastShown = true;
-                InventMagApp.showToast('Error', data.message || 'Operation failed.', 'error');
+                InventMagApp.showToast('Warning', data.message || 'Operation failed.', 'warning');
             }
         }
     })

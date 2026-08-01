@@ -65,32 +65,35 @@
                                 </div>
                                 <div class="row g-3">
                                     <div class="col-md-6">
-                                        <div class="form-label">Currency Code</div>
-                                        <select name="currency_code" id="currencyCode" class="form-select" required>
+                                        <label class="form-label" for="currency_code">Currency Code</label>
+                                        <select name="currency_code" id="currency_code" class="form-select @error('currency_code') is-invalid @enderror" required>
                                             @foreach ($predefinedCurrencies as $currency)
                                                 <option value="{{ $currency['code'] }}"
-                                                    {{ $settings->currency_code == $currency['code'] ? 'selected' : '' }}>
+                                                    {{ old('currency_code', $settings->currency_code) == $currency['code'] ? 'selected' : '' }}>
                                                     {{ $currency['name'] }} ({{ $currency['symbol'] }})
                                                 </option>
                                             @endforeach
                                         </select>
+                                        @error('currency_code')<div class="invalid-feedback">{{ $message }}</div>@enderror
                                     </div>
                                     <div class="col-md-6">
-                                        <div class="form-label">Currency Symbol</div>
-                                        <input type="text" name="currency_symbol" id="currencySymbol" class="form-control"
-                                            value="{{ $settings->currency_symbol }}" required
+                                        <label class="form-label" for="currency_symbol">Currency Symbol</label>
+                                        <input type="text" name="currency_symbol" id="currency_symbol" class="form-control @error('currency_symbol') is-invalid @enderror"
+                                            value="{{ old('currency_symbol', $settings->currency_symbol) }}" required
                                             placeholder="e.g., $">
+                                        @error('currency_symbol')<div class="invalid-feedback">{{ $message }}</div>@enderror
                                     </div>
                                     <div class="col-md-6">
-                                        <div class="form-label">Currency Position</div>
-                                        <select name="position" class="form-select" required>
+                                        <label class="form-label" for="position">Currency Position</label>
+                                        <select name="position" id="position" class="form-select @error('position') is-invalid @enderror" required>
                                             <option value="prefix"
-                                                {{ $settings->position == 'prefix' ? 'selected' : '' }}>
+                                                {{ old('position', $settings->position) == 'prefix' ? 'selected' : '' }}>
                                                 Prefix ($100)</option>
                                             <option value="suffix"
-                                                {{ $settings->position == 'suffix' ? 'selected' : '' }}>
+                                                {{ old('position', $settings->position) == 'suffix' ? 'selected' : '' }}>
                                                 Suffix (100$)</option>
                                         </select>
+                                        @error('position')<div class="invalid-feedback">{{ $message }}</div>@enderror
                                     </div>
                                 </div>
 
@@ -108,22 +111,25 @@
                                 </div>
                                 <div class="row g-3">
                                     <div class="col-md-4">
-                                        <div class="form-label">Decimal Separator</div>
-                                        <input type="text" name="decimal_separator" id="decimalSeparator" class="form-control"
-                                            value="{{ $settings->decimal_separator }}" required
+                                        <label class="form-label" for="decimal_separator">Decimal Separator</label>
+                                        <input type="text" name="decimal_separator" id="decimal_separator" class="form-control @error('decimal_separator') is-invalid @enderror"
+                                            value="{{ old('decimal_separator', $settings->decimal_separator) }}" required
                                             placeholder="e.g., .">
+                                        @error('decimal_separator')<div class="invalid-feedback">{{ $message }}</div>@enderror
                                     </div>
                                     <div class="col-md-4">
-                                        <div class="form-label">Thousand Separator</div>
-                                        <input type="text" name="thousand_separator" id="thousandSeparator" class="form-control"
-                                            value="{{ $settings->thousand_separator }}" required
+                                        <label class="form-label" for="thousand_separator">Thousand Separator</label>
+                                        <input type="text" name="thousand_separator" id="thousand_separator" class="form-control @error('thousand_separator') is-invalid @enderror"
+                                            value="{{ old('thousand_separator', $settings->thousand_separator) }}" required
                                             placeholder="e.g., ,">
+                                        @error('thousand_separator')<div class="invalid-feedback">{{ $message }}</div>@enderror
                                     </div>
                                     <div class="col-md-4">
-                                        <div class="form-label">Decimal Places</div>
-                                        <input type="number" name="decimal_places" id="decimalPlaces" class="form-control"
-                                            value="{{ $settings->decimal_places }}" required
+                                        <label class="form-label" for="decimal_places">Decimal Places</label>
+                                        <input type="number" name="decimal_places" id="decimal_places" class="form-control @error('decimal_places') is-invalid @enderror"
+                                            value="{{ old('decimal_places', $settings->decimal_places) }}" required
                                             placeholder="e.g., 2" min="0" max="10">
+                                        @error('decimal_places')<div class="invalid-feedback">{{ $message }}</div>@enderror
                                     </div>
                                     <div class="col-12">
                                         <div class="alert alert-info mb-0 mt-1">

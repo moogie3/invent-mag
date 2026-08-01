@@ -16,6 +16,7 @@ export function initNewPipelineForm() {
     newPipelineFormListenerAttached = true;
 
     newPipelineForm.addEventListener("submit", async function (e) {
+        if (e.defaultPrevented) return;
         e.preventDefault();
 
         const formData = new FormData(this);

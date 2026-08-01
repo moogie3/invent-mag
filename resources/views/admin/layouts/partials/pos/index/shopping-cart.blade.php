@@ -26,7 +26,7 @@
             </div>
 
             <div class="d-flex justify-content-between align-items-center mb-2">
-                <span class="text-nowrap">{{ __('messages.po_order_discount') }}:</span>
+                <span class="text-nowrap" id="discountLabel" data-base="{{ __('messages.po_order_discount') }}">{{ __('messages.po_order_discount') }}:</span>
                 <div class="input-group" style="max-width: 140px; flex-wrap: nowrap;">
                     <input type="number" id="orderDiscount" class="form-control form-control-sm" value="0" min="0">
                     <select id="discountType" class="form-select form-select-sm" style="max-width: 55px;">
@@ -37,17 +37,32 @@
             </div>
 
             <div class="d-flex justify-content-between align-items-center mb-2">
-                <span class="text-nowrap">{{ __('messages.tax') }}:</span>
+                <span class="text-nowrap" id="taxLabel" data-base="{{ __('messages.tax') }}">{{ __('messages.tax') }}:</span>
                 <select id="taxSelector" class="form-select form-select-sm" style="max-width: 160px;" name="tax_id">
-                    <option value="">{{ __('messages.none') }} (0%)</option>
+                    <option value="" data-name="{{ __('messages.none') }}">{{ __('messages.none') }} (0%)</option>
                     @foreach($taxes as $tax)
-                        <option value="{{ $tax->id }}" data-rate="{{ $tax->rate }}" data-type="{{ $tax->type }}"
+                        <option value="{{ $tax->id }}" data-name="{{ $tax->name }}" data-rate="{{ $tax->rate }}" data-type="{{ $tax->type }}"
                             {{ $tax->is_default ? 'selected' : '' }}>
                             {{ $tax->name }} ({{ $tax->rate }}%)
                         </option>
                     @endforeach
                 </select>
             </div>
+
+            @php $currentTenant = app('currentTenant'); @endphp
+            @if($currentTenant->isIndonesian() && $currentTenant->hasFeature('ppn'))
+            <div class="d-flex justify-content-between align-items-center mb-2">
+                <span class="text-nowrap">{{ __('messages.withholding_tax') }}:</span>
+                <select id="pphSelector" class="form-select form-select-sm" style="max-width: 160px;" name="pph_tax_id">
+                    <option value="">{{ __('messages.none') }}</option>
+                    @foreach($taxes->where('is_pph', true) as $pphTax)
+                        <option value="{{ $pphTax->id }}" data-rate="{{ $pphTax->rate }}" data-type="{{ $pphTax->type }}">
+                            {{ $pphTax->name }} ({{ $pphTax->rate }}%)
+                        </option>
+                    @endforeach
+                </select>
+            </div>
+            @endif
 
             <hr>
 
@@ -61,6 +76,9 @@
             <input type="hidden" id="orderDiscountTypeInput" name="discount_total_type" value="fixed">
             <input type="hidden" id="taxInput" name="tax_amount" value="0">
             <input type="hidden" id="grandTotalInput" name="grand_total" value="0">
+            <input type="hidden" id="pphEnabledInput" name="pph_enabled" value="0">
+            <input type="hidden" id="pphRateInput" name="pph_rate" value="0">
+            <input type="hidden" id="pphAmountInput" name="pph_amount" value="0">
 
             <div class="mt-3">
                 <button type="button" id="processPaymentBtn" class="btn btn-primary w-100">

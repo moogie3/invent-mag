@@ -1,5 +1,6 @@
 import { SalesOrderModule } from "../common/SalesOrderModule.js";
 import { formatCurrency } from "../../../../utils/currencyFormatter.js";
+import { validateForm } from "../../../utils/formValidator.js";
 
 export class SalesOrderEdit extends SalesOrderModule {
     constructor(config = {}) {
@@ -73,8 +74,14 @@ export class SalesOrderEdit extends SalesOrderModule {
             document.body.addEventListener("change", (e) => {
                 if (e.target && e.target.id === "taxSelector") {
                     const opt = e.target.options[e.target.selectedIndex];
+                    const taxLabel = document.getElementById("taxLabel");
                     const typeInput = document.getElementById("taxTypeInput");
                     const rateInput = document.getElementById("taxRateInput");
+                    if (taxLabel) {
+                        const base = taxLabel.dataset.base || taxLabel.textContent;
+                        const rate = parseFloat(opt.dataset.rate) || 0;
+                        taxLabel.textContent = opt.value && opt.dataset.name ? base + ' (' + opt.dataset.name + ' ' + rate + '%)' : base;
+                    }
                     if (typeInput) typeInput.value = opt.dataset.type || "exclusive";
                     if (rateInput) rateInput.value = parseFloat(opt.dataset.rate) || 0;
                     this.calculateTotals();
@@ -84,10 +91,46 @@ export class SalesOrderEdit extends SalesOrderModule {
             // Sync hidden inputs on initial page load from the selected option
             const initialOpt = taxSelector.options[taxSelector.selectedIndex];
             if (initialOpt) {
+                const taxLabel = document.getElementById("taxLabel");
                 const typeInput = document.getElementById("taxTypeInput");
                 const rateInput = document.getElementById("taxRateInput");
+                if (taxLabel) {
+                    const base = taxLabel.dataset.base || taxLabel.textContent;
+                    const rate = parseFloat(initialOpt.dataset.rate) || 0;
+                    taxLabel.textContent = initialOpt.value && initialOpt.dataset.name ? base + ' (' + initialOpt.dataset.name + ' ' + rate + '%)' : base;
+                }
                 if (typeInput && initialOpt.dataset.type) typeInput.value = initialOpt.dataset.type;
                 if (rateInput && initialOpt.dataset.rate) rateInput.value = parseFloat(initialOpt.dataset.rate) || 0;
+            }
+        }
+
+        const pphSelector = document.getElementById("pphSelector");
+        if (pphSelector) {
+            document.body.addEventListener("change", (e) => {
+                if (e.target && e.target.id === "pphSelector") {
+                    const pphInput = document.getElementById("pphEnabledInput");
+                    const pphRateInput = document.getElementById("pphRateInput");
+                    const pphTaxIdInput = document.getElementById("pphTaxIdInput");
+                    if (e.target.value) {
+                        const opt = e.target.options[e.target.selectedIndex];
+                        if (pphInput) pphInput.value = "1";
+                        if (pphRateInput) pphRateInput.value = opt.dataset.rate;
+                        if (pphTaxIdInput) pphTaxIdInput.value = e.target.value;
+                    } else {
+                        if (pphInput) pphInput.value = "0";
+                        if (pphRateInput) pphRateInput.value = "0";
+                        if (pphTaxIdInput) pphTaxIdInput.value = "";
+                    }
+                    this.calculateTotals();
+                }
+            });
+
+            const initialPphOpt = pphSelector.options[pphSelector.selectedIndex];
+            if (initialPphOpt && initialPphOpt.value) {
+                const pphRateInput = document.getElementById("pphRateInput");
+                const pphTaxIdInput = document.getElementById("pphTaxIdInput");
+                if (pphRateInput) pphRateInput.value = initialPphOpt.dataset.rate || 0;
+                if (pphTaxIdInput) pphTaxIdInput.value = initialPphOpt.value;
             }
         }
     }
@@ -195,6 +238,13 @@ export class SalesOrderEdit extends SalesOrderModule {
         const taxAmount = this.calculateTaxAmount(totalAfterAllDiscounts);
         const grandTotal = this.getTaxType() === "inclusive" ? totalAfterAllDiscounts : totalAfterAllDiscounts + taxAmount;
 
+        const pphAmount = this.calculatePphAmount(totalAfterAllDiscounts);
+        const pphAmountInput = document.getElementById("pphAmountInput");
+        if (pphAmountInput) pphAmountInput.value = pphAmount.toFixed(2);
+        const pphTotalDisplay = document.getElementById("pphTotal");
+        if (pphTotalDisplay) pphTotalDisplay.textContent = formatCurrency(pphAmount);
+        const finalTotal = grandTotal - pphAmount;
+
         document.getElementById("subtotal").innerText =
             formatCurrency(subtotal);
         document.getElementById("orderDiscountTotal").innerText =
@@ -206,10 +256,10 @@ export class SalesOrderEdit extends SalesOrderModule {
         }
 
         document.getElementById("finalTotal").innerText =
-            formatCurrency(grandTotal);
+            formatCurrency(finalTotal);
 
         document.getElementById("grandTotalInput").value =
-            grandTotal.toFixed(2);
+            finalTotal.toFixed(2);
         document.getElementById("totalDiscountInput").value =
             orderDiscountAmount.toFixed(2);
         document.getElementById("taxInput").value = taxAmount.toFixed(2);
@@ -217,6 +267,17 @@ export class SalesOrderEdit extends SalesOrderModule {
         const totalTaxInput = document.getElementById("total_tax_input");
         if (totalTaxInput) {
             totalTaxInput.value = taxAmount.toFixed(2);
+        }
+
+        // Update discount label with type info
+        const discountLabel = document.getElementById('discountLabel');
+        if (discountLabel) {
+            const base = discountLabel.dataset.base || 'Order Discount';
+            const val = parseFloat(document.getElementById('discountTotalValue')?.value) || 0;
+            const type = document.getElementById('discountTotalType')?.value || 'fixed';
+            discountLabel.textContent = val > 0
+                ? (type === 'percentage' ? base + ' (' + val + '%)' : base + ' (Rp ' + val.toLocaleString() + ')')
+                : base;
         }
 
         const totalPaid = parseFloat(
@@ -228,7 +289,7 @@ export class SalesOrderEdit extends SalesOrderModule {
         const creditUsed = parseFloat(
             this.elements.balanceAmount.dataset.creditUsed || 0,
         );
-        const newBalance = Math.max(0, grandTotal - totalPaid - returnedAmount - creditUsed);
+        const newBalance = Math.max(0, finalTotal - totalPaid - returnedAmount - creditUsed);
 
         if (this.elements.balanceAmount) {
             this.elements.balanceAmount.textContent =
@@ -238,7 +299,8 @@ export class SalesOrderEdit extends SalesOrderModule {
     }
 
     serializeProducts(event) {
-        event.preventDefault(); // Prevent default form submission
+        if (event.defaultPrevented) return;
+        event.preventDefault();
 
         if (this.isSubmitting) {
             return; // Prevent multiple submissions

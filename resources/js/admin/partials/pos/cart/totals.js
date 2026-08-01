@@ -47,14 +47,41 @@ export function calculateTotals() {
         grandTotal = taxableAmount + taxAmount;
     }
 
+    const pphSelector = document.getElementById('pphSelector');
+    let pphAmount = 0;
+    if (pphSelector && pphSelector.value) {
+        const pphOpt = pphSelector.options[pphSelector.selectedIndex];
+        const pphRate = parseFloat(pphOpt.dataset.rate) || 0;
+        pphAmount = Math.round(taxableAmount * (pphRate / 100) * 100) / 100;
+    }
+    const totalAfterPph = Math.max(0, grandTotal - pphAmount);
+    grandTotal = totalAfterPph;
+
     if (subtotalElement) subtotalElement.innerText = formatCurrency(subtotal);
-    if (finalTotalElement) finalTotalElement.innerText = formatCurrency(grandTotal);
+    if (finalTotalElement) finalTotalElement.innerText = formatCurrency(totalAfterPph);
     if (cartCountElement) cartCountElement.innerText = products.length.toString();
 
     if (orderDiscountInput) orderDiscountInput.value = discountValue;  // raw input value (% or fixed), backend recalculates
     if (orderDiscountTypeInput) orderDiscountTypeInput.value = discountType;
     if (taxInput) taxInput.value = taxAmount;
-    if (grandTotalInput) grandTotalInput.value = grandTotal;
+    if (grandTotalInput) grandTotalInput.value = totalAfterPph;
+
+    const taxLabel = document.getElementById('taxLabel');
+    if (taxLabel && selectedTaxOption) {
+        const base = taxLabel.dataset.base || 'Tax';
+        const rate = parseFloat(selectedTaxOption.dataset.rate) || 0;
+        taxLabel.textContent = selectedTaxOption.value && selectedTaxOption.dataset.name ? base + ' (' + selectedTaxOption.dataset.name + ' ' + rate + '%)' : base;
+    }
+
+    const discountLabel = document.getElementById('discountLabel');
+    if (discountLabel) {
+        const base = discountLabel.dataset.base || 'Order Discount';
+        const val = parseFloat(orderDiscountElement?.value) || 0;
+        const type = discountTypeElement?.value || 'fixed';
+        discountLabel.textContent = val > 0
+            ? (type === 'percentage' ? base + ' (' + val + '%)' : base + ' (Rp ' + val.toLocaleString() + ')')
+            : base;
+    }
 
     if (processPaymentBtn) processPaymentBtn.disabled = products.length === 0;
 }

@@ -344,11 +344,17 @@ class SalesService
             $taxableAmount = $subTotal - $orderDiscountAmount;
             $taxAmount = SalesHelper::calculateTaxAmount($taxableAmount, $taxRate, $taxType);
 
+            $pphTaxId = $data['pph_tax_id'] ?? null;
+            $pphTax = $pphTaxId ? Tax::find($pphTaxId) : null;
+            $pphTaxRate = $pphTax ? (float) $pphTax->rate : 0;
+            $pphAmount = SalesHelper::calculatePphAmount($taxableAmount, $pphTaxRate);
+
             if ($taxType === 'inclusive') {
                 $grandTotal = $taxableAmount;
             } else {
                 $grandTotal = $taxableAmount + $taxAmount;
             }
+            $grandTotal = max(0, $grandTotal - $pphAmount);
 
             $invoice = $data['invoice'] ?? $this->generateInvoiceNumber();
             
@@ -377,10 +383,17 @@ class SalesService
                 'customer_credit_used'=> 0,
                 'notes'               => $data['notes'] ?? null,
                 'terms_conditions'    => $data['terms_conditions'] ?? null,
-                // PPN / e-Faktur fields — derived from selected tax's is_ppn flag
-                'ppn_enabled'         => $tax?->is_ppn ?? false,
-                'ppn_rate'            => $tax?->is_ppn ? $taxRate : null,
-                'ppn_amount'          => $tax?->is_ppn ? $taxAmount : 0,
+                // PPN / e-Faktur fields — derived from selected tax's is_ppn flag.
+                // Only applied when tenant's tax jurisdiction is Indonesian.
+                'ppn_enabled'         => app('currentTenant')->isIndonesian() && ($tax?->is_ppn ?? false),
+                'ppn_rate'            => app('currentTenant')->isIndonesian() && ($tax?->is_ppn ?? false) ? $taxRate : null,
+                'ppn_amount'          => app('currentTenant')->isIndonesian() && ($tax?->is_ppn ?? false) ? $taxAmount : 0,
+                // PPh / Withholding Tax fields — derived from selected PPh tax's is_pph flag.
+                // Only applied when tenant's tax jurisdiction is Indonesian.
+                'pph_enabled'         => app('currentTenant')->isIndonesian() && ($pphTax?->is_pph ?? false),
+                'pph_rate'            => app('currentTenant')->isIndonesian() && ($pphTax?->is_pph ?? false) ? $pphTaxRate : null,
+                'pph_amount'          => app('currentTenant')->isIndonesian() && ($pphTax?->is_pph ?? false) ? $pphAmount : 0,
+                'pph_tax_id'          => app('currentTenant')->isIndonesian() && ($pphTax?->is_pph ?? false) ? $pphTax?->id : null,
             ]);
 
             // Apply customer credit if provided
@@ -513,6 +526,26 @@ class SalesService
                 $sale
             );
 
+            // Create PPh journal entry if PPh is applied
+            if ($pphAmount > 0 && app('currentTenant')->isIndonesian() && ($pphTax?->is_pph ?? false)) {
+                $pphReceivableAccountId = $accountingSettings['pph_receivable_account_id'] ?? null;
+                if ($pphReceivableAccountId) {
+                    $pphReceivableAccount = Account::find($pphReceivableAccountId);
+                    if ($pphReceivableAccount) {
+                        $pphTransactions = [
+                            ['account_name' => $pphReceivableAccount->name, 'type' => 'debit', 'amount' => $pphAmount],
+                            ['account_name' => $accountsReceivableAccountName, 'type' => 'credit', 'amount' => $pphAmount],
+                        ];
+                        $this->accountingService->createJournalEntry(
+                            "PPh Withholding on Sale #{$sale->invoice}",
+                            Carbon::parse($data['order_date']),
+                            $pphTransactions,
+                            $sale
+                        );
+                    }
+                }
+            }
+
             // Create customer credit usage journal entry if credit was applied
             $creditUsed = $sale->customer_credit_used;
             if ($creditUsed > 0) {
@@ -598,11 +631,17 @@ class SalesService
             $taxableAmount = $subTotal - $orderDiscountAmount;
             $taxAmount = SalesHelper::calculateTaxAmount($taxableAmount, $taxRate, $taxType);
 
+            $pphTaxId = $data['pph_tax_id'] ?? null;
+            $pphTax = $pphTaxId ? Tax::find($pphTaxId) : null;
+            $pphTaxRate = $pphTax ? (float) $pphTax->rate : 0;
+            $pphAmount = SalesHelper::calculatePphAmount($taxableAmount, $pphTaxRate);
+
             if ($taxType === 'inclusive') {
                 $grandTotal = $taxableAmount;
             } else {
                 $grandTotal = $taxableAmount + $taxAmount;
             }
+            $grandTotal = max(0, $grandTotal - $pphAmount);
 
             $sale->update([
                 'customer_id'         => $data['customer_id'],
@@ -618,10 +657,17 @@ class SalesService
                 'payment_type'        => $data['payment_type'] ?? '-',
                 'notes'               => $data['notes'] ?? $sale->notes,
                 'terms_conditions'    => $data['terms_conditions'] ?? $sale->terms_conditions,
-                // PPN / e-Faktur fields — derived from selected tax's is_ppn flag
-                'ppn_enabled'         => $tax?->is_ppn ?? false,
-                'ppn_rate'            => $tax?->is_ppn ? $taxRate : null,
-                'ppn_amount'          => $tax?->is_ppn ? $taxAmount : 0,
+                // PPN / e-Faktur fields — derived from selected tax's is_ppn flag.
+                // Only applied when tenant's tax jurisdiction is Indonesian.
+                'ppn_enabled'         => app('currentTenant')->isIndonesian() && ($tax?->is_ppn ?? false),
+                'ppn_rate'            => app('currentTenant')->isIndonesian() && ($tax?->is_ppn ?? false) ? $taxRate : null,
+                'ppn_amount'          => app('currentTenant')->isIndonesian() && ($tax?->is_ppn ?? false) ? $taxAmount : 0,
+                // PPh / Withholding Tax fields — derived from selected PPh tax's is_pph flag.
+                // Only applied when tenant's tax jurisdiction is Indonesian.
+                'pph_enabled'         => app('currentTenant')->isIndonesian() && ($pphTax?->is_pph ?? false),
+                'pph_rate'            => app('currentTenant')->isIndonesian() && ($pphTax?->is_pph ?? false) ? $pphTaxRate : null,
+                'pph_amount'          => app('currentTenant')->isIndonesian() && ($pphTax?->is_pph ?? false) ? $pphAmount : 0,
+                'pph_tax_id'          => app('currentTenant')->isIndonesian() && ($pphTax?->is_pph ?? false) ? $pphTax?->id : null,
             ]);
 
             foreach ($products as $productData) {
@@ -826,6 +872,19 @@ class SalesService
                 \App\Models\NsfpPool::where('nsfp', $fakturPajak->nsfp)->update(['status' => 'cancelled']);
                 $fakturPajak->items()->delete();
                 $fakturPajak->delete();
+            }
+
+            // Reverse PPh journal entries
+            if ($sale->isPph() && $sale->pph_amount > 0) {
+                $pphJournalEntries = \App\Models\JournalEntry::where('sourceable_type', get_class($sale))
+                    ->where('sourceable_id', $sale->id)
+                    ->where('description', 'like', '%PPh Withholding%')
+                    ->get();
+                foreach ($pphJournalEntries as $entry) {
+                    if ($entry->status === \App\Models\JournalEntry::STATUS_POSTED && $entry->canBeReversed()) {
+                        $this->accountingService->reverseJournalEntry($entry, "Auto-reversal due to deleted Sale #{$sale->invoice} (PPh)");
+                    }
+                }
             }
 
             foreach ($sale->salesItems as $item) {

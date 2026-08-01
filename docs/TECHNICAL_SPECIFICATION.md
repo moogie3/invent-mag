@@ -14,7 +14,7 @@ Invent-MAG is a production-ready, enterprise-grade ERP system built on Laravel 1
 
 - **Multi-tenant SaaS architecture** with row-level database isolation
 - **1066 test files** ensuring code reliability
-- **451+ commits** demonstrating sustained development
+- **527+ commits** demonstrating sustained development
 - **Docker + CI/CD** for modern DevOps practices
 - **Service-oriented architecture** with clean separation of concerns
 - **Turbo Drive (Hotwire)** for SPA-like navigation without a frontend framework
@@ -381,8 +381,9 @@ class SalesHelper
 // Tenant model — jurisdiction-based feature visibility
 $tenant->isIndonesian();  // Returns true if tax_jurisdiction === 'indonesia'
 
-// Tax model — PPN (VAT) identification
+// Tax model — PPN (VAT) and PPh (Withholding Tax) identification
 $tax->isPpn();  // Returns true if is_ppn === true
+$tax->isPph();  // Returns true if is_pph === true
 ```
 
 **Benefits:**
@@ -425,7 +426,7 @@ routes/
 | ------------------ | ----------------- | -------------------------------- |
 | **Authentication** | Laravel Fortify   | Email/password with verification |
 | **API Auth**       | Laravel Sanctum   | Token-based API access           |
-| **Authorization**  | Spatie Permission | 79 granular permissions          |
+| **Authorization**  | Spatie Permission | 101 granular permissions          |
 | **Passwords**      | Bcrypt            | Industry-standard hashing        |
 | **Sessions**       | Encrypted cookies | Secure session management        |
 
@@ -545,7 +546,7 @@ Tenant (1)
 | **accounts**          | Chart of accounts | 35+ per tenant     |
 | **journal_entries**   | Accounting        | 10000s per tenant  |
 | **transactions**      | Accounting lines  | 100000s per tenant |
-| **taxes**             | Tax rate/label definitions with `is_ppn` flag | Per tenant |
+| **taxes**             | Tax rate/label definitions with `is_ppn` and `is_pph` flags | Per tenant |
 
 ### 4.3 Performance Optimizations
 
@@ -835,13 +836,8 @@ class SalesForecastService
 - Event-driven architecture
 - Queue-based processing
 
-**Potential Integrations:**
+**Committed Future Enhancements:**
 
-- Payment gateways (Stripe, PayPal)
-- Accounting software (QuickBooks, Xero)
-- E-commerce platforms (Shopify, WooCommerce)
-- Shipping providers
-- SMS/WhatsApp notifications
 - **PJAP API (Klikpajak)** — Phase 2: Direct DJP submission (enterprise only)
 
 ### 9.3 e-Faktur PPN Compliance (Implemented July 2026)
@@ -870,6 +866,36 @@ Indonesia's DJP (Direktorat Jenderal Pajak) requires PKP businesses to issue ele
 - PJAP API direct submission via Klikpajak (`PjapInterface` contract)
 - Real-time approval/rejection status from DJP
 - Enterprise-only premium automation
+
+### 9.4 PPh (Withholding Tax) Implementation
+
+PPh (Pajak Penghasilan) is implemented as a second independent dropdown on sales transactions, separate from PPN. It follows the same universal tax system as PPN but operates as a distinct tax category.
+
+**Tax Model Flag:**
+- `Tax.is_pph` flags withholding tax records in the universal tax system, mirroring how `Tax.is_ppn` identifies PPN taxes
+- PPh and PPN are independent dropdowns — selecting a PPN tax does not auto-select PPh and vice versa
+
+**Snapshot Pattern on Sales:**
+- `pph_enabled` — boolean, whether PPh was active on the sale
+- `pph_rate` — decimal, the PPh rate at time of sale (e.g. 0.02 for PPh 23)
+- `pph_amount` — computed PPh amount in cents
+- `pph_tax_id` — foreign key to the `taxes` record used (snapshot for audit trail)
+
+**Journal Entries:**
+- PPh reduces the amount the customer pays. When a sale with PPh is posted:
+  - **Dr** PPh Receivable (asset) — the withholding amount
+  - **Cr** Accounts Receivable — reduces what the customer owes
+- The net receivable from the customer is `grand_total - pph_amount`
+
+**Feature Gating:**
+- Gated by `isIndonesian()` (jurisdiction check on Tenant) + `hasFeature('ppn')` (plan feature slug)
+- PPh is only available to tenants with the PPN feature enabled on Professional or Enterprise plans
+
+**Chart of Accounts (auto-seeded):**
+| Account              | Code              | Type     | Purpose                                      |
+|----------------------|-------------------|----------|----------------------------------------------|
+| PPh Receivable       | `1170-{tenant_id}` | Asset    | Tracks withholding tax receivable from customers |
+| PPh 23 Payable       | `2150-{tenant_id}` | Liability | Tracks PPh 23 payable to tax authorities    |
 
 ---
 

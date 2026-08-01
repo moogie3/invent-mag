@@ -9,16 +9,17 @@
             <form action="{{ route('admin.login') }}" method="POST" autocomplete="off" novalidate>
                 @csrf
                 <div class="mb-3">
-                    <label class="form-label">Email</label>
-                    <input type="email" name="email" class="form-control" placeholder="Your email" autocomplete="off"
+                    <label class="form-label" for="email">Email</label>
+                    <input type="email" name="email" id="email" class="form-control @error('email') is-invalid @enderror" placeholder="Your email" autocomplete="off"
                         required value="{{ old('email') }}">
+                    @error('email')<div class="invalid-feedback">{{ $message }}</div>@enderror
                 </div>
                 <div class="mb-2">
-                    <label class="form-label">
+                    <label class="form-label" for="password">
                         Password
                     </label>
                     <div class="input-group input-group-flat">
-                        <input type="password" name="password" class="form-control" placeholder="Your password"
+                        <input type="password" name="password" class="form-control @error('password') is-invalid @enderror" placeholder="Your password"
                             autocomplete="off" id="password" required>
                         <span class="input-group-text">
                             <a href="#" class="link-secondary" title="Show password" data-bs-toggle="tooltip"
@@ -27,6 +28,7 @@
                             </a>
                         </span>
                     </div>
+                    @error('password')<div class="invalid-feedback">{{ $message }}</div>@enderror
                 </div>
                 <div class="form-footer">
                     <button type="submit" class="btn btn-primary w-100" id="loginSubmitBtn">

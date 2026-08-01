@@ -63,12 +63,14 @@
                                 </div>
                                 <div class="row g-3">
                                     <div class="col-md-6">
-                                        <div class="form-label">Application Name</div>
-                                        <input type="text" name="app_name" class="form-control" value="{{ $appSettings['app_name'] }}">
+                                        <label class="form-label" for="app_name">Application Name</label>
+                                        <input type="text" name="app_name" id="app_name" class="form-control @error('app_name') is-invalid @enderror" value="{{ old('app_name', $appSettings['app_name']) }}">
+                                        @error('app_name')<div class="invalid-feedback">{{ $message }}</div>@enderror
                                     </div>
                                     <div class="col-md-6">
-                                        <div class="form-label">Application URL</div>
-                                        <input type="url" name="app_url" class="form-control" value="{{ $appSettings['app_url'] }}">
+                                        <label class="form-label" for="app_url">Application URL</label>
+                                        <input type="url" name="app_url" id="app_url" class="form-control @error('app_url') is-invalid @enderror" value="{{ old('app_url', $appSettings['app_url']) }}">
+                                        @error('app_url')<div class="invalid-feedback">{{ $message }}</div>@enderror
                                     </div>
                                     <div class="col-md-4">
                                         <div class="form-label">Environment</div>

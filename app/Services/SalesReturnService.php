@@ -274,6 +274,23 @@ class SalesReturnService
                 }
             }
 
+            // Reverse PPh withholding proportionally
+            if ($sale->isPph() && $sale->pph_amount > 0) {
+                $pphReceivableAccountId = $accountingSettings['pph_receivable_account_id'] ?? null;
+                if ($pphReceivableAccountId) {
+                    $pphReceivableAccount = Account::find($pphReceivableAccountId);
+                    if ($pphReceivableAccount) {
+                        $returnRatio = $totalAmount > 0 && $sale->total > 0 ? $totalAmount / $sale->total : 0;
+                        $proportionalPph = round($sale->pph_amount * $returnRatio, 2);
+                        if ($proportionalPph > 0) {
+                            // Reverse original PPh: Dr AR / Cr PPh Receivable
+                            $transactions[] = ['account_name' => $accountsReceivableAccount->name, 'type' => 'debit', 'amount' => $proportionalPph];
+                            $transactions[] = ['account_name' => $pphReceivableAccount->name, 'type' => 'credit', 'amount' => $proportionalPph];
+                        }
+                    }
+                }
+            }
+
             $this->accountingService->createJournalEntry(
                 "Sales Return for SO #{$sale->invoice}",
                 Carbon::parse($salesReturn->return_date),
@@ -696,6 +713,23 @@ class SalesReturnService
                     if ($proportionalPpn > 0) {
                         $transactions[] = ['account_name' => $ppnKeluaranAccount->name, 'type' => 'debit', 'amount' => $proportionalPpn];
                         $transactions[] = ['account_name' => $accountsReceivableAccount->name, 'type' => 'credit', 'amount' => $proportionalPpn];
+                    }
+                }
+            }
+        }
+
+        // Reverse PPh withholding proportionally
+        if ($sale->isPph() && $sale->pph_amount > 0) {
+            $pphReceivableAccountId = $accountingSettings['pph_receivable_account_id'] ?? null;
+            if ($pphReceivableAccountId) {
+                $pphReceivableAccount = Account::find($pphReceivableAccountId);
+                if ($pphReceivableAccount) {
+                    $returnRatio = $totalAmount > 0 && $sale->total > 0 ? $totalAmount / $sale->total : 0;
+                    $proportionalPph = round($sale->pph_amount * $returnRatio, 2);
+                    if ($proportionalPph > 0) {
+                        // Reverse original PPh: Dr AR / Cr PPh Receivable
+                        $transactions[] = ['account_name' => $accountsReceivableAccount->name, 'type' => 'debit', 'amount' => $proportionalPph];
+                        $transactions[] = ['account_name' => $pphReceivableAccount->name, 'type' => 'credit', 'amount' => $proportionalPph];
                     }
                 }
             }

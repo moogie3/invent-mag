@@ -1,4 +1,4 @@
-<form id="product-edit-form" method="POST" action="{{ route('admin.product.update', $products->id) }}" enctype="multipart/form-data">
+<form id="product-edit-form" method="POST" action="{{ route('admin.product.update', $products->id) }}" enctype="multipart/form-data" novalidate data-validate-form>
     @csrf
     @method('PUT')
 

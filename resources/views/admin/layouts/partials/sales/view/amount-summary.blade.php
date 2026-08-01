@@ -54,6 +54,13 @@
     @endif
     @endif
 
+    @if($currentTenant->isIndonesian() && $currentTenant->hasFeature('ppn') && $sales->isPph())
+    <div class="d-flex justify-content-between mb-2">
+        <span class="text-muted">{{ __('messages.withholding_tax') }} ({{ $sales->pph_rate }}%)</span>
+        <span class="fw-bold text-danger">-{{ \App\Helpers\CurrencyHelper::format($sales->pph_amount) }}</span>
+    </div>
+    @endif
+
     <div class="d-flex justify-content-between align-items-center mb-3">
         <div class="fs-4"><strong>{{ __('messages.grand_total') }}</strong></div>
         <div class="fs-3 fw-bold text-primary">

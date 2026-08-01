@@ -1,7 +1,7 @@
 <tbody id="invoiceTableBody" class="table-tbody">
     @php
         $currentTenant = app('currentTenant');
-        $ppnColCount = ($currentTenant instanceof \App\Models\Tenant && $currentTenant->isIndonesian() && $currentTenant->hasFeature('ppn')) ? 1 : 0;
+        $ppnColCount = ($currentTenant instanceof \App\Models\Tenant && $currentTenant->isIndonesian() && $currentTenant->hasFeature('ppn')) ? 2 : 0;
     @endphp
     @forelse ($sales as $index => $sale)
         @include('admin.layouts.partials.sales.index.table-row', ['sale' => $sale, 'index' => $index])

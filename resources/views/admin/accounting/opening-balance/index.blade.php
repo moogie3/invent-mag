@@ -56,9 +56,10 @@
                             <div class="col-md-4">
                                 <label for="balance_date" class="form-label">{{ __('messages.balance_date') }}</label>
                                 <input type="date" name="balance_date" id="balance_date" 
-                                    class="form-control" 
-                                    value="{{ $balanceDate }}" 
+                                    class="form-control @error('balance_date') is-invalid @enderror" 
+                                    value="{{ old('balance_date', $balanceDate) }}" 
                                     max="{{ date('Y-m-d') }}">
+                                @error('balance_date')<div class="invalid-feedback">{{ $message }}</div>@enderror
                             </div>
                             <div class="col-md-8">
                                 <label for="notes" class="form-label">{{ __('messages.notes') }} ({{ __('messages.optional') }})</label>

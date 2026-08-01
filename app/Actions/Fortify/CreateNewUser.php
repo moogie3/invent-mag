@@ -92,6 +92,8 @@ class CreateNewUser implements CreatesNewUsers
                     'accounts_receivable_account_id' => $accountsReceivableAccount->id,
                     'cost_of_goods_sold_account_id' => $costOfGoodsSoldAccount->id,
                     'ppn_keluaran_account_id' => $outputVatAccount?->id,
+                    'pph_receivable_account_id' => Account::where('tenant_id', $tenantId)->where('code', '1170-' . $tenantId)->value('id'),
+                    'pph_payable_account_id'    => Account::where('tenant_id', $tenantId)->where('code', '2150-' . $tenantId)->value('id'),
                 ];
                 $tenant->save();
             }

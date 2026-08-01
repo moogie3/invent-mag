@@ -381,6 +381,7 @@ return [
     'session_security' => 'Sesi & Keamanan: Konfigurasi logout otomatis.',
     'performance' => 'Performance: Toggle animasi UI, lazy loading.',
     'language_localization' => 'Bahasa & Lokalisasi: Atur bahasa sistem.',
+    'tax_region' => 'Wilayah Pajak: Atur yurisdiksi pajak bisnis Anda. Pilih "Indonesia" untuk mengaktifkan fitur PPN dan e-Faktur. Pengaturan ini hanya tersedia untuk paket Professional ke atas.',
     'advanced_options' => 'Opsi Lanjutan: Aktifkan mode debug.',
 
     // Settings - Unit Management

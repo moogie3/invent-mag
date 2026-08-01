@@ -1,4 +1,5 @@
 import { formatCurrency } from '../../../../utils/currencyFormatter.js';
+import { validateForm } from "../../../utils/formValidator.js";
 
 export class SalesReturnEdit {
     constructor() {
@@ -223,10 +224,14 @@ export class SalesReturnEdit {
     }
 
     handleSubmit(event) {
+        if (event.defaultPrevented) return;
         const itemsArray = Object.values(this.returnedItems);
         if (itemsArray.length === 0) {
             event.preventDefault();
-            alert('No items selected for return.');
+            event.stopPropagation();
+            if (window.InventMagApp && typeof window.InventMagApp.showToast === 'function') {
+                window.InventMagApp.showToast('Warning', 'No items selected for return.', 'warning');
+            }
             return;
         }
 

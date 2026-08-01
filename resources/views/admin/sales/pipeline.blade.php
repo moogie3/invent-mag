@@ -207,7 +207,7 @@
                         </h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
-                    <form id="newOpportunityForm">
+                    <form id="newOpportunityForm" novalidate data-validate-form>
                         <div class="modal-body">
                             <div class="mb-3">
                                 <label for="opportunityName" class="form-label">
@@ -322,7 +322,7 @@
                             </div>
                             <div class="tab-pane fade" id="add-pipeline" role="tabpanel"
                                 aria-labelledby="add-pipeline-tab">
-                                <form id="newPipelineForm">
+                                <form id="newPipelineForm" novalidate data-validate-form>
                                     <div class="mb-3">
                                         <label for="newPipelineName" class="form-label">
                                             <i class="ti ti-chart-line me-1"></i>{{ __('messages.pipeline_name') }}
@@ -366,7 +366,7 @@
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
-                        <form id="editPipelineForm">
+                        <form id="editPipelineForm" novalidate data-validate-form>
                             <input type="hidden" id="editPipelineId" name="id">
                             <div class="mb-3">
                                 <label for="editPipelineName" class="form-label">
@@ -400,7 +400,7 @@
                         <div id="pipelineStagesContainer" class="mb-3">
                             <!-- Stages will be loaded here -->
                         </div>
-                        <form id="newStageForm" class="row g-2 align-items-end">
+                        <form id="newStageForm" class="row g-2 align-items-end" novalidate data-validate-form>
                             <input type="hidden" id="newStagePipelineId" name="pipeline_id">
                             <div class="col-md-5">
                                 <label for="newStageName" class="form-label">
@@ -442,7 +442,7 @@
                         </h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
-                    <form id="editOpportunityForm">
+                    <form id="editOpportunityForm" novalidate data-validate-form>
                         <div class="modal-body">
                             <input type="hidden" id="editOpportunityId" name="id">
                             <input type="hidden" id="editOpportunityPipelineId" name="sales_pipeline_id">

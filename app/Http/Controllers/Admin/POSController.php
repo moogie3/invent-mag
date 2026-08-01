@@ -51,6 +51,8 @@ class POSController extends Controller
                 'payment_method' => 'required|string|in:Cash,Card,Transfer,eWallet',
                 'amount_received' => 'nullable|numeric|min:0|required_if:payment_method,Cash',
                 'change_amount' => 'nullable|numeric|min:0',
+                'tax_id' => 'nullable|exists:taxes,id',
+                'pph_tax_id' => 'nullable|exists:taxes,id',
             ]);
 
             $sale = $this->posService->createSale($request->all());

@@ -90,6 +90,7 @@ class PurchaseController extends Controller
             'discount_total' => 'nullable|numeric',
             'discount_total_type' => 'nullable|in:fixed,percentage',
             'tax_id' => 'nullable|exists:taxes,id',
+            'pph_tax_id' => 'nullable|exists:taxes,id',
         ]);
 
         try {
@@ -117,6 +118,7 @@ class PurchaseController extends Controller
             'discount_total' => 'nullable|numeric',
             'discount_total_type' => 'nullable|in:fixed,percentage',
             'tax_id' => 'nullable|exists:taxes,id',
+            'pph_tax_id' => 'nullable|exists:taxes,id',
         ]);
 
         try {

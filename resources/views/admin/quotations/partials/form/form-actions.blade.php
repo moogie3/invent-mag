@@ -3,6 +3,6 @@
         <i class="ti ti-arrow-left"></i> {{ __('messages.cancel') }}
     </button>
     <button type="submit" class="btn btn-success d-none d-sm-inline-block">
-        <i class="ti ti-device-floppy"></i> {{ isset($quotation) ? __('messages.edit_quotation') : __('messages.create_quotation') }}
+        <i class="ti ti-device-floppy"></i> {{ ($quotation->exists ?? false) ? __('messages.edit_quotation') : __('messages.create_quotation') }}
     </button>
 </div>

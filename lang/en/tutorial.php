@@ -372,6 +372,7 @@ return [
     'session_security' => 'Session & Security: Configure auto-logout after inactivity (15 min, 30 min, 1 hour, 2 hours, or disabled). Enable "Remember Last Page" to return to your previous location after login.',
     'performance' => 'Performance: Toggle UI animations, lazy loading for images, and fluid layout. Set automatic data refresh rate (15s, 30s, 1min, 5min, or manual only).',
     'language_localization' => 'Language & Localization: Set the system language for translations (English or Bahasa Indonesia).',
+    'tax_region' => 'Tax Region: Set your business tax jurisdiction. Select "Indonesia" to enable PPN and e-Faktur features. This setting is only available on Professional plans and above.',
     'advanced_options' => 'Advanced Options: Enable debug mode for development information, keyboard shortcuts for power users, and help tooltips throughout the interface. Click "View Shortcuts" to see available keyboard commands.',
 
     // Settings - Unit Management

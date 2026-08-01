@@ -1,7 +1,7 @@
 # Invent-MAG — Product Roadmap
 
 > **Last updated:** July 2026  
-> **Version:** 2.1  
+> **Version:** 2.4  
 > **Stack:** Laravel 11 · Blade/Alpine.js · MySQL · Redis · Dompdf · Spatie Multitenancy · Spatie Permission  
 > **Deployment:** Docker · DigitalOcean (backend) · Vercel (frontend/marketing)  
 > **Domain:** https://invent-mag.web.id
@@ -43,8 +43,8 @@ This section documents the actual architecture so all future development stays s
 - Feature check: `$tenant->hasFeature('accounting')` → checks JSON array
 - Route-level guard: `->middleware('plan.feature:accounting')` → `CheckPlanFeature` middleware
 - Blade-level guard: `@planHas('accounting') ... @endPlanHas`
-- Feature slugs currently in use: `accounting`, `pos`, `crm`, `forecasting`, `api`, `audit_log`, `stock_opname`
-- **New e-Faktur feature slugs to add**: `ppn`, `efaktur_api` (Phase 2)
+- Feature slugs currently in use (verified against `database/seeders/PlanSeeder.php` + route middleware): `accounting`, `pos`, `crm`, `sales_pipeline`, `stock_opname`, `sales_returns`, `purchase_returns`, `hr`, `cash_flow`, `quotations`, `ppn`, `financial_reports`, `multi_currency`, `sales_forecasting`, `api_access`, `audit_compliance` (+ non-gated baseline slugs: `products`, `inventory`, `sales`, `purchases`, `invoices`, `dashboard`, `basic_reports`, `customers`, `suppliers`)
+- **New e-Faktur feature slug to add (Phase 2)**: `efaktur_api` (Enterprise only) — `ppn` (Phase 1) is already added to Professional & Enterprise plans
 - How to add a feature to a plan: migration that updates the JSON array (see `2026_04_18_071144_add_stock_opname_feature_to_plans.php` as pattern)
 
 ### 1.3 The "Invoice" Model is `Sales`
@@ -156,8 +156,8 @@ return $dompdf->stream('FP-' . $faktur->nsfp . '.pdf', ['Attachment' => false]);
 | **Full accounting suite** | ❌ Not included | Feature slug: `accounting` |
 | **CRM & sales pipeline** | ❌ Not included | Feature slug: `crm` |
 | **Stock Opname** | ❌ Not included | Feature slug: `stock_opname` |
-| **Sales forecasting (AI)** | ❌ Not included | Feature slug: `forecasting` |
-| **RESTful API** | ❌ Not included | Feature slug: `api` |
+| **Sales forecasting (AI)** | ❌ Not included | Feature slug: `sales_forecasting` |
+| **RESTful API** | ❌ Not included | Feature slug: `api_access` |
 
 > **Note:** Accounting is scoped to Pro & Enterprise. The Starter plan is intentionally positioned as an inventory + order management tool.
 
@@ -190,10 +190,10 @@ return $dompdf->stream('FP-' . $faktur->nsfp . '.pdf', ['Attachment' => false]);
 | Everything in Professional | ✅ Live | |
 | Unlimited users | ✅ Live | `plans.max_users = -1` |
 | Unlimited products | ✅ Live | `plans.max_products = -1` |
-| Sales forecasting — Holt-Winters | ✅ Live | Feature slug: `forecasting` |
-| RESTful API (Scribe-documented) | ✅ Live | Feature slug: `api` |
-| Audit trail & compliance logging | ✅ Live | Feature slug: `audit_log` |
-| Custom roles & 79 granular permissions | ✅ Live | Spatie Permission |
+| Sales forecasting — Holt-Winters | ✅ Live | Feature slug: `sales_forecasting` |
+| RESTful API (Scribe-documented) | ✅ Live | Feature slug: `api_access` |
+| Audit trail & compliance logging | ✅ Live | Feature slug: `audit_compliance` |
+| Custom roles & 101 granular permissions | ✅ Live | Spatie Permission |
 | **HR & Payroll** | ✅ Live | Feature slug: `hr` |
 | Dedicated support & SLA | ✅ Live | |
 
@@ -209,27 +209,7 @@ return $dompdf->stream('FP-' . $faktur->nsfp . '.pdf', ['Attachment' => false]);
 
 ---
 
-### 3.2 Pricing Comparison Table vs. Zahir Online
-
-**Status:** Planned — add below pricing cards in `invent-mag-fe/src/components/Pricing.astro`
-
-| Feature | Invent-MAG Starter | Invent-MAG Pro | Zahir Small Business |
-|---|:---:|:---:|:---:|
-| Price | $19/mo | $59/mo | Rp 150k/mo (annual only) |
-| Users | 3 | 10 | 1 |
-| Billing | Monthly | Monthly | **Annual only** |
-| Accounting | ❌ | ✅ | ✅ |
-| Sales & purchase returns | ✅ | ✅ | ✅ |
-| CRM / Pipeline | ❌ | ✅ | ❌ |
-| POS | ✅ | ✅ | ❌ |
-| AI Forecasting | ❌ | ❌ | ❌ |
-| e-Faktur (DJP) | ❌ | ✅ CSV + PDF | CSV only |
-| REST API | ❌ | ❌ | ❌ |
-| Free Trial | 30 days | 30 days | 30 days |
-
----
-
-### 3.3 Extend Free Trial to 30 Days ✅ DONE
+### 3.2 Extend Free Trial to 30 Days ✅ DONE
 
 **Rationale:** Zahir offers 30 days. Accounting software takes longer to evaluate than simpler SaaS — users need time to set up CoA, post journal entries, and run reports.
 
@@ -258,7 +238,7 @@ return $dompdf->stream('FP-' . $faktur->nsfp . '.pdf', ['Attachment' => false]);
 **Plan tier for e-Faktur:**
 - Phase 1 (PPN + Faktur Pajak PDF + CSV export): **Professional & Enterprise** — depends on accounting module
 - Phase 2 (PJAP API direct submission): **Enterprise** — premium automation
-- Feature slugs to add: `ppn` (Phase 1), `efaktur_api` (Phase 2)
+- Feature slugs to add: `efaktur_api` (Phase 2) — `ppn` (Phase 1) already added
 
 ---
 
@@ -1691,7 +1671,21 @@ Tax double-submissions to DJP are a legal problem. Protection at 5 levels:
 
 ---
 
-### 5.2 Cash Flow Statement ✅ DONE
+### 5.2 Advanced Multi-Currency (Real-Time Rates)
+
+**Why:** Current multi-currency is static configuration (per-tenant currency + conversion rates manually set). Real-time rates would let invoices, P&L, and aging reports reflect daily FX.
+
+**What:**
+- Live FX rate provider (e.g., open.er-api.com / Bank Indonesia reference rates)
+- Daily automatic rate sync + manual override
+- Revaluation entries (Dr/Cr FX gain-loss) for open AR/AP at period end
+- Multi-currency reporting (report in base currency with rate at transaction date)
+
+**Complexity:** Medium (~2-3 weeks). Requires a rates provider, scheduled sync job, and revaluation journal entry pattern through `AccountingService`.
+
+---
+
+### 5.3 Cash Flow Statement ✅ DONE
 
 **Why:** The third core financial statement. P&L and Balance Sheet already exist. Cash Flow Statement completes the set — required by Indonesian accounting standards (PSAK).
 
@@ -1711,7 +1705,7 @@ Tax double-submissions to DJP are a legal problem. Protection at 5 levels:
 
 ---
 
-### 5.3 WhatsApp Invoice Delivery
+### 5.4 WhatsApp Invoice Delivery
 
 **Why:** Indonesian businesses overwhelmingly use WhatsApp Business for customer communication. Sending invoice PDFs via WhatsApp outperforms email for this market segment.
 
@@ -1725,13 +1719,85 @@ Tax double-submissions to DJP are a legal problem. Protection at 5 levels:
 
 ---
 
-### 5.4 Midtrans Payment Links on Invoices
+### 5.5 Midtrans Payment Links on Invoices
 
 **Status:** Midtrans Snap already integrated for SaaS subscription payments (`Api/PaymentController.php`, `BillingService.php`).
 
 **Extension:** Generate Snap payment links on customer invoices. On payment webhook, update `sales.status = 'Paid'` and create journal entry automatically (Dr Cash, Cr AR).
 
 **Complexity:** Low (~1 week — Midtrans SDK already installed and configured).
+
+---
+
+### 5.6 SPT Report Templates
+
+**Why:** Monthly SPT Masa PPN filing is mandatory for PKP businesses in Indonesia. Providing templates that auto-populate from existing data saves manual work and reduces errors.
+
+**Current state (July 2026):** PPN Keluaran (output VAT) summary already exists via `EFakturService::getSptMasaSummary()` (masa/tahun, faktur counts, DPP, PPN).
+
+**What:**
+- SPT Masa PPN form template pre-filled from sales/purchase data
+- PPN Keluaran (output VAT) summary from Faktur Pajak — ✅ done
+- PPN Masukan (input VAT) summary from purchase data — ⚠️ **missing prerequisite:** POs deliberately carry no tax (Decision 14), so input VAT tracking must be built first (a Purchase Invoice tax stage + PPN Masukan 1140 journal), or the SPT will only ever reflect output VAT
+- Export to DJP-compatible format (CSV or PDF)
+
+**Complexity:** Medium (~1-2 weeks). Blocked on PPN Masukan/input VAT tracking, not on tax record changes.
+
+---
+
+### 5.7 Bank Integrations (BCA, BNI, Mandiri)
+
+**Why:** Direct bank API integration enables real-time balance checking and automated transaction matching for bank reconciliation.
+
+**What:**
+- BCA, BNI, Mandiri API connections
+- Automated bank statement import (replaces manual CSV upload)
+- Real-time balance verification
+
+**Complexity:** High (~2-3 weeks per bank). Each bank has different API requirements and authentication flows.
+
+---
+
+### 5.8 PPh Support (21, 22, 23, 25)
+
+**Why:** PPh (Pajak Penghasilan / Income Tax) withholding is required alongside PPN for comprehensive Indonesian tax compliance.
+
+**Approach (July 2026):** All PPh types run on the **universal tax system** — a Tax record flagged `is_pph = true` automatically appears in the PPh dropdown on Sales, PO, POS, and Quotation forms and posts through the existing shared PPh journal path (Dr PPh Receivable 1170 / Cr PPh Payable 2150). No per-type engines are planned; for the UMKM target they would add complexity without accounting accuracy (every PPh type already posts to the same PPh Payable).
+
+**What:**
+- ~~PPh 23 (service fee withholding)~~ — ✅ **Completed (July 2026).** Seeded Tax record `PPH 23` (2%, `is_pph = true`). Snapshot fields (`pph_enabled`/`pph_rate`/`pph_amount`) on Sales/PO/POS/Quotation, journal posting, and the sales-view PPh line all live.
+- PPh 21 (employee income tax) — 🔜 **Future (low effort).** Correct UMKM scope is a flat **"Payroll Tax" picker** on the payroll screen (withholding line in the payment journal), **not** a full TER/PTKP/1721-II engine. Reuses the `is_pph` mechanism. Depends on HR & Payroll feature (`hr` slug).
+- PPh 22 (goods withholding) — 🔜 **Future (trivial).** Add a seeded Tax record `PPH 22` (1.5%, `is_pph = true`) to `TaxSeeder` — it flows through every existing PPh dropdown and journal path unchanged. No new models or journal code.
+- PPh 25 (monthly installments) — ⏸️ **Deferred.** A manual journal entry covers the monthly installment for UMKM; a dedicated calculation engine is out of scope.
+
+**Complexity:** Low. PPh 23 is done; PPh 22 is a one-line seeder change; PPh 21 is a small payroll picker. The heavy "calculation engines" once planned for 21/22/25 are intentionally **not** built.
+
+---
+
+### 5.9 Mobile Application
+
+**Why:** Field sales teams and warehouse staff need mobile access for inventory checks, quick sales, and pipeline updates.
+
+**What:**
+- React Native or Flutter cross-platform app
+- Core features: POS, inventory lookup, sales pipeline, customer management
+- Offline support for areas with poor connectivity
+
+**Complexity:** High (~3+ months). Separate codebase, API-first design required.
+
+---
+
+### 5.10 Advanced BI Dashboards
+
+**Why:** Current reporting covers P&L, Balance Sheet, Cash Flow, and Trial Balance. Advanced BI would provide deeper insights — trend analysis, forecasting visualizations, and cross-period comparisons.
+
+**What:**
+- Interactive charts and graphs (revenue trends, expense breakdowns, customer segments)
+- Cross-period comparison (month-over-month, year-over-year)
+- Drill-down from summary to transaction detail
+- Export to PDF/presentation format
+
+**Complexity:** Medium (~2 weeks). Depends on charting library choice and data aggregation layer.
 
 ---
 
@@ -1750,10 +1816,10 @@ Tax double-submissions to DJP are a legal problem. Protection at 5 levels:
 | POS | ✅ | ✅ | ❌ |
 | Stock Opname | ❌ | ✅ | Limited |
 | Multi-currency | ❌ | ✅ | ✅ (paid add-on) |
-| AI Sales Forecasting | ❌ | ❌ | ❌ |
-| e-Faktur CSV | 🔜 Phase 1 | 🔜 Phase 1 | ✅ (CSV only) |
+| AI Sales Forecasting | ❌ | ✅ Enterprise | ❌ |
+| e-Faktur CSV + PDF | ✅ Completed | ✅ Completed | ✅ (CSV only) |
 | e-Faktur Direct API | 🔜 Phase 2 | 🔜 Phase 2 | ❌ |
-| REST API | ❌ | ❌ | ❌ |
+| REST API | ❌ | ✅ Enterprise | ❌ |
 | Free Trial | 30 days | 30 days | 30 days |
 
 **Invent-MAG advantages:**
@@ -1766,7 +1832,7 @@ Tax double-submissions to DJP are a legal problem. Protection at 5 levels:
 
 **Gaps to address:**
 1. ~~Only 7-day trial vs Zahir's 30-day~~ ✅ **30-day trial implemented (July 2026)**
-2. No e-Faktur yet (Phase 1 = parity, Phase 2 = superior)
+2. e-Faktur Phase 2 (PJAP API direct submission) not yet live — Phase 1 (CSV + PDF) complete = Zahir parity, Phase 2 = superior
 3. Zahir has been in market since 1999 (brand trust gap — takes time to close)
 
 ---

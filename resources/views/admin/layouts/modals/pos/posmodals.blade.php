@@ -133,7 +133,7 @@
                     aria-label="Close"></button>
             </div>
             <form id="quickCreateCustomerForm" action="{{ route('admin.customer.quickCreate') }}" method="POST"
-                enctype="multipart/form-data">
+                enctype="multipart/form-data" novalidate data-validate-form>
                 @csrf
                 <div class="modal-body p-4">
                     <div class="mb-3">
@@ -191,7 +191,7 @@
                     aria-label="Close"></button>
             </div>
             <form id="quickCreateProductForm" enctype="multipart/form-data" method="POST"
-                action="{{ route('admin.product.quickCreate') }}">
+                action="{{ route('admin.product.quickCreate') }}" novalidate data-validate-form>
                 @csrf
                 <div class="modal-body p-4">
 

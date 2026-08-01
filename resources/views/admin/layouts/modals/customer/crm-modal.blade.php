@@ -186,7 +186,7 @@
                                     </h3>
                                 </div>
                                 <div class="card-body pb-2">
-                                    <form id="interactionForm" class="mb-3">
+                                    <form id="interactionForm" class="mb-3" novalidate data-validate-form>
                                         <div class="row g-2">
                                             <div class="col-md-3">
                                                 <select class="form-select" name="type" required>

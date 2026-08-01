@@ -38,18 +38,19 @@
                                             <div class="settings-section-content">
                                                 <div class="row g-3">
                                                     <div class="col-md-6">
-                                                        <div class="form-label">{{ __('messages.currency_selection_select_currency') }}</div>
+                                                        <label class="form-label" for="selectedCurrency">{{ __('messages.currency_selection_select_currency') }}</label>
                                                         <select name="selected_currency" id="selectedCurrency"
-                                                            class="form-select" required>
+                                                            class="form-select @error('currency_code') is-invalid @enderror" required>
                                                             @foreach ($predefinedCurrencies as $currency)
                                                                 <option value="{{ $currency['code'] }}"
                                                                     data-symbol="{{ $currency['symbol'] }}"
                                                                     data-locale="{{ $currency['locale'] }}"
-                                                                    {{ $setting->currency_code == $currency['code'] ? 'selected' : '' }}>
+                                                                    {{ old('currency_code', $setting->currency_code) == $currency['code'] ? 'selected' : '' }}>
                                                                     {{ $currency['name'] }} ({{ $currency['symbol'] }})
                                                                 </option>
                                                             @endforeach
                                                         </select>
+                                                        @error('currency_code')<div class="invalid-feedback">{{ $message }}</div>@enderror
                                                         <small class="text-muted">{{ __('messages.currency_selection_select_business_currency_description') }}</small>
                                                     </div>
                                                     <input type="hidden" name="currency_code" id="currencyCode"
@@ -59,17 +60,18 @@
                                                     <input type="hidden" name="currency_symbol" id="currencySymbol"
                                                         value="{{ $setting->currency_symbol }}">
                                                     <div class="col-md-6">
-                                                        <div class="form-label">{{ __('messages.currency_selection_currency_position') }}</div>
-                                                        <select name="position" class="form-select" required>
+                                                        <label class="form-label" for="position">{{ __('messages.currency_selection_currency_position') }}</label>
+                                                        <select name="position" id="position" class="form-select @error('position') is-invalid @enderror" required>
                                                             <option value="prefix"
-                                                                {{ $setting->position == 'prefix' ? 'selected' : '' }}>
+                                                                {{ old('position', $setting->position) == 'prefix' ? 'selected' : '' }}>
                                                                 {{ __('messages.currency_selection_prefix') }}
                                                                 ($100)</option>
                                                             <option value="suffix"
-                                                                {{ $setting->position == 'suffix' ? 'selected' : '' }}>
+                                                                {{ old('position', $setting->position) == 'suffix' ? 'selected' : '' }}>
                                                                 {{ __('messages.currency_selection_suffix') }}
                                                                 (100$)</option>
                                                         </select>
+                                                        @error('position')<div class="invalid-feedback">{{ $message }}</div>@enderror
                                                         <small class="text-muted">{{ __('messages.currency_selection_choose_symbol_display_description') }}</small>
                                                     </div>
                                                 </div>
@@ -90,24 +92,27 @@
                                             <div class="settings-section-content">
                                                 <div class="row g-3">
                                                     <div class="col-md-6">
-                                                        <div class="form-label">{{ __('messages.currency_number_formatting_decimal_separator') }}</div>
-                                                        <input type="text" name="decimal_separator" class="form-control"
-                                                            value="{{ $setting->decimal_separator }}" required
+                                                        <label class="form-label" for="decimal_separator">{{ __('messages.currency_number_formatting_decimal_separator') }}</label>
+                                                        <input type="text" name="decimal_separator" id="decimal_separator" class="form-control @error('decimal_separator') is-invalid @enderror"
+                                                            value="{{ old('decimal_separator', $setting->decimal_separator) }}" required
                                                             placeholder="e.g., .">
+                                                        @error('decimal_separator')<div class="invalid-feedback">{{ $message }}</div>@enderror
                                                         <small class="text-muted">{{ __('messages.currency_number_formatting_decimal_separator_description') }}</small>
                                                     </div>
                                                     <div class="col-md-6">
-                                                        <div class="form-label">{{ __('messages.currency_number_formatting_thousand_separator') }}</div>
-                                                        <input type="text" name="thousand_separator" class="form-control"
-                                                            value="{{ $setting->thousand_separator }}" required
+                                                        <label class="form-label" for="thousand_separator">{{ __('messages.currency_number_formatting_thousand_separator') }}</label>
+                                                        <input type="text" name="thousand_separator" id="thousand_separator" class="form-control @error('thousand_separator') is-invalid @enderror"
+                                                            value="{{ old('thousand_separator', $setting->thousand_separator) }}" required
                                                             placeholder="e.g., ,">
+                                                        @error('thousand_separator')<div class="invalid-feedback">{{ $message }}</div>@enderror
                                                         <small class="text-muted">{{ __('messages.currency_number_formatting_thousand_separator_description') }}</small>
                                                     </div>
                                                     <div class="col-md-6">
-                                                        <div class="form-label">{{ __('messages.currency_number_formatting_decimal_places') }}</div>
-                                                        <input type="number" name="decimal_places" class="form-control"
-                                                            value="{{ $setting->decimal_places }}" required
+                                                        <label class="form-label" for="decimal_places">{{ __('messages.currency_number_formatting_decimal_places') }}</label>
+                                                        <input type="number" name="decimal_places" id="decimal_places" class="form-control @error('decimal_places') is-invalid @enderror"
+                                                            value="{{ old('decimal_places', $setting->decimal_places) }}" required
                                                             placeholder="e.g., 2" min="0" max="10">
+                                                        @error('decimal_places')<div class="invalid-feedback">{{ $message }}</div>@enderror
                                                         <small class="text-muted">{{ __('messages.currency_number_formatting_decimal_places_description') }}</small>
                                                     </div>
                                                     <div class="col-md-6">

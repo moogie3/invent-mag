@@ -43,28 +43,32 @@
                     <i class="ti ti-plus me-1"></i>{{ __('messages.tax_modal_create_title') }}</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <form id="createTaxForm" action="{{ route('admin.setting.tax.store') }}" method="POST">
+            <form id="createTaxForm" action="{{ route('admin.setting.tax.store') }}" method="POST" novalidate data-validate-form>
                 @csrf
                 <div class="modal-body">
                     <div class="mb-3">
                         <label for="createTaxName" class="form-label">{{ __('messages.tax_name') }}</label>
-                        <input type="text" class="form-control" id="createTaxName" name="name" required>
+                        <input type="text" class="form-control @error('name') is-invalid @enderror" id="createTaxName" name="name" required>
+                        @error('name')<div class="invalid-feedback">{{ $message }}</div>@enderror
                     </div>
                     <div class="mb-3">
                         <label for="createTaxRate" class="form-label">{{ __('messages.tax_rate') }}</label>
-                        <input type="number" class="form-control" id="createTaxRate" name="rate" step="0.01" min="0" max="100" required>
+                        <input type="number" class="form-control @error('rate') is-invalid @enderror" id="createTaxRate" name="rate" step="0.01" min="0" max="100" required>
+                        @error('rate')<div class="invalid-feedback">{{ $message }}</div>@enderror
                     </div>
                     <div class="mb-3">
                         <label for="createTaxType" class="form-label">{{ __('messages.tax_type') }}</label>
-                        <select class="form-select" id="createTaxType" name="type" required>
+                        <select class="form-select @error('type') is-invalid @enderror" id="createTaxType" name="type" required>
                             <option value="exclusive">{{ __('messages.tax_type_exclusive') }}</option>
                             <option value="inclusive">{{ __('messages.tax_type_inclusive') }}</option>
                             <option value="none">{{ __('messages.tax_type_none') }}</option>
                         </select>
+                        @error('type')<div class="invalid-feedback">{{ $message }}</div>@enderror
                     </div>
                     <div class="mb-3">
                         <label for="createTaxDescription" class="form-label">{{ __('messages.tax_description') }}</label>
-                        <textarea class="form-control" id="createTaxDescription" name="description" rows="2"></textarea>
+                        <textarea class="form-control @error('description') is-invalid @enderror" id="createTaxDescription" name="description" rows="2"></textarea>
+                        @error('description')<div class="invalid-feedback">{{ $message }}</div>@enderror
                     </div>
                     <div class="mb-3">
                         <div class="form-check form-switch">
@@ -98,30 +102,34 @@
                 </h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <form id="editTaxForm" method="POST">
+            <form id="editTaxForm" method="POST" novalidate data-validate-form>
                 @csrf
                 @method('PUT')
                 <div class="modal-body">
                     <input type="hidden" id="editTaxId" name="id">
                     <div class="mb-3">
                         <label for="editTaxName" class="form-label">{{ __('messages.tax_name') }}</label>
-                        <input type="text" class="form-control" id="editTaxName" name="name" required>
+                        <input type="text" class="form-control @error('name') is-invalid @enderror" id="editTaxName" name="name" required>
+                        @error('name')<div class="invalid-feedback">{{ $message }}</div>@enderror
                     </div>
                     <div class="mb-3">
                         <label for="editTaxRate" class="form-label">{{ __('messages.tax_rate') }}</label>
-                        <input type="number" class="form-control" id="editTaxRate" name="rate" step="0.01" min="0" max="100" required>
+                        <input type="number" class="form-control @error('rate') is-invalid @enderror" id="editTaxRate" name="rate" step="0.01" min="0" max="100" required>
+                        @error('rate')<div class="invalid-feedback">{{ $message }}</div>@enderror
                     </div>
                     <div class="mb-3">
                         <label for="editTaxType" class="form-label">{{ __('messages.tax_type') }}</label>
-                        <select class="form-select" id="editTaxType" name="type" required>
+                        <select class="form-select @error('type') is-invalid @enderror" id="editTaxType" name="type" required>
                             <option value="exclusive">{{ __('messages.tax_type_exclusive') }}</option>
                             <option value="inclusive">{{ __('messages.tax_type_inclusive') }}</option>
                             <option value="none">{{ __('messages.tax_type_none') }}</option>
                         </select>
+                        @error('type')<div class="invalid-feedback">{{ $message }}</div>@enderror
                     </div>
                     <div class="mb-3">
                         <label for="editTaxDescription" class="form-label">{{ __('messages.tax_description') }}</label>
-                        <textarea class="form-control" id="editTaxDescription" name="description" rows="2"></textarea>
+                        <textarea class="form-control @error('description') is-invalid @enderror" id="editTaxDescription" name="description" rows="2"></textarea>
+                        @error('description')<div class="invalid-feedback">{{ $message }}</div>@enderror
                     </div>
                     <div class="mb-3">
                         <div class="form-check form-switch">

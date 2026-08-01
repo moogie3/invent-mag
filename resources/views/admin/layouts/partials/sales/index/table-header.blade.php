@@ -41,6 +41,9 @@
         <th class="sticky-top " style="z-index: 1020;">
             <span class="fs-4 py-3">{{ __('messages.ppn_status') }}</span>
         </th>
+        <th class="sticky-top " style="z-index: 1020;">
+            <span class="fs-4 py-3">{{ __('messages.pph_status') }}</span>
+        </th>
         @endif
         <th style="width:180px;text-align:center" class="fs-4 py-3 no-print sticky-top " style="z-index: 1020;">
             {{ __('messages.action') }}

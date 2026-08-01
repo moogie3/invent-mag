@@ -23,6 +23,7 @@ class TaxSeeder extends Seeder
                 'description' => 'Pajak Pertambahan Nilai 11% (Standard VAT for Indonesia)',
                 'is_active' => true,
                 'is_default' => true,
+                'is_ppn' => true,
             ]
         );
 
@@ -34,6 +35,7 @@ class TaxSeeder extends Seeder
                 'description' => 'Pajak Pertambahan Nilai 12% (Higher VAT rate)',
                 'is_active' => true,
                 'is_default' => false,
+                'is_ppn' => true,
             ]
         );
 
@@ -45,6 +47,7 @@ class TaxSeeder extends Seeder
                 'description' => 'Pajak Penghasilan Pasal 23 (Withholding tax on services)',
                 'is_active' => true,
                 'is_default' => false,
+                'is_pph' => true,
             ]
         );
 

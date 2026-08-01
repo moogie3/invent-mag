@@ -42,16 +42,18 @@
                     <i class="ti ti-plus me-1"></i>{{ __('messages.unit_modal_create_title') }}</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <form id="createUnitForm" action="{{ route('admin.setting.unit.store') }}" method="POST">
+            <form id="createUnitForm" action="{{ route('admin.setting.unit.store') }}" method="POST" novalidate data-validate-form>
                 @csrf
                 <div class="modal-body">
                     <div class="mb-3">
                         <label for="symbol" class="form-label">{{ __('messages.table_code') }}</label>
-                        <input type="text" class="form-control" id="symbol" name="symbol">
+                        <input type="text" class="form-control @error('symbol') is-invalid @enderror" id="symbol" name="symbol" required>
+                        @error('symbol')<div class="invalid-feedback">{{ $message }}</div>@enderror
                     </div>
                     <div class="mb-3">
                         <label for="name" class="form-label">{{ __('messages.table_name') }}</label>
-                        <input type="text" class="form-control" id="name" name="name">
+                        <input type="text" class="form-control @error('name') is-invalid @enderror" id="name" name="name" required>
+                        @error('name')<div class="invalid-feedback">{{ $message }}</div>@enderror
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -72,18 +74,20 @@
                 </h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <form id="editUnitForm" method="POST">
+            <form id="editUnitForm" method="POST" novalidate data-validate-form>
                 @csrf
                 @method('PUT')
                 <div class="modal-body">
                     <input type="hidden" id="unitId" name="id">
                     <div class="mb-3">
                         <label for="unitSymbolEdit" class="form-label">{{ __('messages.table_code') }}</label>
-                        <input type="text" class="form-control" id="unitSymbolEdit" name="symbol">
+                        <input type="text" class="form-control @error('symbol') is-invalid @enderror" id="unitSymbolEdit" name="symbol" required>
+                        @error('symbol')<div class="invalid-feedback">{{ $message }}</div>@enderror
                     </div>
                     <div class="mb-3">
                         <label for="unitNameEdit" class="form-label">{{ __('messages.table_name') }}</label>
-                        <input type="text" class="form-control" id="unitNameEdit" name="name">
+                        <input type="text" class="form-control @error('name') is-invalid @enderror" id="unitNameEdit" name="name" required>
+                        @error('name')<div class="invalid-feedback">{{ $message }}</div>@enderror
                     </div>
                 </div>
                 <div class="modal-footer">

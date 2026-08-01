@@ -2,6 +2,7 @@
 
 namespace Tests\Unit\Services;
 
+use App\Models\Account;
 use App\Models\Categories;
 use App\Models\Customer;
 use App\Models\Product;
@@ -164,5 +165,64 @@ class PosServiceTest extends TestCase
         $this->assertEquals(374, $data['grandTotal']); // 350 - 10 + 34 = 374
         $this->assertEquals(400, $data['amountReceived']);
         $this->assertEquals(26, $data['change']); // 400 - 374 = 26
+    }
+
+    #[Test]
+    public function it_stores_pph_snapshot_and_creates_pph_journal_on_pos_sale()
+    {
+        $this->tenant->update(['tax_jurisdiction' => 'ID']);
+
+        $pphTax = Tax::create([
+            'name' => 'PPh 23',
+            'rate' => 2,
+            'type' => 'exclusive',
+            'is_active' => true,
+            'is_pph' => true,
+        ]);
+
+        $pphReceivableAccount = Account::create([
+            'name' => 'PPh Receivable ' . $this->tenant->id,
+            'code' => '1170-' . $this->tenant->id,
+            'type' => 'asset',
+            'tenant_id' => $this->tenant->id,
+        ]);
+        $this->tenant->update([
+            'accounting_settings' => array_merge(
+                $this->tenant->accounting_settings ?? [],
+                ['pph_receivable_account_id' => $pphReceivableAccount->id]
+            ),
+        ]);
+
+        $user = User::factory()->create();
+        Auth::login($user);
+
+        $customer = Customer::factory()->create();
+        $product = Product::factory()->withStock(10)->create(['selling_price' => 100]);
+
+        $productsPayload = json_encode([
+            ['id' => $product->id, 'quantity' => 2, 'price' => 100],
+        ]);
+
+        $data = [
+            'products' => $productsPayload,
+            'customer_id' => $customer->id,
+            'transaction_date' => now()->format('Y-m-d'),
+            'payment_method' => 'Cash',
+            'discount_total' => 0,
+            'discount_total_type' => 'fixed',
+            'tax_id' => Tax::first()->id,
+            'pph_tax_id' => $pphTax->id,
+            'amount_received' => 300,
+        ];
+
+        $sale = $this->posService->createSale($data);
+
+        // Subtotal 200, tax 10% exclusive = 20, PPh 2% of 200 = 4
+        // grandTotal = 200 + 20 - 4 = 216
+        $this->assertTrue($sale->fresh()->pph_enabled);
+        $this->assertEquals(2.0, $sale->fresh()->pph_rate);
+        $this->assertEquals(4.0, $sale->fresh()->pph_amount);
+        $this->assertEquals($pphTax->id, $sale->fresh()->pph_tax_id);
+        $this->assertEquals(216.0, $sale->fresh()->total);
     }
 }

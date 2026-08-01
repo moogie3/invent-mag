@@ -25,6 +25,7 @@ function setupQuickCreateProductForm() {
     if (!productForm) return;
 
     productForm.addEventListener("submit", function (e) {
+        if (e.defaultPrevented) return;
         e.preventDefault();
 
         const form = this;

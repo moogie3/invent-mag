@@ -204,7 +204,7 @@
                                 <div class="row g-3">
                                     <div class="col-md-5">
                                         <label class="form-label">Tenant</label>
-                                        <select name="tenant_id" class="form-select" required>
+                                        <select name="tenant_id" class="form-select @error('tenant_id') is-invalid @enderror" required>
                                             <option value="">-- Select Tenant --</option>
                                             @foreach($tenants as $t)
                                             <option value="{{ $t->id }}">
@@ -212,13 +212,15 @@
                                             </option>
                                             @endforeach
                                         </select>
+                                        @error('tenant_id')<div class="invalid-feedback">{{ $message }}</div>@enderror
                                     </div>
                                     <div class="col-md-4">
                                         <label class="form-label">Backup Type</label>
-                                        <select name="type" class="form-select" required>
+                                        <select name="type" class="form-select @error('type') is-invalid @enderror" required>
                                             <option value="db_only">Database Only</option>
                                             <option value="full">Full (DB + Files)</option>
                                         </select>
+                                        @error('type')<div class="invalid-feedback">{{ $message }}</div>@enderror
                                     </div>
                                     <div class="col-md-3 d-flex align-items-end">
                                         <button type="submit" class="btn btn-primary w-100">
@@ -235,7 +237,7 @@
                                 <div class="row g-3">
                                     <div class="col-md-5">
                                         <label class="form-label">Tenant to Restore</label>
-                                        <select name="tenant_id" class="form-select" required>
+                                        <select name="tenant_id" class="form-select @error('tenant_id') is-invalid @enderror" required>
                                             <option value="">-- Select Tenant --</option>
                                             @foreach($tenants as $t)
                                             <option value="{{ $t->id }}">
@@ -246,10 +248,12 @@
                                             </option>
                                             @endforeach
                                         </select>
+                                        @error('tenant_id')<div class="invalid-feedback">{{ $message }}</div>@enderror
                                     </div>
                                     <div class="col-md-4">
                                         <label class="form-label">Backup File (ZIP)</label>
-                                        <input type="file" name="backup_file" class="form-control" accept=".zip" required>
+                                        <input type="file" name="backup_file" class="form-control @error('backup_file') is-invalid @enderror" accept=".zip" required>
+                                        @error('backup_file')<div class="invalid-feedback">{{ $message }}</div>@enderror
                                     </div>
                                     <div class="col-md-3 d-flex align-items-end">
                                         <button type="submit" class="btn btn-warning w-100" id="restore-btn">
@@ -261,7 +265,8 @@
                                 <div class="row g-3 mt-2">
                                     <div class="col-md-5">
                                         <label class="form-label">Backup Password <span class="text-muted small">(required if encrypted)</span></label>
-                                        <input type="password" name="password" class="form-control" placeholder="Leave blank if not encrypted">
+                                        <input type="password" name="password" class="form-control @error('password') is-invalid @enderror" placeholder="Leave blank if not encrypted">
+                                        @error('password')<div class="invalid-feedback">{{ $message }}</div>@enderror
                                     </div>
                                 </div>
                                 <div class="alert alert-warning mt-3 mb-0">

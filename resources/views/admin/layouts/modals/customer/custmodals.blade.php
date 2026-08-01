@@ -44,32 +44,38 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <form id="createCustomerForm" action="{{ route('admin.customer.store') }}" method="POST"
-                enctype="multipart/form-data">
+                enctype="multipart/form-data" novalidate data-validate-form>
                 @csrf
                 <div class="modal-body">
                     <div class="mb-3">
                         <label for="customerName" class="form-label">{{ __('messages.table_name') }}</label>
-                        <input type="text" class="form-control" id="customerName" name="name">
+                        <input type="text" class="form-control @error('name') is-invalid @enderror" id="customerName" name="name" required>
+                        @error('name')<div class="invalid-feedback">{{ $message }}</div>@enderror
                     </div>
                     <div class="mb-3">
                         <label for="customerAddress" class="form-label">{{ __('messages.table_address') }}</label>
-                        <input type="text" class="form-control" id="customerAddress" name="address">
+                        <input type="text" class="form-control @error('address') is-invalid @enderror" id="customerAddress" name="address">
+                        @error('address')<div class="invalid-feedback">{{ $message }}</div>@enderror
                     </div>
                     <div class="mb-3">
                         <label for="customerPhone" class="form-label">{{ __('messages.supplier_modal_phone_number') }}</label>
-                        <input type="text" class="form-control" id="customerPhone" name="phone_number">
+                        <input type="text" class="form-control @error('phone_number') is-invalid @enderror" id="customerPhone" name="phone_number">
+                        @error('phone_number')<div class="invalid-feedback">{{ $message }}</div>@enderror
                     </div>
                     <div class="mb-3">
                         <label for="customerEmail" class="form-label">{{ __('messages.table_email') }}</label>
-                        <input type="email" class="form-control" id="customerEmail" name="email">
+                        <input type="email" class="form-control @error('email') is-invalid @enderror" id="customerEmail" name="email">
+                        @error('email')<div class="invalid-feedback">{{ $message }}</div>@enderror
                     </div>
                     <div class="mb-3">
                         <label for="customerImage" class="form-label">{{ __('messages.table_image') }}</label>
-                        <input type="file" class="form-control" id="customerImage" name="image">
+                        <input type="file" class="form-control @error('image') is-invalid @enderror" id="customerImage" name="image">
+                        @error('image')<div class="invalid-feedback">{{ $message }}</div>@enderror
                     </div>
                     <div class="mb-3">
                         <label for="customerPaymentTerms" class="form-label">{{ __('messages.table_payment_terms') }}</label>
-                        <input type="text" class="form-control" id="customerPaymentTerms" name="payment_terms">
+                        <input type="text" class="form-control @error('payment_terms') is-invalid @enderror" id="customerPaymentTerms" name="payment_terms">
+                        @error('payment_terms')<div class="invalid-feedback">{{ $message }}</div>@enderror
                     </div>
                     @php
                         $currentTenant = app('currentTenant');
@@ -80,7 +86,8 @@
                     <h6 class="mb-3 text-muted"><i class="ti ti-file-invoice me-1"></i>{{ __('messages.customer_tax_data') }}</h6>
                     <div class="mb-3">
                         <label for="customerNpwp" class="form-label">{{ __('messages.customer_npwp') }}</label>
-                        <input type="text" class="form-control" id="customerNpwp" name="npwp" placeholder="00.000.000.0-000.000" maxlength="20">
+                        <input type="text" class="form-control @error('npwp') is-invalid @enderror" id="customerNpwp" name="npwp" placeholder="00.000.000.0-000.000" maxlength="20">
+                        @error('npwp')<div class="invalid-feedback">{{ $message }}</div>@enderror
                     </div>
                     <div class="mb-3">
                         <label class="form-label">{{ __('messages.customer_pkp_status') }}</label>
@@ -91,11 +98,13 @@
                     </div>
                     <div class="mb-3">
                         <label for="customerPkpDate" class="form-label">{{ __('messages.customer_pkp_date') }}</label>
-                        <input type="date" class="form-control" id="customerPkpDate" name="pkp_date">
+                        <input type="date" class="form-control @error('pkp_date') is-invalid @enderror" id="customerPkpDate" name="pkp_date">
+                        @error('pkp_date')<div class="invalid-feedback">{{ $message }}</div>@enderror
                     </div>
                     <div class="mb-3">
                         <label for="customerAlamatNpwp" class="form-label">{{ __('messages.customer_alamat_npwp') }}</label>
-                        <textarea class="form-control" id="customerAlamatNpwp" name="alamat_npwp" rows="2"></textarea>
+                        <textarea class="form-control @error('alamat_npwp') is-invalid @enderror" id="customerAlamatNpwp" name="alamat_npwp" rows="2"></textarea>
+                        @error('alamat_npwp')<div class="invalid-feedback">{{ $message }}</div>@enderror
                     </div>
                     @endif
                 </div>
@@ -116,45 +125,52 @@
                 <h5 class="modal-title" id="editCustomerModalLabel"><i class="ti ti-edit me-1"></i> {{ __('messages.customer_modal_edit_title') }}</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <form id="editCustomerForm" method="POST" enctype="multipart/form-data">
+            <form id="editCustomerForm" method="POST" enctype="multipart/form-data" novalidate data-validate-form>
                 @csrf
                 @method('PUT')
                 <div class="modal-body">
                     <input type="hidden" id="customerId" name="id">
                     <div class="mb-3">
                         <label for="customerNameEdit" class="form-label">{{ __('messages.table_name') }}</label>
-                        <input type="text" class="form-control" id="customerNameEdit" name="name">
+                        <input type="text" class="form-control @error('name') is-invalid @enderror" id="customerNameEdit" name="name" required>
+                        @error('name')<div class="invalid-feedback">{{ $message }}</div>@enderror
                     </div>
                     <div class="mb-3">
                         <label for="customerAddressEdit" class="form-label">{{ __('messages.table_address') }}</label>
-                        <input type="text" class="form-control" id="customerAddressEdit" name="address">
+                        <input type="text" class="form-control @error('address') is-invalid @enderror" id="customerAddressEdit" name="address">
+                        @error('address')<div class="invalid-feedback">{{ $message }}</div>@enderror
                     </div>
                     <div class="mb-3">
                         <label for="customerPhoneEdit" class="form-label">{{ __('messages.supplier_modal_phone_number') }}</label>
-                        <input type="text" class="form-control" id="customerPhoneEdit" name="phone_number">
+                        <input type="text" class="form-control @error('phone_number') is-invalid @enderror" id="customerPhoneEdit" name="phone_number">
+                        @error('phone_number')<div class="invalid-feedback">{{ $message }}</div>@enderror
                     </div>
                     <div class="mb-3">
                         <label for="customerEmailEdit" class="form-label">{{ __('messages.table_email') }}</label>
-                        <input type="email" class="form-control" id="customerEmailEdit" name="email">
+                        <input type="email" class="form-control @error('email') is-invalid @enderror" id="customerEmailEdit" name="email">
+                        @error('email')<div class="invalid-feedback">{{ $message }}</div>@enderror
                     </div>
                     <div class="mb-3 text-center" id="currentCustomerImageContainer">
                         {{-- Image or icon will be displayed here by JavaScript --}}
                     </div>
                     <div class="mb-3">
                         <label for="customerImageEdit" class="form-label">{{ __('messages.table_image') }}</label>
-                        <input type="file" class="form-control" id="customerImageEdit" name="image">
+                        <input type="file" class="form-control @error('image') is-invalid @enderror" id="customerImageEdit" name="image">
+                        @error('image')<div class="invalid-feedback">{{ $message }}</div>@enderror
                     </div>
                     <div class="mb-3">
                         <label for="customerPaymentTermsEdit" class="form-label">{{ __('messages.table_payment_terms') }}</label>
-                        <input type="text" class="form-control" id="customerPaymentTermsEdit"
+                        <input type="text" class="form-control @error('payment_terms') is-invalid @enderror" id="customerPaymentTermsEdit"
                             name="payment_terms">
+                        @error('payment_terms')<div class="invalid-feedback">{{ $message }}</div>@enderror
                     </div>
                     @if($showPpnFields)
                     <hr class="my-3">
                     <h6 class="mb-3 text-muted"><i class="ti ti-file-invoice me-1"></i>{{ __('messages.customer_tax_data') }}</h6>
                     <div class="mb-3">
                         <label for="customerNpwpEdit" class="form-label">{{ __('messages.customer_npwp') }}</label>
-                        <input type="text" class="form-control" id="customerNpwpEdit" name="npwp" placeholder="00.000.000.0-000.000" maxlength="20">
+                        <input type="text" class="form-control @error('npwp') is-invalid @enderror" id="customerNpwpEdit" name="npwp" placeholder="00.000.000.0-000.000" maxlength="20">
+                        @error('npwp')<div class="invalid-feedback">{{ $message }}</div>@enderror
                     </div>
                     <div class="mb-3">
                         <label class="form-label">{{ __('messages.customer_pkp_status') }}</label>
@@ -165,11 +181,13 @@
                     </div>
                     <div class="mb-3">
                         <label for="customerPkpDateEdit" class="form-label">{{ __('messages.customer_pkp_date') }}</label>
-                        <input type="date" class="form-control" id="customerPkpDateEdit" name="pkp_date">
+                        <input type="date" class="form-control @error('pkp_date') is-invalid @enderror" id="customerPkpDateEdit" name="pkp_date">
+                        @error('pkp_date')<div class="invalid-feedback">{{ $message }}</div>@enderror
                     </div>
                     <div class="mb-3">
                         <label for="customerAlamatNpwpEdit" class="form-label">{{ __('messages.customer_alamat_npwp') }}</label>
-                        <textarea class="form-control" id="customerAlamatNpwpEdit" name="alamat_npwp" rows="2"></textarea>
+                        <textarea class="form-control @error('alamat_npwp') is-invalid @enderror" id="customerAlamatNpwpEdit" name="alamat_npwp" rows="2"></textarea>
+                        @error('alamat_npwp')<div class="invalid-feedback">{{ $message }}</div>@enderror
                     </div>
                     @endif
                 </div>

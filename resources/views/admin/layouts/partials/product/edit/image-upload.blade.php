@@ -9,7 +9,8 @@
                 <img src="{{ asset($products->image) }}" alt="{{ __('messages.pos_product_image') }}" class="rounded border shadow-sm" width="200">
             @endif
         </div>
-        <input type="file" name="image" class="form-control">
+        <input type="file" name="image" id="image" class="form-control @error('image') is-invalid @enderror">
+        @error('image')<div class="invalid-feedback">{{ $message }}</div>@enderror
         <small class="text-muted">{{ __('messages.upload_new_image_replace_current') }}</small>
     </div>
 </div>

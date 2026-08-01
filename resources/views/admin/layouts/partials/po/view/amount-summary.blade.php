@@ -31,6 +31,16 @@
             {{ \App\Helpers\CurrencyHelper::format($taxAmount) }}
         </div>
     </div>
+    @php
+        $currentTenant = app('currentTenant');
+        $showPph = $currentTenant instanceof \App\Models\Tenant && $currentTenant->isIndonesian() && $currentTenant->hasFeature('ppn');
+    @endphp
+    @if($showPph && $pos->isPph())
+    <div class="d-flex justify-content-between mb-2">
+        <span class="text-muted">{{ __('messages.withholding_tax') }} ({{ $pos->pph_rate }}%)</span>
+        <span class="fw-bold text-danger">-{{ \App\Helpers\CurrencyHelper::format($pos->pph_amount) }}</span>
+    </div>
+    @endif
     <hr class="border-primary">
 
     <div class="d-flex justify-content-between align-items-center mb-3">

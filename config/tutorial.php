@@ -410,7 +410,7 @@ return [
             'title' => 'tutorial.system_settings',
             'icon'  => 'ti-settings',
             'desc'  => 'tutorial.system_settings_desc',
-            'steps' => ['tutorial.interface_layout', 'tutorial.theme_config', 'tutorial.notifications', 'tutorial.session_security', 'tutorial.performance', 'tutorial.language_localization', 'tutorial.advanced_options'],
+            'steps' => ['tutorial.interface_layout', 'tutorial.theme_config', 'tutorial.notifications', 'tutorial.session_security', 'tutorial.performance', 'tutorial.language_localization', 'tutorial.tax_region', 'tutorial.advanced_options'],
         ],
         'admin.accounting.ledger*' => [
             'title' => 'tutorial.general_ledger',

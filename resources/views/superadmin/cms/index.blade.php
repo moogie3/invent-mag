@@ -234,11 +234,13 @@
                     <div class="card-body">
                         <div class="mb-3">
                             <label class="form-label">Contact Email</label>
-                            <input type="email" name="contact_email" class="form-control" value="{{ $content['contact_email'] }}" maxlength="255">
+                            <input type="email" name="contact_email" class="form-control @error('contact_email') is-invalid @enderror" value="{{ $content['contact_email'] }}" maxlength="255">
+                            @error('contact_email')<div class="invalid-feedback">{{ $message }}</div>@enderror
                         </div>
                         <div class="mb-3">
                             <label class="form-label">Footer Text</label>
-                            <input type="text" name="footer_text" class="form-control" value="{{ $content['footer_text'] }}" maxlength="500">
+                            <input type="text" name="footer_text" class="form-control @error('footer_text') is-invalid @enderror" value="{{ $content['footer_text'] }}" maxlength="500">
+                            @error('footer_text')<div class="invalid-feedback">{{ $message }}</div>@enderror
                         </div>
                     </div>
                     <div class="card-footer d-flex justify-content-end border-top">

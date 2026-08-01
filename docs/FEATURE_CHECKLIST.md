@@ -1,7 +1,7 @@
 # Invent-MAG: Complete Feature Checklist
 
 **Last Updated:** July 2026  
-**Version:** 2.2  
+**Version:** 2.5  
 **System Version:** 2.1
 
 ---
@@ -17,7 +17,7 @@
 - [x] Resend API Email integration
 - [x] User authentication (Laravel Fortify)
 - [x] Email verification required
-- [x] Role-based access control (79 permissions, 3 roles)
+- [x] Role-based access control (101 permissions, 3 roles)
 - [x] API authentication (Laravel Sanctum)
 - [x] Password security (bcrypt hashing)
 - [x] Session management
@@ -373,7 +373,7 @@
 
 - [x] User CRUD
 - [x] Role assignment (Superuser, Staff, POS)
-- [x] Granular permissions (79)
+- [x] Granular permissions (101)
 - [x] Email verification
 - [x] Password reset
 - [x] Profile management
@@ -521,13 +521,13 @@
 ### 🧪 Testing
 
 - [x] PHPUnit 11+ configured
-- [x] 791 test files (42 Feature + 48 Unit PHP, 171 JS)
+- [x] 552 PHP test methods / 2541 PHP assertions (42 Feature + 56 Unit PHP, 169 JS Vitest files)
 - [x] Feature tests (controllers, routes)
 - [x] Unit tests (services, helpers)
 - [x] Multi-tenancy tests
 - [x] Tenant creation trait
 - [x] Parallel testing support
-- [x] Vitest for frontend (171 JS test files)
+- [x] Vitest for frontend (169 JS test files)
 
 ---
 
@@ -590,7 +590,11 @@
 - [x] Alpine.js interactions
 - [x] Tabler UI components
 - [x] Modal dialogs
-- [x] Form validation
+- [x] Form validation — **global standardized system** (`resources/js/admin/utils/formValidator.js`)
+  - [x] All admin forms carry `novalidate data-validate-form` (browser native popups disabled)
+  - [x] Capture-phase submit listener runs before Turbo — validates all `[required]` fields
+  - [x] Highlights **every** empty required field with `is-invalid` + shows InventMagApp `'Warning'` toast + focuses first invalid field
+  - [x] Custom JS handlers guard with `if (e.defaultPrevented) return;` so validation failures stop submission
 - [x] Toast notifications
 - [x] Auth-specific session error/success modals
 - [x] Loading states
@@ -610,18 +614,23 @@
 
 - [ ] Bank reconciliation
 - [ ] Advanced multi-currency (real-time rates)
+- [ ] e-Faktur Phase 2: PJAP API (Klikpajak direct DJP submission)
 
 ### Medium Priority
 
 - [x] **Indonesian tax compliance (PPN 11%)** — Phase 1 complete (see e-Faktur section below)
 - [x] **e-Faktur CSV export** — DJP FK/OF format with UTF-8 BOM, amounts in cents
-- [ ] SPT report templates
+- [ ] SPT report templates (SPT Masa PPN) — PPN Keluaran summary exists; requires PPN Masukan/input VAT tracking on Purchase Invoices first (POs carry no tax by design)
 - [ ] Bank integrations (BCA, BNI, Mandiri)
+- [ ] WhatsApp invoice delivery
+- [ ] Midtrans payment links on invoices
 
 ### Low Priority
 
-- [ ] PPh support (21, 22, 23, 25)
-- [ ] WhatsApp integration
+- [x] PPh 23 (Withholding Tax on services) — completed via seeded `is_pph` Tax record (2%)
+- [ ] PPh 21 (employee withholding) — UMKM-flat "Payroll Tax" picker on payroll screen (withholding line in payment journal); explicitly NOT a full TER/PTKP/1721-II engine
+- [ ] PPh 22 (goods withholding) — trivial: seed a `PPH 22` Tax record (1.5%, `is_pph = true`); flows through existing PPh dropdowns + shared PPh Payable (2150) unchanged
+- [ ] PPh 25 (installment tax payments) — deferred; manual journal entry suffices for UMKM
 - [ ] Mobile app (React Native/Flutter)
 - [ ] Advanced BI dashboards
 
@@ -632,21 +641,23 @@
 | Metric               | Value     |
 | -------------------- | --------- |
 | **Total Features**   | 220+      |
-| **Controllers**      | 32        |
-| **Services**         | 35        |
-| **Models**           | 38        |
-| **Helpers**          | 8         |
-| **Test Files**       | 791       |
+| **Controllers**      | 62        |
+| **Services**         | 46        |
+| **Models**           | 51        |
+| **Helpers**          | 6         |
+| **Test Methods (PHP)** | 552      |
+| **Test Assertions (PHP)** | 2541   |
+| **JS Test Files**    | 169       |
 | **API Endpoints**    | 50+       |
-| **Database Tables**  | 43        |
-| **Migrations**       | 49        |
-| **Seeders**          | 26        |
-| **Permissions**      | 79        |
+| **Database Tables**  | 55        |
+| **Migrations**       | 100+      |
+| **Seeders**          | 36        |
+| **Permissions**      | 101       |
 | **Routes**           | 220+      |
-| **JavaScript Files** | 161       |
+| **JavaScript Files** | 189       |
 | **Languages**        | 2 (EN/ID) |
 | **Development Time** | 1.5 years |
-| **Total Commits**    | 451+      |
+| **Total Commits**    | 527+      |
 
 ---
 
@@ -656,12 +667,12 @@
 2. **Complete Accounting** - Double-entry with manual journal entries
 3. **Multi-tenant SaaS** - True isolation, single codebase
 4. **Sales Pipeline** - Kanban with forecasting
-5. **791 Test Files** - Enterprise-grade testing (PHP + JS)
+5. **552 PHP Tests / 2541 Assertions + 169 Vitest Files** - Enterprise-grade testing (PHP + JS)
 6. **Docker + CI/CD** - Modern DevOps ready
 7. **Comprehensive Audit Trail** - Security and accounting
 8. **Contextual Tutorial System** - 50+ page-specific help guides with drill-down navigation - users click a topic category, see all pages in that category, click one to navigate there with its contextual tutorial auto-opened
 
 ---
 
-**Document Version:** 2.2  
+**Document Version:** 2.5  
 **Last Updated:** July 2026

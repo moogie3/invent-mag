@@ -34,7 +34,7 @@
                                 <h3 class="card-title">{{ __('messages.stock_opname_details') }}</h3>
                             </div>
                             <div class="card-body">
-                                <form action="{{ route('admin.stock-opname.store') }}" method="POST">
+                                <form action="{{ route('admin.stock-opname.store') }}" method="POST" novalidate data-validate-form>
                                     @csrf
                                     
                                     <div class="mb-3">

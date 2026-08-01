@@ -4,7 +4,7 @@
             <div class="col-md-12">
                 <div class="card shadow-sm border-0 rounded-3">
                     <div class="card-body">
-                        <form method="POST" action="{{ route('admin.quotations.store') }}" id="quotationForm">
+                        <form method="POST" action="{{ route('admin.quotations.store') }}" id="quotationForm" novalidate data-validate-form>
                             @csrf
                             @include('admin.quotations.partials.form.quotation-info')
                             @include('admin.quotations.partials.form.quotation-items')

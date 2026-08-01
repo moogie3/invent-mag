@@ -36,6 +36,19 @@
             {!! \App\Helpers\PurchaseHelper::getStatusText($po->status, $po->due_date) !!}
         </span>
     </td>
+    @php
+        $currentTenant = app('currentTenant');
+        $showPpnCol = $currentTenant instanceof \App\Models\Tenant && $currentTenant->isIndonesian() && $currentTenant->hasFeature('ppn');
+    @endphp
+    @if($showPpnCol)
+    <td>
+        @if($po->isPph())
+            <span class="badge bg-orange-lt">{{ __('messages.withholding_tax') }} {{ $po->pph_rate }}%</span>
+        @else
+            <span class="text-muted">-</span>
+        @endif
+    </td>
+    @endif
     <td class="no-print" style="text-align:center">
         @include('admin.layouts.partials.po.index.table-actions', ['po' => $po])
     </td>

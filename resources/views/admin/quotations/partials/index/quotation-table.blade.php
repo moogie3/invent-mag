@@ -21,6 +21,15 @@
                 <th class="sortable" data-sort="tax_amount">
                     <button class="table-sort">{{ __('messages.tax') }}</button>
                 </th>
+                @php
+                    $currentTenant = app('currentTenant');
+                    $showPpnCol = $currentTenant instanceof \App\Models\Tenant && $currentTenant->isIndonesian() && $currentTenant->hasFeature('ppn');
+                @endphp
+                @if($showPpnCol)
+                <th class="sortable" data-sort="pph_amount">
+                    <button class="table-sort">{{ __('messages.pph_status') }}</button>
+                </th>
+                @endif
                 <th class="sortable" data-sort="status">
                     <button class="table-sort">{{ __('messages.quotation_status') }}</button>
                 </th>
@@ -47,6 +56,15 @@
                         <span class="text-muted">-</span>
                     @endif
                 </td>
+                @if($showPpnCol)
+                <td>
+                    @if(($q->pph_enabled ?? false) && ($q->pph_amount ?? 0) > 0)
+                        <span class="badge bg-orange-lt">{{ __('messages.withholding_tax') }} {{ $q->pph_rate }}%</span>
+                    @else
+                        <span class="text-muted">-</span>
+                    @endif
+                </td>
+                @endif
                 <td>
                     @php
                         $statusClasses = [
@@ -109,7 +127,7 @@
             </tr>
             @empty
             <tr>
-                <td colspan="9" class="py-4 text-muted">{{ __('messages.no_data') }}</td>
+                <td colspan="10" class="py-4 text-muted">{{ __('messages.no_data') }}</td>
             </tr>
             @endforelse
         </tbody>

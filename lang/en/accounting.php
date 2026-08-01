@@ -36,6 +36,10 @@ return [
             'name' => 'Input VAT',
             'description' => 'Value Added Tax paid on purchases.',
         ],
+        'pph_receivable' => [
+            'name' => 'PPh Receivable',
+            'description' => 'Withholding tax receivable from customers (tax credit to be claimed from DJP).',
+        ],
         'fixed_assets' => [
             'name' => 'Fixed Assets',
         ],
@@ -182,6 +186,10 @@ return [
         'salary_payable' => [
             'name' => 'Salary Payable',
             'description' => 'Accrued salary liability to employees.',
+        ],
+        'pph_payable' => [
+            'name' => 'PPh 23 Payable',
+            'description' => 'Withholding tax payable to DJP (tax withheld from vendor payments).',
         ],
     ],
 ];

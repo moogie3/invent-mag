@@ -62,6 +62,11 @@ class Sales extends Model
         'ppn_enabled',
         'ppn_rate',
         'ppn_amount',
+        // PPh / Withholding Tax
+        'pph_enabled',
+        'pph_rate',
+        'pph_amount',
+        'pph_tax_id',
     ];
 
     protected $guarded = [
@@ -139,17 +144,31 @@ class Sales extends Model
         return $this->belongsTo(Tax::class, 'tax_id');
     }
 
+    public function pphTax(): BelongsTo
+    {
+        return $this->belongsTo(Tax::class, 'pph_tax_id');
+    }
+
     /**
      * Determine if this sale uses a PPN (Indonesian VAT) tax.
-     * Source of truth is the Tax model's is_ppn flag via the relationship.
-     * Falls back to the snapshot ppn_enabled field if tax relationship is not loaded.
+     * Always reads from the stored snapshot ppn_enabled field.
+     * Never reads from the live Tax.is_ppn relationship — the snapshot is the source of truth
+     * for historical records. If a tax record's is_ppn flag is later changed, it must NOT
+     * retroactively affect existing sales.
      */
     public function isPpn(): bool
     {
-        if ($this->relationLoaded('tax') && $this->tax) {
-            return $this->tax->is_ppn;
-        }
         return (bool) $this->ppn_enabled;
+    }
+
+    /**
+     * Determine if this sale has PPh (withholding tax) applied.
+     * Always reads from the stored snapshot pph_enabled field.
+     * Never reads from the live Tax.is_pph relationship.
+     */
+    public function isPph(): bool
+    {
+        return (bool) $this->pph_enabled;
     }
 
     public function payments()
@@ -175,7 +194,8 @@ class Sales extends Model
                 $this->order_discount,
                 $this->order_discount_type,
                 $this->tax_rate,
-                $this->tax_type ?? 'exclusive'
+                $this->tax_type ?? 'exclusive',
+                $this->pph_rate ?? 0
             );
             return round($summary['finalTotal'], 2);
         }
@@ -243,7 +263,8 @@ class Sales extends Model
             $this->order_discount_type ?? 'fixed',
             $this->tax_rate ?? 0,
             $this->salesReturns,
-            $this->tax_type ?? 'exclusive'
+            $this->tax_type ?? 'exclusive',
+            $this->pph_rate ?? 0
         );
 
         return $summary['finalTotal'];
@@ -266,6 +287,10 @@ class Sales extends Model
         'ppn_enabled' => 'boolean',
         'ppn_rate'    => 'float',
         'ppn_amount'  => 'float',
+        // PPh / Withholding Tax
+        'pph_enabled' => 'boolean',
+        'pph_rate'    => 'float',
+        'pph_amount'  => 'float',
     ];
 
     // Explicitly define the factory for the model

@@ -42,6 +42,7 @@ class AccountSeeder extends Seeder
                             ['name' => 'accounting.accounts.inventory.name', 'code' => '1140-' . $tenantId, 'type' => 'asset', 'level' => 2, 'description' => 'accounting.accounts.inventory.description'],
                             ['name' => 'accounting.accounts.prepaid_expenses.name', 'code' => '1150-' . $tenantId, 'type' => 'asset', 'level' => 2, 'description' => 'accounting.accounts.prepaid_expenses.description'],
                             ['name' => 'accounting.accounts.input_vat.name', 'code' => '1160-' . $tenantId, 'type' => 'asset', 'level' => 2, 'description' => 'accounting.accounts.input_vat.description'],
+                            ['name' => 'accounting.accounts.pph_receivable.name', 'code' => '1170-' . $tenantId, 'type' => 'asset', 'level' => 2, 'description' => 'accounting.accounts.pph_receivable.description'],
                         ]
                     ],
                     ['name' => 'accounting.accounts.fixed_assets.name', 'code' => '1200-' . $tenantId, 'type' => 'asset', 'level' => 1,
@@ -65,6 +66,7 @@ class AccountSeeder extends Seeder
                             ['name' => 'accounting.accounts.accrued_expenses.name', 'code' => '2120-' . $tenantId, 'type' => 'liability', 'level' => 2, 'description' => 'accounting.accounts.accrued_expenses.description'],
                             ['name' => 'accounting.accounts.output_vat.name', 'code' => '2130-' . $tenantId, 'type' => 'liability', 'level' => 2, 'description' => 'accounting.accounts.output_vat.description'],
                             ['name' => 'accounting.accounts.salary_payable.name', 'code' => '2140-' . $tenantId, 'type' => 'liability', 'level' => 2, 'description' => 'accounting.accounts.salary_payable.description'],
+                            ['name' => 'accounting.accounts.pph_payable.name', 'code' => '2150-' . $tenantId, 'type' => 'liability', 'level' => 2, 'description' => 'accounting.accounts.pph_payable.description'],
                         ]
                     ],
                     ['name' => 'accounting.accounts.long_term_liabilities.name', 'code' => '2200-' . $tenantId, 'type' => 'liability', 'level' => 1,
@@ -158,6 +160,8 @@ class AccountSeeder extends Seeder
             'accounts_payable_account_id'    => Account::where('tenant_id', $tenantId)->where('code', '2110-' . $codePrefix)->value('id'),
             'cash_account_id'                => Account::where('tenant_id', $tenantId)->where('code', '1110-' . $codePrefix)->value('id'),
             'ppn_keluaran_account_id'        => Account::where('tenant_id', $tenantId)->where('code', '2130-' . $codePrefix)->value('id'),
+            'pph_receivable_account_id'      => Account::where('tenant_id', $tenantId)->where('code', '1170-' . $codePrefix)->value('id'),
+            'pph_payable_account_id'         => Account::where('tenant_id', $tenantId)->where('code', '2150-' . $codePrefix)->value('id'),
         ];
 
         $tenant->accounting_settings = $accountSettings;

@@ -147,19 +147,11 @@ class SettingsController extends Controller
 
         // Block switching away from ID if draft FakturPajak or unissued PPN sales exist
         if ($tenant->tax_jurisdiction === 'ID' && $jurisdiction !== 'ID') {
-            $hasDraftFaktur = \App\Models\FakturPajak::where('tenant_id', $tenant->id)
-                ->where('status', 'draft')
-                ->exists();
-            $hasUnissuedPpn = \App\Models\Sales::where('tenant_id', $tenant->id)
-                ->where('ppn_enabled', true)
-                ->where('ppn_amount', '>', 0)
-                ->where('faktur_pajak_id', null)
-                ->exists();
-
-            if ($hasDraftFaktur || $hasUnissuedPpn) {
+            $check = $tenant->canDisableIndonesianJurisdiction();
+            if (! $check['safe']) {
                 return response()->json([
                     'success' => false,
-                    'message' => __('messages.efaktur_cannot_disable_with_drafts'),
+                    'message' => $check['message'],
                 ], 422);
             }
         }

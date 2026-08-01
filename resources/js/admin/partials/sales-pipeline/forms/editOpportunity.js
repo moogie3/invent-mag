@@ -28,6 +28,7 @@ export function initEditOpportunityForm() {
     editOpportunityFormListenerAttached = true;
 
     editOpportunityForm.addEventListener("submit", async function (e) {
+        if (e.defaultPrevented) return;
         e.preventDefault();
 
         const opportunityId =

@@ -134,6 +134,7 @@ class SalesHelperTest extends TestCase
             'totalProductDiscount' => 0.0,
             'orderDiscount' => 0.0,
             'taxAmount' => 0.0,
+            'pphAmount' => 0.0,
             'finalTotal' => 0.0,
         ], $summary);
     }
@@ -151,6 +152,7 @@ class SalesHelperTest extends TestCase
             'totalProductDiscount' => 0.0,
             'orderDiscount' => 0.0,
             'taxAmount' => 0.0,
+            'pphAmount' => 0.0,
             'finalTotal' => 100.0,
         ], $summary);
     }
@@ -175,6 +177,7 @@ class SalesHelperTest extends TestCase
             'totalProductDiscount' => 20.0, // 10% of 100 = 10, fixed 5 * 2 = 10. Total 20.
             'orderDiscount' => 18.0,
             'taxAmount' => 16.2,
+            'pphAmount' => 0.0,
             'finalTotal' => 178.2,
         ], $summary);
     }
@@ -192,8 +195,49 @@ class SalesHelperTest extends TestCase
             'totalProductDiscount' => 0.0,
             'orderDiscount' => 0.0,
             'taxAmount' => 0.0,
+            'pphAmount' => 0.0,
             'finalTotal' => 100.0,
         ], $summary);
+    }
+
+    // Test cases for PPh in calculateInvoiceSummary
+    #[Test]
+    public function it_calculates_invoice_summary_with_pph_only()
+    {
+        $items = [
+            (object)['customer_price' => 1000, 'quantity' => 1, 'discount' => 0, 'discount_type' => 'fixed']
+        ];
+        $summary = SalesHelper::calculateInvoiceSummary($items, 0, 'fixed', 0, 'exclusive', 2);
+        // Taxable = 1000, PPh = 20, no regular tax
+        // finalTotal = 1000 - 20 = 980
+        $this->assertEquals(20.0, $summary['pphAmount']);
+        $this->assertEquals(980.0, $summary['finalTotal']);
+    }
+
+    #[Test]
+    public function it_calculates_invoice_summary_with_ppn_and_pph()
+    {
+        $items = [
+            (object)['customer_price' => 1000, 'quantity' => 1, 'discount' => 0, 'discount_type' => 'fixed']
+        ];
+        $summary = SalesHelper::calculateInvoiceSummary($items, 0, 'fixed', 11, 'exclusive', 2);
+        // Taxable = 1000, PPN = 110, PPh = 20
+        // finalTotal = 1000 + 110 - 20 = 1090
+        $this->assertEquals(110.0, $summary['taxAmount']);
+        $this->assertEquals(20.0, $summary['pphAmount']);
+        $this->assertEquals(1090.0, $summary['finalTotal']);
+    }
+
+    #[Test]
+    public function it_calculates_invoice_summary_with_pph_default_rate_zero()
+    {
+        $items = [
+            (object)['customer_price' => 1000, 'quantity' => 1, 'discount' => 0, 'discount_type' => 'fixed']
+        ];
+        // Default pphRate is 0
+        $summary = SalesHelper::calculateInvoiceSummary($items, 0, 'fixed', 0, 'exclusive');
+        $this->assertEquals(0.0, $summary['pphAmount']);
+        $this->assertEquals(1000.0, $summary['finalTotal']);
     }
 
     // Test cases for getStatusClass (reused from PurchaseHelperTest)

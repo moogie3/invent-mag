@@ -8,6 +8,7 @@ export function initEditUserFormSubmission() {
     editUserForm.dataset.listenerAttached = 'true';
     
     editUserForm.addEventListener("submit", function (event) {
+        if (event.defaultPrevented) return;
         event.preventDefault();
 
         const formData = new FormData(this);
@@ -82,9 +83,9 @@ export function initEditUserFormSubmission() {
                         Object.keys(data.errors).forEach((key) => {
                             errorMessage += `- ${data.errors[key].join(", ")}\n`;
                         });
-                        InventMagApp.showToast("Error", errorMessage, "error");
+                        InventMagApp.showToast("Warning", errorMessage, "warning");
                     } else {
-                        InventMagApp.showToast("Error", data.message || "Failed to update user.", "error");
+                        InventMagApp.showToast("Warning", data.message || "Failed to update user.", "warning");
                     }
                 }
             })

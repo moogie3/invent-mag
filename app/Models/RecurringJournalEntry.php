@@ -2,14 +2,15 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\BelongsToTenant;
+use App\Services\AccountingService;
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use App\Models\Concerns\BelongsToTenant;
-use Carbon\Carbon;
 
 class RecurringJournalEntry extends Model
 {
-    use HasFactory, BelongsToTenant;
+    use BelongsToTenant, HasFactory;
 
     protected $fillable = [
         'tenant_id',
@@ -37,9 +38,13 @@ class RecurringJournalEntry extends Model
     ];
 
     public const FREQUENCY_DAILY = 'daily';
+
     public const FREQUENCY_WEEKLY = 'weekly';
+
     public const FREQUENCY_MONTHLY = 'monthly';
+
     public const FREQUENCY_QUARTERLY = 'quarterly';
+
     public const FREQUENCY_YEARLY = 'yearly';
 
     public function creator()
@@ -54,12 +59,13 @@ class RecurringJournalEntry extends Model
                 ->where('tenant_id', $this->tenant_id)
                 ->first();
         }
+
         return null;
     }
 
     public function isDueForGeneration(): bool
     {
-        if (!$this->is_active) {
+        if (! $this->is_active) {
             return false;
         }
 
@@ -91,17 +97,17 @@ class RecurringJournalEntry extends Model
         }
     }
 
-    public function generateJournalEntry(Account $templateAccount = null): ?JournalEntry
+    public function generateJournalEntry(?Account $templateAccount = null): ?JournalEntry
     {
-        if (!$this->isDueForGeneration()) {
+        if (! $this->isDueForGeneration()) {
             return null;
         }
 
-        $accountingService = app(\App\Services\AccountingService::class);
+        $accountingService = app(AccountingService::class);
 
         $description = $this->name;
         if ($templateAccount) {
-            $description .= ' - ' . $templateAccount->name;
+            $description .= ' - '.$templateAccount->name;
         }
 
         $transactions = [];
@@ -139,7 +145,7 @@ class RecurringJournalEntry extends Model
             ->whereDate('next_generation_date', '<=', now())
             ->where(function ($q) {
                 $q->whereNull('end_date')
-                  ->orWhereDate('end_date', '>=', now());
+                    ->orWhereDate('end_date', '>=', now());
             });
     }
 }

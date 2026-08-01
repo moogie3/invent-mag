@@ -40,8 +40,8 @@ return new class extends Migration
 
             // Status lifecycle: draft → submitted → approved/rejected
             $table->enum('status', ['draft', 'submitted', 'approved', 'rejected', 'amended', 'cancelled'])
-                  ->default('draft')
-                  ->index();
+                ->default('draft')
+                ->index();
 
             // DJP / PJAP submission tracking (Phase 2 fields, nullable for Phase 1)
             $table->string('djp_reference_number', 50)->nullable();

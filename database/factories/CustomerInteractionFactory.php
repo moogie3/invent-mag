@@ -2,7 +2,9 @@
 
 namespace Database\Factories;
 
+use App\Models\Customer;
 use App\Models\CustomerInteraction;
+use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 class CustomerInteractionFactory extends Factory
@@ -22,8 +24,8 @@ class CustomerInteractionFactory extends Factory
     public function definition()
     {
         return [
-            'customer_id' => \App\Models\Customer::factory(),
-            'user_id' => \App\Models\User::factory(),
+            'customer_id' => Customer::factory(),
+            'user_id' => User::factory(),
             'type' => $this->faker->randomElement(['call', 'email', 'meeting', 'note']),
             'notes' => $this->faker->paragraph,
             'interaction_date' => $this->faker->dateTimeBetween('-1 year', 'now'),

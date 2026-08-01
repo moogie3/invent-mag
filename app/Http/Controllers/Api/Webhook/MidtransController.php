@@ -9,6 +9,8 @@ use App\Services\BillingService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
+use Midtrans\Config;
+use Spatie\Multitenancy\Models\Tenant;
 
 // Load Midtrans SDK (Non-namespaced)
 require_once base_path('vendor/midtrans/midtrans-php/Midtrans.php');
@@ -20,8 +22,8 @@ class MidtransController extends Controller
     public function __construct(BillingService $billingService)
     {
         $this->billingService = $billingService;
-        \Midtrans\Config::$isProduction = config('midtrans.is_production', false);
-        \Midtrans\Config::$serverKey = config('midtrans.server_key');
+        Config::$isProduction = config('midtrans.is_production', false);
+        Config::$serverKey = config('midtrans.server_key');
     }
 
     public function handle(Request $request)
@@ -35,31 +37,34 @@ class MidtransController extends Controller
         $signatureKey = $payload['signature_key'] ?? null;
         $transactionStatus = $payload['transaction_status'] ?? null;
 
-        if (!$orderId || !$statusCode || !$grossAmount || !$signatureKey) {
+        if (! $orderId || ! $statusCode || ! $grossAmount || ! $signatureKey) {
             return response()->json(['message' => 'Invalid payload'], 400);
         }
 
         // Verify Signature Key
         $serverKey = config('midtrans.server_key', env('MIDTRANS_SERVER_KEY'));
-        $calculatedSignature = hash("sha512", $orderId . $statusCode . $grossAmount . $serverKey);
+        $calculatedSignature = hash('sha512', $orderId.$statusCode.$grossAmount.$serverKey);
 
         if ($calculatedSignature !== $signatureKey) {
             Log::error('Midtrans Webhook: Invalid signature', [
                 'expected' => $calculatedSignature,
-                'received' => $signatureKey
+                'received' => $signatureKey,
             ]);
+
             return response()->json(['message' => 'Invalid signature'], 403);
         }
 
         $order = SubscriptionOrder::where('order_number', $orderId)->first();
 
-        if (!$order) {
+        if (! $order) {
             Log::error("Midtrans Webhook: Order not found ({$orderId})");
+
             return response()->json(['message' => 'Order not found'], 404);
         }
 
         if ($order->status === 'paid') {
             Log::info("Order {$orderId} already processed, skipping webhook.");
+
             return response()->json(['message' => 'Order already processed']);
         }
 
@@ -83,12 +88,12 @@ class MidtransController extends Controller
                 Log::info("Invoice email sent to {$recipientEmail} for order {$orderId}.");
             }
 
-            \Spatie\Multitenancy\Models\Tenant::forgetCurrent();
+            Tenant::forgetCurrent();
 
         } elseif ($transactionStatus == 'cancel' || $transactionStatus == 'deny' || $transactionStatus == 'expire') {
             $order->update([
                 'status' => 'failed',
-                'payment_info' => $payload
+                'payment_info' => $payload,
             ]);
             Log::info("Order {$orderId} failed or expired.");
         }

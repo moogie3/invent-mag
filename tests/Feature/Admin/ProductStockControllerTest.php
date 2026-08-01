@@ -2,21 +2,23 @@
 
 namespace Tests\Feature\Admin;
 
-use App\Models\User;
 use App\Models\Product;
 use App\Models\ProductWarehouse;
+use App\Models\User;
 use App\Models\Warehouse;
-use Tests\TestCase;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Tests\Traits\CreatesTenant;
 use Database\Seeders\RoleSeeder;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\TestCase;
+use Tests\Traits\CreatesTenant;
 
 class ProductStockControllerTest extends TestCase
 {
-    use RefreshDatabase, CreatesTenant;
+    use CreatesTenant, RefreshDatabase;
 
     protected User $user;
+
     protected Product $product;
+
     protected Warehouse $warehouse;
 
     protected function setUp(): void
@@ -40,7 +42,7 @@ class ProductStockControllerTest extends TestCase
 
     public function test_it_can_get_main_stock()
     {
-        $response = $this->get('/admin/product/' . $this->product->id . '/main-stock');
+        $response = $this->get('/admin/product/'.$this->product->id.'/main-stock');
 
         $response->assertStatus(200);
         $response->assertJson([
@@ -51,7 +53,7 @@ class ProductStockControllerTest extends TestCase
 
     public function test_it_can_get_warehouse_stock()
     {
-        $response = $this->get('/admin/product/' . $this->product->id . '/warehouse-stock/' . $this->warehouse->id);
+        $response = $this->get('/admin/product/'.$this->product->id.'/warehouse-stock/'.$this->warehouse->id);
 
         $response->assertStatus(200);
         $response->assertJson([
@@ -107,7 +109,7 @@ class ProductStockControllerTest extends TestCase
 
     public function test_it_can_get_all_warehouse_stock()
     {
-        $response = $this->get('/admin/product/' . $this->product->id . '/all-warehouse-stock');
+        $response = $this->get('/admin/product/'.$this->product->id.'/all-warehouse-stock');
 
         $response->assertStatus(200);
         $response->assertJson([

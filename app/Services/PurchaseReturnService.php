@@ -2,21 +2,21 @@
 
 namespace App\Services;
 
-use App\Models\PurchaseReturn;
-use Illuminate\Http\Request;
-use App\Models\Purchase;
-use Carbon\Carbon;
-use App\Models\User;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Auth;
-use App\Models\PurchaseReturnItem;
-use App\Models\Product;
-use App\Models\Account;
-use Dompdf\Dompdf;
-use App\Models\ProductWarehouse;
-use App\Models\POItem;
 use App\Helpers\CurrencyHelper;
+use App\Helpers\PurchaseHelper;
+use App\Models\Account;
 use App\Models\JournalEntry;
+use App\Models\POItem;
+use App\Models\Product;
+use App\Models\ProductWarehouse;
+use App\Models\Purchase;
+use App\Models\PurchaseReturn;
+use App\Models\PurchaseReturnItem;
+use App\Models\User;
+use Carbon\Carbon;
+use Dompdf\Dompdf;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class PurchaseReturnService
 {
@@ -35,7 +35,9 @@ class PurchaseReturnService
             ->get();
 
         foreach ($poItems as $poItem) {
-            if ($quantity <= 0) break;
+            if ($quantity <= 0) {
+                break;
+            }
             $decrement = min($poItem->remaining_quantity, $quantity);
             $poItem->decrement('remaining_quantity', $decrement);
             $quantity -= $decrement;
@@ -50,7 +52,9 @@ class PurchaseReturnService
             ->get();
 
         foreach ($poItems as $poItem) {
-            if ($quantity <= 0) break;
+            if ($quantity <= 0) {
+                break;
+            }
             $availableSpace = $poItem->quantity - $poItem->remaining_quantity;
             $increment = min($availableSpace, $quantity);
             $poItem->increment('remaining_quantity', $increment);
@@ -92,12 +96,12 @@ class PurchaseReturnService
         return DB::transaction(function () use ($data) {
             $purchase = Purchase::findOrFail($data['purchase_id']);
             $items = json_decode($data['items'], true);
-            if (!$items || !is_array($items)) {
+            if (! $items || ! is_array($items)) {
                 throw new \Exception('Invalid items data');
             }
 
             // Filter for items that are actually being returned
-            $returnedItems = array_filter($items, function($item) {
+            $returnedItems = array_filter($items, function ($item) {
                 return isset($item['returned_quantity']) && $item['returned_quantity'] > 0;
             });
 
@@ -113,10 +117,10 @@ class PurchaseReturnService
 
             // Copy tax information from the purchase.
             // Compute whenever rate > 0 — tax_id may be null for legacy records.
-            $taxRate   = (float) ($purchase->tax_rate ?? 0);
-            $taxType   = $purchase->tax_type ?? 'none';
+            $taxRate = (float) ($purchase->tax_rate ?? 0);
+            $taxType = $purchase->tax_type ?? 'none';
             $taxAmount = $taxRate > 0
-                ? \App\Helpers\PurchaseHelper::calculateTaxAmount($totalReturnAmount, $taxRate, $taxType)
+                ? PurchaseHelper::calculateTaxAmount($totalReturnAmount, $taxRate, $taxType)
                 : 0.0;
 
             $purchaseReturn = PurchaseReturn::create([
@@ -164,7 +168,6 @@ class PurchaseReturnService
             $totalPurchasedQuantity = $purchase->items->sum('quantity');
             $totalReturnedQuantity = $purchase->purchaseReturns()->with('items')->get()->flatMap->items->sum('quantity');
 
-
             if ($totalReturnedQuantity >= $totalPurchasedQuantity) {
                 $purchase->update(['status' => 'Returned']);
             } elseif ($totalReturnedQuantity > 0) {
@@ -173,7 +176,7 @@ class PurchaseReturnService
 
             // Create Journal Entry for the return
             $accountingSettings = app('currentTenant')->accounting_settings ?? [];
-            if (!$accountingSettings || !isset($accountingSettings['inventory_account_id']) || !isset($accountingSettings['accounts_payable_account_id'])) {
+            if (! $accountingSettings || ! isset($accountingSettings['inventory_account_id']) || ! isset($accountingSettings['accounts_payable_account_id'])) {
                 throw new \Exception('Accounting settings for inventory or accounts payable are not configured.');
             }
 
@@ -181,7 +184,7 @@ class PurchaseReturnService
             $accountsPayableAccount = Account::find($accountingSettings['accounts_payable_account_id'] ?? null);
             $purchaseAccount = Account::find($accountingSettings['cost_of_goods_sold_account_id'] ?? null); // Use COGS account for Purchase
 
-            if (!$inventoryAccount || !$accountsPayableAccount || !$purchaseAccount) {
+            if (! $inventoryAccount || ! $accountsPayableAccount || ! $purchaseAccount) {
                 throw new \Exception('Required accounts (Inventory, Accounts Payable, Purchases) not found for Purchase Return. Please check Accounting Settings.');
             }
 
@@ -241,7 +244,7 @@ class PurchaseReturnService
     {
         return DB::transaction(function () use ($purchaseReturn, $data) {
             $items = json_decode($data['items'], true);
-            if (!$items || !is_array($items)) {
+            if (! $items || ! is_array($items)) {
                 throw new \Exception('Invalid items data');
             }
 
@@ -265,7 +268,7 @@ class PurchaseReturnService
             $purchaseReturn->items()->delete();
 
             // Filter for items that are actually being returned
-            $returnedItems = array_filter($items, function($item) {
+            $returnedItems = array_filter($items, function ($item) {
                 return isset($item['returned_quantity']) && $item['returned_quantity'] > 0;
             });
 
@@ -274,8 +277,6 @@ class PurchaseReturnService
                 // For now, let's assume at least one item should remain for an update.
                 // Or, we can just proceed and it will result in a zero-total return.
             }
-
-
 
             // Recalculate total amount on the backend
             $totalReturnAmount = 0;
@@ -288,7 +289,7 @@ class PurchaseReturnService
             $updatedTaxRate = (float) ($purchase->tax_rate ?? 0);
             $updatedTaxType = $purchase->tax_type ?? 'none';
             if ($updatedTaxRate > 0) {
-                $updatedTaxAmount = \App\Helpers\PurchaseHelper::calculateTaxAmount(
+                $updatedTaxAmount = PurchaseHelper::calculateTaxAmount(
                     $totalReturnAmount,
                     $updatedTaxRate,
                     $updatedTaxType
@@ -306,7 +307,6 @@ class PurchaseReturnService
                 'tax_amount' => $updatedTaxAmount,
                 'tax_type' => $updatedTaxType,
             ]);
-
 
             foreach ($returnedItems as $itemData) {
                 $returnedQuantity = $itemData['returned_quantity'];
@@ -337,18 +337,17 @@ class PurchaseReturnService
             $purchase = $purchaseReturn->purchase;
             // Update original purchase status
             $totalPurchasedQuantity = $purchase->items()->sum('quantity');
-            $totalReturnedQuantity = $purchase->purchaseReturns()->with('items')->get()->flatMap(function($pr) {
+            $totalReturnedQuantity = $purchase->purchaseReturns()->with('items')->get()->flatMap(function ($pr) {
                 return $pr->items;
             })->sum('quantity');
-
 
             if ($totalReturnedQuantity >= $totalPurchasedQuantity) {
                 $purchase->update(['status' => 'Returned']);
             } elseif ($totalReturnedQuantity > 0) {
                 $purchase->update(['status' => 'Partial']); // Reverted to 'Partial'
             } else {
-                 // You might want to revert to the original purchase status if all returns are deleted.
-                 // This depends on business logic. For now, we leave it.
+                // You might want to revert to the original purchase status if all returns are deleted.
+                // This depends on business logic. For now, we leave it.
             }
 
             // Update Journal Entry if it exists, or create a new one.
@@ -377,10 +376,11 @@ class PurchaseReturnService
 
         if ($exportOption === 'pdf') {
             $html = view('admin.por.bulk-export-pdf', compact('purchaseReturns'))->render();
-            $dompdf = new Dompdf();
+            $dompdf = new Dompdf;
             $dompdf->loadHtml($html);
             $dompdf->setPaper('A4', 'landscape');
             $dompdf->render();
+
             return $dompdf->stream('purchase-returns.pdf');
         }
 
@@ -555,11 +555,11 @@ class PurchaseReturnService
         $address = User::where('tenant_id', $tenantId)->whereNotNull('address')->value('address');
 
         $html = view('admin.por.print-pdf', compact('por', 'shopname', 'address'))->render();
-        $dompdf = new Dompdf();
+        $dompdf = new Dompdf;
         $dompdf->loadHtml($html);
         $dompdf->setPaper('A4', 'portrait');
         $dompdf->render();
 
-        return $dompdf->stream('purchase-return-' . $por->id . '.pdf', ['Attachment' => false]);
+        return $dompdf->stream('purchase-return-'.$por->id.'.pdf', ['Attachment' => false]);
     }
 }

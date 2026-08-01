@@ -19,15 +19,15 @@ class FakturPajak extends Model
     protected function casts(): array
     {
         return [
-            'tanggal_faktur'       => 'date',
-            'djp_submitted_at'     => 'datetime',
-            'djp_response_at'      => 'datetime',
+            'tanggal_faktur' => 'date',
+            'djp_submitted_at' => 'datetime',
+            'djp_response_at' => 'datetime',
             'djp_response_payload' => 'array',
-            'is_pengganti'         => 'boolean',
-            'dpp'                  => 'decimal:2',
-            'ppn'                  => 'decimal:2',
-            'ppnbm'                => 'decimal:2',
-            'ppn_rate'             => 'decimal:2',
+            'is_pengganti' => 'boolean',
+            'dpp' => 'decimal:2',
+            'ppn' => 'decimal:2',
+            'ppnbm' => 'decimal:2',
+            'ppn_rate' => 'decimal:2',
         ];
     }
 
@@ -90,13 +90,13 @@ class FakturPajak extends Model
     public function statusLabel(): string
     {
         return match ($this->status) {
-            'draft'     => 'Draft',
+            'draft' => 'Draft',
             'submitted' => 'Submitted',
-            'approved'  => 'Approved',
-            'rejected'  => 'Rejected',
-            'amended'   => 'Amended',
+            'approved' => 'Approved',
+            'rejected' => 'Rejected',
+            'amended' => 'Amended',
             'cancelled' => 'Cancelled',
-            default     => ucfirst($this->status),
+            default => ucfirst($this->status),
         };
     }
 
@@ -106,13 +106,13 @@ class FakturPajak extends Model
     public function statusColor(): string
     {
         return match ($this->status) {
-            'draft'     => 'secondary',
+            'draft' => 'secondary',
             'submitted' => 'primary',
-            'approved'  => 'success',
-            'rejected'  => 'danger',
-            'amended'   => 'warning',
+            'approved' => 'success',
+            'rejected' => 'danger',
+            'amended' => 'warning',
             'cancelled' => 'dark',
-            default     => 'secondary',
+            default => 'secondary',
         };
     }
 }

@@ -2,18 +2,18 @@
 
 namespace Tests\Feature\Admin;
 
+use Database\Seeders\RoleSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
-use Database\Seeders\RoleSeeder;
 use Tests\TestCase;
 use Tests\Traits\CreatesTenant;
 use ZipArchive;
 
 class BackupControllerTest extends TestCase
 {
-    use WithFaker, CreatesTenant, RefreshDatabase;
+    use CreatesTenant, RefreshDatabase, WithFaker;
 
     protected function setUp(): void
     {
@@ -121,15 +121,15 @@ class BackupControllerTest extends TestCase
 
     public function test_download_streams_file_that_belongs_to_tenant(): void
     {
-        $filename = $this->tenant->domain . '-2024-01-01-00-00-00.zip';
-        Storage::disk('local')->put('backups/' . $filename, 'fake-zip-content');
+        $filename = $this->tenant->domain.'-2024-01-01-00-00-00.zip';
+        Storage::disk('local')->put('backups/'.$filename, 'fake-zip-content');
 
         $response = $this->actingAs($this->user)
             ->get(route('admin.setting.backup.download', $filename));
 
         $response->assertStatus(200);
 
-        Storage::disk('local')->delete('backups/' . $filename);
+        Storage::disk('local')->delete('backups/'.$filename);
     }
 
     // ──────────────────────────────────────────────
@@ -138,15 +138,15 @@ class BackupControllerTest extends TestCase
 
     public function test_delete_removes_backup_file(): void
     {
-        $filename = $this->tenant->domain . '-2024-01-01-12-00-00.zip';
-        Storage::disk('local')->put('backups/' . $filename, 'fake-zip-content');
+        $filename = $this->tenant->domain.'-2024-01-01-12-00-00.zip';
+        Storage::disk('local')->put('backups/'.$filename, 'fake-zip-content');
 
         $response = $this->actingAs($this->user)
             ->delete(route('admin.setting.backup.delete', $filename));
 
         $response->assertRedirect(route('admin.setting.backup.index'));
         $response->assertSessionHas('success');
-        $this->assertFalse(Storage::disk('local')->exists('backups/' . $filename));
+        $this->assertFalse(Storage::disk('local')->exists('backups/'.$filename));
     }
 
     public function test_delete_returns_error_for_missing_file(): void
@@ -161,7 +161,7 @@ class BackupControllerTest extends TestCase
     public function test_delete_rejects_file_belonging_to_another_tenant(): void
     {
         $filename = 'othertenant-2024-01-01-00-00-00.zip';
-        Storage::disk('local')->put('backups/' . $filename, 'fake');
+        Storage::disk('local')->put('backups/'.$filename, 'fake');
 
         $response = $this->actingAs($this->user)
             ->delete(route('admin.setting.backup.delete', $filename));
@@ -169,9 +169,9 @@ class BackupControllerTest extends TestCase
         $response->assertRedirect(route('admin.setting.backup.index'));
         $response->assertSessionHas('error');
         // File should NOT have been deleted
-        $this->assertTrue(Storage::disk('local')->exists('backups/' . $filename));
+        $this->assertTrue(Storage::disk('local')->exists('backups/'.$filename));
 
-        Storage::disk('local')->delete('backups/' . $filename);
+        Storage::disk('local')->delete('backups/'.$filename);
     }
 
     // ──────────────────────────────────────────────
@@ -208,7 +208,7 @@ class BackupControllerTest extends TestCase
         $response = $this->actingAs($this->user)
             ->post(route('admin.setting.backup.restore'), [
                 'backup_file' => $zip,
-                'password'    => 'wrong-password',
+                'password' => 'wrong-password',
             ]);
 
         $response->assertRedirect();
@@ -253,8 +253,8 @@ class BackupControllerTest extends TestCase
     public function test_restore_fails_gracefully_when_zip_missing_backup_sql(): void
     {
         // Build a valid ZIP that does NOT contain backup.sql
-        $zipPath = sys_get_temp_dir() . '/test-no-sql.zip';
-        $zip = new ZipArchive();
+        $zipPath = sys_get_temp_dir().'/test-no-sql.zip';
+        $zip = new ZipArchive;
         $zip->open($zipPath, ZipArchive::CREATE | ZipArchive::OVERWRITE);
         $zip->addFromString('readme.txt', 'no sql here');
         $zip->close();
@@ -278,7 +278,7 @@ class BackupControllerTest extends TestCase
     {
         $response = $this->actingAs($this->user)
             ->post(route('admin.setting.backup.password'), [
-                'new_password'              => 'NewStrongPass123!XYZ',
+                'new_password' => 'NewStrongPass123!XYZ',
                 'new_password_confirmation' => 'NewStrongPass123!XYZ',
             ]);
 
@@ -289,8 +289,8 @@ class BackupControllerTest extends TestCase
     {
         $response = $this->actingAs($this->user)
             ->post(route('admin.setting.backup.password'), [
-                'current_password'          => 'wrong-user-password',
-                'new_password'              => 'NewStrongPass123!XYZ',
+                'current_password' => 'wrong-user-password',
+                'new_password' => 'NewStrongPass123!XYZ',
                 'new_password_confirmation' => 'NewStrongPass123!XYZ',
             ]);
 
@@ -302,8 +302,8 @@ class BackupControllerTest extends TestCase
     {
         $response = $this->actingAs($this->user)
             ->post(route('admin.setting.backup.password'), [
-                'current_password'          => 'password',
-                'new_password'              => 'short',        // too short, fails min:16
+                'current_password' => 'password',
+                'new_password' => 'short',        // too short, fails min:16
                 'new_password_confirmation' => 'short',
             ]);
 
@@ -314,8 +314,8 @@ class BackupControllerTest extends TestCase
     {
         $response = $this->actingAs($this->user)
             ->post(route('admin.setting.backup.password'), [
-                'current_password'          => 'password',
-                'new_password'              => 'NewStrongPass123!XYZ',
+                'current_password' => 'password',
+                'new_password' => 'NewStrongPass123!XYZ',
                 'new_password_confirmation' => 'DoesNotMatch123!XYZ',
             ]);
 
@@ -327,10 +327,10 @@ class BackupControllerTest extends TestCase
         // The user factory creates users with password = 'password' by default
         $response = $this->actingAs($this->user)
             ->post(route('admin.setting.backup.password'), [
-                'current_password'          => 'password',
-                'new_password'              => 'NewStrongPass123!XYZ',
+                'current_password' => 'password',
+                'new_password' => 'NewStrongPass123!XYZ',
                 'new_password_confirmation' => 'NewStrongPass123!XYZ',
-                'encryption_enabled'        => '1',
+                'encryption_enabled' => '1',
             ]);
 
         $response->assertRedirect(route('admin.setting.backup.index'));
@@ -347,10 +347,10 @@ class BackupControllerTest extends TestCase
 
         $response = $this->actingAs($this->user)
             ->post(route('admin.setting.backup.password'), [
-                'current_password'          => 'password',
-                'new_password'              => 'NewStrongPass123!XYZ',
+                'current_password' => 'password',
+                'new_password' => 'NewStrongPass123!XYZ',
                 'new_password_confirmation' => 'NewStrongPass123!XYZ',
-                'encryption_enabled'        => '0', // explicit falsy to disable
+                'encryption_enabled' => '0', // explicit falsy to disable
             ]);
 
         $response->assertRedirect(route('admin.setting.backup.index'));
@@ -368,8 +368,8 @@ class BackupControllerTest extends TestCase
      */
     private function makeFakeBackupZip(): UploadedFile
     {
-        $zipPath = sys_get_temp_dir() . '/test-backup-' . uniqid() . '.zip';
-        $zip = new ZipArchive();
+        $zipPath = sys_get_temp_dir().'/test-backup-'.uniqid().'.zip';
+        $zip = new ZipArchive;
         $zip->open($zipPath, ZipArchive::CREATE | ZipArchive::OVERWRITE);
         $zip->addFromString('backup.sql', "SET FOREIGN_KEY_CHECKS=0;\n-- fake sql\nSET FOREIGN_KEY_CHECKS=1;\n");
         $zip->close();

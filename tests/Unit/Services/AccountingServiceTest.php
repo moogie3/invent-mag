@@ -6,19 +6,19 @@ use App\Models\Account;
 use App\Models\JournalEntry;
 use App\Models\Sales;
 use App\Models\Transaction;
-use App\Services\AccountingService;
 use App\Services\AccountingAuditService;
+use App\Services\AccountingService;
+use Database\Seeders\AccountSeeder;
 use Exception;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Carbon;
 use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 use Tests\Traits\CreatesTenant;
-use Database\Seeders\AccountSeeder;
 
 class AccountingServiceTest extends TestCase
 {
-    use RefreshDatabase, CreatesTenant;
+    use CreatesTenant, RefreshDatabase;
 
     protected AccountingService $accountingService;
 
@@ -28,8 +28,8 @@ class AccountingServiceTest extends TestCase
         $this->setupTenant();
         // Seed the accounts
         $this->seed(AccountSeeder::class);
-        
-        $auditService = new AccountingAuditService();
+
+        $auditService = new AccountingAuditService;
         $this->accountingService = new AccountingService($auditService);
     }
 
@@ -40,8 +40,8 @@ class AccountingServiceTest extends TestCase
         $date = Carbon::now();
 
         $tenantId = app('currentTenant')->id;
-        $arAccount = Account::where('code', '1130-' . $tenantId)->first();
-        $revenueAccount = Account::where('code', '4100-' . $tenantId)->first();
+        $arAccount = Account::where('code', '1130-'.$tenantId)->first();
+        $revenueAccount = Account::where('code', '4100-'.$tenantId)->first();
 
         $transactions = [
             ['account_name' => $arAccount->name, 'type' => 'debit', 'amount' => 100.00],
@@ -49,7 +49,7 @@ class AccountingServiceTest extends TestCase
         ];
 
         $journalEntry = $this->accountingService->createJournalEntry(
-            "Test Entry",
+            'Test Entry',
             $date,
             $transactions,
             $sale
@@ -92,11 +92,11 @@ class AccountingServiceTest extends TestCase
             ['account_name' => 'Sales Revenue', 'type' => 'credit', 'amount' => 90.00], // Unbalanced
         ];
 
-        $entriesBefore     = JournalEntry::count();
-        $txCountBefore     = Transaction::count();
+        $entriesBefore = JournalEntry::count();
+        $txCountBefore = Transaction::count();
 
         try {
-            $this->accountingService->createJournalEntry("Unbalanced Entry", $date, $transactions, $sale);
+            $this->accountingService->createJournalEntry('Unbalanced Entry', $date, $transactions, $sale);
         } finally {
             // No new journal entry or transaction should have been created
             $this->assertEquals($entriesBefore, JournalEntry::count());
@@ -122,7 +122,7 @@ class AccountingServiceTest extends TestCase
         $txCountBefore = Transaction::count();
 
         try {
-            $this->accountingService->createJournalEntry("Invalid Account Entry", $date, $transactions, $sale);
+            $this->accountingService->createJournalEntry('Invalid Account Entry', $date, $transactions, $sale);
         } finally {
             // DB transaction should have rolled back — no new entries
             $this->assertEquals($entriesBefore, JournalEntry::count());

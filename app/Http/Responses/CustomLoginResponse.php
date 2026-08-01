@@ -2,18 +2,20 @@
 
 namespace App\Http\Responses;
 
-use Laravel\Fortify\Contracts\LoginResponse as LoginResponseContract;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Session;
+use Laravel\Fortify\Contracts\LoginResponse as LoginResponseContract;
+use Symfony\Component\HttpFoundation\Response;
 
 class CustomLoginResponse implements LoginResponseContract
 {
     /**
      * Create an HTTP response that represents the object.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @param  Request  $request
+     * @return Response
      */
     public function toResponse($request)
     {
@@ -31,6 +33,7 @@ class CustomLoginResponse implements LoginResponseContract
         } else {
             // Clear the intended URL if not remembering last page
             Session::forget('url.intended');
+
             return redirect(config('fortify.home'))->with('success', 'Login successful!');
         }
     }

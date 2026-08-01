@@ -3,6 +3,7 @@
 namespace Database\Factories;
 
 use App\Models\StockOpname;
+use App\Models\User;
 use App\Models\Warehouse;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
@@ -14,12 +15,12 @@ class StockOpnameFactory extends Factory
     {
         return [
             'tenant_id' => null,
-            'reference_number' => 'SO-' . date('ymd') . '-' . str_pad(mt_rand(1, 9999), 4, '0', STR_PAD_LEFT),
+            'reference_number' => 'SO-'.date('ymd').'-'.str_pad(mt_rand(1, 9999), 4, '0', STR_PAD_LEFT),
             'warehouse_id' => Warehouse::factory(),
             'status' => 'Draft',
             'scheduled_date' => now()->addDay()->toDateString(),
             'notes' => null,
-            'created_by' => \App\Models\User::factory(),
+            'created_by' => User::factory(),
             'completed_at' => null,
             'total_variance_value' => null,
         ];
@@ -28,7 +29,7 @@ class StockOpnameFactory extends Factory
     public function configure()
     {
         return $this->afterCreating(function (StockOpname $opname) {
-            if (!$opname->tenant_id && $opname->warehouse) {
+            if (! $opname->tenant_id && $opname->warehouse) {
                 $opname->update(['tenant_id' => $opname->warehouse->tenant_id]);
             }
         });

@@ -2,10 +2,10 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Seeder;
 use App\Models\Customer;
-use App\Models\User;
 use App\Models\CustomerInteraction;
+use App\Models\User;
+use Illuminate\Database\Seeder;
 
 class CustomerInteractionSeeder extends Seeder
 {
@@ -19,7 +19,8 @@ class CustomerInteractionSeeder extends Seeder
         $tenantId = app('currentTenant')->id;
 
         if (CustomerInteraction::where('tenant_id', $tenantId)->count() > 0) {
-            $this->command->info("Customer interactions already exist for tenant " . app('currentTenant')->name . ". Skipping.");
+            $this->command->info('Customer interactions already exist for tenant '.app('currentTenant')->name.'. Skipping.');
+
             return;
         }
 
@@ -27,12 +28,14 @@ class CustomerInteractionSeeder extends Seeder
         $user = User::where('tenant_id', $tenantId)->first(); // Get the first user for the tenant
 
         if ($customers->isEmpty()) {
-            $this->command->info('Skipping CustomerInteractionSeeder for tenant ' . app('currentTenant')->name . ': No customers found. Please run CustomerSeeder first.');
+            $this->command->info('Skipping CustomerInteractionSeeder for tenant '.app('currentTenant')->name.': No customers found. Please run CustomerSeeder first.');
+
             return;
         }
 
-        if (!$user) {
-            $this->command->info('Skipping CustomerInteractionSeeder for tenant ' . app('currentTenant')->name . ': No users found. Please ensure UserSeeder has been run for this tenant.');
+        if (! $user) {
+            $this->command->info('Skipping CustomerInteractionSeeder for tenant '.app('currentTenant')->name.': No users found. Please ensure UserSeeder has been run for this tenant.');
+
             return;
         }
 
@@ -45,6 +48,6 @@ class CustomerInteractionSeeder extends Seeder
             ]);
         }
 
-        $this->command->info('Customer interactions for tenant ' . app('currentTenant')->name . ' seeded successfully.');
+        $this->command->info('Customer interactions for tenant '.app('currentTenant')->name.' seeded successfully.');
     }
 }

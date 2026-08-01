@@ -2,16 +2,17 @@
 
 namespace Tests\Feature\Admin;
 
-use App\Models\User;
 use App\Models\Warehouse;
-use Tests\TestCase;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Tests\Traits\CreatesTenant;
+use App\Services\WarehouseService;
 use Database\Seeders\RoleSeeder;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Pagination\LengthAwarePaginator;
+use Tests\TestCase;
+use Tests\Traits\CreatesTenant;
 
 class WarehouseControllerTest extends TestCase
 {
-    use RefreshDatabase, CreatesTenant;
+    use CreatesTenant, RefreshDatabase;
 
     protected function setUp(): void
     {
@@ -79,20 +80,20 @@ class WarehouseControllerTest extends TestCase
         ];
 
         // Mock the WarehouseService to return a failure
-        $mockService = \Mockery::mock(\App\Services\WarehouseService::class);
+        $mockService = \Mockery::mock(WarehouseService::class);
         $mockService->shouldReceive('createWarehouse')
-                    ->once()
-                    ->andReturn(['success' => false, 'message' => 'Service creation failed.']);
+            ->once()
+            ->andReturn(['success' => false, 'message' => 'Service creation failed.']);
         $mockService->shouldReceive('getWarehouseIndexData') // Add expectation for index method call
-                    ->andReturn([
-                        'wos' => new \Illuminate\Pagination\LengthAwarePaginator([], 0, 10),
-                        'entries' => 10,
-                        'totalwarehouse' => 0,
-                        'mainWarehouse' => null,
-                        'shopname' => 'Test Shop',
-                        'address' => 'Test Address',
-                    ]);
-        $this->app->instance(\App\Services\WarehouseService::class, $mockService);
+            ->andReturn([
+                'wos' => new LengthAwarePaginator([], 0, 10),
+                'entries' => 10,
+                'totalwarehouse' => 0,
+                'mainWarehouse' => null,
+                'shopname' => 'Test Shop',
+                'address' => 'Test Address',
+            ]);
+        $this->app->instance(WarehouseService::class, $mockService);
 
         $this->get(route('admin.warehouse')); // Set previous URL for back() redirect
         $response = $this->post(route('admin.warehouse.store'), $warehouseData);
@@ -153,9 +154,9 @@ class WarehouseControllerTest extends TestCase
         ];
         $errorMessage = 'Service update failed.';
 
-        $mockService = \Mockery::mock(\App\Services\WarehouseService::class);
+        $mockService = \Mockery::mock(WarehouseService::class);
         $mockService->shouldReceive('updateWarehouse')->once()->andReturn(['success' => false, 'message' => $errorMessage]);
-        $this->app->instance(\App\Services\WarehouseService::class, $mockService);
+        $this->app->instance(WarehouseService::class, $mockService);
 
         $response = $this->put(route('admin.warehouse.update', $warehouse->id), $updateData);
 
@@ -167,9 +168,9 @@ class WarehouseControllerTest extends TestCase
     {
         $warehouse = Warehouse::factory()->create();
 
-        $mockService = \Mockery::mock(\App\Services\WarehouseService::class);
+        $mockService = \Mockery::mock(WarehouseService::class);
         $mockService->shouldReceive('deleteWarehouse')->once()->andReturn(['success' => true]);
-        $this->app->instance(\App\Services\WarehouseService::class, $mockService);
+        $this->app->instance(WarehouseService::class, $mockService);
 
         $response = $this->post(route('admin.warehouse.destroy', $warehouse->id));
 
@@ -182,9 +183,9 @@ class WarehouseControllerTest extends TestCase
         $warehouse = Warehouse::factory()->create();
         $errorMessage = 'Service deletion failed.';
 
-        $mockService = \Mockery::mock(\App\Services\WarehouseService::class);
+        $mockService = \Mockery::mock(WarehouseService::class);
         $mockService->shouldReceive('deleteWarehouse')->once()->andReturn(['success' => false, 'message' => $errorMessage]);
-        $this->app->instance(\App\Services\WarehouseService::class, $mockService);
+        $this->app->instance(WarehouseService::class, $mockService);
 
         $response = $this->post(route('admin.warehouse.destroy', $warehouse->id));
 
@@ -197,9 +198,9 @@ class WarehouseControllerTest extends TestCase
         Warehouse::where('is_main', true)->update(['is_main' => false]);
         $warehouse = Warehouse::factory()->create(['is_main' => false]);
 
-        $mockService = \Mockery::mock(\App\Services\WarehouseService::class);
+        $mockService = \Mockery::mock(WarehouseService::class);
         $mockService->shouldReceive('setMainWarehouse')->once()->andReturn(['success' => true]);
-        $this->app->instance(\App\Services\WarehouseService::class, $mockService);
+        $this->app->instance(WarehouseService::class, $mockService);
 
         $response = $this->post(route('admin.warehouse.set-main', $warehouse->id));
 
@@ -212,9 +213,9 @@ class WarehouseControllerTest extends TestCase
         Warehouse::where('is_main', true)->update(['is_main' => false]);
         $mainWarehouse = Warehouse::factory()->create(['is_main' => true]);
 
-        $mockService = \Mockery::mock(\App\Services\WarehouseService::class);
+        $mockService = \Mockery::mock(WarehouseService::class);
         $mockService->shouldReceive('unsetMainWarehouse')->once()->andReturn(['success' => true]);
-        $this->app->instance(\App\Services\WarehouseService::class, $mockService);
+        $this->app->instance(WarehouseService::class, $mockService);
 
         $response = $this->post(route('admin.warehouse.unset-main', $mainWarehouse->id));
 
@@ -227,9 +228,9 @@ class WarehouseControllerTest extends TestCase
         $warehouse = Warehouse::factory()->create(['is_main' => true]);
         $errorMessage = 'Service unset main failed.';
 
-        $mockService = \Mockery::mock(\App\Services\WarehouseService::class);
+        $mockService = \Mockery::mock(WarehouseService::class);
         $mockService->shouldReceive('unsetMainWarehouse')->once()->andReturn(['success' => false, 'message' => $errorMessage]);
-        $this->app->instance(\App\Services\WarehouseService::class, $mockService);
+        $this->app->instance(WarehouseService::class, $mockService);
 
         $response = $this->post(route('admin.warehouse.unset-main', $warehouse->id));
 
@@ -245,9 +246,9 @@ class WarehouseControllerTest extends TestCase
             'description' => 'A new AJAX warehouse.',
         ];
 
-        $mockService = \Mockery::mock(\App\Services\WarehouseService::class);
+        $mockService = \Mockery::mock(WarehouseService::class);
         $mockService->shouldReceive('createWarehouse')->once()->andReturn(['success' => true]);
-        $this->app->instance(\App\Services\WarehouseService::class, $mockService);
+        $this->app->instance(WarehouseService::class, $mockService);
 
         $response = $this->withHeaders(['X-Requested-With' => 'XMLHttpRequest'])
             ->json('POST', route('admin.warehouse.store'), $warehouseData);
@@ -265,9 +266,9 @@ class WarehouseControllerTest extends TestCase
         ];
         $errorMessage = 'AJAX creation failed.';
 
-        $mockService = \Mockery::mock(\App\Services\WarehouseService::class);
+        $mockService = \Mockery::mock(WarehouseService::class);
         $mockService->shouldReceive('createWarehouse')->once()->andReturn(['success' => false, 'message' => $errorMessage]);
-        $this->app->instance(\App\Services\WarehouseService::class, $mockService);
+        $this->app->instance(WarehouseService::class, $mockService);
 
         $response = $this->withHeaders(['X-Requested-With' => 'XMLHttpRequest'])
             ->json('POST', route('admin.warehouse.store'), $warehouseData);
@@ -276,7 +277,7 @@ class WarehouseControllerTest extends TestCase
             ->assertJson([
                 'success' => false,
                 'message' => $errorMessage,
-                'errors' => ['name' => [$errorMessage]]
+                'errors' => ['name' => [$errorMessage]],
             ]);
     }
 
@@ -289,9 +290,9 @@ class WarehouseControllerTest extends TestCase
             'description' => 'Updated AJAX description.',
         ];
 
-        $mockService = \Mockery::mock(\App\Services\WarehouseService::class);
+        $mockService = \Mockery::mock(WarehouseService::class);
         $mockService->shouldReceive('updateWarehouse')->once()->andReturn(['success' => true]);
-        $this->app->instance(\App\Services\WarehouseService::class, $mockService);
+        $this->app->instance(WarehouseService::class, $mockService);
 
         $response = $this->withHeaders(['X-Requested-With' => 'XMLHttpRequest'])
             ->json('PUT', route('admin.warehouse.update', $warehouse->id), $updateData);
@@ -310,9 +311,9 @@ class WarehouseControllerTest extends TestCase
         ];
         $errorMessage = 'AJAX update failed.';
 
-        $mockService = \Mockery::mock(\App\Services\WarehouseService::class);
+        $mockService = \Mockery::mock(WarehouseService::class);
         $mockService->shouldReceive('updateWarehouse')->once()->andReturn(['success' => false, 'message' => $errorMessage]);
-        $this->app->instance(\App\Services\WarehouseService::class, $mockService);
+        $this->app->instance(WarehouseService::class, $mockService);
 
         $response = $this->withHeaders(['X-Requested-With' => 'XMLHttpRequest'])
             ->json('PUT', route('admin.warehouse.update', $warehouse->id), $updateData);
@@ -325,9 +326,9 @@ class WarehouseControllerTest extends TestCase
     {
         $warehouse = Warehouse::factory()->create();
 
-        $mockService = \Mockery::mock(\App\Services\WarehouseService::class);
+        $mockService = \Mockery::mock(WarehouseService::class);
         $mockService->shouldReceive('deleteWarehouse')->once()->andReturn(['success' => true]);
-        $this->app->instance(\App\Services\WarehouseService::class, $mockService);
+        $this->app->instance(WarehouseService::class, $mockService);
 
         $response = $this->withHeaders(['X-Requested-With' => 'XMLHttpRequest'])
             ->json('POST', route('admin.warehouse.destroy', $warehouse->id));
@@ -341,9 +342,9 @@ class WarehouseControllerTest extends TestCase
         $warehouse = Warehouse::factory()->create();
         $errorMessage = 'AJAX deletion failed.';
 
-        $mockService = \Mockery::mock(\App\Services\WarehouseService::class);
+        $mockService = \Mockery::mock(WarehouseService::class);
         $mockService->shouldReceive('deleteWarehouse')->once()->andReturn(['success' => false, 'message' => $errorMessage]);
-        $this->app->instance(\App\Services\WarehouseService::class, $mockService);
+        $this->app->instance(WarehouseService::class, $mockService);
 
         $response = $this->withHeaders(['X-Requested-With' => 'XMLHttpRequest'])
             ->json('POST', route('admin.warehouse.destroy', $warehouse->id));

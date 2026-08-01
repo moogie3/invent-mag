@@ -9,6 +9,8 @@ use App\Services\BillingService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
+use Midtrans\Config;
+use Midtrans\Transaction;
 
 // Load Midtrans SDK (Non-namespaced)
 require_once base_path('vendor/midtrans/midtrans-php/Midtrans.php');
@@ -20,14 +22,14 @@ class PaymentController extends Controller
     public function __construct(BillingService $billingService)
     {
         $this->billingService = $billingService;
-        \Midtrans\Config::$isProduction = config('midtrans.is_production', false);
-        \Midtrans\Config::$serverKey = config('midtrans.server_key');
+        Config::$isProduction = config('midtrans.is_production', false);
+        Config::$serverKey = config('midtrans.server_key');
     }
 
     /**
      * Confirm payment directly from frontend after successful Snap transaction.
      * This ensures the plan is updated immediately without waiting for webhook.
-     * 
+     *
      * Security: Verifies the order belongs to the current tenant.
      */
     public function confirm(Request $request)
@@ -41,13 +43,14 @@ class PaymentController extends Controller
         $transactionResult = $request->input('transaction_result');
 
         $currentTenant = app('currentTenant');
-        
+
         $order = SubscriptionOrder::where('order_number', $orderId)
             ->where('tenant_id', $currentTenant->id)
             ->first();
 
-        if (!$order) {
+        if (! $order) {
             Log::warning("Payment confirm: Order not found or not owned by tenant. Order: {$orderId}, Tenant: {$currentTenant->id}");
+
             return response()->json(['message' => 'Order not found'], 404);
         }
 
@@ -56,8 +59,8 @@ class PaymentController extends Controller
         }
 
         try {
-            $status = \Midtrans\Transaction::status($orderId);
-            
+            $status = Transaction::status($orderId);
+
             if ($status->transaction_status === 'settlement' || $status->transaction_status === 'capture') {
                 $order->update([
                     'status' => 'paid',
@@ -82,12 +85,12 @@ class PaymentController extends Controller
             } else {
                 return response()->json([
                     'message' => 'Payment not completed',
-                    'status' => $status->transaction_status
+                    'status' => $status->transaction_status,
                 ], 400);
             }
         } catch (\Exception $e) {
-            Log::error('Payment confirmation error: ' . $e->getMessage());
-            
+            Log::error('Payment confirmation error: '.$e->getMessage());
+
             return response()->json(['message' => 'Payment verification failed. Please try again later.'], 500);
         }
     }

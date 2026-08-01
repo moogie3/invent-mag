@@ -12,7 +12,7 @@ use Tests\Traits\CreatesTenant;
 
 class AgingReportServiceTest extends TestCase
 {
-    use RefreshDatabase, CreatesTenant;
+    use CreatesTenant, RefreshDatabase;
 
     protected $service;
 

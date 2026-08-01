@@ -2,13 +2,14 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\BelongsToTenant;
+use App\Services\AccountingService;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use App\Models\Concerns\BelongsToTenant;
 
 class OpeningBalance extends Model
 {
-    use HasFactory, BelongsToTenant;
+    use BelongsToTenant, HasFactory;
 
     protected $fillable = [
         'tenant_id',
@@ -45,12 +46,13 @@ class OpeningBalance extends Model
         } elseif ($this->balance < 0) {
             return 'credit';
         }
+
         return 'neutral';
     }
 
     public function createJournalEntry(): JournalEntry
     {
-        $accountingService = app(\App\Services\AccountingService::class);
+        $accountingService = app(AccountingService::class);
 
         $transactions = [];
 
@@ -70,7 +72,7 @@ class OpeningBalance extends Model
             ];
         }
 
-        if (!empty($transactions)) {
+        if (! empty($transactions)) {
             return $accountingService->createJournalEntry(
                 "Opening Balance - {$this->account->name}",
                 $this->balance_date,

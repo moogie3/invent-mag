@@ -8,15 +8,12 @@ class TutorialService
 {
     /**
      * Get the tutorial context data for a given route name.
-     *
-     * @param string|null $routeName
-     * @return array
      */
     public function getContextForRoute(?string $routeName): array
     {
         $contexts = config('tutorial.contexts', []);
 
-        if (!$routeName) {
+        if (! $routeName) {
             return $this->getDefaultContext();
         }
 
@@ -31,15 +28,13 @@ class TutorialService
 
     /**
      * Fallback default context if no route matches.
-     *
-     * @return array
      */
     protected function getDefaultContext(): array
     {
         return config('tutorial.contexts.*', [
             'title' => 'tutorial.help_tutorial',
-            'icon'  => 'ti-help',
-            'desc'  => 'tutorial.need_help_navigating',
+            'icon' => 'ti-help',
+            'desc' => 'tutorial.need_help_navigating',
             'steps' => [
                 'tutorial.general_navigation',
                 'tutorial.general_settings',

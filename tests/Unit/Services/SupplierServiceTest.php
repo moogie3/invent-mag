@@ -4,16 +4,16 @@ namespace Tests\Unit\Services;
 
 use App\Models\Supplier;
 use App\Services\SupplierService;
-use Tests\TestCase;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 use PHPUnit\Framework\Attributes\Test;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\TestCase;
 use Tests\Traits\CreatesTenant;
 
 class SupplierServiceTest extends TestCase
 {
-    use RefreshDatabase, CreatesTenant;
+    use CreatesTenant, RefreshDatabase;
 
     protected SupplierService $supplierService;
 
@@ -22,7 +22,7 @@ class SupplierServiceTest extends TestCase
         parent::setUp();
         $this->setupTenant(); // Creates $this->tenant and $this->user, and calls actingAs
         $this->user->assignRole('superuser'); // Ensure the user has permissions for services
-        $this->supplierService = new SupplierService();
+        $this->supplierService = new SupplierService;
     }
 
     #[Test]
@@ -107,7 +107,7 @@ class SupplierServiceTest extends TestCase
         $this->assertTrue($result['success']);
         $this->assertDatabaseHas('suppliers', ['name' => 'New Supplier with Image']);
         $supplier = Supplier::where('name', 'New Supplier with Image')->first();
-        Storage::disk('public')->assertExists('image/' . $supplier->getRawOriginal('image'));
+        Storage::disk('public')->assertExists('image/'.$supplier->getRawOriginal('image'));
     }
 
     #[Test]
@@ -126,7 +126,7 @@ class SupplierServiceTest extends TestCase
 
         $this->assertDatabaseHas('suppliers', ['id' => $supplier->id, 'name' => 'Updated Supplier with Image']);
         $supplier = $supplier->fresh();
-        Storage::disk('public')->assertExists('image/' . $supplier->getRawOriginal('image'));
+        Storage::disk('public')->assertExists('image/'.$supplier->getRawOriginal('image'));
     }
 
     #[Test]
@@ -138,7 +138,6 @@ class SupplierServiceTest extends TestCase
         $supplier = Supplier::factory()->create(['image' => $oldImageName]);
         Storage::disk('public')->putFileAs('image', $oldImage, $oldImageName);
 
-
         $data = [
             'name' => 'Updated Supplier Name',
             'code' => $supplier->code,
@@ -147,7 +146,7 @@ class SupplierServiceTest extends TestCase
 
         $this->supplierService->updateSupplier($supplier, $data);
 
-        Storage::disk('public')->assertMissing('image/' . $oldImageName);
+        Storage::disk('public')->assertMissing('image/'.$oldImageName);
     }
 
     #[Test]
@@ -162,7 +161,7 @@ class SupplierServiceTest extends TestCase
         $this->supplierService->deleteSupplier($supplier);
 
         $this->assertDatabaseMissing('suppliers', ['id' => $supplier->id]);
-        Storage::disk('public')->assertMissing('image/' . $imageName);
+        Storage::disk('public')->assertMissing('image/'.$imageName);
     }
 
     #[Test]

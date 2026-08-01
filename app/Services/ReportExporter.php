@@ -13,41 +13,31 @@ class ReportExporter
 {
     /**
      * Export data to PDF.
-     *
-     * @param string $view
-     * @param array $data
-     * @param string $filename
-     * @param string $orientation
-     * @return Response
      */
     public function exportToPdf(string $view, array $data, string $filename, string $orientation = 'portrait'): Response
     {
-        $dompdf = new Dompdf();
+        $dompdf = new Dompdf;
         $html = view($view, $data)->render();
         $dompdf->loadHtml($html);
         $dompdf->setPaper('A4', $orientation);
         $dompdf->render();
 
         $output = $dompdf->output();
-        
+
         return response($output, 200, [
             'Content-Type' => 'application/pdf',
-            'Content-Disposition' => 'inline; filename="' . $filename . '"',
+            'Content-Disposition' => 'inline; filename="'.$filename.'"',
         ]);
     }
 
     /**
      * Export data to CSV.
-     *
-     * @param callable $callback
-     * @param string $filename
-     * @return StreamedResponse
      */
     public function exportToCsv(callable $callback, string $filename): StreamedResponse
     {
         $headers = [
             'Content-type' => 'text/csv',
-            'Content-Disposition' => 'attachment; filename=' . $filename,
+            'Content-Disposition' => 'attachment; filename='.$filename,
             'Pragma' => 'no-cache',
             'Cache-Control' => 'must-revalidate, post-check=0, pre-check=0',
             'Expires' => '0',
@@ -58,16 +48,12 @@ class ReportExporter
 
     /**
      * Export Income Statement to CSV.
-     *
-     * @param array $reportData
-     * @param string $filename
-     * @return Response
      */
     public function exportIncomeStatementToCsv(array $reportData, string $filename): Response
     {
         return $this->exportToCsv(function () use ($reportData) {
             $file = fopen('php://output', 'w');
-            
+
             fputcsv($file, ['Income Statement']);
             fputcsv($file, ["Period: {$reportData['start_date']} to {$reportData['end_date']}"]);
             fputcsv($file, []);
@@ -94,16 +80,12 @@ class ReportExporter
 
     /**
      * Export Balance Sheet to CSV.
-     *
-     * @param array $reportData
-     * @param string $filename
-     * @return Response
      */
     public function exportBalanceSheetToCsv(array $reportData, string $filename): Response
     {
         return $this->exportToCsv(function () use ($reportData) {
             $file = fopen('php://output', 'w');
-            
+
             fputcsv($file, ['Balance Sheet']);
             fputcsv($file, ["As of: {$reportData['end_date']}"]);
             fputcsv($file, []);
@@ -138,10 +120,7 @@ class ReportExporter
     /**
      * Export Aged Receivables/Payables to CSV.
      *
-     * @param array $aging
-     * @param string $filename
-     * @param string $reportType 'receivables' or 'payables'
-     * @return Response
+     * @param  string  $reportType  'receivables' or 'payables'
      */
     public function exportAgingToCsv(array $aging, string $filename, string $reportType = 'receivables'): Response
     {
@@ -157,9 +136,9 @@ class ReportExporter
 
         return $this->exportToCsv(function () use ($aging, $buckets, $contactLabel) {
             $file = fopen('php://output', 'w');
-            
-            fputcsv($file, ['Aged ' . ($contactLabel === 'Customer' ? 'Receivables' : 'Payables') . ' Report']);
-            fputcsv($file, ["Report Date: " . Carbon::now()->format('Y-m-d')]);
+
+            fputcsv($file, ['Aged '.($contactLabel === 'Customer' ? 'Receivables' : 'Payables').' Report']);
+            fputcsv($file, ['Report Date: '.Carbon::now()->format('Y-m-d')]);
             fputcsv($file, []);
 
             foreach ($aging as $bucketKey => $invoices) {
@@ -172,12 +151,12 @@ class ReportExporter
                         'Days Overdue',
                         'Amount',
                     ]);
-                    
+
                     foreach ($invoices as $invoice) {
-                        $contact = $contactLabel === 'Customer' 
+                        $contact = $contactLabel === 'Customer'
                             ? ($invoice->customer->name ?? 'Walk-in Customer')
                             : ($invoice->supplier->name ?? 'Unknown Supplier');
-                            
+
                         fputcsv($file, [
                             $contact,
                             $invoice->invoice,
@@ -186,8 +165,8 @@ class ReportExporter
                             CurrencyHelper::format($invoice->total),
                         ]);
                     }
-                    
-                    fputcsv($file, ['Total for ' . $buckets[$bucketKey], '', '', '', CurrencyHelper::format($invoices->sum('total'))]);
+
+                    fputcsv($file, ['Total for '.$buckets[$bucketKey], '', '', '', CurrencyHelper::format($invoices->sum('total'))]);
                     fputcsv($file, []);
                 }
             }
@@ -198,16 +177,12 @@ class ReportExporter
 
     /**
      * Export Adjustment Log to CSV.
-     *
-     * @param Collection $adjustments
-     * @param string $filename
-     * @return Response
      */
     public function exportAdjustmentLogToCsv(Collection $adjustments, string $filename): Response
     {
         return $this->exportToCsv(function () use ($adjustments) {
             $file = fopen('php://output', 'w');
-            
+
             fputcsv($file, [
                 'Date',
                 'Product',
@@ -239,16 +214,12 @@ class ReportExporter
 
     /**
      * Export Recent Transactions to CSV.
-     *
-     * @param Collection $transactions
-     * @param string $filename
-     * @return Response
      */
     public function exportRecentTransactionsToCsv(Collection $transactions, string $filename): Response
     {
         return $this->exportToCsv(function () use ($transactions) {
             $file = fopen('php://output', 'w');
-            
+
             fputcsv($file, [
                 'Type',
                 'Invoice',
@@ -275,23 +246,19 @@ class ReportExporter
 
     /**
      * Export Cash Flow Statement to CSV.
-     *
-     * @param array $reportData
-     * @param string $filename
-     * @return Response
      */
     public function exportCashFlowToCsv(array $reportData, string $filename): Response
     {
         return $this->exportToCsv(function () use ($reportData) {
             $file = fopen('php://output', 'w');
-            
+
             fputcsv($file, ['Cash Flow Statement']);
             fputcsv($file, ["Period: {$reportData['start_date']} to {$reportData['end_date']}"]);
             fputcsv($file, []);
 
             fputcsv($file, ['Operating Activities']);
             fputcsv($file, ['Net Income', CurrencyHelper::format($reportData['net_income'])]);
-            
+
             foreach ($reportData['non_cash_items'] as $item) {
                 fputcsv($file, [$item['account_name'], CurrencyHelper::format($item['amount'])]);
             }

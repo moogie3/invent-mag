@@ -8,7 +8,7 @@ use App\Models\Purchase;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\POItem>
+ * @extends Factory<POItem>
  */
 class POItemFactory extends Factory
 {
@@ -23,7 +23,7 @@ class POItemFactory extends Factory
         $price = $this->faker->randomFloat(2, 10, 200);
         $discount = $this->faker->randomFloat(2, 0, 10);
         $discountType = $this->faker->randomElement(['fixed', 'percentage']);
-        
+
         $discountAmountPerUnit = $discountType === 'percentage' ? ($price * $discount) / 100 : $discount;
         $total = ($price - $discountAmountPerUnit) * $quantity;
         $expiryDate = $this->faker->boolean(70) ? $this->faker->dateTimeBetween('now', '+1 year')->format('Y-m-d H:i:s') : null;

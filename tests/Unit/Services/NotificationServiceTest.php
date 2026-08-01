@@ -2,16 +2,15 @@
 
 namespace Tests\Unit\Services;
 
+use App\Models\Payment;
 use App\Models\POItem;
 use App\Models\Product;
 use App\Models\Purchase;
 use App\Models\Sales;
-use App\Models\Payment;
 use App\Services\NotificationService;
-use Carbon\Carbon;
-use Tests\TestCase;
-use PHPUnit\Framework\Attributes\Test;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use PHPUnit\Framework\Attributes\Test;
+use Tests\TestCase;
 use Tests\Traits\CreatesTenant;
 
 class NotificationServiceTest extends TestCase
@@ -24,7 +23,7 @@ class NotificationServiceTest extends TestCase
     {
         parent::setUp();
         $this->setupTenant();
-        $this->notificationService = new NotificationService();
+        $this->notificationService = new NotificationService;
     }
 
     #[Test]
@@ -46,13 +45,13 @@ class NotificationServiceTest extends TestCase
         $product = Product::factory()->create();
         $purchase = Purchase::factory()->create(['due_date' => now()->addYear(), 'status' => 'Paid']);
         POItem::factory()->create(['product_id' => $product->id, 'po_id' => $purchase->id, 'expiry_date' => now()->addDays(20)]);
-        
+
         // Paid purchase - should not be in notifications
         $paidPurchase = Purchase::factory()->create(['due_date' => now()->addDays(1), 'status' => 'Paid']);
         Payment::factory()->create([
             'paymentable_id' => $paidPurchase->id,
             'paymentable_type' => Purchase::class,
-            'payment_date' => now()->subDay()
+            'payment_date' => now()->subDay(),
         ]);
 
         // Paid today - should be in notifications
@@ -60,9 +59,8 @@ class NotificationServiceTest extends TestCase
         Payment::factory()->create([
             'paymentable_id' => $paidTodayPurchase->id,
             'paymentable_type' => Purchase::class,
-            'payment_date' => now()
+            'payment_date' => now(),
         ]);
-
 
         // 2. Call the service method
         $notifications = $this->notificationService->getDueNotifications();
@@ -72,7 +70,7 @@ class NotificationServiceTest extends TestCase
 
         $notificationTitles = $notifications->pluck('title');
         $this->assertContains('Due Purchase: PO #1', $notificationTitles);
-        $this->assertContains('Due Invoice: #' . $sale->invoice, $notificationTitles);
+        $this->assertContains('Due Invoice: #'.$sale->invoice, $notificationTitles);
         $this->assertTrue($notifications->contains(function ($value, $key) {
             return str_starts_with($value['title'], 'Low Stock Alert');
         }));

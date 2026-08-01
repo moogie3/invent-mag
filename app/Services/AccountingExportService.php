@@ -12,41 +12,31 @@ class AccountingExportService
 {
     /**
      * Export to PDF.
-     *
-     * @param string $view
-     * @param array $data
-     * @param string $filename
-     * @param string $orientation
-     * @return Response
      */
     public function exportToPdf(string $view, array $data, string $filename, string $orientation = 'landscape'): Response
     {
-        $dompdf = new Dompdf();
+        $dompdf = new Dompdf;
         $html = view($view, $data)->render();
         $dompdf->loadHtml($html);
         $dompdf->setPaper('A4', $orientation);
         $dompdf->render();
 
         $output = $dompdf->output();
-        
+
         return response($output, 200, [
             'Content-Type' => 'application/pdf',
-            'Content-Disposition' => 'inline; filename="' . $filename . '"',
+            'Content-Disposition' => 'inline; filename="'.$filename.'"',
         ]);
     }
 
     /**
      * Export to CSV.
-     *
-     * @param callable $callback
-     * @param string $filename
-     * @return StreamedResponse
      */
     public function exportToCsv(callable $callback, string $filename): StreamedResponse
     {
         $headers = [
             'Content-type' => 'text/csv',
-            'Content-Disposition' => 'attachment; filename=' . $filename,
+            'Content-Disposition' => 'attachment; filename='.$filename,
             'Pragma' => 'no-cache',
             'Cache-Control' => 'must-revalidate, post-check=0, pre-check=0',
             'Expires' => '0',
@@ -57,10 +47,6 @@ class AccountingExportService
 
     /**
      * Export Chart of Accounts to PDF.
-     *
-     * @param Collection $accounts
-     * @param string $filename
-     * @return Response
      */
     public function exportChartOfAccountsToPdf(Collection $accounts, string $filename): Response
     {
@@ -74,10 +60,6 @@ class AccountingExportService
 
     /**
      * Export Chart of Accounts to CSV.
-     *
-     * @param array $accountList
-     * @param string $filename
-     * @return Response
      */
     public function exportChartOfAccountsToCsv(array $accountList, string $filename): Response
     {
@@ -100,12 +82,6 @@ class AccountingExportService
 
     /**
      * Export Journal to PDF.
-     *
-     * @param Collection $entries
-     * @param string $startDate
-     * @param string $endDate
-     * @param string $filename
-     * @return Response
      */
     public function exportJournalToPdf(Collection $entries, string $startDate, string $endDate, string $filename): Response
     {
@@ -119,10 +95,6 @@ class AccountingExportService
 
     /**
      * Export Journal to CSV.
-     *
-     * @param Collection $entries
-     * @param string $filename
-     * @return Response
      */
     public function exportJournalToCsv(Collection $entries, string $filename): Response
     {
@@ -149,13 +121,6 @@ class AccountingExportService
 
     /**
      * Export Trial Balance to PDF.
-     *
-     * @param array $reportData
-     * @param float $totalDebits
-     * @param float $totalCredits
-     * @param string $endDate
-     * @param string $filename
-     * @return Response
      */
     public function exportTrialBalanceToPdf(array $reportData, float $totalDebits, float $totalCredits, string $endDate, string $filename): Response
     {
@@ -169,19 +134,12 @@ class AccountingExportService
 
     /**
      * Export Trial Balance to CSV.
-     *
-     * @param array $reportData
-     * @param float $totalDebits
-     * @param float $totalCredits
-     * @param string $endDate
-     * @param string $filename
-     * @return Response
      */
     public function exportTrialBalanceToCsv(array $reportData, float $totalDebits, float $totalCredits, string $endDate, string $filename): Response
     {
         return $this->exportToCsv(function () use ($reportData, $totalDebits, $totalCredits, $endDate) {
             $file = fopen('php://output', 'w');
-            fputcsv($file, ['Trial Balance as of ' . $endDate]);
+            fputcsv($file, ['Trial Balance as of '.$endDate]);
             fputcsv($file, []);
             fputcsv($file, ['Code', 'Account', 'Debit', 'Credit']);
 
@@ -208,14 +166,7 @@ class AccountingExportService
     /**
      * Export General Ledger to PDF.
      *
-     * @param mixed $account
-     * @param Collection $transactions
-     * @param float $openingBalance
-     * @param float $closingBalance
-     * @param string $startDate
-     * @param string $endDate
-     * @param string $filename
-     * @return Response
+     * @param  mixed  $account
      */
     public function exportGeneralLedgerToPdf($account, Collection $transactions, float $openingBalance, float $closingBalance, string $startDate, string $endDate, string $filename): Response
     {
@@ -230,21 +181,14 @@ class AccountingExportService
     /**
      * Export General Ledger to CSV.
      *
-     * @param mixed $account
-     * @param Collection $transactions
-     * @param float $openingBalance
-     * @param float $closingBalance
-     * @param string $startDate
-     * @param string $endDate
-     * @param string $filename
-     * @return Response
+     * @param  mixed  $account
      */
     public function exportGeneralLedgerToCsv($account, Collection $transactions, float $openingBalance, float $closingBalance, string $startDate, string $endDate, string $filename): Response
     {
         return $this->exportToCsv(function () use ($account, $transactions, $openingBalance, $closingBalance, $startDate, $endDate) {
             $file = fopen('php://output', 'w');
             fputcsv($file, ['Account:', $account->name]);
-            fputcsv($file, ['Period:', $startDate . ' to ' . $endDate]);
+            fputcsv($file, ['Period:', $startDate.' to '.$endDate]);
             fputcsv($file, []);
             fputcsv($file, ['Date', 'Description', 'Debit', 'Credit', 'Balance']);
 

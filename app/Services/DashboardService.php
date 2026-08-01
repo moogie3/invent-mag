@@ -5,10 +5,11 @@ namespace App\Services;
 use App\Helpers\CurrencyHelper;
 use App\Models\Categories;
 use App\Models\Customer;
+use App\Models\POItem;
 use App\Models\Product;
+use App\Models\ProductWarehouse;
 use App\Models\Purchase;
 use App\Models\Sales;
-use App\Models\SalesItem;
 use App\Models\Supplier;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
@@ -17,7 +18,7 @@ class DashboardService
 {
     public function getDashboardData(array $dates = [], $reportType = 'all', $categoryId = null)
     {
-        if (empty($dates) || !isset($dates['start']) || !isset($dates['end'])) {
+        if (empty($dates) || ! isset($dates['start']) || ! isset($dates['end'])) {
             $dates = $this->calculateDateRange('this_year');
         }
         $totalLiability = Purchase::sum('total');
@@ -29,7 +30,7 @@ class DashboardService
         $inCountUnpaid = $this->getPurchaseCountbyLocation('IN', 'Unpaid');
         $recentSales = Sales::with('customer:id,name')->select('id', 'customer_id', 'invoice', 'total', 'status', 'created_at')->orderBy('created_at', 'desc')->limit(3)->get()->each->setAppends([]);
         $recentPurchases = Purchase::with('supplier:id,name')->select('id', 'supplier_id', 'invoice', 'total', 'status', 'created_at')->orderBy('created_at', 'desc')->limit(3)->get()->each->setAppends([]);
-        
+
         // New aging calculations
         $arAging = $this->getAccountsReceivableAging();
         $apAging = $this->getAccountsPayableAging();
@@ -44,10 +45,10 @@ class DashboardService
         $topCategories = $this->getTopCategories($dates);
         $monthlyData = $this->getMonthlyData($dates, $categoryId);
         // $lowStockProducts = Product::getLowStockProducts(); // Old logic
-        
+
         // Fetch low stock items per warehouse - optimized to filter in database
         $tenantId = app('currentTenant')->id;
-        $lowStockProducts = \App\Models\ProductWarehouse::with(['product', 'warehouse'])
+        $lowStockProducts = ProductWarehouse::with(['product', 'warehouse'])
             ->where('product_warehouse.tenant_id', $tenantId)
             ->where('product_warehouse.quantity', '>', 0)
             ->whereHas('product', function ($query) use ($tenantId) {
@@ -56,10 +57,10 @@ class DashboardService
             })
             ->get();
 
-        $expiringSoonItems = \App\Models\POItem::getExpiringSoonItems();
+        $expiringSoonItems = POItem::getExpiringSoonItems();
 
         $monthFormat = DB::connection()->getDriverName() === 'sqlite' ? "strftime('%b', order_date)" : "DATE_FORMAT(order_date, '%b')";
-        $monthNumFormat = DB::connection()->getDriverName() === 'sqlite' ? "strftime('%m', order_date)" : "MONTH(order_date)";
+        $monthNumFormat = DB::connection()->getDriverName() === 'sqlite' ? "strftime('%m', order_date)" : 'MONTH(order_date)';
 
         $salesData = Sales::selectRaw("
             $monthFormat as month,
@@ -142,12 +143,12 @@ class DashboardService
     {
         $dates = $this->calculateDateRange($dateRange, $startDate, $endDate);
 
-        $monthFormat    = DB::connection()->getDriverName() === 'sqlite'
+        $monthFormat = DB::connection()->getDriverName() === 'sqlite'
             ? "strftime('%b', order_date)"
             : "DATE_FORMAT(order_date, '%b')";
         $monthNumFormat = DB::connection()->getDriverName() === 'sqlite'
             ? "strftime('%m', order_date)"
-            : "MONTH(order_date)";
+            : 'MONTH(order_date)';
 
         if ($type === 'purchases') {
             $rows = Purchase::selectRaw("
@@ -172,10 +173,10 @@ class DashboardService
         }
 
         return [
-            'labels'    => $rows->pluck('month')->toArray(),
-            'data'      => $rows->pluck('total')->toArray(),
+            'labels' => $rows->pluck('month')->toArray(),
+            'data' => $rows->pluck('total')->toArray(),
             'formatted' => $rows->pluck('total')
-                ->map(fn($val) => CurrencyHelper::format($val))
+                ->map(fn ($val) => CurrencyHelper::format($val))
                 ->toArray(),
         ];
     }
@@ -340,7 +341,7 @@ class DashboardService
                 'route' => null,
                 'percentage' => $totalLiability > 0 ? round(($unpaidLiability / $totalLiability) * 100) : 0,
                 'trend' => $unpaidLiability < $totalLiability * 0.5 ? 'positive' : 'negative',
-                'trend_label' => $totalLiability > 0 ? round(($unpaidLiability / $totalLiability) * 100) . '%' : '0%',
+                'trend_label' => $totalLiability > 0 ? round(($unpaidLiability / $totalLiability) * 100).'%' : '0%',
                 'trend_icon' => $unpaidLiability < $totalLiability * 0.5 ? 'ti ti-trending-up' : 'ti ti-trending-down',
                 'badge_class' => $unpaidLiability < $totalLiability * 0.5 ? 'bg-success-lt' : 'bg-danger-lt',
             ],
@@ -355,7 +356,7 @@ class DashboardService
                 'route' => null,
                 'percentage' => $totalRevenue > 0 ? round(($unpaidRevenue / $totalRevenue) * 100) : 0,
                 'trend' => $unpaidRevenue > $totalRevenue * 0.5 ? 'positive' : 'negative',
-                'trend_label' => $totalRevenue > 0 ? round(($unpaidRevenue / $totalRevenue) * 100) . '%' : '0%',
+                'trend_label' => $totalRevenue > 0 ? round(($unpaidRevenue / $totalRevenue) * 100).'%' : '0%',
                 'trend_icon' => $unpaidRevenue > $totalRevenue * 0.5 ? 'ti ti-trending-up' : 'ti ti-trending-down',
                 'badge_class' => $unpaidRevenue > $totalRevenue * 0.5 ? 'bg-success-lt' : 'bg-danger-lt',
             ],
@@ -401,14 +402,14 @@ class DashboardService
     {
         $tenantId = app('currentTenant')->id;
         $driver = DB::connection()->getDriverName();
-        
+
         // Calculate days overdue: NOW - due_date
         // SQLite: julianday('now') - julianday(due_date)
         // MySQL: DATEDIFF(NOW(), due_date)
-        
-        $diffSql = $driver === 'sqlite' 
-            ? "julianday('now') - julianday(due_date)" 
-            : "DATEDIFF(NOW(), due_date)";
+
+        $diffSql = $driver === 'sqlite'
+            ? "julianday('now') - julianday(due_date)"
+            : 'DATEDIFF(NOW(), due_date)';
 
         $results = DB::table('sales')
             ->selectRaw("
@@ -438,10 +439,10 @@ class DashboardService
     {
         $tenantId = app('currentTenant')->id;
         $driver = DB::connection()->getDriverName();
-        
-        $diffSql = $driver === 'sqlite' 
-            ? "julianday('now') - julianday(due_date)" 
-            : "DATEDIFF(NOW(), due_date)";
+
+        $diffSql = $driver === 'sqlite'
+            ? "julianday('now') - julianday(due_date)"
+            : 'DATEDIFF(NOW(), due_date)';
 
         $results = DB::table('po')
             ->selectRaw("
@@ -493,7 +494,6 @@ class DashboardService
         $prevGrossProfit = $prevMonthTotalRevenue - $prevMonthCogs;
         $prevOperatingIncome = $prevGrossProfit - $prevMonthOperatingExpenses;
 
-
         $paidLiabilities = $this->getLiabilityPaymentsMonthly();
         $receivablePaid = $this->getPaidDebtMonthly();
         $netProfit = $totalRevenue - $operatingExpenses;
@@ -504,7 +504,6 @@ class DashboardService
         $netProfitChange = $prevNetProfit > 0 ? (($netProfit - $prevNetProfit) / $prevNetProfit) * 100 : 0;
         $grossProfitChange = $prevGrossProfit > 0 ? (($grossProfit - $prevGrossProfit) / $prevGrossProfit) * 100 : 0;
         $operatingIncomeChange = $prevOperatingIncome > 0 ? (($operatingIncome - $prevOperatingIncome) / $prevOperatingIncome) * 100 : 0;
-
 
         return [
             [
@@ -672,7 +671,7 @@ class DashboardService
         return [
             'labels' => $salesData->pluck('date')->toArray(),
             'data' => $salesData->pluck('total')->toArray(),
-            'formatted' => $salesData->pluck('total')->map(fn($val) => number_format($val))->toArray(),
+            'formatted' => $salesData->pluck('total')->map(fn ($val) => number_format($val))->toArray(),
         ];
     }
 
@@ -687,7 +686,7 @@ class DashboardService
         return [
             'labels' => $purchaseData->pluck('date')->toArray(),
             'data' => $purchaseData->pluck('total')->toArray(),
-            'formatted' => $purchaseData->pluck('total')->map(fn($val) => number_format($val))->toArray(),
+            'formatted' => $purchaseData->pluck('total')->map(fn ($val) => number_format($val))->toArray(),
         ];
     }
 
@@ -717,23 +716,25 @@ class DashboardService
 
     private function getPurchaseCountByLocation($location, $status = null)
     {
-        $query = Purchase::whereHas('supplier', fn($q) => $q->where('location', $location));
+        $query = Purchase::whereHas('supplier', fn ($q) => $q->where('location', $location));
         if ($status) {
             $query->where('status', $status);
         }
+
         return $query->count();
     }
 
     private function getTopSellingProducts($dates)
     {
         $tenantId = app('currentTenant')->id;
+
         return DB::table('sales_items')
             ->join('sales', 'sales_items.sales_id', '=', 'sales.id')
             ->join('products', 'sales_items.product_id', '=', 'products.id')
             ->leftJoin('categories', 'products.category_id', '=', 'categories.id')
             ->select(
-                'sales_items.product_id', 
-                DB::raw('SUM(sales_items.quantity) as units_sold'), 
+                'sales_items.product_id',
+                DB::raw('SUM(sales_items.quantity) as units_sold'),
                 DB::raw('SUM(sales_items.total) as revenue'),
                 'products.name as product_name',
                 'products.code as product_code',
@@ -747,7 +748,7 @@ class DashboardService
             ->limit(5)
             ->get()
             ->map(
-                fn($item) => (object) [
+                fn ($item) => (object) [
                     'id' => $item->product_id,
                     'name' => $item->product_name ?? 'Unknown Product',
                     'code' => $item->product_code ?? 'N/A',
@@ -793,7 +794,7 @@ class DashboardService
             ->limit(5)
             ->get()
             ->map(
-                fn($item) => (object) [
+                fn ($item) => (object) [
                     'id' => $item->customer_id,
                     'name' => $item->customers->name ?? 'Unknown Customer',
                     'total_sales' => $item->total_sales,
@@ -840,7 +841,7 @@ class DashboardService
             ->limit(5)
             ->get()
             ->map(
-                fn($item) => (object) [
+                fn ($item) => (object) [
                     'id' => $item->supplier_id,
                     'name' => $item->suppliers->name ?? 'Unknown Supplier',
                     'location' => $item->suppliers->location ?? 'N/A',
@@ -872,10 +873,10 @@ class DashboardService
 
         // Main query to calculate average difference
         // DATEDIFF(last_payment_date, due_date)
-        
-        $dateDiffSql = $driver === 'sqlite' 
-            ? "julianday(p.last_payment_date) - julianday(sales.due_date)" 
-            : "DATEDIFF(p.last_payment_date, sales.due_date)";
+
+        $dateDiffSql = $driver === 'sqlite'
+            ? 'julianday(p.last_payment_date) - julianday(sales.due_date)'
+            : 'DATEDIFF(p.last_payment_date, sales.due_date)';
 
         $avgDays = DB::table('sales')
             ->joinSub($latestPayments, 'p', function ($join) {
@@ -917,7 +918,7 @@ class DashboardService
                         'invoice' => $sale->invoice,
                         'customer_supplier' => $sale->customer_name ?? 'Walk-in Customer',
                         'date' => $sale->order_date,
-                        'amount' => (float)$sale->total,
+                        'amount' => (float) $sale->total,
                         'status' => $sale->status,
                     ];
                 });
@@ -940,7 +941,7 @@ class DashboardService
                         'invoice' => $purchase->invoice,
                         'customer_supplier' => $purchase->supplier_name ?? 'Unknown Supplier',
                         'date' => $purchase->order_date,
-                        'amount' => (float)$purchase->total,
+                        'amount' => (float) $purchase->total,
                         'status' => $purchase->status,
                     ];
                 });

@@ -4,7 +4,6 @@ namespace App\Http\Controllers\SuperAdmin;
 
 use App\Http\Controllers\Controller;
 use App\Models\SubscriptionOrder;
-use Illuminate\Http\Request;
 
 class BillingController extends Controller
 {
@@ -27,6 +26,7 @@ class BillingController extends Controller
     public function show(SubscriptionOrder $order)
     {
         $order->load('tenant', 'plan');
+
         return view('superadmin.billing.show', compact('order'));
     }
 

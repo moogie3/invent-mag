@@ -2,11 +2,9 @@
 
 namespace Database\Seeders;
 
-use App\Models\User;
 use App\Models\Account;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+use App\Models\User;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Spatie\Permission\Models\Role;
 
@@ -22,8 +20,8 @@ class UserSeeder extends Seeder
         $tenantName = $tenant->name;
         $tenantNameSlug = strtolower(str_replace(' ', '-', $tenantName));
 
-        $email = 'admin-' . $tenantNameSlug . '@gmail.com';
-        
+        $email = 'admin-'.$tenantNameSlug.'@gmail.com';
+
         if (str_starts_with($tenantName, 'Demo ')) {
             if (str_contains($tenantName, 'Starter')) {
                 $email = 'starter@demo.com';
@@ -35,19 +33,19 @@ class UserSeeder extends Seeder
                 $email = 'admin@demo.com';
             }
         }
-        
+
         $this->command->info("Creating admin user for tenant: {$tenantName}");
-        
+
         // Generate shopname from tenant name
         $shopname = $tenantNameSlug;
         if (str_starts_with($tenantName, 'Demo ')) {
             $shopname = strtolower(str_replace(' ', '-', preg_replace('/\s+Workspace\s*$/', '', $tenantName)));
         }
-        
+
         $user = User::updateOrCreate(
             ['email' => $email, 'tenant_id' => $tenantId],
             [
-                'name' => 'admin-' . $tenantNameSlug,
+                'name' => 'admin-'.$tenantNameSlug,
                 'shopname' => $shopname,
                 'password' => Hash::make('password'),
                 'avatar' => '',
@@ -59,17 +57,16 @@ class UserSeeder extends Seeder
         $role = Role::where('name', 'superuser')->first();
         if ($role) {
             $user->assignRole($role);
-            $this->command->info("  - Assigned superuser role");
+            $this->command->info('  - Assigned superuser role');
         }
 
         // Set default accounting settings
-        $cashAccount = Account::where('code', '1110-' . $tenantId)->first();
-        $accountsPayableAccount = Account::where('code', '2110-' . $tenantId)->first();
-        $inventoryAccount = Account::where('code', '1140-' . $tenantId)->first();
-        $salesRevenueAccount = Account::where('code', '4100-' . $tenantId)->first();
-        $accountsReceivableAccount = Account::where('code', '1130-' . $tenantId)->first();
-        $costOfGoodsSoldAccount = Account::where('code', '5200-' . $tenantId)->first();
-
+        $cashAccount = Account::where('code', '1110-'.$tenantId)->first();
+        $accountsPayableAccount = Account::where('code', '2110-'.$tenantId)->first();
+        $inventoryAccount = Account::where('code', '1140-'.$tenantId)->first();
+        $salesRevenueAccount = Account::where('code', '4100-'.$tenantId)->first();
+        $accountsReceivableAccount = Account::where('code', '1130-'.$tenantId)->first();
+        $costOfGoodsSoldAccount = Account::where('code', '5200-'.$tenantId)->first();
 
         if ($cashAccount && $accountsPayableAccount && $inventoryAccount && $salesRevenueAccount && $accountsReceivableAccount && $costOfGoodsSoldAccount) {
             $user->accounting_settings = [
@@ -81,9 +78,9 @@ class UserSeeder extends Seeder
                 'cost_of_goods_sold_account_id' => $costOfGoodsSoldAccount->id,
             ];
             $user->save();
-            $this->command->info("  - Configured default accounting settings");
+            $this->command->info('  - Configured default accounting settings');
         }
-        
+
         $this->command->info("Admin user created: {$email} (password: 'password')");
         $this->command->info("User seeding completed for tenant: {$tenantName}");
     }

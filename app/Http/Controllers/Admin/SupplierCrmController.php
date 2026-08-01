@@ -19,9 +19,10 @@ class SupplierCrmController extends Controller
     {
         try {
             $data = $this->crmService->getSupplierCrmData($id, $request->input('page', 1));
+
             return response()->json($data);
         } catch (\Exception $e) {
-            return response()->json(['error' => 'Failed to load SRM data: ' . $e->getMessage()], 500);
+            return response()->json(['error' => 'Failed to load SRM data: '.$e->getMessage()], 500);
         }
     }
 
@@ -35,9 +36,10 @@ class SupplierCrmController extends Controller
 
         try {
             $interaction = $this->crmService->storeSupplierInteraction($request->all(), $supplierId);
+
             return response()->json($interaction);
         } catch (\Exception $e) {
-            return response()->json(['message' => 'Failed to store interaction: ' . $e->getMessage()], 500);
+            return response()->json(['message' => 'Failed to store interaction: '.$e->getMessage()], 500);
         }
     }
 
@@ -50,7 +52,7 @@ class SupplierCrmController extends Controller
                 'historical_purchases' => $historicalPurchases,
             ]);
         } catch (\Exception $e) {
-            return response()->json(['message' => 'Failed to load historical purchases: ' . $e->getMessage()], 500);
+            return response()->json(['message' => 'Failed to load historical purchases: '.$e->getMessage()], 500);
         }
     }
 
@@ -63,7 +65,7 @@ class SupplierCrmController extends Controller
                 'product_history' => $productHistory,
             ]);
         } catch (\Exception $e) {
-            return response()->json(['message' => 'Failed to load product history: ' . $e->getMessage()], 500);
+            return response()->json(['message' => 'Failed to load product history: '.$e->getMessage()], 500);
         }
     }
 }

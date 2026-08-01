@@ -25,7 +25,7 @@ class MultiTenancyTest extends TestCase
         $tenantA = Tenant::create(['name' => 'Tenant A', 'domain' => 'tenant-a.localhost']);
         $tenantA->makeCurrent();
         $userA = User::factory()->create(['email' => 'user@tenant-a.com', 'tenant_id' => $tenantA->id]);
-        
+
         // 2. Setup Tenant B
         Tenant::forgetCurrent();
         $tenantB = Tenant::create(['name' => 'Tenant B', 'domain' => 'tenant-b.localhost']);
@@ -47,7 +47,7 @@ class MultiTenancyTest extends TestCase
         $userA = User::factory()->create([
             'email' => 'admin@tenant-a.com',
             'password' => Hash::make('password'),
-            'tenant_id' => $tenantA->id
+            'tenant_id' => $tenantA->id,
         ]);
 
         // 2. Setup Tenant B (Empty)
@@ -57,7 +57,7 @@ class MultiTenancyTest extends TestCase
         $tenantB->makeCurrent();
 
         // 4. Attempt to login using Tenant A's credentials
-        // We use the route name to ensure we hit the correct endpoint, 
+        // We use the route name to ensure we hit the correct endpoint,
         // effectively simulating being on the current tenant's login page
         $response = $this->post(route('admin.login'), [
             'email' => 'admin@tenant-a.com',
@@ -78,7 +78,7 @@ class MultiTenancyTest extends TestCase
         $userA = User::factory()->create([
             'email' => 'admin@tenant-a.com',
             'password' => Hash::make('password'),
-            'tenant_id' => $tenantA->id
+            'tenant_id' => $tenantA->id,
         ]);
 
         // 2. Simulate being on Tenant A

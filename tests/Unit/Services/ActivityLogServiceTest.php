@@ -2,16 +2,18 @@
 
 namespace Tests\Unit\Services;
 
+use App\Models\Product;
+use App\Models\User;
 use App\Services\ActivityLogService;
-use Tests\TestCase;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Tests\Traits\CreatesTenant;
 use Database\Seeders\RoleSeeder;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Mockery;
+use Tests\TestCase;
+use Tests\Traits\CreatesTenant;
 
 class ActivityLogServiceTest extends TestCase
 {
-    use RefreshDatabase, CreatesTenant;
+    use CreatesTenant, RefreshDatabase;
 
     protected ActivityLogService $service;
 
@@ -20,10 +22,10 @@ class ActivityLogServiceTest extends TestCase
         parent::setUp();
         $this->setupTenant();
         $this->seed(RoleSeeder::class);
-        $this->service = new ActivityLogService();
+        $this->service = new ActivityLogService;
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         Mockery::close();
         parent::tearDown();
@@ -35,7 +37,7 @@ class ActivityLogServiceTest extends TestCase
         $method = $reflection->getMethod('guessLabel');
         $method->setAccessible(true);
 
-        $product = new \App\Models\Product(['name' => 'Test Product']);
+        $product = new Product(['name' => 'Test Product']);
         $result = $method->invoke($this->service, $product);
 
         $this->assertEquals('Test Product', $result);
@@ -47,7 +49,8 @@ class ActivityLogServiceTest extends TestCase
         $method = $reflection->getMethod('guessLabel');
         $method->setAccessible(true);
 
-        $model = new class {
+        $model = new class
+        {
             public $title = 'Test Title';
         };
         $result = $method->invoke($this->service, $model);
@@ -61,7 +64,8 @@ class ActivityLogServiceTest extends TestCase
         $method = $reflection->getMethod('guessLabel');
         $method->setAccessible(true);
 
-        $model = new class {
+        $model = new class
+        {
             public $invoice = 'INV-001';
         };
         $result = $method->invoke($this->service, $model);
@@ -86,7 +90,7 @@ class ActivityLogServiceTest extends TestCase
         $method = $reflection->getMethod('guessLabel');
         $method->setAccessible(true);
 
-        $model = new \stdClass();
+        $model = new \stdClass;
         $model->unknown_field = 'test';
         $result = $method->invoke($this->service, $model);
 
@@ -95,7 +99,7 @@ class ActivityLogServiceTest extends TestCase
 
     public function test_log_export_creates_export_activity()
     {
-        $user = \App\Models\User::factory()->create();
+        $user = User::factory()->create();
         $user->assignRole('superuser');
         $this->actingAs($user);
 

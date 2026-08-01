@@ -13,8 +13,8 @@ class BillingService
     /**
      * Get the next billing period dates.
      *
-     * @param Plan|null $plan  If provided, uses the plan's billing cycle length.
-     *                         Falls back to 30 days for backward compatibility.
+     * @param  Plan|null  $plan  If provided, uses the plan's billing cycle length.
+     *                           Falls back to 30 days for backward compatibility.
      */
     public function getNextBillingPeriod(?Plan $plan = null): array
     {
@@ -24,15 +24,15 @@ class BillingService
 
         return [
             'start' => $nextStart->toDateString(),
-            'end'   => $nextStart->copy()->addDays($days)->toDateString(),
+            'end' => $nextStart->copy()->addDays($days)->toDateString(),
         ];
     }
 
     /**
      * Get the current billing period dates.
      *
-     * @param Plan|null $plan  If provided, uses the plan's billing cycle length.
-     *                         Falls back to 30 days for backward compatibility.
+     * @param  Plan|null  $plan  If provided, uses the plan's billing cycle length.
+     *                           Falls back to 30 days for backward compatibility.
      */
     public function getCurrentBillingPeriod(?Plan $plan = null): array
     {
@@ -41,7 +41,7 @@ class BillingService
 
         return [
             'start' => $now->toDateString(),
-            'end'   => $now->copy()->addDays($days)->toDateString(),
+            'end' => $now->copy()->addDays($days)->toDateString(),
         ];
     }
 
@@ -170,7 +170,7 @@ class BillingService
         $creditAmount = $this->calculateDowngradeCredit($currentPlan, $newPlan, $daysRemaining);
 
         $tenant->pending_plan_id = $newPlan->id;
-        $tenant->pending_plan_effective_at = $nextPeriod['start'] . ' 00:00:00';
+        $tenant->pending_plan_effective_at = $nextPeriod['start'].' 00:00:00';
         $tenant->proration_credit = $creditAmount;
 
         $this->initializeBillingPeriodIfEmpty($tenant, $newPlan);
@@ -196,7 +196,7 @@ class BillingService
      */
     public function cancelScheduledDowngrade(Tenant $tenant): bool
     {
-        if (!$tenant->hasScheduledDowngrade()) {
+        if (! $tenant->hasScheduledDowngrade()) {
             return false;
         }
 
@@ -219,8 +219,8 @@ class BillingService
      * This is the ONLY method that should handle post-payment plan activation.
      * Used by PlanController, MidtransController webhook, and API PaymentController.
      *
-     * @param SubscriptionOrder  $order       The paid order
-     * @param array              $paymentInfo Raw payment info from Midtrans (optional)
+     * @param  SubscriptionOrder  $order  The paid order
+     * @param  array  $paymentInfo  Raw payment info from Midtrans (optional)
      * @return array Operation result with keys: type, message, plan, and optional proration/effective_date
      */
     public function confirmPayment(SubscriptionOrder $order, array $paymentInfo = []): array
@@ -238,10 +238,10 @@ class BillingService
         $this->initializeBillingPeriodIfEmpty($tenant, $newPlan);
 
         match ($changeType) {
-            'upgrade'  => $result = $this->confirmUpgrade($tenant, $order, $newPlan, $currentPlan),
-            'same'     => $result = $this->confirmRenewal($tenant, $order, $newPlan),
+            'upgrade' => $result = $this->confirmUpgrade($tenant, $order, $newPlan, $currentPlan),
+            'same' => $result = $this->confirmRenewal($tenant, $order, $newPlan),
             'downgrade' => $result = $this->confirmDowngrade($tenant, $order, $newPlan, $currentPlan),
-            default    => $result = ['type' => 'unknown', 'message' => 'Unknown change type.'],
+            default => $result = ['type' => 'unknown', 'message' => 'Unknown change type.'],
         };
 
         return $result;
@@ -332,7 +332,7 @@ class BillingService
             : 0.0;
 
         $tenant->pending_plan_id = $newPlan->id;
-        $tenant->pending_plan_effective_at = $nextPeriod['start'] . ' 00:00:00';
+        $tenant->pending_plan_effective_at = $nextPeriod['start'].' 00:00:00';
         $tenant->proration_credit = $creditAmount;
         $tenant->trial_ends_at = null;
         $tenant->save();

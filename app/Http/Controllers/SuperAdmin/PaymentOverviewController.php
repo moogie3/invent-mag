@@ -22,6 +22,7 @@ class PaymentOverviewController extends Controller
         $revenueByGateway = $paidOrders_all
             ->groupBy(function ($order) {
                 $info = $order->payment_info;
+
                 return is_array($info) && isset($info['payment_type'])
                     ? $info['payment_type']
                     : 'unknown';
@@ -43,7 +44,8 @@ class PaymentOverviewController extends Controller
                 return $order->paid_at->format('Y-m');
             })
             ->map(function ($group, $month) {
-                $label = date('M Y', strtotime($month . '-01'));
+                $label = date('M Y', strtotime($month.'-01'));
+
                 return (object) [
                     'month' => $month,
                     'label' => $label,
@@ -53,15 +55,15 @@ class PaymentOverviewController extends Controller
             ->sortBy('month')
             ->values();
 
-        $chartMonths = array();
-        $chartRevenue = array();
+        $chartMonths = [];
+        $chartRevenue = [];
         foreach ($monthlyRevenue as $mr) {
             $chartMonths[] = $mr->label;
             $chartRevenue[] = $mr->total;
         }
 
-        $gatewayLabels = array();
-        $gatewayData = array();
+        $gatewayLabels = [];
+        $gatewayData = [];
         foreach ($revenueByGateway as $gw) {
             $gwLabel = ucfirst(str_replace('_', ' ', $gw->gateway));
             $gatewayLabels[] = $gwLabel;

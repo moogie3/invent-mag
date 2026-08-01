@@ -1,9 +1,7 @@
 <?php
 
-use Illuminate\Database\Migrations\Migration;
-use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Support\Facades\Schema;
 use App\Models\Plan;
+use Illuminate\Database\Migrations\Migration;
 
 return new class extends Migration
 {
@@ -12,7 +10,7 @@ return new class extends Migration
         $plans = Plan::whereIn('slug', ['professional', 'enterprise'])->get();
         foreach ($plans as $plan) {
             $features = $plan->features ?? [];
-            if (!in_array('stock_opname', $features)) {
+            if (! in_array('stock_opname', $features)) {
                 $features[] = 'stock_opname';
                 $plan->features = $features;
                 $plan->save();

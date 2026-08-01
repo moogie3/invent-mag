@@ -707,7 +707,7 @@ All three reuse the existing universal `is_pph` mechanism. No separate engines o
 
 | Feature                    | Tier          | Status                   |
 | -------------------------- | ------------- | ------------------------ |
-| Bank Reconciliation        | Professional+ | Planned                  |
+| ~~Bank Reconciliation~~        | Professional+ | ✅ DONE Aug 2026 (CSV-based; variance gate, entry locking, reconciled badges) |
 | Advanced Multi-Currency    | Professional+ | Planned                  |
 | e-Faktur Phase 2: PJAP API | Enterprise    | Planned (8 deliverables) |
 

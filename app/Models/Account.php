@@ -2,14 +2,14 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\BelongsToTenant;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use App\Models\Concerns\BelongsToTenant;
 
 class Account extends Model
 {
-    use HasFactory, BelongsToTenant;
+    use BelongsToTenant, HasFactory;
 
     protected $fillable = [
         'parent_id',
@@ -40,6 +40,7 @@ class Account extends Model
     ];
 
     public const NORMAL_BALANCE_DEBIT = 'debit';
+
     public const NORMAL_BALANCE_CREDIT = 'credit';
 
     /**
@@ -85,6 +86,7 @@ class Account extends Model
         if (in_array($this->type, ['asset', 'expense'])) {
             return $debits - $credits;
         }
+
         return $credits - $debits;
     }
 
@@ -112,6 +114,7 @@ class Account extends Model
         if (in_array($this->type, ['asset', 'expense'])) {
             return $debits - $credits;
         }
+
         return $credits - $debits;
     }
 
@@ -120,8 +123,8 @@ class Account extends Model
      */
     public function canBeDeleted(): bool
     {
-        return !$this->transactions()->exists() &&
-               !$this->children()->exists() &&
+        return ! $this->transactions()->exists() &&
+               ! $this->children()->exists() &&
                $this->opening_balance == 0;
     }
 
@@ -143,6 +146,7 @@ class Account extends Model
                 ? self::NORMAL_BALANCE_CREDIT
                 : self::NORMAL_BALANCE_DEBIT;
         }
+
         return $this->normal_balance;
     }
 

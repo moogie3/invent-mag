@@ -5,20 +5,19 @@ namespace Tests\Feature\Admin;
 use App\Models\Customer;
 use App\Models\Product;
 use App\Models\Quotation;
-use App\Models\Sales;
 use App\Models\Tax;
-use App\Models\User;
 use App\Models\Warehouse;
+use Database\Seeders\RoleSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 use Tests\Traits\CreatesTenant;
-use Database\Seeders\RoleSeeder;
 
 class QuotationControllerTest extends TestCase
 {
-    use RefreshDatabase, CreatesTenant;
+    use CreatesTenant, RefreshDatabase;
 
     protected Customer $customer;
+
     protected Tax $tax;
 
     protected function setUp(): void
@@ -41,7 +40,7 @@ class QuotationControllerTest extends TestCase
     private function createQuotation(array $overrides = []): Quotation
     {
         return Quotation::create(array_merge([
-            'quotation_number' => 'QTN-' . now()->format('Ymd') . '-0001',
+            'quotation_number' => 'QTN-'.now()->format('Ymd').'-0001',
             'customer_id' => $this->customer->id,
             'user_id' => $this->user->id,
             'quotation_date' => now()->toDateString(),
@@ -67,7 +66,7 @@ class QuotationControllerTest extends TestCase
     public function test_it_can_display_the_quotation_index_page()
     {
         $this->createQuotation();
-        $this->createQuotation(['quotation_number' => 'QTN-' . now()->format('Ymd') . '-0002']);
+        $this->createQuotation(['quotation_number' => 'QTN-'.now()->format('Ymd').'-0002']);
 
         $response = $this->get(route('admin.quotations'));
 
@@ -271,8 +270,8 @@ class QuotationControllerTest extends TestCase
 
     public function test_it_can_bulk_delete_quotations()
     {
-        $q1 = $this->createQuotation(['quotation_number' => 'QTN-' . now()->format('Ymd') . '-0010']);
-        $q2 = $this->createQuotation(['quotation_number' => 'QTN-' . now()->format('Ymd') . '-0011']);
+        $q1 = $this->createQuotation(['quotation_number' => 'QTN-'.now()->format('Ymd').'-0010']);
+        $q2 = $this->createQuotation(['quotation_number' => 'QTN-'.now()->format('Ymd').'-0011']);
 
         $response = $this->post(route('admin.quotations.bulk-delete'), [
             'ids' => [$q1->id, $q2->id],
@@ -435,9 +434,9 @@ class QuotationControllerTest extends TestCase
 
         $this->post(route('admin.quotations.store'), $data);
 
-        $prefix = 'QTN-' . now()->format('Ymd');
+        $prefix = 'QTN-'.now()->format('Ymd');
         $this->assertDatabaseHas('quotations', [
-            'quotation_number' => $prefix . '-0001',
+            'quotation_number' => $prefix.'-0001',
         ]);
 
         // Create another - should increment
@@ -447,11 +446,11 @@ class QuotationControllerTest extends TestCase
         $this->post(route('admin.quotations.store'), $data);
 
         $this->assertDatabaseHas('quotations', [
-            'quotation_number' => $prefix . '-0002',
+            'quotation_number' => $prefix.'-0002',
         ]);
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         if (class_exists(\Mockery::class)) {
             \Mockery::close();

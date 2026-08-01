@@ -3,18 +3,16 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\Account;
 use App\Models\JournalEntry;
-use App\Services\ManualJournalEntryService;
 use App\Services\AccountingAuditService;
+use App\Services\ManualJournalEntryService;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-use Carbon\Carbon;
 
 class JournalEntryController extends Controller
 {
     protected $manualJournalService;
+
     protected $auditService;
 
     public function __construct(ManualJournalEntryService $manualJournalService, AccountingAuditService $auditService)
@@ -47,6 +45,7 @@ class JournalEntryController extends Controller
     public function create()
     {
         $accounts = $this->manualJournalService->getAvailableAccounts();
+
         return view('admin.accounting.journal-entries.create', compact('accounts'));
     }
 
@@ -67,13 +66,15 @@ class JournalEntryController extends Controller
 
         try {
             $entry = $this->manualJournalService->create($data);
+
             return redirect()->route('admin.accounting.journal-entries.index')
                 ->with('success', 'Journal entry created successfully.');
         } catch (\Exception $e) {
-            Log::error('Failed to create journal entry: ' . $e->getMessage());
+            Log::error('Failed to create journal entry: '.$e->getMessage());
+
             return redirect()->back()
                 ->withInput()
-                ->with('error', 'Error creating journal entry: ' . $e->getMessage());
+                ->with('error', 'Error creating journal entry: '.$e->getMessage());
         }
     }
 
@@ -84,6 +85,7 @@ class JournalEntryController extends Controller
     {
         $entry = $this->manualJournalService->getEntryDetails($journalEntry);
         $auditLogs = $this->auditService->getEntryAuditLogs($journalEntry);
+
         return view('admin.accounting.journal-entries.show', compact('entry', 'auditLogs'));
     }
 
@@ -99,6 +101,7 @@ class JournalEntryController extends Controller
 
         $entry = $this->manualJournalService->getEntryDetails($journalEntry);
         $accounts = $this->manualJournalService->getAvailableAccounts();
+
         return view('admin.accounting.journal-entries.edit', compact('entry', 'accounts'));
     }
 
@@ -119,13 +122,15 @@ class JournalEntryController extends Controller
 
         try {
             $entry = $this->manualJournalService->update($journalEntry, $data);
+
             return redirect()->route('admin.accounting.journal-entries.show', $entry)
                 ->with('success', 'Journal entry updated successfully.');
         } catch (\Exception $e) {
-            Log::error('Failed to update journal entry: ' . $e->getMessage());
+            Log::error('Failed to update journal entry: '.$e->getMessage());
+
             return redirect()->back()
                 ->withInput()
-                ->with('error', 'Error updating journal entry: ' . $e->getMessage());
+                ->with('error', 'Error updating journal entry: '.$e->getMessage());
         }
     }
 
@@ -136,12 +141,14 @@ class JournalEntryController extends Controller
     {
         try {
             $entry = $this->manualJournalService->post($journalEntry);
+
             return redirect()->route('admin.accounting.journal-entries.show', $entry)
                 ->with('success', 'Journal entry posted successfully.');
         } catch (\Exception $e) {
-            Log::error('Failed to post journal entry: ' . $e->getMessage());
+            Log::error('Failed to post journal entry: '.$e->getMessage());
+
             return redirect()->back()
-                ->with('error', 'Error posting journal entry: ' . $e->getMessage());
+                ->with('error', 'Error posting journal entry: '.$e->getMessage());
         }
     }
 
@@ -156,12 +163,14 @@ class JournalEntryController extends Controller
 
         try {
             $entry = $this->manualJournalService->void($journalEntry, $request->reason);
+
             return redirect()->route('admin.accounting.journal-entries.show', $entry)
                 ->with('success', 'Journal entry voided successfully.');
         } catch (\Exception $e) {
-            Log::error('Failed to void journal entry: ' . $e->getMessage());
+            Log::error('Failed to void journal entry: '.$e->getMessage());
+
             return redirect()->back()
-                ->with('error', 'Error voiding journal entry: ' . $e->getMessage());
+                ->with('error', 'Error voiding journal entry: '.$e->getMessage());
         }
     }
 
@@ -172,12 +181,14 @@ class JournalEntryController extends Controller
     {
         try {
             $reversalEntry = $this->manualJournalService->reverse($journalEntry, $request->notes);
+
             return redirect()->route('admin.accounting.journal-entries.show', $reversalEntry)
                 ->with('success', 'Journal entry reversed successfully.');
         } catch (\Exception $e) {
-            Log::error('Failed to reverse journal entry: ' . $e->getMessage());
+            Log::error('Failed to reverse journal entry: '.$e->getMessage());
+
             return redirect()->back()
-                ->with('error', 'Error reversing journal entry: ' . $e->getMessage());
+                ->with('error', 'Error reversing journal entry: '.$e->getMessage());
         }
     }
 
@@ -188,28 +199,28 @@ class JournalEntryController extends Controller
     {
         try {
             $this->manualJournalService->delete($journalEntry);
-            
+
             if (request()->ajax() || request()->wantsJson()) {
                 return response()->json([
                     'success' => true,
                     'message' => 'Journal entry deleted successfully.',
                 ]);
             }
-            
+
             return redirect()->route('admin.accounting.journal-entries.index')
                 ->with('success', 'Journal entry deleted successfully.');
         } catch (\Exception $e) {
-            Log::error('Failed to delete journal entry: ' . $e->getMessage());
-            
+            Log::error('Failed to delete journal entry: '.$e->getMessage());
+
             if (request()->ajax() || request()->wantsJson()) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Error deleting journal entry: ' . $e->getMessage(),
+                    'message' => 'Error deleting journal entry: '.$e->getMessage(),
                 ]);
             }
-            
+
             return redirect()->back()
-                ->with('error', 'Error deleting journal entry: ' . $e->getMessage());
+                ->with('error', 'Error deleting journal entry: '.$e->getMessage());
         }
     }
 
@@ -220,12 +231,14 @@ class JournalEntryController extends Controller
     {
         try {
             $newEntry = $this->manualJournalService->duplicate($journalEntry, $request->get('auto_post', false));
+
             return redirect()->route('admin.accounting.journal-entries.edit', $newEntry)
                 ->with('success', 'Journal entry duplicated. Please review and post.');
         } catch (\Exception $e) {
-            Log::error('Failed to duplicate journal entry: ' . $e->getMessage());
+            Log::error('Failed to duplicate journal entry: '.$e->getMessage());
+
             return redirect()->back()
-                ->with('error', 'Error duplicating journal entry: ' . $e->getMessage());
+                ->with('error', 'Error duplicating journal entry: '.$e->getMessage());
         }
     }
 
@@ -236,6 +249,7 @@ class JournalEntryController extends Controller
     {
         $query = $request->input('query', '');
         $accounts = $this->manualJournalService->searchAccounts($query);
+
         return response()->json([
             'success' => true,
             'accounts' => $accounts->map(function ($account) {
@@ -263,14 +277,14 @@ class JournalEntryController extends Controller
         $credits = 0;
 
         foreach ($transactions as $tx) {
-            if (!isset($tx['account_code'], $tx['type'], $tx['amount'])) {
+            if (! isset($tx['account_code'], $tx['type'], $tx['amount'])) {
                 return response()->json([
                     'success' => false,
                     'message' => 'Each transaction must have account_code, type, and amount.',
                 ], 422);
             }
 
-            if (!in_array($tx['type'], ['debit', 'credit'])) {
+            if (! in_array($tx['type'], ['debit', 'credit'])) {
                 return response()->json([
                     'success' => false,
                     'message' => "Invalid transaction type: {$tx['type']}",

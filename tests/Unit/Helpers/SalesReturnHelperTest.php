@@ -38,28 +38,28 @@ class SalesReturnHelperTest extends TestCase
     #[Test]
     public function it_returns_correct_status_text_for_completed()
     {
-        $expected = '<span class="h4"><i class="ti ti-check me-1 fs-4"></i> ' . __('messages.sr_status_completed') . '</span>';
+        $expected = '<span class="h4"><i class="ti ti-check me-1 fs-4"></i> '.__('messages.sr_status_completed').'</span>';
         $this->assertEquals($expected, SalesReturnHelper::getStatusText('completed'));
     }
 
     #[Test]
     public function it_returns_correct_status_text_for_pending()
     {
-        $expected = '<span class="h4"><i class="ti ti-clock me-1 fs-4"></i> ' . __('messages.sr_status_pending') . '</span>';
+        $expected = '<span class="h4"><i class="ti ti-clock me-1 fs-4"></i> '.__('messages.sr_status_pending').'</span>';
         $this->assertEquals($expected, SalesReturnHelper::getStatusText('pending'));
     }
 
     #[Test]
     public function it_returns_correct_status_text_for_canceled()
     {
-        $expected = '<span class="h4"><i class="ti ti-x me-1 fs-4"></i> ' . __('messages.sr_status_canceled') . '</span>';
+        $expected = '<span class="h4"><i class="ti ti-x me-1 fs-4"></i> '.__('messages.sr_status_canceled').'</span>';
         $this->assertEquals($expected, SalesReturnHelper::getStatusText('canceled'));
     }
 
     #[Test]
     public function it_returns_default_status_text_for_unknown_status()
     {
-        $expected = '<span class="h4"><i class="ti ti-info-circle me-1 fs-4"></i> ' . ucfirst('unknown') . '</span>';
+        $expected = '<span class="h4"><i class="ti ti-info-circle me-1 fs-4"></i> '.ucfirst('unknown').'</span>';
         $this->assertEquals($expected, SalesReturnHelper::getStatusText('unknown'));
     }
 }

@@ -3,15 +3,16 @@
 namespace Tests\Unit\Services;
 
 use App\Services\ReportExporter;
-use Tests\TestCase;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Tests\Traits\CreatesTenant;
 use Database\Seeders\RoleSeeder;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Mockery;
+use Symfony\Component\HttpFoundation\StreamedResponse;
+use Tests\TestCase;
+use Tests\Traits\CreatesTenant;
 
 class ReportExporterTest extends TestCase
 {
-    use RefreshDatabase, CreatesTenant;
+    use CreatesTenant, RefreshDatabase;
 
     protected ReportExporter $exporter;
 
@@ -20,10 +21,10 @@ class ReportExporterTest extends TestCase
         parent::setUp();
         $this->setupTenant();
         $this->seed(RoleSeeder::class);
-        $this->exporter = new ReportExporter();
+        $this->exporter = new ReportExporter;
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         Mockery::close();
         parent::tearDown();
@@ -37,7 +38,7 @@ class ReportExporterTest extends TestCase
             fclose($file);
         }, 'test.csv');
 
-        $this->assertInstanceOf(\Symfony\Component\HttpFoundation\StreamedResponse::class, $response);
+        $this->assertInstanceOf(StreamedResponse::class, $response);
         $this->assertEquals(200, $response->getStatusCode());
     }
 

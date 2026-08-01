@@ -7,6 +7,7 @@ use App\Models\Customer;
 use App\Models\Product;
 use App\Models\Sales;
 use App\Services\SalesService;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\Rule;
@@ -36,6 +37,7 @@ class SalesController extends Controller
     public function getExpiringSoonSales()
     {
         $expiringSales = $this->salesService->getExpiringSales();
+
         return response()->json($expiringSales);
     }
 
@@ -57,7 +59,7 @@ class SalesController extends Controller
     {
         $sale = Sales::findOrFail($id);
 
-        if ($sale->type === \App\Models\Sales::TYPE_POS) {
+        if ($sale->type === Sales::TYPE_POS) {
             return redirect()->route('admin.pos.receipt', $id);
         }
 
@@ -70,13 +72,16 @@ class SalesController extends Controller
     {
         try {
             $sales = $this->salesService->getSalesForModal($id);
+
             return view('admin.layouts.modals.sales.salesmodals-view', compact('sales'));
-        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+        } catch (ModelNotFoundException $e) {
             Log::error("Sales record not found for modal view: {$id}");
+
             return response('<div class="alert alert-danger">Sales record not found.</div>', 404);
         } catch (\Exception $e) {
-            Log::error("Error loading sales modal view for ID {$id}: " . $e->getMessage(), ['exception' => $e]);
-            return response('<div class="alert alert-danger">Error loading sales details: ' . $e->getMessage() . '</div>', 500);
+            Log::error("Error loading sales modal view for ID {$id}: ".$e->getMessage(), ['exception' => $e]);
+
+            return response('<div class="alert alert-danger">Error loading sales details: '.$e->getMessage().'</div>', 500);
         }
     }
 
@@ -99,11 +104,13 @@ class SalesController extends Controller
 
         try {
             $this->salesService->createSale($request->all());
+
             return redirect()->route('admin.sales')->with('success', 'Sale created successfully.');
         } catch (\Exception $e) {
-            Log::error('Sale creation failed: ' . $e->getMessage(), ['exception' => $e, 'input' => $request->all()]);
+            Log::error('Sale creation failed: '.$e->getMessage(), ['exception' => $e, 'input' => $request->all()]);
+
             return back()
-                ->withErrors(['error' => 'Something went wrong: ' . $e->getMessage()])
+                ->withErrors(['error' => 'Something went wrong: '.$e->getMessage()])
                 ->withInput();
         }
     }
@@ -129,11 +136,13 @@ class SalesController extends Controller
 
         try {
             $this->salesService->updateSale($sale, $request->all());
+
             return redirect()->route('admin.sales.show', $id)->with('success', 'Sale updated successfully.');
         } catch (\Exception $e) {
-            Log::error('Sale update failed for ID ' . $id . ': ' . $e->getMessage(), ['exception' => $e, 'input' => $request->all()]);
+            Log::error('Sale update failed for ID '.$id.': '.$e->getMessage(), ['exception' => $e, 'input' => $request->all()]);
+
             return back()
-                ->withErrors(['error' => 'Something went wrong: ' . $e->getMessage()])
+                ->withErrors(['error' => 'Something went wrong: '.$e->getMessage()])
                 ->withInput();
         }
     }
@@ -151,10 +160,11 @@ class SalesController extends Controller
         try {
             $sale = Sales::findOrFail($id);
             $this->salesService->addPayment($sale, $request->all());
+
             return redirect()->route('admin.sales.show', $sale->id)->with('success', 'Payment added successfully.');
         } catch (\Exception $e) {
             return back()
-                ->withErrors(['error' => 'Something went wrong: ' . $e->getMessage()])
+                ->withErrors(['error' => 'Something went wrong: '.$e->getMessage()])
                 ->withInput();
         }
     }
@@ -162,6 +172,7 @@ class SalesController extends Controller
     public function getCustomerPrice(Customer $customer, Product $product)
     {
         $pastPrice = $this->salesService->getPastCustomerPriceForProduct($customer, $product);
+
         return response()->json(['past_price' => $pastPrice]);
     }
 
@@ -181,9 +192,10 @@ class SalesController extends Controller
 
         try {
             $this->salesService->bulkDeleteSales($request->ids);
+
             return response()->json([
                 'success' => true,
-                'message' => "Successfully deleted sales order(s)",
+                'message' => 'Successfully deleted sales order(s)',
             ]);
         } catch (\Exception $e) {
             return response()->json([
@@ -203,6 +215,7 @@ class SalesController extends Controller
 
         try {
             $updatedCount = $this->salesService->bulkMarkPaid($request->ids);
+
             return response()->json([
                 'success' => true,
                 'message' => "Successfully marked {$updatedCount} sales order(s) as paid.",
@@ -227,9 +240,12 @@ class SalesController extends Controller
 
     /**
      * @group Sales Orders
+     *
      * @summary Bulk Export Sales Orders
+     *
      * @bodyParam ids array required An array of sales order IDs to export. Example: [1, 2, 3]
      * @bodyParam export_option string required The export format ('pdf' or 'csv'). Example: "csv"
+     *
      * @response 200 "The exported file."
      */
     public function bulkExport(Request $request)
@@ -242,6 +258,7 @@ class SalesController extends Controller
 
         try {
             $file = $this->salesService->bulkExportSales($request->all(), $request->ids, $request->export_option);
+
             return $file;
         } catch (\Exception $e) {
             return response()->json([
@@ -257,7 +274,7 @@ class SalesController extends Controller
         try {
             return $this->salesService->printInvoice($id);
         } catch (\Exception $e) {
-            return back()->with('error', 'Error generating invoice. ' . $e->getMessage());
+            return back()->with('error', 'Error generating invoice. '.$e->getMessage());
         }
     }
 
@@ -267,6 +284,7 @@ class SalesController extends Controller
 
         try {
             $this->salesService->deleteSale($sale);
+
             return redirect()->route('admin.sales')->with('success', 'Sales order deleted successfully');
         } catch (\Exception $e) {
             return redirect()->route('admin.sales')->with('error', 'Error deleting sales order. Please try again.');

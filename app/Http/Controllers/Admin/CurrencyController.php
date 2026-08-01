@@ -3,10 +3,9 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\CurrencySetting;
-use App\Models\Unit;
 use App\Services\CurrencyService;
 use Illuminate\Http\Request;
+use Illuminate\Validation\ValidationException;
 
 class CurrencyController extends Controller
 {
@@ -21,6 +20,7 @@ class CurrencyController extends Controller
     {
         $entries = $request->input('entries', 10);
         $data = $this->currencyService->getCurrencyEditData($entries);
+
         return view('admin.currency.currency-edit', $data);
     }
 
@@ -39,11 +39,12 @@ class CurrencyController extends Controller
 
             $result = $this->currencyService->updateCurrency($validatedData);
 
-            if (!$result['success']) {
+            if (! $result['success']) {
                 $message = $result['message'] ?? 'An unexpected error occurred.';
                 if ($request->ajax()) {
                     return response()->json(['success' => false, 'message' => $message], 500);
                 }
+
                 return redirect()->route('admin.setting.currency.edit')->with('error', $message);
             }
 
@@ -53,10 +54,11 @@ class CurrencyController extends Controller
             }
 
             return redirect()->route('admin.setting.currency.edit')->with('success', $message);
-        } catch (\Illuminate\Validation\ValidationException $e) {
+        } catch (ValidationException $e) {
             if ($request->ajax()) {
                 return response()->json(['errors' => $e->errors()], 422);
             }
+
             return redirect()->back()->withErrors($e->errors())->withInput();
         } catch (\Exception $e) {
 
@@ -64,6 +66,7 @@ class CurrencyController extends Controller
             if ($request->ajax()) {
                 return response()->json(['success' => false, 'message' => $message], 500);
             }
+
             return redirect()->route('admin.setting.currency.edit')->with('error', $message);
         }
     }

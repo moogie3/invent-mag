@@ -4,14 +4,14 @@ namespace Tests\Unit\Services;
 
 use App\Models\Tax;
 use App\Services\TaxService;
-use Tests\TestCase;
-use PHPUnit\Framework\Attributes\Test;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use PHPUnit\Framework\Attributes\Test;
+use Tests\TestCase;
 use Tests\Traits\CreatesTenant;
 
 class TaxServiceTest extends TestCase
 {
-    use RefreshDatabase, CreatesTenant;
+    use CreatesTenant, RefreshDatabase;
 
     protected TaxService $taxService;
 
@@ -20,7 +20,7 @@ class TaxServiceTest extends TestCase
         parent::setUp();
         $this->setupTenant(); // Creates $this->tenant and $this->user, and calls actingAs
         $this->user->assignRole('superuser'); // Ensure the user has permissions for services
-        $this->taxService = new TaxService();
+        $this->taxService = new TaxService;
     }
 
     #[Test]
@@ -43,20 +43,20 @@ class TaxServiceTest extends TestCase
     {
         $tax = Tax::factory()->create();
         $data = [
-            'name'        => 'VAT',
-            'rate'        => 20,
-            'type'        => 'exclusive',
+            'name' => 'VAT',
+            'rate' => 20,
+            'type' => 'exclusive',
             'description' => null,
-            'is_active'   => true,
-            'is_default'  => false,
+            'is_active' => true,
+            'is_default' => false,
         ];
 
         $updated = $this->taxService->update($tax, $data);
 
         $this->assertDatabaseHas('taxes', [
-            'id'        => $tax->id,
-            'name'      => 'VAT',
-            'rate'      => 20,
+            'id' => $tax->id,
+            'name' => 'VAT',
+            'rate' => 20,
             'is_active' => true,
         ]);
         $this->assertInstanceOf(Tax::class, $updated);
@@ -66,19 +66,19 @@ class TaxServiceTest extends TestCase
     public function it_can_create_tax_settings_if_none_exist()
     {
         $data = [
-            'name'        => 'GST',
-            'rate'        => 5,
-            'type'        => 'exclusive',
+            'name' => 'GST',
+            'rate' => 5,
+            'type' => 'exclusive',
             'description' => null,
-            'is_active'   => true,
-            'is_default'  => false,
+            'is_active' => true,
+            'is_default' => false,
         ];
 
         $tax = $this->taxService->create($data);
 
         $this->assertDatabaseHas('taxes', [
-            'name'      => 'GST',
-            'rate'      => 5,
+            'name' => 'GST',
+            'rate' => 5,
             'is_active' => true,
         ]);
         $this->assertInstanceOf(Tax::class, $tax);

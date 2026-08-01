@@ -2,14 +2,20 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Helpers\CurrencyHelper;
+use App\Helpers\ProductHelper;
 use App\Http\Controllers\Controller;
 use App\Models\Categories;
 use App\Models\Product;
+use App\Models\StockAdjustment;
 use App\Models\Supplier;
 use App\Models\Unit;
 use App\Models\Warehouse;
 use App\Services\ProductService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Validation\Rule;
+use Illuminate\Validation\ValidationException;
 
 class ProductController extends Controller
 {
@@ -25,10 +31,10 @@ class ProductController extends Controller
         try {
             $entries = $request->input('entries', 10);
             $filters = $request->only(['warehouse_id']); // Add other filters if needed
-            
+
             // Pass filters to service
             $products = $this->productService->getPaginatedProducts($entries, $filters);
-            
+
             $totalproduct = Product::count();
             $lowStockCount = Product::lowStockCount();
             $expiringSoonCount = $this->productService->getExpiringSoonPOItemsCount();
@@ -47,7 +53,8 @@ class ProductController extends Controller
 
             return view('admin.product.index', compact('totalcategory', 'products', 'entries', 'totalproduct', 'lowStockCount', 'lowStockProducts', 'expiringSoonCount', 'expiringSoonProducts', 'selectedWarehouse') + $formData);
         } catch (\Exception $e) {
-            \Illuminate\Support\Facades\Log::error('Failed to load products index: ' . $e->getMessage(), ['exception' => $e]);
+            Log::error('Failed to load products index: '.$e->getMessage(), ['exception' => $e]);
+
             return redirect()->back()->with('error', 'Error loading products. Please try again.');
         }
     }
@@ -56,9 +63,11 @@ class ProductController extends Controller
     {
         try {
             $formData = $this->productService->getProductFormData();
+
             return view('admin.product.product-create', $formData);
         } catch (\Exception $e) {
-            \Illuminate\Support\Facades\Log::error('Failed to load product create form: ' . $e->getMessage(), ['exception' => $e]);
+            Log::error('Failed to load product create form: '.$e->getMessage(), ['exception' => $e]);
+
             return redirect()->route('admin.product')->with('error', 'Error loading form. Please try again.');
         }
     }
@@ -68,21 +77,22 @@ class ProductController extends Controller
         try {
             $thirtyDaysFromNow = now()->addDays(30);
             $product = Product::with([
-                'category', 
-                'supplier', 
-                'unit', 
-                'warehouses', 
-                'poItems' => function($query) use ($thirtyDaysFromNow) {
+                'category',
+                'supplier',
+                'unit',
+                'warehouses',
+                'poItems' => function ($query) use ($thirtyDaysFromNow) {
                     $query->whereNotNull('expiry_date')
                         ->where('expiry_date', '>=', now())
                         ->where('expiry_date', '<=', $thirtyDaysFromNow)
                         ->where('remaining_quantity', '>', 0)
                         ->with('purchaseOrder.warehouse')
                         ->orderBy('expiry_date', 'asc');
-                }
+                },
             ])->findOrFail($id);
-            $product->formatted_price = \App\Helpers\CurrencyHelper::formatWithPosition($product->price);
-            $product->formatted_selling_price = \App\Helpers\CurrencyHelper::formatWithPosition($product->selling_price);
+            $product->formatted_price = CurrencyHelper::formatWithPosition($product->price);
+            $product->formatted_selling_price = CurrencyHelper::formatWithPosition($product->selling_price);
+
             return response()->json($product);
         } catch (\Exception $e) {
             return response()->json([
@@ -108,8 +118,8 @@ class ProductController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'code' => ['required', 'string', 'max:100', \Illuminate\Validation\Rule::unique('products', 'code')->where('tenant_id', auth()->user()->tenant_id)],
-            'name' => ['required', 'string', 'max:255', \Illuminate\Validation\Rule::unique('products', 'name')->where('tenant_id', auth()->user()->tenant_id)],
+            'code' => ['required', 'string', 'max:100', Rule::unique('products', 'code')->where('tenant_id', auth()->user()->tenant_id)],
+            'name' => ['required', 'string', 'max:255', Rule::unique('products', 'name')->where('tenant_id', auth()->user()->tenant_id)],
             'low_stock_threshold' => 'nullable|integer|min:1',
             'price' => 'required|numeric|min:0',
             'selling_price' => 'required|numeric|min:0',
@@ -123,7 +133,7 @@ class ProductController extends Controller
 
         try {
             $this->productService->createProduct($request->all());
-            
+
             if ($request->header('X-Laravel-JSON')) {
                 return response()->json([
                     'success' => true,
@@ -131,9 +141,9 @@ class ProductController extends Controller
                     'redirect' => route('admin.product'),
                 ]);
             }
-            
+
             return redirect()->route('admin.product')->with('success', 'Product created');
-        } catch (\Illuminate\Validation\ValidationException $e) {
+        } catch (ValidationException $e) {
             if ($request->header('X-Laravel-JSON')) {
                 return response()->json([
                     'success' => false,
@@ -141,17 +151,18 @@ class ProductController extends Controller
                     'errors' => $e->errors(),
                 ], 422);
             }
+
             return redirect()->back()->withErrors($e->errors())->withInput();
         } catch (\Exception $e) {
-            \Illuminate\Support\Facades\Log::error('Product creation failed: ' . $e->getMessage(), ['exception' => $e, 'input' => $request->except('image')]);
-            
+            Log::error('Product creation failed: '.$e->getMessage(), ['exception' => $e, 'input' => $request->except('image')]);
+
             if ($request->header('X-Laravel-JSON')) {
                 return response()->json([
                     'success' => false,
                     'message' => 'Error creating product. Please try again.',
                 ], 500);
             }
-            
+
             return redirect()->back()
                 ->withInput()
                 ->with('error', 'Error creating product. Please try again.');
@@ -160,7 +171,9 @@ class ProductController extends Controller
 
     /**
      * @group Products
+     *
      * @summary Quickly Create a Product
+     *
      * @bodyParam code string required The product code. Example: "PROD-001"
      * @bodyParam name string required The product name. Example: "New Product"
      * @bodyParam stock_quantity integer required The initial stock quantity. Example: 100
@@ -169,13 +182,14 @@ class ProductController extends Controller
      * @bodyParam category_id integer required The ID of the product category. Example: 1
      * @bodyParam units_id integer required The ID of the product unit. Example: 1
      * @bodyParam supplier_id integer required The ID of the product supplier. Example: 1
+     *
      * @response 200 {"success": true, "message": "Product created successfully", "product": {"id": 1, "name": "New Product"}}
      */
     public function quickCreate(Request $request)
     {
         $request->validate([
-            'code' => ['required', 'string', \Illuminate\Validation\Rule::unique('products', 'code')->where('tenant_id', auth()->user()->tenant_id)],
-            'name' => ['required', 'string', \Illuminate\Validation\Rule::unique('products', 'name')->where('tenant_id', auth()->user()->tenant_id)],
+            'code' => ['required', 'string', Rule::unique('products', 'code')->where('tenant_id', auth()->user()->tenant_id)],
+            'name' => ['required', 'string', Rule::unique('products', 'name')->where('tenant_id', auth()->user()->tenant_id)],
             'barcode' => 'nullable|string',
             'low_stock_threshold' => 'nullable|integer|min:1',
             'price' => 'required|numeric',
@@ -210,9 +224,9 @@ class ProductController extends Controller
         $product = Product::findOrFail($id);
 
         $request->validate([
-            'code' => ['required', 'string', 'max:100', \Illuminate\Validation\Rule::unique('products', 'code')->where('tenant_id', auth()->user()->tenant_id)->ignore($product->id)],
-            'barcode' => 'nullable|string|max:100|unique:products,barcode,' . $product->id,
-            'name' => ['required', 'string', 'max:255', \Illuminate\Validation\Rule::unique('products', 'name')->where('tenant_id', auth()->user()->tenant_id)->ignore($product->id)],
+            'code' => ['required', 'string', 'max:100', Rule::unique('products', 'code')->where('tenant_id', auth()->user()->tenant_id)->ignore($product->id)],
+            'barcode' => 'nullable|string|max:100|unique:products,barcode,'.$product->id,
+            'name' => ['required', 'string', 'max:255', Rule::unique('products', 'name')->where('tenant_id', auth()->user()->tenant_id)->ignore($product->id)],
             'low_stock_threshold' => 'nullable|integer|min:1',
             'price' => 'required|numeric|min:0',
             'selling_price' => 'required|numeric|min:0',
@@ -226,7 +240,7 @@ class ProductController extends Controller
 
         try {
             $this->productService->updateProduct($product, $request->all());
-            
+
             if ($request->header('X-Laravel-JSON')) {
                 return response()->json([
                     'success' => true,
@@ -234,9 +248,9 @@ class ProductController extends Controller
                     'redirect' => route('admin.product'),
                 ]);
             }
-            
+
             return redirect()->route('admin.product')->with('success', 'Product updated successfully');
-        } catch (\Illuminate\Validation\ValidationException $e) {
+        } catch (ValidationException $e) {
             if ($request->header('X-Laravel-JSON')) {
                 return response()->json([
                     'success' => false,
@@ -244,17 +258,18 @@ class ProductController extends Controller
                     'errors' => $e->errors(),
                 ], 422);
             }
+
             return redirect()->back()->withErrors($e->errors())->withInput();
         } catch (\Exception $e) {
-            \Illuminate\Support\Facades\Log::error('Product update failed for ID ' . $id . ': ' . $e->getMessage(), ['exception' => $e]);
-            
+            Log::error('Product update failed for ID '.$id.': '.$e->getMessage(), ['exception' => $e]);
+
             if ($request->header('X-Laravel-JSON')) {
                 return response()->json([
                     'success' => false,
                     'message' => 'Error updating product. Please try again.',
                 ], 500);
             }
-            
+
             return redirect()->back()
                 ->withInput()
                 ->with('error', 'Error updating product. Please try again.');
@@ -266,14 +281,14 @@ class ProductController extends Controller
         try {
             $product = Product::findOrFail($id);
             $this->productService->deleteProduct($product);
-            
+
             if ($request->header('X-Laravel-JSON')) {
                 return response()->json([
                     'success' => true,
                     'message' => 'Product deleted successfully',
                 ]);
             }
-            
+
             return redirect()->route('admin.product')->with('success', 'Product deleted');
         } catch (\Exception $e) {
             if ($request->header('X-Laravel-JSON')) {
@@ -282,7 +297,7 @@ class ProductController extends Controller
                     'message' => 'Error deleting product. Please try again.',
                 ], 500);
             }
-            
+
             return redirect()->back()
                 ->with('error', 'Error deleting product. Please try again.');
         }
@@ -303,8 +318,11 @@ class ProductController extends Controller
 
     /**
      * @group Products
+     *
      * @summary Bulk Delete Products
+     *
      * @bodyParam ids array required An array of product IDs to delete. Example: [1, 2, 3]
+     *
      * @response 200 {"success": true, "message": "Successfully deleted 2 product(s)", "deleted_count": 2, "images_deleted": 1}
      */
     public function bulkDelete(Request $request)
@@ -316,6 +334,7 @@ class ProductController extends Controller
 
         try {
             $result = $this->productService->bulkDeleteProducts($request->ids);
+
             return response()->json([
                 'success' => true,
                 'message' => "Successfully deleted {$result['deleted_count']} product(s)",
@@ -333,9 +352,12 @@ class ProductController extends Controller
 
     /**
      * @group Products
+     *
      * @summary Bulk Export Products
+     *
      * @bodyParam ids array required An array of product IDs to export. Example: [1, 2, 3]
      * @bodyParam export_option string required The export format ('pdf' or 'csv'). Example: "csv"
+     *
      * @response 200 "The exported file."
      */
     public function bulkExport(Request $request)
@@ -348,6 +370,7 @@ class ProductController extends Controller
 
         try {
             $file = $this->productService->bulkExportProducts($request->all(), $request->ids, $request->export_option);
+
             return $file;
         } catch (\Exception $e) {
             return response()->json([
@@ -379,7 +402,7 @@ class ProductController extends Controller
             foreach ($result['changes'] as $change) {
                 // Use the new total stock for badge calculation, not the warehouse-specific stock
                 $lowStockThreshold = $change['low_stock_threshold'] ?? 10;
-                [$badgeClass, $badgeText] = \App\Helpers\ProductHelper::getStockClassAndText($change['new_stock_quantity'], $lowStockThreshold);
+                [$badgeClass, $badgeText] = ProductHelper::getStockClassAndText($change['new_stock_quantity'], $lowStockThreshold);
                 $updatedProductsWithBadges[] = array_merge($change, [
                     'badge_class' => $badgeClass,
                     'badge_text' => $badgeText,
@@ -445,7 +468,7 @@ class ProductController extends Controller
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Error adjusting stock: ' . $e->getMessage(),
+                'message' => 'Error adjusting stock: '.$e->getMessage(),
                 'error_details' => config('app.debug') ? $e->getMessage() : 'Internal server error',
             ], 500);
         }
@@ -478,6 +501,7 @@ class ProductController extends Controller
     {
         try {
             $expiringSoonProducts = $this->productService->getExpiringSoonPOItems();
+
             return response()->json($expiringSoonProducts);
         } catch (\Exception $e) {
             return response()->json([
@@ -491,7 +515,7 @@ class ProductController extends Controller
     public function getAdjustmentLog($id)
     {
         try {
-            $adjustments = \App\Models\StockAdjustment::where('product_id', $id)
+            $adjustments = StockAdjustment::where('product_id', $id)
                 ->with('adjustedBy:id,name') // Eager load user name
                 ->orderBy('created_at', 'desc')
                 ->get();

@@ -2,11 +2,10 @@
 
 namespace App\Services;
 
+use App\Exceptions\PlanLimitExceededException;
 use App\Models\User;
-use Illuminate\Support\Facades\Hash;
-
-use Spatie\Permission\Models\Role;
 use Spatie\Permission\Models\Permission;
+use Spatie\Permission\Models\Role;
 
 class UserService
 {
@@ -15,6 +14,7 @@ class UserService
         $users = User::all();
         $roles = Role::all();
         $permissions = Permission::all();
+
         return compact('users', 'roles', 'permissions');
     }
 
@@ -35,11 +35,11 @@ class UserService
             $planService = app(PlanService::class);
             if (! $planService->canAddUser()) {
                 $limit = $planService->getUserLimit();
-                throw new \App\Exceptions\PlanLimitExceededException(
+                throw new PlanLimitExceededException(
                     "You have reached the maximum number of users ({$limit}) allowed on your current plan. Please upgrade to add more users."
                 );
             }
-        } catch (\App\Exceptions\PlanLimitExceededException $e) {
+        } catch (PlanLimitExceededException $e) {
             throw $e;
         } catch (\Exception $e) {
             // If PlanService is unavailable (e.g., plans table doesn't exist yet),

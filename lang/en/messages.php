@@ -1720,7 +1720,7 @@ return [
     'backup_file_must_be_file' => 'Backup file must be a file',
     'backup_file_must_be_zip' => 'Backup file must be a .zip file',
     'backup_file_format' => 'Upload .zip backup file',
-    
+
     // HR
     'administration' => 'Administration',
     'hr' => 'HR',
@@ -1767,12 +1767,12 @@ return [
     'hr_inactive' => 'Inactive',
     'hr_resigned' => 'Resigned',
     'hr_terminated' => 'Terminated',
-    
+
     // Generic CRUD messages
     'record_created' => 'Record created successfully',
     'record_updated' => 'Record updated successfully',
     'record_deleted' => 'Record deleted successfully',
-    
+
     // Common
     'add' => 'Add',
     'edit' => 'Edit',
@@ -1942,4 +1942,49 @@ return [
     'tax_region' => 'Tax Region',
     'tax_region_description' => 'Set your business tax region. This determines which regional tax features (e.g. Indonesian e-Faktur) are available.',
     'tax_jurisdiction_saved' => 'Tax jurisdiction updated successfully.',
+
+    'bank_reconciliation' => 'Bank Reconciliation',
+    'bank_reconciliation_summary' => 'Import bank statements and match them against your journal entries to confirm your cash balance.',
+    'bank_reconciliation_import' => 'Import Statement',
+    'bank_reconciliation_import_details' => 'Import Bank Statement',
+    'bank_reconciliation_import_summary' => 'Import a bank statement (CSV/TXT) and match its lines to your journal entries to verify your cash balance.',
+    'bank_reconciliation_opening_balance_synced' => 'Prefilled from the account opening balance as of :date. Adjust if your statement period differs.',
+    'bank_reconciliation_opening_balance_hint' => 'Enter the opening balance shown on your statement. If the account has an opening balance set, it will be prefilled automatically.',
+    'bank_reconciliation_total' => 'Total Reconciliations',
+    'bank_reconciliation_open' => 'Open',
+    'bank_reconciliation_completed' => 'Completed',
+    'bank_reconciliation_list' => 'Reconciliation History',
+    'bank_reconciliation_bank' => 'Bank',
+    'bank_reconciliation_select_bank' => 'Select a bank',
+    'bank_reconciliation_account' => 'Bank Account',
+    'bank_reconciliation_select_account' => 'Select a bank account',
+    'bank_reconciliation_statement_file' => 'Statement File (CSV)',
+    'bank_reconciliation_file_hint' => 'Upload the bank statement CSV/TXT export. Supported formats: BCA, Mandiri, BNI, BRI.',
+    'bank_reconciliation_opening_balance' => 'Opening Balance',
+    'bank_reconciliation_closing_balance' => 'Statement Closing Balance',
+    'bank_reconciliation_computed_closing' => 'Computed Closing',
+    'bank_reconciliation_variance' => 'Variance',
+    'bank_reconciliation_period_start' => 'Period Start',
+    'bank_reconciliation_period_end' => 'Period End',
+    'bank_reconciliation_matched' => 'Matched',
+    'bank_reconciliation_unmatched' => 'Unmatched',
+    'bank_reconciliation_matched_amount' => 'Matched Amount',
+    'bank_reconciliation_unmatched_amount' => 'Unmatched Amount',
+    'bank_reconciliation_lines' => 'Statement Lines',
+    'bank_reconciliation_statement_lines' => 'Statement Lines',
+    'bank_reconciliation_status' => 'Status',
+    'bank_reconciliation_match' => 'Match',
+    'bank_reconciliation_unmatch' => 'Unmatch',
+    'bank_reconciliation_complete' => 'Complete Reconciliation',
+    'bank_reconciliation_complete_confirm' => 'Complete this reconciliation?',
+    'bank_reconciliation_complete_desc' => 'Matched journal entries will be locked and cannot be reversed, voided, or unposted.',
+    'bank_reconciliation_delete' => 'Delete',
+    'bank_reconciliation_delete_confirm' => 'Delete this reconciliation?',
+    'bank_reconciliation_empty' => 'No bank reconciliations yet',
+    'bank_reconciliation_empty_desc' => 'Import your first bank statement to start matching transactions.',
+    'bank_reconciliation_no_candidate' => 'No matching journal entry',
+    'bank_reconciliation_journal_entry' => 'Journal Entry',
+    'bank_reconciliation_variance_pending' => 'This reconciliation is out of balance. Resolve the variance before completing.',
+    'reconciled' => 'Reconciled',
+    'reconciled_hint' => 'This journal entry is part of a completed bank reconciliation.',
 ];

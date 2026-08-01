@@ -85,6 +85,7 @@ class PlanSeeder extends Seeder
                     'cash_flow',
                     'quotations',
                     'ppn',
+                    'bank_reconciliation',
                 ],
             ],
             [
@@ -123,6 +124,7 @@ class PlanSeeder extends Seeder
                     'cash_flow',
                     'quotations',
                     'ppn',
+                    'bank_reconciliation',
                     // Enterprise-only features
                     'sales_forecasting',
                     'api_access',

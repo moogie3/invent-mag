@@ -2,24 +2,24 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Seeder;
 use App\Models\AttendancePeriod;
 use App\Models\PayrollRun;
 use App\Services\PayrollService;
+use Illuminate\Database\Seeder;
 
 class PayrollSeeder extends Seeder
 {
     public function run(): void
     {
         $tenantId = app('currentTenant')->id;
-        
+
         $lastMonth = now()->subMonth();
         $period = AttendancePeriod::where('tenant_id', $tenantId)
             ->where('year', $lastMonth->year)
             ->where('month', $lastMonth->month)
             ->first();
 
-        if (!$period) {
+        if (! $period) {
             return;
         }
 
@@ -29,7 +29,7 @@ class PayrollSeeder extends Seeder
         }
 
         $service = app(PayrollService::class);
-        
+
         // 1. Run Payroll
         $run = $service->runPayroll($period);
 

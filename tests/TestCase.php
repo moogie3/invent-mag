@@ -2,11 +2,14 @@
 
 namespace Tests;
 
+use App\Helpers\CurrencyHelper;
+use App\Models\Account;
+use App\Models\User;
+use Illuminate\Contracts\Console\Kernel;
+use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\TestCase as BaseTestCase;
-use Illuminate\Contracts\Console\Kernel;
-use App\Models\CurrencySetting;
-use App\Helpers\CurrencyHelper;
+use Spatie\Permission\Models\Permission;
 
 abstract class TestCase extends BaseTestCase
 {
@@ -17,7 +20,7 @@ abstract class TestCase extends BaseTestCase
     /**
      * Creates the application.
      *
-     * @return \Illuminate\Foundation\Application
+     * @return Application
      */
     public function createApplication()
     {
@@ -44,17 +47,17 @@ abstract class TestCase extends BaseTestCase
     protected function setupUser(array $permissions = [])
     {
         foreach ($permissions as $permission) {
-            \Spatie\Permission\Models\Permission::findOrCreate($permission);
+            Permission::findOrCreate($permission);
         }
 
-        $user = \App\Models\User::factory()->create();
-        if (!empty($permissions)) {
+        $user = User::factory()->create();
+        if (! empty($permissions)) {
             $user->givePermissionTo($permissions);
         }
 
-        $inventoryAccount = \App\Models\Account::firstOrCreate(['name' => 'Inventory'], ['type' => 'asset']);
-        $accountsPayableAccount = \App\Models\Account::firstOrCreate(['name' => 'Accounts Payable'], ['type' => 'liability']);
-        $cashAccount = \App\Models\Account::firstOrCreate(['name' => 'Cash'], ['type' => 'asset']);
+        $inventoryAccount = Account::firstOrCreate(['name' => 'Inventory'], ['type' => 'asset']);
+        $accountsPayableAccount = Account::firstOrCreate(['name' => 'Accounts Payable'], ['type' => 'liability']);
+        $cashAccount = Account::firstOrCreate(['name' => 'Cash'], ['type' => 'asset']);
 
         // Accounting settings belong to the tenant, not the user.
         // If a current tenant is set in context, update it; otherwise skip (no-op).

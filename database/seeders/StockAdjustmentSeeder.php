@@ -2,13 +2,12 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
-use Illuminate\Database\Seeder;
-use App\Models\StockAdjustment;
 use App\Models\Product;
+use App\Models\ProductWarehouse;
+use App\Models\StockAdjustment;
 use App\Models\User;
 use App\Models\Warehouse;
-use App\Models\ProductWarehouse;
+use Illuminate\Database\Seeder;
 
 class StockAdjustmentSeeder extends Seeder
 {
@@ -25,11 +24,12 @@ class StockAdjustmentSeeder extends Seeder
         $warehouses = Warehouse::where('tenant_id', $tenantId)->get();
 
         if ($products->isEmpty() || $users->isEmpty() || $warehouses->isEmpty()) {
-            $this->command->warn('Skipping StockAdjustmentSeeder for tenant ' . app('currentTenant')->name . ': Missing dependency data.');
+            $this->command->warn('Skipping StockAdjustmentSeeder for tenant '.app('currentTenant')->name.': Missing dependency data.');
+
             return;
         }
 
-        $this->command->info("Seeding Initial Stock for tenant: " . app('currentTenant')->name);
+        $this->command->info('Seeding Initial Stock for tenant: '.app('currentTenant')->name);
 
         // Get IDs of products that already have stock (e.g. from ProductSeeder) to avoid double-stocking
         $productsWithExistingStock = ProductWarehouse::where('tenant_id', $tenantId)
@@ -41,7 +41,8 @@ class StockAdjustmentSeeder extends Seeder
         $totalProducts = $products->count();
 
         if ($totalProducts === 0) {
-            $this->command->info("All products already have stock. Skipping stock adjustment seeding.");
+            $this->command->info('All products already have stock. Skipping stock adjustment seeding.');
+
             return;
         }
 
@@ -77,7 +78,7 @@ class StockAdjustmentSeeder extends Seeder
 
         $this->command->getOutput()->progressFinish();
 
-        $this->command->info("Stock seeding completed!");
-        $this->command->info("Created initial stock records for {$totalProducts} products (100-500 qty each). Total value: \$" . number_format($totalValue, 2));
+        $this->command->info('Stock seeding completed!');
+        $this->command->info("Created initial stock records for {$totalProducts} products (100-500 qty each). Total value: \$".number_format($totalValue, 2));
     }
 }

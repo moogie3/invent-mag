@@ -2,13 +2,13 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\BelongsToTenant;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use App\Models\Concerns\BelongsToTenant;
 
 class Payment extends Model
 {
-    use HasFactory, BelongsToTenant;
+    use BelongsToTenant, HasFactory;
 
     protected $fillable = [
         'paymentable_id',
@@ -35,14 +35,13 @@ class Payment extends Model
 
     /**
      * Get the path to view the model.
-     *
-     * @return string
      */
     public function path(): string
     {
         if ($this->paymentable) {
             return $this->paymentable->path();
         }
+
         return '#'; // Fallback if no paymentable is found
     }
 }

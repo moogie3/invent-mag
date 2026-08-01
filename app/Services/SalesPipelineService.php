@@ -2,24 +2,22 @@
 
 namespace App\Services;
 
-use App\Models\SalesPipeline;
+use App\Helpers\SalesHelper;
+use App\Models\Customer;
 use App\Models\PipelineStage;
-use App\Models\SalesOpportunity;
+use App\Models\ProductWarehouse;
+use App\Models\Quotation;
 use App\Models\Sales;
 use App\Models\SalesItem;
-use App\Models\ProductWarehouse;
-use App\Models\Warehouse;
-use App\Models\Product;
+use App\Models\SalesOpportunity;
+use App\Models\SalesPipeline;
 use App\Models\Tax;
-use App\Models\Quotation;
-use App\Models\QuotationItem;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Auth;
+use App\Models\User;
+use App\Models\Warehouse;
+use Dompdf\Dompdf;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Log;
-
-use App\Models\Customer;
-use App\Helpers\SalesHelper;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class SalesPipelineService
 {
@@ -57,6 +55,7 @@ class SalesPipelineService
         if (isset($data['is_default']) && $data['is_default']) {
             SalesPipeline::where('is_default', true)->update(['is_default' => false]);
         }
+
         return SalesPipeline::create($data);
     }
 
@@ -66,6 +65,7 @@ class SalesPipelineService
             SalesPipeline::where('id', '!=', $pipeline->id)->update(['is_default' => false]);
         }
         $pipeline->update($data);
+
         return $pipeline;
     }
 
@@ -79,12 +79,14 @@ class SalesPipelineService
         // Get the maximum existing position for stages within this pipeline,
         // or -1 if no stages exist, then add 1 to get the next position.
         $data['position'] = ($pipeline->stages()->max('position') ?? -1) + 1;
+
         return $pipeline->stages()->create($data);
     }
 
     public function updateStage(PipelineStage $stage, array $data): PipelineStage
     {
         $stage->update($data);
+
         return $stage;
     }
 
@@ -118,6 +120,7 @@ class SalesPipelineService
     public function createOpportunity(array $data): SalesOpportunity
     {
         \Log::debug('createOpportunity: Starting with data', $data);
+
         return DB::transaction(function () use ($data) {
             \Log::debug('createOpportunity: Inside transaction');
             $opportunity = SalesOpportunity::create([
@@ -159,6 +162,7 @@ class SalesPipelineService
     public function updateOpportunity(SalesOpportunity $opportunity, array $data): SalesOpportunity
     {
         \Log::debug('updateOpportunity: Starting with opportunity and data', ['opportunity_id' => $opportunity->id, 'data' => $data]);
+
         return DB::transaction(function () use ($opportunity, $data) {
             \Log::debug('updateOpportunity: Inside transaction');
             $updateData = [
@@ -179,7 +183,7 @@ class SalesPipelineService
 
             $totalAmount = 0;
             $itemsToCreate = [];
-            if (!empty($data['items'])) {
+            if (! empty($data['items'])) {
                 foreach ($data['items'] as $itemData) {
                     \Log::debug('updateOpportunity: Processing item', $itemData);
                     $price = round($itemData['price'], 2);
@@ -206,7 +210,7 @@ class SalesPipelineService
             $opportunity->update($updateData);
             \Log::debug('updateOpportunity: Opportunity updated');
 
-            if (!empty($itemsToCreate)) {
+            if (! empty($itemsToCreate)) {
                 $opportunity->items()->createMany($itemsToCreate);
                 \Log::debug('updateOpportunity: New items created');
             }
@@ -221,7 +225,7 @@ class SalesPipelineService
             // When deleting an opportunity, we DO NOT delete the linked Sales Order.
             // The Sales Order is a financial record and must persist even if the opportunity is removed.
             // The database foreign key is set to ON DELETE SET NULL, so the link will be cleared automatically.
-            
+
             $opportunity->delete();
         });
     }
@@ -229,29 +233,30 @@ class SalesPipelineService
     public function moveOpportunity(SalesOpportunity $opportunity, int $stageId): SalesOpportunity
     {
         $opportunity->update(['pipeline_stage_id' => $stageId]);
+
         return $opportunity;
     }
 
     public function printOpportunity(int $id)
     {
         $opportunity = SalesOpportunity::with(['customer', 'items.product', 'pipeline', 'stage'])->findOrFail($id);
-        $shopname = \App\Models\User::whereNotNull('shopname')->value('shopname');
-        $address = \App\Models\User::whereNotNull('address')->value('address');
+        $shopname = User::whereNotNull('shopname')->value('shopname');
+        $address = User::whereNotNull('address')->value('address');
 
         $html = view('admin.sales.opportunity-print-pdf', compact('opportunity', 'shopname', 'address'))->render();
-        $dompdf = new \Dompdf\Dompdf();
+        $dompdf = new Dompdf;
         $dompdf->loadHtml($html);
         $dompdf->setPaper('A4', 'portrait');
         $dompdf->render();
 
-        return $dompdf->stream('quotation-' . $opportunity->id . '.pdf', ['Attachment' => false]);
+        return $dompdf->stream('quotation-'.$opportunity->id.'.pdf', ['Attachment' => false]);
     }
 
     public function generateQuotation(int $opportunityId): Quotation
     {
         $opportunity = SalesOpportunity::with('items.product', 'customer')->findOrFail($opportunityId);
 
-        $quotationNumber = 'QTN-' . now()->format('Ymd') . '-' . str_pad(Quotation::where('tenant_id', $opportunity->tenant_id)->count() + 1, 4, '0', STR_PAD_LEFT);
+        $quotationNumber = 'QTN-'.now()->format('Ymd').'-'.str_pad(Quotation::where('tenant_id', $opportunity->tenant_id)->count() + 1, 4, '0', STR_PAD_LEFT);
 
         $subtotal = 0;
         $items = [];
@@ -335,13 +340,13 @@ class SalesPipelineService
                 $lastNumber = (int) substr($lastSalesInvoice->invoice, 3);
                 $invoiceNumber = $lastNumber + 1;
             }
-            $invoice = 'PL-' . str_pad($invoiceNumber, 4, '0', STR_PAD_LEFT);
+            $invoice = 'PL-'.str_pad($invoiceNumber, 4, '0', STR_PAD_LEFT);
 
             $tax = Tax::default()->first() ?? Tax::active()->first();
             $taxRate = $tax ? (float) $tax->rate : 0;
             $taxType = $tax ? $tax->type : 'none';
 
-            $subTotal = round($opportunityItems->reduce(fn($carry, $item) => $carry + ($item->quantity * $item->price), 0));
+            $subTotal = round($opportunityItems->reduce(fn ($carry, $item) => $carry + ($item->quantity * $item->price), 0));
             $taxAmount = SalesHelper::calculateTaxAmount($subTotal, $taxRate, $taxType);
 
             if ($taxType === 'inclusive') {
@@ -352,11 +357,11 @@ class SalesPipelineService
 
             // Assign to Main Warehouse by default for pipeline conversions
             $mainWarehouse = Warehouse::where('is_main', true)->first();
-            if (!$mainWarehouse) {
+            if (! $mainWarehouse) {
                 // Fallback to first available if no main
                 $mainWarehouse = Warehouse::first();
-                if (!$mainWarehouse) {
-                     throw new \Exception('No warehouse available to fulfill this order.');
+                if (! $mainWarehouse) {
+                    throw new \Exception('No warehouse available to fulfill this order.');
                 }
             }
 
@@ -376,7 +381,7 @@ class SalesPipelineService
                 'tax_type' => $taxType,
                 'total' => $grandTotal,
                 'status' => 'Unpaid',
-                'type' => \App\Models\Sales::TYPE_REGULAR,
+                'type' => Sales::TYPE_REGULAR,
                 'sales_opportunity_id' => $opportunity->id,
                 'notes' => $opportunity->notes,
                 'terms_conditions' => $opportunity->terms_conditions,
@@ -402,7 +407,7 @@ class SalesPipelineService
                 $currentStock = $stockRecord ? $stockRecord->quantity : 0;
 
                 if ($currentStock < $item->quantity) {
-                    throw new \Exception('Insufficient stock for product: ' . $item->product->name . '. Available: ' . $currentStock . ', Requested: ' . $item->quantity);
+                    throw new \Exception('Insufficient stock for product: '.$item->product->name.'. Available: '.$currentStock.', Requested: '.$item->quantity);
                 }
 
                 if ($stockRecord) {
@@ -413,7 +418,7 @@ class SalesPipelineService
                         'product_id' => $item->product_id,
                         'warehouse_id' => $mainWarehouse->id,
                         'quantity' => -$item->quantity,
-                        'tenant_id' => $opportunity->tenant_id ?? Auth::user()->tenant_id
+                        'tenant_id' => $opportunity->tenant_id ?? Auth::user()->tenant_id,
                     ]);
                 }
             }

@@ -40,10 +40,10 @@ class CaptureImpersonation
                     // Write impersonation metadata into the session
                     // StartSession already loaded (same object, same ID).
                     session([
-                        'impersonating_tenant_id'   => $data['impersonating_tenant_id'],
+                        'impersonating_tenant_id' => $data['impersonating_tenant_id'],
                         'impersonating_tenant_name' => $data['impersonating_tenant_name'],
-                        'impersonating_user_name'   => $data['impersonating_user_name'],
-                        'superadmin_return_url'     => $data['superadmin_return_url'],
+                        'impersonating_user_name' => $data['impersonating_user_name'],
+                        'superadmin_return_url' => $data['superadmin_return_url'],
                     ]);
 
                     // Log in as the tenant user via the standard guard login path.

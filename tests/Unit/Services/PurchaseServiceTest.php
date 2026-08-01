@@ -2,32 +2,34 @@
 
 namespace Tests\Unit\Services;
 
-use App\Models\POItem; // Added
+use App\Models\Account; // Added
+use App\Models\POItem;
 use App\Models\Product;
+use App\Models\ProductWarehouse;
 use App\Models\Purchase;
 use App\Models\Supplier;
 use App\Models\Tax;
-use App\Models\User;
-use App\Models\Account;
-use App\Models\Warehouse; // Added
-use App\Models\ProductWarehouse;
+use App\Models\User; // Added
+use App\Models\Warehouse;
 use App\Services\AccountingService;
 use App\Services\PurchaseService;
-use Tests\TestCase;
+use Database\Seeders\AccountSeeder;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Auth;
 use Mockery;
-use PHPUnit\Framework\Attributes\Test;
 use Mockery\MockInterface;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use PHPUnit\Framework\Attributes\Test;
+use Tests\TestCase;
 use Tests\Traits\CreatesTenant;
-use Database\Seeders\AccountSeeder;
 
 class PurchaseServiceTest extends TestCase
 {
-    use RefreshDatabase, CreatesTenant;
+    use CreatesTenant, RefreshDatabase;
 
     protected PurchaseService $purchaseService;
+
     protected User $user;
+
     protected MockInterface $accountingServiceMock;
 
     protected function setUp(): void
@@ -44,9 +46,9 @@ class PurchaseServiceTest extends TestCase
 
         // Retrieve SAK-compliant accounts from the seeder, scoped to the current tenant
         $tenantId = app('currentTenant')->id;
-        $cash = Account::where('code', '1110-' . $tenantId)->first();
-        $accountsPayable = Account::where('code', '2110-' . $tenantId)->first();
-        $inventory = Account::where('code', '1140-' . $tenantId)->first();
+        $cash = Account::where('code', '1110-'.$tenantId)->first();
+        $accountsPayable = Account::where('code', '2110-'.$tenantId)->first();
+        $inventory = Account::where('code', '1140-'.$tenantId)->first();
 
         // Ensure accounts exist (they should, due to AccountSeeder)
         $this->assertNotNull($cash, 'Cash account not found in seeder.');
@@ -59,9 +61,9 @@ class PurchaseServiceTest extends TestCase
                 'accounts_payable_account_id' => $accountsPayable->id,
                 'inventory_account_id' => $inventory->id,
                 'cash_account_id' => $cash->id,
-            ]
+            ],
         ]);
-        
+
         $this->user = $this->user->fresh();
         Auth::setUser($this->user);
     }
@@ -140,7 +142,7 @@ class PurchaseServiceTest extends TestCase
     {
         $supplier = Supplier::factory()->create();
         $warehouse = Warehouse::factory()->create(['is_main' => true]);
-        
+
         $product1 = Product::factory()->create();
         ProductWarehouse::updateOrCreate(
             ['product_id' => $product1->id, 'warehouse_id' => $warehouse->id, 'tenant_id' => $product1->tenant_id],
@@ -173,7 +175,7 @@ class PurchaseServiceTest extends TestCase
 
         $this->assertDatabaseHas('po', ['invoice' => 'INV-001', 'warehouse_id' => $warehouse->id]);
         $this->assertDatabaseHas('po_items', ['po_id' => $purchase->id, 'product_id' => $product1->id]);
-        
+
         // Verify pivot table increment
         $this->assertDatabaseHas('product_warehouse', ['product_id' => $product1->id, 'warehouse_id' => $warehouse->id, 'quantity' => 12]);
         $this->assertDatabaseHas('product_warehouse', ['product_id' => $product2->id, 'warehouse_id' => $warehouse->id, 'quantity' => 8]);
@@ -185,7 +187,7 @@ class PurchaseServiceTest extends TestCase
         $supplier = Supplier::factory()->create();
         $warehouse = Warehouse::factory()->create();
         $product1 = Product::factory()->create();
-        
+
         // Init pivot
         ProductWarehouse::updateOrCreate(
             ['product_id' => $product1->id, 'warehouse_id' => $warehouse->id, 'tenant_id' => $product1->tenant_id],
@@ -213,12 +215,13 @@ class PurchaseServiceTest extends TestCase
             ->shouldReceive('createJournalEntry')
             ->once()
             ->with(
-                "Purchase Order #INV-001",
+                'Purchase Order #INV-001',
                 Mockery::any(),
                 Mockery::on(function ($transactions) use ($finalTotal, $inventoryAccountName, $accountsPayableAccountName) {
                     $this->assertCount(2, $transactions);
                     $this->assertEquals($finalTotal, $this->findTransactionAmount($transactions, $inventoryAccountName, 'debit'));
                     $this->assertEquals($finalTotal, $this->findTransactionAmount($transactions, $accountsPayableAccountName, 'credit'));
+
                     return true;
                 }),
                 Mockery::type(Purchase::class)
@@ -241,7 +244,7 @@ class PurchaseServiceTest extends TestCase
             ->shouldReceive('createJournalEntry')
             ->once()
             ->with(
-                "Payment for PO #PO-123",
+                'Payment for PO #PO-123',
                 Mockery::any(),
                 Mockery::on(function ($transactions) {
                     $accountingSettings = app('currentTenant')->accounting_settings;
@@ -251,6 +254,7 @@ class PurchaseServiceTest extends TestCase
                     $this->assertCount(2, $transactions);
                     $this->assertEquals(500, $this->findTransactionAmount($transactions, $accountsPayableAccountName, 'debit'));
                     $this->assertEquals(500, $this->findTransactionAmount($transactions, $cashAccountName, 'credit'));
+
                     return true;
                 }),
                 Mockery::any() // Payment model
@@ -266,7 +270,7 @@ class PurchaseServiceTest extends TestCase
         $purchase = Purchase::factory()->create(['warehouse_id' => $warehouse->id]);
         $product = Product::factory()->create();
         $oldItem = POItem::factory()->create(['po_id' => $purchase->id, 'product_id' => $product->id, 'quantity' => 1]);
-        
+
         // Manually set initial stock state (purchase incremented it)
         ProductWarehouse::updateOrCreate(
             ['product_id' => $product->id, 'warehouse_id' => $warehouse->id, 'tenant_id' => $product->tenant_id],
@@ -303,10 +307,10 @@ class PurchaseServiceTest extends TestCase
         $this->assertDatabaseHas('po', ['id' => $purchase->id, 'status' => 'Paid']);
         $this->assertDatabaseMissing('po_items', ['id' => $oldItem->id]);
         $this->assertDatabaseHas('po_items', ['po_id' => $purchase->id, 'product_id' => $newProduct->id]);
-        
+
         // Old product stock should decrement (revert): 11 - 1 = 10
         $this->assertDatabaseHas('product_warehouse', ['product_id' => $product->id, 'warehouse_id' => $warehouse->id, 'quantity' => 10]);
-        
+
         // New product stock should increment: 20 + 5 = 25
         $this->assertDatabaseHas('product_warehouse', ['product_id' => $newProduct->id, 'warehouse_id' => $warehouse->id, 'quantity' => 25]);
     }
@@ -319,7 +323,7 @@ class PurchaseServiceTest extends TestCase
                 'quantity' => 10,
                 'price' => 100,
                 'total' => 1000,
-                'discount' => 0
+                'discount' => 0,
             ])
             ->create(['discount_total' => 0]);
 
@@ -343,7 +347,7 @@ class PurchaseServiceTest extends TestCase
                 'quantity' => 10,
                 'price' => 100,
                 'total' => 1000,
-                'discount' => 0
+                'discount' => 0,
             ])
             ->create(['discount_total' => 0, 'total' => 1000]); // Explicitly set total
 
@@ -356,7 +360,7 @@ class PurchaseServiceTest extends TestCase
         // Calculate exact remaining balance to pay
         $remaining = $purchase->grand_total - 500;
         $purchase->payments()->create(['amount' => $remaining, 'payment_date' => now()->toDateString(), 'payment_method' => 'Cash']);
-        
+
         $this->purchaseService->updatePurchaseStatus($purchase);
         $this->assertEquals('Paid', $purchase->fresh()->status);
 
@@ -373,7 +377,7 @@ class PurchaseServiceTest extends TestCase
         $purchase = Purchase::factory()->create(['warehouse_id' => $warehouse->id]);
         $product = Product::factory()->create();
         $item = POItem::factory()->create(['po_id' => $purchase->id, 'product_id' => $product->id, 'quantity' => 1]);
-        
+
         // Initial stock state (after purchase was made)
         ProductWarehouse::updateOrCreate(
             ['product_id' => $product->id, 'warehouse_id' => $warehouse->id, 'tenant_id' => $product->tenant_id],
@@ -384,7 +388,7 @@ class PurchaseServiceTest extends TestCase
 
         $this->assertDatabaseMissing('po', ['id' => $purchase->id]);
         $this->assertDatabaseMissing('po_items', ['id' => $item->id]);
-        
+
         // Stock should decrement: 11 - 1 = 10
         $this->assertDatabaseHas('product_warehouse', ['product_id' => $product->id, 'warehouse_id' => $warehouse->id, 'quantity' => 10]);
     }
@@ -408,7 +412,7 @@ class PurchaseServiceTest extends TestCase
         $supplier = Supplier::factory()->create();
         $warehouse = Warehouse::factory()->create();
         $product = Product::factory()->create();
-        
+
         ProductWarehouse::updateOrCreate(
             ['product_id' => $product->id, 'warehouse_id' => $warehouse->id, 'tenant_id' => $product->tenant_id],
             ['quantity' => 10]
@@ -419,7 +423,7 @@ class PurchaseServiceTest extends TestCase
         $purchases = collect();
         for ($i = 0; $i < 3; $i++) {
             $purchaseData = [
-                'invoice' => 'INV-00' . ($i + 1),
+                'invoice' => 'INV-00'.($i + 1),
                 'supplier_id' => $supplier->id,
                 'warehouse_id' => $warehouse->id,
                 'order_date' => now()->toDateString(),
@@ -498,7 +502,7 @@ class PurchaseServiceTest extends TestCase
             'is_pph' => true,
         ]);
 
-        $pphPayableAccount = Account::where('code', '2150-' . $this->tenant->id)->first();
+        $pphPayableAccount = Account::where('code', '2150-'.$this->tenant->id)->first();
         $this->assertNotNull($pphPayableAccount, 'PPh Payable account not found in seeder.');
 
         $this->tenant->update([
@@ -554,13 +558,14 @@ class PurchaseServiceTest extends TestCase
             ->shouldReceive('createJournalEntry')
             ->once()
             ->with(
-                "Purchase Order #PO-PPh-001",
+                'Purchase Order #PO-PPh-001',
                 Mockery::any(),
                 Mockery::on(function ($transactions) use ($inventoryAccountName, $accountsPayableAccountName, $pphPayableAccountName) {
                     $this->assertCount(3, $transactions);
                     $this->assertEquals(222, $this->findTransactionAmount($transactions, $inventoryAccountName, 'debit'));
                     $this->assertEquals(218, $this->findTransactionAmount($transactions, $accountsPayableAccountName, 'credit'));
                     $this->assertEquals(4, $this->findTransactionAmount($transactions, $pphPayableAccountName, 'credit'));
+
                     return true;
                 }),
                 Mockery::type(Purchase::class)
@@ -581,6 +586,7 @@ class PurchaseServiceTest extends TestCase
                 return $transaction['amount'];
             }
         }
+
         return null;
     }
 }

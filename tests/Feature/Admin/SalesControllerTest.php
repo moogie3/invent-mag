@@ -2,31 +2,30 @@
 
 namespace Tests\Feature\Admin;
 
-use App\Models\User;
+use App\Models\Account;
 use App\Models\Customer;
 use App\Models\Product;
+use App\Models\ProductWarehouse;
 use App\Models\Sales;
 use App\Models\SalesItem;
 use App\Models\Warehouse;
-use App\Models\ProductWarehouse;
-use App\Models\Account;
-use Database\Factories\SalesFactory;
-use Illuminate\Support\Facades\Storage;
-use Tests\TestCase;
 use Carbon\Carbon;
-use App\Services\SalesService;
-use Mockery;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Tests\Traits\CreatesTenant;
-use Database\Seeders\RoleSeeder;
+use Database\Factories\SalesFactory;
 use Database\Seeders\AccountSeeder;
+use Database\Seeders\RoleSeeder;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Mockery;
+use Tests\TestCase;
+use Tests\Traits\CreatesTenant;
 
 class SalesControllerTest extends TestCase
 {
-    use RefreshDatabase, CreatesTenant;
+    use CreatesTenant, RefreshDatabase;
 
     protected Customer $customer;
+
     protected Product $product;
+
     protected Warehouse $warehouse; // Added
 
     protected function setUp(): void
@@ -40,11 +39,11 @@ class SalesControllerTest extends TestCase
         // Ensure the current tenant has the necessary accounting settings
         $tenantId = app('currentTenant')->id;
         $this->tenant->accounting_settings = [
-            'cash_account_id' => Account::where('code', '1110-' . $tenantId)->first()->id,
-            'accounts_receivable_account_id' => Account::where('code', '1130-' . $tenantId)->first()->id,
-            'sales_revenue_account_id' => Account::where('code', '4100-' . $tenantId)->first()->id,
-            'cost_of_goods_sold_account_id' => Account::where('code', '5200-' . $tenantId)->first()->id,
-            'inventory_account_id' => Account::where('code', '1140-' . $tenantId)->first()->id,
+            'cash_account_id' => Account::where('code', '1110-'.$tenantId)->first()->id,
+            'accounts_receivable_account_id' => Account::where('code', '1130-'.$tenantId)->first()->id,
+            'sales_revenue_account_id' => Account::where('code', '4100-'.$tenantId)->first()->id,
+            'cost_of_goods_sold_account_id' => Account::where('code', '5200-'.$tenantId)->first()->id,
+            'inventory_account_id' => Account::where('code', '1140-'.$tenantId)->first()->id,
         ];
         $this->tenant->save();
         $this->actingAs($this->user);
@@ -52,19 +51,19 @@ class SalesControllerTest extends TestCase
         $this->warehouse = Warehouse::factory()->create(['is_main' => true]); // Added
         $this->customer = Customer::factory()->create();
         $this->product = Product::factory()->create();
-        
+
         // Ensure product has stock in the warehouse
         ProductWarehouse::updateOrCreate(
             [
                 'product_id' => $this->product->id,
                 'warehouse_id' => $this->warehouse->id,
-                'tenant_id' => $tenantId
+                'tenant_id' => $tenantId,
             ],
             ['quantity' => 100]
         );
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         Mockery::close();
         parent::tearDown();
@@ -96,7 +95,7 @@ class SalesControllerTest extends TestCase
     public function test_it_can_store_a_new_sale()
     {
         $salesData = [
-            'invoice' => 'INV-' . rand(10000, 99999),
+            'invoice' => 'INV-'.rand(10000, 99999),
             'customer_id' => $this->customer->id,
             'warehouse_id' => $this->warehouse->id, // Added
             'order_date' => Carbon::now()->format('Y-m-d'),
@@ -155,11 +154,11 @@ class SalesControllerTest extends TestCase
 
         $newProduct = Product::factory()->create();
         // Ensure new product has stock
-        \App\Models\ProductWarehouse::updateOrCreate(
+        ProductWarehouse::updateOrCreate(
             [
                 'product_id' => $newProduct->id,
                 'warehouse_id' => $this->warehouse->id,
-                'tenant_id' => $sale->tenant_id
+                'tenant_id' => $sale->tenant_id,
             ],
             ['quantity' => 100]
         );
@@ -222,7 +221,7 @@ class SalesControllerTest extends TestCase
         $sale = SalesFactory::new()->create([
             'customer_id' => $this->customer->id,
             'user_id' => $this->user->id,
-            'type' => \App\Models\Sales::TYPE_REGULAR,
+            'type' => Sales::TYPE_REGULAR,
         ]);
         SalesItem::factory()->create(['sales_id' => $sale->id, 'product_id' => $this->product->id]);
 
@@ -276,10 +275,10 @@ class SalesControllerTest extends TestCase
         $response = $this->postJson(route('sales.bulk-delete'), ['ids' => $idsToDelete]);
 
         $response->assertOk()
-                 ->assertJson([
-                     'success' => true,
-                     'message' => "Successfully deleted sales order(s)",
-                 ]);
+            ->assertJson([
+                'success' => true,
+                'message' => 'Successfully deleted sales order(s)',
+            ]);
 
         foreach ($idsToDelete as $id) {
             $this->assertDatabaseMissing('sales', ['id' => $id]);
@@ -289,7 +288,7 @@ class SalesControllerTest extends TestCase
 
     public function test_it_can_bulk_mark_paid_sales()
     {
-        $product = \App\Models\Product::factory()->create();
+        $product = Product::factory()->create();
         $sales = SalesFactory::new()->count(3)->create([
             'customer_id' => $this->customer->id,
             'user_id' => $this->user->id,
@@ -299,7 +298,7 @@ class SalesControllerTest extends TestCase
         ]);
 
         foreach ($sales as $sale) {
-            \App\Models\SalesItem::factory()->create(['sales_id' => $sale->id, 'product_id' => $product->id, 'quantity' => 1, 'total' => 100]);
+            SalesItem::factory()->create(['sales_id' => $sale->id, 'product_id' => $product->id, 'quantity' => 1, 'total' => 100]);
         }
 
         $idsToMarkPaid = $sales->pluck('id')->toArray();
@@ -307,11 +306,11 @@ class SalesControllerTest extends TestCase
         $response = $this->postJson(route('sales.bulk-mark-paid'), ['ids' => $idsToMarkPaid]);
 
         $response->assertOk()
-                 ->assertJson([
-                     'success' => true,
-                     'message' => "Successfully marked 3 sales order(s) as paid.",
-                     'updated_count' => 3,
-                 ]);
+            ->assertJson([
+                'success' => true,
+                'message' => 'Successfully marked 3 sales order(s) as paid.',
+                'updated_count' => 3,
+            ]);
 
         foreach ($idsToMarkPaid as $id) {
             $this->assertDatabaseHas('sales', [
@@ -340,6 +339,6 @@ class SalesControllerTest extends TestCase
         $response = $this->get(route('admin.sales.get-customer-price', ['customer' => $customer->id, 'product' => $product->id]));
 
         $response->assertOk()
-                 ->assertJson(['past_price' => 123.45]);
+            ->assertJson(['past_price' => 123.45]);
     }
 }

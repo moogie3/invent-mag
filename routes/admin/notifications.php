@@ -1,8 +1,8 @@
 <?php
 
+use App\Http\Controllers\Admin\AuditLogController;
 use App\Http\Controllers\Admin\NotificationController;
 use App\Http\Controllers\Admin\UserController;
-use App\Http\Controllers\Admin\AuditLogController;
 
 // Notification Routes
 Route::prefix('notifications')->group(function () {

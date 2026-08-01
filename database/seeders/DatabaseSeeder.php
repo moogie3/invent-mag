@@ -2,10 +2,11 @@
 
 namespace Database\Seeders;
 
+use App\Models\Plan;
 use App\Models\Tenant;
 use Illuminate\Database\Seeder;
-use Spatie\Multitenancy\Multitenancy;
-use App\Models\User; // Add this line
+
+// Add this line
 
 class DatabaseSeeder extends Seeder
 {
@@ -31,32 +32,32 @@ class DatabaseSeeder extends Seeder
         $tenants = [
             [
                 'name' => 'Starter Tenant',
-                'domain' => 'starter.' . $domain,
+                'domain' => 'starter.'.$domain,
                 'plan' => 'starter',
             ],
             [
                 'name' => 'Professional Tenant',
-                'domain' => 'professional.' . $domain,
+                'domain' => 'professional.'.$domain,
                 'plan' => 'professional',
             ],
             [
                 'name' => 'Enterprise Tenant',
-                'domain' => 'enterprise.' . $domain,
+                'domain' => 'enterprise.'.$domain,
                 'plan' => 'enterprise',
             ],
             [
                 'name' => 'Demo Starter Workspace',
-                'domain' => 'demo-starter.' . $domain,
+                'domain' => 'demo-starter.'.$domain,
                 'plan' => 'starter',
             ],
             [
                 'name' => 'Demo Professional Workspace',
-                'domain' => 'demo-pro.' . $domain,
+                'domain' => 'demo-pro.'.$domain,
                 'plan' => 'professional',
             ],
             [
                 'name' => 'Demo Enterprise Workspace',
-                'domain' => 'demo-enterprise.' . $domain,
+                'domain' => 'demo-enterprise.'.$domain,
                 'plan' => 'enterprise',
             ],
         ];
@@ -73,16 +74,16 @@ class DatabaseSeeder extends Seeder
             } else {
                 $tenant = Tenant::create($tenantData);
                 $this->command->info("Created tenant: {$tenant->name}");
-                
+
                 // Assign plan
-                $plan = \App\Models\Plan::findBySlug($planSlug);
+                $plan = Plan::findBySlug($planSlug);
                 if ($plan) {
                     $isDemo = str_starts_with($tenantData['name'], 'Demo ');
-                    $tenant->assignPlan($plan, !$isDemo); // false for Demo to make it active, true for regular to start trial
-                    $this->command->info("  - Assigned {$plan->name} plan" . ($isDemo ? ' (Active/No Trial)' : ' (On Trial)'));
+                    $tenant->assignPlan($plan, ! $isDemo); // false for Demo to make it active, true for regular to start trial
+                    $this->command->info("  - Assigned {$plan->name} plan".($isDemo ? ' (Active/No Trial)' : ' (On Trial)'));
                 }
             }
-            
+
             $tenant->makeCurrent();
 
             // 4. Run all other tenant-specific seeders

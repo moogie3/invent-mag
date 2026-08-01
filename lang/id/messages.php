@@ -1653,7 +1653,7 @@ return [
     'credit_info_invoice' => 'Catatan kredit untuk invoice ini dapat digunakan untuk pembelian mendatang',
     'credit_condition_info' => 'Kredit hanya dibuat ketika status retur adalah "Completed" DAN invoice asli adalah "Paid"',
     'no_credit_unpaid' => 'Tanpa kredit (invoice belum lunas)',
-'view_sales_order' => 'Lihat Pesanan Penjualan',
+    'view_sales_order' => 'Lihat Pesanan Penjualan',
     'view_sales_order_desc' => 'Lihat detail pesanan penjualan lengkap termasuk item, pembayaran, dan informasi retur.',
 
     // Backup
@@ -1713,7 +1713,7 @@ return [
     'backup_file_must_be_file' => 'File cadangan harus berupa file',
     'backup_file_must_be_zip' => 'File cadangan harus berupa .zip',
     'backup_file_format' => 'Unggah file .zip cadangan',
-    
+
     // HR
     'administration' => 'Administrasi',
     'hr' => 'HR',
@@ -1761,12 +1761,12 @@ return [
     'hr_inactive' => 'Nonaktif',
     'hr_resigned' => 'Mengundurkan Diri',
     'hr_terminated' => 'Diberhentikan',
-    
+
     // Generic CRUD messages
     'record_created' => 'Data berhasil dibuat',
     'record_updated' => 'Data berhasil diperbarui',
     'record_deleted' => 'Data berhasil dihapus',
-    
+
     // Common
     'add' => 'Tambah',
     'edit' => 'Edit',
@@ -1907,4 +1907,49 @@ return [
     'tax_region' => 'Wilayah Pajak',
     'tax_region_description' => 'Atur wilayah pajak bisnis Anda. Ini menentukan fitur pajak regional (misalnya e-Faktur Indonesia) yang tersedia.',
     'tax_jurisdiction_saved' => 'Yurisdiksi pajak berhasil diperbarui.',
+
+    'bank_reconciliation' => 'Rekonsiliasi Bank',
+    'bank_reconciliation_summary' => 'Impor laporan bank dan cocokkan dengan jurnal untuk memastikan saldo kas Anda.',
+    'bank_reconciliation_import' => 'Import Laporan',
+    'bank_reconciliation_import_details' => 'Import Laporan Bank',
+    'bank_reconciliation_import_summary' => 'Impor laporan bank (CSV/TXT) dan cocokkan barisnya dengan jurnal Anda untuk memverifikasi saldo kas.',
+    'bank_reconciliation_opening_balance_synced' => 'Terisi otomatis dari saldo awal akun per :date. Sesuaikan jika periode laporan Anda berbeda.',
+    'bank_reconciliation_opening_balance_hint' => 'Masukkan saldo awal yang tertera pada laporan Anda. Jika akun memiliki saldo awal, nilai tersebut akan terisi otomatis.',
+    'bank_reconciliation_total' => 'Total Rekonsiliasi',
+    'bank_reconciliation_open' => 'Terbuka',
+    'bank_reconciliation_completed' => 'Selesai',
+    'bank_reconciliation_list' => 'Riwayat Rekonsiliasi',
+    'bank_reconciliation_bank' => 'Bank',
+    'bank_reconciliation_select_bank' => 'Pilih bank',
+    'bank_reconciliation_account' => 'Akun Bank',
+    'bank_reconciliation_select_account' => 'Pilih akun bank',
+    'bank_reconciliation_statement_file' => 'File Laporan (CSV)',
+    'bank_reconciliation_file_hint' => 'Unggah export CSV/TXT laporan bank. Format yang didukung: BCA, Mandiri, BNI, BRI.',
+    'bank_reconciliation_opening_balance' => 'Saldo Awal',
+    'bank_reconciliation_closing_balance' => 'Saldo Akhir Laporan',
+    'bank_reconciliation_computed_closing' => 'Saldo Akhir Terhitung',
+    'bank_reconciliation_variance' => 'Selisih',
+    'bank_reconciliation_period_start' => 'Awal Periode',
+    'bank_reconciliation_period_end' => 'Akhir Periode',
+    'bank_reconciliation_matched' => 'Tercocok',
+    'bank_reconciliation_unmatched' => 'Belum Cocok',
+    'bank_reconciliation_matched_amount' => 'Jumlah Tercocok',
+    'bank_reconciliation_unmatched_amount' => 'Jumlah Belum Cocok',
+    'bank_reconciliation_lines' => 'Baris Laporan',
+    'bank_reconciliation_statement_lines' => 'Baris Laporan',
+    'bank_reconciliation_status' => 'Status',
+    'bank_reconciliation_match' => 'Cocokkan',
+    'bank_reconciliation_unmatch' => 'Batalkan Cocok',
+    'bank_reconciliation_complete' => 'Selesaikan Rekonsiliasi',
+    'bank_reconciliation_complete_confirm' => 'Selesaikan rekonsiliasi ini?',
+    'bank_reconciliation_complete_desc' => 'Jurnal yang tercocok akan terkunci dan tidak dapat dibalik, dibatalkan, atau dibatalkan posting.',
+    'bank_reconciliation_delete' => 'Hapus',
+    'bank_reconciliation_delete_confirm' => 'Hapus rekonsiliasi ini?',
+    'bank_reconciliation_empty' => 'Belum ada rekonsiliasi bank',
+    'bank_reconciliation_empty_desc' => 'Impor laporan bank pertama Anda untuk mulai mencocokkan transaksi.',
+    'bank_reconciliation_no_candidate' => 'Tidak ada jurnal yang cocok',
+    'bank_reconciliation_journal_entry' => 'Jurnal',
+    'bank_reconciliation_variance_pending' => 'Rekonsiliasi ini belum seimbang. Selesaikan selisihnya sebelum menyelesaikan.',
+    'reconciled' => 'Terekonsiliasi',
+    'reconciled_hint' => 'Entri jurnal ini merupakan bagian dari rekonsiliasi bank yang telah selesai.',
 ];

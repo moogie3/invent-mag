@@ -19,14 +19,14 @@ return new class extends Migration
             $tenantId = $tenant->id;
             $outputVat = DB::table('accounts')
                 ->where('tenant_id', $tenantId)
-                ->where('code', '2130-' . $tenantId)
+                ->where('code', '2130-'.$tenantId)
                 ->first();
 
             $settings['ppn_keluaran_account_id'] = $outputVat?->id;
 
             DB::table('tenants')
                 ->where('id', $tenant->id)
-                ->update(['accounting_settings' => DB::raw("'" . addslashes(json_encode($settings)) . "'")]);
+                ->update(['accounting_settings' => DB::raw("'".addslashes(json_encode($settings))."'")]);
         }
     }
 
@@ -40,7 +40,7 @@ return new class extends Migration
 
             DB::table('tenants')
                 ->where('id', $tenant->id)
-                ->update(['accounting_settings' => DB::raw("'" . addslashes(json_encode($settings)) . "'")]);
+                ->update(['accounting_settings' => DB::raw("'".addslashes(json_encode($settings))."'")]);
         }
     }
 };

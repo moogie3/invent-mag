@@ -22,6 +22,7 @@ class TaxController extends Controller
         $entries = $request->input('entries', 10);
         $taxes = Tax::orderBy('name')->paginate($entries);
         $totalTaxes = Tax::count();
+
         return view('admin.tax.tax', compact('taxes', 'totalTaxes'));
     }
 
@@ -30,10 +31,10 @@ class TaxController extends Controller
         $validated = $request->validate([
             'name' => [
                 'required', 'string', 'max:255',
-                Rule::unique('taxes', 'name')->where(fn($q) => $q->where('tenant_id', app('currentTenant')->id)),
+                Rule::unique('taxes', 'name')->where(fn ($q) => $q->where('tenant_id', app('currentTenant')->id)),
             ],
             'rate' => 'required|numeric|min:0|max:100',
-            'type' => 'required|in:' . implode(',', Tax::TYPES),
+            'type' => 'required|in:'.implode(',', Tax::TYPES),
             'description' => 'nullable|string|max:500',
             'is_default' => 'boolean',
             'is_active' => 'boolean',
@@ -51,6 +52,7 @@ class TaxController extends Controller
             if ($request->ajax()) {
                 return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
             }
+
             return redirect()->back()->with('error', $e->getMessage())->withInput();
         }
     }
@@ -61,11 +63,11 @@ class TaxController extends Controller
             'name' => [
                 'required', 'string', 'max:255',
                 Rule::unique('taxes', 'name')
-                    ->where(fn($q) => $q->where('tenant_id', app('currentTenant')->id))
+                    ->where(fn ($q) => $q->where('tenant_id', app('currentTenant')->id))
                     ->ignore($tax->id),
             ],
             'rate' => 'required|numeric|min:0|max:100',
-            'type' => 'required|in:' . implode(',', Tax::TYPES),
+            'type' => 'required|in:'.implode(',', Tax::TYPES),
             'description' => 'nullable|string|max:500',
             'is_default' => 'boolean',
             'is_active' => 'boolean',
@@ -83,6 +85,7 @@ class TaxController extends Controller
             if ($request->ajax()) {
                 return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
             }
+
             return redirect()->back()->with('error', $e->getMessage())->withInput();
         }
     }
@@ -101,6 +104,7 @@ class TaxController extends Controller
             if ($request->ajax()) {
                 return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
             }
+
             return redirect()->back()->with('error', $e->getMessage());
         }
     }
@@ -119,6 +123,7 @@ class TaxController extends Controller
             if ($request->ajax()) {
                 return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
             }
+
             return redirect()->back()->with('error', $e->getMessage());
         }
     }
@@ -127,7 +132,7 @@ class TaxController extends Controller
     {
         $taxId = $request->input('tax_id');
 
-        if (!$taxId) {
+        if (! $taxId) {
             $tax = $this->taxService->getDefault();
         } else {
             $tax = $this->taxService->findById($taxId);

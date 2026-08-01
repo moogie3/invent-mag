@@ -22,6 +22,7 @@ class PayslipController extends Controller
     {
         try {
             $pdfPath = $this->service->generatePayslip($item);
+
             return back()->with('success', __('messages.record_created'));
         } catch (\Exception $e) {
             return back()->with('error', $e->getMessage());
@@ -34,7 +35,7 @@ class PayslipController extends Controller
             return back()->with('error', 'Payslip not generated yet.');
         }
 
-        $dompdf = new Dompdf();
+        $dompdf = new Dompdf;
         $html = view('admin.hr.payslip.print', [
             'item' => $item,
             'employee' => $item->employee,
@@ -43,6 +44,7 @@ class PayslipController extends Controller
         $dompdf->loadHtml($html);
         $dompdf->setPaper('A4');
         $dompdf->render();
+
         return $dompdf->stream("payslip-{$item->employee->employee_code}-{$item->payrollRun->period->year}-{$item->payrollRun->period->month}.pdf");
     }
 }

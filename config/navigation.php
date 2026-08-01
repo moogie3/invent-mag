@@ -153,10 +153,10 @@ return [
             ],
         ],
         [
-            'title'        => 'messages.efaktur',
-            'icon'         => 'ti ti-file-invoice',
-            'route'        => 'admin.efaktur.index',
-            'permission'   => 'view-efaktur',
+            'title' => 'messages.efaktur',
+            'icon' => 'ti ti-file-invoice',
+            'route' => 'admin.efaktur.index',
+            'permission' => 'view-efaktur',
             'plan_feature' => 'ppn',  // Professional+ only
             'jurisdiction' => 'ID',   // Only visible for Indonesian tenants
         ],
@@ -186,6 +186,13 @@ return [
                     'permission' => 'view-reports',
                     'icon' => 'ti ti-currency-dollar',
                     'plan_feature' => 'cash_flow', // Professional+
+                ],
+                [
+                    'title' => 'messages.bank_reconciliation',
+                    'route' => 'admin.bank-reconciliation.index',
+                    'permission' => 'view-accounting',
+                    'icon' => 'ti ti-building-bank',
+                    'plan_feature' => 'bank_reconciliation', // Professional+
                 ],
                 [
                     'title' => 'messages.aged_receivables_report',

@@ -2,23 +2,24 @@
 
 namespace App\Services;
 
-use App\Models\Purchase;
+use App\Helpers\CurrencyHelper;
+use App\Helpers\PurchaseHelper;
+use App\Models\Account;
+use App\Models\JournalEntry;
+use App\Models\Payment;
 use App\Models\POItem;
 use App\Models\Product;
 use App\Models\ProductWarehouse;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Auth;
-use App\Helpers\PurchaseHelper;
-use App\Helpers\CurrencyHelper;
+use App\Models\Purchase;
 use App\Models\Supplier;
-use App\Models\User;
-use Carbon\Carbon;
-use App\Models\Account;
-use App\Models\PurchaseReturn;
-use App\Models\PurchaseReturnItem;
-use App\Models\Warehouse;
 use App\Models\Tax;
+use App\Models\User;
+use App\Models\Warehouse;
+use Carbon\Carbon;
 use Dompdf\Dompdf;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class PurchaseService
 {
@@ -40,8 +41,8 @@ class PurchaseService
 
         if (isset($filters['month']) && $filters['month']) {
             $query->whereMonth('order_date', $filters['month']);
-            if (!isset($filters['year'])) { // If year is not specified, default to current year
-                $query->whereYear('order_date', \Carbon\Carbon::now()->year);
+            if (! isset($filters['year'])) { // If year is not specified, default to current year
+                $query->whereYear('order_date', Carbon::now()->year);
             }
         }
 
@@ -71,11 +72,11 @@ class PurchaseService
                 SUM(CASE WHEN po.order_date >= ? AND po.order_date <= ? THEN po.total ELSE 0 END) as total_monthly,
                 SUM(CASE WHEN po.status = 'Paid' AND po.order_date >= ? AND po.order_date <= ? THEN po.total ELSE 0 END) as payment_monthly
             ", [$monthStart, $monthEnd, $monthStart, $monthEnd]);
-            
+
         if ($tenantId) {
             $aggQuery->where('po.tenant_id', $tenantId);
         }
-        
+
         $aggregates = $aggQuery->first();
 
         $inCount = (int) ($aggregates->in_count ?? 0);
@@ -92,10 +93,10 @@ class PurchaseService
             ->where('payments.paymentable_type', Purchase::class)
             ->whereIn('po.status', ['Unpaid', 'Partial'])
             ->where('suppliers.location', 'IN');
-            
+
         $paidAgainstOut = clone $paidAgainstIn;
         $paidAgainstOut->where('suppliers.location', 'OUT');
-        
+
         if ($tenantId) {
             $paidAgainstIn->where('po.tenant_id', $tenantId);
             $paidAgainstOut->where('po.tenant_id', $tenantId);
@@ -103,7 +104,7 @@ class PurchaseService
 
         $inCountamount = max(0, $inCountamount - $paidAgainstIn->sum('payments.amount'));
         $outCountamount = max(0, $outCountamount - $paidAgainstOut->sum('payments.amount'));
-        
+
         $shopname = User::where('tenant_id', $tenantId)->whereNotNull('shopname')->value('shopname');
         $address = User::where('tenant_id', $tenantId)->whereNotNull('address')->value('address');
 
@@ -129,7 +130,7 @@ class PurchaseService
     {
         $pos = Purchase::with(['items', 'supplier', 'payments', 'purchaseReturns.items'])->find($id);
 
-        if (!$pos) {
+        if (! $pos) {
             return []; // Or throw an exception, depending on desired behavior
         }
 
@@ -148,8 +149,8 @@ class PurchaseService
     {
         $pos = Purchase::with(['items', 'supplier', 'payments', 'purchaseReturns.items'])->find($id);
 
-        if (!$pos) {
-            throw new \Illuminate\Database\Eloquent\ModelNotFoundException("Purchase with ID {$id} not found.");
+        if (! $pos) {
+            throw new ModelNotFoundException("Purchase with ID {$id} not found.");
         }
 
         $suppliers = Supplier::all();
@@ -181,7 +182,7 @@ class PurchaseService
     {
         return DB::transaction(function () use ($data) {
             $products = json_decode($data['products'], true);
-            if (!$products || !is_array($products)) {
+            if (! $products || ! is_array($products)) {
                 throw new \Exception('Invalid product data');
             }
 
@@ -223,7 +224,7 @@ class PurchaseService
                     'discount' => $productData['discount'] ?? 0,
                     'discount_type' => $productData['discountType'] ?? 'fixed',
                     'total' => $itemTotal,
-                    'expiry_date' => !empty($productData['expiry_date']) ? $productData['expiry_date'] : null,
+                    'expiry_date' => ! empty($productData['expiry_date']) ? $productData['expiry_date'] : null,
                 ]);
                 $totalAmount += $itemTotal;
 
@@ -232,7 +233,7 @@ class PurchaseService
                     [
                         'product_id' => $productData['product_id'],
                         'warehouse_id' => $purchase->warehouse_id,
-                        'tenant_id' => $purchase->tenant_id
+                        'tenant_id' => $purchase->tenant_id,
                     ],
                     ['quantity' => 0]
                 );
@@ -254,18 +255,18 @@ class PurchaseService
             $finalTotal = max(0, $finalTotal - $pphAmount);
 
             $purchase->update([
-                'total'     => $finalTotal,
+                'total' => $finalTotal,
                 'total_tax' => $taxAmount,
                 'pph_enabled' => app('currentTenant')->isIndonesian() && ($pphTax?->is_pph ?? false),
-                'pph_rate'    => app('currentTenant')->isIndonesian() && ($pphTax?->is_pph ?? false) ? $pphTaxRate : null,
-                'pph_amount'  => app('currentTenant')->isIndonesian() && ($pphTax?->is_pph ?? false) ? $pphAmount : 0,
-                'pph_tax_id'  => app('currentTenant')->isIndonesian() && ($pphTax?->is_pph ?? false) ? $pphTax?->id : null,
+                'pph_rate' => app('currentTenant')->isIndonesian() && ($pphTax?->is_pph ?? false) ? $pphTaxRate : null,
+                'pph_amount' => app('currentTenant')->isIndonesian() && ($pphTax?->is_pph ?? false) ? $pphAmount : 0,
+                'pph_tax_id' => app('currentTenant')->isIndonesian() && ($pphTax?->is_pph ?? false) ? $pphTax?->id : null,
             ]);
 
             // Get accounting settings from tenant
             $accountingSettings = app('currentTenant')->accounting_settings ?? [];
 
-            if (!$accountingSettings || !isset($accountingSettings['inventory_account_id']) || !isset($accountingSettings['accounts_payable_account_id'])) {
+            if (! $accountingSettings || ! isset($accountingSettings['inventory_account_id']) || ! isset($accountingSettings['accounts_payable_account_id'])) {
                 throw new \Exception('Accounting settings for inventory or accounts payable are not configured.');
             }
 
@@ -274,7 +275,7 @@ class PurchaseService
             $inventoryAccount = Account::find($accountingSettings['inventory_account_id']);
             $accountsPayableAccount = Account::find($accountingSettings['accounts_payable_account_id']);
 
-            if (!$inventoryAccount || !$accountsPayableAccount) {
+            if (! $inventoryAccount || ! $accountsPayableAccount) {
                 throw new \Exception('Required accounts (Inventory, Accounts Payable) not found. Please check Accounting Settings.');
             }
 
@@ -314,7 +315,7 @@ class PurchaseService
     {
         return DB::transaction(function () use ($purchase, $data) {
             $products = json_decode($data['products'], true);
-            if (!$products || !is_array($products)) {
+            if (! $products || ! is_array($products)) {
                 throw new \Exception('Invalid product data');
             }
 
@@ -367,7 +368,7 @@ class PurchaseService
                     'discount' => $productData['discount'] ?? 0,
                     'discount_type' => $productData['discountType'] ?? 'fixed',
                     'total' => $itemTotal,
-                    'expiry_date' => !empty($productData['expiry_date']) ? $productData['expiry_date'] : null,
+                    'expiry_date' => ! empty($productData['expiry_date']) ? $productData['expiry_date'] : null,
                 ]);
                 $totalAmount += $itemTotal;
 
@@ -376,7 +377,7 @@ class PurchaseService
                     [
                         'product_id' => $productData['product_id'],
                         'warehouse_id' => $purchase->warehouse_id, // Use updated warehouse ID
-                        'tenant_id' => $purchase->tenant_id
+                        'tenant_id' => $purchase->tenant_id,
                     ],
                     ['quantity' => 0]
                 );
@@ -397,12 +398,12 @@ class PurchaseService
             $finalTotal = max(0, $finalTotal - $pphAmount);
 
             $purchase->update([
-                'total'     => $finalTotal,
+                'total' => $finalTotal,
                 'total_tax' => $taxAmount,
                 'pph_enabled' => app('currentTenant')->isIndonesian() && ($pphTax?->is_pph ?? false),
-                'pph_rate'    => app('currentTenant')->isIndonesian() && ($pphTax?->is_pph ?? false) ? $pphTaxRate : null,
-                'pph_amount'  => app('currentTenant')->isIndonesian() && ($pphTax?->is_pph ?? false) ? $pphAmount : 0,
-                'pph_tax_id'  => app('currentTenant')->isIndonesian() && ($pphTax?->is_pph ?? false) ? $pphTax?->id : null,
+                'pph_rate' => app('currentTenant')->isIndonesian() && ($pphTax?->is_pph ?? false) ? $pphTaxRate : null,
+                'pph_amount' => app('currentTenant')->isIndonesian() && ($pphTax?->is_pph ?? false) ? $pphAmount : 0,
+                'pph_tax_id' => app('currentTenant')->isIndonesian() && ($pphTax?->is_pph ?? false) ? $pphTax?->id : null,
             ]);
 
             // Refresh model to get grand_total attribute updated
@@ -431,7 +432,7 @@ class PurchaseService
         });
     }
 
-    public function addPayment(Purchase $purchase, array $data): \App\Models\Payment
+    public function addPayment(Purchase $purchase, array $data): Payment
     {
         return DB::transaction(function () use ($purchase, $data) {
             $payment = $purchase->payments()->create([
@@ -447,7 +448,7 @@ class PurchaseService
             // Get accounting settings from tenant
             $accountingSettings = app('currentTenant')->accounting_settings ?? [];
 
-            if (!$accountingSettings || !isset($accountingSettings['accounts_payable_account_id']) || !isset($accountingSettings['cash_account_id'])) {
+            if (! $accountingSettings || ! isset($accountingSettings['accounts_payable_account_id']) || ! isset($accountingSettings['cash_account_id'])) {
                 throw new \Exception('Accounting settings for accounts payable or cash are not configured.');
             }
 
@@ -456,7 +457,7 @@ class PurchaseService
             $accountsPayableAccount = Account::find($accountingSettings['accounts_payable_account_id']);
             $cashAccount = Account::find($accountingSettings['cash_account_id']);
 
-            if (!$accountsPayableAccount || !$cashAccount) {
+            if (! $accountsPayableAccount || ! $cashAccount) {
                 throw new \Exception('Required accounts (Accounts Payable, Cash) not found. Please check Accounting Settings.');
             }
 
@@ -501,12 +502,12 @@ class PurchaseService
     {
         DB::transaction(function () use ($purchase) {
             // Reverse associated journal entries for accurate accounting
-            $journalEntries = \App\Models\JournalEntry::where('sourceable_type', get_class($purchase))
+            $journalEntries = JournalEntry::where('sourceable_type', get_class($purchase))
                 ->where('sourceable_id', $purchase->id)
                 ->get();
 
             foreach ($journalEntries as $entry) {
-                if ($entry->status === \App\Models\JournalEntry::STATUS_POSTED && $entry->canBeReversed()) {
+                if ($entry->status === JournalEntry::STATUS_POSTED && $entry->canBeReversed()) {
                     $this->accountingService->reverseJournalEntry($entry, "Auto-reversal due to deleted PO #{$purchase->invoice}");
                 }
             }
@@ -558,6 +559,7 @@ class PurchaseService
                 $updatedCount++;
             }
         });
+
         return $updatedCount;
     }
 
@@ -580,10 +582,11 @@ class PurchaseService
 
         if ($exportOption === 'pdf') {
             $html = view('admin.po.bulk-export-pdf', compact('purchases'))->render();
-            $dompdf = new Dompdf();
+            $dompdf = new Dompdf;
             $dompdf->loadHtml($html);
             $dompdf->setPaper('A4', 'landscape');
             $dompdf->render();
+
             return $dompdf->stream('purchase-orders.pdf');
         }
 
@@ -634,12 +637,12 @@ class PurchaseService
         $address = User::whereNotNull('address')->value('address');
 
         $html = view('admin.po.print-pdf', compact('pos', 'shopname', 'address'))->render();
-        $dompdf = new Dompdf();
+        $dompdf = new Dompdf;
         $dompdf->loadHtml($html);
         $dompdf->setPaper('A4', 'portrait');
         $dompdf->render();
 
-        return $dompdf->stream('po-' . $pos->invoice . '.pdf', ['Attachment' => false]);
+        return $dompdf->stream('po-'.$pos->invoice.'.pdf', ['Attachment' => false]);
     }
 
     public function getPurchaseMetrics()
@@ -691,8 +694,8 @@ class PurchaseService
     public function getExpiringPurchaseCount(): int
     {
         return Purchase::where('due_date', '<=', Carbon::now()->addDays(90))
-                        ->where('status', '!=', 'Paid')
-                        ->count();
+            ->where('status', '!=', 'Paid')
+            ->count();
     }
 
     public function getExpiringPurchases()

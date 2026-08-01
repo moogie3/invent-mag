@@ -2,10 +2,9 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
-use Spatie\Permission\Models\Role;
 use Spatie\Permission\Models\Permission;
+use Spatie\Permission\Models\Role;
 
 class RolePermissionSeeder extends Seeder
 {
@@ -39,7 +38,7 @@ class RolePermissionSeeder extends Seeder
             'manage-stock-opname',
 
             'edit-warehouses',
-            
+
             // HR
             'view-hr',
             'manage-employees',
@@ -62,10 +61,10 @@ class RolePermissionSeeder extends Seeder
             'view-products',
             'view-reports',
         ]);
-        
-        $this->command->info("Role permissions synced successfully!");
-        $this->command->info("  - Superuser: All permissions");
-        $this->command->info("  - Staff: 40+ permissions assigned");
-        $this->command->info("  - POS: 6 basic permissions assigned");
+
+        $this->command->info('Role permissions synced successfully!');
+        $this->command->info('  - Superuser: All permissions');
+        $this->command->info('  - Staff: 40+ permissions assigned');
+        $this->command->info('  - POS: 6 basic permissions assigned');
     }
 }

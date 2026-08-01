@@ -30,7 +30,7 @@ return new class extends Migration
 
         foreach ($plans as $plan) {
             $features = $plan->features ?? [];
-            $plan->features = array_values(array_filter($features, fn($f) => $f !== 'ppn'));
+            $plan->features = array_values(array_filter($features, fn ($f) => $f !== 'ppn'));
             $plan->save();
         }
     }

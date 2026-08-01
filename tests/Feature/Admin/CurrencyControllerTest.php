@@ -2,22 +2,21 @@
 
 namespace Tests\Feature\Admin;
 
-use App\Models\User;
 use App\Models\CurrencySetting;
+use App\Models\User;
 use App\Services\CurrencyService;
-use Illuminate\Http\Request;
+use Database\Seeders\RoleSeeder;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Mockery;
 use Tests\TestCase;
-use Illuminate\Pagination\LengthAwarePaginator;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Traits\CreatesTenant;
-use Database\Seeders\RoleSeeder;
 
 class CurrencyControllerTest extends TestCase
 {
-    use RefreshDatabase, CreatesTenant;
+    use CreatesTenant, RefreshDatabase;
 
     protected CurrencyService $currencyService;
+
     protected array $validData;
 
     protected function setUp(): void

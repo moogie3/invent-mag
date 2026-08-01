@@ -2,30 +2,31 @@
 
 namespace Tests\Feature\Admin;
 
-use App\Models\User;
 use App\Models\Customer;
 use App\Models\Warehouse;
+use App\Services\CustomerService;
+use Database\Seeders\RoleSeeder;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Storage;
 use Tests\TestCase;
-use App\Services\CustomerService;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Traits\CreatesTenant;
-use Database\Seeders\RoleSeeder;
 
 class CustomerControllerTest extends TestCase
 {
-    use RefreshDatabase, CreatesTenant;
+    use CreatesTenant, RefreshDatabase;
 
     protected function setUp(): void
     {
-                parent::setUp();
-                config(['auth.defaults.guard' => 'web']);
-                $this->setupTenant();
-                $this->seed(RoleSeeder::class); // Seed roles and permissions
-                $this->user->assignRole('superuser');
+        parent::setUp();
+        config(['auth.defaults.guard' => 'web']);
+        $this->setupTenant();
+        $this->seed(RoleSeeder::class); // Seed roles and permissions
+        $this->user->assignRole('superuser');
 
-                Warehouse::factory()->create(['is_main' => true]);    }
+        Warehouse::factory()->create(['is_main' => true]);
+    }
 
     public function test_it_can_display_the_customer_index_page()
     {
@@ -49,8 +50,8 @@ class CustomerControllerTest extends TestCase
         // Mock the CustomerService
         $mockService = \Mockery::mock(CustomerService::class);
         $mockService->shouldReceive('getCustomerMetrics')
-                    ->once()
-                    ->andReturn($expectedMetrics);
+            ->once()
+            ->andReturn($expectedMetrics);
         $this->app->instance(CustomerService::class, $mockService);
 
         $response = $this->get(route('admin.customer.metrics'));
@@ -100,14 +101,14 @@ class CustomerControllerTest extends TestCase
         // Mock the CustomerService to return a failure
         $mockService = \Mockery::mock(CustomerService::class);
         $mockService->shouldReceive('createCustomer')
-                    ->once()
-                    ->andReturn(['success' => false, 'message' => $errorMessage]);
+            ->once()
+            ->andReturn(['success' => false, 'message' => $errorMessage]);
         $mockService->shouldReceive('getCustomerIndexData') // Add expectation for index method call
-                    ->andReturn([
-                        'customers' => new \Illuminate\Pagination\LengthAwarePaginator([], 0, 10),
-                        'entries' => 10,
-                        'totalcustomer' => 0,
-                    ]);
+            ->andReturn([
+                'customers' => new LengthAwarePaginator([], 0, 10),
+                'entries' => 10,
+                'totalcustomer' => 0,
+            ]);
         $this->app->instance(CustomerService::class, $mockService);
 
         $this->get(route('admin.customer')); // Set previous URL for back() redirect
@@ -151,8 +152,8 @@ class CustomerControllerTest extends TestCase
         // Mock the CustomerService
         $mockService = \Mockery::mock(CustomerService::class);
         $mockService->shouldReceive('quickCreateCustomer')
-                    ->once()
-                    ->andReturn(['success' => true, 'customer' => $mockCustomer]);
+            ->once()
+            ->andReturn(['success' => true, 'customer' => $mockCustomer]);
         $this->app->instance(CustomerService::class, $mockService);
 
         $response = $this->post(route('admin.customer.quickCreate'), $customerData);
@@ -198,8 +199,8 @@ class CustomerControllerTest extends TestCase
         // Mock the CustomerService to return a failure
         $mockService = \Mockery::mock(CustomerService::class);
         $mockService->shouldReceive('quickCreateCustomer')
-                    ->once()
-                    ->andReturn(['success' => false, 'message' => $errorMessage]);
+            ->once()
+            ->andReturn(['success' => false, 'message' => $errorMessage]);
         $this->app->instance(CustomerService::class, $mockService);
 
         $response = $this->post(route('admin.customer.quickCreate'), $customerData, ['Accept' => 'application/json']);
@@ -210,8 +211,6 @@ class CustomerControllerTest extends TestCase
             'message' => $errorMessage,
         ]);
     }
-
-
 
     public function test_it_can_update_a_customer()
     {
@@ -270,14 +269,14 @@ class CustomerControllerTest extends TestCase
         // Mock the CustomerService to return a failure
         $mockService = \Mockery::mock(CustomerService::class);
         $mockService->shouldReceive('updateCustomer')
-                    ->once()
-                    ->andReturn(['success' => false, 'message' => $errorMessage]);
+            ->once()
+            ->andReturn(['success' => false, 'message' => $errorMessage]);
         $mockService->shouldReceive('getCustomerIndexData') // Add expectation for index method call
-                    ->andReturn([
-                        'customers' => new \Illuminate\Pagination\LengthAwarePaginator([], 0, 10),
-                        'entries' => 10,
-                        'totalcustomer' => 0,
-                    ]);
+            ->andReturn([
+                'customers' => new LengthAwarePaginator([], 0, 10),
+                'entries' => 10,
+                'totalcustomer' => 0,
+            ]);
         $this->app->instance(CustomerService::class, $mockService);
 
         $this->get(route('admin.customer')); // Set previous URL for back() redirect
@@ -325,8 +324,8 @@ class CustomerControllerTest extends TestCase
         // Mock the CustomerService to return a failure
         $mockService = \Mockery::mock(CustomerService::class);
         $mockService->shouldReceive('deleteCustomer')
-                    ->once()
-                    ->andReturn(['success' => false, 'message' => $errorMessage]);
+            ->once()
+            ->andReturn(['success' => false, 'message' => $errorMessage]);
         $this->app->instance(CustomerService::class, $mockService);
 
         $response = $this->delete(route('admin.customer.destroy', $customer->id));
@@ -386,7 +385,7 @@ class CustomerControllerTest extends TestCase
             ->assertJson([
                 'success' => false,
                 'message' => $errorMessage,
-                'errors' => ['name' => [$errorMessage]]
+                'errors' => ['name' => [$errorMessage]],
             ]);
     }
 

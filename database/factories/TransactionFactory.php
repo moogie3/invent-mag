@@ -4,10 +4,11 @@ namespace Database\Factories;
 
 use App\Models\Account;
 use App\Models\JournalEntry;
+use App\Models\Transaction;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Transaction>
+ * @extends Factory<Transaction>
  */
 class TransactionFactory extends Factory
 {

@@ -2,16 +2,17 @@
 
 namespace App\Services;
 
-use App\Models\Product;
+use App\Helpers\CurrencyHelper;
 use App\Models\Categories;
+use App\Models\POItem;
+use App\Models\Product;
+use App\Models\ProductWarehouse;
+use App\Models\StockAdjustment;
 use App\Models\Supplier;
 use App\Models\Unit;
 use App\Models\Warehouse;
-use App\Models\ProductWarehouse;
-use App\Helpers\CurrencyHelper;
 use Dompdf\Dompdf;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
@@ -74,13 +75,13 @@ class ProductService
 
     public function createProduct(array $data)
     {
-        $data['has_expiry'] = !empty($data['has_expiry']);
+        $data['has_expiry'] = ! empty($data['has_expiry']);
 
         unset($data['warehouse_id']);
 
         if (isset($data['image'])) {
             $image = $data['image'];
-            $imageName = Str::random(10) . '_' . $image->getClientOriginalName();
+            $imageName = Str::random(10).'_'.$image->getClientOriginalName();
             $image->storeAs('image', $imageName, 'public');
             $data['image'] = $imageName;
         }
@@ -105,19 +106,19 @@ class ProductService
 
     public function updateProduct(Product $product, array $data)
     {
-        $data['has_expiry'] = !empty($data['has_expiry']);
+        $data['has_expiry'] = ! empty($data['has_expiry']);
 
         // warehouse_id is no longer updatable on the product itself
         unset($data['warehouse_id']);
 
         if (isset($data['image'])) {
             $oldImageName = $product->getRawOriginal('image');
-            if (!empty($oldImageName)) {
-                Storage::disk('public')->delete('image/' . $oldImageName);
+            if (! empty($oldImageName)) {
+                Storage::disk('public')->delete('image/'.$oldImageName);
             }
 
             $image = $data['image'];
-            $imageName = Str::random(10) . '_' . $image->getClientOriginalName();
+            $imageName = Str::random(10).'_'.$image->getClientOriginalName();
             $image->storeAs('image', $imageName, 'public');
             $data['image'] = $imageName;
         }
@@ -130,8 +131,8 @@ class ProductService
     public function deleteProduct(Product $product)
     {
         $imageName = $product->getRawOriginal('image');
-        if (!empty($imageName)) {
-            Storage::disk('public')->delete('image/' . $imageName);
+        if (! empty($imageName)) {
+            Storage::disk('public')->delete('image/'.$imageName);
         }
 
         $product->delete();
@@ -151,8 +152,8 @@ class ProductService
 
             foreach ($products as $product) {
                 $imageName = $product->getRawOriginal('image');
-                if (!empty($imageName)) {
-                    $imagePath = 'image/' . $imageName;
+                if (! empty($imageName)) {
+                    $imagePath = 'image/'.$imageName;
 
                     if (Storage::disk('public')->exists($imagePath)) {
                         Storage::disk('public')->delete($imagePath);
@@ -185,7 +186,7 @@ class ProductService
             }
             if (isset($filters['warehouse_id']) && $filters['warehouse_id']) {
                 // Filter by existence in warehouse pivot
-                $query->whereHas('warehouses', function($q) use ($filters) {
+                $query->whereHas('warehouses', function ($q) use ($filters) {
                     $q->where('warehouses.id', $filters['warehouse_id']);
                 });
             }
@@ -194,10 +195,10 @@ class ProductService
             }
             if (isset($filters['search']) && $filters['search']) {
                 $search = $filters['search'];
-                $query->where(function($q) use ($search) {
+                $query->where(function ($q) use ($search) {
                     $q->where('name', 'LIKE', "%{$search}%")
-                      ->orWhere('code', 'LIKE', "%{$search}%")
-                      ->orWhere('barcode', 'LIKE', "%{$search}%");
+                        ->orWhere('code', 'LIKE', "%{$search}%")
+                        ->orWhere('barcode', 'LIKE', "%{$search}%");
                 });
             }
         }
@@ -206,10 +207,11 @@ class ProductService
 
         if ($exportOption === 'pdf') {
             $html = view('admin.product.bulk-export-pdf', compact('products'))->render();
-            $dompdf = new Dompdf();
+            $dompdf = new Dompdf;
             $dompdf->loadHtml($html);
             $dompdf->setPaper('A4', 'landscape');
             $dompdf->render();
+
             return $dompdf->stream('products.pdf');
         }
 
@@ -267,8 +269,8 @@ class ProductService
             $targetWarehouse = Warehouse::where('is_main', true)->first();
         }
 
-        if (!$targetWarehouse) {
-             throw new \Exception('Target warehouse not found for bulk update.');
+        if (! $targetWarehouse) {
+            throw new \Exception('Target warehouse not found for bulk update.');
         }
 
         $insufficientProducts = [];
@@ -280,8 +282,8 @@ class ProductService
             }
         }
 
-        if (!empty($insufficientProducts)) {
-            throw new \Exception('Cannot set negative stock. Products: ' . implode(', ', $insufficientProducts));
+        if (! empty($insufficientProducts)) {
+            throw new \Exception('Cannot set negative stock. Products: '.implode(', ', $insufficientProducts));
         }
 
         $updatedCount = 0;
@@ -315,7 +317,7 @@ class ProductService
                         $adjustmentType = 'decrease';
                     }
 
-                    \App\Models\StockAdjustment::create([
+                    StockAdjustment::create([
                         'product_id' => $product->id,
                         'warehouse_id' => $targetWarehouse->id,
                         'adjustment_type' => $adjustmentType,
@@ -346,14 +348,14 @@ class ProductService
         ];
     }
 
-    public function adjustProductStock(Product $product, float $adjustmentAmount, string $adjustmentType, ?string $reason, ?int $adjustedBy, int $warehouseId = null): Product
+    public function adjustProductStock(Product $product, float $adjustmentAmount, string $adjustmentType, ?string $reason, ?int $adjustedBy, ?int $warehouseId = null): Product
     {
-        if (!$warehouseId) {
+        if (! $warehouseId) {
             $warehouseId = Product::getMainWarehouseId();
         }
 
-        if (!$warehouseId) {
-             throw new \Exception('No warehouse specified and no main warehouse found.');
+        if (! $warehouseId) {
+            throw new \Exception('No warehouse specified and no main warehouse found.');
         }
 
         $stockRecord = ProductWarehouse::firstOrCreate(
@@ -394,7 +396,7 @@ class ProductService
                 $quantityAfter = $adjustmentAmount;
             }
 
-            \App\Models\StockAdjustment::create([
+            StockAdjustment::create([
                 'product_id' => $product->id,
                 'warehouse_id' => $warehouseId,
                 'adjustment_type' => $adjustmentType,
@@ -415,21 +417,21 @@ class ProductService
         $productsQuery = Product::query();
 
         $productsQuery->with([
-            'category' => function($q) {
+            'category' => function ($q) {
                 $q->select('id', 'name');
             },
-            'unit' => function($q) {
+            'unit' => function ($q) {
                 $q->select('id', 'name', 'symbol');
             },
-            'supplier' => function($q) {
+            'supplier' => function ($q) {
                 $q->select('id', 'name');
-            }
+            },
         ]);
 
         $productsQuery->where(function ($q) use ($query) {
             $q->where('name', 'LIKE', "%{$query}%")
-              ->orWhere('code', 'LIKE', "%{$query}%")
-              ->orWhere('barcode', 'LIKE', "%{$query}%");
+                ->orWhere('code', 'LIKE', "%{$query}%")
+                ->orWhere('barcode', 'LIKE', "%{$query}%");
 
             $q->orWhereHas('category', function ($cat) use ($query) {
                 $cat->where('name', 'LIKE', "%{$query}%");
@@ -455,11 +457,11 @@ class ProductService
     {
         $thirtyDaysFromNow = now()->addDays(30);
 
-        return \App\Models\POItem::whereNotNull('expiry_date')
+        return POItem::whereNotNull('expiry_date')
             ->where('expiry_date', '>=', now())
             ->where('expiry_date', '<=', $thirtyDaysFromNow)
             ->where('remaining_quantity', '>', 0) // Only show items with remaining quantity
-            ->with(['product' => function($query) {
+            ->with(['product' => function ($query) {
                 $query->select('id', 'name', 'code'); // Select only necessary product fields
             }])
             ->get();
@@ -469,7 +471,7 @@ class ProductService
     {
         $thirtyDaysFromNow = now()->addDays(30);
 
-        return \App\Models\POItem::whereNotNull('expiry_date')
+        return POItem::whereNotNull('expiry_date')
             ->whereDate('expiry_date', '>=', now())
             ->whereDate('expiry_date', '<=', $thirtyDaysFromNow)
             ->where('remaining_quantity', '>', 0) // Only count items with remaining quantity
@@ -481,11 +483,11 @@ class ProductService
         $thirtyDaysFromNow = now()->addDays(30);
         $sevenDaysAgo = now()->subDays(7);
 
-        return \App\Models\POItem::whereNotNull('expiry_date')
+        return POItem::whereNotNull('expiry_date')
             ->where('expiry_date', '>=', now())
             ->where('expiry_date', '<=', $thirtyDaysFromNow)
             ->where('created_at', '>=', $sevenDaysAgo) // Filter for recently purchased items
-            ->with(['product' => function($query) {
+            ->with(['product' => function ($query) {
                 $query->select('id', 'name', 'code'); // Select only necessary product fields
             }])
             ->get();

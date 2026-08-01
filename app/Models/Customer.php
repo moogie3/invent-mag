@@ -2,14 +2,15 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\BelongsToTenant;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Storage;
-use App\Models\Concerns\BelongsToTenant;
 
 class Customer extends Model
 {
-    use HasFactory, BelongsToTenant;
+    use BelongsToTenant, HasFactory;
 
     protected $table = 'customers';
 
@@ -32,13 +33,14 @@ class Customer extends Model
         'tenant_id',
     ];
 
-    protected function image(): \Illuminate\Database\Eloquent\Casts\Attribute
+    protected function image(): Attribute
     {
-        return \Illuminate\Database\Eloquent\Casts\Attribute::make(
+        return Attribute::make(
             get: function ($value) {
-                if ($value && $value !== 'default_placeholder.png' && Storage::disk('public')->exists('image/' . $value)) {
+                if ($value && $value !== 'default_placeholder.png' && Storage::disk('public')->exists('image/'.$value)) {
                     return asset("storage/image/{$value}");
                 }
+
                 return asset('img/default_placeholder.png');
             }
         );

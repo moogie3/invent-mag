@@ -2,10 +2,11 @@
 
 namespace App\Services;
 
+use App\Helpers\ProductHelper;
+use App\Models\POItem;
+use App\Models\ProductWarehouse;
 use App\Models\Purchase;
 use App\Models\Sales;
-use App\Models\Product;
-use Illuminate\Support\Carbon as IlluminateCarbon;
 use Carbon\Carbon;
 use Illuminate\Support\Collection;
 
@@ -15,11 +16,11 @@ class NotificationService
     {
         $today = Carbon::today();
         $user = auth()->user();
-        
-        if (!$user) {
+
+        if (! $user) {
             return collect();
         }
-        
+
         $settings = $user->system_settings ?? [];
         $dismissed = $settings['dismissed_notifications'] ?? [];
 
@@ -28,7 +29,7 @@ class NotificationService
             ->concat($this->getSalesNotifications($today))
             ->concat($this->getLowStockNotifications())
             ->concat($this->getExpiringProductNotifications())
-            ->filter(fn($item) => $item['show_notification'] && !in_array($item['id'], $dismissed))
+            ->filter(fn ($item) => $item['show_notification'] && ! in_array($item['id'], $dismissed))
             ->sortBy([['days_remaining', 'asc']]);
     }
 
@@ -61,7 +62,7 @@ class NotificationService
                 $showNotification = $po->status !== 'Paid' || ($paymentDate && $today->isSameDay($paymentDate));
 
                 return [
-                    'id' => 'po::' . $po->id,
+                    'id' => 'po::'.$po->id,
                     'title' => "Due Purchase: PO #{$po->id}",
                     'description' => "Due on {$po->due_date->format('M d, Y')}",
                     'due_date' => $po->due_date,
@@ -71,7 +72,7 @@ class NotificationService
                     'days_remaining' => $daysRemaining,
                     'route' => route('admin.po.edit', ['id' => $po->id]),
                     'type' => 'purchase',
-                    'label' => 'PO Invoice #' . $po->id,
+                    'label' => 'PO Invoice #'.$po->id,
                     'status_badge' => $statusInfo['badge'],
                     'status_text' => $statusInfo['text'],
                     'status_icon' => $statusInfo['icon'],
@@ -93,7 +94,7 @@ class NotificationService
                 $showNotification = $sale->status !== 'Paid' || ($paymentDate && $today->isSameDay($paymentDate));
 
                 return [
-                    'id' => 'sale::' . $sale->id,
+                    'id' => 'sale::'.$sale->id,
                     'title' => "Due Invoice: #{$sale->invoice}",
                     'description' => "Due on {$sale->due_date->format('M d, Y')}",
                     'due_date' => $sale->due_date,
@@ -103,7 +104,7 @@ class NotificationService
                     'days_remaining' => $daysRemaining,
                     'route' => route('admin.sales.edit', ['id' => $sale->id]),
                     'type' => 'sales',
-                    'label' => 'Invoice #' . $sale->invoice,
+                    'label' => 'Invoice #'.$sale->invoice,
                     'status_badge' => $statusInfo['badge'],
                     'status_text' => $statusInfo['text'],
                     'status_icon' => $statusInfo['icon'],
@@ -115,7 +116,8 @@ class NotificationService
     protected function getLowStockNotifications(): Collection
     {
         $tenantId = app('currentTenant')->id;
-        return \App\Models\ProductWarehouse::with(['product', 'warehouse'])
+
+        return ProductWarehouse::with(['product', 'warehouse'])
             ->where('product_warehouse.tenant_id', $tenantId)
             ->where('product_warehouse.quantity', '>', 0)
             ->whereHas('product', function ($query) use ($tenantId) {
@@ -126,10 +128,11 @@ class NotificationService
             ->map(function ($pw) {
                 $product = $pw->product;
                 $warehouse = $pw->warehouse;
-                    return [
-                        'id' => 'product::' . $product->id . '::' . $pw->warehouse_id,
-                        'title' => "Low Stock Alert: {$product->name}",
-                        'description' => "Only {$pw->quantity} remaining in {$warehouse->name}",
+
+                return [
+                    'id' => 'product::'.$product->id.'::'.$pw->warehouse_id,
+                    'title' => "Low Stock Alert: {$product->name}",
+                    'description' => "Only {$pw->quantity} remaining in {$warehouse->name}",
                     'due_date' => Carbon::now(),
                     'status' => 'Low Stock',
                     'urgency' => 'high',
@@ -137,7 +140,7 @@ class NotificationService
                     'route' => route('admin.product.edit', ['id' => $product->id]),
                     'threshold' => $product->low_stock_threshold ?? 10,
                     'type' => 'product',
-                    'label' => 'Product #' . $product->code,
+                    'label' => 'Product #'.$product->code,
                     'status_badge' => 'text-red',
                     'status_text' => 'Low Stock',
                     'status_icon' => 'ti ti-alert-triangle',
@@ -150,15 +153,15 @@ class NotificationService
 
     protected function getExpiringProductNotifications(): Collection
     {
-        return \App\Models\POItem::getExpiringSoonItems()
+        return POItem::getExpiringSoonItems()
             ->map(function ($poItem) {
                 $product = $poItem->product;
                 $warehouse = $poItem->purchaseOrder->warehouse ?? null;
                 $daysRemaining = (int) Carbon::now()->diffInDays($poItem->expiry_date, false);
-                [$badgeClass, $badgeText] = \App\Helpers\ProductHelper::getExpiryClassAndText($poItem->expiry_date);
+                [$badgeClass, $badgeText] = ProductHelper::getExpiryClassAndText($poItem->expiry_date);
 
                 return [
-                    'id' => 'poitem::' . $poItem->id,
+                    'id' => 'poitem::'.$poItem->id,
                     'title' => "Expiring Product: {$product->name}",
                     'description' => $warehouse
                         ? "Expires on {$poItem->expiry_date->format('M d, Y')} in {$warehouse->name}"
@@ -171,7 +174,7 @@ class NotificationService
                     'days_remaining' => $daysRemaining,
                     'route' => route('admin.product.edit', ['id' => $product->id]),
                     'type' => 'product',
-                    'label' => 'Product #' . $product->code,
+                    'label' => 'Product #'.$product->code,
                     'status_badge' => str_replace('badge ', '', $badgeClass),
                     'status_text' => $badgeText,
                     'status_icon' => 'ti ti-calendar-time',
@@ -181,7 +184,7 @@ class NotificationService
             });
     }
 
-    private function getStatusInfo(string $status, Carbon $dueDate, ? Carbon $paymentDate = null): array
+    private function getStatusInfo(string $status, Carbon $dueDate, ?Carbon $paymentDate = null): array
     {
         $today = Carbon::today();
         $diffDays = (int) $today->diffInDays($dueDate, false);
@@ -190,6 +193,7 @@ class NotificationService
             if ($paymentDate && $today->isSameDay($paymentDate)) {
                 return ['badge' => 'text-green', 'text' => 'Paid Today', 'icon' => 'ti ti-check'];
             }
+
             return ['badge' => 'text-green', 'text' => 'Paid', 'icon' => 'ti ti-check'];
         }
         if ($diffDays == 0) {

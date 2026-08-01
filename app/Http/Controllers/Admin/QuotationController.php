@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Helpers\SalesHelper;
 use App\Http\Controllers\Controller;
 use App\Models\Customer;
 use App\Models\Product;
@@ -10,11 +11,9 @@ use App\Models\Sales;
 use App\Models\Tax;
 use App\Models\User;
 use App\Services\SalesService;
-use App\Helpers\SalesHelper;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Validation\Rule;
 
 class QuotationController extends Controller
 {
@@ -33,7 +32,7 @@ class QuotationController extends Controller
         if ($search = $request->input('search')) {
             $query->where(function ($q) use ($search) {
                 $q->where('quotation_number', 'like', "%{$search}%")
-                  ->orWhereHas('customer', fn($cq) => $cq->where('name', 'like', "%{$search}%"));
+                    ->orWhereHas('customer', fn ($cq) => $cq->where('name', 'like', "%{$search}%"));
             });
         }
 
@@ -71,7 +70,7 @@ class QuotationController extends Controller
         $customers = Customer::orderBy('name')->get();
         $products = Product::orderBy('name')->get();
         $taxes = Tax::active()->orderBy('name')->get();
-        $quotation = new Quotation();
+        $quotation = new Quotation;
 
         return view('admin.quotations.quotation-create', compact('customers', 'products', 'taxes', 'quotation'));
     }
@@ -120,9 +119,9 @@ class QuotationController extends Controller
             $taxableAmount = $afterDiscount;
 
             $pphTaxId = $request->pph_tax_id ?? null;
-            $pphTax = $pphTaxId ? \App\Models\Tax::find($pphTaxId) : null;
+            $pphTax = $pphTaxId ? Tax::find($pphTaxId) : null;
             $pphRate = $pphTax ? (float) $pphTax->rate : 0;
-            $pphAmount = \App\Helpers\SalesHelper::calculatePphAmount($taxableAmount, $pphRate);
+            $pphAmount = SalesHelper::calculatePphAmount($taxableAmount, $pphRate);
             $total = max(0, $total - $pphAmount);
 
             $quotation = Quotation::create([
@@ -145,9 +144,9 @@ class QuotationController extends Controller
                 'notes' => $request->notes,
                 'terms_conditions' => $request->terms_conditions,
                 'pph_enabled' => app('currentTenant')->isIndonesian() && ($pphTax?->is_pph ?? false),
-                'pph_rate'    => app('currentTenant')->isIndonesian() && ($pphTax?->is_pph ?? false) ? $pphRate : null,
-                'pph_amount'  => app('currentTenant')->isIndonesian() && ($pphTax?->is_pph ?? false) ? $pphAmount : 0,
-                'pph_tax_id'  => app('currentTenant')->isIndonesian() && ($pphTax?->is_pph ?? false) ? $pphTax?->id : null,
+                'pph_rate' => app('currentTenant')->isIndonesian() && ($pphTax?->is_pph ?? false) ? $pphRate : null,
+                'pph_amount' => app('currentTenant')->isIndonesian() && ($pphTax?->is_pph ?? false) ? $pphAmount : 0,
+                'pph_tax_id' => app('currentTenant')->isIndonesian() && ($pphTax?->is_pph ?? false) ? $pphTax?->id : null,
             ]);
 
             DB::commit();
@@ -156,14 +155,16 @@ class QuotationController extends Controller
                 ->with('success', 'Quotation created successfully.');
         } catch (\Throwable $e) {
             DB::rollBack();
-            Log::error('Quotation creation failed: ' . $e->getMessage(), ['exception' => $e]);
-            return back()->withErrors(['error' => 'Something went wrong: ' . $e->getMessage()])->withInput();
+            Log::error('Quotation creation failed: '.$e->getMessage(), ['exception' => $e]);
+
+            return back()->withErrors(['error' => 'Something went wrong: '.$e->getMessage()])->withInput();
         }
     }
 
     public function show($id)
     {
         $quotation = Quotation::with('customer', 'user', 'convertedToSales')->findOrFail($id);
+
         return view('admin.quotations.show', compact('quotation'));
     }
 
@@ -223,9 +224,9 @@ class QuotationController extends Controller
             $taxableAmount = $afterDiscount;
 
             $pphTaxId = $request->pph_tax_id ?? null;
-            $pphTax = $pphTaxId ? \App\Models\Tax::find($pphTaxId) : null;
+            $pphTax = $pphTaxId ? Tax::find($pphTaxId) : null;
             $pphRate = $pphTax ? (float) $pphTax->rate : 0;
-            $pphAmount = \App\Helpers\SalesHelper::calculatePphAmount($taxableAmount, $pphRate);
+            $pphAmount = SalesHelper::calculatePphAmount($taxableAmount, $pphRate);
             $total = max(0, $total - $pphAmount);
 
             $quotation->update([
@@ -245,9 +246,9 @@ class QuotationController extends Controller
                 'notes' => $request->notes,
                 'terms_conditions' => $request->terms_conditions,
                 'pph_enabled' => app('currentTenant')->isIndonesian() && ($pphTax?->is_pph ?? false),
-                'pph_rate'    => app('currentTenant')->isIndonesian() && ($pphTax?->is_pph ?? false) ? $pphRate : null,
-                'pph_amount'  => app('currentTenant')->isIndonesian() && ($pphTax?->is_pph ?? false) ? $pphAmount : 0,
-                'pph_tax_id'  => app('currentTenant')->isIndonesian() && ($pphTax?->is_pph ?? false) ? $pphTax?->id : null,
+                'pph_rate' => app('currentTenant')->isIndonesian() && ($pphTax?->is_pph ?? false) ? $pphRate : null,
+                'pph_amount' => app('currentTenant')->isIndonesian() && ($pphTax?->is_pph ?? false) ? $pphAmount : 0,
+                'pph_tax_id' => app('currentTenant')->isIndonesian() && ($pphTax?->is_pph ?? false) ? $pphTax?->id : null,
             ]);
 
             DB::commit();
@@ -256,8 +257,9 @@ class QuotationController extends Controller
                 ->with('success', 'Quotation updated successfully.');
         } catch (\Throwable $e) {
             DB::rollBack();
-            Log::error('Quotation update failed: ' . $e->getMessage(), ['exception' => $e]);
-            return back()->withErrors(['error' => 'Something went wrong: ' . $e->getMessage()])->withInput();
+            Log::error('Quotation update failed: '.$e->getMessage(), ['exception' => $e]);
+
+            return back()->withErrors(['error' => 'Something went wrong: '.$e->getMessage()])->withInput();
         }
     }
 
@@ -267,6 +269,7 @@ class QuotationController extends Controller
 
         try {
             $quotation->delete();
+
             return redirect()->route('admin.quotations')
                 ->with('success', 'Quotation deleted successfully.');
         } catch (\Throwable $e) {
@@ -345,8 +348,9 @@ class QuotationController extends Controller
                 ->with('success', 'Quotation converted to sales order successfully.');
         } catch (\Throwable $e) {
             DB::rollBack();
-            Log::error('Quotation conversion failed: ' . $e->getMessage(), ['exception' => $e]);
-            return redirect()->back()->with('error', 'Failed to convert quotation: ' . $e->getMessage());
+            Log::error('Quotation conversion failed: '.$e->getMessage(), ['exception' => $e]);
+
+            return redirect()->back()->with('error', 'Failed to convert quotation: '.$e->getMessage());
         }
     }
 
@@ -355,12 +359,14 @@ class QuotationController extends Controller
         $quotation = Quotation::with('customer', 'user')->findOrFail($id);
         $shopname = User::whereNotNull('shopname')->value('shopname');
         $address = User::whereNotNull('address')->value('address');
+
         return view('admin.quotations.quotation-print-pdf', compact('quotation', 'shopname', 'address'));
     }
 
     public function getProductDetails($id)
     {
         $product = Product::findOrFail($id);
+
         return response()->json([
             'price' => $product->selling_price,
             'name' => $product->name,
@@ -371,9 +377,11 @@ class QuotationController extends Controller
     {
         try {
             $quotation = Quotation::with('customer', 'user')->findOrFail($id);
+
             return view('admin.layouts.modals.quotations.quotationsmodals-view', compact('quotation'));
         } catch (\Throwable $e) {
-            Log::error("Error loading quotation modal view for ID {$id}: " . $e->getMessage());
+            Log::error("Error loading quotation modal view for ID {$id}: ".$e->getMessage());
+
             return response('<div class="alert alert-danger">Error loading quotation details.</div>', 500);
         }
     }
@@ -387,6 +395,7 @@ class QuotationController extends Controller
 
         try {
             Quotation::whereIn('id', $request->ids)->delete();
+
             return response()->json(['success' => true, 'message' => 'Quotations deleted successfully.']);
         } catch (\Throwable $e) {
             return response()->json(['success' => false, 'message' => 'Error deleting quotations.'], 500);
@@ -413,6 +422,7 @@ class QuotationController extends Controller
                 foreach ($quotations as $q) {
                     $csv .= "\"{$q->quotation_number}\",\"{$q->customer?->name}\",\"{$q->quotation_date?->format('Y-m-d')}\",{$q->total},\"{$q->status}\"\n";
                 }
+
                 return response($csv, 200, [
                     'Content-Type' => 'text/csv',
                     'Content-Disposition' => 'attachment; filename="quotations.csv"',
@@ -423,6 +433,7 @@ class QuotationController extends Controller
             if ($first) {
                 return redirect()->route('admin.quotations.print', $first->id);
             }
+
             return back()->with('error', 'No quotations to export.');
         } catch (\Throwable $e) {
             return response()->json(['success' => false, 'message' => 'Export failed.'], 500);
@@ -431,7 +442,7 @@ class QuotationController extends Controller
 
     private function generateQuotationNumber(): string
     {
-        $prefix = 'QTN-' . date('Ymd');
+        $prefix = 'QTN-'.date('Ymd');
         $last = Quotation::where('quotation_number', 'like', "{$prefix}-%")
             ->orderBy('id', 'desc')
             ->first();
@@ -443,6 +454,6 @@ class QuotationController extends Controller
             $newNum = 1;
         }
 
-        return "{$prefix}-" . str_pad($newNum, 4, '0', STR_PAD_LEFT);
+        return "{$prefix}-".str_pad($newNum, 4, '0', STR_PAD_LEFT);
     }
 }

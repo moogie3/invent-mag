@@ -1,8 +1,8 @@
 <?php
 
-use App\Http\Controllers\Admin\SupplierController;
 use App\Http\Controllers\Admin\CustomerController;
 use App\Http\Controllers\Admin\CustomerCrmController;
+use App\Http\Controllers\Admin\SupplierController;
 use App\Http\Controllers\Admin\SupplierCrmController;
 
 // Supplier Routes

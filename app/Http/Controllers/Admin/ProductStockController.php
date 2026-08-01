@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Product;
-use App\Models\ProductWarehouse;
 use App\Models\Warehouse;
 use Illuminate\Http\Request;
 
@@ -13,7 +12,7 @@ class ProductStockController extends Controller
     public function mainStock($id)
     {
         $product = Product::findOrFail($id);
-        
+
         return response()->json([
             'success' => true,
             'product_id' => $product->id,
@@ -35,9 +34,9 @@ class ProductStockController extends Controller
     {
         $product = Product::findOrFail($id);
         $warehouse = Warehouse::findOrFail($warehouseId);
-        
+
         $stock = $product->getWarehouseStock($warehouseId);
-        
+
         return response()->json([
             'success' => true,
             'product_id' => $product->id,
@@ -63,7 +62,7 @@ class ProductStockController extends Controller
         $products = $request->input('products');
         $warehouseId = $request->input('warehouse_id') ?? Product::getMainWarehouseId();
 
-        if (!$warehouseId) {
+        if (! $warehouseId) {
             return response()->json([
                 'success' => false,
                 'message' => 'No main warehouse configured.',
@@ -79,10 +78,10 @@ class ProductStockController extends Controller
             $product = Product::find($item['id']);
             $requestedQty = (int) $item['quantity'];
             $availableQty = $product ? $product->getWarehouseStock($warehouseId) : 0;
-            
+
             $sufficient = $availableQty >= $requestedQty;
-            
-            if (!$sufficient) {
+
+            if (! $sufficient) {
                 $allAvailable = false;
             }
 
@@ -114,7 +113,7 @@ class ProductStockController extends Controller
 
         $productIds = $request->input('product_ids');
         $products = Product::whereIn('id', $productIds)->get();
-        
+
         $results = $products->map(function ($product) {
             return [
                 'id' => $product->id,
@@ -136,8 +135,8 @@ class ProductStockController extends Controller
     public function allWarehouseStock($id)
     {
         $product = Product::findOrFail($id);
-        
-        $warehouses = $product->warehouses()->get()->map(function ($warehouse) use ($product) {
+
+        $warehouses = $product->warehouses()->get()->map(function ($warehouse) {
             return [
                 'id' => $warehouse->id,
                 'name' => $warehouse->name,

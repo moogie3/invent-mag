@@ -20,6 +20,7 @@ class StockTransferController extends Controller
     public function index()
     {
         $warehouses = Warehouse::all();
+
         return view('admin.reports.stock-transfer', compact('warehouses'));
     }
 
@@ -60,7 +61,7 @@ class StockTransferController extends Controller
             $toQty = $toStockRecord->quantity;
 
             $fromStockRecord->update(['quantity' => $fromQty - $request['quantity']]);
-            
+
             $toStockRecord->update(['quantity' => $toQty + $request['quantity']]);
 
             StockAdjustment::create([

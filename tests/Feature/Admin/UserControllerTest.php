@@ -4,20 +4,19 @@ namespace Tests\Feature\Admin;
 
 use App\Models\User;
 use App\Services\UserService;
-use Illuminate\Foundation\Testing\WithFaker;
-use Mockery;
-use Spatie\Permission\Models\Role;
-use Spatie\Permission\Models\Permission;
-use Spatie\Permission\PermissionRegistrar;
-use Tests\TestCase;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Tests\Traits\CreatesTenant;
-use Illuminate\Pagination\LengthAwarePaginator;
 use Database\Seeders\RoleSeeder;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\WithFaker;
+use Illuminate\Pagination\LengthAwarePaginator;
+use Mockery;
+use Spatie\Permission\Models\Permission;
+use Spatie\Permission\Models\Role;
+use Tests\TestCase;
+use Tests\Traits\CreatesTenant;
 
 class UserControllerTest extends TestCase
 {
-    use WithFaker, CreatesTenant, RefreshDatabase;
+    use CreatesTenant, RefreshDatabase, WithFaker;
 
     protected function setUp(): void
     {
@@ -28,7 +27,7 @@ class UserControllerTest extends TestCase
         $this->actingAs($this->user);
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         Mockery::close();
         parent::tearDown();
@@ -168,8 +167,6 @@ class UserControllerTest extends TestCase
         $response->assertStatus(200);
         $response->assertJson($showData);
     }
-
-
 
     public function test_edit_user_returns_json_for_ajax_request()
     {
@@ -407,17 +404,17 @@ class UserControllerTest extends TestCase
 
         // Explicitly define expected permissions based on test setup
         $expectedSuperuserPermissions = [
-            'view-users', 'create-users', 'edit-users', 'delete-users'
+            'view-users', 'create-users', 'edit-users', 'delete-users',
         ];
         sort($expectedSuperuserPermissions);
 
         $expectedStaffPermissions = [
-            'view-users'
+            'view-users',
         ];
         sort($expectedStaffPermissions);
 
         $expectedPosPermissions = [
-            'create-users'
+            'create-users',
         ];
         sort($expectedPosPermissions);
 
@@ -435,7 +432,7 @@ class UserControllerTest extends TestCase
 
         $expectedAllPermissionsSubset = [
             'view-users', 'create-users', 'edit-users', 'delete-users',
-            'permission1', 'permission2', 'permission3'
+            'permission1', 'permission2', 'permission3',
         ];
         sort($expectedAllPermissionsSubset);
 

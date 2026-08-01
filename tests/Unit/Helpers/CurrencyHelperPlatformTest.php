@@ -4,10 +4,10 @@ namespace Tests\Unit\Helpers;
 
 use App\Helpers\CurrencyHelper;
 use App\Models\PlatformCurrencySetting;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 
 class CurrencyHelperPlatformTest extends TestCase
 {

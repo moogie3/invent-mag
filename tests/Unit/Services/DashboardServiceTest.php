@@ -12,10 +12,10 @@ use App\Models\SalesItem;
 use App\Models\Supplier;
 use App\Models\User;
 use App\Services\DashboardService;
-use Tests\TestCase;
-use PHPUnit\Framework\Attributes\Test;
 use Carbon\Carbon;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use PHPUnit\Framework\Attributes\Test;
+use Tests\TestCase;
 use Tests\Traits\CreatesTenant;
 
 class DashboardServiceTest extends TestCase
@@ -28,7 +28,7 @@ class DashboardServiceTest extends TestCase
     {
         parent::setUp();
         $this->setupTenant();
-        $this->dashboardService = new DashboardService();
+        $this->dashboardService = new DashboardService;
     }
 
     #[Test]
@@ -52,7 +52,7 @@ class DashboardServiceTest extends TestCase
             'customer_id' => $customer->id,
             'order_date' => now(),
             'total' => 100,
-            'status' => 'Paid'
+            'status' => 'Paid',
         ]);
         SalesItem::factory()->create(['sales_id' => $sale1->id, 'product_id' => $product->id, 'quantity' => 1, 'customer_price' => 100]);
 
@@ -60,7 +60,7 @@ class DashboardServiceTest extends TestCase
             'customer_id' => $customer->id,
             'order_date' => now(),
             'total' => 200,
-            'status' => 'Unpaid'
+            'status' => 'Unpaid',
         ]);
         SalesItem::factory()->create(['sales_id' => $sale2->id, 'product_id' => $product->id, 'quantity' => 2, 'customer_price' => 100]);
 
@@ -70,7 +70,7 @@ class DashboardServiceTest extends TestCase
             'order_date' => now(),
             'total' => 50,
             'status' => 'Paid',
-            'due_date' => now()->addDays(30)
+            'due_date' => now()->addDays(30),
         ]);
         POItem::factory()->create(['po_id' => $purchase1->id, 'product_id' => $product->id, 'quantity' => 5, 'price' => 10, 'expiry_date' => null]);
 
@@ -79,7 +79,7 @@ class DashboardServiceTest extends TestCase
             'order_date' => now(),
             'total' => 80,
             'status' => 'Unpaid',
-            'due_date' => now()->subDay() // Overdue
+            'due_date' => now()->subDay(), // Overdue
         ]);
         // This POItem expires soon (within 30 days)
         POItem::factory()->create(['po_id' => $purchase2->id, 'product_id' => $product->id, 'quantity' => 8, 'price' => 10, 'expiry_date' => now()->addDays(5)]);
@@ -121,7 +121,6 @@ class DashboardServiceTest extends TestCase
         $this->assertCount(1, $data['topSellingProducts']);
         $this->assertEquals(1, $data['keyMetrics'][3]['value']); // Overdue invoices count
     }
-
 
     #[Test]
     public function it_calculates_date_range_for_today()

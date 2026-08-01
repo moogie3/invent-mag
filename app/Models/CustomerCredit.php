@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class CustomerCredit extends Model
 {
-    use HasFactory, BelongsToTenant;
+    use BelongsToTenant, HasFactory;
 
     protected $table = 'customer_credits';
 
@@ -52,20 +52,22 @@ class CustomerCredit extends Model
         if (array_key_exists('available_amount', $this->attributes) && $this->attributes['available_amount'] !== null) {
             return (float) $this->attributes['available_amount'];
         }
+
         return $this->amount - $this->used_amount;
     }
 
     public function getIsExpiredAttribute(): bool
     {
-        if (!$this->expires_at) {
+        if (! $this->expires_at) {
             return false;
         }
+
         return $this->expires_at->isPast();
     }
 
     public function getIsActiveAttribute(): bool
     {
-        return $this->status === 'active' && !$this->is_expired && $this->available_amount > 0;
+        return $this->status === 'active' && ! $this->is_expired && $this->available_amount > 0;
     }
 
     public function scopeActive($query)

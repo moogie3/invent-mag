@@ -1,22 +1,22 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\SuperAdmin\DashboardController;
-use App\Http\Controllers\SuperAdmin\Auth\LoginController;
-use App\Http\Controllers\SuperAdmin\TenantController;
-use App\Http\Controllers\SuperAdmin\PlanController;
-use App\Http\Controllers\SuperAdmin\SubscriptionController;
-use App\Http\Controllers\SuperAdmin\PermissionController;
-use App\Http\Controllers\SuperAdmin\BackupController;
 use App\Http\Controllers\SuperAdmin\AuditLogController;
-use App\Http\Controllers\SuperAdmin\SettingController;
-use App\Http\Controllers\SuperAdmin\FeatureController;
+use App\Http\Controllers\SuperAdmin\Auth\LoginController;
+use App\Http\Controllers\SuperAdmin\BackupController;
 use App\Http\Controllers\SuperAdmin\BillingController;
-use App\Http\Controllers\SuperAdmin\PaymentOverviewController;
-use App\Http\Controllers\SuperAdmin\TransactionController;
-use App\Http\Controllers\SuperAdmin\PendingPaymentController;
-use App\Http\Controllers\SuperAdmin\InvoiceController;
 use App\Http\Controllers\SuperAdmin\CmsController;
+use App\Http\Controllers\SuperAdmin\DashboardController;
+use App\Http\Controllers\SuperAdmin\FeatureController;
+use App\Http\Controllers\SuperAdmin\InvoiceController;
+use App\Http\Controllers\SuperAdmin\PaymentOverviewController;
+use App\Http\Controllers\SuperAdmin\PendingPaymentController;
+use App\Http\Controllers\SuperAdmin\PermissionController;
+use App\Http\Controllers\SuperAdmin\PlanController;
+use App\Http\Controllers\SuperAdmin\SettingController;
+use App\Http\Controllers\SuperAdmin\SubscriptionController;
+use App\Http\Controllers\SuperAdmin\TenantController;
+use App\Http\Controllers\SuperAdmin\TransactionController;
+use Illuminate\Support\Facades\Route;
 
 Route::middleware('guest:super_admin')->group(function () {
     Route::get('/login', [LoginController::class, 'create'])->name('superadmin.login');

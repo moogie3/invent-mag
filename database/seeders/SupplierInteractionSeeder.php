@@ -2,10 +2,10 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Seeder;
 use App\Models\Supplier;
-use App\Models\User;
 use App\Models\SupplierInteraction;
+use App\Models\User;
+use Illuminate\Database\Seeder;
 
 class SupplierInteractionSeeder extends Seeder
 {
@@ -19,7 +19,8 @@ class SupplierInteractionSeeder extends Seeder
         $tenantId = app('currentTenant')->id;
 
         if (SupplierInteraction::where('tenant_id', $tenantId)->count() > 0) {
-            $this->command->info("Supplier interactions already exist for tenant " . app('currentTenant')->name . ". Skipping.");
+            $this->command->info('Supplier interactions already exist for tenant '.app('currentTenant')->name.'. Skipping.');
+
             return;
         }
 
@@ -27,12 +28,14 @@ class SupplierInteractionSeeder extends Seeder
         $user = User::where('tenant_id', $tenantId)->first(); // Get the first user for the tenant
 
         if ($suppliers->isEmpty()) {
-            $this->command->info('Skipping SupplierInteractionSeeder for tenant ' . app('currentTenant')->name . ': No suppliers found. Please run SupplierSeeder first.');
+            $this->command->info('Skipping SupplierInteractionSeeder for tenant '.app('currentTenant')->name.': No suppliers found. Please run SupplierSeeder first.');
+
             return;
         }
 
-        if (!$user) {
-            $this->command->info('Skipping SupplierInteractionSeeder for tenant ' . app('currentTenant')->name . ': No users found. Please ensure UserSeeder has been run for this tenant.');
+        if (! $user) {
+            $this->command->info('Skipping SupplierInteractionSeeder for tenant '.app('currentTenant')->name.': No users found. Please ensure UserSeeder has been run for this tenant.');
+
             return;
         }
 
@@ -45,6 +48,6 @@ class SupplierInteractionSeeder extends Seeder
             ]);
         }
 
-        $this->command->info('Supplier interactions for tenant ' . app('currentTenant')->name . ' seeded successfully.');
+        $this->command->info('Supplier interactions for tenant '.app('currentTenant')->name.' seeded successfully.');
     }
 }

@@ -2,18 +2,18 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Seeder;
-use App\Models\Sales;
+use App\Helpers\SalesHelper;
 use App\Models\Customer;
-use App\Models\User;
 use App\Models\Product;
+use App\Models\ProductWarehouse;
+use App\Models\Sales;
 use App\Models\SalesItem;
 use App\Models\Tax;
-use App\Helpers\SalesHelper;
+use App\Models\User;
 use App\Models\Warehouse;
-use App\Models\ProductWarehouse;
 use App\Services\AccountingService;
 use Carbon\Carbon;
+use Illuminate\Database\Seeder;
 
 class SalesSeeder extends Seeder
 {
@@ -23,7 +23,7 @@ class SalesSeeder extends Seeder
     {
         $this->accountingService = $accountingService;
     }
-    
+
     /**
      * Run the database seeds.
      *
@@ -35,7 +35,8 @@ class SalesSeeder extends Seeder
 
         $existingSales = Sales::where('tenant_id', $tenantId)->count();
         if ($existingSales > 0) {
-            $this->command->info("Sales already exist for tenant " . app('currentTenant')->name . ". Skipping to preserve existing data.");
+            $this->command->info('Sales already exist for tenant '.app('currentTenant')->name.'. Skipping to preserve existing data.');
+
             return;
         }
 
@@ -46,17 +47,18 @@ class SalesSeeder extends Seeder
         $warehouseIds = Warehouse::where('tenant_id', $tenantId)->pluck('id')->toArray(); // Fetch warehouse IDs
 
         if ($customers->isEmpty() || $users->isEmpty() || $products->isEmpty() || empty($warehouseIds)) {
-            $this->command->warn('Skipping SalesSeeder for tenant ' . app('currentTenant')->name . ': Missing dependency data.');
+            $this->command->warn('Skipping SalesSeeder for tenant '.app('currentTenant')->name.': Missing dependency data.');
+
             return;
         }
-        
-        $this->command->info("Seeding Sales data for tenant: " . app('currentTenant')->name);
-        $this->command->info("Available: {$customers->count()} customers, {$users->count()} users, {$products->count()} products, " . count($warehouseIds) . " warehouses");
+
+        $this->command->info('Seeding Sales data for tenant: '.app('currentTenant')->name);
+        $this->command->info("Available: {$customers->count()} customers, {$users->count()} users, {$products->count()} products, ".count($warehouseIds).' warehouses');
 
         // Resolve default tax once — TaxSeeder must run before SalesSeeder
         $defaultTax = Tax::where('tenant_id', $tenantId)->where('is_default', true)->first()
             ?? Tax::where('tenant_id', $tenantId)->where('is_active', true)->first();
-        $taxId   = $defaultTax?->id;
+        $taxId = $defaultTax?->id;
         $taxRate = $defaultTax ? (float) $defaultTax->rate : 0.0;
         $taxType = $defaultTax ? $defaultTax->type : 'none';
 
@@ -70,26 +72,26 @@ class SalesSeeder extends Seeder
             $status = collect(['Unpaid', 'Paid', 'Partial'])->random();
 
             $invoiceNumber = $i + 1;
-            $invoice = 'INV-' . str_pad($invoiceNumber, 5, '0', STR_PAD_LEFT) . '-' . $tenantId;
+            $invoice = 'INV-'.str_pad($invoiceNumber, 5, '0', STR_PAD_LEFT).'-'.$tenantId;
 
             $sales = Sales::create([
-                'invoice'             => $invoice,
-                'customer_id'         => $customer->id,
-                'user_id'             => $user->id,
-                'warehouse_id'        => $warehouseId,
-                'order_date'          => $orderDate,
-                'due_date'            => $dueDate,
-                'payment_type'        => $paymentType,
-                'order_discount'      => rand(0, 20),
+                'invoice' => $invoice,
+                'customer_id' => $customer->id,
+                'user_id' => $user->id,
+                'warehouse_id' => $warehouseId,
+                'order_date' => $orderDate,
+                'due_date' => $dueDate,
+                'payment_type' => $paymentType,
+                'order_discount' => rand(0, 20),
                 'order_discount_type' => collect(['percentage', 'fixed'])->random(),
-                'tax_id'              => $taxId,
-                'tax_rate'            => $taxRate,
-                'tax_type'            => $taxType,
-                'total_tax'           => 0,
-                'total'               => 0,
-                'status'              => $status,
-                'type'                => \App\Models\Sales::TYPE_REGULAR,
-                'tenant_id'           => $tenantId,
+                'tax_id' => $taxId,
+                'tax_rate' => $taxRate,
+                'tax_type' => $taxType,
+                'total_tax' => 0,
+                'total' => 0,
+                'status' => $status,
+                'type' => Sales::TYPE_REGULAR,
+                'tenant_id' => $tenantId,
             ]);
 
             $totalSalesAmount = 0;
@@ -135,7 +137,7 @@ class SalesSeeder extends Seeder
 
                 // Apply tax consistently using SalesHelper (respects exclusive/inclusive/none)
                 $totalTaxAmount = SalesHelper::calculateTaxAmount($netSales, $taxRate, $taxType);
-                $grandTotal     = ($taxType === 'inclusive') ? $netSales : ($netSales + $totalTaxAmount);
+                $grandTotal = ($taxType === 'inclusive') ? $netSales : ($netSales + $totalTaxAmount);
 
                 $attempts++;
             } while (($grandTotal < 100 || $grandTotal > 10000 || $netSales < $totalCostOfGoods) && $attempts < $maxAttempts);
@@ -146,13 +148,13 @@ class SalesSeeder extends Seeder
                 $netSales *= $scaleFactor;
                 $totalCostOfGoods *= $scaleFactor;
                 $totalTaxAmount = SalesHelper::calculateTaxAmount($netSales, $taxRate, $taxType);
-                $grandTotal     = ($taxType === 'inclusive') ? $netSales : ($netSales + $totalTaxAmount);
+                $grandTotal = ($taxType === 'inclusive') ? $netSales : ($netSales + $totalTaxAmount);
             } elseif ($grandTotal > 10000) {
                 $scaleFactor = rand(8000, 10000) / $grandTotal;
                 $netSales *= $scaleFactor;
                 $totalCostOfGoods *= $scaleFactor;
                 $totalTaxAmount = SalesHelper::calculateTaxAmount($netSales, $taxRate, $taxType);
-                $grandTotal     = ($taxType === 'inclusive') ? $netSales : ($netSales + $totalTaxAmount);
+                $grandTotal = ($taxType === 'inclusive') ? $netSales : ($netSales + $totalTaxAmount);
             }
 
             $finalCalculatedTotal = $grandTotal;
@@ -160,21 +162,21 @@ class SalesSeeder extends Seeder
 
             foreach ($salesItemsData as $itemData) {
                 SalesItem::create(array_merge(['sales_id' => $sales->id], $itemData));
-                
+
                 // Decrement stock from the selected warehouse (if it exists in seeding context)
                 // For seeding, assume stock was added via Purchase first. If not, this goes negative.
                 // To fix negative stock in seeders, we should ensure PurchaseSeeder runs BEFORE SalesSeeder
                 // OR initialize stock with a positive value.
-                
+
                 $stockRecord = ProductWarehouse::where('product_id', $itemData['product_id'])
                     ->where('warehouse_id', $sales->warehouse_id)
                     ->where('tenant_id', $tenantId)
                     ->first();
-                
+
                 if ($stockRecord) {
                     // Ensure enough stock exists before selling to avoid negative numbers in seed
                     if ($stockRecord->quantity < $itemData['quantity']) {
-                         $stockRecord->update(['quantity' => $stockRecord->quantity + 100]);
+                        $stockRecord->update(['quantity' => $stockRecord->quantity + 100]);
                     }
                     $stockRecord->decrement('quantity', $itemData['quantity']);
                 } else {
@@ -183,10 +185,10 @@ class SalesSeeder extends Seeder
                         'product_id' => $itemData['product_id'],
                         'warehouse_id' => $sales->warehouse_id,
                         'quantity' => 100, // Start with 100, then decrement will make it 100 - sold
-                        'tenant_id' => $tenantId
+                        'tenant_id' => $tenantId,
                     ]);
                     // Re-fetch to decrement properly
-                    $stockRecord = \App\Models\ProductWarehouse::where('product_id', $itemData['product_id'])
+                    $stockRecord = ProductWarehouse::where('product_id', $itemData['product_id'])
                         ->where('warehouse_id', $sales->warehouse_id)
                         ->where('tenant_id', $tenantId)
                         ->first();
@@ -213,7 +215,7 @@ class SalesSeeder extends Seeder
                         'tenant_id' => $tenantId,
                     ]);
                 } elseif ($status === 'Partial') {
-                    $paidAmount = rand(1, (int)($finalCalculatedTotal * 0.8)); // Pay between 1 and 80%
+                    $paidAmount = rand(1, (int) ($finalCalculatedTotal * 0.8)); // Pay between 1 and 80%
                     $sales->payments()->create([
                         'amount' => $paidAmount,
                         'payment_date' => $orderDate->copy()->addDays(rand(0, 5)),
@@ -229,19 +231,19 @@ class SalesSeeder extends Seeder
             try {
                 // 1. Record the revenue and accounts receivable
                 $revenueTransactions = [
-                    ['account_code' => '1130-' . $tenantId, 'type' => 'debit', 'amount' => $finalCalculatedTotal],
-                    ['account_code' => '4100-' . $tenantId, 'type' => 'credit', 'amount' => $totalSalesAmount],
+                    ['account_code' => '1130-'.$tenantId, 'type' => 'debit', 'amount' => $finalCalculatedTotal],
+                    ['account_code' => '4100-'.$tenantId, 'type' => 'credit', 'amount' => $totalSalesAmount],
                 ];
                 if ($totalTaxAmount > 0) {
-                    $revenueTransactions[] = ['account_code' => '2130-' . $tenantId, 'type' => 'credit', 'amount' => $totalTaxAmount];
+                    $revenueTransactions[] = ['account_code' => '2130-'.$tenantId, 'type' => 'credit', 'amount' => $totalTaxAmount];
                 }
                 $this->accountingService->createJournalEntry("Sale - Invoice {$sales->invoice}", $orderDate, $revenueTransactions, $sales);
 
                 // 2. Record the cost of goods sold
                 if ($totalCostOfGoods > 0) {
                     $cogsTransactions = [
-                        ['account_code' => '5200-' . $tenantId, 'type' => 'debit', 'amount' => $totalCostOfGoods],
-                        ['account_code' => '1140-' . $tenantId, 'type' => 'credit', 'amount' => $totalCostOfGoods],
+                        ['account_code' => '5200-'.$tenantId, 'type' => 'debit', 'amount' => $totalCostOfGoods],
+                        ['account_code' => '1140-'.$tenantId, 'type' => 'credit', 'amount' => $totalCostOfGoods],
                     ];
                     $this->accountingService->createJournalEntry("COGS for Invoice {$sales->invoice}", $orderDate, $cogsTransactions, $sales);
                 }
@@ -249,18 +251,18 @@ class SalesSeeder extends Seeder
                 // 3. Record the payment, if any
                 if ($paidAmount > 0) {
                     $paymentTransactions = [
-                        ['account_code' => '1110-' . $tenantId, 'type' => 'debit', 'amount' => $paidAmount],
-                        ['account_code' => '1130-' . $tenantId, 'type' => 'credit', 'amount' => $paidAmount],
+                        ['account_code' => '1110-'.$tenantId, 'type' => 'debit', 'amount' => $paidAmount],
+                        ['account_code' => '1130-'.$tenantId, 'type' => 'credit', 'amount' => $paidAmount],
                     ];
                     $this->accountingService->createJournalEntry("Payment for Invoice {$sales->invoice}", $orderDate, $paymentTransactions, $sales);
                 }
 
             } catch (\Exception $e) {
-                $this->command->error("Failed to create journal entry for sale {$sales->invoice}: " . $e->getMessage());
+                $this->command->error("Failed to create journal entry for sale {$sales->invoice}: ".$e->getMessage());
             }
         }
-        
-        $this->command->info("Sales seeding completed successfully!");
-        $this->command->info("Created 50 sales invoices with items, payments, and journal entries.");
+
+        $this->command->info('Sales seeding completed successfully!');
+        $this->command->info('Created 50 sales invoices with items, payments, and journal entries.');
     }
 }

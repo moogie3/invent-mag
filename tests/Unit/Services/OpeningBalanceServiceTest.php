@@ -4,14 +4,15 @@ namespace Tests\Unit\Services;
 
 use App\Models\Account;
 use App\Models\OpeningBalance;
-use App\Services\OpeningBalanceService;
 use App\Services\AccountingService;
-use Tests\TestCase;
-use PHPUnit\Framework\Attributes\Test;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Tests\Traits\CreatesTenant;
+use App\Services\OpeningBalanceService;
 use Database\Seeders\AccountSeeder;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Collection;
 use Mockery;
+use PHPUnit\Framework\Attributes\Test;
+use Tests\TestCase;
+use Tests\Traits\CreatesTenant;
 
 class OpeningBalanceServiceTest extends TestCase
 {
@@ -24,7 +25,7 @@ class OpeningBalanceServiceTest extends TestCase
         parent::setUp();
         $this->setupTenant();
         $this->seed(AccountSeeder::class);
-        
+
         $mockAccountingService = Mockery::mock(AccountingService::class);
         $this->openingBalanceService = new OpeningBalanceService($mockAccountingService);
     }
@@ -39,8 +40,8 @@ class OpeningBalanceServiceTest extends TestCase
     public function it_gets_accounts_for_setup()
     {
         $accounts = $this->openingBalanceService->getAccountsForSetup();
-        
-        $this->assertInstanceOf(\Illuminate\Support\Collection::class, $accounts);
+
+        $this->assertInstanceOf(Collection::class, $accounts);
         $this->assertTrue($accounts->count() > 0);
     }
 
@@ -91,8 +92,8 @@ class OpeningBalanceServiceTest extends TestCase
     public function it_gets_opening_balance_for_account()
     {
         $tenantId = app('currentTenant')->id;
-        $account = Account::where('code', '1140-' . $tenantId)->first();
-        
+        $account = Account::where('code', '1140-'.$tenantId)->first();
+
         $openingBalance = OpeningBalance::create([
             'tenant_id' => $tenantId,
             'account_id' => $account->id,
@@ -113,8 +114,8 @@ class OpeningBalanceServiceTest extends TestCase
     public function it_gets_all_opening_balances()
     {
         $tenantId = app('currentTenant')->id;
-        $account = Account::where('code', '1140-' . $tenantId)->first();
-        
+        $account = Account::where('code', '1140-'.$tenantId)->first();
+
         OpeningBalance::create([
             'tenant_id' => $tenantId,
             'account_id' => $account->id,
@@ -127,7 +128,7 @@ class OpeningBalanceServiceTest extends TestCase
 
         $balances = $this->openingBalanceService->getAllOpeningBalances();
 
-        $this->assertInstanceOf(\Illuminate\Support\Collection::class, $balances);
+        $this->assertInstanceOf(Collection::class, $balances);
         $this->assertTrue($balances->count() > 0);
     }
 
@@ -135,9 +136,9 @@ class OpeningBalanceServiceTest extends TestCase
     public function it_gets_summary()
     {
         $tenantId = app('currentTenant')->id;
-        $account = Account::where('code', '1140-' . $tenantId)->first();
+        $account = Account::where('code', '1140-'.$tenantId)->first();
 
-        if (!$account) {
+        if (! $account) {
             $this->markTestSkipped('Required account not found');
         }
 

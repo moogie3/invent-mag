@@ -2,17 +2,15 @@
 
 namespace App\Services;
 
+use App\Models\Customer;
 use App\Models\Plan;
 use App\Models\Tenant;
+use App\Models\Warehouse;
 use Database\Seeders\AccountSeeder;
 use Database\Seeders\CategorySeeder;
 use Database\Seeders\CurrencySeeder;
-use Database\Seeders\CustomerSeeder;
-use Database\Seeders\SupplierSeeder;
 use Database\Seeders\TaxSeeder;
 use Database\Seeders\UnitSeeder;
-use Database\Seeders\WarehouseSeeder;
-use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Log;
 
 class TenantSetupService
@@ -21,7 +19,7 @@ class TenantSetupService
 
     public function __construct()
     {
-        $this->planService = new PlanService();
+        $this->planService = new PlanService;
     }
 
     /**
@@ -62,10 +60,12 @@ class TenantSetupService
         try {
             if (Plan::count() === 0) {
                 Log::info("No plans found in database. Skipping plan assignment for tenant '{$tenant->name}'.");
+
                 return;
             }
         } catch (\Exception $e) {
             Log::info("Plans table not available yet. Skipping plan assignment for tenant '{$tenant->name}'.");
+
             return;
         }
 
@@ -93,10 +93,10 @@ class TenantSetupService
 
         foreach ($seeders as $seeder) {
             try {
-                $instance = new $seeder();
+                $instance = new $seeder;
                 $instance->run();
             } catch (\Throwable $e) {
-                \Log::error("Error running seeder {$seeder}: " . $e->getMessage());
+                \Log::error("Error running seeder {$seeder}: ".$e->getMessage());
                 // Continue with other seeders
             }
         }
@@ -108,13 +108,13 @@ class TenantSetupService
     private function createDefaultWarehouse(Tenant $tenant): void
     {
         try {
-            \App\Models\Warehouse::create([
+            Warehouse::create([
                 'name' => 'Main Warehouse',
-                'address' => $tenant->name . ' Main Location',
+                'address' => $tenant->name.' Main Location',
                 'is_main' => true,
             ]);
         } catch (\Exception $e) {
-            \Log::error('Error creating default warehouse: ' . $e->getMessage());
+            \Log::error('Error creating default warehouse: '.$e->getMessage());
         }
     }
 
@@ -124,14 +124,14 @@ class TenantSetupService
     private function createDefaultCustomer(Tenant $tenant): void
     {
         try {
-            \App\Models\Customer::create([
+            Customer::create([
                 'name' => 'Walk-in Customer',
-                'email' => 'cash@' . $tenant->domain,
+                'email' => 'cash@'.$tenant->domain,
                 'phone_number' => '-',
                 'address' => '-',
             ]);
         } catch (\Exception $e) {
-            \Log::error('Error creating default customer: ' . $e->getMessage());
+            \Log::error('Error creating default customer: '.$e->getMessage());
         }
     }
 }

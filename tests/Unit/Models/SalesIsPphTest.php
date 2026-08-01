@@ -2,17 +2,17 @@
 
 namespace Tests\Unit\Models;
 
+use App\Models\Product;
 use App\Models\Sales;
 use App\Models\SalesItem;
-use App\Models\Product;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Traits\CreatesTenant;
 
 class SalesIsPphTest extends TestCase
 {
-    use RefreshDatabase, CreatesTenant;
+    use CreatesTenant, RefreshDatabase;
 
     protected function setUp(): void
     {

@@ -25,7 +25,7 @@ class TaxService
     public function create(array $data): Tax
     {
         return DB::transaction(function () use ($data) {
-            if (!empty($data['is_default'])) {
+            if (! empty($data['is_default'])) {
                 Tax::where('tenant_id', app('currentTenant')->id)->update(['is_default' => false]);
             }
 
@@ -43,7 +43,7 @@ class TaxService
     public function update(Tax $tax, array $data): Tax
     {
         return DB::transaction(function () use ($tax, $data) {
-            if (!empty($data['is_default'])) {
+            if (! empty($data['is_default'])) {
                 Tax::where('tenant_id', app('currentTenant')->id)
                     ->where('id', '!=', $tax->id)
                     ->update(['is_default' => false]);
@@ -67,6 +67,7 @@ class TaxService
         return DB::transaction(function () use ($tax) {
             Tax::where('tenant_id', app('currentTenant')->id)->update(['is_default' => false]);
             $tax->update(['is_default' => true]);
+
             return $tax->fresh();
         });
     }
@@ -78,6 +79,7 @@ class TaxService
 
             if ($hasReferences) {
                 $tax->update(['is_active' => false]);
+
                 return;
             }
 

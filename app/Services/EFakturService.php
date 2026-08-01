@@ -5,12 +5,14 @@ namespace App\Services;
 use App\Models\Account;
 use App\Models\FakturPajak;
 use App\Models\FakturPajakItem;
+use App\Models\JournalEntry;
 use App\Models\NsfpPool;
 use App\Models\Sales;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class EFakturService
 {
@@ -48,7 +50,7 @@ class EFakturService
         }
 
         if ($sale->fakturPajak()->exists()) {
-            throw new \DomainException('A Faktur Pajak has already been generated for this sale (Invoice: ' . $sale->invoice . ').');
+            throw new \DomainException('A Faktur Pajak has already been generated for this sale (Invoice: '.$sale->invoice.').');
         }
 
         return DB::transaction(function () use ($sale, $tenant) {
@@ -64,7 +66,7 @@ class EFakturService
             $nsfp->update(['status' => 'used', 'used_at' => now()]);
 
             $customer = $sale->customer;
-            $ppnRate  = $sale->ppn_rate ?? $tenant->ppn_rate ?? 11.00;
+            $ppnRate = $sale->ppn_rate ?? $tenant->ppn_rate ?? 11.00;
 
             // Calculate DPP (Dasar Pengenaan Pajak = taxable base, excl. PPN)
             // DPP = grand_total - total_tax (i.e., subtotal minus order discount, before any tax)
@@ -72,22 +74,22 @@ class EFakturService
             $ppn = round($sale->total_tax, 2);
 
             $faktur = FakturPajak::create([
-                'sales_id'        => $sale->id,
-                'nsfp'            => $nsfp->nsfp,
-                'tanggal_faktur'  => $sale->order_date->toDateString(),
-                'masa_pajak'      => $sale->order_date->month,
-                'tahun_pajak'     => $sale->order_date->year,
-                'npwp_penjual'    => $tenant->npwp ?? '',
-                'nama_penjual'    => $tenant->name,
-                'alamat_penjual'  => Auth::user()->address ?? $tenant->name,
-                'npwp_pembeli'    => $customer->npwp ?? '00.000.000.0-000.000',
-                'nama_pembeli'    => $customer->name,
-                'alamat_pembeli'  => $customer->alamat_npwp ?? $customer->address ?? '',
-                'dpp'             => $dpp,
-                'ppn'             => $ppn,
-                'ppnbm'           => 0,
-                'ppn_rate'        => $ppnRate,
-                'status'          => 'draft',
+                'sales_id' => $sale->id,
+                'nsfp' => $nsfp->nsfp,
+                'tanggal_faktur' => $sale->order_date->toDateString(),
+                'masa_pajak' => $sale->order_date->month,
+                'tahun_pajak' => $sale->order_date->year,
+                'npwp_penjual' => $tenant->npwp ?? '',
+                'nama_penjual' => $tenant->name,
+                'alamat_penjual' => Auth::user()->address ?? $tenant->name,
+                'npwp_pembeli' => $customer->npwp ?? '00.000.000.0-000.000',
+                'nama_pembeli' => $customer->name,
+                'alamat_pembeli' => $customer->alamat_npwp ?? $customer->address ?? '',
+                'dpp' => $dpp,
+                'ppn' => $ppn,
+                'ppnbm' => 0,
+                'ppn_rate' => $ppnRate,
+                'status' => 'draft',
             ]);
 
             // Update NSFP pool with back-reference to the generated faktur
@@ -102,14 +104,14 @@ class EFakturService
 
                 FakturPajakItem::create([
                     'faktur_pajak_id' => $faktur->id,
-                    'nama_barang'     => $item->name ?? $item->product?->name ?? 'Produk',
-                    'harga_satuan'    => $item->customer_price,
-                    'jumlah_barang'   => $item->quantity,
-                    'harga_total'     => $item->total,
-                    'diskon'          => $item->discount ?? 0,
-                    'dpp'             => $itemDpp,
-                    'ppn'             => $itemPpn,
-                    'kode_objek_pajak'=> '01',  // BKP default
+                    'nama_barang' => $item->name ?? $item->product?->name ?? 'Produk',
+                    'harga_satuan' => $item->customer_price,
+                    'jumlah_barang' => $item->quantity,
+                    'harga_total' => $item->total,
+                    'diskon' => $item->discount ?? 0,
+                    'dpp' => $itemDpp,
+                    'ppn' => $itemPpn,
+                    'kode_objek_pajak' => '01',  // BKP default
                 ]);
             }
 
@@ -118,8 +120,8 @@ class EFakturService
 
             Log::info('FakturPajak generated', [
                 'faktur_id' => $faktur->id,
-                'nsfp'      => $faktur->nsfp,
-                'sales_id'  => $sale->id,
+                'nsfp' => $faktur->nsfp,
+                'sales_id' => $sale->id,
                 'tenant_id' => $tenant->id,
             ]);
 
@@ -144,7 +146,7 @@ class EFakturService
 
         DB::transaction(function () use ($faktur) {
             // Reverse the PPN Keluaran journal entry if one was posted
-            $ppnJournalEntry = \App\Models\JournalEntry::where('sourceable_type', FakturPajak::class)
+            $ppnJournalEntry = JournalEntry::where('sourceable_type', FakturPajak::class)
                 ->where('sourceable_id', $faktur->id)
                 ->where('status', 'posted')
                 ->first();
@@ -183,7 +185,7 @@ class EFakturService
         $accountingSettings = $tenant->accounting_settings ?? [];
 
         $ppnKeluaranAccountId = $accountingSettings['ppn_keluaran_account_id'] ?? null;
-        $arAccountId          = $accountingSettings['accounts_receivable_account_id'] ?? null;
+        $arAccountId = $accountingSettings['accounts_receivable_account_id'] ?? null;
 
         // If PPN accounts not yet configured, skip posting (don't crash — warn in log)
         if (! $ppnKeluaranAccountId || ! $arAccountId) {
@@ -191,35 +193,37 @@ class EFakturService
                 'faktur_id' => $faktur->id,
                 'tenant_id' => $tenant->id,
             ]);
+
             return;
         }
 
         $ppnKeluaranAccount = Account::find($ppnKeluaranAccountId);
-        $arAccount          = Account::find($arAccountId);
+        $arAccount = Account::find($arAccountId);
 
         if (! $ppnKeluaranAccount || ! $arAccount) {
             Log::warning('PPN journal entry skipped — configured account not found.', [
-                'faktur_id'               => $faktur->id,
+                'faktur_id' => $faktur->id,
                 'ppn_keluaran_account_id' => $ppnKeluaranAccountId,
-                'ar_account_id'           => $arAccountId,
+                'ar_account_id' => $arAccountId,
             ]);
+
             return;
         }
 
         // Use AccountingService — never create journal entries directly
         $this->accountingService->createJournalEntry(
-            description:    'PPN Keluaran — FP ' . $faktur->nsfp . ' / ' . $faktur->nama_pembeli,
-            date:           Carbon::parse($faktur->tanggal_faktur),
-            transactions:   [
+            description: 'PPN Keluaran — FP '.$faktur->nsfp.' / '.$faktur->nama_pembeli,
+            date: Carbon::parse($faktur->tanggal_faktur),
+            transactions: [
                 [
                     'account_id' => $arAccount->id,
-                    'type'       => 'debit',
-                    'amount'     => $faktur->ppn,
+                    'type' => 'debit',
+                    'amount' => $faktur->ppn,
                 ],
                 [
                     'account_id' => $ppnKeluaranAccount->id,
-                    'type'       => 'credit',
-                    'amount'     => $faktur->ppn,
+                    'type' => 'credit',
+                    'amount' => $faktur->ppn,
                 ],
             ],
             sourceDocument: $faktur   // FakturPajak is the sourceable
@@ -237,10 +241,10 @@ class EFakturService
     public function calculatePpn(float $subtotal, ?float $ppnRate = null): array
     {
         $tenant = app('currentTenant');
-        $rate   = $ppnRate ?? $tenant->ppn_rate ?? 11.0;
-        $dpp    = round($subtotal, 2);
-        $ppn    = round($dpp * ($rate / 100), 2);
-        $total  = $dpp + $ppn;
+        $rate = $ppnRate ?? $tenant->ppn_rate ?? 11.0;
+        $dpp = round($subtotal, 2);
+        $ppn = round($dpp * ($rate / 100), 2);
+        $total = $dpp + $ppn;
 
         return compact('dpp', 'ppn', 'total', 'rate');
     }
@@ -260,32 +264,36 @@ class EFakturService
      */
     public function importNsfpPool(string $nsfpText): array
     {
-        $lines    = preg_split('/\r?\n/', trim($nsfpText));
-        $tenant   = app('currentTenant');
+        $lines = preg_split('/\r?\n/', trim($nsfpText));
+        $tenant = app('currentTenant');
         $imported = 0;
-        $skipped  = 0;
-        $errors   = [];
+        $skipped = 0;
+        $errors = [];
 
         foreach ($lines as $line) {
             $nsfp = trim($line);
-            if (empty($nsfp)) continue;
+            if (empty($nsfp)) {
+                continue;
+            }
 
             // Validate NSFP format: XXX.XXX-YY.XXXXXXXX
             if (! preg_match('/^\d{3}\.\d{3}-\d{2}\.\d{8}$/', $nsfp)) {
                 $errors[] = "Invalid NSFP format: {$nsfp}";
+
                 continue;
             }
 
             // Skip if already in pool (idempotent)
             if (NsfpPool::where('nsfp', $nsfp)->exists()) {
                 $skipped++;
+
                 continue;
             }
 
             NsfpPool::create([
                 'tenant_id' => $tenant->id,
-                'nsfp'      => $nsfp,
-                'status'    => 'available',
+                'nsfp' => $nsfp,
+                'status' => 'available',
             ]);
             $imported++;
         }
@@ -309,7 +317,7 @@ class EFakturService
      * - Amounts are in CENTS (integer, no decimal point) — multiply by 100, cast to int
      * - UTF-8 BOM required for Excel compatibility with Indonesian locale
      */
-    public function exportCsvForDjp(int $masaPajak, int $tahunPajak): \Symfony\Component\HttpFoundation\StreamedResponse
+    public function exportCsvForDjp(int $masaPajak, int $tahunPajak): StreamedResponse
     {
         $fakturs = FakturPajak::with(['items', 'sale'])
             ->where('masa_pajak', $masaPajak)
@@ -379,8 +387,8 @@ class EFakturService
 
             fclose($handle);
         }, $filename, [
-            'Content-Type'        => 'text/csv; charset=UTF-8',
-            'Content-Disposition' => 'attachment; filename="' . $filename . '"',
+            'Content-Type' => 'text/csv; charset=UTF-8',
+            'Content-Disposition' => 'attachment; filename="'.$filename.'"',
         ]);
     }
 
@@ -402,16 +410,16 @@ class EFakturService
         $active = (clone $base)->whereIn('status', ['draft', 'submitted', 'approved']);
 
         return [
-            'masa_pajak'   => $masaPajak,
-            'tahun_pajak'  => $tahunPajak,
+            'masa_pajak' => $masaPajak,
+            'tahun_pajak' => $tahunPajak,
             'total_faktur' => (clone $base)->count(),
-            'approved'     => (clone $base)->where('status', 'approved')->count(),
-            'submitted'    => (clone $base)->where('status', 'submitted')->count(),
-            'draft'        => (clone $base)->where('status', 'draft')->count(),
-            'rejected'     => (clone $base)->where('status', 'rejected')->count(),
-            'cancelled'    => (clone $base)->where('status', 'cancelled')->count(),
-            'total_dpp'    => $active->sum('dpp'),
-            'total_ppn'    => $active->sum('ppn'),
+            'approved' => (clone $base)->where('status', 'approved')->count(),
+            'submitted' => (clone $base)->where('status', 'submitted')->count(),
+            'draft' => (clone $base)->where('status', 'draft')->count(),
+            'rejected' => (clone $base)->where('status', 'rejected')->count(),
+            'cancelled' => (clone $base)->where('status', 'cancelled')->count(),
+            'total_dpp' => $active->sum('dpp'),
+            'total_ppn' => $active->sum('ppn'),
         ];
     }
 }

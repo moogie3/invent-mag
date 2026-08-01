@@ -322,7 +322,7 @@ return [
     'hr_attendance_step_1' => 'Buka Periode: Klik "Buka Periode" untuk mulai melacak kehadiran untuk bulan baru. Anda memilih Tahun dan Bulan.',
     'hr_attendance_step_2' => 'Lihat Periode: Klik ikon mata untuk melihat tabel kehadiran harian untuk bulan tertentu.',
     'hr_attendance_step_3' => 'Tutup Periode: Setelah bulan selesai dan diverifikasi, Anda dapat menutup periode untuk mencegah pengeditan lebih lanjut. Ini biasanya dilakukan sebelum menjalankan penggajian (payroll).',
-    
+
     'hr_attendance_details' => 'Pelacak Kehadiran',
     'hr_attendance_details_desc' => 'Tandai kehadiran karyawan untuk setiap hari dalam sebulan.',
     'hr_attendance_details_step_1' => 'Edit Individu: Klik pada sel kosong di tabel dan ketik kode status: P (Hadir), A (Absen), S (Sakit), L (Izin), H (Libur), atau ½ (Setengah Hari). Klik di luar kotak untuk menyimpan otomatis.',
@@ -335,7 +335,7 @@ return [
     'hr_payroll_desc' => 'Hasilkan dan proses penggajian bulanan berdasarkan data kehadiran dan default tunjangan/potongan.',
     'hr_payroll_step_1' => 'Proses Penggajian: Klik "Proses Penggajian" dan pilih periode kehadiran. Sistem akan secara otomatis menghitung gaji prorata, uang lembur, dan menarik default tunjangan/potongan.',
     'hr_payroll_step_2' => 'Perhitungan Prorata: Jika seorang karyawan absen (Alpa), sistem secara otomatis menghitung "Potongan Absen" dan menguranginya dari gaji bruto mereka.',
-    
+
     'hr_payroll_details' => 'Detail & Akuntansi Penggajian',
     'hr_payroll_details_desc' => 'Tinjau slip gaji individu dan proses alur akuntansi dua langkah. Untuk menghapus draf penggajian, klik tombol Hapus merah (hanya tersedia saat masih berstatus Draft).',
     'hr_payroll_details_step_1' => 'Edit Draf: Saat proses masih dalam status "Draft", Anda dapat mengklik tombol edit pada setiap karyawan untuk menyesuaikan tunjangan dan potongan mereka secara manual untuk bulan ini. Atau klik Hapus untuk menghapus draf secara keseluruhan.',
@@ -570,6 +570,7 @@ return [
     'save_ob' => 'Simpan: Klik "Simpan Saldo Awal" untuk menyimpan.',
     'delete_ob' => 'Hapus: Gunakan "Hapus Saldo Awal" untuk menghapus.',
     'summary_ob' => 'Ringkasan: Bagian bawah menunjukkan saldo awal tersimpan.',
+    'opening_balance_vs_recon' => 'Saldo Awal vs Rekonsiliasi Bank: Saldo Awal adalah potret saldo akun Anda satu kali saat pertama kali mulai menggunakan sistem (misalnya hari pertama tahun fiskal). Saldo ini tidak terkait dengan laporan bank mana pun. Sebaliknya, Rekonsiliasi Bank memverifikasi satu periode laporan tertentu dengan mencocokkan transaksinya terhadap entri jurnal Anda.',
 
     // Income Statement
     'income_statement' => 'Laporan Laba Rugi',
@@ -636,6 +637,20 @@ return [
     'financing_section' => 'Aktivitas Pendanaan: Menunjukkan arus kas dari utang, ekuitas, dan dividen.',
     'net_change_cf' => 'Perubahan Bersih Kas: Bagian bawah menunjukkan kenaikan atau penurunan bersih kas, plus saldo kas awal dan akhir.',
     'export_cf' => 'Ekspor: Gunakan dropdown ekspor untuk mencetak atau mengunduh PDF atau CSV.',
+
+    // Rekonsiliasi Bank
+    'bank_reconciliation' => 'Rekonsiliasi Bank',
+    'bank_reconciliation_desc' => 'Impor laporan bank dan cocokkan dengan entri jurnal untuk memverifikasi saldo kas Anda.',
+    'bank_reconciliation_import' => 'Impor Laporan Bank',
+    'bank_reconciliation_import_desc' => 'Unggah export laporan bank Anda untuk memulai rekonsiliasi.',
+    'bank_reconciliation_import_why' => 'Mengapa Perlu Impor Laporan: Rekonsiliasi hanya dapat dimulai setelah daftar transaksi bank berada di dalam sistem. Halaman ini mengubah export laporan bank Anda (CSV/TXT dari BCA, Mandiri, BNI, atau BRI) menjadi baris-baris laporan yang akan dicocokkan dengan entri jurnal Anda. Hasil pencocokan membuktikan bahwa saldo Kas/Bank Anda sesuai dengan bank.',
+    'bank_reconciliation_step_1' => 'Pilih Bank & Akun: Pilih bank (BCA, Mandiri, BNI, BRI) dan akun kas/bank yang akan direkonsiliasi.',
+    'bank_reconciliation_step_2' => 'Unggah Laporan: Unggah export CSV/TXT dari bank Anda. Sistem mendeteksi format secara otomatis (BCA, Mandiri, BNI, BRI).',
+    'bank_reconciliation_step_3' => 'Atur Saldo: Masukkan saldo awal dan akhir dari laporan, serta rentang tanggal periode opsional.',
+    'bank_reconciliation_step_4' => 'Tinjau Hasil Cocok: Baris yang tercocok otomatis menampilkan badge "Cocok". Baris yang belum cocok dapat dicocokkan manual ke entri jurnal.',
+    'bank_reconciliation_step_5' => 'Pencocokan Manual: Gunakan dropdown "Cocokkan ke Entri" untuk memilih entri jurnal yang tepat, atau "Batalkan Cocok" untuk melepas kecocokan yang salah.',
+    'bank_reconciliation_step_6' => 'Selesaikan: Saat selisih sudah 0, klik "Selesaikan Rekonsiliasi" untuk mengunci entri yang tercocok dari reverse, void, atau unpost.',
+    'bank_reconciliation_opening_vs_recon' => 'Saldo Awal Laporan vs Saldo Awal Sistem: Saldo awal pada formulir ini adalah saldo awal yang tertera pada laporan bank yang Anda impor. Bidang ini terisi otomatis dari Saldo Awal akun (diatur di Akuntansi > Saldo Awal) sebagai jalan pintas, namun keduanya sering berbeda karena ada transaksi di antara keduanya. Pastikan sesuai dengan laporan agar selisih yang dihitung bermakna.',
 
     // Activity Log
     'activity_log' => 'Log Aktivitas',

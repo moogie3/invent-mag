@@ -12,7 +12,7 @@ class CustomerCreditObserver
      */
     public function creating(CustomerCredit $customerCredit): void
     {
-        if (!isset($customerCredit->available_amount)) {
+        if (! isset($customerCredit->available_amount)) {
             $customerCredit->available_amount = $customerCredit->amount - ($customerCredit->used_amount ?? 0);
         }
     }

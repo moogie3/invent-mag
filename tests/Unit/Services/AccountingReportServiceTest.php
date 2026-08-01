@@ -4,16 +4,17 @@ namespace Tests\Unit\Services;
 
 use App\Models\Account;
 use App\Services\AccountingReportService;
-use Tests\TestCase;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Tests\Traits\CreatesTenant;
-use Database\Seeders\RoleSeeder;
 use Database\Seeders\AccountSeeder;
+use Database\Seeders\RoleSeeder;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Collection;
 use Mockery;
+use Tests\TestCase;
+use Tests\Traits\CreatesTenant;
 
 class AccountingReportServiceTest extends TestCase
 {
-    use RefreshDatabase, CreatesTenant;
+    use CreatesTenant, RefreshDatabase;
 
     protected AccountingReportService $service;
 
@@ -23,10 +24,10 @@ class AccountingReportServiceTest extends TestCase
         $this->setupTenant();
         $this->seed(RoleSeeder::class);
         $this->seed(AccountSeeder::class);
-        $this->service = new AccountingReportService();
+        $this->service = new AccountingReportService;
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         Mockery::close();
         parent::tearDown();
@@ -65,7 +66,7 @@ class AccountingReportServiceTest extends TestCase
     {
         $result = $this->service->getChartOfAccounts();
 
-        $this->assertInstanceOf(\Illuminate\Support\Collection::class, $result);
+        $this->assertInstanceOf(Collection::class, $result);
     }
 
     public function test_get_chart_of_accounts_includes_children()
@@ -92,7 +93,7 @@ class AccountingReportServiceTest extends TestCase
     public function test_flatten_account_hierarchy_adds_indentation()
     {
         $parent = Account::first();
-        
+
         $accounts = collect([$parent]);
         $result = $this->service->flattenAccountHierarchy($accounts);
 

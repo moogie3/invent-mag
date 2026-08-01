@@ -5,11 +5,10 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Storage;
 use Symfony\Component\Process\Process;
 
 class BackupController extends Controller
@@ -23,7 +22,7 @@ class BackupController extends Controller
     {
         $path = 'backups';
         $tenant = app('currentTenant');
-        $domainPrefix = $tenant->domain . '-';
+        $domainPrefix = $tenant->domain.'-';
 
         $allFiles = Storage::disk('local')->files($path);
 
@@ -46,7 +45,7 @@ class BackupController extends Controller
     {
         $tenant = app('currentTenant');
         $files = $this->getBackupFiles();
-        $latestBackup = !empty($files) ? $files[0] : null;
+        $latestBackup = ! empty($files) ? $files[0] : null;
 
         return view('admin.settings.backup', compact('tenant', 'files', 'latestBackup'));
     }
@@ -60,7 +59,7 @@ class BackupController extends Controller
 
             $tenant = app('currentTenant');
             $type = $request->input('type', 'db_only');
-            $filename = $tenant->domain . '-' . now()->format('Y-m-d-H-i-s') . '.zip';
+            $filename = $tenant->domain.'-'.now()->format('Y-m-d-H-i-s').'.zip';
             $tenantId = $tenant->getKey();
 
             $artisan = base_path('artisan');
@@ -85,32 +84,32 @@ class BackupController extends Controller
             $errorOutput = $process->getErrorOutput();
 
             // Check if the specific backup file was created
-            $backupPath = 'backups/' . $filename;
+            $backupPath = 'backups/'.$filename;
             if (Storage::disk('local')->exists($backupPath)) {
                 return response()->json([
                     'success' => true,
-                    'message' => __('messages.backup_success')
+                    'message' => __('messages.backup_success'),
                 ]);
             }
 
             // If failed, see if it's mysqldump
-            if (str_contains(strtolower($output . $errorOutput), 'mysqldump')) {
+            if (str_contains(strtolower($output.$errorOutput), 'mysqldump')) {
                 return response()->json([
                     'success' => false,
                     'warning' => true,
-                    'message' => __('messages.backup_info_local')
+                    'message' => __('messages.backup_info_local'),
                 ]);
             }
 
             return response()->json([
                 'success' => false,
-                'message' => __('messages.backup_error') . ': ' . ($errorOutput ?: 'Unknown error')
+                'message' => __('messages.backup_error').': '.($errorOutput ?: 'Unknown error'),
             ], 500);
 
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => $e->getMessage()
+                'message' => $e->getMessage(),
             ], 500);
         }
     }
@@ -118,16 +117,16 @@ class BackupController extends Controller
     public function download(string $filename)
     {
         $tenant = app('currentTenant');
-        $path = $this->getBackupPath() . '/' . $filename;
+        $path = $this->getBackupPath().'/'.$filename;
 
         // Security: Verify file belongs to this tenant
-        if (!Storage::disk('local')->exists($path)) {
+        if (! Storage::disk('local')->exists($path)) {
             return redirect()->route('admin.setting.backup.index')
                 ->with('error', __('messages.backup_file_not_found'));
         }
 
         // Verify filename starts with tenant domain (additional security)
-        if (!str_starts_with($filename, $tenant->domain)) {
+        if (! str_starts_with($filename, $tenant->domain)) {
             return redirect()->route('admin.setting.backup.index')
                 ->with('error', __('messages.backup_unauthorized'));
         }
@@ -143,16 +142,16 @@ class BackupController extends Controller
     public function delete(string $filename)
     {
         $tenant = app('currentTenant');
-        $path = $this->getBackupPath() . '/' . $filename;
+        $path = $this->getBackupPath().'/'.$filename;
 
         // Security: Verify file belongs to this tenant
-        if (!Storage::disk('local')->exists($path)) {
+        if (! Storage::disk('local')->exists($path)) {
             return redirect()->route('admin.setting.backup.index')
                 ->with('error', __('messages.backup_file_not_found'));
         }
 
         // Verify filename starts with tenant domain (additional security)
-        if (!str_starts_with($filename, $tenant->domain)) {
+        if (! str_starts_with($filename, $tenant->domain)) {
             return redirect()->route('admin.setting.backup.index')
                 ->with('error', __('messages.backup_unauthorized'));
         }
@@ -225,20 +224,21 @@ class BackupController extends Controller
             Log::channel('security')->info('Backup restore file stored', [
                 'tenant_id' => $tenant->id,
                 'temp_path' => $tempPath,
-                'filename'  => $file->getClientOriginalName(),
+                'filename' => $file->getClientOriginalName(),
                 'encrypted' => $tenant->isBackupEncrypted(),
             ]);
 
             // Open and validate the ZIP
-            $zipPath   = Storage::disk('local')->path($tempPath);
-            $zip       = new \ZipArchive();
+            $zipPath = Storage::disk('local')->path($tempPath);
+            $zip = new \ZipArchive;
             $openResult = $zip->open($zipPath);
 
             if ($openResult !== true) {
                 Storage::disk('local')->delete($tempPath);
                 Log::error('Restore failed: Invalid ZIP', ['result' => $openResult]);
+
                 return redirect()->back()->withInput()
-                    ->with('error', __('messages.backup_restore_error') . ': Invalid or corrupted ZIP file');
+                    ->with('error', __('messages.backup_restore_error').': Invalid or corrupted ZIP file');
             }
 
             // Find backup.sql inside the ZIP
@@ -246,8 +246,9 @@ class BackupController extends Controller
             if ($sqlIndex === false) {
                 $zip->close();
                 Storage::disk('local')->delete($tempPath);
+
                 return redirect()->back()->withInput()
-                    ->with('error', __('messages.backup_restore_error') . ': backup.sql not found inside ZIP');
+                    ->with('error', __('messages.backup_restore_error').': backup.sql not found inside ZIP');
             }
 
             // Extract SQL content from ZIP
@@ -259,22 +260,22 @@ class BackupController extends Controller
 
             if (empty($sqlContent)) {
                 return redirect()->back()->withInput()
-                    ->with('error', __('messages.backup_restore_error') . ': backup.sql is empty');
+                    ->with('error', __('messages.backup_restore_error').': backup.sql is empty');
             }
 
             // Execute the SQL to restore tenant data
-            $dbConfig   = config('database.connections.mysql');
-            $tenantId   = $tenant->getKey();
-            $mysqlPath  = $dbConfig['dump']['dump_binary_path'] ?? 'C:/xampp/mysql/bin';
-            $host       = $dbConfig['host'];
-            $port       = $dbConfig['port'];
-            $username   = $dbConfig['username'];
+            $dbConfig = config('database.connections.mysql');
+            $tenantId = $tenant->getKey();
+            $mysqlPath = $dbConfig['dump']['dump_binary_path'] ?? 'C:/xampp/mysql/bin';
+            $host = $dbConfig['host'];
+            $port = $dbConfig['port'];
+            $username = $dbConfig['username'];
             $dbPassword = $dbConfig['password'];
-            $database   = $dbConfig['database'];
+            $database = $dbConfig['database'];
 
             // Write SQL to a temp file for mysql CLI
-            $sqlTempPath = storage_path('app/backup-restore/restore_' . $tenantId . '_' . time() . '.sql');
-            if (!is_dir(dirname($sqlTempPath))) {
+            $sqlTempPath = storage_path('app/backup-restore/restore_'.$tenantId.'_'.time().'.sql');
+            if (! is_dir(dirname($sqlTempPath))) {
                 mkdir(dirname($sqlTempPath), 0755, true);
             }
             file_put_contents($sqlTempPath, $sqlContent);
@@ -287,7 +288,7 @@ class BackupController extends Controller
                 '-u', $username,
             ];
             if ($dbPassword) {
-                $cmd[] = '-p' . $dbPassword;
+                $cmd[] = '-p'.$dbPassword;
             }
             $cmd[] = $database;
 
@@ -300,16 +301,17 @@ class BackupController extends Controller
             // Clean up SQL temp file
             @unlink($sqlTempPath);
 
-            if (!$process->isSuccessful()) {
+            if (! $process->isSuccessful()) {
                 $error = $process->getErrorOutput();
                 Log::error('Restore SQL execution failed', ['error' => $error, 'tenant_id' => $tenantId]);
+
                 return redirect()->route('admin.setting.backup.index')
-                    ->with('error', __('messages.backup_restore_error') . ': ' . $error);
+                    ->with('error', __('messages.backup_restore_error').': '.$error);
             }
 
             Log::channel('security')->info('Backup restored successfully', [
                 'tenant_id' => $tenantId,
-                'filename'  => $file->getClientOriginalName(),
+                'filename' => $file->getClientOriginalName(),
             ]);
 
             return redirect()->route('admin.setting.backup.index')
@@ -317,8 +319,9 @@ class BackupController extends Controller
 
         } catch (\Exception $e) {
             Log::error('Restore exception', ['error' => $e->getMessage(), 'trace' => $e->getTraceAsString()]);
+
             return redirect()->route('admin.setting.backup.index')
-                ->with('error', __('messages.backup_restore_error') . ': ' . $e->getMessage());
+                ->with('error', __('messages.backup_restore_error').': '.$e->getMessage());
         }
     }
 
@@ -347,12 +350,13 @@ class BackupController extends Controller
         $user = Auth::user();
 
         // Verify current password against user's password
-        if (!Hash::check($request->current_password, $user->password)) {
+        if (! Hash::check($request->current_password, $user->password)) {
             Log::channel('security')->warning('Failed password change attempt', [
                 'user_id' => $user->id,
                 'email' => $user->email,
                 'reason' => 'Incorrect current password',
             ]);
+
             return redirect()->back()
                 ->with('error', __('messages.backup_password_error'));
         }

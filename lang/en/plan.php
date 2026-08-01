@@ -76,7 +76,7 @@ return [
     'bank_transfer' => 'Bank Transfer',
     'coming_soon' => 'Coming Soon',
     'cancel_and_back' => 'Cancel and back to plans',
-    'secure_payment' => "Your payment is secure and encrypted",
+    'secure_payment' => 'Your payment is secure and encrypted',
     'token_error' => 'Payment token not generated. Please try again or contact support.',
     'back_to_plans' => 'Back to Plans',
     'opening_payment' => 'Opening payment window...',
@@ -156,19 +156,19 @@ return [
     'notif_view_all' => 'View all notifications',
 
     // Product Expiry Notifications
-    'notif_product_expiry_title'         => 'Products Nearing Expiry',
-    'notif_product_expiry_desc'          => ':count item(s) in your inventory will expire within 30 days. Review and action before losses occur.',
+    'notif_product_expiry_title' => 'Products Nearing Expiry',
+    'notif_product_expiry_desc' => ':count item(s) in your inventory will expire within 30 days. Review and action before losses occur.',
     'notif_product_expiry_critical_desc' => ':critical item(s) expire within 7 days (:total total expiring within 30 days). Immediate action recommended.',
-    'notif_view_products'                => 'View Products',
+    'notif_view_products' => 'View Products',
 
     // Backup Status Notifications
-    'notif_no_backup_title'       => 'No Backup Found',
-    'notif_no_backup_desc'        => 'You have not created any backups yet. Run a backup to protect your data.',
-    'notif_backup_recent_title'   => 'Backup Completed Successfully',
-    'notif_backup_recent_desc'    => 'Your last backup was created :time. Your data is protected.',
-    'notif_backup_overdue_title'  => 'Backup Overdue',
-    'notif_backup_overdue_desc'   => 'Your last backup was :days day(s) ago. We recommend backing up your data regularly.',
-    'notif_go_to_backup'          => 'Go to Backup',
+    'notif_no_backup_title' => 'No Backup Found',
+    'notif_no_backup_desc' => 'You have not created any backups yet. Run a backup to protect your data.',
+    'notif_backup_recent_title' => 'Backup Completed Successfully',
+    'notif_backup_recent_desc' => 'Your last backup was created :time. Your data is protected.',
+    'notif_backup_overdue_title' => 'Backup Overdue',
+    'notif_backup_overdue_desc' => 'Your last backup was :days day(s) ago. We recommend backing up your data regularly.',
+    'notif_go_to_backup' => 'Go to Backup',
 
     // Trial Banner
     'close_normal' => 'Close',

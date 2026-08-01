@@ -23,12 +23,14 @@ class AttendanceController extends Controller
     public function index()
     {
         $data = $this->service->getIndexData();
+
         return view('admin.hr.attendance.index', $data);
     }
 
     public function show(AttendancePeriod $period)
     {
         $data = $this->service->getPeriodShowData($period);
+
         return view('admin.hr.attendance.show', $data);
     }
 
@@ -43,6 +45,7 @@ class AttendanceController extends Controller
                 ActivityLog::MODULE_ATTENDANCE,
                 "Exported Attendance Records for {$period->name}"
             );
+
             return $this->service->exportPeriodRecords($period, $request->export_option);
         } catch (\Exception $e) {
             return response()->json([
@@ -63,6 +66,7 @@ class AttendanceController extends Controller
 
         try {
             $this->service->openPeriod($validated['year'], $validated['month'], $validated['working_days']);
+
             return back()->with('success', __('messages.record_created'));
         } catch (\Exception $e) {
             return back()->with('error', $e->getMessage());
@@ -73,6 +77,7 @@ class AttendanceController extends Controller
     {
         try {
             $this->service->closePeriod($period);
+
             return back()->with('success', __('messages.record_updated'));
         } catch (\Exception $e) {
             return back()->with('error', $e->getMessage());
@@ -83,6 +88,7 @@ class AttendanceController extends Controller
     {
         try {
             $this->service->deletePeriod($period);
+
             return redirect()->route('admin.hr.attendance.index')->with('success', __('messages.record_deleted'));
         } catch (\Exception $e) {
             return back()->with('error', $e->getMessage());
@@ -97,14 +103,16 @@ class AttendanceController extends Controller
                 return response()->json([
                     'success' => true,
                     'message' => __('messages.record_updated'),
-                    'record' => $record
+                    'record' => $record,
                 ]);
             }
+
             return back()->with('success', __('messages.record_updated'));
         } catch (\Exception $e) {
             if ($request->ajax() || $request->wantsJson()) {
                 return response()->json(['success' => false, 'message' => $e->getMessage()], 422);
             }
+
             return back()->with('error', $e->getMessage());
         }
     }
@@ -122,6 +130,7 @@ class AttendanceController extends Controller
                 ActivityLog::MODULE_ATTENDANCE,
                 'Exported Attendance Periods'
             );
+
             return $this->service->exportPeriods($request->ids, $request->export_option);
         } catch (\Exception $e) {
             return response()->json([
@@ -151,6 +160,7 @@ class AttendanceController extends Controller
                 $validated['overtime_hours'] ?? null,
                 $validated['skip_days'] ?? []
             );
+
             return back()->with('success', "Filled {$count} records.");
         } catch (\Exception $e) {
             return back()->with('error', $e->getMessage());

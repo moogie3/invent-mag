@@ -4,11 +4,11 @@ namespace Tests\Unit\Helpers;
 
 use App\Helpers\CurrencyHelper;
 use App\Models\CurrencySetting;
+use Carbon\Carbon;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
-use Carbon\Carbon;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Traits\CreatesTenant;
 
 class CurrencyHelperTest extends TestCase
@@ -46,8 +46,8 @@ class CurrencyHelperTest extends TestCase
         );
 
         $expectedWithPosition = $defaultSettings->position === 'prefix'
-            ? $defaultSettings->currency_symbol . ' ' . $expected
-            : $expected . ' ' . $defaultSettings->currency_symbol;
+            ? $defaultSettings->currency_symbol.' '.$expected
+            : $expected.' '.$defaultSettings->currency_symbol;
 
         $this->assertEquals($expectedWithPosition, $formatted);
     }

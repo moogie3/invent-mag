@@ -25,7 +25,7 @@ class NavigationServiceProvider extends ServiceProvider
             $menu = $this->filterMenuByPlan(config('navigation.menu'));
             $navigationType = auth()->user()->system_settings['navigation_type'] ?? 'sidebar';
             $view->with('navigationItems', $menu)
-                 ->with('navigationType', $navigationType);
+                ->with('navigationType', $navigationType);
         });
     }
 
@@ -63,6 +63,7 @@ class NavigationServiceProvider extends ServiceProvider
                             if (isset($child['plan_feature'])) {
                                 return $this->tenantHasFeature($tenant, $child['plan_feature']);
                             }
+
                             return true;
                         }
                     ));
@@ -86,6 +87,7 @@ class NavigationServiceProvider extends ServiceProvider
     {
         try {
             $tenant = app('currentTenant');
+
             return $tenant instanceof Tenant ? $tenant : null;
         } catch (\Exception $e) {
             return null;

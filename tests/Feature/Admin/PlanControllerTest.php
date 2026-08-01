@@ -2,9 +2,6 @@
 
 namespace Tests\Feature\Admin;
 
-use App\Models\Plan;
-use App\Models\Tenant;
-use App\Models\User;
 use Database\Seeders\PlanSeeder;
 use Database\Seeders\RoleSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -49,7 +46,7 @@ class PlanControllerTest extends TestCase
 
     public function test_upgrade_with_feature_query_returns_suggested_plan()
     {
-        $response = $this->actingAs($this->user)->get(route('admin.setting.plan.upgrade') . '?feature=pos');
+        $response = $this->actingAs($this->user)->get(route('admin.setting.plan.upgrade').'?feature=pos');
 
         $response->assertStatus(200);
         $response->assertViewHas('suggestedPlan');
@@ -83,7 +80,7 @@ class PlanControllerTest extends TestCase
 
     public function test_index_handles_success_query_parameter()
     {
-        $response = $this->actingAs($this->user)->get(route('admin.setting.plan') . '?success=1');
+        $response = $this->actingAs($this->user)->get(route('admin.setting.plan').'?success=1');
 
         $response->assertStatus(200);
     }
@@ -95,7 +92,7 @@ class PlanControllerTest extends TestCase
         $response->assertStatus(200);
 
         $usageStats = $response->viewData('usageStats');
-        
+
         $this->assertArrayHasKey('users', $usageStats);
         $this->assertArrayHasKey('warehouses', $usageStats);
     }
@@ -107,7 +104,7 @@ class PlanControllerTest extends TestCase
         $response->assertStatus(200);
 
         $features = $response->viewData('features');
-        
+
         $this->assertNotEmpty($features);
     }
 

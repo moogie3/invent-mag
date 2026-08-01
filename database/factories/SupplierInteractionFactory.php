@@ -2,7 +2,9 @@
 
 namespace Database\Factories;
 
+use App\Models\Supplier;
 use App\Models\SupplierInteraction;
+use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 class SupplierInteractionFactory extends Factory
@@ -22,8 +24,8 @@ class SupplierInteractionFactory extends Factory
     public function definition()
     {
         return [
-            'supplier_id' => \App\Models\Supplier::factory(),
-            'user_id' => \App\Models\User::factory(),
+            'supplier_id' => Supplier::factory(),
+            'user_id' => User::factory(),
             'type' => $this->faker->randomElement(['call', 'email', 'meeting', 'note']),
             'notes' => $this->faker->paragraph,
             'interaction_date' => $this->faker->dateTimeBetween('-1 year', 'now'),

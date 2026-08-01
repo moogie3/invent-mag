@@ -22,6 +22,6 @@ class TestingServiceProvider extends ServiceProvider
     {
         if ($this->app->environment('testing')) {
             RateLimiter::for('*', fn () => RateLimiter::none());
-        }    
+        }
     }
 }

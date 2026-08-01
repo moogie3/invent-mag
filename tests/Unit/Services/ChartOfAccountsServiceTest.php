@@ -3,17 +3,18 @@
 namespace Tests\Unit\Services;
 
 use App\Models\Account;
+use App\Models\User;
 use App\Services\ChartOfAccountsService;
+use Database\Seeders\AccountSeeder;
+use Database\Seeders\RoleSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Mockery;
 use Tests\TestCase;
 use Tests\Traits\CreatesTenant;
-use Database\Seeders\RoleSeeder;
-use Database\Seeders\AccountSeeder;
-use Mockery;
 
 class ChartOfAccountsServiceTest extends TestCase
 {
-    use RefreshDatabase, CreatesTenant;
+    use CreatesTenant, RefreshDatabase;
 
     protected ChartOfAccountsService $service;
 
@@ -23,10 +24,10 @@ class ChartOfAccountsServiceTest extends TestCase
         $this->setupTenant();
         $this->seed(RoleSeeder::class);
         $this->seed(AccountSeeder::class);
-        $this->service = new ChartOfAccountsService();
+        $this->service = new ChartOfAccountsService;
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         Mockery::close();
         parent::tearDown();
@@ -34,7 +35,7 @@ class ChartOfAccountsServiceTest extends TestCase
 
     public function test_it_gets_accounting_settings()
     {
-        $user = \App\Models\User::factory()->create();
+        $user = User::factory()->create();
         $user->assignRole('superuser');
         $this->actingAs($user);
 
@@ -46,12 +47,12 @@ class ChartOfAccountsServiceTest extends TestCase
 
     public function test_it_updates_accounting_settings()
     {
-        $user = \App\Models\User::factory()->create();
+        $user = User::factory()->create();
         $user->assignRole('superuser');
         $this->actingAs($user);
 
         $tenantId = app('currentTenant')->id;
-        $accounts = Account::where('code', 'like', '%-' . $tenantId)->take(6)->get();
+        $accounts = Account::where('code', 'like', '%-'.$tenantId)->take(6)->get();
 
         $data = [
             'sales_revenue_account_id' => $accounts[0]->id,
@@ -78,12 +79,12 @@ class ChartOfAccountsServiceTest extends TestCase
 
     public function test_settings_persists_after_update()
     {
-        $user = \App\Models\User::factory()->create();
+        $user = User::factory()->create();
         $user->assignRole('superuser');
         $this->actingAs($user);
 
         $tenantId = app('currentTenant')->id;
-        $accounts = Account::where('code', 'like', '%-' . $tenantId)->take(6)->get();
+        $accounts = Account::where('code', 'like', '%-'.$tenantId)->take(6)->get();
 
         $data = [
             'sales_revenue_account_id' => $accounts[0]->id,
@@ -97,7 +98,7 @@ class ChartOfAccountsServiceTest extends TestCase
         $this->service->updateAccountingSettings($data);
 
         $tenant = app('currentTenant')->fresh();
-        
+
         $this->assertEquals($data['sales_revenue_account_id'], $tenant->accounting_settings['sales_revenue_account_id']);
     }
 }

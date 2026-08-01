@@ -13,6 +13,7 @@ class AttendanceService
     public function getIndexData()
     {
         $periods = AttendancePeriod::orderBy('year', 'desc')->orderBy('month', 'desc')->get();
+
         return compact('periods');
     }
 
@@ -23,6 +24,7 @@ class AttendanceService
             ->with('employee')
             ->get()
             ->keyBy('employee_id');
+
         return compact('period', 'employees', 'records');
     }
 
@@ -31,7 +33,7 @@ class AttendanceService
         $existing = AttendancePeriod::where('year', $year)
             ->where('month', $month)
             ->first();
-        
+
         if ($existing) {
             throw new \InvalidArgumentException("Period {$year}-{$month} already exists.");
         }
@@ -100,13 +102,13 @@ class AttendanceService
             for ($day = 1; $day <= $daysInMonth; $day++) {
                 $date = sprintf('%04d-%02d-%02d', $period->year, $period->month, $day);
                 $weekday = date('N', strtotime($date));
-                
+
                 if (in_array($weekday, $skipDays)) {
                     continue;
                 }
 
                 $records[] = [
-'tenant_id' => app('currentTenant')->id,
+                    'tenant_id' => app('currentTenant')->id,
                     'employee_id' => $employeeId,
                     'period_id' => $period->id,
                     'date' => $date,
@@ -143,10 +145,11 @@ class AttendanceService
 
         if ($exportOption === 'pdf') {
             $html = view('admin.hr.attendance.export-period-pdf', compact('period', 'employees', 'records', 'daysInMonth'))->render();
-            $dompdf = new Dompdf();
+            $dompdf = new Dompdf;
             $dompdf->loadHtml($html);
             $dompdf->setPaper('A4', 'landscape');
             $dompdf->render();
+
             return $dompdf->stream("attendance-{$period->year}-{$period->month}.pdf");
         }
 
@@ -176,6 +179,7 @@ class AttendanceService
                 }
                 fclose($file);
             };
+
             return response()->stream($callback, 200, $headers);
         }
 
@@ -192,10 +196,11 @@ class AttendanceService
 
         if ($exportOption === 'pdf') {
             $html = view('admin.hr.attendance.export-pdf', compact('periods'))->render();
-            $dompdf = new Dompdf();
+            $dompdf = new Dompdf;
             $dompdf->loadHtml($html);
             $dompdf->setPaper('A4', 'landscape');
             $dompdf->render();
+
             return $dompdf->stream('attendance-periods.pdf');
         }
 
@@ -222,6 +227,7 @@ class AttendanceService
                 }
                 fclose($file);
             };
+
             return response()->stream($callback, 200, $headers);
         }
 

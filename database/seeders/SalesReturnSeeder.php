@@ -2,17 +2,15 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Seeder;
-use App\Models\SalesReturn;
-use App\Models\Sales;
-use App\Models\SalesItem;
-use App\Models\ProductWarehouse;
-use App\Models\User;
 use App\Models\Product;
-use App\Models\SalesReturnItem;
+use App\Models\ProductWarehouse;
+use App\Models\Sales;
+use App\Models\SalesReturn;
+use App\Models\User;
 use App\Services\AccountingService;
 use Carbon\Carbon;
-use Illuminate\Support\Facades\DB;
+use Faker\Factory;
+use Illuminate\Database\Seeder;
 
 class SalesReturnSeeder extends Seeder
 {
@@ -34,7 +32,8 @@ class SalesReturnSeeder extends Seeder
 
         $existingReturns = SalesReturn::where('tenant_id', $tenantId)->count();
         if ($existingReturns > 0) {
-            $this->command->info("Sales returns already exist for tenant " . app('currentTenant')->name . ". Skipping to preserve existing data.");
+            $this->command->info('Sales returns already exist for tenant '.app('currentTenant')->name.'. Skipping to preserve existing data.');
+
             return;
         }
 
@@ -42,13 +41,14 @@ class SalesReturnSeeder extends Seeder
         $sales = Sales::where('tenant_id', $tenantId)->has('salesItems')->get(); // Only sales with items
 
         if ($users->isEmpty() || $sales->isEmpty()) {
-            $this->command->warn('Skipping SalesReturnSeeder for tenant ' . app('currentTenant')->name . ': No users or sales with items found. Please run UserSeeder and SalesSeeder first.');
+            $this->command->warn('Skipping SalesReturnSeeder for tenant '.app('currentTenant')->name.': No users or sales with items found. Please run UserSeeder and SalesSeeder first.');
+
             return;
         }
 
-        $this->command->info("Seeding Sales Returns for tenant: " . app('currentTenant')->name);
-        
-        $faker = \Faker\Factory::create();
+        $this->command->info('Seeding Sales Returns for tenant: '.app('currentTenant')->name);
+
+        $faker = Factory::create();
 
         $count = 0;
         for ($i = 0; $i < 15; $i++) {
@@ -74,7 +74,7 @@ class SalesReturnSeeder extends Seeder
             foreach ($selectedSalesItems as $salesItem) {
                 $returnQuantity = rand(1, $salesItem->quantity); // Return a quantity less than or equal to original
                 $netUnitPrice = $salesItem->total / $salesItem->quantity;
-                $itemTotal = $returnQuantity * $netUnitPrice; 
+                $itemTotal = $returnQuantity * $netUnitPrice;
                 $totalReturnAmount += $itemTotal;
 
                 $returnItemsData[] = [
@@ -92,17 +92,17 @@ class SalesReturnSeeder extends Seeder
 
             // Create the SalesReturn — copy tax fields from the parent sale
             $salesReturn = SalesReturn::create([
-                'sales_id'     => $sale->id,
-                'user_id'      => $user->id,
-                'return_date'  => $returnDate,
-                'reason'       => $faker->sentence(),
+                'sales_id' => $sale->id,
+                'user_id' => $user->id,
+                'return_date' => $returnDate,
+                'reason' => $faker->sentence(),
                 'total_amount' => $totalReturnAmount,
-                'status'       => $status,
-                'tax_id'       => $sale->tax_id,
-                'tax_rate'     => $sale->tax_rate ?? 0,
-                'tax_type'     => $sale->tax_type ?? 'none',
-                'tax_amount'   => round($totalReturnAmount * (($sale->tax_rate ?? 0) / 100), 2),
-                'tenant_id'    => $tenantId,
+                'status' => $status,
+                'tax_id' => $sale->tax_id,
+                'tax_rate' => $sale->tax_rate ?? 0,
+                'tax_type' => $sale->tax_type ?? 'none',
+                'tax_amount' => round($totalReturnAmount * (($sale->tax_rate ?? 0) / 100), 2),
+                'tenant_id' => $tenantId,
             ]);
 
             // Create SalesReturnItems
@@ -118,7 +118,7 @@ class SalesReturnSeeder extends Seeder
                 if ($stockRecord) {
                     $stockRecord->increment('quantity', $salesReturnItem->quantity);
                 } else {
-                     ProductWarehouse::create([
+                    ProductWarehouse::create([
                         'product_id' => $salesReturnItem->product_id,
                         'warehouse_id' => $sale->warehouse_id,
                         'quantity' => $salesReturnItem->quantity,
@@ -133,19 +133,19 @@ class SalesReturnSeeder extends Seeder
 
             // Debit Sales Returns (or a specific return expense account)
             // Credit Accounts Receivable / Cash (depending on original payment type or refund status)
-            $transactions[] = ['account_code' => '4100-' . $tenantId, 'type' => 'debit', 'amount' => $totalReturnAmount]; // Reduce revenue
-            $transactions[] = ['account_code' => '1130-' . $tenantId, 'type' => 'credit', 'amount' => $totalReturnAmount]; // Reduce AR
+            $transactions[] = ['account_code' => '4100-'.$tenantId, 'type' => 'debit', 'amount' => $totalReturnAmount]; // Reduce revenue
+            $transactions[] = ['account_code' => '1130-'.$tenantId, 'type' => 'credit', 'amount' => $totalReturnAmount]; // Reduce AR
 
             try {
                 $this->accountingService->createJournalEntry($description, Carbon::parse($returnDate), $transactions, $salesReturn);
             } catch (\Exception $e) {
-                $this->command->error("Failed to create journal entry for sales return {$salesReturn->id}: " . $e->getMessage());
+                $this->command->error("Failed to create journal entry for sales return {$salesReturn->id}: ".$e->getMessage());
             }
-            
+
             $count++;
         }
-        
-        $this->command->info("Sales Return seeding completed!");
+
+        $this->command->info('Sales Return seeding completed!');
         $this->command->info("Created {$count} sales returns with items, stock updates, and journal entries.");
     }
 }

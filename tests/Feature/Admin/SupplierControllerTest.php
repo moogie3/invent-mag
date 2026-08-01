@@ -2,21 +2,19 @@
 
 namespace Tests\Feature\Admin;
 
-use App\Models\User;
 use App\Models\Supplier;
 use App\Models\Warehouse;
-use Illuminate\Http\UploadedFile;
-use Illuminate\Support\Facades\Storage;
-use Tests\TestCase;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Tests\Traits\CreatesTenant;
-use Database\Seeders\RoleSeeder;
 use App\Services\SupplierService;
+use Database\Seeders\RoleSeeder;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Pagination\LengthAwarePaginator;
+use Tests\TestCase;
+use Tests\Traits\CreatesTenant;
 
 class SupplierControllerTest extends TestCase
 {
-    use RefreshDatabase, CreatesTenant;
+    use CreatesTenant, RefreshDatabase;
 
     protected function setUp(): void
     {
@@ -51,8 +49,8 @@ class SupplierControllerTest extends TestCase
         // Mock the SupplierService
         $mockService = \Mockery::mock(SupplierService::class);
         $mockService->shouldReceive('getSupplierMetrics')
-                    ->once()
-                    ->andReturn($expectedMetrics);
+            ->once()
+            ->andReturn($expectedMetrics);
         $this->app->instance(SupplierService::class, $mockService);
 
         $response = $this->get(route('admin.supplier.metrics'));
@@ -124,16 +122,16 @@ class SupplierControllerTest extends TestCase
         // Mock the SupplierService to return a failure
         $mockService = \Mockery::mock(SupplierService::class);
         $mockService->shouldReceive('createSupplier')
-                    ->once()
-                    ->andReturn(['success' => false, 'message' => $errorMessage]);
+            ->once()
+            ->andReturn(['success' => false, 'message' => $errorMessage]);
         $mockService->shouldReceive('getSupplierIndexData') // Add expectation for index method call
-                    ->andReturn([
-                        'suppliers' => new LengthAwarePaginator([], 0, 10),
-                        'entries' => 10,
-                        'totalsupplier' => 0,
-                        'inCount' => 0,
-                        'outCount' => 0,
-                    ]);
+            ->andReturn([
+                'suppliers' => new LengthAwarePaginator([], 0, 10),
+                'entries' => 10,
+                'totalsupplier' => 0,
+                'inCount' => 0,
+                'outCount' => 0,
+            ]);
         $this->app->instance(SupplierService::class, $mockService);
 
         $this->get(route('admin.supplier')); // Set previous URL for back() redirect
@@ -210,8 +208,8 @@ class SupplierControllerTest extends TestCase
 
         $mockService = \Mockery::mock(SupplierService::class);
         $mockService->shouldReceive('updateSupplier')
-                    ->once()
-                    ->andReturn(['success' => false, 'message' => $errorMessage]);
+            ->once()
+            ->andReturn(['success' => false, 'message' => $errorMessage]);
         $this->app->instance(SupplierService::class, $mockService);
 
         $response = $this->put(route('admin.supplier.update', $supplier->id), $updateData);
@@ -241,8 +239,8 @@ class SupplierControllerTest extends TestCase
 
         $mockService = \Mockery::mock(SupplierService::class);
         $mockService->shouldReceive('deleteSupplier')
-                    ->once()
-                    ->andReturn(['success' => false, 'message' => $errorMessage]);
+            ->once()
+            ->andReturn(['success' => false, 'message' => $errorMessage]);
         $this->app->instance(SupplierService::class, $mockService);
 
         $response = $this->delete(route('admin.supplier.destroy', $supplier->id));
@@ -296,7 +294,7 @@ class SupplierControllerTest extends TestCase
             ->assertJson([
                 'success' => false,
                 'message' => $errorMessage,
-                'errors' => ['name' => [$errorMessage]]
+                'errors' => ['name' => [$errorMessage]],
             ]);
     }
 

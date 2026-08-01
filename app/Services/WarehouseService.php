@@ -2,10 +2,8 @@
 
 namespace App\Services;
 
-use App\Helpers\CurrencyHelper;
-use App\Models\Warehouse;
-
 use App\Models\User;
+use App\Models\Warehouse;
 use Dompdf\Dompdf;
 
 class WarehouseService
@@ -30,9 +28,10 @@ class WarehouseService
 
         // Defense-in-depth: check plan warehouse limit before creating
         try {
-            $planService = app(\App\Services\PlanService::class);
+            $planService = app(PlanService::class);
             if (! $planService->canAddWarehouse()) {
                 $limit = $planService->getWarehouseLimit();
+
                 return ['success' => false, 'message' => "You have reached the maximum number of warehouses ({$limit}) allowed on your current plan. Please upgrade to add more warehouses."];
             }
         } catch (\Exception $e) {
@@ -82,6 +81,7 @@ class WarehouseService
             $warehouse->is_main = true;
             $warehouse->save();
             $warehouse->refresh(); // Refresh the model
+
             return ['success' => true, 'message' => 'Main warehouse updated successfully.'];
         });
     }
@@ -93,6 +93,7 @@ class WarehouseService
                 $warehouse->is_main = false;
                 $warehouse->save();
                 $warehouse->refresh(); // Refresh the model
+
                 return ['success' => true, 'message' => 'Main warehouse status removed.'];
             }
 
@@ -106,10 +107,11 @@ class WarehouseService
 
         if ($exportOption === 'pdf') {
             $html = view('admin.warehouse.export-pdf', compact('warehouses'))->render();
-            $dompdf = new Dompdf();
+            $dompdf = new Dompdf;
             $dompdf->loadHtml($html);
             $dompdf->setPaper('A4', 'landscape');
             $dompdf->render();
+
             return $dompdf->stream('warehouses.pdf');
         }
 

@@ -37,7 +37,7 @@ class ProfileService
         }
 
         if (isset($data['current_password']) && isset($data['password'])) {
-            if (!Hash::check($data['current_password'], $user->password)) {
+            if (! Hash::check($data['current_password'], $user->password)) {
                 return ['success' => false, 'message' => 'Current password is incorrect.'];
             }
             $user->password = Hash::make($data['password']);
@@ -50,26 +50,23 @@ class ProfileService
 
     /**
      * Update user password
-     * 
-     * @param User $user
-     * @param string $password
-     * @return array
      */
     public function updatePassword(User $user, string $password): array
     {
         try {
             $user->password = Hash::make($password);
             $user->save();
-            
+
             return [
-                'success' => true, 
-                'message' => 'Password updated successfully!'
+                'success' => true,
+                'message' => 'Password updated successfully!',
             ];
         } catch (\Exception $e) {
-            \Log::error('Password update failed: ' . $e->getMessage());
+            \Log::error('Password update failed: '.$e->getMessage());
+
             return [
-                'success' => false, 
-                'message' => 'Failed to update password. Please try again.'
+                'success' => false,
+                'message' => 'Failed to update password. Please try again.',
             ];
         }
     }

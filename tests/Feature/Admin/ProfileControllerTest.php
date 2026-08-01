@@ -2,21 +2,18 @@
 
 namespace Tests\Feature\Admin;
 
-use App\Models\User;
 use App\Services\ProfileService;
+use Database\Seeders\RoleSeeder;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
-use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 use Mockery;
-use Spatie\Permission\Models\Role;
 use Tests\TestCase;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Traits\CreatesTenant;
-use Database\Seeders\RoleSeeder;
 
 class ProfileControllerTest extends TestCase
 {
-    use WithFaker, CreatesTenant, RefreshDatabase;
+    use CreatesTenant, RefreshDatabase, WithFaker;
 
     protected $profileServiceMock;
 
@@ -67,7 +64,6 @@ class ProfileControllerTest extends TestCase
         $response->assertSessionHas('success', 'Profile updated successfully!');
     }
 
-
     public function test_update_handles_failed_update()
     {
         $updateData = ['name' => 'New Name', 'email' => 'new@example.com', 'timezone' => 'UTC'];
@@ -82,7 +78,6 @@ class ProfileControllerTest extends TestCase
         $response->assertSessionHasErrors(['profile_update_error' => 'Incorrect password']);
     }
 
-
     public function test_update_validates_request_data()
     {
         $response = $this->actingAs($this->user)->put(route('admin.setting.profile.update'), ['name' => '']);
@@ -91,7 +86,6 @@ class ProfileControllerTest extends TestCase
         $response = $this->actingAs($this->user)->put(route('admin.setting.profile.update'), ['email' => 'not-an-email']);
         $response->assertSessionHasErrors('email');
     }
-
 
     public function test_update_handles_ajax_request_on_failure()
     {
@@ -125,7 +119,6 @@ class ProfileControllerTest extends TestCase
         $response->assertJson(['success' => true, 'message' => 'Profile updated successfully!']);
     }
 
-
     public function test_delete_avatar_deletes_avatar_successfully()
     {
         $this->profileServiceMock->shouldReceive('deleteAvatar')
@@ -137,7 +130,6 @@ class ProfileControllerTest extends TestCase
         $response->assertRedirect();
         $response->assertSessionHas('success', 'Avatar deleted successfully!');
     }
-
 
     public function test_delete_avatar_handles_ajax_request()
     {

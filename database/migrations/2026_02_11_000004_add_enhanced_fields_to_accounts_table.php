@@ -29,7 +29,7 @@ return new class extends Migration
                 'opening_balance_date',
                 'currency',
                 'allow_manual_entry',
-                'tax_type'
+                'tax_type',
             ]);
         });
     }

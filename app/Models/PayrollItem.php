@@ -40,12 +40,14 @@ class PayrollItem extends Model
     public function calculateGross(): float
     {
         $allowanceTotal = collect($this->allowances)->sum('amount');
+
         return $this->base_salary + $allowanceTotal + $this->overtime_pay;
     }
 
     public function calculateNet(): float
     {
         $deductionTotal = collect($this->deductions)->sum('amount');
+
         return $this->calculateGross() - $deductionTotal;
     }
 }

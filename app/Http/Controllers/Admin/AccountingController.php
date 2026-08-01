@@ -5,22 +5,27 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Account;
 use App\Models\ActivityLog;
-use App\Services\AccountService;
 use App\Services\AccountingExportService;
 use App\Services\AccountingReportService;
+use App\Services\AccountService;
 use App\Services\ActivityLogService;
 use App\Services\ChartOfAccountsService;
 use App\Services\GeneralLedgerService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Validation\ValidationException;
 
 class AccountingController extends Controller
 {
     protected $accountService;
+
     protected $generalLedgerService;
+
     protected $accountingReportService;
+
     protected $accountingExportService;
+
     protected $chartOfAccountsService;
 
     public function __construct(
@@ -43,7 +48,7 @@ class AccountingController extends Controller
     public function accounting()
     {
         $settingsData = $this->chartOfAccountsService->getAccountingSettings();
-        
+
         return view('admin.accounting.accounting-setting', [
             'accounts' => $settingsData['accounts'],
             'settings' => $settingsData['settings'],
@@ -164,6 +169,7 @@ class AccountingController extends Controller
     public function accountsIndex()
     {
         $accounts = $this->accountService->getAccountsWithChildren();
+
         return view('admin.accounting.accounts.index', compact('accounts'));
     }
 
@@ -173,6 +179,7 @@ class AccountingController extends Controller
     public function accountsCreate()
     {
         $accounts = $this->accountService->getAllAccountsOrdered();
+
         return view('admin.accounting.accounts.create', compact('accounts'));
     }
 
@@ -183,9 +190,10 @@ class AccountingController extends Controller
     {
         try {
             $this->accountService->createAccount($request->all());
+
             return redirect()->route('admin.accounting.accounts.index')
                 ->with('success', 'Account created successfully.');
-        } catch (\Illuminate\Validation\ValidationException $e) {
+        } catch (ValidationException $e) {
             return redirect()->back()
                 ->withErrors($e->validator)
                 ->withInput();
@@ -198,6 +206,7 @@ class AccountingController extends Controller
     public function accountsEdit(Account $account)
     {
         $accounts = $this->accountService->getAllAccountsExcept($account->id);
+
         return view('admin.accounting.accounts.edit', compact('account', 'accounts'));
     }
 
@@ -208,9 +217,10 @@ class AccountingController extends Controller
     {
         try {
             $this->accountService->updateAccount($account, $request->all());
+
             return redirect()->route('admin.accounting.accounts.index')
                 ->with('success', 'Account updated successfully.');
-        } catch (\Illuminate\Validation\ValidationException $e) {
+        } catch (ValidationException $e) {
             return redirect()->back()
                 ->withErrors($e->validator)
                 ->withInput();
@@ -225,7 +235,7 @@ class AccountingController extends Controller
         $result = $this->accountService->deleteAccount($account);
 
         $messageType = $result['success'] ? 'success' : 'error';
-        
+
         return redirect()->route('admin.accounting.accounts.index')
             ->with($messageType, $result['message']);
     }
@@ -256,14 +266,15 @@ class AccountingController extends Controller
 
             if ($request->export_option === 'csv') {
                 $accountList = $this->accountingReportService->flattenAccountHierarchy($accounts);
+
                 return $this->accountingExportService->exportChartOfAccountsToCsv(
                     $accountList,
                     'chart-of-accounts.csv'
                 );
             }
         } catch (\Exception $e) {
-            Log::error('Error exporting accounts: ' . $e->getMessage());
-            
+            Log::error('Error exporting accounts: '.$e->getMessage());
+
             return response()->json([
                 'success' => false,
                 'message' => 'Error exporting accounts. Please try again.',
@@ -307,8 +318,8 @@ class AccountingController extends Controller
                 return $this->accountingExportService->exportJournalToCsv($entries, 'journal.csv');
             }
         } catch (\Exception $e) {
-            Log::error('Error exporting journal: ' . $e->getMessage());
-            
+            Log::error('Error exporting journal: '.$e->getMessage());
+
             return response()->json([
                 'success' => false,
                 'message' => 'Error exporting journal. Please try again.',
@@ -356,8 +367,8 @@ class AccountingController extends Controller
                 );
             }
         } catch (\Exception $e) {
-            Log::error('Error exporting trial balance: ' . $e->getMessage());
-            
+            Log::error('Error exporting trial balance: '.$e->getMessage());
+
             return response()->json([
                 'success' => false,
                 'message' => 'Error exporting trial balance. Please try again.',
@@ -418,8 +429,8 @@ class AccountingController extends Controller
                 );
             }
         } catch (\Exception $e) {
-            Log::error('Error exporting general ledger: ' . $e->getMessage());
-            
+            Log::error('Error exporting general ledger: '.$e->getMessage());
+
             return response()->json([
                 'success' => false,
                 'message' => 'Error exporting general ledger. Please try again.',

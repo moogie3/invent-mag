@@ -11,9 +11,7 @@ class SalesForecastService
     /**
      * Generate a sales forecast.
      *
-     * @param int $monthsToForecast
-     * @param string $model 'linear' or 'holt-winters'
-     * @return array
+     * @param  string  $model  'linear' or 'holt-winters'
      */
     public function generateForecast(int $monthsToForecast = 6, string $model = 'holt-winters'): array
     {
@@ -23,7 +21,7 @@ class SalesForecastService
 
         // Get monthly sales data for the last 24 months for better accuracy
         $salesData = Sales::select(
-            DB::raw($monthFormat . ' as month'),
+            DB::raw($monthFormat.' as month'),
             DB::raw('SUM(total) as total_sales')
         )
             ->where('order_date', '>=', Carbon::now()->subMonths(24)->startOfMonth())
@@ -39,17 +37,17 @@ class SalesForecastService
             ];
         }
 
-        $historicalValues = $salesData->pluck('total_sales')->map(fn($val) => (float) $val)->toArray();
+        $historicalValues = $salesData->pluck('total_sales')->map(fn ($val) => (float) $val)->toArray();
         $historicalLabels = $salesData->pluck('month')->toArray();
 
         if ($model === 'holt-winters' && $salesData->count() >= 12) {
             $optimizationResult = $this->optimizeHoltWinters($historicalValues);
             $forecastData = $this->forecastHoltWinters(
-                $historicalValues, 
-                $monthsToForecast, 
-                12, 
-                $optimizationResult['alpha'], 
-                $optimizationResult['beta'], 
+                $historicalValues,
+                $monthsToForecast,
+                12,
+                $optimizationResult['alpha'],
+                $optimizationResult['beta'],
                 $optimizationResult['gamma']
             );
             $mape = $optimizationResult['mape'];
@@ -70,8 +68,8 @@ class SalesForecastService
             'historical' => $historicalValues,
             'forecast' => $forecastData,
             'metrics' => [
-                'mape' => $mape
-            ]
+                'mape' => $mape,
+            ],
         ];
     }
 
@@ -82,7 +80,7 @@ class SalesForecastService
         $n = count($x);
         $sumX = array_sum($x);
         $sumY = array_sum($y);
-        $sumX2 = array_sum(array_map(fn($val) => $val * $val, $x));
+        $sumX2 = array_sum(array_map(fn ($val) => $val * $val, $x));
         $sumXY = 0;
         for ($i = 0; $i < $n; $i++) {
             $sumXY += $x[$i] * $y[$i];
@@ -103,9 +101,9 @@ class SalesForecastService
         for ($i = 0; $i < $n; $i++) {
             $predicted = $slope * $x[$i] + $intercept;
             $actual = $y[$i];
-            
+
             $errorsSq += pow($actual - $predicted, 2);
-            
+
             if ($actual > 0) {
                 $absPercentErrors += abs(($actual - $predicted) / $actual);
                 $validMapeCount++;
@@ -134,7 +132,7 @@ class SalesForecastService
             foreach ($steps as $beta) {
                 foreach ($steps as $gamma) {
                     $metrics = $this->calculateHoltWintersInSampleMetrics($data, $seasonLength, $alpha, $beta, $gamma);
-                    
+
                     if ($metrics['rmse'] < $bestRmse) {
                         $bestRmse = $metrics['rmse'];
                         $bestMape = $metrics['mape'];
@@ -151,7 +149,7 @@ class SalesForecastService
             'beta' => $bestBeta,
             'gamma' => $bestGamma,
             'rmse' => round($bestRmse, 2),
-            'mape' => round($bestMape, 2)
+            'mape' => round($bestMape, 2),
         ];
     }
 
@@ -176,7 +174,7 @@ class SalesForecastService
 
         foreach ($data as $i => $actual) {
             $seasonIndex = $i % $seasonLength;
-            
+
             // In-sample prediction for current period (using previous level, trend, and season)
             $predicted = max(0, $level + $trend + $season[$seasonIndex]);
 
@@ -210,7 +208,7 @@ class SalesForecastService
         $n = count($x);
         $sumX = array_sum($x);
         $sumY = array_sum($y);
-        $sumX2 = array_sum(array_map(fn($val) => $val * $val, $x));
+        $sumX2 = array_sum(array_map(fn ($val) => $val * $val, $x));
         $sumXY = 0;
         for ($i = 0; $i < $n; $i++) {
             $sumXY += $x[$i] * $y[$i];

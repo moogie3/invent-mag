@@ -1,15 +1,15 @@
 <?php
 
-use App\Http\Controllers\Admin\SettingsController;
-use App\Http\Controllers\Admin\CurrencyController;
-use App\Http\Controllers\Admin\ProfileController;
-use App\Http\Controllers\Admin\TaxController;
+use App\Http\Controllers\Admin\AccountingController;
+use App\Http\Controllers\Admin\BackupController;
 use App\Http\Controllers\Admin\CategoryController;
-use App\Http\Controllers\Admin\UnitController;
+use App\Http\Controllers\Admin\CurrencyController;
 use App\Http\Controllers\Admin\NotificationController;
 use App\Http\Controllers\Admin\PlanController;
-use App\Http\Controllers\Admin\BackupController;
-use App\Http\Controllers\Admin\AccountingController;
+use App\Http\Controllers\Admin\ProfileController;
+use App\Http\Controllers\Admin\SettingsController;
+use App\Http\Controllers\Admin\TaxController;
+use App\Http\Controllers\Admin\UnitController;
 
 Route::get('api/settings', [SettingsController::class, 'getSettings'])->name('admin.api.settings');
 

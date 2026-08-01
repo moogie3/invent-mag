@@ -2,17 +2,19 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\BelongsToTenant;
 use Illuminate\Database\Eloquent\Casts\Attribute;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use App\Models\Concerns\BelongsToTenant;
-use App\Models\ProductWarehouse;
 
 class Product extends Model
 {
-    use HasFactory, BelongsToTenant;
+    use BelongsToTenant, HasFactory;
+
     protected $table = 'products';
+
     protected $fillable = [
         'code',
         'barcode',
@@ -67,6 +69,7 @@ class Product extends Model
     public static function getMainWarehouseId()
     {
         $mainWarehouse = Warehouse::where('is_main', true)->first();
+
         return $mainWarehouse ? $mainWarehouse->id : null;
     }
 
@@ -78,12 +81,14 @@ class Product extends Model
     public function getMainWarehouseStockAttribute()
     {
         $mainWarehouseId = self::getMainWarehouseId();
-        if (!$mainWarehouseId) return 0;
-        
+        if (! $mainWarehouseId) {
+            return 0;
+        }
+
         $stockRecord = $this->productWarehouses()
             ->where('warehouse_id', $mainWarehouseId)
             ->first();
-        
+
         return $stockRecord ? max(0, (float) $stockRecord->quantity) : 0;
     }
 
@@ -92,7 +97,7 @@ class Product extends Model
         $stockRecord = $this->productWarehouses()
             ->where('warehouse_id', $warehouseId)
             ->first();
-        
+
         return $stockRecord ? max(0, (float) $stockRecord->quantity) : 0;
     }
 
@@ -111,41 +116,48 @@ class Product extends Model
     public function hasSufficientStock($quantity, $warehouseId = null)
     {
         $warehouseId = $warehouseId ?? self::getMainWarehouseId();
-        if (!$warehouseId) return false;
-        
+        if (! $warehouseId) {
+            return false;
+        }
+
         $stock = $this->getWarehouseStock($warehouseId);
+
         return $stock >= $quantity;
     }
 
     public function deductStock($quantity, $warehouseId = null)
     {
         $warehouseId = $warehouseId ?? self::getMainWarehouseId();
-        if (!$warehouseId) return false;
-        
-        $stockRecord = $this->getStockForWarehouse($warehouseId);
-        
-        if (!$stockRecord) {
-            throw new \Exception("No stock record found for this product in the warehouse.");
+        if (! $warehouseId) {
+            return false;
         }
-        
+
+        $stockRecord = $this->getStockForWarehouse($warehouseId);
+
+        if (! $stockRecord) {
+            throw new \Exception('No stock record found for this product in the warehouse.');
+        }
+
         $currentStock = (float) $stockRecord->quantity;
-        
+
         if ($currentStock < $quantity) {
             throw new \Exception("Insufficient stock. Available: {$currentStock}, Requested: {$quantity}");
         }
-        
+
         $stockRecord->decrement('quantity', $quantity);
-        
+
         return true;
     }
 
     public function addStock($quantity, $warehouseId = null)
     {
         $warehouseId = $warehouseId ?? self::getMainWarehouseId();
-        if (!$warehouseId) return false;
-        
+        if (! $warehouseId) {
+            return false;
+        }
+
         $stockRecord = $this->getStockForWarehouse($warehouseId);
-        
+
         if ($stockRecord) {
             $stockRecord->increment('quantity', $quantity);
         } else {
@@ -156,19 +168,21 @@ class Product extends Model
                 'tenant_id' => $this->tenant_id,
             ]);
         }
-        
+
         return true;
     }
 
     public function isLowStock($warehouseId = null)
     {
         $stock = $warehouseId ? $this->getWarehouseStock($warehouseId) : $this->main_warehouse_stock;
+
         return $stock <= $this->getLowStockThreshold();
     }
 
     public function isOutOfStock($warehouseId = null)
     {
         $stock = $warehouseId ? $this->getWarehouseStock($warehouseId) : $this->main_warehouse_stock;
+
         return $stock <= 0;
     }
 
@@ -198,7 +212,7 @@ class Product extends Model
     protected function image(): Attribute
     {
         return Attribute::make(
-            get: fn($value) => $value
+            get: fn ($value) => $value
                 ? asset("storage/image/{$value}") // Convert filename to full URL
                 : asset('img/default_placeholder.png'), // Default image if no image exists
         );
@@ -206,8 +220,6 @@ class Product extends Model
 
     /**
      * Get the effective low stock threshold for this product
-     *
-     * @return int
      */
     public function getLowStockThreshold(): int
     {
@@ -215,18 +227,16 @@ class Product extends Model
         return $this->low_stock_threshold ?? self::DEFAULT_LOW_STOCK_THRESHOLD;
     }
 
-
-
     /**
      * Get all products with low stock (per warehouse)
      *
-     * @return \Illuminate\Database\Eloquent\Collection
+     * @return Collection
      */
     public static function getLowStockProducts()
     {
         $tenantId = app('currentTenant')->id ?? null;
-        
-        $items = \App\Models\ProductWarehouse::with(['product', 'warehouse'])
+
+        $items = ProductWarehouse::with(['product', 'warehouse'])
             ->where('product_warehouse.tenant_id', $tenantId)
             ->where('product_warehouse.quantity', '>', 0)
             ->whereHas('product', function ($query) use ($tenantId) {
@@ -246,14 +256,12 @@ class Product extends Model
 
     /**
      * Count how many products have low stock (per warehouse)
-     *
-     * @return int
      */
     public static function lowStockCount(): int
     {
         $tenantId = app('currentTenant')->id ?? null;
-        
-        return \App\Models\ProductWarehouse::where('product_warehouse.tenant_id', $tenantId)
+
+        return ProductWarehouse::where('product_warehouse.tenant_id', $tenantId)
             ->where('product_warehouse.quantity', '>', 0)
             ->whereHas('product', function ($query) use ($tenantId) {
                 $query->where('tenant_id', $tenantId)
@@ -265,7 +273,7 @@ class Product extends Model
     /**
      * Get products that will expire soon (within 30 days)
      *
-     * @return \Illuminate\Database\Eloquent\Collection
+     * @return Collection
      */
     public static function getExpiringSoonProducts()
     {
@@ -273,13 +281,13 @@ class Product extends Model
 
         return self::whereHas('poItems', function ($query) use ($thirtyDaysFromNow) {
             $query->whereNotNull('expiry_date')
-                  ->where('expiry_date', '>', now())
-                  ->where('expiry_date', '<=', $thirtyDaysFromNow);
+                ->where('expiry_date', '>', now())
+                ->where('expiry_date', '<=', $thirtyDaysFromNow);
         })->with(['poItems' => function ($query) use ($thirtyDaysFromNow) {
             $query->whereNotNull('expiry_date')
-                  ->where('expiry_date', '>', now())
-                  ->where('expiry_date', '<=', $thirtyDaysFromNow)
-                  ->orderBy('expiry_date', 'asc');
+                ->where('expiry_date', '>', now())
+                ->where('expiry_date', '<=', $thirtyDaysFromNow)
+                ->orderBy('expiry_date', 'asc');
         }])->get();
     }
 
@@ -294,8 +302,8 @@ class Product extends Model
 
         return self::whereHas('poItems', function ($query) use ($thirtyDaysFromNow) {
             $query->whereNotNull('expiry_date')
-                  ->where('expiry_date', '>', now())
-                  ->where('expiry_date', '<=', $thirtyDaysFromNow);
+                ->where('expiry_date', '>', now())
+                ->where('expiry_date', '<=', $thirtyDaysFromNow);
         })->count();
     }
 

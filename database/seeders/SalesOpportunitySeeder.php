@@ -2,14 +2,13 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
-use Illuminate\Database\Seeder;
+use App\Models\Customer;
+use App\Models\PipelineStage;
+use App\Models\Product;
 use App\Models\SalesOpportunity;
 use App\Models\SalesOpportunityItem;
 use App\Models\SalesPipeline;
-use App\Models\Customer;
-use App\Models\Product;
-use App\Models\PipelineStage;
+use Illuminate\Database\Seeder;
 
 class SalesOpportunitySeeder extends Seeder
 {
@@ -25,8 +24,9 @@ class SalesOpportunitySeeder extends Seeder
         $products = Product::where('tenant_id', $tenantId)->get();
         $stages = $pipeline ? PipelineStage::where('sales_pipeline_id', $pipeline->id)->where('tenant_id', $tenantId)->get() : collect();
 
-        if (!$pipeline || $customers->isEmpty() || $products->isEmpty() || $stages->isEmpty()) {
-            $this->command->warn('Skipping SalesOpportunitySeeder for tenant ' . app('currentTenant')->name . ': Default pipeline, customers, products, or stages not found.');
+        if (! $pipeline || $customers->isEmpty() || $products->isEmpty() || $stages->isEmpty()) {
+            $this->command->warn('Skipping SalesOpportunitySeeder for tenant '.app('currentTenant')->name.': Default pipeline, customers, products, or stages not found.');
+
             return;
         }
 
@@ -37,11 +37,11 @@ class SalesOpportunitySeeder extends Seeder
                 'customer_id' => $customers->random()->id,
                 'sales_pipeline_id' => $pipeline->id,
                 'pipeline_stage_id' => $stages->random()->id,
-                'name' => 'Opportunity ' . ($i + 1),
+                'name' => 'Opportunity '.($i + 1),
                 'amount' => rand(1000, 10000),
                 'status' => $status,
-                'notes' => 'Notes for opportunity ' . ($i + 1),
-                'terms_conditions' => 'Standard terms and conditions for opportunity ' . ($i + 1),
+                'notes' => 'Notes for opportunity '.($i + 1),
+                'terms_conditions' => 'Standard terms and conditions for opportunity '.($i + 1),
                 'tenant_id' => $tenantId,
             ]);
 
@@ -57,7 +57,7 @@ class SalesOpportunitySeeder extends Seeder
             }
             $count++;
         }
-        
-        $this->command->info("Seeded {$count} Sales Opportunities for tenant: " . app('currentTenant')->name);
+
+        $this->command->info("Seeded {$count} Sales Opportunities for tenant: ".app('currentTenant')->name);
     }
 }

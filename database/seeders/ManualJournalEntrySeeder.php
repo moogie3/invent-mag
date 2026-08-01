@@ -3,12 +3,10 @@
 namespace Database\Seeders;
 
 use App\Models\Account;
-use App\Models\JournalEntry;
-use App\Models\Transaction;
-use App\Services\AccountingService;
 use App\Services\AccountingAuditService;
-use Illuminate\Database\Seeder;
+use App\Services\AccountingService;
 use Carbon\Carbon;
+use Illuminate\Database\Seeder;
 
 class ManualJournalEntrySeeder extends Seeder
 {
@@ -19,7 +17,7 @@ class ManualJournalEntrySeeder extends Seeder
     {
         $tenantId = app('currentTenant')->id;
         $tenantName = app('currentTenant')->name;
-        
+
         // Get accounts for transactions
         $cashAccount = Account::where('tenant_id', $tenantId)
             ->where('code', 'like', '1110-%')
@@ -33,21 +31,22 @@ class ManualJournalEntrySeeder extends Seeder
         $arAccount = Account::where('tenant_id', $tenantId)
             ->where('code', 'like', '1130-%')
             ->first();
-        
-        if (!$cashAccount || !$expenseAccount) {
+
+        if (! $cashAccount || ! $expenseAccount) {
             $this->command->warn("Skipping ManualJournalEntrySeeder for tenant {$tenantName}: Required accounts not found. Please run AccountSeeder first.");
+
             return;
         }
 
-        $auditService = new AccountingAuditService();
+        $auditService = new AccountingAuditService;
         $accountingService = new AccountingService($auditService);
 
         // Create sample draft entries
         $this->createDraftEntries($accountingService, $cashAccount, $expenseAccount, $tenantId);
-        
+
         // Create sample posted entries
         $this->createPostedEntries($accountingService, $cashAccount, $expenseAccount, $revenueAccount, $arAccount, $tenantId);
-        
+
         // Create a voided entry
         $this->createVoidedEntry($accountingService, $cashAccount, $expenseAccount, $tenantId);
 
@@ -72,7 +71,7 @@ class ManualJournalEntrySeeder extends Seeder
         $utilityAccount = Account::where('tenant_id', $tenantId)
             ->where('code', 'like', '6230-%')
             ->first();
-        
+
         if ($utilityAccount) {
             $accountingService->createManualJournalEntry(
                 'Utility Expense Accrual',
@@ -95,7 +94,7 @@ class ManualJournalEntrySeeder extends Seeder
         $rentAccount = Account::where('tenant_id', $tenantId)
             ->where('code', 'like', '6220-%')
             ->first();
-        
+
         if ($rentAccount) {
             $accountingService->createManualJournalEntry(
                 'Monthly Rent Payment',
@@ -130,7 +129,7 @@ class ManualJournalEntrySeeder extends Seeder
         $salaryPayable = Account::where('tenant_id', $tenantId)
             ->where('code', 'like', '2140-%')
             ->first();
-        
+
         if ($salaryAccount && $salaryPayable) {
             $accountingService->createManualJournalEntry(
                 'Monthly Salary Accrual',

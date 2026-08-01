@@ -2,21 +2,18 @@
 
 namespace App\Actions\Fortify;
 
-use App\Models\User;
+use App\Models\Account;
 use App\Models\Tenant;
-use Illuminate\Support\Facades\Hash;
+use App\Models\User;
+use App\Services\TenantSetupService;
+use Illuminate\Auth\Events\Registered;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 use Laravel\Fortify\Contracts\CreatesNewUsers;
 use Spatie\Permission\Models\Role;
-use Illuminate\Support\Str;
-use Illuminate\Auth\Events\Registered;
-use App\Models\CurrencySetting;
-use App\Models\Tax;
-use App\Models\Account;
-use Database\Seeders\AccountSeeder;
-use Illuminate\Support\Facades\Log;
-use App\Services\TenantSetupService;
 
 class CreateNewUser implements CreatesNewUsers
 {
@@ -25,8 +22,8 @@ class CreateNewUser implements CreatesNewUsers
     public function create(array $input): User
     {
         set_time_limit(0); // Prevent PHP timeout for heavy tenant creation
-        Log::info('Registration attempt started for: ' . ($input['email'] ?? 'unknown'));
-        
+        Log::info('Registration attempt started for: '.($input['email'] ?? 'unknown'));
+
         Validator::make($input, [
             'name' => ['required', 'string', 'max:255'],
             'shopname' => ['required', 'string', 'max:255', Rule::unique('tenants', 'name')],
@@ -41,17 +38,17 @@ class CreateNewUser implements CreatesNewUsers
             'plan' => ['nullable', 'string', 'in:starter,professional,enterprise'],
         ])->validate();
 
-        return \Illuminate\Support\Facades\DB::transaction(function () use ($input) {
+        return DB::transaction(function () use ($input) {
             $tenant = Tenant::create([
                 'name' => $input['shopname'],
-                'domain' => Str::slug($input['shopname']) . '.' . config('app.domain'),
+                'domain' => Str::slug($input['shopname']).'.'.config('app.domain'),
             ]);
 
             $tenant = Tenant::findOrFail($tenant->id);
 
             // Set up tenant with default data and assign plan
             $planSlug = $input['plan'] ?? null;
-            $setupService = new TenantSetupService();
+            $setupService = new TenantSetupService;
             $setupService->setup($tenant, $planSlug);
 
             // Make the tenant current
@@ -75,13 +72,13 @@ class CreateNewUser implements CreatesNewUsers
 
             // Set default accounting settings
             $tenantId = $tenant->id;
-            $cashAccount = Account::where('code', '1110-' . $tenantId)->first();
-            $accountsPayableAccount = Account::where('code', '2110-' . $tenantId)->first();
-            $inventoryAccount = Account::where('code', '1140-' . $tenantId)->first();
-            $salesRevenueAccount = Account::where('code', '4100-' . $tenantId)->first();
-            $accountsReceivableAccount = Account::where('code', '1130-' . $tenantId)->first();
-            $costOfGoodsSoldAccount = Account::where('code', '5200-' . $tenantId)->first();
-            $outputVatAccount = Account::where('code', '2130-' . $tenantId)->first();
+            $cashAccount = Account::where('code', '1110-'.$tenantId)->first();
+            $accountsPayableAccount = Account::where('code', '2110-'.$tenantId)->first();
+            $inventoryAccount = Account::where('code', '1140-'.$tenantId)->first();
+            $salesRevenueAccount = Account::where('code', '4100-'.$tenantId)->first();
+            $accountsReceivableAccount = Account::where('code', '1130-'.$tenantId)->first();
+            $costOfGoodsSoldAccount = Account::where('code', '5200-'.$tenantId)->first();
+            $outputVatAccount = Account::where('code', '2130-'.$tenantId)->first();
 
             if ($cashAccount && $accountsPayableAccount && $inventoryAccount && $salesRevenueAccount && $accountsReceivableAccount && $costOfGoodsSoldAccount) {
                 $tenant->accounting_settings = [
@@ -92,8 +89,8 @@ class CreateNewUser implements CreatesNewUsers
                     'accounts_receivable_account_id' => $accountsReceivableAccount->id,
                     'cost_of_goods_sold_account_id' => $costOfGoodsSoldAccount->id,
                     'ppn_keluaran_account_id' => $outputVatAccount?->id,
-                    'pph_receivable_account_id' => Account::where('tenant_id', $tenantId)->where('code', '1170-' . $tenantId)->value('id'),
-                    'pph_payable_account_id'    => Account::where('tenant_id', $tenantId)->where('code', '2150-' . $tenantId)->value('id'),
+                    'pph_receivable_account_id' => Account::where('tenant_id', $tenantId)->where('code', '1170-'.$tenantId)->value('id'),
+                    'pph_payable_account_id' => Account::where('tenant_id', $tenantId)->where('code', '2150-'.$tenantId)->value('id'),
                 ];
                 $tenant->save();
             }

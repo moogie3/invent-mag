@@ -13,33 +13,35 @@ class ActivityLogSeeder extends Seeder
     public function run(): void
     {
         $tenants = Tenant::all();
-        
+
         if ($tenants->isEmpty()) {
             $this->command->warn('No tenants found. Skipping activity log seeding.');
+
             return;
         }
 
-        $this->command->info('Creating sample activity logs for ' . $tenants->count() . ' tenants...');
-        
+        $this->command->info('Creating sample activity logs for '.$tenants->count().' tenants...');
+
         foreach ($tenants as $tenant) {
             $this->seedLogsForTenant($tenant);
         }
-        
+
         $this->command->info('Activity log seeding complete.');
     }
-    
+
     protected function seedLogsForTenant(Tenant $tenant): void
     {
         $tenantId = $tenant->id;
-        
+
         // Get some users from the database for the logs
         $users = User::withoutGlobalScope(TenantScope::class)
             ->where('tenant_id', $tenantId)
             ->limit(3)
             ->get();
-        
+
         if ($users->isEmpty()) {
             $this->command->warn("No users found for tenant {$tenant->name}. Skipping.");
+
             return;
         }
 
@@ -59,7 +61,7 @@ class ActivityLogSeeder extends Seeder
             'Manual Journal Entry' => ['create', 'update', 'delete', 'post', 'void', 'reverse', 'view'],
             'POS' => ['create', 'update', 'payment', 'view'],
         ];
-        
+
         $descriptions = [
             'Product' => [
                 'create' => 'Created product: Sample Product A',
@@ -168,24 +170,24 @@ class ActivityLogSeeder extends Seeder
             $description = $descriptions[$module][$action] ?? "{$action} {$module}";
 
             // Normalize module name to a valid class name (remove spaces)
-            $entityType = "App\\Models\\" . str_replace(' ', '', $module);
+            $entityType = 'App\\Models\\'.str_replace(' ', '', $module);
 
             ActivityLog::create([
-                'tenant_id'    => $tenantId,
-                'user_id'      => $user->id,
-                'user_name'    => $user->name,
-                'user_role'    => $user->getRoleNames()->first() ?? 'staff',
-                'module'       => $module,
-                'action'       => $action,
-                'entity_type'  => $entityType,
-                'entity_id'    => rand(1, 100),
-                'entity_label' => "Sample {$module} " . rand(1, 100),
-                'description'  => $description,
-                'old_values'   => $action === 'update' ? json_encode(['name' => 'Old Value', 'price' => 1000]) : null,
-                'new_values'   => in_array($action, ['create', 'update']) ? json_encode(['name' => 'New Value', 'price' => 1500]) : null,
-                'ip_address'   => '192.168.1.' . rand(1, 255),
-                'user_agent'   => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
-                'created_at'   => now()->subDays($daysAgo)->subHours($hoursAgo),
+                'tenant_id' => $tenantId,
+                'user_id' => $user->id,
+                'user_name' => $user->name,
+                'user_role' => $user->getRoleNames()->first() ?? 'staff',
+                'module' => $module,
+                'action' => $action,
+                'entity_type' => $entityType,
+                'entity_id' => rand(1, 100),
+                'entity_label' => "Sample {$module} ".rand(1, 100),
+                'description' => $description,
+                'old_values' => $action === 'update' ? json_encode(['name' => 'Old Value', 'price' => 1000]) : null,
+                'new_values' => in_array($action, ['create', 'update']) ? json_encode(['name' => 'New Value', 'price' => 1500]) : null,
+                'ip_address' => '192.168.1.'.rand(1, 255),
+                'user_agent' => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+                'created_at' => now()->subDays($daysAgo)->subHours($hoursAgo),
             ]);
         }
 

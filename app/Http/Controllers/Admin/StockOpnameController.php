@@ -23,13 +23,14 @@ class StockOpnameController extends Controller
         $opnames = StockOpname::with('warehouse', 'createdBy.roles')
             ->orderBy('created_at', 'desc')
             ->paginate(15);
-            
+
         return view('admin.stock-opname.index', compact('opnames'));
     }
 
     public function create()
     {
         $warehouses = Warehouse::all();
+
         return view('admin.stock-opname.create', compact('warehouses'));
     }
 
@@ -58,26 +59,26 @@ class StockOpnameController extends Controller
     public function show(StockOpname $stockOpname)
     {
         $user = Auth::user();
-        if (!$user || $stockOpname->tenant_id !== $user->tenant_id) {
+        if (! $user || $stockOpname->tenant_id !== $user->tenant_id) {
             abort(403);
         }
 
         $stockOpname->load('warehouse', 'createdBy.roles');
-        
+
         $items = $stockOpname->items()
             ->with('product')
             ->paginate(50);
-            
+
         return view('admin.stock-opname.show', compact('stockOpname', 'items'));
     }
 
     public function updateCounts(Request $request, StockOpname $stockOpname)
     {
         $user = Auth::user();
-        if (!$user || $stockOpname->tenant_id !== $user->tenant_id) {
+        if (! $user || $stockOpname->tenant_id !== $user->tenant_id) {
             abort(403);
         }
-        
+
         if ($stockOpname->status === 'Completed') {
             abort(403);
         }
@@ -100,10 +101,10 @@ class StockOpnameController extends Controller
     public function complete(StockOpname $stockOpname)
     {
         $user = Auth::user();
-        if (!$user || $stockOpname->tenant_id !== $user->tenant_id) {
+        if (! $user || $stockOpname->tenant_id !== $user->tenant_id) {
             abort(403);
         }
-        
+
         if ($stockOpname->status === 'Completed') {
             abort(403);
         }
@@ -117,14 +118,14 @@ class StockOpnameController extends Controller
             return back()->with('error', $e->getMessage());
         }
     }
-    
+
     public function cancel(StockOpname $stockOpname)
     {
         $user = Auth::user();
-        if (!$user || $stockOpname->tenant_id !== $user->tenant_id) {
+        if (! $user || $stockOpname->tenant_id !== $user->tenant_id) {
             abort(403);
         }
-        
+
         if ($stockOpname->status === 'Completed') {
             abort(403);
         }

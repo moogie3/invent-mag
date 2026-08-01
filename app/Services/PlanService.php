@@ -18,6 +18,7 @@ class PlanService
     {
         try {
             $tenant = app('currentTenant');
+
             return $tenant instanceof Tenant ? $tenant : null;
         } catch (\Exception $e) {
             return null;
@@ -70,6 +71,7 @@ class PlanService
         }
 
         $currentCount = User::count();
+
         return $tenant->canAddUsers($currentCount);
     }
 
@@ -85,6 +87,7 @@ class PlanService
         }
 
         $currentCount = Warehouse::count();
+
         return $tenant->canAddWarehouses($currentCount);
     }
 
@@ -100,6 +103,7 @@ class PlanService
         }
 
         $currentCount = Product::count();
+
         return $tenant->canAddProducts($currentCount);
     }
 
@@ -116,6 +120,7 @@ class PlanService
         }
 
         $plan = $tenant->getEffectivePlan();
+
         return $plan ? $plan->max_users : -1;
     }
 
@@ -132,6 +137,7 @@ class PlanService
         }
 
         $plan = $tenant->getEffectivePlan();
+
         return $plan ? $plan->max_warehouses : -1;
     }
 
@@ -148,6 +154,7 @@ class PlanService
         }
 
         $plan = $tenant->getEffectivePlan();
+
         return $plan ? $plan->max_products : -1;
     }
 
@@ -208,6 +215,7 @@ class PlanService
 
         if ($plan === null) {
             Log::error('No default plan found. Tenant will operate without a plan (backward-compat mode).');
+
             return;
         }
 

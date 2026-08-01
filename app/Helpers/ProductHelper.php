@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Helpers;
 
 use App\Models\Product;
@@ -9,12 +10,12 @@ class ProductHelper
     /**
      * Get appropriate class and text for expiry date badges
      *
-     * @param \Carbon\Carbon|string|null $expiryDate
+     * @param  Carbon|string|null  $expiryDate
      * @return array [badgeClass, badgeText]
      */
     public static function getExpiryClassAndText($expiryDate)
     {
-        if (!$expiryDate) {
+        if (! $expiryDate) {
             return [null, null]; // Handle null gracefully
         }
 
@@ -25,11 +26,11 @@ class ProductHelper
         if ($expiryDate->isPast()) {
             return ['badge bg-red text-white', 'Expired'];
         } elseif ($diffDays <= 3 && $diffDays > 0) {
-            return ['badge bg-orange text-white', 'Expiring Soon (' . $diffDays . 'd)'];
+            return ['badge bg-orange text-white', 'Expiring Soon ('.$diffDays.'d)'];
         } elseif ($diffDays <= 7) {
-            return ['badge bg-yellow text-white', 'Expiring Soon (' . $diffDays . 'd)'];
+            return ['badge bg-yellow text-white', 'Expiring Soon ('.$diffDays.'d)'];
         } elseif ($diffDays <= 30) {
-            return ['badge bg-blue text-white', 'Expiring in ' . $diffDays . 'd'];
+            return ['badge bg-blue text-white', 'Expiring in '.$diffDays.'d'];
         }
 
         return [null, null]; // No badge if it's far away
@@ -37,15 +38,11 @@ class ProductHelper
 
     /**
      * Get low stock badge and text
-     *
-     * @param int $stockQty
-     * @param int|null $threshold
-     * @return array
      */
     public static function getStockClassAndText(int $stockQty, ?int $threshold = null): array
     {
         // Use Product's default threshold if not provided
-        $effectiveThreshold = $threshold ?? \App\Models\Product::DEFAULT_LOW_STOCK_THRESHOLD;
+        $effectiveThreshold = $threshold ?? Product::DEFAULT_LOW_STOCK_THRESHOLD;
 
         if ($stockQty <= $effectiveThreshold) {
             return ['badge bg-red text-white', 'Low Stock'];

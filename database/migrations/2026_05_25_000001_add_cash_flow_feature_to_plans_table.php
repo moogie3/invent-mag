@@ -9,7 +9,7 @@ return new class extends Migration
     {
         foreach (['professional', 'enterprise'] as $slug) {
             $plan = Plan::where('slug', $slug)->first();
-            if ($plan && !in_array('cash_flow', $plan->features ?? [])) {
+            if ($plan && ! in_array('cash_flow', $plan->features ?? [])) {
                 $plan->features = array_merge($plan->features ?? [], ['cash_flow']);
                 $plan->save();
             }
@@ -21,7 +21,7 @@ return new class extends Migration
         foreach (['professional', 'enterprise'] as $slug) {
             $plan = Plan::where('slug', $slug)->first();
             if ($plan) {
-                $plan->features = array_values(array_filter($plan->features ?? [], fn($f) => $f !== 'cash_flow'));
+                $plan->features = array_values(array_filter($plan->features ?? [], fn ($f) => $f !== 'cash_flow'));
                 $plan->save();
             }
         }

@@ -2,16 +2,16 @@
 
 namespace App\Services;
 
-use App\Models\StockOpname;
-use App\Models\StockOpnameItem;
+use App\Models\Account;
+use App\Models\Product;
 use App\Models\ProductWarehouse;
 use App\Models\StockAdjustment;
-use App\Models\Product;
-use App\Models\Account;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Auth;
+use App\Models\StockOpname;
+use App\Models\StockOpnameItem;
 use Carbon\Carbon;
 use Exception;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class StockOpnameService
 {
@@ -26,7 +26,7 @@ class StockOpnameService
     {
         return DB::transaction(function () use ($warehouseId, $scheduledDate, $notes) {
             $user = Auth::user();
-            
+
             $opname = StockOpname::create([
                 'tenant_id' => $user->tenant_id,
                 'reference_number' => $this->generateReferenceNumber(),
@@ -60,7 +60,7 @@ class StockOpnameService
             $productsWithoutStock = Product::where('tenant_id', $user->tenant_id)
                 ->whereNotIn('id', $productIdsWithStock)
                 ->get();
-                
+
             foreach ($productsWithoutStock as $product) {
                 $items[] = [
                     'stock_opname_id' => $opname->id,
@@ -86,27 +86,29 @@ class StockOpnameService
     {
         return DB::transaction(function () use ($opname, $counts) {
             foreach ($counts as $productId => $countedQty) {
-                if ($countedQty === null || $countedQty === '') continue;
-                
+                if ($countedQty === null || $countedQty === '') {
+                    continue;
+                }
+
                 $item = StockOpnameItem::where('stock_opname_id', $opname->id)
                     ->where('product_id', $productId)
                     ->first();
-                    
+
                 if ($item) {
                     $variance = (float) $countedQty - $item->expected_qty;
                     $unitCost = $item->product->cost ?? $item->product->price ?? 0;
                     $item->update([
                         'counted_qty' => (float) $countedQty,
                         'variance' => $variance,
-                        'variance_value' => abs($variance) * $unitCost
+                        'variance_value' => abs($variance) * $unitCost,
                     ]);
                 }
             }
-            
+
             if ($opname->status === 'Draft') {
                 $opname->update(['status' => 'In Progress']);
             }
-            
+
             return $opname;
         });
     }
@@ -120,16 +122,16 @@ class StockOpnameService
         return DB::transaction(function () use ($opname) {
             $user = Auth::user();
             $tenant = $user->tenant;
-            
+
             // Get all items with a variance
             $itemsWithVariance = $opname->items()->whereNotNull('variance')->where('variance', '!=', 0)->get();
-            
+
             $totalShrinkageValue = 0;
             $totalExcessValue = 0;
 
             foreach ($itemsWithVariance as $item) {
                 $product = $item->product;
-                
+
                 // 1. Update ProductWarehouse
                 $pw = ProductWarehouse::firstOrCreate(
                     [
@@ -139,7 +141,7 @@ class StockOpnameService
                     ],
                     ['quantity' => 0]
                 );
-                
+
                 $pw->quantity = $item->counted_qty;
                 $pw->save();
 
@@ -178,20 +180,20 @@ class StockOpnameService
             return $opname;
         });
     }
-    
+
     protected function processAccounting(StockOpname $opname, float $totalShrinkageValue, float $totalExcessValue)
     {
         $accountingSettings = app('currentTenant')->accounting_settings ?? [];
-        if (!$accountingSettings || !isset($accountingSettings['inventory_account_id']) || !isset($accountingSettings['cost_of_goods_sold_account_id'])) {
+        if (! $accountingSettings || ! isset($accountingSettings['inventory_account_id']) || ! isset($accountingSettings['cost_of_goods_sold_account_id'])) {
             // Silently skip if accounting not configured
             return;
         }
 
         $inventoryAccount = Account::find($accountingSettings['inventory_account_id'] ?? null);
         // We use COGS or a dedicated Shrinkage account. Here we use COGS as fallback since it's an expense.
-        $expenseAccount = Account::find($accountingSettings['cost_of_goods_sold_account_id'] ?? null); 
+        $expenseAccount = Account::find($accountingSettings['cost_of_goods_sold_account_id'] ?? null);
 
-        if (!$inventoryAccount || !$expenseAccount) {
+        if (! $inventoryAccount || ! $expenseAccount) {
             return;
         }
 
@@ -208,8 +210,8 @@ class StockOpnameService
             $transactions[] = ['account_name' => $inventoryAccount->name, 'type' => 'debit', 'amount' => $totalExcessValue];
             $transactions[] = ['account_name' => $expenseAccount->name, 'type' => 'credit', 'amount' => $totalExcessValue];
         }
-        
-        if (!empty($transactions)) {
+
+        if (! empty($transactions)) {
             $this->accountingService->createJournalEntry(
                 "Stock Opname Variance #{$opname->reference_number}",
                 Carbon::parse($opname->completed_at ?? now()),
@@ -224,7 +226,7 @@ class StockOpnameService
         $tenantId = Auth::user()->tenant_id;
         $prefix = 'SO-';
         $date = date('ymd');
-        
+
         $latest = StockOpname::where('tenant_id', $tenantId)
             ->where('reference_number', 'like', "{$prefix}{$date}-%")
             ->orderBy('id', 'desc')

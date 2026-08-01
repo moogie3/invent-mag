@@ -1,7 +1,7 @@
 # Invent-MAG: Complete Feature Checklist
 
-**Last Updated:** July 2026  
-**Version:** 2.5  
+**Last Updated:** August 2026  
+**Version:** 2.6  
 **System Version:** 2.1
 
 ---
@@ -313,6 +313,17 @@
 - [x] Recurring journal entry infrastructure
 - [x] Journal entry approval workflow
 - [x] Comprehensive accounting audit log
+
+#### Bank Reconciliation (Professional + Enterprise)
+- [x] CSV/TXT statement import (BCA, Mandiri, BNI, BRI) with per-bank parser + auto delimiter/number/date detection
+- [x] Auto-match journal entries by amount + date proximity (±5 days)
+- [x] Manual match / unmatch UI for statement lines
+- [x] Reconciliation lock — matched journal entries cannot be reversed, voided, or unposted after completion
+- [x] Opening / statement closing / computed closing balance + variance
+- [x] **Variance gate** — reconciliation cannot be completed when variance ≠ 0 (0.005 tolerance); Complete button disabled out-of-balance
+- [x] **Opening balance prefill** — statement opening balance prefilled from the account's Opening Balance (adjustable to the statement)
+- [x] **Reconciled status badges** — matched entries show "Terekonsiliasi" in Journal, Ledger, and manual-entry lists (`withReconciledStatus()` scope, no N+1)
+- [x] Open → Completed status workflow with reconciliation history list
 
 ---
 

@@ -1,15 +1,15 @@
 <?php
+
 use App\Http\Controllers\Api\Auth\AuthController;
 use App\Http\Controllers\Api\Auth\RegisteredUserController;
 use App\Http\Controllers\Api\CmsController;
+use App\Http\Controllers\Api\PaymentController;
 use App\Http\Controllers\Api\TenantLookupController;
+use App\Http\Controllers\Api\Webhook\MidtransController;
 use App\Models\Plan;
 use App\Services\PlanService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-
-use App\Http\Controllers\Api\Webhook\MidtransController;
-use App\Http\Controllers\Api\PaymentController;
 
 /*
 |--------------------------------------------------------------------------
@@ -66,6 +66,7 @@ Route::middleware(['auth:sanctum', 'throttle:api'])->prefix('v1')->group(functio
 
     Route::get('/plan/current', function (Request $request) {
         $planService = app(PlanService::class);
+
         return response()->json($planService->getUsageStats());
     })->name('api.plan.current');
 });

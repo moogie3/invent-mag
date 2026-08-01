@@ -4,7 +4,6 @@ namespace Tests\Feature\Admin;
 
 use App\Models\Product;
 use App\Models\ProductWarehouse;
-use App\Models\StockAdjustment;
 use App\Models\User;
 use App\Models\Warehouse;
 use Database\Seeders\RoleSeeder;
@@ -37,7 +36,7 @@ class StockTransferControllerTest extends TestCase
     {
         $fromWarehouse = Warehouse::factory()->create();
         $toWarehouse = Warehouse::factory()->create();
-        
+
         // Create product with stock in from warehouse using factory
         $product = Product::factory()->create();
         $productWarehouse = $product->productWarehouses()->first();
@@ -107,7 +106,7 @@ class StockTransferControllerTest extends TestCase
     {
         $fromWarehouse = Warehouse::factory()->create();
         $toWarehouse = Warehouse::factory()->create();
-        
+
         // Create product with only 10 units in stock
         $product = Product::factory()->create();
         $productWarehouse = $product->productWarehouses()->first();
@@ -132,7 +131,7 @@ class StockTransferControllerTest extends TestCase
     {
         $warehouse = Warehouse::factory()->create();
         $product = Product::factory()->create();
-        
+
         // Update existing product warehouse to our test warehouse
         $productWarehouse = $product->productWarehouses()->first();
         $productWarehouse->update([
@@ -155,7 +154,7 @@ class StockTransferControllerTest extends TestCase
     {
         $warehouse = Warehouse::factory()->create();
         $product = Product::factory()->create();
-        
+
         // Set quantity to zero
         $productWarehouse = $product->productWarehouses()->first();
         $productWarehouse->update([

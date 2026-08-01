@@ -25,12 +25,14 @@ class PayrollController extends Controller
     public function index()
     {
         $data = $this->service->getIndexData();
+
         return view('admin.hr.payroll.index', $data);
     }
 
     public function show(PayrollRun $run)
     {
         $data = $this->service->getRunShowData($run);
+
         return view('admin.hr.payroll.show', $data);
     }
 
@@ -46,6 +48,7 @@ class PayrollController extends Controller
                 ActivityLog::MODULE_PAYROLL,
                 "Exported Payroll Items for {$runLabel}"
             );
+
             return $this->service->exportRunItems($run, $request->export_option);
         } catch (\Exception $e) {
             return response()->json([
@@ -60,6 +63,7 @@ class PayrollController extends Controller
     {
         try {
             $run = $this->service->runPayroll($period);
+
             return redirect()->route('admin.hr.payroll.show', $run)->with('success', __('messages.record_created'));
         } catch (\Exception $e) {
             return back()->with('error', $e->getMessage());
@@ -70,6 +74,7 @@ class PayrollController extends Controller
     {
         try {
             $this->service->deletePayrollRun($run);
+
             return redirect()->route('admin.hr.payroll.index')->with('success', __('messages.record_deleted'));
         } catch (\Exception $e) {
             return back()->with('error', $e->getMessage());
@@ -94,6 +99,7 @@ class PayrollController extends Controller
                 "Updated payroll item #{$item->id} for employee #{$item->employee_id}",
                 $item
             );
+
             return back()->with('success', __('messages.record_updated'));
         } catch (\Exception $e) {
             return back()->with('error', $e->getMessage());
@@ -104,6 +110,7 @@ class PayrollController extends Controller
     {
         try {
             $this->service->approve($run);
+
             return back()->with('success', __('messages.record_updated'));
         } catch (\Exception $e) {
             return back()->with('error', $e->getMessage());
@@ -123,6 +130,7 @@ class PayrollController extends Controller
                 ActivityLog::MODULE_PAYROLL,
                 'Exported Payroll Runs'
             );
+
             return $this->service->exportRuns($request->ids, $request->export_option);
         } catch (\Exception $e) {
             return response()->json([
@@ -141,6 +149,7 @@ class PayrollController extends Controller
 
         try {
             $this->service->markPaid($run, $validated['account_id']);
+
             return back()->with('success', __('messages.record_updated'));
         } catch (\Exception $e) {
             return back()->with('error', $e->getMessage());

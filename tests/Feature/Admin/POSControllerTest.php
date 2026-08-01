@@ -2,28 +2,27 @@
 
 namespace Tests\Feature\Admin;
 
-use App\Models\User;
 use App\Models\Customer;
 use App\Models\Product;
+use App\Models\ProductWarehouse;
 use App\Models\Sales;
 use App\Models\SalesItem;
-use App\Models\ProductWarehouse;
 use App\Models\Warehouse;
-use Database\Factories\SalesFactory;
-use Illuminate\Support\Facades\Storage;
-use Tests\TestCase;
-use Carbon\Carbon;
 use App\Services\PosService;
-use Mockery;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Tests\Traits\CreatesTenant;
+use Carbon\Carbon;
+use Database\Factories\SalesFactory;
 use Database\Seeders\RoleSeeder;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Mockery;
+use Tests\TestCase;
+use Tests\Traits\CreatesTenant;
 
 class POSControllerTest extends TestCase
 {
-    use RefreshDatabase, CreatesTenant;
+    use CreatesTenant, RefreshDatabase;
 
     protected Customer $customer;
+
     protected Product $product;
 
     protected function setUp(): void
@@ -37,19 +36,19 @@ class POSControllerTest extends TestCase
         Warehouse::factory()->create(['is_main' => true]);
         $this->customer = Customer::factory()->create();
         $this->product = Product::factory()->create();
-        
+
         // Ensure stock exists using updateOrCreate
         ProductWarehouse::updateOrCreate(
             [
                 'product_id' => $this->product->id,
                 'warehouse_id' => Warehouse::first()->id,
-                'tenant_id' => $this->product->tenant_id
+                'tenant_id' => $this->product->tenant_id,
             ],
             ['quantity' => 10]
         );
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         Mockery::close();
         parent::tearDown();
@@ -98,7 +97,7 @@ class POSControllerTest extends TestCase
         $this->assertDatabaseHas('sales', [
             'id' => $saleId,
             'customer_id' => $this->customer->id,
-            'type' => \App\Models\Sales::TYPE_POS, // POS sales should be marked as such
+            'type' => Sales::TYPE_POS, // POS sales should be marked as such
         ]);
 
         $this->assertDatabaseHas('sales_items', [
@@ -138,7 +137,7 @@ class POSControllerTest extends TestCase
         $this->assertDatabaseHas('sales', [
             'id' => $saleId,
             'customer_id' => $this->customer->id,
-            'type' => \App\Models\Sales::TYPE_POS,
+            'type' => Sales::TYPE_POS,
         ]);
     }
 
@@ -204,7 +203,7 @@ class POSControllerTest extends TestCase
         $sale = SalesFactory::new()->create([
             'customer_id' => $this->customer->id,
             'user_id' => $this->user->id,
-            'type' => \App\Models\Sales::TYPE_POS,
+            'type' => Sales::TYPE_POS,
         ]);
         SalesItem::factory()->create(['sales_id' => $sale->id, 'product_id' => $this->product->id]);
 
@@ -221,8 +220,8 @@ class POSControllerTest extends TestCase
         $sale = SalesFactory::new()->create([
             'customer_id' => $this->customer->id,
             'user_id' => $this->user->id,
-            'type' => \App\Models\Sales::TYPE_POS,
-            'invoice' => 'POS-1234'
+            'type' => Sales::TYPE_POS,
+            'invoice' => 'POS-1234',
         ]);
         SalesItem::factory()->create(['sales_id' => $sale->id, 'product_id' => $this->product->id]);
 
@@ -236,7 +235,7 @@ class POSControllerTest extends TestCase
         $sale = SalesFactory::new()->create([
             'customer_id' => $this->customer->id,
             'user_id' => $this->user->id,
-            'type' => \App\Models\Sales::TYPE_POS,
+            'type' => Sales::TYPE_POS,
         ]);
         SalesItem::factory()->create(['sales_id' => $sale->id, 'product_id' => $this->product->id]);
 
@@ -277,12 +276,12 @@ class POSControllerTest extends TestCase
     public function test_pos_store_fails_with_exact_stock_limit()
     {
         $mainWarehouse = Warehouse::where('is_main', true)->first();
-        
+
         ProductWarehouse::updateOrCreate(
             [
                 'product_id' => $this->product->id,
                 'warehouse_id' => $mainWarehouse->id,
-                'tenant_id' => $this->product->tenant_id
+                'tenant_id' => $this->product->tenant_id,
             ],
             ['quantity' => 5]
         );
@@ -315,12 +314,12 @@ class POSControllerTest extends TestCase
     public function test_pos_store_succeeds_with_exact_available_stock()
     {
         $mainWarehouse = Warehouse::where('is_main', true)->first();
-        
+
         ProductWarehouse::updateOrCreate(
             [
                 'product_id' => $this->product->id,
                 'warehouse_id' => $mainWarehouse->id,
-                'tenant_id' => $this->product->tenant_id
+                'tenant_id' => $this->product->tenant_id,
             ],
             ['quantity' => 5]
         );

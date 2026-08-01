@@ -4,17 +4,16 @@ namespace Tests\Feature\Admin;
 
 use App\Models\Account;
 use App\Models\OpeningBalance;
-use App\Services\OpeningBalanceService;
+use App\Models\User;
+use Database\Seeders\AccountSeeder;
+use Database\Seeders\RoleSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 use Tests\Traits\CreatesTenant;
-use Database\Seeders\RoleSeeder;
-use Database\Seeders\AccountSeeder;
-use Mockery;
 
 class OpeningBalanceControllerTest extends TestCase
 {
-    use RefreshDatabase, CreatesTenant;
+    use CreatesTenant, RefreshDatabase;
 
     protected function setUp(): void
     {
@@ -88,11 +87,11 @@ class OpeningBalanceControllerTest extends TestCase
     public function test_it_saves_opening_balances()
     {
         $tenantId = app('currentTenant')->id;
-        $assetAccount = Account::where('code', '1140-' . $tenantId)->first();
-        $equityAccount = Account::where('code', '3100-' . $tenantId)->first();
+        $assetAccount = Account::where('code', '1140-'.$tenantId)->first();
+        $equityAccount = Account::where('code', '3100-'.$tenantId)->first();
 
         // Skip if equity account doesn't exist (depends on COA being reset)
-        if (!$assetAccount || !$equityAccount) {
+        if (! $assetAccount || ! $equityAccount) {
             $this->markTestSkipped('Required accounts not found');
         }
 
@@ -113,9 +112,9 @@ class OpeningBalanceControllerTest extends TestCase
     public function test_it_deletes_opening_balances()
     {
         $tenantId = app('currentTenant')->id;
-        $assetAccount = Account::where('code', '1140-' . $tenantId)->first();
+        $assetAccount = Account::where('code', '1140-'.$tenantId)->first();
 
-        if (!$assetAccount) {
+        if (! $assetAccount) {
             $this->markTestSkipped('Required account not found');
         }
 
@@ -154,7 +153,7 @@ class OpeningBalanceControllerTest extends TestCase
 
     public function test_unauthorized_user_cannot_access_opening_balance_page()
     {
-        $user = \App\Models\User::factory()->for($this->tenant)->create();
+        $user = User::factory()->for($this->tenant)->create();
         $this->actingAs($user);
 
         $response = $this->get(route('admin.accounting.opening-balance.index'));

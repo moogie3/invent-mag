@@ -97,6 +97,11 @@
                                                         {{ $entry->date->format('d M Y') }}</td>
                                                     <td rowspan="{{ $entry->transactions->count() }}" class="align-top">
                                                         {{ $entry->description }}
+                                                        @if($entry->isReconciled())
+                                                            <span class="badge bg-teal text-white ms-1" title="{{ __('messages.reconciled_hint') }}">
+                                                                <i class="ti ti-circle-check"></i> {{ __('messages.reconciled') }}
+                                                            </span>
+                                                        @endif
                                                         @if ($entry->sourceable && method_exists($entry->sourceable, 'path'))
                                                             <a href="{{ $entry->sourceable->path() }}" target="_blank"
                                                                 class="ms-2">({{ __('messages.view_source') }})</a>

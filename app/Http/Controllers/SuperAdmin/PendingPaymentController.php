@@ -4,7 +4,6 @@ namespace App\Http\Controllers\SuperAdmin;
 
 use App\Http\Controllers\Controller;
 use App\Models\SubscriptionOrder;
-use Illuminate\Http\Request;
 
 class PendingPaymentController extends Controller
 {

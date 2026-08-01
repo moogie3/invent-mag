@@ -21,6 +21,7 @@ class SupplierController extends Controller
     public function getMetrics()
     {
         $metrics = $this->supplierService->getSupplierMetrics();
+
         return response()->json($metrics);
     }
 
@@ -28,6 +29,7 @@ class SupplierController extends Controller
     {
         $entries = $request->input('entries', 10);
         $data = $this->supplierService->getSupplierIndexData($entries);
+
         return view('admin.supplier.index', $data);
     }
 
@@ -49,16 +51,18 @@ class SupplierController extends Controller
 
         $result = $this->supplierService->createSupplier($request->all());
 
-        if (!$result['success']) {
+        if (! $result['success']) {
             if ($request->ajax()) {
                 return response()->json(['success' => false, 'message' => $result['message'], 'errors' => ['name' => [$result['message']]]], 422);
             }
+
             return back()->withErrors(['name' => $result['message']])->withInput();
         }
 
         if ($request->ajax()) {
             return response()->json(['success' => true, 'message' => 'Supplier created successfully.']);
         }
+
         return redirect()->route('admin.supplier')->with('success', 'Supplier created');
     }
 
@@ -82,21 +86,24 @@ class SupplierController extends Controller
             $supplier = Supplier::findOrFail($id);
             $result = $this->supplierService->updateSupplier($supplier, $request->all());
 
-            if (!$result['success']) {
+            if (! $result['success']) {
                 if ($request->ajax()) {
                     return response()->json(['success' => false, 'message' => $result['message']], 422);
                 }
+
                 return back()->with('error', $result['message'])->withInput();
             }
 
             if ($request->ajax()) {
                 return response()->json(['success' => true, 'message' => 'Supplier updated successfully.']);
             }
+
             return redirect()->route('admin.supplier')->with('success', 'Supplier updated');
         } catch (\Exception $e) {
             if ($request->ajax()) {
                 return response()->json(['success' => false, 'message' => 'An unexpected error occurred.'], 500);
             }
+
             return back()->with('error', 'An unexpected error occurred.')->withInput();
         }
     }
@@ -107,29 +114,35 @@ class SupplierController extends Controller
             $supplier = Supplier::findOrFail($id);
             $result = $this->supplierService->deleteSupplier($supplier);
 
-            if (!$result['success']) {
+            if (! $result['success']) {
                 if ($request->ajax()) {
                     return response()->json(['success' => false, 'message' => $result['message']], 500);
                 }
+
                 return redirect()->route('admin.supplier')->with('error', $result['message']);
             }
 
             if ($request->ajax()) {
                 return response()->json(['success' => true, 'message' => 'Supplier deleted successfully.']);
             }
+
             return redirect()->route('admin.supplier')->with('success', 'Supplier deleted');
         } catch (\Exception $e) {
             if ($request->ajax()) {
                 return response()->json(['success' => false, 'message' => 'An unexpected error occurred.'], 500);
             }
+
             return redirect()->route('admin.supplier')->with('error', 'An unexpected error occurred.');
         }
     }
 
     /**
      * @group Suppliers
+     *
      * @summary Export All Suppliers
+     *
      * @bodyParam export_option string required The export format ('pdf' or 'csv'). Example: "csv"
+     *
      * @response 200 "The exported file."
      */
     public function exportAll(Request $request)
@@ -144,6 +157,7 @@ class SupplierController extends Controller
                 'Exported Suppliers'
             );
             $file = $this->supplierService->exportAllSuppliers($request->export_option);
+
             return $file;
         } catch (\Exception $e) {
             return response()->json([

@@ -341,6 +341,21 @@ Owner's Equity             |             | 75,000,000
 TOTAL                      | 80,000,000  | 80,000,000 ✓
 ```
 
+#### 4. Opening Balance vs Bank Reconciliation (Important Distinction)
+
+These two features serve **different purposes** and are often confused:
+
+| | Opening Balance | Bank Reconciliation |
+|---|---|---|
+| **What it is** | A one-time snapshot of your account balances when you **started using the system** (e.g., first day of fiscal year) | Verifies a **specific bank statement period** by matching statement transactions against your journal entries |
+| **Tied to a statement?** | No | Yes — the bank statement you import |
+| **How often** | Once (or per fiscal year start / migration) | Monthly (or as often as you receive statements) |
+| **Opening balance field** | The starting point of your entire books | The **starting balance printed on the specific statement** — it usually differs from the account Opening Balance because transactions occurred in between |
+
+The Bank Reconciliation form **prefills its opening balance from the account Opening Balance** as a convenience, but you should confirm or adjust it to match the actual statement start balance.
+
+> **Rule of thumb:** Set your **Opening Balance once** when you begin. Then use **Bank Reconciliation** each month to prove your books agree with the bank.
+
 ---
 
 ## Accounting Menu Explained
@@ -444,6 +459,8 @@ TOTAL                      | 80,000,000  | 80,000,000 ✓
 - Migrating from another system
 
 **Navigation:** `Accounting → Opening Balance`
+
+> **Not to be confused with Bank Reconciliation:** Opening Balance is a one-time system-start snapshot. Bank Reconciliation (`Reports → Bank Reconciliation`) verifies each bank statement period monthly — see [Opening Balance vs Bank Reconciliation](#4-opening-balance-vs-bank-reconciliation-important-distinction).
 
 ---
 

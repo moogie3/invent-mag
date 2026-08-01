@@ -2,31 +2,32 @@
 
 namespace Tests\Unit\Services;
 
+use App\Models\Account;
 use App\Models\Customer;
 use App\Models\Product;
+use App\Models\ProductWarehouse;
 use App\Models\Sales;
 use App\Models\SalesItem;
-use App\Models\User;
-use App\Models\Account;
 use App\Models\Tax;
-use App\Models\Warehouse; // Added
-use App\Models\ProductWarehouse;
+use App\Models\User; // Added
+use App\Models\Warehouse;
 use App\Services\AccountingService;
 use App\Services\SalesService;
-use Tests\TestCase;
+use Database\Seeders\AccountSeeder;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Auth;
 use Mockery;
 use Mockery\MockInterface;
 use PHPUnit\Framework\Attributes\Test;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\TestCase;
 use Tests\Traits\CreatesTenant;
-use Database\Seeders\AccountSeeder;
 
 class SalesServiceTest extends TestCase
 {
     use CreatesTenant, RefreshDatabase;
 
     protected SalesService $salesService;
+
     protected MockInterface $accountingServiceMock;
 
     protected function setUp(): void
@@ -41,11 +42,11 @@ class SalesServiceTest extends TestCase
 
         // Retrieve SAK-compliant accounts from the seeder
         $tenantId = app('currentTenant')->id;
-        $cash = Account::where('code', '1110-' . $tenantId)->first();
-        $accountsReceivable = Account::where('code', '1130-' . $tenantId)->first();
-        $salesRevenue = Account::where('code', '4100-' . $tenantId)->first();
-        $costOfGoodsSold = Account::where('code', '5200-' . $tenantId)->first();
-        $inventory = Account::where('code', '1140-' . $tenantId)->first();
+        $cash = Account::where('code', '1110-'.$tenantId)->first();
+        $accountsReceivable = Account::where('code', '1130-'.$tenantId)->first();
+        $salesRevenue = Account::where('code', '4100-'.$tenantId)->first();
+        $costOfGoodsSold = Account::where('code', '5200-'.$tenantId)->first();
+        $inventory = Account::where('code', '1140-'.$tenantId)->first();
 
         // Ensure accounts exist
         $this->assertNotNull($cash, 'Cash account not found in seeder.');
@@ -63,9 +64,9 @@ class SalesServiceTest extends TestCase
                 'sales_revenue_account_id' => $salesRevenue->id,
                 'cost_of_goods_sold_account_id' => $costOfGoodsSold->id,
                 'inventory_account_id' => $inventory->id,
-            ]
+            ],
         ]);
-        
+
         // Refresh the user instance and update Auth
         $this->user = $this->user->fresh();
         Auth::setUser($this->user);
@@ -147,7 +148,7 @@ class SalesServiceTest extends TestCase
     {
         $customer = Customer::factory()->create();
         $warehouse = Warehouse::factory()->create(['is_main' => true]);
-        
+
         $product = Product::factory()->create(['price' => 50]);
         // Set initial stock in warehouse
         ProductWarehouse::updateOrCreate(
@@ -173,12 +174,12 @@ class SalesServiceTest extends TestCase
         $this->assertInstanceOf(Sales::class, $sale);
         $this->assertDatabaseHas('sales', ['id' => $sale->id, 'customer_id' => $customer->id, 'warehouse_id' => $warehouse->id]);
         $this->assertDatabaseHas('sales_items', ['sales_id' => $sale->id, 'product_id' => $product->id]);
-        
+
         // Verify stock in pivot table
         $this->assertDatabaseHas('product_warehouse', [
             'product_id' => $product->id,
             'warehouse_id' => $warehouse->id,
-            'quantity' => 8
+            'quantity' => 8,
         ]);
     }
 
@@ -187,7 +188,7 @@ class SalesServiceTest extends TestCase
     {
         $customer = Customer::factory()->create();
         $warehouse = Warehouse::factory()->create();
-        
+
         $product = Product::factory()->create(['price' => 50]);
         // Set initial stock
         ProductWarehouse::updateOrCreate(
@@ -227,6 +228,7 @@ class SalesServiceTest extends TestCase
                     $this->assertEquals($grandTotal, $this->findTransactionAmount($transactions, $salesRevenueAccountName, 'credit'));
                     $this->assertEquals($cogs, $this->findTransactionAmount($transactions, $costOfGoodsSoldAccountName, 'debit'));
                     $this->assertEquals($cogs, $this->findTransactionAmount($transactions, $inventoryAccountName, 'credit'));
+
                     return true;
                 }),
                 Mockery::type(Sales::class)
@@ -259,6 +261,7 @@ class SalesServiceTest extends TestCase
                     $this->assertCount(2, $transactions);
                     $this->assertEquals(500, $this->findTransactionAmount($transactions, $cashAccountName, 'debit'));
                     $this->assertEquals(500, $this->findTransactionAmount($transactions, $accountsReceivableAccountName, 'credit'));
+
                     return true;
                 }),
                 Mockery::any() // Payment model
@@ -266,7 +269,6 @@ class SalesServiceTest extends TestCase
 
         $this->salesService->addPayment($sale, $data);
     }
-
 
     #[Test]
     public function it_can_update_a_sale()
@@ -280,7 +282,7 @@ class SalesServiceTest extends TestCase
 
         $sale = Sales::factory()->create(['warehouse_id' => $warehouse->id]);
         $oldItem = SalesItem::factory()->create(['sales_id' => $sale->id, 'product_id' => $product->id, 'quantity' => 1]);
-        
+
         // Stock should have been decremented when sale was created (conceptually)
         // Since we created sale/items directly via factory, stock wasn't auto-decremented.
         // Let's manually set pivot to what it "should" be after sale: 9.
@@ -312,10 +314,10 @@ class SalesServiceTest extends TestCase
         $this->assertDatabaseHas('sales', ['id' => $sale->id, 'order_discount' => 5]);
         $this->assertDatabaseMissing('sales_items', ['id' => $oldItem->id]);
         $this->assertDatabaseHas('sales_items', ['sales_id' => $sale->id, 'product_id' => $newProduct->id]);
-        
+
         // Old product stock should revert: 9 + 1 = 10
         $this->assertDatabaseHas('product_warehouse', ['product_id' => $product->id, 'warehouse_id' => $warehouse->id, 'quantity' => 10]);
-        
+
         // New product stock should decrement: 20 - 5 = 15
         $this->assertDatabaseHas('product_warehouse', ['product_id' => $newProduct->id, 'warehouse_id' => $warehouse->id, 'quantity' => 15]);
     }
@@ -366,7 +368,7 @@ class SalesServiceTest extends TestCase
         $sale = Sales::factory()->create(['warehouse_id' => $warehouse->id]);
         $product = Product::factory()->create();
         $item = SalesItem::factory()->create(['sales_id' => $sale->id, 'product_id' => $product->id, 'quantity' => 1]);
-        
+
         // Setup initial stock state as if sale happened
         ProductWarehouse::updateOrCreate(
             ['product_id' => $product->id, 'warehouse_id' => $warehouse->id, 'tenant_id' => $product->tenant_id],
@@ -377,12 +379,12 @@ class SalesServiceTest extends TestCase
 
         $this->assertDatabaseMissing('sales', ['id' => $sale->id]);
         $this->assertDatabaseMissing('sales_items', ['id' => $item->id]);
-        
+
         // Stock should revert: 9 + 1 = 10
         $this->assertDatabaseHas('product_warehouse', [
             'product_id' => $product->id,
             'warehouse_id' => $warehouse->id,
-            'quantity' => 10
+            'quantity' => 10,
         ]);
     }
 
@@ -392,11 +394,11 @@ class SalesServiceTest extends TestCase
         $warehouse = Warehouse::factory()->create();
         // Create 3 sales
         $sales = Sales::factory()->count(3)->create(['warehouse_id' => $warehouse->id]);
-        
-        foreach($sales as $sale) {
+
+        foreach ($sales as $sale) {
             $product = Product::factory()->create();
             SalesItem::factory()->create(['sales_id' => $sale->id, 'product_id' => $product->id, 'quantity' => 1]);
-            
+
             // Init stock
             ProductWarehouse::updateOrCreate(
                 ['product_id' => $product->id, 'warehouse_id' => $warehouse->id, 'tenant_id' => $sale->tenant_id],
@@ -416,13 +418,13 @@ class SalesServiceTest extends TestCase
     #[Test]
     public function it_can_bulk_mark_sales_as_paid()
     {
-        $product = \App\Models\Product::factory()->create();
+        $product = Product::factory()->create();
         $sales = Sales::factory()->count(3)->create(['total' => 100, 'status' => 'Unpaid', 'amount_received' => 0]);
-        
+
         foreach ($sales as $sale) {
-            \App\Models\SalesItem::factory()->create(['sales_id' => $sale->id, 'product_id' => $product->id, 'quantity' => 1, 'total' => 100]);
+            SalesItem::factory()->create(['sales_id' => $sale->id, 'product_id' => $product->id, 'quantity' => 1, 'total' => 100]);
         }
-        
+
         $ids = $sales->pluck('id')->toArray();
 
         $this->accountingServiceMock->shouldReceive('createJournalEntry')->times(3);
@@ -487,6 +489,7 @@ class SalesServiceTest extends TestCase
                 return $transaction['amount'];
             }
         }
+
         return null;
     }
 
@@ -515,8 +518,8 @@ class SalesServiceTest extends TestCase
 
         // Create a PPh receivable account for journal entries
         $pphReceivableAccount = Account::create([
-            'name' => 'PPh Receivable ' . $this->tenant->id,
-            'code' => '1150' . $this->tenant->id,
+            'name' => 'PPh Receivable '.$this->tenant->id,
+            'code' => '1150'.$this->tenant->id,
             'type' => 'asset',
             'tenant_id' => $this->tenant->id,
         ]);
@@ -620,8 +623,8 @@ class SalesServiceTest extends TestCase
         ]);
 
         $pphReceivableAccount = Account::create([
-            'name' => 'PPh Receivable ' . $this->tenant->id,
-            'code' => '1150' . $this->tenant->id,
+            'name' => 'PPh Receivable '.$this->tenant->id,
+            'code' => '1150'.$this->tenant->id,
             'type' => 'asset',
             'tenant_id' => $this->tenant->id,
         ]);
@@ -717,8 +720,8 @@ class SalesServiceTest extends TestCase
         ]);
 
         $pphReceivableAccount = Account::create([
-            'name' => 'PPh Receivable ' . $this->tenant->id,
-            'code' => '1150' . $this->tenant->id,
+            'name' => 'PPh Receivable '.$this->tenant->id,
+            'code' => '1150'.$this->tenant->id,
             'type' => 'asset',
             'tenant_id' => $this->tenant->id,
         ]);
@@ -792,8 +795,8 @@ class SalesServiceTest extends TestCase
         ]);
 
         $pphReceivableAccount = Account::create([
-            'name' => 'PPh Receivable ' . $this->tenant->id,
-            'code' => '1150' . $this->tenant->id,
+            'name' => 'PPh Receivable '.$this->tenant->id,
+            'code' => '1150'.$this->tenant->id,
             'type' => 'asset',
             'tenant_id' => $this->tenant->id,
         ]);

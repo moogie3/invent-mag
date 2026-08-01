@@ -5,10 +5,9 @@ namespace Tests\Unit\Services;
 use App\Models\User;
 use App\Models\Warehouse;
 use App\Services\WarehouseService;
-use Tests\TestCase;
-use PHPUnit\Framework\Attributes\Test;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use PHPUnit\Framework\Attributes\Test;
+use Tests\TestCase;
 use Tests\Traits\CreatesTenant;
 
 class WarehouseServiceTest extends TestCase
@@ -21,7 +20,7 @@ class WarehouseServiceTest extends TestCase
     {
         parent::setUp();
         $this->setupTenant();
-        $this->warehouseService = new WarehouseService();
+        $this->warehouseService = new WarehouseService;
     }
 
     #[Test]

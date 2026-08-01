@@ -6,14 +6,14 @@ use App\Http\Requests\ProfileUpdateRequest;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Validator;
-use Tests\TestCase;
 use Illuminate\Validation\Rule;
 use PHPUnit\Framework\Attributes\Test;
+use Tests\TestCase;
 use Tests\Traits\CreatesTenant;
 
 class ProfileUpdateRequestTest extends TestCase
 {
-    use RefreshDatabase, CreatesTenant;
+    use CreatesTenant, RefreshDatabase;
 
     private ProfileUpdateRequest $request;
 
@@ -21,7 +21,7 @@ class ProfileUpdateRequestTest extends TestCase
     {
         parent::setUp();
         $this->setupTenant(); // Creates $this->tenant and $this->user, and calls actingAs
-        $this->request = new ProfileUpdateRequest();
+        $this->request = new ProfileUpdateRequest;
     }
 
     #[Test]

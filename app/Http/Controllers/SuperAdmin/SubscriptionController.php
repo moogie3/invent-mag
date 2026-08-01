@@ -3,8 +3,8 @@
 namespace App\Http\Controllers\SuperAdmin;
 
 use App\Http\Controllers\Controller;
-use App\Models\Tenant;
 use App\Models\SubscriptionOrder;
+use App\Models\Tenant;
 
 class SubscriptionController extends Controller
 {
@@ -15,18 +15,18 @@ class SubscriptionController extends Controller
             ->paginate(20);
 
         $allTenants = Tenant::all();
-        $isDemo = fn(Tenant $t) => str_starts_with($t->name, 'Demo ');
+        $isDemo = fn (Tenant $t) => str_starts_with($t->name, 'Demo ');
 
         $stats = [
             'total' => $allTenants->count(),
-            'active' => $allTenants->filter(fn(Tenant $t) => $t->plan_status === 'active')->count(),
-            'trialing' => $allTenants->filter(fn(Tenant $t) => ! $isDemo($t) && $t->plan_status === 'trialing' && $t->onTrial())->count(),
-            'expired' => $allTenants->filter(fn(Tenant $t) => ! $isDemo($t)
+            'active' => $allTenants->filter(fn (Tenant $t) => $t->plan_status === 'active')->count(),
+            'trialing' => $allTenants->filter(fn (Tenant $t) => ! $isDemo($t) && $t->plan_status === 'trialing' && $t->onTrial())->count(),
+            'expired' => $allTenants->filter(fn (Tenant $t) => ! $isDemo($t)
                 && $t->plan_status !== 'active'
                 && $t->plan_status !== 'terminated'
                 && $t->planInactive()
             )->count(),
-            'terminated' => $allTenants->filter(fn(Tenant $t) => ! $isDemo($t) && $t->plan_status === 'terminated')->count(),
+            'terminated' => $allTenants->filter(fn (Tenant $t) => ! $isDemo($t) && $t->plan_status === 'terminated')->count(),
         ];
 
         return view('superadmin.subscriptions.index', compact('subscriptions', 'stats'));
@@ -74,7 +74,7 @@ class SubscriptionController extends Controller
                 ->with('error', 'Only terminated subscriptions can be reactivated.');
         }
 
-        if (!$tenant->plan) {
+        if (! $tenant->plan) {
             return redirect()->route('superadmin.subscriptions.index')
                 ->with('error', 'Tenant has no plan assigned. Assign a plan first.');
         }

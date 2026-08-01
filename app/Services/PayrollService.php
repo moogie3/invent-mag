@@ -109,7 +109,7 @@ class PayrollService
         if ($absenceDeductionAmount > 0) {
             $defaultDeductions[] = [
                 'label' => __('messages.hr_absence_deduction'),
-                'amount' => round($absenceDeductionAmount, 2)
+                'amount' => round($absenceDeductionAmount, 2),
             ];
         }
 
@@ -179,22 +179,24 @@ class PayrollService
     protected function postApprovalJournalEntry(PayrollRun $run): void
     {
         $totalNet = $run->items->sum('net_pay');
-        if ($totalNet <= 0) return;
+        if ($totalNet <= 0) {
+            return;
+        }
 
         $tenantId = app('currentTenant')->id;
         $accountingService = app(AccountingService::class);
 
         $transactions = [
             [
-                'account_code' => '6300-' . $tenantId,
+                'account_code' => '6300-'.$tenantId,
                 'type' => 'debit',
-                'amount' => $totalNet
+                'amount' => $totalNet,
             ],
             [
-                'account_code' => '2140-' . $tenantId,
+                'account_code' => '2140-'.$tenantId,
                 'type' => 'credit',
-                'amount' => $totalNet
-            ]
+                'amount' => $totalNet,
+            ],
         ];
 
         $accountingService->createJournalEntry(
@@ -208,28 +210,30 @@ class PayrollService
     protected function postPaymentJournalEntry(PayrollRun $run, int $accountId): void
     {
         $totalNet = $run->items->sum('net_pay');
-        if ($totalNet <= 0) return;
+        if ($totalNet <= 0) {
+            return;
+        }
 
         $tenantId = app('currentTenant')->id;
         $paymentAccount = Account::find($accountId);
-        if (!$paymentAccount) {
-            throw new \InvalidArgumentException("Payment account not found.");
+        if (! $paymentAccount) {
+            throw new \InvalidArgumentException('Payment account not found.');
         }
 
         $accountingService = app(AccountingService::class);
 
         $transactions = [
             [
-                'account_code' => '2140-' . $tenantId,
+                'account_code' => '2140-'.$tenantId,
                 'type' => 'debit',
-                'amount' => $totalNet
+                'amount' => $totalNet,
             ],
             [
                 'account_id' => $accountId,
                 'account_name' => $paymentAccount->name,
                 'type' => 'credit',
-                'amount' => $totalNet
-            ]
+                'amount' => $totalNet,
+            ],
         ];
 
         $accountingService->createJournalEntry(
@@ -248,10 +252,11 @@ class PayrollService
 
         if ($exportOption === 'pdf') {
             $html = view('admin.hr.payroll.export-run-pdf', compact('run', 'items'))->render();
-            $dompdf = new Dompdf();
+            $dompdf = new Dompdf;
             $dompdf->loadHtml($html);
             $dompdf->setPaper('A4', 'landscape');
             $dompdf->render();
+
             return $dompdf->stream("payroll-{$run->period->year}-{$run->period->month}.pdf");
         }
 
@@ -281,6 +286,7 @@ class PayrollService
                 }
                 fclose($file);
             };
+
             return response()->stream($callback, 200, $headers);
         }
 
@@ -297,10 +303,11 @@ class PayrollService
 
         if ($exportOption === 'pdf') {
             $html = view('admin.hr.payroll.export-pdf', compact('runs'))->render();
-            $dompdf = new Dompdf();
+            $dompdf = new Dompdf;
             $dompdf->loadHtml($html);
             $dompdf->setPaper('A4', 'landscape');
             $dompdf->render();
+
             return $dompdf->stream('payroll-runs.pdf');
         }
 
@@ -326,6 +333,7 @@ class PayrollService
                 }
                 fclose($file);
             };
+
             return response()->stream($callback, 200, $headers);
         }
 

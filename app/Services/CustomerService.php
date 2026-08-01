@@ -2,13 +2,11 @@
 
 namespace App\Services;
 
-use App\Helpers\CurrencyHelper;
 use App\Models\Customer;
-use App\Models\Sales;
 use Dompdf\Dompdf;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 
 class CustomerService
@@ -17,12 +15,12 @@ class CustomerService
     {
         $customers = Customer::paginate($entries);
         $totalcustomer = Customer::count();
-        
+
         $customerCredits = [];
         foreach ($customers as $customer) {
             $customerCredits[$customer->id] = $customer->activeCredits()->sum('available_amount');
         }
-        
+
         return compact('customers', 'entries', 'totalcustomer', 'customerCredits');
     }
 
@@ -92,7 +90,7 @@ class CustomerService
         if (isset($data['image'])) {
             $oldImage = $customer->getRawOriginal('image');
             if ($oldImage) {
-                Storage::disk('public')->delete('image/' . $oldImage);
+                Storage::disk('public')->delete('image/'.$oldImage);
             }
             $data['image'] = $this->storeImage($data['image']);
         }
@@ -106,7 +104,7 @@ class CustomerService
     {
         $image = $customer->getRawOriginal('image');
         if ($image) {
-            Storage::disk('public')->delete('image/' . $image);
+            Storage::disk('public')->delete('image/'.$image);
         }
 
         $customer->delete();
@@ -114,12 +112,11 @@ class CustomerService
         return ['success' => true, 'message' => 'Customer deleted successfully.'];
     }
 
-    
-
     private function storeImage($image): string
     {
-        $imageName = Str::random(10) . '_' . $image->getClientOriginalName();
+        $imageName = Str::random(10).'_'.$image->getClientOriginalName();
         $image->storeAs('image', $imageName, 'public');
+
         return $imageName;
     }
 
@@ -136,10 +133,11 @@ class CustomerService
 
         if ($exportOption === 'pdf') {
             $html = view('admin.customer.export-pdf', compact('customers'))->render();
-            $dompdf = new Dompdf();
+            $dompdf = new Dompdf;
             $dompdf->loadHtml($html);
             $dompdf->setPaper('A4', 'landscape');
             $dompdf->render();
+
             return $dompdf->stream('customers.pdf');
         }
 

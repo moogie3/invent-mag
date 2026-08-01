@@ -2,8 +2,8 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Seeder;
 use App\Models\Customer;
+use Illuminate\Database\Seeder;
 
 class CustomerSeeder extends Seeder
 {
@@ -15,7 +15,7 @@ class CustomerSeeder extends Seeder
         $tenantId = app('currentTenant')->id;
 
         Customer::updateOrCreate(
-            ['email' => 'walk-in@' . $tenantId . '.com', 'tenant_id' => $tenantId],
+            ['email' => 'walk-in@'.$tenantId.'.com', 'tenant_id' => $tenantId],
             [
                 'name' => 'Walk In Customer',
                 'address' => '-',

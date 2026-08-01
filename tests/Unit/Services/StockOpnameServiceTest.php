@@ -4,7 +4,6 @@ namespace Tests\Unit\Services;
 
 use App\Models\Product;
 use App\Models\ProductWarehouse;
-use App\Models\StockAdjustment;
 use App\Models\StockOpname;
 use App\Models\StockOpnameItem;
 use App\Models\Warehouse;
@@ -22,6 +21,7 @@ class StockOpnameServiceTest extends TestCase
     use CreatesTenant, RefreshDatabase;
 
     protected StockOpnameService $service;
+
     protected MockInterface $accountingServiceMock;
 
     protected function setUp(): void
@@ -43,7 +43,7 @@ class StockOpnameServiceTest extends TestCase
     public function create_opname_creates_stock_opname_record()
     {
         $this->actingAs($this->user);
-        
+
         $warehouse = Warehouse::factory()->create(['tenant_id' => $this->tenant->id]);
 
         $opname = $this->service->createOpname(
@@ -63,7 +63,7 @@ class StockOpnameServiceTest extends TestCase
     public function create_opname_snapshots_current_stock()
     {
         $this->actingAs($this->user);
-        
+
         $warehouse = Warehouse::factory()->create(['tenant_id' => $this->tenant->id]);
         $product = Product::factory()->create(['tenant_id' => $this->tenant->id]);
 
@@ -88,7 +88,7 @@ class StockOpnameServiceTest extends TestCase
     public function create_opname_includes_products_without_warehouse_records()
     {
         $this->actingAs($this->user);
-        
+
         $warehouse = Warehouse::factory()->create(['tenant_id' => $this->tenant->id]);
         $productWithoutStock = Product::factory()->withNoStock()->create(['tenant_id' => $this->tenant->id]);
 
@@ -107,7 +107,7 @@ class StockOpnameServiceTest extends TestCase
     public function update_counts_updates_items_and_transitions_status()
     {
         $this->actingAs($this->user);
-        
+
         $warehouse = Warehouse::factory()->create(['tenant_id' => $this->tenant->id]);
         $product = Product::factory()->create(['tenant_id' => $this->tenant->id, 'price' => 5000]);
 
@@ -145,7 +145,7 @@ class StockOpnameServiceTest extends TestCase
     public function update_counts_handles_null_values()
     {
         $this->actingAs($this->user);
-        
+
         $warehouse = Warehouse::factory()->create(['tenant_id' => $this->tenant->id]);
         $product = Product::factory()->create(['tenant_id' => $this->tenant->id]);
 
@@ -176,7 +176,7 @@ class StockOpnameServiceTest extends TestCase
     public function update_counts_skips_in_progress_transition_if_already_in_progress()
     {
         $this->actingAs($this->user);
-        
+
         $warehouse = Warehouse::factory()->create(['tenant_id' => $this->tenant->id]);
         $product = Product::factory()->create(['tenant_id' => $this->tenant->id]);
 
@@ -204,7 +204,7 @@ class StockOpnameServiceTest extends TestCase
     public function complete_opname_adjusts_product_warehouse_quantities()
     {
         $this->actingAs($this->user);
-        
+
         $warehouse = Warehouse::factory()->create(['tenant_id' => $this->tenant->id]);
         $product = Product::factory()->create(['tenant_id' => $this->tenant->id, 'price' => 5000]);
 
@@ -244,7 +244,7 @@ class StockOpnameServiceTest extends TestCase
     public function complete_opname_creates_stock_adjustment_records()
     {
         $this->actingAs($this->user);
-        
+
         $warehouse = Warehouse::factory()->create(['tenant_id' => $this->tenant->id]);
         $product = Product::factory()->create(['tenant_id' => $this->tenant->id, 'price' => 5000]);
 
@@ -285,7 +285,7 @@ class StockOpnameServiceTest extends TestCase
     public function complete_opname_throws_if_already_completed()
     {
         $this->actingAs($this->user);
-        
+
         $warehouse = Warehouse::factory()->create(['tenant_id' => $this->tenant->id]);
 
         $opname = StockOpname::factory()->create([
@@ -304,7 +304,7 @@ class StockOpnameServiceTest extends TestCase
     public function complete_opname_handles_excess_inventory()
     {
         $this->actingAs($this->user);
-        
+
         $warehouse = Warehouse::factory()->create(['tenant_id' => $this->tenant->id]);
         $product = Product::factory()->create(['tenant_id' => $this->tenant->id, 'price' => 5000]);
 
@@ -345,7 +345,7 @@ class StockOpnameServiceTest extends TestCase
     public function generate_reference_number_increments_sequence()
     {
         $this->actingAs($this->user);
-        
+
         $warehouse = Warehouse::factory()->create(['tenant_id' => $this->tenant->id]);
 
         $opname1 = $this->service->createOpname(
@@ -372,7 +372,7 @@ class StockOpnameServiceTest extends TestCase
     public function generate_reference_number_resets_for_new_date()
     {
         $this->actingAs($this->user);
-        
+
         $warehouse = Warehouse::factory()->create(['tenant_id' => $this->tenant->id]);
 
         $opname1 = $this->service->createOpname(

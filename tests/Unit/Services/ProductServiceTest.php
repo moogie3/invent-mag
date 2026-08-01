@@ -5,18 +5,17 @@ namespace Tests\Unit\Services;
 use App\Models\Categories;
 use App\Models\POItem;
 use App\Models\Product;
-use App\Models\StockAdjustment;
+use App\Models\ProductWarehouse;
 use App\Models\Supplier;
 use App\Models\Unit;
 use App\Models\User;
 use App\Models\Warehouse;
-use App\Models\ProductWarehouse;
 use App\Services\ProductService;
-use Tests\TestCase;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 use PHPUnit\Framework\Attributes\Test;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\TestCase;
 use Tests\Traits\CreatesTenant;
 
 class ProductServiceTest extends TestCase
@@ -29,7 +28,7 @@ class ProductServiceTest extends TestCase
     {
         parent::setUp();
         $this->setupTenant();
-        $this->productService = new ProductService();
+        $this->productService = new ProductService;
     }
 
     #[Test]
@@ -55,14 +54,14 @@ class ProductServiceTest extends TestCase
         $suppliers = Supplier::factory()->count(2)->create();
         $warehouses = Warehouse::factory()->count(2)->create();
         $mainWarehouse = Warehouse::factory()->create(['is_main' => true]);
-        
+
         $product = Product::factory()->create([
             'low_stock_threshold' => 10,
             'category_id' => $categories->first()->id,
             'units_id' => $units->first()->id,
             'supplier_id' => $suppliers->first()->id,
         ]);
-        
+
         // Clear factory-generated stock to ensure we control the total stock
         $product->productWarehouses()->delete();
 
@@ -71,7 +70,7 @@ class ProductServiceTest extends TestCase
             'product_id' => $product->id,
             'warehouse_id' => $mainWarehouse->id,
             'quantity' => 5,
-            'tenant_id' => $product->tenant_id
+            'tenant_id' => $product->tenant_id,
         ]);
 
         $data = $this->productService->getProductFormData();
@@ -139,7 +138,7 @@ class ProductServiceTest extends TestCase
         $this->assertInstanceOf(Product::class, $product);
         $this->assertDatabaseHas('products', ['name' => 'Test Product with Image']);
         $this->assertNotNull($product->image);
-        Storage::disk('public')->assertExists('image/' . $product->getRawOriginal('image'));
+        Storage::disk('public')->assertExists('image/'.$product->getRawOriginal('image'));
         $this->assertFalse($product->has_expiry);
     }
 
@@ -208,7 +207,7 @@ class ProductServiceTest extends TestCase
     {
         Storage::fake('public');
         $products = Product::factory()->count(3)->create()->each(function ($product) {
-            $imageName = 'test_' . $product->id . '.jpg';
+            $imageName = 'test_'.$product->id.'.jpg';
             $product->image = $imageName;
             $product->save();
             Storage::disk('public')->put('image/'.$imageName, 'content');
@@ -230,10 +229,10 @@ class ProductServiceTest extends TestCase
         $user = User::factory()->create();
         // Setup main warehouse
         $warehouse = Warehouse::factory()->create(['is_main' => true]);
-        
+
         $products = Product::factory()->count(2)->create();
         // Initialize stock for main warehouse manually as factory might pick random
-        foreach($products as $p) {
+        foreach ($products as $p) {
             ProductWarehouse::updateOrCreate(
                 ['product_id' => $p->id, 'warehouse_id' => $warehouse->id, 'tenant_id' => $p->tenant_id],
                 ['quantity' => 10]
@@ -248,11 +247,11 @@ class ProductServiceTest extends TestCase
         $result = $this->productService->bulkUpdateStock($updates, 'Test Reason', $user->id);
 
         $this->assertEquals(2, $result['updated_count']);
-        
+
         // Check pivot table
         $this->assertDatabaseHas('product_warehouse', ['product_id' => $products[0]->id, 'warehouse_id' => $warehouse->id, 'quantity' => 15]);
         $this->assertDatabaseHas('product_warehouse', ['product_id' => $products[1]->id, 'warehouse_id' => $warehouse->id, 'quantity' => 5]);
-        
+
         $this->assertDatabaseHas('stock_adjustments', ['product_id' => $products[0]->id, 'reason' => 'Test Reason', 'warehouse_id' => $warehouse->id]);
         $this->assertDatabaseHas('stock_adjustments', ['product_id' => $products[1]->id, 'reason' => 'Test Reason', 'warehouse_id' => $warehouse->id]);
     }
@@ -263,16 +262,16 @@ class ProductServiceTest extends TestCase
         $user = User::factory()->create();
         $warehouse = Warehouse::factory()->create(['is_main' => true]);
         $product = Product::factory()->create();
-        
+
         // Ensure pivot exists with known quantity
-        \App\Models\ProductWarehouse::updateOrCreate(
+        ProductWarehouse::updateOrCreate(
             ['product_id' => $product->id, 'warehouse_id' => $warehouse->id, 'tenant_id' => $product->tenant_id],
             ['quantity' => 10]
         );
 
         // Test increase
         $this->productService->adjustProductStock($product, 5, 'increase', 'Test Increase', $user->id, $warehouse->id);
-        
+
         $this->assertDatabaseHas('product_warehouse', ['product_id' => $product->id, 'warehouse_id' => $warehouse->id, 'quantity' => 15]);
         $this->assertDatabaseHas('stock_adjustments', ['product_id' => $product->id, 'adjustment_type' => 'increase', 'warehouse_id' => $warehouse->id]);
 
@@ -377,16 +376,16 @@ class ProductServiceTest extends TestCase
     {
         $user = User::factory()->create();
         $warehouse = Warehouse::factory()->create(['is_main' => true]);
-        
+
         $product = Product::factory()->create();
-        
+
         $updates = [
             ['id' => $product->id, 'stock_quantity' => -5],
         ];
 
         $this->expectException(\Exception::class);
         $this->expectExceptionMessage('Cannot set negative stock');
-        
+
         $this->productService->bulkUpdateStock($updates, 'Test', $user->id);
     }
 
@@ -396,7 +395,7 @@ class ProductServiceTest extends TestCase
         $user = User::factory()->create();
         $warehouse = Warehouse::factory()->create(['is_main' => true]);
         $product = Product::factory()->create();
-        
+
         ProductWarehouse::updateOrCreate(
             ['product_id' => $product->id, 'warehouse_id' => $warehouse->id, 'tenant_id' => $product->tenant_id],
             ['quantity' => 5]
@@ -404,7 +403,7 @@ class ProductServiceTest extends TestCase
 
         $this->expectException(\Exception::class);
         $this->expectExceptionMessage('Insufficient stock');
-        
+
         $this->productService->adjustProductStock($product, 10, 'decrease', 'Test', $user->id, $warehouse->id);
     }
 
@@ -414,7 +413,7 @@ class ProductServiceTest extends TestCase
         $user = User::factory()->create();
         $warehouse = Warehouse::factory()->create(['is_main' => true]);
         $product = Product::factory()->create();
-        
+
         ProductWarehouse::updateOrCreate(
             ['product_id' => $product->id, 'warehouse_id' => $warehouse->id, 'tenant_id' => $product->tenant_id],
             ['quantity' => 10]
@@ -422,7 +421,7 @@ class ProductServiceTest extends TestCase
 
         $this->expectException(\Exception::class);
         $this->expectExceptionMessage('Cannot correct stock to negative');
-        
+
         $this->productService->adjustProductStock($product, -5, 'correction', 'Test', $user->id, $warehouse->id);
     }
 
@@ -432,14 +431,14 @@ class ProductServiceTest extends TestCase
         $user = User::factory()->create();
         $warehouse = Warehouse::factory()->create(['is_main' => true]);
         $product = Product::factory()->create();
-        
+
         ProductWarehouse::updateOrCreate(
             ['product_id' => $product->id, 'warehouse_id' => $warehouse->id, 'tenant_id' => $product->tenant_id],
             ['quantity' => 5]
         );
 
         $this->productService->adjustProductStock($product, 5, 'decrease', 'Test', $user->id, $warehouse->id);
-        
+
         $this->assertDatabaseHas('product_warehouse', ['product_id' => $product->id, 'warehouse_id' => $warehouse->id, 'quantity' => 0]);
     }
 }

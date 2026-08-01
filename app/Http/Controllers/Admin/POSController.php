@@ -3,17 +3,12 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\Customer;
-use App\Models\Product;
 use App\Models\Sales;
-use App\Models\Categories;
-use App\Models\Supplier;
-use App\Models\Unit;
 use App\Models\Tax;
 use App\Services\PosService;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
-use Illuminate\Session\TokenMismatchException;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Validation\ValidationException;
 
 class POSController extends Controller
 {
@@ -28,15 +23,17 @@ class POSController extends Controller
     {
         $data = $this->posService->getPosIndexData();
         $data['taxes'] = Tax::active()->orderBy('name')->get();
+
         return view('admin.pos.index', $data);
     }
 
     public function store(Request $request)
     {
-        if (!Auth::check()) {
+        if (! Auth::check()) {
             if ($request->wantsJson()) {
                 return response()->json(['success' => false, 'message' => 'Unauthenticated.'], 401);
             }
+
             return redirect()->route('admin.login');
         }
 
@@ -59,15 +56,15 @@ class POSController extends Controller
 
             if ($request->wantsJson()) {
                 return response()->json([
-                    'success' => true, 
-                    'message' => 'Transaction completed successfully.', 
-                    'sale_id' => $sale->id
+                    'success' => true,
+                    'message' => 'Transaction completed successfully.',
+                    'sale_id' => $sale->id,
                 ]);
             }
 
             return redirect()->route('admin.pos.receipt', $sale->id)->with('success', 'Transaction completed successfully.');
-            
-        } catch (\Illuminate\Validation\ValidationException $e) {
+
+        } catch (ValidationException $e) {
             if ($request->wantsJson()) {
                 return response()->json(['success' => false, 'message' => 'Validation failed.', 'errors' => $e->errors()], 422);
             }
@@ -76,6 +73,7 @@ class POSController extends Controller
             if ($request->wantsJson()) {
                 return response()->json(['success' => false, 'message' => $e->getMessage()], 400);
             }
+
             return redirect()->back()->withInput()->with('error', $e->getMessage());
         }
     }
@@ -95,7 +93,7 @@ class POSController extends Controller
 
         return view('admin.pos.print', $receiptData);
     }
-    
+
     public function validateStock(Request $request)
     {
         $request->validate([
@@ -103,10 +101,10 @@ class POSController extends Controller
             'products.*.id' => 'required|exists:products,id',
             'products.*.quantity' => 'required|integer|min:1',
         ]);
-        
+
         try {
             $insufficientProducts = $this->posService->validateStockBeforeSale($request->input('products'));
-            
+
             return response()->json([
                 'success' => true,
                 'available' => empty($insufficientProducts),

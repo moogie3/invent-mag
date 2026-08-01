@@ -5,6 +5,7 @@ namespace App\Observers;
 use App\Models\ActivityLog;
 use App\Models\Sales;
 use App\Services\ActivityLogService;
+use Illuminate\Support\Facades\Log;
 
 /**
  * Generic observer that can be reused for any model.
@@ -13,6 +14,7 @@ use App\Services\ActivityLogService;
 class ActivityObserver
 {
     protected ActivityLogService $logService;
+
     protected ?string $module = null;
 
     public function __construct(ActivityLogService $logService)
@@ -23,6 +25,7 @@ class ActivityObserver
     public function setModule(string $module): self
     {
         $this->module = $module;
+
         return $this;
     }
 
@@ -31,6 +34,7 @@ class ActivityObserver
         if ($model instanceof Sales && $model->type === Sales::TYPE_POS) {
             return ActivityLog::MODULE_POS;
         }
+
         return $this->module;
     }
 
@@ -44,12 +48,12 @@ class ActivityObserver
             $label = $this->guessLabel($model);
             $this->logService->logCreate(
                 $module,
-                "Created {$module}" . ($label ? ": {$label}" : " #{$model->id}"),
+                "Created {$module}".($label ? ": {$label}" : " #{$model->id}"),
                 $model,
                 $model->toArray()
             );
         } catch (\Throwable $e) {
-            \Illuminate\Support\Facades\Log::warning("ActivityObserver::created failed for {$this->module}: " . $e->getMessage());
+            Log::warning("ActivityObserver::created failed for {$this->module}: ".$e->getMessage());
         }
     }
 
@@ -60,7 +64,7 @@ class ActivityObserver
             if (empty($module)) {
                 return;
             }
-            $label    = $this->guessLabel($model);
+            $label = $this->guessLabel($model);
             $oldValues = $model->getOriginal();
             $newValues = $model->getChanges();
 
@@ -70,13 +74,13 @@ class ActivityObserver
 
             $this->logService->logUpdate(
                 $module,
-                "Updated {$module}" . ($label ? ": {$label}" : " #{$model->id}"),
+                "Updated {$module}".($label ? ": {$label}" : " #{$model->id}"),
                 $model,
                 $oldValues,
                 $newValues
             );
         } catch (\Throwable $e) {
-            \Illuminate\Support\Facades\Log::warning("ActivityObserver::updated failed for {$this->module}: " . $e->getMessage());
+            Log::warning("ActivityObserver::updated failed for {$this->module}: ".$e->getMessage());
         }
     }
 
@@ -90,22 +94,23 @@ class ActivityObserver
             $label = $this->guessLabel($model);
             $this->logService->logDelete(
                 $module,
-                "Deleted {$module}" . ($label ? ": {$label}" : " #{$model->id}"),
+                "Deleted {$module}".($label ? ": {$label}" : " #{$model->id}"),
                 $model,
                 $model->toArray()
             );
         } catch (\Throwable $e) {
-            \Illuminate\Support\Facades\Log::warning("ActivityObserver::deleted failed for {$this->module}: " . $e->getMessage());
+            Log::warning("ActivityObserver::deleted failed for {$this->module}: ".$e->getMessage());
         }
     }
 
     protected function guessLabel($model): ?string
     {
         foreach (['name', 'title', 'invoice', 'code', 'email'] as $col) {
-            if (isset($model->{$col}) && !empty($model->{$col})) {
+            if (isset($model->{$col}) && ! empty($model->{$col})) {
                 return (string) $model->{$col};
             }
         }
+
         return null;
     }
 }

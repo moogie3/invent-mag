@@ -2,17 +2,18 @@
 
 namespace Tests\Unit\Services;
 
+use App\Models\User;
 use App\Services\SecurityLogger;
-use Tests\TestCase;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Tests\Traits\CreatesTenant;
 use Database\Seeders\RoleSeeder;
-use Mockery;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Log;
+use Mockery;
+use Tests\TestCase;
+use Tests\Traits\CreatesTenant;
 
 class SecurityLoggerTest extends TestCase
 {
-    use RefreshDatabase, CreatesTenant;
+    use CreatesTenant, RefreshDatabase;
 
     protected function setUp(): void
     {
@@ -21,7 +22,7 @@ class SecurityLoggerTest extends TestCase
         $this->seed(RoleSeeder::class);
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         Mockery::close();
         parent::tearDown();
@@ -29,7 +30,7 @@ class SecurityLoggerTest extends TestCase
 
     public function test_log_password_change()
     {
-        $user = \App\Models\User::factory()->create();
+        $user = User::factory()->create();
 
         Log::shouldReceive('channel')
             ->with('security')
@@ -73,7 +74,7 @@ class SecurityLoggerTest extends TestCase
 
     public function test_log_successful_login()
     {
-        $user = \App\Models\User::factory()->create();
+        $user = User::factory()->create();
 
         Log::shouldReceive('channel')
             ->with('security')
@@ -89,7 +90,7 @@ class SecurityLoggerTest extends TestCase
 
     public function test_log_permission_denied()
     {
-        $user = \App\Models\User::factory()->create();
+        $user = User::factory()->create();
 
         Log::shouldReceive('channel')
             ->with('security')

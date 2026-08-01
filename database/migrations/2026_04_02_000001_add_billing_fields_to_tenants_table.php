@@ -11,10 +11,10 @@ return new class extends Migration
         Schema::table('tenants', function (Blueprint $table) {
             $table->date('billing_period_start')->nullable()->after('plan_changed_at');
             $table->date('billing_period_end')->nullable()->after('billing_period_start');
-            
+
             $table->foreignId('pending_plan_id')->nullable()->constrained('plans')->nullOnDelete()->after('plan_id');
             $table->timestamp('pending_plan_effective_at')->nullable()->after('pending_plan_id');
-            
+
             $table->decimal('proration_credit', 15, 2)->nullable()->after('pending_plan_effective_at');
         });
     }

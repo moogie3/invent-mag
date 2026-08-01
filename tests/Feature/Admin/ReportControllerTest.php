@@ -2,29 +2,31 @@
 
 namespace Tests\Feature\Admin;
 
-use App\Models\User;
 use App\Services\AgingReportService;
 use App\Services\CashFlowService;
 use App\Services\FinancialReportingService;
 use App\Services\ReportExporter;
 use App\Services\TransactionService;
+use Database\Seeders\RoleSeeder;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Mockery;
-use Spatie\Permission\Models\Role;
 use Tests\TestCase;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Traits\CreatesTenant;
-use Database\Seeders\RoleSeeder;
 
 class ReportControllerTest extends TestCase
 {
-    use WithFaker, CreatesTenant, RefreshDatabase;
+    use CreatesTenant, RefreshDatabase, WithFaker;
 
     protected $transactionServiceMock;
+
     protected $cashFlowServiceMock;
+
     protected $financialReportingServiceMock;
+
     protected $agingReportServiceMock;
+
     protected $reportExporterMock;
 
     protected function setUp(): void
@@ -116,7 +118,7 @@ class ReportControllerTest extends TestCase
     {
         $transactions = [
             ['id' => 1, 'type' => 'sale'],
-            ['id' => 2, 'type' => 'purchase']
+            ['id' => 2, 'type' => 'purchase'],
         ];
         $this->transactionServiceMock->shouldReceive('bulkMarkAsPaid')->with($transactions)->andReturn(2);
 

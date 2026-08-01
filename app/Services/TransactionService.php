@@ -3,19 +3,19 @@
 namespace App\Services;
 
 use App\DTOs\TransactionDTO;
+use App\Helpers\CurrencyHelper;
 use App\Models\Purchase;
 use App\Models\Sales;
 use Carbon\Carbon;
+use Dompdf\Dompdf;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Collection;
-use Dompdf\Dompdf;
-use App\Services\SalesService;
-use App\Services\PurchaseService;
 
 class TransactionService
 {
     protected $salesService;
+
     protected $purchaseService;
 
     public function __construct(SalesService $salesService, PurchaseService $purchaseService)
@@ -32,13 +32,13 @@ class TransactionService
         $purchaseQuery = $this->buildPurchaseQuery($dates, $filters['status'], $filters['search']);
 
         $sales = collect();
-        if (!$filters['type'] || $filters['type'] === 'sale') {
-            $sales = $salesQuery->get()->map(fn($sale) => $this->transformSaleToTransaction($sale));
+        if (! $filters['type'] || $filters['type'] === 'sale') {
+            $sales = $salesQuery->get()->map(fn ($sale) => $this->transformSaleToTransaction($sale));
         }
 
         $purchases = collect();
-        if (!$filters['type'] || $filters['type'] === 'purchase') {
-            $purchases = $purchaseQuery->get()->map(fn($purchase) => $this->transformPurchaseToTransaction($purchase));
+        if (! $filters['type'] || $filters['type'] === 'purchase') {
+            $purchases = $purchaseQuery->get()->map(fn ($purchase) => $this->transformPurchaseToTransaction($purchase));
         }
 
         $transactions = $this->sortTransactions($sales->merge($purchases), $filters['sort'], $filters['direction']);
@@ -51,29 +51,29 @@ class TransactionService
         $dates = $this->calculateDateRange($filters['date_range'], $filters['start_date'], $filters['end_date']);
 
         $salesQuery = Sales::query()
-            ->when($dates['start'], fn($q) => $q->where('order_date', '>=', $dates['start']))
-            ->when($dates['end'], fn($q) => $q->where('order_date', '<=', $dates['end']))
-            ->when($filters['status'], fn($q, $status) => $q->where('status', $status))
-            ->when($filters['search'] && (!$filters['type'] || $filters['type'] === 'sale'), function ($q) use ($filters) {
+            ->when($dates['start'], fn ($q) => $q->where('order_date', '>=', $dates['start']))
+            ->when($dates['end'], fn ($q) => $q->where('order_date', '<=', $dates['end']))
+            ->when($filters['status'], fn ($q, $status) => $q->where('status', $status))
+            ->when($filters['search'] && (! $filters['type'] || $filters['type'] === 'sale'), function ($q) use ($filters) {
                 $q->where(function ($query) use ($filters) {
                     $query->where('invoice', 'LIKE', "%{$filters['search']}%")
-                        ->orWhereHas('customer', fn($cq) => $cq->where('name', 'LIKE', "%{$filters['search']}%"));
+                        ->orWhereHas('customer', fn ($cq) => $cq->where('name', 'LIKE', "%{$filters['search']}%"));
                 });
             });
 
         $purchaseQuery = Purchase::query()
-            ->when($dates['start'], fn($q) => $q->where('order_date', '>=', $dates['start']))
-            ->when($dates['end'], fn($q) => $q->where('order_date', '<=', $dates['end']))
-            ->when($filters['status'], fn($q, $status) => $q->where('status', $status))
-            ->when($filters['search'] && (!$filters['type'] || $filters['type'] === 'purchase'), function ($q) use ($filters) {
+            ->when($dates['start'], fn ($q) => $q->where('order_date', '>=', $dates['start']))
+            ->when($dates['end'], fn ($q) => $q->where('order_date', '<=', $dates['end']))
+            ->when($filters['status'], fn ($q, $status) => $q->where('status', $status))
+            ->when($filters['search'] && (! $filters['type'] || $filters['type'] === 'purchase'), function ($q) use ($filters) {
                 $q->where(function ($query) use ($filters) {
                     $query->where('invoice', 'LIKE', "%{$filters['search']}%")
-                        ->orWhereHas('supplier', fn($sq) => $sq->where('name', 'LIKE', "%{$filters['search']}%"));
+                        ->orWhereHas('supplier', fn ($sq) => $sq->where('name', 'LIKE', "%{$filters['search']}%"));
                 });
             });
 
         $salesStats = null;
-        if (!$filters['type'] || $filters['type'] === 'sale') {
+        if (! $filters['type'] || $filters['type'] === 'sale') {
             $salesStats = $salesQuery->selectRaw('
                 COUNT(*) as count,
                 SUM(total) as amount,
@@ -85,7 +85,7 @@ class TransactionService
         }
 
         $purchaseStats = null;
-        if (!$filters['type'] || $filters['type'] === 'purchase') {
+        if (! $filters['type'] || $filters['type'] === 'purchase') {
             $purchaseStats = $purchaseQuery->selectRaw('
                 COUNT(*) as count,
                 SUM(total) as amount,
@@ -125,11 +125,11 @@ class TransactionService
             }
         }
 
-        if (!empty($salesIds)) {
+        if (! empty($salesIds)) {
             $updatedCount += $this->salesService->bulkMarkPaid($salesIds);
         }
 
-        if (!empty($purchaseIds)) {
+        if (! empty($purchaseIds)) {
             $updatedCount += $this->purchaseService->bulkMarkPaid($purchaseIds);
         }
 
@@ -146,25 +146,29 @@ class TransactionService
         $type = $filters['type'] ?? null;
 
         $dates = $this->calculateDateRange($dateRange, $startDate, $endDate);
-        
+
         $salesIds = [];
         $purchaseIds = [];
         if ($selectedIds) {
             foreach ($selectedIds as $compositeId) {
                 if (strpos($compositeId, '_') !== false) {
                     [$t, $id] = explode('_', $compositeId);
-                    if ($t === 'sale') $salesIds[] = $id;
-                    if ($t === 'purchase') $purchaseIds[] = $id;
+                    if ($t === 'sale') {
+                        $salesIds[] = $id;
+                    }
+                    if ($t === 'purchase') {
+                        $purchaseIds[] = $id;
+                    }
                 } else {
-                     // Fallback if integer IDs are passed (e.g. from existing code?)
-                     // but we expect strings now.
+                    // Fallback if integer IDs are passed (e.g. from existing code?)
+                    // but we expect strings now.
                 }
             }
         }
 
         $salesQuery = $this->buildSalesQuery($dates, $status, $search);
         if ($selectedIds) {
-            if (!empty($salesIds)) {
+            if (! empty($salesIds)) {
                 $salesQuery->whereIn('id', $salesIds);
             } else {
                 $salesQuery->whereRaw('1 = 0'); // No sales selected
@@ -173,7 +177,7 @@ class TransactionService
 
         $purchaseQuery = $this->buildPurchaseQuery($dates, $status, $search);
         if ($selectedIds) {
-            if (!empty($purchaseIds)) {
+            if (! empty($purchaseIds)) {
                 $purchaseQuery->whereIn('id', $purchaseIds);
             } else {
                 $purchaseQuery->whereRaw('1 = 0'); // No purchases selected
@@ -181,21 +185,21 @@ class TransactionService
         }
 
         $sales = collect();
-        if (!$type || $type === 'sale') {
-             // If selectedIds provided, only run query if salesIds is not empty
-             // The query update above handles this via whereRaw('1=0') but we can also skip here.
-            $sales = $salesQuery->get()->toBase()->map(fn($sale) => $this->transformSaleToTransaction($sale, true));
+        if (! $type || $type === 'sale') {
+            // If selectedIds provided, only run query if salesIds is not empty
+            // The query update above handles this via whereRaw('1=0') but we can also skip here.
+            $sales = $salesQuery->get()->toBase()->map(fn ($sale) => $this->transformSaleToTransaction($sale, true));
         }
 
         $purchases = collect();
-        if (!$type || $type === 'purchase') {
-            $purchases = $purchaseQuery->get()->toBase()->map(fn($purchase) => $this->transformPurchaseToTransaction($purchase, true));
+        if (! $type || $type === 'purchase') {
+            $purchases = $purchaseQuery->get()->toBase()->map(fn ($purchase) => $this->transformPurchaseToTransaction($purchase, true));
         }
 
         $transactions = $sales->merge($purchases)->sortByDesc('date');
 
         // ID filtering is already done at query level
-        
+
         return $transactions;
     }
 
@@ -239,23 +243,23 @@ class TransactionService
         $salesTransactions = Sales::whereIn('id', $ids)
             ->with('customer')
             ->get()
-            ->map(fn($sale) => (object) [
+            ->map(fn ($sale) => (object) [
                 'id' => $sale->id,
                 'type' => 'sale',
                 'status' => $sale->status,
                 'sale_id' => $sale->id,
-                'purchase_id' => null
+                'purchase_id' => null,
             ]);
 
         $purchaseTransactions = Purchase::whereIn('id', $ids)
             ->with('supplier')
             ->get()
-            ->map(fn($purchase) => (object) [
+            ->map(fn ($purchase) => (object) [
                 'id' => $purchase->id,
                 'type' => 'purchase',
                 'status' => $purchase->status,
                 'sale_id' => null,
-                'purchase_id' => $purchase->id
+                'purchase_id' => $purchase->id,
             ]);
 
         return $salesTransactions->concat($purchaseTransactions);
@@ -264,9 +268,9 @@ class TransactionService
     private function buildSalesQuery($dates, $status, $search)
     {
         return Sales::with('customer')
-            ->when($dates['start'], fn($q) => $q->where('order_date', '>=', $dates['start']))
-            ->when($dates['end'], fn($q) => $q->where('order_date', '<=', $dates['end']))
-            ->when($status, fn($q, $status) => $q->where('status', $status))
+            ->when($dates['start'], fn ($q) => $q->where('order_date', '>=', $dates['start']))
+            ->when($dates['end'], fn ($q) => $q->where('order_date', '<=', $dates['end']))
+            ->when($status, fn ($q, $status) => $q->where('status', $status))
             ->when($search, function ($q) use ($search) {
                 $q->where(function ($query) use ($search) {
                     $query->where('invoice', 'LIKE', "%{$search}%")
@@ -284,9 +288,9 @@ class TransactionService
     private function buildPurchaseQuery($dates, $status, $search)
     {
         return Purchase::with('supplier')
-            ->when($dates['start'], fn($q) => $q->where('order_date', '>=', $dates['start']))
-            ->when($dates['end'], fn($q) => $q->where('order_date', '<=', $dates['end']))
-            ->when($status, fn($q, $status) => $q->where('status', $status))
+            ->when($dates['start'], fn ($q) => $q->where('order_date', '>=', $dates['start']))
+            ->when($dates['end'], fn ($q) => $q->where('order_date', '<=', $dates['end']))
+            ->when($status, fn ($q, $status) => $q->where('status', $status))
             ->when($search, function ($q) use ($search) {
                 $q->where(function ($query) use ($search) {
                     $query->where('invoice', 'LIKE', "%{$search}%")
@@ -321,6 +325,7 @@ class TransactionService
             'view_url' => route('admin.sales.show', $sale->id),
             'edit_url' => route('admin.sales.edit', $sale->id),
         ];
+
         return $forExport ? $data : new TransactionDTO($data);
     }
 
@@ -342,6 +347,7 @@ class TransactionService
             'view_url' => route('admin.po.show', $purchase->id),
             'edit_url' => route('admin.po.edit', $purchase->id),
         ];
+
         return $forExport ? $data : new TransactionDTO($data);
     }
 
@@ -354,6 +360,7 @@ class TransactionService
             } elseif (is_object($transaction) && isset($transaction->{$sort})) {
                 $sortKey = $sort;
             }
+
             return is_array($transaction) ? $transaction[$sortKey] : $transaction->{$sortKey};
         });
 
@@ -368,6 +375,7 @@ class TransactionService
     {
         $currentPage = Paginator::resolveCurrentPage();
         $currentItems = $transactions->slice(($currentPage - 1) * $perPage, $perPage)->values();
+
         return new LengthAwarePaginator($currentItems, $transactions->count(), $perPage, $currentPage, [
             'path' => Paginator::resolveCurrentPath(),
             'pageName' => 'page',
@@ -416,6 +424,7 @@ class TransactionService
         if ($transaction instanceof Sales && $transaction->status === 'Partial') {
             return $transaction->amount_received ?? 0;
         }
+
         return 0;
     }
 
@@ -441,11 +450,11 @@ class TransactionService
     {
         $transactions = $this->getTransactionsForExport($filters, $selectedIds);
 
-        $filename = 'transactions_' . date('Y-m-d_H-i-s') . '.csv';
+        $filename = 'transactions_'.date('Y-m-d_H-i-s').'.csv';
 
         $headers = [
             'Content-Type' => 'text/csv',
-            'Content-Disposition' => 'attachment; filename="' . $filename . '"',
+            'Content-Disposition' => 'attachment; filename="'.$filename.'"',
         ];
 
         $callback = function () use ($transactions) {
@@ -462,7 +471,7 @@ class TransactionService
                     $transaction['amount'],
                     $transaction['paid_amount'],
                     $transaction['due_amount'],
-                    $transaction['status']
+                    $transaction['status'],
                 ]);
             }
 
@@ -478,11 +487,12 @@ class TransactionService
 
         if ($exportOption === 'pdf') {
             $html = view('admin.reports.recent-transactions-bulk-export-pdf', compact('transactions'))->render();
-            $dompdf = new Dompdf();
+            $dompdf = new Dompdf;
             $dompdf->loadHtml($html);
             $dompdf->setPaper('A4', 'landscape');
             $dompdf->render();
             $output = $dompdf->output();
+
             return response()->streamDownload(function () use ($output) {
                 echo $output;
             }, 'transactions.pdf');
@@ -514,7 +524,7 @@ class TransactionService
                         $transaction['invoice'],
                         $transaction['customer_supplier'],
                         Carbon::parse($transaction['date'])->format('Y-m-d H:i'),
-                        \App\Helpers\CurrencyHelper::format($transaction['amount']),
+                        CurrencyHelper::format($transaction['amount']),
                         $transaction['status'],
                     ]);
                 }

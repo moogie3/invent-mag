@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Unit;
 use App\Services\UnitService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
 
 class UnitController extends Controller
 {
@@ -20,12 +21,13 @@ class UnitController extends Controller
     {
         $entries = $request->input('entries', 10);
         $data = $this->unitService->getUnitIndexData($entries);
+
         return view('admin.unit.index', $data);
     }
 
     public function store(Request $request)
     {
-        $validator = \Illuminate\Support\Facades\Validator::make($request->all(), [
+        $validator = Validator::make($request->all(), [
             'name' => 'required',
             'symbol' => 'required',
         ]);
@@ -34,27 +36,30 @@ class UnitController extends Controller
             if ($request->ajax()) {
                 return response()->json(['success' => false, 'message' => $validator->errors()->first(), 'errors' => $validator->errors()], 422);
             }
+
             return redirect()->route('admin.setting.unit')->withErrors($validator)->withInput();
         }
 
         $result = $this->unitService->createUnit($request->all());
 
-        if (!$result['success']) {
+        if (! $result['success']) {
             if ($request->ajax()) {
                 return response()->json(['success' => false, 'message' => $result['message'], 'errors' => ['name' => [$result['message']]]], 422);
             }
+
             return redirect()->route('admin.setting.unit')->withErrors(['name' => $result['message']])->withInput();
         }
 
         if ($request->ajax()) {
             return response()->json(['success' => true, 'message' => 'Unit created successfully.']);
         }
+
         return redirect()->route('admin.setting.unit')->with('success', 'Unit created');
     }
 
     public function update(Request $request, $id)
     {
-        $validator = \Illuminate\Support\Facades\Validator::make($request->all(), [
+        $validator = Validator::make($request->all(), [
             'name' => 'required',
             'symbol' => 'required',
         ]);
@@ -63,29 +68,33 @@ class UnitController extends Controller
             if ($request->ajax()) {
                 return response()->json(['success' => false, 'message' => $validator->errors()->first(), 'errors' => $validator->errors()], 422);
             }
+
             return redirect()->route('admin.setting.unit')->withErrors($validator)->withInput();
         }
 
         $unit = Unit::find($id);
-        if (!$unit) {
+        if (! $unit) {
             if ($request->ajax()) {
                 return response()->json(['success' => false, 'message' => 'Unit not found.'], 404);
             }
+
             return redirect()->route('admin.setting.unit')->with('error', 'Unit not found.');
         }
 
         $result = $this->unitService->updateUnit($unit, $request->all());
 
-        if (!$result['success']) {
+        if (! $result['success']) {
             if ($request->ajax()) {
                 return response()->json(['success' => false, 'message' => $result['message'], 'errors' => ['name' => [$result['message']]]], 422);
             }
+
             return redirect()->route('admin.setting.unit')->withErrors(['name' => $result['message']])->withInput();
         }
 
         if ($request->ajax()) {
             return response()->json(['success' => true, 'message' => 'Unit updated successfully.']);
         }
+
         return redirect()->route('admin.setting.unit')->with('success', 'Unit updated');
     }
 
@@ -94,16 +103,18 @@ class UnitController extends Controller
         $unit = Unit::find($id);
         $result = $this->unitService->deleteUnit($unit);
 
-        if (!$result['success']) {
+        if (! $result['success']) {
             if ($request->ajax()) {
                 return response()->json(['success' => false, 'message' => $result['message']], 500);
             }
+
             return redirect()->route('admin.setting.unit')->with('error', $result['message']);
         }
 
         if ($request->ajax()) {
             return response()->json(['success' => true, 'message' => 'Unit deleted successfully.']);
         }
+
         return redirect()->route('admin.setting.unit')->with('success', 'Unit deleted');
     }
 }

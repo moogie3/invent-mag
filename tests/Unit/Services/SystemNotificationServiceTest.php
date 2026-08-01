@@ -3,13 +3,12 @@
 namespace Tests\Unit\Services;
 
 use App\Models\Plan;
-use App\Models\Product;
-use App\Models\Tenant;
 use App\Models\User;
 use App\Models\Warehouse;
 use App\Services\SystemNotificationService;
 use Database\Seeders\PlanSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Collection;
 use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 use Tests\Traits\CreatesTenant;
@@ -24,8 +23,8 @@ class SystemNotificationServiceTest extends TestCase
     {
         parent::setUp();
         $this->setupTenant();
-        $this->service = new SystemNotificationService();
-        
+        $this->service = new SystemNotificationService;
+
         (new PlanSeeder)->run();
     }
 
@@ -40,7 +39,7 @@ class SystemNotificationServiceTest extends TestCase
     {
         $notifications = $this->service->getSystemNotifications();
 
-        $this->assertInstanceOf(\Illuminate\Support\Collection::class, $notifications);
+        $this->assertInstanceOf(Collection::class, $notifications);
     }
 
     #[Test]
@@ -56,10 +55,10 @@ class SystemNotificationServiceTest extends TestCase
     {
         $starter = Plan::findBySlug('starter');
         $this->tenant->assignPlan($starter);
-        
+
         // Test that service returns collection
         $notifications = $this->service->getSystemNotifications();
-        $this->assertInstanceOf(\Illuminate\Support\Collection::class, $notifications);
+        $this->assertInstanceOf(Collection::class, $notifications);
     }
 
     #[Test]
@@ -67,7 +66,7 @@ class SystemNotificationServiceTest extends TestCase
     {
         // Test basic return works
         $notifications = $this->service->getSystemNotifications();
-        $this->assertInstanceOf(\Illuminate\Support\Collection::class, $notifications);
+        $this->assertInstanceOf(Collection::class, $notifications);
     }
 
     #[Test]
@@ -81,7 +80,7 @@ class SystemNotificationServiceTest extends TestCase
         ]);
 
         $notifications = $this->service->getSystemNotifications();
-        
+
         $expiring = $notifications->firstWhere('id', 'system::plan_expiring');
         $this->assertNotNull($expiring);
     }
@@ -97,7 +96,7 @@ class SystemNotificationServiceTest extends TestCase
         ]);
 
         $notifications = $this->service->getSystemNotifications();
-        
+
         $expired = $notifications->firstWhere('id', 'system::plan_expired');
         $this->assertNotNull($expired);
     }
@@ -107,12 +106,12 @@ class SystemNotificationServiceTest extends TestCase
     {
         $starter = Plan::findBySlug('starter');
         $this->tenant->assignPlan($starter);
-        
+
         User::factory()->create(['tenant_id' => $this->tenant->id]);
         User::factory()->create(['tenant_id' => $this->tenant->id]);
 
         $notifications = $this->service->getSystemNotifications();
-        
+
         $userLimit = $notifications->firstWhere('id', 'system::user_limit_reached');
         $this->assertNotNull($userLimit);
     }
@@ -122,11 +121,11 @@ class SystemNotificationServiceTest extends TestCase
     {
         $starter = Plan::findBySlug('starter');
         $this->tenant->assignPlan($starter);
-        
+
         Warehouse::factory()->create(['tenant_id' => $this->tenant->id]);
 
         $notifications = $this->service->getSystemNotifications();
-        
+
         $warehouseLimit = $notifications->firstWhere('id', 'system::warehouse_limit_reached');
         $this->assertNotNull($warehouseLimit);
     }
@@ -136,7 +135,7 @@ class SystemNotificationServiceTest extends TestCase
     {
         // Test that service returns a collection
         $notifications = $this->service->getSystemNotifications();
-        $this->assertInstanceOf(\Illuminate\Support\Collection::class, $notifications);
+        $this->assertInstanceOf(Collection::class, $notifications);
     }
 
     #[Test]
@@ -144,7 +143,7 @@ class SystemNotificationServiceTest extends TestCase
     {
         // Just verify service works
         $notifications = $this->service->getSystemNotifications();
-        $this->assertInstanceOf(\Illuminate\Support\Collection::class, $notifications);
+        $this->assertInstanceOf(Collection::class, $notifications);
     }
 
     #[Test]
@@ -157,7 +156,7 @@ class SystemNotificationServiceTest extends TestCase
         ]);
 
         $notifications = $this->service->getSystemNotifications();
-        
+
         $profileIncomplete = $notifications->firstWhere('id', 'system::profile_incomplete');
         $this->assertNotNull($profileIncomplete);
     }
@@ -167,7 +166,7 @@ class SystemNotificationServiceTest extends TestCase
     {
         $professional = Plan::findBySlug('professional');
         $starter = Plan::findBySlug('starter');
-        
+
         $this->tenant->assignPlan($professional);
         $this->tenant->update([
             'pending_plan_id' => $starter->id,
@@ -176,7 +175,7 @@ class SystemNotificationServiceTest extends TestCase
         ]);
 
         $notifications = $this->service->getSystemNotifications();
-        
+
         $scheduledDowngrade = $notifications->firstWhere('id', 'system::scheduled_downgrade');
         $this->assertNotNull($scheduledDowngrade);
     }
@@ -186,7 +185,7 @@ class SystemNotificationServiceTest extends TestCase
     {
         // Verify service returns a collection
         $notifications = $this->service->getSystemNotifications();
-        $this->assertInstanceOf(\Illuminate\Support\Collection::class, $notifications);
+        $this->assertInstanceOf(Collection::class, $notifications);
     }
 
     #[Test]
@@ -206,7 +205,7 @@ class SystemNotificationServiceTest extends TestCase
         ]);
 
         $notifications = $this->service->getSystemNotifications();
-        
+
         $trialNotification = $notifications->firstWhere('id', 'system::trial_status');
         $this->assertNull($trialNotification);
     }
@@ -222,7 +221,7 @@ class SystemNotificationServiceTest extends TestCase
         ]);
 
         $notifications = $this->service->getSystemNotifications();
-        
+
         $trialNotification = $notifications->firstWhere('id', 'system::trial_status');
         $this->assertNull($trialNotification);
     }
@@ -232,19 +231,19 @@ class SystemNotificationServiceTest extends TestCase
     {
         // Verify service works
         $notifications = $this->service->getSystemNotifications();
-        $this->assertInstanceOf(\Illuminate\Support\Collection::class, $notifications);
+        $this->assertInstanceOf(Collection::class, $notifications);
     }
 
     #[Test]
     public function recent_upgrade_not_shown_after_24_hours()
     {
         $professional = Plan::findBySlug('professional');
-        
+
         $this->tenant->assignPlan($professional);
         $this->tenant->update(['plan_changed_at' => now()->subHours(25)]);
 
         $notifications = $this->service->getSystemNotifications();
-        
+
         $recentUpgrade = $notifications->firstWhere('id', 'system::recent_upgrade');
         $this->assertNull($recentUpgrade);
     }

@@ -17,12 +17,12 @@ class FakturPajakItem extends Model
     protected function casts(): array
     {
         return [
-            'harga_satuan'  => 'decimal:2',
+            'harga_satuan' => 'decimal:2',
             'jumlah_barang' => 'decimal:4',
-            'harga_total'   => 'decimal:2',
-            'diskon'        => 'decimal:2',
-            'dpp'           => 'decimal:2',
-            'ppn'           => 'decimal:2',
+            'harga_total' => 'decimal:2',
+            'diskon' => 'decimal:2',
+            'dpp' => 'decimal:2',
+            'ppn' => 'decimal:2',
         ];
     }
 

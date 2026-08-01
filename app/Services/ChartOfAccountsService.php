@@ -13,8 +13,6 @@ class ChartOfAccountsService
 {
     /**
      * Get accounting settings for the current tenant.
-     *
-     * @return array
      */
     public function getAccountingSettings(): array
     {
@@ -30,9 +28,6 @@ class ChartOfAccountsService
 
     /**
      * Update accounting settings for the current tenant.
-     *
-     * @param array $data
-     * @return array
      */
     public function updateAccountingSettings(array $data): array
     {
@@ -48,9 +43,6 @@ class ChartOfAccountsService
 
     /**
      * Validate accounting settings data.
-     *
-     * @param array $data
-     * @return array
      */
     public function validateSettingsData(array $data): array
     {
@@ -63,7 +55,7 @@ class ChartOfAccountsService
             'cash_account_id' => 'required|exists:accounts,id',
             'ppn_keluaran_account_id' => 'nullable|exists:accounts,id',
             'pph_receivable_account_id' => 'nullable|exists:accounts,id',
-            'pph_payable_account_id'    => 'nullable|exists:accounts,id',
+            'pph_payable_account_id' => 'nullable|exists:accounts,id',
         ];
     }
 
@@ -79,7 +71,7 @@ class ChartOfAccountsService
 
         try {
             DB::beginTransaction();
-            Log::debug('Explicit transaction started. DB_CONNECTION: ' . config('database.default') . ', Transaction Level: ' . DB::transactionLevel());
+            Log::debug('Explicit transaction started. DB_CONNECTION: '.config('database.default').', Transaction Level: '.DB::transactionLevel());
 
             try {
                 // Temporarily disable foreign key checks
@@ -89,7 +81,7 @@ class ChartOfAccountsService
                     DB::statement('SET FOREIGN_KEY_CHECKS=0;');
                 }
             } catch (\Exception $e) {
-                Log::error('Failed to disable foreign key checks: ' . $e->getMessage());
+                Log::error('Failed to disable foreign key checks: '.$e->getMessage());
                 throw $e;
             }
 
@@ -100,7 +92,7 @@ class ChartOfAccountsService
                 Account::query()->delete();
                 Log::debug('Accounting data truncated.');
             } catch (\Exception $e) {
-                Log::error('Failed to delete/truncate accounting data: ' . $e->getMessage());
+                Log::error('Failed to delete/truncate accounting data: '.$e->getMessage());
                 throw $e;
             }
 
@@ -112,7 +104,7 @@ class ChartOfAccountsService
                     DB::statement('SET FOREIGN_KEY_CHECKS=1;');
                 }
             } catch (\Exception $e) {
-                Log::error('Failed to re-enable foreign key checks: ' . $e->getMessage());
+                Log::error('Failed to re-enable foreign key checks: '.$e->getMessage());
                 throw $e;
             }
 
@@ -128,11 +120,11 @@ class ChartOfAccountsService
             ];
         } catch (\Exception $e) {
             DB::rollBack();
-            Log::error('Failed to reset COA: ' . $e->getMessage());
-            
+            Log::error('Failed to reset COA: '.$e->getMessage());
+
             return [
                 'success' => false,
-                'message' => 'An error occurred while resetting the Chart of Accounts: ' . $e->getMessage(),
+                'message' => 'An error occurred while resetting the Chart of Accounts: '.$e->getMessage(),
             ];
         }
     }

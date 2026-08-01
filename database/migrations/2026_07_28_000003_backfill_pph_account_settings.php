@@ -19,12 +19,12 @@ return new class extends Migration
 
             $pphReceivable = DB::table('accounts')
                 ->where('tenant_id', $tenantId)
-                ->where('code', '1170-' . $tenantId)
+                ->where('code', '1170-'.$tenantId)
                 ->first();
 
             $pphPayable = DB::table('accounts')
                 ->where('tenant_id', $tenantId)
-                ->where('code', '2150-' . $tenantId)
+                ->where('code', '2150-'.$tenantId)
                 ->first();
 
             $settings['pph_receivable_account_id'] = $pphReceivable?->id;
@@ -32,7 +32,7 @@ return new class extends Migration
 
             DB::table('tenants')
                 ->where('id', $tenant->id)
-                ->update(['accounting_settings' => DB::raw("'" . addslashes(json_encode($settings)) . "'")]);
+                ->update(['accounting_settings' => DB::raw("'".addslashes(json_encode($settings))."'")]);
         }
     }
 
@@ -46,7 +46,7 @@ return new class extends Migration
 
             DB::table('tenants')
                 ->where('id', $tenant->id)
-                ->update(['accounting_settings' => DB::raw("'" . addslashes(json_encode($settings)) . "'")]);
+                ->update(['accounting_settings' => DB::raw("'".addslashes(json_encode($settings))."'")]);
         }
     }
 };

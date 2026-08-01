@@ -3,16 +3,11 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\POItem;
-use App\Models\Product;
 use App\Models\Purchase;
-use App\Models\Supplier;
-use App\Models\User;
 use App\Services\PurchaseService;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
 
 class PurchaseController extends Controller
@@ -40,6 +35,7 @@ class PurchaseController extends Controller
     public function getExpiringSoonPurchases()
     {
         $expiringPurchases = $this->purchaseService->getExpiringPurchases();
+
         return response()->json($expiringPurchases);
     }
 
@@ -68,13 +64,16 @@ class PurchaseController extends Controller
     {
         try {
             $pos = $this->purchaseService->getPurchaseForModal($id);
+
             return view('admin.layouts.modals.po.pomodals-view', compact('pos'));
-        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+        } catch (ModelNotFoundException $e) {
             Log::error("Purchase record not found for modal view: {$id}");
+
             return response('<div class="alert alert-danger">Purchase record not found.</div>', 404);
         } catch (\Exception $e) {
-            Log::error("Error loading purchase modal view for ID {$id}: " . $e->getMessage(), ['exception' => $e]);
-            return response('<div class="alert alert-danger">Error loading purchase details: ' . $e->getMessage() . '</div>', 500);
+            Log::error("Error loading purchase modal view for ID {$id}: ".$e->getMessage(), ['exception' => $e]);
+
+            return response('<div class="alert alert-danger">Error loading purchase details: '.$e->getMessage().'</div>', 500);
         }
     }
 
@@ -95,11 +94,13 @@ class PurchaseController extends Controller
 
         try {
             $this->purchaseService->createPurchase($request->all());
+
             return redirect()->route('admin.po')->with('success', 'Purchase Order created successfully.');
         } catch (\Exception $e) {
-            Log::error('Purchase Order creation failed: ' . $e->getMessage(), ['exception' => $e, 'input' => $request->all()]);
+            Log::error('Purchase Order creation failed: '.$e->getMessage(), ['exception' => $e, 'input' => $request->all()]);
+
             return back()
-                ->withErrors(['error' => 'Something went wrong: ' . $e->getMessage()])
+                ->withErrors(['error' => 'Something went wrong: '.$e->getMessage()])
                 ->withInput();
         }
     }
@@ -123,11 +124,13 @@ class PurchaseController extends Controller
 
         try {
             $this->purchaseService->updatePurchase($purchase, $request->all());
+
             return redirect()->route('admin.po.show', $purchase->id)->with('success', 'Purchase order updated successfully.');
         } catch (\Exception $e) {
-            Log::error('Purchase Order update failed for ID ' . $id . ': ' . $e->getMessage(), ['exception' => $e, 'input' => $request->all()]);
+            Log::error('Purchase Order update failed for ID '.$id.': '.$e->getMessage(), ['exception' => $e, 'input' => $request->all()]);
+
             return back()
-                ->withErrors(['error' => 'Something went wrong: ' . $e->getMessage()])
+                ->withErrors(['error' => 'Something went wrong: '.$e->getMessage()])
                 ->withInput();
         }
     }
@@ -144,10 +147,11 @@ class PurchaseController extends Controller
         try {
             $purchase = Purchase::findOrFail($id);
             $this->purchaseService->addPayment($purchase, $request->all());
+
             return redirect()->route('admin.po.show', $purchase->id)->with('success', 'Payment added successfully.');
         } catch (\Exception $e) {
             return back()
-                ->withErrors(['error' => 'Something went wrong: ' . $e->getMessage()])
+                ->withErrors(['error' => 'Something went wrong: '.$e->getMessage()])
                 ->withInput();
         }
     }
@@ -158,6 +162,7 @@ class PurchaseController extends Controller
 
         try {
             $this->purchaseService->deletePurchase($purchase);
+
             return redirect()->route('admin.po')->with('success', 'Purchase order deleted successfully');
         } catch (\Exception $e) {
             return redirect()->route('admin.po')->with('error', 'Error deleting purchase order. Please try again.');
@@ -173,17 +178,20 @@ class PurchaseController extends Controller
 
     public function print($id)
     {
-         try {
+        try {
             return $this->purchaseService->printPo($id);
         } catch (\Exception $e) {
-            return back()->with('error', 'Error generating purchase order. ' . $e->getMessage());
+            return back()->with('error', 'Error generating purchase order. '.$e->getMessage());
         }
     }
 
     /**
      * @group Purchase Orders
+     *
      * @summary Bulk Delete Purchase Orders
+     *
      * @bodyParam ids array required An array of purchase order IDs to delete. Example: [1, 2, 3]
+     *
      * @response 200 {"success": true, "message": "Successfully deleted purchase order(s)"}
      */
     public function bulkDelete(Request $request)
@@ -195,9 +203,10 @@ class PurchaseController extends Controller
 
         try {
             $this->purchaseService->bulkDeletePurchases($request->ids);
+
             return response()->json([
                 'success' => true,
-                'message' => "Successfully deleted purchase order(s)",
+                'message' => 'Successfully deleted purchase order(s)',
             ]);
         } catch (\Exception $e) {
             return response()->json([
@@ -210,8 +219,11 @@ class PurchaseController extends Controller
 
     /**
      * @group Purchase Orders
+     *
      * @summary Bulk Mark Purchase Orders as Paid
+     *
      * @bodyParam ids array required An array of purchase order IDs to mark as paid. Example: [1, 2, 3]
+     *
      * @response 200 {"success": true, "message": "Successfully marked 2 purchase order(s) as paid.", "updated_count": 2}
      */
     public function bulkMarkPaid(Request $request)
@@ -223,6 +235,7 @@ class PurchaseController extends Controller
 
         try {
             $updatedCount = $this->purchaseService->bulkMarkPaid($request->ids);
+
             return response()->json([
                 'success' => true,
                 'message' => "Successfully marked {$updatedCount} purchase order(s) as paid.",
@@ -247,9 +260,12 @@ class PurchaseController extends Controller
 
     /**
      * @group Purchase Orders
+     *
      * @summary Bulk Export Purchase Orders
+     *
      * @bodyParam ids array required An array of purchase order IDs to export. Example: [1, 2, 3]
      * @bodyParam export_option string required The export format ('pdf' or 'csv'). Example: "csv"
+     *
      * @response 200 "The exported file."
      */
     public function bulkExport(Request $request)
@@ -262,6 +278,7 @@ class PurchaseController extends Controller
 
         try {
             $file = $this->purchaseService->bulkExportPurchases($request->all(), $request->ids, $request->export_option);
+
             return $file;
         } catch (\Exception $e) {
             return response()->json([

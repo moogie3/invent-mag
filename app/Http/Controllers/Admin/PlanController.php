@@ -8,6 +8,10 @@ use App\Models\SubscriptionOrder;
 use App\Services\BillingService;
 use App\Services\PlanService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
+use Midtrans\Config;
+use Midtrans\Snap;
+use Midtrans\Transaction;
 
 // Load Midtrans SDK (Non-namespaced)
 require_once base_path('vendor/midtrans/midtrans-php/Midtrans.php');
@@ -15,6 +19,7 @@ require_once base_path('vendor/midtrans/midtrans-php/Midtrans.php');
 class PlanController extends Controller
 {
     protected PlanService $planService;
+
     protected BillingService $billingService;
 
     public function __construct(PlanService $planService, BillingService $billingService)
@@ -63,7 +68,7 @@ class PlanController extends Controller
                     $effectiveDate = $tenant->pending_plan_effective_at->format('F d, Y');
                     $credit = $tenant->proration_credit ?? 0;
 
-                    $message = "Payment successful! Your downgrade to {$scheduledPlan->name} will take effect on {$effectiveDate}. You will keep your current {$oldPlan->name} plan until then. A credit of $" . number_format($credit, 2) . " will be applied to your next bill.";
+                    $message = "Payment successful! Your downgrade to {$scheduledPlan->name} will take effect on {$effectiveDate}. You will keep your current {$oldPlan->name} plan until then. A credit of $".number_format($credit, 2).' will be applied to your next bill.';
                 } else {
                     $message = "Payment successful! You are now on the {$currentPlan->name} plan.";
                 }
@@ -95,8 +100,8 @@ class PlanController extends Controller
         // because a trial countdown should not be conflated with a paid subscription expiry
         $isOnActiveTrial = $tenant ? $tenant->isOnActiveTrial() : false;
 
-         // Check if plan is expiring soon (within 7 days) — only for paid subscriptions.
-         // Active trials are excluded because their trial window should not
+        // Check if plan is expiring soon (within 7 days) — only for paid subscriptions.
+        // Active trials are excluded because their trial window should not
         // trigger the "renew" workflow.
         $expiringSoon = false;
         $expiryDays = null;
@@ -106,7 +111,7 @@ class PlanController extends Controller
             if ($currentExpiryDate) {
                 $expiryDays = $tenant->subscriptionDaysRemaining();
 
-                if (!$isOnActiveTrial && $expiryDays >= 0 && $expiryDays <= 7) {
+                if (! $isOnActiveTrial && $expiryDays >= 0 && $expiryDays <= 7) {
                     $expiringSoon = true;
                 }
             }
@@ -142,7 +147,7 @@ class PlanController extends Controller
         $currentPlan = $tenant->getCurrentPlan();
         $changeType = $this->billingService->getPlanChangeType($currentPlan, $newPlan);
 
-        $orderNumber = 'INV-' . strtoupper(uniqid()) . '-' . time();
+        $orderNumber = 'INV-'.strtoupper(uniqid()).'-'.time();
 
         $exchangeRate = 16000;
         $taxRate = 0.12;
@@ -167,10 +172,10 @@ class PlanController extends Controller
             'change_type' => $changeType,
         ]);
 
-        \Midtrans\Config::$serverKey = config('midtrans.server_key');
-        \Midtrans\Config::$isProduction = config('midtrans.is_production', false);
-        \Midtrans\Config::$isSanitized = true;
-        \Midtrans\Config::$is3ds = true;
+        Config::$serverKey = config('midtrans.server_key');
+        Config::$isProduction = config('midtrans.is_production', false);
+        Config::$isSanitized = true;
+        Config::$is3ds = true;
 
         $params = [
             'transaction_details' => [
@@ -187,32 +192,32 @@ class PlanController extends Controller
                     'id' => $newPlan->slug,
                     'price' => $priceIdr,
                     'quantity' => 1,
-                    'name' => $newPlan->name . ' Subscription' . ($changeType === 'upgrade' ? ' (including prorated upgrade)' : ''),
-                ]
-            ]
+                    'name' => $newPlan->name.' Subscription'.($changeType === 'upgrade' ? ' (including prorated upgrade)' : ''),
+                ],
+            ],
         ];
 
         try {
-            $snapToken = \Midtrans\Snap::getSnapToken($params);
+            $snapToken = Snap::getSnapToken($params);
 
             $order->update(['snap_token' => $snapToken]);
 
             if ($request->header('X-Laravel-JSON') || $request->expectsJson()) {
                 return response()->json([
-                    'redirect' => route('admin.setting.plan.checkout', ['order' => $order->id])
+                    'redirect' => route('admin.setting.plan.checkout', ['order' => $order->id]),
                 ]);
             }
 
             return redirect()->route('admin.setting.plan.checkout', ['order' => $order->id]);
 
         } catch (\Exception $e) {
-            \Illuminate\Support\Facades\Log::error('Midtrans Error: ' . $e->getMessage());
+            Log::error('Midtrans Error: '.$e->getMessage());
 
             if ($request->header('X-Laravel-JSON') || $request->expectsJson()) {
                 return response()->json(['error' => 'Payment gateway error. Please try again later.'], 500);
             }
 
-            return back()->with('error', 'Payment gateway error. Please try again later. ' . $e->getMessage());
+            return back()->with('error', 'Payment gateway error. Please try again later. '.$e->getMessage());
         }
     }
 
@@ -256,8 +261,9 @@ class PlanController extends Controller
             ->where('tenant_id', $tenant->id)
             ->first();
 
-        if (!$order) {
-            \Illuminate\Support\Facades\Log::warning("Payment confirm: Order not found or not owned by tenant. Order: {$orderId}, Tenant: {$tenant->id}");
+        if (! $order) {
+            Log::warning("Payment confirm: Order not found or not owned by tenant. Order: {$orderId}, Tenant: {$tenant->id}");
+
             return response()->json(['message' => 'Order not found'], 404);
         }
 
@@ -266,10 +272,10 @@ class PlanController extends Controller
         }
 
         try {
-            \Midtrans\Config::$isProduction = config('midtrans.is_production', false);
-            \Midtrans\Config::$serverKey = config('midtrans.server_key');
+            Config::$isProduction = config('midtrans.is_production', false);
+            Config::$serverKey = config('midtrans.server_key');
 
-            $status = \Midtrans\Transaction::status($orderId);
+            $status = Transaction::status($orderId);
 
             if ($status->transaction_status === 'settlement' || $status->transaction_status === 'capture') {
                 $order->update([
@@ -291,11 +297,11 @@ class PlanController extends Controller
             } else {
                 return response()->json([
                     'message' => 'Payment not completed',
-                    'status' => $status->transaction_status
+                    'status' => $status->transaction_status,
                 ], 400);
             }
         } catch (\Exception $e) {
-            \Illuminate\Support\Facades\Log::error('Payment confirmation error: ' . $e->getMessage());
+            Log::error('Payment confirmation error: '.$e->getMessage());
 
             return response()->json(['message' => 'Payment verification failed. Please try again later.'], 500);
         }

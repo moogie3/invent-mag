@@ -6,22 +6,21 @@ use App\Models\Categories;
 use App\Models\Product;
 use App\Models\Supplier;
 use App\Models\Unit;
-use App\Models\User;
 use App\Models\Warehouse;
 use App\Services\ProductService;
+use Database\Seeders\RoleSeeder;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 use Mockery;
 use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Traits\CreatesTenant;
-use Database\Seeders\RoleSeeder;
 
 class ProductControllerTest extends TestCase
 {
-    use WithFaker, CreatesTenant, RefreshDatabase;
+    use CreatesTenant, RefreshDatabase, WithFaker;
 
     protected function setUp(): void
     {
@@ -194,7 +193,7 @@ class ProductControllerTest extends TestCase
         $response->assertStatus(200)
             ->assertJson([
                 'success' => true,
-                'message' => "Successfully deleted 3 product(s)",
+                'message' => 'Successfully deleted 3 product(s)',
                 'deleted_count' => 3,
             ]);
 
@@ -220,7 +219,7 @@ class ProductControllerTest extends TestCase
         $response->assertStatus(200)
             ->assertJson([
                 'success' => true,
-                'message' => "Successfully updated stock for 2 product(s)",
+                'message' => 'Successfully updated stock for 2 product(s)',
                 'updated_count' => 2,
             ]);
 
@@ -865,7 +864,7 @@ class ProductControllerTest extends TestCase
         $mockService->shouldReceive('adjustProductStock')
             ->once()
             ->with(
-                Mockery::on(fn($p) => $p->id === $product->id),
+                Mockery::on(fn ($p) => $p->id === $product->id),
                 5.0,
                 'increase',
                 'Test adjustment',
@@ -888,7 +887,7 @@ class ProductControllerTest extends TestCase
             ->assertJson([
                 'success' => true,
                 'message' => 'Stock adjusted successfully.',
-                // 'product' => ['stock_quantity' => 15] // This part is tricky if using mock. 
+                // 'product' => ['stock_quantity' => 15] // This part is tricky if using mock.
                 // ProductController returns $product->fresh()->load(...)
                 // Since we mock the service to return a product, we rely on what the service returns.
                 // But the controller method `adjustStock` uses the return value of service.
@@ -929,12 +928,12 @@ class ProductControllerTest extends TestCase
     public function search_returns_correctly_formatted_products_from_service()
     {
         $mockProducts = collect([
-            (object)[
+            (object) [
                 'id' => 1,
                 'name' => 'Test Product',
                 'code' => 'TEST001',
-                'category' => (object)['name' => 'Category1'],
-                'unit' => (object)['symbol' => 'pcs'],
+                'category' => (object) ['name' => 'Category1'],
+                'unit' => (object) ['symbol' => 'pcs'],
             ],
         ]);
 

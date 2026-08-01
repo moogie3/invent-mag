@@ -2,9 +2,6 @@
 
 namespace Tests\Unit\Services;
 
-use App\Models\Account;
-use App\Models\JournalEntry;
-use App\Models\Tenant;
 use App\Services\CashFlowService;
 use App\Services\FinancialReportingService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -17,6 +14,7 @@ class CashFlowServiceTest extends TestCase
     use CreatesTenant, RefreshDatabase;
 
     protected CashFlowService $cashFlowService;
+
     protected $financialReportingServiceMock;
 
     protected function setUp(): void

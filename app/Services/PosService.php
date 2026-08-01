@@ -2,23 +2,21 @@
 
 namespace App\Services;
 
-use App\Models\Product;
-use App\Models\Sales;
-use App\Models\SalesItem;
-use App\Models\Tax;
 use App\Helpers\SalesHelper;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
-use Carbon\Carbon;
-
+use App\Models\Account;
 use App\Models\Categories;
 use App\Models\Customer;
+use App\Models\Product;
+use App\Models\ProductWarehouse;
+use App\Models\Sales;
+use App\Models\SalesItem;
 use App\Models\Supplier;
+use App\Models\Tax;
 use App\Models\Unit;
 use App\Models\Warehouse;
-use App\Models\ProductWarehouse;
-use App\Models\Account;
-use App\Services\AccountingService;
+use Carbon\Carbon;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class PosService
 {
@@ -32,25 +30,25 @@ class PosService
     public function getPosIndexData()
     {
         $products = Product::with(['unit', 'productWarehouses'])->get();
-        
+
         $mainWarehouse = Warehouse::where('is_main', true)->first();
         $mainWarehouseId = $mainWarehouse ? $mainWarehouse->id : null;
 
         $products->each(function ($product) use ($mainWarehouseId) {
             $product->setAppends([]); // Prevent heavy default accessors
-            
+
             if ($mainWarehouseId) {
                 $mainStock = $product->productWarehouses->where('warehouse_id', $mainWarehouseId)->first();
                 $stockQty = $mainStock ? max(0, (float) $mainStock->quantity) : 0;
             } else {
                 $stockQty = 0;
             }
-            
+
             $product->main_warehouse_stock = $stockQty;
             $product->stock_quantity = $stockQty;
             $product->total_stock = $product->productWarehouses->sum('quantity');
         });
-        
+
         $customers = Customer::all();
         $walkInCustomerId = $customers->where('name', 'Walk In Customer')->first()->id ?? null;
         $categories = Categories::all();
@@ -64,22 +62,22 @@ class PosService
     public function validateStockBeforeSale(array $products, $warehouseId = null)
     {
         $warehouseId = $warehouseId ?? Product::getMainWarehouseId();
-        
-        if (!$warehouseId) {
+
+        if (! $warehouseId) {
             throw new \Exception('No main warehouse configured. Please set a main warehouse first.');
         }
-        
+
         $insufficientProducts = [];
-        
+
         foreach ($products as $item) {
             $product = Product::find($item['id']);
-            if (!$product) {
+            if (! $product) {
                 continue;
             }
-            
+
             $availableStock = $product->getWarehouseStock($warehouseId);
             $requestedQty = (int) $item['quantity'];
-            
+
             if ($availableStock < $requestedQty) {
                 $insufficientProducts[] = [
                     'id' => $product->id,
@@ -90,24 +88,24 @@ class PosService
                 ];
             }
         }
-        
+
         return $insufficientProducts;
     }
 
     public function createSale(array $data)
     {
         $products = json_decode($data['products'], true);
-        if (!$products || !is_array($products)) {
+        if (! $products || ! is_array($products)) {
             throw new \Exception('Invalid product data');
         }
-        
+
         if (empty($products)) {
             throw new \Exception('No products in the order');
         }
 
         $productIds = array_column($products, 'id');
         $dbProducts = Product::whereIn('id', $productIds)->get()->keyBy('id');
-        
+
         $subTotal = 0;
         $totalBeforeDiscounts = 0;
 
@@ -142,24 +140,24 @@ class PosService
         $amountReceived = (float) ($data['amount_received'] ?? $grandTotal);
         if (strtoupper($paymentMethod) === 'CASH' && $amountReceived < $grandTotal) {
             throw new \Exception(
-                'Amount received (' . number_format($amountReceived, 2, '.', '') . ') ' .
-                'must be greater than or equal to the grand total (' . number_format($grandTotal, 2, '.', '') . ').'
+                'Amount received ('.number_format($amountReceived, 2, '.', '').') '.
+                'must be greater than or equal to the grand total ('.number_format($grandTotal, 2, '.', '').').'
             );
         }
 
         $lastPosInvoice = Sales::where('invoice', 'like', 'POS-%')
-                            ->latest()
-                            ->first();
+            ->latest()
+            ->first();
 
         $invoiceNumber = 1;
         if ($lastPosInvoice) {
             $lastNumber = (int) substr($lastPosInvoice->invoice, 4);
             $invoiceNumber = $lastNumber + 1;
         }
-        $invoice = 'POS-' . str_pad($invoiceNumber, 4, '0', STR_PAD_LEFT);
+        $invoice = 'POS-'.str_pad($invoiceNumber, 4, '0', STR_PAD_LEFT);
 
         $mainWarehouse = Warehouse::where('is_main', true)->first();
-        if (!$mainWarehouse) {
+        if (! $mainWarehouse) {
             throw new \Exception('No main warehouse configured. Please set a main warehouse first.');
         }
 
@@ -171,15 +169,15 @@ class PosService
         $insufficientProducts = [];
         foreach ($products as $product) {
             $productModel = $dbProducts[$product['id']] ?? null;
-            if (!$productModel) {
+            if (! $productModel) {
                 continue;
             }
-            
+
             $availableStock = 0;
             if (isset($stockRecords[$product['id']])) {
                 $availableStock = (float) $stockRecords[$product['id']]->quantity;
             }
-            
+
             $requestedQty = (int) $product['quantity'];
             if ($availableStock < $requestedQty) {
                 $insufficientProducts[] = [
@@ -191,13 +189,13 @@ class PosService
                 ];
             }
         }
-        
-        if (!empty($insufficientProducts)) {
+
+        if (! empty($insufficientProducts)) {
             $productList = collect($insufficientProducts)->pluck('name')->implode(', ');
-            throw new \Exception('Insufficient stock for: ' . $productList . '. Please adjust quantities or restock.');
+            throw new \Exception('Insufficient stock for: '.$productList.'. Please adjust quantities or restock.');
         }
 
-        return DB::transaction(function () use ($data, $products, $dbProducts, $grandTotal, $orderDiscount, $orderDiscountType, $taxAmount, $taxRateVal, $taxId, $taxType, $subTotal, $mainWarehouse, $invoice, $amountReceived, $taxable) {
+        return DB::transaction(function () use ($data, $products, $dbProducts, $grandTotal, $orderDiscount, $orderDiscountType, $taxAmount, $taxRateVal, $taxId, $taxType, $mainWarehouse, $invoice, $amountReceived, $taxable) {
             $pphTaxId = $data['pph_tax_id'] ?? null;
             $pphTax = $pphTaxId ? Tax::find($pphTaxId) : null;
             $pphTaxRate = $pphTax ? (float) $pphTax->rate : 0;
@@ -226,16 +224,16 @@ class PosService
                 'change_amount' => $changeAmount,
                 'type' => Sales::TYPE_POS,
                 'pph_enabled' => app('currentTenant')->isIndonesian() && ($pphTax?->is_pph ?? false),
-                'pph_rate'    => app('currentTenant')->isIndonesian() && ($pphTax?->is_pph ?? false) ? $pphTaxRate : null,
-                'pph_amount'  => app('currentTenant')->isIndonesian() && ($pphTax?->is_pph ?? false) ? $pphAmount : 0,
-                'pph_tax_id'  => app('currentTenant')->isIndonesian() && ($pphTax?->is_pph ?? false) ? $pphTax?->id : null,
+                'pph_rate' => app('currentTenant')->isIndonesian() && ($pphTax?->is_pph ?? false) ? $pphTaxRate : null,
+                'pph_amount' => app('currentTenant')->isIndonesian() && ($pphTax?->is_pph ?? false) ? $pphAmount : 0,
+                'pph_tax_id' => app('currentTenant')->isIndonesian() && ($pphTax?->is_pph ?? false) ? $pphTax?->id : null,
             ]);
 
             $sale->payments()->create([
                 'amount' => $grandTotal,
                 'payment_date' => now(),
                 'payment_method' => $data['payment_method'],
-                'notes' => 'Payment for POS sale ' . $invoice,
+                'notes' => 'Payment for POS sale '.$invoice,
             ]);
 
             $stockRecords = ProductWarehouse::whereIn('product_id', array_column($products, 'id'))
@@ -245,7 +243,7 @@ class PosService
 
             foreach ($products as $product) {
                 $productModel = $dbProducts[$product['id']] ?? null;
-                if (!$productModel) {
+                if (! $productModel) {
                     continue;
                 }
                 $productSubtotal = $product['price'] * $product['quantity'];
@@ -272,7 +270,7 @@ class PosService
             }
 
             $accountingSettings = app('currentTenant')->accounting_settings ?? [];
-            if (!empty($accountingSettings) && isset($accountingSettings['sales_revenue_account_id'], $accountingSettings['accounts_receivable_account_id'], $accountingSettings['cost_of_goods_sold_account_id'], $accountingSettings['inventory_account_id'])) {
+            if (! empty($accountingSettings) && isset($accountingSettings['sales_revenue_account_id'], $accountingSettings['accounts_receivable_account_id'], $accountingSettings['cost_of_goods_sold_account_id'], $accountingSettings['inventory_account_id'])) {
                 $salesRevenueAccount = Account::find($accountingSettings['sales_revenue_account_id']);
                 $accountsReceivableAccount = Account::find($accountingSettings['accounts_receivable_account_id']);
                 $costOfGoodsSoldAccount = Account::find($accountingSettings['cost_of_goods_sold_account_id']);

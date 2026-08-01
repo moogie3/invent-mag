@@ -2,20 +2,19 @@
 
 namespace Tests\Feature\Admin;
 
-use App\Models\User;
-use App\Models\Supplier;
-use App\Models\Purchase;
 use App\Models\POItem;
 use App\Models\Product;
-use Tests\TestCase;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Tests\Traits\CreatesTenant;
-use Database\Seeders\RoleSeeder;
+use App\Models\Purchase;
+use App\Models\Supplier;
 use App\Services\CrmService;
+use Database\Seeders\RoleSeeder;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\TestCase;
+use Tests\Traits\CreatesTenant;
 
 class SupplierCrmControllerTest extends TestCase
 {
-    use RefreshDatabase, CreatesTenant;
+    use CreatesTenant, RefreshDatabase;
 
     protected function setUp(): void
     {
@@ -64,8 +63,8 @@ class SupplierCrmControllerTest extends TestCase
         // Mock the CrmService to throw an exception
         $mockService = \Mockery::mock(CrmService::class);
         $mockService->shouldReceive('getSupplierCrmData')
-                    ->once()
-                    ->andThrow(new \Exception('Service exception.'));
+            ->once()
+            ->andThrow(new \Exception('Service exception.'));
         $this->app->instance(CrmService::class, $mockService);
 
         $response = $this->getJson("/admin/suppliers/{$supplier->id}/srm-details");
@@ -127,8 +126,8 @@ class SupplierCrmControllerTest extends TestCase
         // Mock the CrmService to throw an exception
         $mockService = \Mockery::mock(CrmService::class);
         $mockService->shouldReceive('storeSupplierInteraction')
-                    ->once()
-                    ->andThrow(new \Exception('Service interaction failed.'));
+            ->once()
+            ->andThrow(new \Exception('Service interaction failed.'));
         $this->app->instance(CrmService::class, $mockService);
 
         $response = $this->postJson("/admin/suppliers/{$supplier->id}/interactions", $interactionData);
@@ -175,8 +174,8 @@ class SupplierCrmControllerTest extends TestCase
         // Mock the CrmService to throw an exception
         $mockService = \Mockery::mock(CrmService::class);
         $mockService->shouldReceive('getSupplierHistoricalPurchases')
-                    ->once()
-                    ->andThrow(new \Exception('Service historical purchases failed.'));
+            ->once()
+            ->andThrow(new \Exception('Service historical purchases failed.'));
         $this->app->instance(CrmService::class, $mockService);
 
         $response = $this->getJson("/admin/suppliers/{$supplier->id}/historical-purchases");
@@ -250,8 +249,8 @@ class SupplierCrmControllerTest extends TestCase
         // Mock the CrmService to throw an exception
         $mockService = \Mockery::mock(CrmService::class);
         $mockService->shouldReceive('getSupplierProductHistory')
-                    ->once()
-                    ->andThrow(new \Exception('Service product history failed.'));
+            ->once()
+            ->andThrow(new \Exception('Service product history failed.'));
         $this->app->instance(CrmService::class, $mockService);
 
         $response = $this->getJson("/admin/suppliers/{$supplier->id}/product-history");

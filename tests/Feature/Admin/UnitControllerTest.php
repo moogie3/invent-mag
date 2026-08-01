@@ -3,21 +3,18 @@
 namespace Tests\Feature\Admin;
 
 use App\Models\Unit;
-use App\Models\User;
 use App\Services\UnitService;
-use Illuminate\Foundation\Testing\WithFaker;
-use Mockery;
-use Illuminate\Pagination\LengthAwarePaginator;
-use Spatie\Permission\Models\Role;
-use Spatie\Permission\PermissionRegistrar;
-use Tests\TestCase;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Tests\Traits\CreatesTenant;
 use Database\Seeders\RoleSeeder;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\WithFaker;
+use Illuminate\Pagination\LengthAwarePaginator;
+use Mockery;
+use Tests\TestCase;
+use Tests\Traits\CreatesTenant;
 
 class UnitControllerTest extends TestCase
 {
-    use WithFaker, CreatesTenant, RefreshDatabase;
+    use CreatesTenant, RefreshDatabase, WithFaker;
 
     protected function setUp(): void
     {
@@ -28,7 +25,7 @@ class UnitControllerTest extends TestCase
         $this->actingAs($this->user);
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         Mockery::close();
         parent::tearDown();
@@ -241,7 +238,7 @@ class UnitControllerTest extends TestCase
             ->assertJson([
                 'success' => false,
                 'message' => $errorMessage,
-                'errors' => ['name' => [$errorMessage]]
+                'errors' => ['name' => [$errorMessage]],
             ]);
     }
 
@@ -294,7 +291,7 @@ class UnitControllerTest extends TestCase
             ->assertJson([
                 'success' => false,
                 'message' => $errorMessage,
-                'errors' => ['name' => [$errorMessage]]
+                'errors' => ['name' => [$errorMessage]],
             ]);
     }
 

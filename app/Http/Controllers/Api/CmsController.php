@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Support\Facades\Storage;
 
 class CmsController extends Controller
 {
@@ -13,7 +12,7 @@ class CmsController extends Controller
         $defaults = $this->getDefaults();
 
         $path = storage_path('app/cms.json');
-        if (!file_exists($path)) {
+        if (! file_exists($path)) {
             return response()->json($defaults);
         }
 
@@ -70,7 +69,7 @@ class CmsController extends Controller
             'cta_title' => 'Ready to streamline your business?',
             'cta_description' => 'Join thousands of businesses using Invent-MAG to manage inventory, sales, and accounting in one place.',
             'contact_email' => 'jefrydwijaya3@gmail.com',
-            'footer_text' => '© ' . date('Y') . ' Invent-MAG. All rights reserved.',
+            'footer_text' => '© '.date('Y').' Invent-MAG. All rights reserved.',
         ];
     }
 }

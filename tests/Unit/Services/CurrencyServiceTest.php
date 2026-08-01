@@ -5,14 +5,14 @@ namespace Tests\Unit\Services;
 use App\Models\CurrencySetting;
 use App\Models\Unit;
 use App\Services\CurrencyService;
-use Tests\TestCase;
-use PHPUnit\Framework\Attributes\Test;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use PHPUnit\Framework\Attributes\Test;
+use Tests\TestCase;
 use Tests\Traits\CreatesTenant;
 
 class CurrencyServiceTest extends TestCase
 {
-    use RefreshDatabase, CreatesTenant;
+    use CreatesTenant, RefreshDatabase;
 
     protected CurrencyService $currencyService;
 
@@ -20,7 +20,7 @@ class CurrencyServiceTest extends TestCase
     {
         parent::setUp();
         $this->setupTenant();
-        $this->currencyService = new CurrencyService();
+        $this->currencyService = new CurrencyService;
     }
 
     #[Test]

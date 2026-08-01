@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Log;
 class CheckExpiredSubscriptions extends Command
 {
     protected $signature = 'billing:check-expired';
+
     protected $description = 'Transition active subscriptions to expired when billing period has passed';
 
     public function handle(): int

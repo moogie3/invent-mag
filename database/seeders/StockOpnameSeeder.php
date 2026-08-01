@@ -2,13 +2,12 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Seeder;
+use App\Models\Product;
 use App\Models\StockOpname;
 use App\Models\StockOpnameItem;
-use App\Models\Product;
 use App\Models\User;
 use App\Models\Warehouse;
-use App\Models\ProductWarehouse;
+use Illuminate\Database\Seeder;
 
 class StockOpnameSeeder extends Seeder
 {
@@ -24,11 +23,12 @@ class StockOpnameSeeder extends Seeder
             if ($this->command) {
                 $this->command->warn('Skipping StockOpnameSeeder: Missing dependency data.');
             }
+
             return;
         }
 
         if ($this->command) {
-            $this->command->info("Seeding Stock Opnames...");
+            $this->command->info('Seeding Stock Opnames...');
         }
 
         $defaultWarehouse = $warehouses->first();
@@ -38,7 +38,7 @@ class StockOpnameSeeder extends Seeder
         $draftOpname = StockOpname::create([
             'tenant_id' => $tenantId,
             'warehouse_id' => $defaultWarehouse->id,
-            'reference_number' => 'SO-' . date('ymd') . '-0001',
+            'reference_number' => 'SO-'.date('ymd').'-0001',
             'status' => 'Draft',
             'scheduled_date' => now()->addDays(7),
             'notes' => 'Monthly scheduled stock opname',
@@ -64,7 +64,7 @@ class StockOpnameSeeder extends Seeder
         $inProgressOpname = StockOpname::create([
             'tenant_id' => $tenantId,
             'warehouse_id' => $defaultWarehouse->id,
-            'reference_number' => 'SO-' . date('ymd') . '-0002',
+            'reference_number' => 'SO-'.date('ymd').'-0002',
             'status' => 'In Progress',
             'scheduled_date' => now()->subDays(2),
             'notes' => 'Quick count - partial',
@@ -75,7 +75,7 @@ class StockOpnameSeeder extends Seeder
             $expected = rand(10, 100);
             $counted = $index < 3 ? $expected + rand(-5, 5) : null;
             $variance = $counted !== null ? $counted - $expected : null;
-            
+
             StockOpnameItem::create([
                 'stock_opname_id' => $inProgressOpname->id,
                 'product_id' => $product->id,
@@ -94,7 +94,7 @@ class StockOpnameSeeder extends Seeder
         $completedOpname = StockOpname::create([
             'tenant_id' => $tenantId,
             'warehouse_id' => $defaultWarehouse->id,
-            'reference_number' => 'SO-' . date('ymd') . '-0003',
+            'reference_number' => 'SO-'.date('ymd').'-0003',
             'status' => 'Completed',
             'scheduled_date' => now()->subDays(10),
             'completed_at' => now()->subDays(9),
@@ -106,7 +106,7 @@ class StockOpnameSeeder extends Seeder
             $expected = rand(20, 80);
             $counted = $expected + rand(-3, 3);
             $variance = $counted - $expected;
-            
+
             StockOpnameItem::create([
                 'stock_opname_id' => $completedOpname->id,
                 'product_id' => $product->id,
@@ -119,7 +119,7 @@ class StockOpnameSeeder extends Seeder
 
         if ($this->command) {
             $this->command->info("Created: {$completedOpname->reference_number}");
-            $this->command->info("Done!");
+            $this->command->info('Done!');
         }
     }
 }

@@ -4,14 +4,15 @@ namespace Tests\Unit\Services;
 
 use App\Models\Categories;
 use App\Services\CategoryService;
-use Tests\TestCase;
-use PHPUnit\Framework\Attributes\Test;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Validation\ValidationException;
+use PHPUnit\Framework\Attributes\Test;
+use Tests\TestCase;
 use Tests\Traits\CreatesTenant;
 
 class CategoryServiceTest extends TestCase
 {
-    use RefreshDatabase, CreatesTenant;
+    use CreatesTenant, RefreshDatabase;
 
     protected CategoryService $categoryService;
 
@@ -20,7 +21,7 @@ class CategoryServiceTest extends TestCase
         parent::setUp();
         $this->setupTenant(); // Creates $this->tenant and $this->user, and calls actingAs
         $this->user->assignRole('superuser'); // Ensure the user has permissions for services
-        $this->categoryService = new CategoryService();
+        $this->categoryService = new CategoryService;
     }
 
     #[Test]
@@ -60,7 +61,7 @@ class CategoryServiceTest extends TestCase
     #[Test]
     public function it_returns_error_if_category_already_exists()
     {
-        $this->expectException(\Illuminate\Validation\ValidationException::class);
+        $this->expectException(ValidationException::class);
 
         Categories::factory()->create(['name' => 'Electronics', 'description' => 'Electronic gadgets and devices']);
 

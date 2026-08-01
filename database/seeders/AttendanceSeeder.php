@@ -2,11 +2,10 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Seeder;
-use App\Models\Employee;
 use App\Models\AttendancePeriod;
 use App\Models\AttendanceRecord;
-use Carbon\Carbon;
+use App\Models\Employee;
+use Illuminate\Database\Seeder;
 
 class AttendanceSeeder extends Seeder
 {

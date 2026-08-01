@@ -9,14 +9,14 @@ use App\Models\Sales;
 use App\Models\SalesOpportunity;
 use App\Models\SalesPipeline;
 use App\Services\SalesPipelineService;
-use Tests\TestCase;
-use PHPUnit\Framework\Attributes\Test;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use PHPUnit\Framework\Attributes\Test;
+use Tests\TestCase;
 use Tests\Traits\CreatesTenant;
 
 class SalesPipelineServiceTest extends TestCase
 {
-    use RefreshDatabase, CreatesTenant;
+    use CreatesTenant, RefreshDatabase;
 
     protected SalesPipelineService $salesPipelineService;
 
@@ -25,7 +25,7 @@ class SalesPipelineServiceTest extends TestCase
         parent::setUp();
         $this->setupTenant(); // Creates $this->tenant and $this->user, and calls actingAs
         $this->user->assignRole('superuser'); // Ensure the user has permissions for services
-        $this->salesPipelineService = new SalesPipelineService();
+        $this->salesPipelineService = new SalesPipelineService;
     }
 
     #[Test]

@@ -103,7 +103,7 @@ class AccountingAuditService
             'total_credit' => $journalEntry->total_credit,
         ];
 
-        if (!empty($transactions)) {
+        if (! empty($transactions)) {
             $data['transactions'] = array_map(function ($tx) {
                 return [
                     'account_code' => $tx['account_code'] ?? null,

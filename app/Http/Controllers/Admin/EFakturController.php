@@ -22,7 +22,7 @@ class EFakturController extends Controller
     {
         $this->authorize('view-efaktur');
 
-        $masa  = (int) $request->get('masa', now()->month);
+        $masa = (int) $request->get('masa', now()->month);
         $tahun = (int) $request->get('tahun', now()->year);
 
         $fakturs = FakturPajak::with(['sale.customer'])
@@ -32,7 +32,7 @@ class EFakturController extends Controller
             ->paginate(25)
             ->withQueryString();
 
-        $summary   = $this->efakturService->getSptMasaSummary($masa, $tahun);
+        $summary = $this->efakturService->getSptMasaSummary($masa, $tahun);
         $nsfpCount = NsfpPool::where('status', 'available')->count();
 
         return view('admin.efaktur.index', compact('fakturs', 'summary', 'masa', 'tahun', 'nsfpCount'));
@@ -47,6 +47,7 @@ class EFakturController extends Controller
         $this->authorize('view-efaktur');
 
         $fakturPajak->load(['items', 'sale.customer', 'sale.salesItems.product']);
+
         return view('admin.efaktur.show', compact('fakturPajak'));
     }
 
@@ -60,8 +61,9 @@ class EFakturController extends Controller
 
         try {
             $faktur = $this->efakturService->generateFakturPajak($sale);
+
             return redirect()->route('admin.efaktur.show', $faktur)
-                ->with('success', 'Faktur Pajak ' . $faktur->nsfp . ' berhasil dibuat.');
+                ->with('success', 'Faktur Pajak '.$faktur->nsfp.' berhasil dibuat.');
         } catch (\Exception $e) {
             return back()->with('error', $e->getMessage());
         }
@@ -77,8 +79,9 @@ class EFakturController extends Controller
 
         try {
             $this->efakturService->cancelFakturPajak($fakturPajak);
+
             return redirect()->route('admin.efaktur.index')
-                ->with('success', 'Faktur Pajak ' . $fakturPajak->nsfp . ' dibatalkan.');
+                ->with('success', 'Faktur Pajak '.$fakturPajak->nsfp.' dibatalkan.');
         } catch (\Exception $e) {
             return back()->with('error', $e->getMessage());
         }
@@ -96,12 +99,12 @@ class EFakturController extends Controller
 
         $html = view('admin.efaktur.faktur-pdf', compact('fakturPajak'))->render();
 
-        $dompdf = new Dompdf();
+        $dompdf = new Dompdf;
         $dompdf->loadHtml($html);
         $dompdf->setPaper('A4', 'portrait');
         $dompdf->render();
 
-        $filename = 'FP-' . str_replace(['.', '-'], '', $fakturPajak->nsfp) . '.pdf';
+        $filename = 'FP-'.str_replace(['.', '-'], '', $fakturPajak->nsfp).'.pdf';
 
         return $dompdf->stream($filename, ['Attachment' => false]);
     }
@@ -114,7 +117,7 @@ class EFakturController extends Controller
     {
         $this->authorize('view-efaktur');
 
-        $masa  = (int) $request->get('masa', now()->month);
+        $masa = (int) $request->get('masa', now()->month);
         $tahun = (int) $request->get('tahun', now()->year);
 
         return $this->efakturService->exportCsvForDjp($masa, $tahun);
@@ -128,9 +131,9 @@ class EFakturController extends Controller
     {
         $this->authorize('manage-efaktur-settings');
 
-        $tenant    = app('currentTenant');
+        $tenant = app('currentTenant');
         $nsfpCount = NsfpPool::where('status', 'available')->count();
-        $nsfpUsed  = NsfpPool::where('status', 'used')->count();
+        $nsfpUsed = NsfpPool::where('status', 'used')->count();
 
         return view('admin.efaktur.settings', compact('tenant', 'nsfpCount', 'nsfpUsed'));
     }
@@ -141,10 +144,10 @@ class EFakturController extends Controller
 
         $validated = $request->validate([
             'tax_jurisdiction' => 'nullable|string|max:10',
-            'npwp'       => 'nullable|string|max:20',
+            'npwp' => 'nullable|string|max:20',
             'pkp_status' => 'boolean',
-            'pkp_date'   => 'nullable|date',
-            'ppn_rate'   => 'numeric|min:0|max:100',
+            'pkp_date' => 'nullable|date',
+            'ppn_rate' => 'numeric|min:0|max:100',
         ]);
 
         // Ensure pkp_status is a boolean (checkbox sends '1' or omits key)
@@ -183,9 +186,9 @@ class EFakturController extends Controller
         $msg = "Import selesai: {$result['imported']} NSFP berhasil diimpor, {$result['skipped']} sudah ada.";
 
         if (count($result['errors']) > 0) {
-            $msg .= ' Error: ' . implode('; ', array_slice($result['errors'], 0, 5));
+            $msg .= ' Error: '.implode('; ', array_slice($result['errors'], 0, 5));
             if (count($result['errors']) > 5) {
-                $msg .= ' (dan ' . (count($result['errors']) - 5) . ' error lainnya)';
+                $msg .= ' (dan '.(count($result['errors']) - 5).' error lainnya)';
             }
         }
 

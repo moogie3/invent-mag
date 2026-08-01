@@ -4,10 +4,12 @@ namespace App\Helpers;
 
 use App\Models\CurrencySetting;
 use App\Models\PlatformCurrencySetting;
+use Carbon\Carbon;
 
 class CurrencyHelper
 {
     protected static $settings = null;
+
     protected static $platformSettings = null;
 
     /**
@@ -95,10 +97,10 @@ class CurrencyHelper
         );
 
         $result = $settings->position === 'prefix'
-            ? $settings->currency_symbol . ' ' . $formatted
-            : $formatted . ' ' . $settings->currency_symbol;
+            ? $settings->currency_symbol.' '.$formatted
+            : $formatted.' '.$settings->currency_symbol;
 
-        return $isNegative ? '-' . $result : $result;
+        return $isNegative ? '-'.$result : $result;
     }
 
     /**
@@ -170,10 +172,10 @@ class CurrencyHelper
         );
 
         $result = $settings->position === 'prefix'
-            ? $settings->currency_symbol . ' ' . $formatted
-            : $formatted . ' ' . $settings->currency_symbol;
+            ? $settings->currency_symbol.' '.$formatted
+            : $formatted.' '.$settings->currency_symbol;
 
-        return $isNegative ? '-' . $result : $result;
+        return $isNegative ? '-'.$result : $result;
     }
 
     /**
@@ -187,6 +189,6 @@ class CurrencyHelper
 
     public static function formatDate($date)
     {
-        return \Carbon\Carbon::parse($date)->format('d M Y');
+        return Carbon::parse($date)->format('d M Y');
     }
 }

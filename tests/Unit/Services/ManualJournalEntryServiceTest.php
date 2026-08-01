@@ -4,22 +4,23 @@ namespace Tests\Unit\Services;
 
 use App\Models\Account;
 use App\Models\JournalEntry;
-use App\Services\ManualJournalEntryService;
 use App\Services\AccountingService;
+use App\Services\ManualJournalEntryService;
+use Carbon\Carbon;
+use Database\Seeders\AccountSeeder;
+use Database\Seeders\RoleSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Mockery;
 use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 use Tests\Traits\CreatesTenant;
-use Database\Seeders\AccountSeeder;
-use Database\Seeders\RoleSeeder;
-use Carbon\Carbon;
-use Mockery;
 
 class ManualJournalEntryServiceTest extends TestCase
 {
-    use RefreshDatabase, CreatesTenant;
+    use CreatesTenant, RefreshDatabase;
 
     protected ManualJournalEntryService $service;
+
     protected $accountingServiceMock;
 
     protected function setUp(): void
@@ -28,7 +29,7 @@ class ManualJournalEntryServiceTest extends TestCase
         $this->setupTenant();
         $this->seed(RoleSeeder::class);
         $this->seed(AccountSeeder::class);
-        
+
         $this->accountingServiceMock = Mockery::mock(AccountingService::class);
         $this->service = new ManualJournalEntryService($this->accountingServiceMock);
     }
@@ -148,7 +149,7 @@ class ManualJournalEntryServiceTest extends TestCase
 
         $this->expectException(\Exception::class);
         $this->expectExceptionMessage('Debits (500) do not equal credits (1000)');
-        
+
         $this->service->create($data);
     }
 
@@ -444,7 +445,7 @@ class ManualJournalEntryServiceTest extends TestCase
         $reflection = new \ReflectionClass($this->service);
         $method = $reflection->getMethod('prepareTransactions');
         $method->setAccessible(true);
-        
+
         $result = $method->invoke($this->service, $transactions);
 
         $this->assertCount(2, $result);

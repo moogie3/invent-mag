@@ -107,6 +107,11 @@
                                         <td>{{ $transaction->journalEntry->date->format('d M Y') }}</td>
                                         <td>
                                             {{ $transaction->journalEntry->description }}
+                                            @if($transaction->journalEntry->isReconciled())
+                                                <span class="badge bg-teal text-white ms-1" title="{{ __('messages.reconciled_hint') }}">
+                                                    <i class="ti ti-circle-check"></i> {{ __('messages.reconciled') }}
+                                                </span>
+                                            @endif
                                             @if ($transaction->journalEntry->sourceable && method_exists($transaction->journalEntry->sourceable, 'path'))
                                                 <a href="{{ $transaction->journalEntry->sourceable->path() }}"
                                                     target="_blank" class="ms-2">({{ __('messages.view_source') }})</a>

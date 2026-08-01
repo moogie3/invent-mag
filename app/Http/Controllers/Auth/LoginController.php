@@ -3,20 +3,20 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Http\Responses\LogoutResponse;
 use App\Models\ActivityLog;
 use App\Models\User;
 use App\Scopes\TenantScope;
 use App\Services\ActivityLogService;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use App\Http\Responses\LogoutResponse;
 
 class LoginController extends Controller
 {
     /**
      * Handle an incoming authentication request.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @return mixed
      */
     public function store(Request $request)
@@ -28,8 +28,8 @@ class LoginController extends Controller
 
         // Find the user by email, ignoring the tenant scope for this initial lookup
         $user = User::withoutGlobalScope(TenantScope::class)
-                    ->where('email', $request->email)
-                    ->first();
+            ->where('email', $request->email)
+            ->first();
 
         // If no user is found, or they don't have a tenant, fail as normal
         if (! $user || ! $user->tenant) {
@@ -41,8 +41,8 @@ class LoginController extends Controller
         // If the user is not on their correct tenant domain, redirect them
         if ($tenantDomain !== $request->getHost()) {
             // Reconstruct the URL with the correct domain and path
-            $redirectUrl = "https://{$tenantDomain}" . $request->getRequestUri();
-            
+            $redirectUrl = "https://{$tenantDomain}".$request->getRequestUri();
+
             return redirect()->away($redirectUrl)->withInput($request->only('email'));
         }
 
@@ -55,7 +55,7 @@ class LoginController extends Controller
                 app(ActivityLogService::class)->log(
                     ActivityLog::MODULE_DASHBOARD,
                     ActivityLog::ACTION_LOGIN,
-                    'User logged in: ' . Auth::user()->name . ' (' . Auth::user()->email . ')',
+                    'User logged in: '.Auth::user()->name.' ('.Auth::user()->email.')',
                 );
             } catch (\Throwable $e) {
                 // never block login because of logging failure
@@ -71,8 +71,7 @@ class LoginController extends Controller
     /**
      * Handle a failed authentication attempt.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\RedirectResponse
+     * @return RedirectResponse
      */
     protected function failAuthentication(Request $request)
     {
@@ -95,8 +94,7 @@ class LoginController extends Controller
     /**
      * Log the user out of the application.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \App\Http\Responses\LogoutResponse
+     * @return LogoutResponse
      */
     public function destroy(Request $request)
     {
@@ -106,7 +104,7 @@ class LoginController extends Controller
                 app(ActivityLogService::class)->log(
                     ActivityLog::MODULE_DASHBOARD,
                     ActivityLog::ACTION_LOGOUT,
-                    'User logged out: ' . Auth::user()->name . ' (' . Auth::user()->email . ')',
+                    'User logged out: '.Auth::user()->name.' ('.Auth::user()->email.')',
                 );
             }
         } catch (\Throwable $e) {
@@ -119,6 +117,6 @@ class LoginController extends Controller
 
         $request->session()->regenerateToken();
 
-        return new LogoutResponse();
+        return new LogoutResponse;
     }
 }

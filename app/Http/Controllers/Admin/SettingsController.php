@@ -3,12 +3,11 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\Account;
 use App\Models\ActivityLog;
+use App\Models\User;
 use App\Services\ActivityLogService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
 class SettingsController extends Controller
@@ -16,12 +15,13 @@ class SettingsController extends Controller
     public function index()
     {
         $tenant = app('currentTenant');
+
         return view('admin.settings.settings', ['tenant' => $tenant]);
     }
 
     public function update(Request $request)
     {
-        /** @var \App\Models\User $user */
+        /** @var User $user */
         $user = Auth::user();
 
         $validatedData = $request->validate([
@@ -63,7 +63,7 @@ class SettingsController extends Controller
 
         Log::debug('Before save - show_theme_toggle:', [
             'value' => $user->system_settings['show_theme_toggle'] ?? 'not set',
-            'user_id' => Auth::id()
+            'user_id' => Auth::id(),
         ]);
 
         // Save the user
@@ -74,13 +74,13 @@ class SettingsController extends Controller
 
         Log::debug('After save (and refresh) - show_theme_toggle:', [
             'value' => $user->system_settings['show_theme_toggle'] ?? 'not set',
-            'user_id' => Auth::id()
+            'user_id' => Auth::id(),
         ]);
 
         Log::info('System settings updated successfully', [
             'user_id' => Auth::id(),
             'theme_mode' => $settingsToSave['theme_mode'],
-            'settings' => $settingsToSave
+            'settings' => $settingsToSave,
         ]);
 
         try {
@@ -101,7 +101,7 @@ class SettingsController extends Controller
 
     public function getSettings()
     {
-        /** @var \App\Models\User $user */
+        /** @var User $user */
         $user = Auth::user();
 
         $settings = $user->system_settings ?? [];
@@ -170,7 +170,7 @@ class SettingsController extends Controller
 
     public function updateThemeMode(Request $request)
     {
-        /** @var \App\Models\User $user */
+        /** @var User $user */
         $user = Auth::user();
 
         $validatedData = $request->validate([
@@ -179,22 +179,20 @@ class SettingsController extends Controller
 
         $existingSettings = $user->system_settings ?? [];
         $user->system_settings = array_merge($existingSettings, [
-            'theme_mode' => $validatedData['theme_mode']
+            'theme_mode' => $validatedData['theme_mode'],
         ]);
 
         $user->save();
 
         Log::info('Theme mode updated', [
             'user_id' => Auth::id(),
-            'theme_mode' => $validatedData['theme_mode']
+            'theme_mode' => $validatedData['theme_mode'],
         ]);
 
         return response()->json([
             'success' => true,
             'message' => 'Theme mode updated successfully.',
-            'theme_mode' => $validatedData['theme_mode']
+            'theme_mode' => $validatedData['theme_mode'],
         ]);
     }
-
-    
 }

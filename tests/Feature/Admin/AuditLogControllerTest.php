@@ -2,19 +2,20 @@
 
 namespace Tests\Feature\Admin;
 
-use App\Models\User;
+use App\Http\Controllers\Admin\AuditLogController;
 use App\Models\ActivityLog;
+use App\Models\User;
 use App\Services\ActivityLogService;
-use Tests\TestCase;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Tests\Traits\CreatesTenant;
-use Database\Seeders\RoleSeeder;
 use Database\Seeders\PermissionSeeder;
+use Database\Seeders\RoleSeeder;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Mockery;
+use Tests\TestCase;
+use Tests\Traits\CreatesTenant;
 
 class AuditLogControllerTest extends TestCase
 {
-    use RefreshDatabase, CreatesTenant;
+    use CreatesTenant, RefreshDatabase;
 
     protected ActivityLogService $logService;
 
@@ -24,10 +25,10 @@ class AuditLogControllerTest extends TestCase
         $this->setupTenant();
         $this->seed(RoleSeeder::class);
         $this->seed(PermissionSeeder::class);
-        $this->logService = new ActivityLogService();
+        $this->logService = new ActivityLogService;
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         Mockery::close();
         parent::tearDown();
@@ -40,14 +41,15 @@ class AuditLogControllerTest extends TestCase
         ]);
         $user->assignRole('superuser');
         $this->actingAs($user);
+
         return $user;
     }
 
     public function test_constructor_requires_superuser_role()
     {
-        $controller = new \App\Http\Controllers\Admin\AuditLogController($this->logService);
-        
-        $this->assertInstanceOf(\App\Http\Controllers\Admin\AuditLogController::class, $controller);
+        $controller = new AuditLogController($this->logService);
+
+        $this->assertInstanceOf(AuditLogController::class, $controller);
     }
 
     public function test_index_returns_view_with_required_data()
@@ -55,7 +57,7 @@ class AuditLogControllerTest extends TestCase
         $this->actingAsSuperuser();
 
         $tenantId = app('currentTenant')->id;
-        
+
         ActivityLog::factory()->create([
             'tenant_id' => $tenantId,
             'module' => 'Product',
@@ -86,7 +88,7 @@ class AuditLogControllerTest extends TestCase
         $this->actingAsSuperuser();
 
         $tenantId = app('currentTenant')->id;
-        
+
         ActivityLog::factory()->count(30)->create([
             'tenant_id' => $tenantId,
         ]);
@@ -102,7 +104,7 @@ class AuditLogControllerTest extends TestCase
 
         $tenantId = app('currentTenant')->id;
         $user = User::factory()->create(['tenant_id' => $tenantId]);
-        
+
         ActivityLog::factory()->create([
             'tenant_id' => $tenantId,
             'user_id' => $user->id,
@@ -119,7 +121,7 @@ class AuditLogControllerTest extends TestCase
         $this->actingAsSuperuser();
 
         $tenantId = app('currentTenant')->id;
-        
+
         ActivityLog::factory()->create([
             'tenant_id' => $tenantId,
             'module' => 'Product',
@@ -135,7 +137,7 @@ class AuditLogControllerTest extends TestCase
         $this->actingAsSuperuser();
 
         $tenantId = app('currentTenant')->id;
-        
+
         ActivityLog::factory()->create([
             'tenant_id' => $tenantId,
             'action' => 'create',
@@ -151,7 +153,7 @@ class AuditLogControllerTest extends TestCase
         $this->actingAsSuperuser();
 
         $tenantId = app('currentTenant')->id;
-        
+
         ActivityLog::factory()->create([
             'tenant_id' => $tenantId,
             'description' => 'Test search term here',
@@ -167,7 +169,7 @@ class AuditLogControllerTest extends TestCase
         $this->actingAsSuperuser();
 
         $tenantId = app('currentTenant')->id;
-        
+
         ActivityLog::factory()->create([
             'tenant_id' => $tenantId,
             'created_at' => now(),
@@ -186,7 +188,7 @@ class AuditLogControllerTest extends TestCase
         $this->actingAsSuperuser();
 
         $tenantId = app('currentTenant')->id;
-        
+
         $log = ActivityLog::factory()->create([
             'tenant_id' => $tenantId,
             'module' => 'Product',
@@ -220,7 +222,7 @@ class AuditLogControllerTest extends TestCase
         $this->actingAsSuperuser();
 
         $tenantId = app('currentTenant')->id;
-        
+
         $log = ActivityLog::factory()->create([
             'tenant_id' => $tenantId,
             'module' => 'Product',
@@ -244,7 +246,7 @@ class AuditLogControllerTest extends TestCase
         $this->actingAsSuperuser();
 
         $tenantId = app('currentTenant')->id;
-        
+
         ActivityLog::factory()->create([
             'tenant_id' => $tenantId,
         ]);
@@ -259,7 +261,7 @@ class AuditLogControllerTest extends TestCase
         $this->actingAsSuperuser();
 
         $tenantId = app('currentTenant')->id;
-        
+
         ActivityLog::factory()->create([
             'tenant_id' => $tenantId,
             'created_at' => now(),

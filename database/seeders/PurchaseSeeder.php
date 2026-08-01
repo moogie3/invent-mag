@@ -2,17 +2,17 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Seeder;
+use App\Helpers\PurchaseHelper;
+use App\Models\POItem;
+use App\Models\Product;
+use App\Models\ProductWarehouse;
 use App\Models\Purchase;
 use App\Models\Supplier;
-use App\Models\Product;
-use App\Models\POItem;
-use App\Models\Warehouse;
-use App\Models\ProductWarehouse;
 use App\Models\Tax;
-use App\Helpers\PurchaseHelper;
+use App\Models\Warehouse;
 use App\Services\AccountingService;
 use Carbon\Carbon;
+use Illuminate\Database\Seeder;
 
 class PurchaseSeeder extends Seeder
 {
@@ -37,17 +37,18 @@ class PurchaseSeeder extends Seeder
         $warehouseIds = Warehouse::where('tenant_id', $tenantId)->pluck('id')->toArray();
 
         if ($suppliers->isEmpty() || $products->isEmpty() || empty($warehouseIds)) {
-            $this->command->warn('Skipping PurchaseSeeder for tenant ' . app('currentTenant')->name . ': Missing dependency data.');
+            $this->command->warn('Skipping PurchaseSeeder for tenant '.app('currentTenant')->name.': Missing dependency data.');
+
             return;
         }
 
-        $this->command->info("Seeding Purchase Orders for tenant: " . app('currentTenant')->name);
-        $this->command->info("Available: {$suppliers->count()} suppliers, {$products->count()} products, " . count($warehouseIds) . " warehouses");
+        $this->command->info('Seeding Purchase Orders for tenant: '.app('currentTenant')->name);
+        $this->command->info("Available: {$suppliers->count()} suppliers, {$products->count()} products, ".count($warehouseIds).' warehouses');
 
         // Resolve default tax once — TaxSeeder must run before PurchaseSeeder
         $defaultTax = Tax::where('tenant_id', $tenantId)->where('is_default', true)->first()
             ?? Tax::where('tenant_id', $tenantId)->where('is_active', true)->first();
-        $taxId   = $defaultTax?->id;
+        $taxId = $defaultTax?->id;
         $taxRate = $defaultTax ? (float) $defaultTax->rate : 0.0;
         $taxType = $defaultTax ? $defaultTax->type : 'none';
 
@@ -60,21 +61,21 @@ class PurchaseSeeder extends Seeder
             $status = collect(['Unpaid', 'Paid', 'Partial'])->random();
 
             $purchase = Purchase::create([
-                'invoice'             => 'PO-' . str_pad(Purchase::where('tenant_id', $tenantId)->count() + 1, 5, '0', STR_PAD_LEFT),
-                'supplier_id'         => $supplier->id,
-                'warehouse_id'        => $warehouseId,
-                'order_date'          => $orderDate,
-                'due_date'            => $dueDate,
-                'payment_type'        => $paymentType,
-                'discount_total'      => rand(0, 50),
+                'invoice' => 'PO-'.str_pad(Purchase::where('tenant_id', $tenantId)->count() + 1, 5, '0', STR_PAD_LEFT),
+                'supplier_id' => $supplier->id,
+                'warehouse_id' => $warehouseId,
+                'order_date' => $orderDate,
+                'due_date' => $dueDate,
+                'payment_type' => $paymentType,
+                'discount_total' => rand(0, 50),
                 'discount_total_type' => collect(['percentage', 'fixed'])->random(),
-                'tax_id'              => $taxId,
-                'tax_rate'            => $taxRate,
-                'tax_type'            => $taxType,
-                'total'               => 0,
-                'total_tax'           => 0,
-                'status'              => $status,
-                'tenant_id'           => $tenantId,
+                'tax_id' => $taxId,
+                'tax_rate' => $taxRate,
+                'tax_type' => $taxType,
+                'total' => 0,
+                'total_tax' => 0,
+                'status' => $status,
+                'tenant_id' => $tenantId,
             ]);
 
             $totalPurchaseAmount = 0;
@@ -141,7 +142,7 @@ class PurchaseSeeder extends Seeder
                     [
                         'product_id' => $product->id,
                         'warehouse_id' => $purchase->warehouse_id,
-                        'tenant_id' => $tenantId
+                        'tenant_id' => $tenantId,
                     ],
                     ['quantity' => 0]
                 );
@@ -149,15 +150,15 @@ class PurchaseSeeder extends Seeder
             }
 
             $purchase->update(['total' => $totalPurchaseAmount]);
-            
+
             // Compute tax and store the true grand total
-            $orderDiscount   = PurchaseHelper::calculateDiscount($totalPurchaseAmount, $purchase->discount_total, $purchase->discount_total_type);
-            $afterDiscount   = $totalPurchaseAmount - $orderDiscount;
-            $totalTaxAmount  = PurchaseHelper::calculateTaxAmount($afterDiscount, $taxRate, $taxType);
-            $grandTotal      = ($taxType === 'inclusive') ? $afterDiscount : ($afterDiscount + $totalTaxAmount);
+            $orderDiscount = PurchaseHelper::calculateDiscount($totalPurchaseAmount, $purchase->discount_total, $purchase->discount_total_type);
+            $afterDiscount = $totalPurchaseAmount - $orderDiscount;
+            $totalTaxAmount = PurchaseHelper::calculateTaxAmount($afterDiscount, $taxRate, $taxType);
+            $grandTotal = ($taxType === 'inclusive') ? $afterDiscount : ($afterDiscount + $totalTaxAmount);
 
             $purchase->update([
-                'total'     => $grandTotal,
+                'total' => $grandTotal,
                 'total_tax' => $totalTaxAmount,
             ]);
 
@@ -175,7 +176,7 @@ class PurchaseSeeder extends Seeder
                         'tenant_id' => $tenantId,
                     ]);
                 } elseif ($status === 'Partial') {
-                    $paidAmount = rand(1, (int)($grandTotal * 0.8)); // Pay between 1 and 80%
+                    $paidAmount = rand(1, (int) ($grandTotal * 0.8)); // Pay between 1 and 80%
                     $purchase->payments()->create([
                         'amount' => $paidAmount,
                         'payment_date' => $orderDate->copy()->addDays(rand(0, 5)),
@@ -192,34 +193,34 @@ class PurchaseSeeder extends Seeder
             $description = "Purchase of goods, invoice {$purchase->invoice}";
 
             // Debit Inventory for the grand total (includes tax for exclusive)
-            $transactions[] = ['account_code' => '1140-' . $tenantId, 'type' => 'debit', 'amount' => $grandTotal];
+            $transactions[] = ['account_code' => '1140-'.$tenantId, 'type' => 'debit', 'amount' => $grandTotal];
 
             if ($status === 'Paid') {
                 // Credit Cash for the full amount
-                $transactions[] = ['account_code' => '1110-' . $tenantId, 'type' => 'credit', 'amount' => $grandTotal];
+                $transactions[] = ['account_code' => '1110-'.$tenantId, 'type' => 'credit', 'amount' => $grandTotal];
             } elseif ($status === 'Unpaid') {
                 // Credit Accounts Payable for the full amount
-                $transactions[] = ['account_code' => '2110-' . $tenantId, 'type' => 'credit', 'amount' => $grandTotal];
+                $transactions[] = ['account_code' => '2110-'.$tenantId, 'type' => 'credit', 'amount' => $grandTotal];
             } elseif ($status === 'Partial') {
                 // Credit Cash for the paid amount
                 if ($paidAmount > 0) {
-                    $transactions[] = ['account_code' => '1110-' . $tenantId, 'type' => 'credit', 'amount' => $paidAmount];
+                    $transactions[] = ['account_code' => '1110-'.$tenantId, 'type' => 'credit', 'amount' => $paidAmount];
                 }
                 // Credit Accounts Payable for the remaining balance
                 $remainingBalance = $grandTotal - $paidAmount;
                 if ($remainingBalance > 0) {
-                    $transactions[] = ['account_code' => '2110-' . $tenantId, 'type' => 'credit', 'amount' => $remainingBalance];
+                    $transactions[] = ['account_code' => '2110-'.$tenantId, 'type' => 'credit', 'amount' => $remainingBalance];
                 }
             }
-            
+
             try {
                 $this->accountingService->createJournalEntry($description, $orderDate, $transactions, $purchase);
             } catch (\Exception $e) {
-                $this->command->error("Failed to create journal entry for purchase {$purchase->invoice}: " . $e->getMessage());
+                $this->command->error("Failed to create journal entry for purchase {$purchase->invoice}: ".$e->getMessage());
             }
         }
-        
-        $this->command->info("Purchase Orders seeding completed successfully!");
-        $this->command->info("Created 50 purchase orders with items, payments, and journal entries.");
+
+        $this->command->info('Purchase Orders seeding completed successfully!');
+        $this->command->info('Created 50 purchase orders with items, payments, and journal entries.');
     }
 }

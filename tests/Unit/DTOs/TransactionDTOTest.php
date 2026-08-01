@@ -3,9 +3,9 @@
 namespace Tests\Unit\DTOs;
 
 use App\DTOs\TransactionDTO;
+use Carbon\Carbon;
 use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
-use Carbon\Carbon;
 
 class TransactionDTOTest extends TestCase
 {

@@ -5,7 +5,6 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\ActivityLog;
 use App\Models\Customer;
-use App\Models\CustomerCredit;
 use App\Services\ActivityLogService;
 use App\Services\CustomerService;
 use Illuminate\Http\Request;
@@ -22,6 +21,7 @@ class CustomerController extends Controller
     public function getMetrics()
     {
         $metrics = $this->customerService->getCustomerMetrics();
+
         return response()->json($metrics);
     }
 
@@ -29,6 +29,7 @@ class CustomerController extends Controller
     {
         $entries = $request->input('entries', 10);
         $data = $this->customerService->getCustomerIndexData($entries);
+
         return view('admin.customer.index', $data);
     }
 
@@ -49,16 +50,18 @@ class CustomerController extends Controller
 
         $result = $this->customerService->createCustomer($request->all());
 
-        if (!$result['success']) {
+        if (! $result['success']) {
             if ($request->ajax()) {
                 return response()->json(['success' => false, 'message' => $result['message'], 'errors' => ['name' => [$result['message']]]], 422);
             }
+
             return back()->withErrors(['name' => $result['message']])->withInput();
         }
 
         if ($request->ajax()) {
             return response()->json(['success' => true, 'message' => 'Customer created successfully.']);
         }
+
         return redirect()->route('admin.customer')->with('success', 'Customer created');
     }
 
@@ -79,14 +82,14 @@ class CustomerController extends Controller
 
         $result = $this->customerService->quickCreateCustomer($request->all());
 
-        if (!$result['success']) {
+        if (! $result['success']) {
             return response()->json(['success' => false, 'message' => $result['message']], 422);
         }
 
         return response()->json([
             'success' => true,
             'message' => 'Customer created successfully',
-            'customer' => $result['customer']
+            'customer' => $result['customer'],
         ]);
     }
 
@@ -108,16 +111,18 @@ class CustomerController extends Controller
         $customer = Customer::findOrFail($id);
         $result = $this->customerService->updateCustomer($customer, $request->all()); // Get the result
 
-        if (!$result['success']) { // Check for service-level error
+        if (! $result['success']) { // Check for service-level error
             if ($request->ajax()) {
                 return response()->json(['success' => false, 'message' => $result['message']], 422);
             }
+
             return back()->with('error', $result['message'])->withInput(); // Redirect with error
         }
 
         if ($request->ajax()) {
             return response()->json(['success' => true, 'message' => 'Customer updated successfully.']);
         }
+
         return redirect()->route('admin.customer')->with('success', 'Customer updated');
     }
 
@@ -126,23 +131,28 @@ class CustomerController extends Controller
         $customer = Customer::findOrFail($id);
         $result = $this->customerService->deleteCustomer($customer); // Get the result
 
-        if (!$result['success']) { // Check for service-level error
+        if (! $result['success']) { // Check for service-level error
             if ($request->ajax()) {
                 return response()->json(['success' => false, 'message' => $result['message']], 500);
             }
+
             return redirect()->route('admin.customer')->with('error', $result['message']);
         }
 
         if ($request->ajax()) {
             return response()->json(['success' => true, 'message' => 'Customer deleted successfully.']);
         }
+
         return redirect()->route('admin.customer')->with('success', 'Customer deleted');
     }
 
     /**
      * @group Customers
+     *
      * @summary Export All Customers
+     *
      * @bodyParam export_option string required The export format ('pdf' or 'csv'). Example: "csv"
+     *
      * @response 200 "The exported file."
      */
     public function exportAll(Request $request)
@@ -157,6 +167,7 @@ class CustomerController extends Controller
                 'Exported Customers'
             );
             $file = $this->customerService->exportAllCustomers($request->export_option);
+
             return $file;
         } catch (\Exception $e) {
             return response()->json([
@@ -170,7 +181,7 @@ class CustomerController extends Controller
     public function getCredits(Customer $customer)
     {
         $credits = $customer->activeCredits()->get();
-        
+
         $creditsData = $credits->map(function ($credit) {
             return [
                 'id' => $credit->id,

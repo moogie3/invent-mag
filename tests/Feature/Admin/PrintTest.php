@@ -5,17 +5,15 @@ namespace Tests\Feature\Admin;
 use App\Models\Product;
 use App\Models\Purchase;
 use App\Models\Sales;
-use App\Models\User;
+use App\Models\SalesItem;
+use Database\Seeders\RoleSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Spatie\Permission\Models\Permission;
-use Spatie\Permission\Models\Role;
 use Tests\TestCase;
 use Tests\Traits\CreatesTenant;
-use Database\Seeders\RoleSeeder;
 
 class PrintTest extends TestCase
 {
-    use RefreshDatabase, CreatesTenant;
+    use CreatesTenant, RefreshDatabase;
 
     protected function setUp(): void
     {
@@ -29,8 +27,8 @@ class PrintTest extends TestCase
     {
         // Create a product and a POS sale with one item
         $product = Product::factory()->create();
-        $sale = Sales::factory()->create(['type' => \App\Models\Sales::TYPE_POS]);
-        $salesItem = \App\Models\SalesItem::factory()->create([
+        $sale = Sales::factory()->create(['type' => Sales::TYPE_POS]);
+        $salesItem = SalesItem::factory()->create([
             'sales_id' => $sale->id,
             'product_id' => $product->id,
             'quantity' => 2,
@@ -49,7 +47,7 @@ class PrintTest extends TestCase
 
     public function test_sales_invoice_can_be_rendered_for_printing()
     {
-        $sale = Sales::factory()->create(['type' => \App\Models\Sales::TYPE_REGULAR]);
+        $sale = Sales::factory()->create(['type' => Sales::TYPE_REGULAR]);
 
         $response = $this->get(route('admin.sales.show', $sale->id));
 

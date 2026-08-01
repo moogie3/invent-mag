@@ -4,8 +4,8 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Services\OpeningBalanceService;
-use Illuminate\Http\Request;
 use Carbon\Carbon;
+use Illuminate\Http\Request;
 
 class OpeningBalanceController extends Controller
 {
@@ -23,7 +23,7 @@ class OpeningBalanceController extends Controller
     {
         $accounts = $this->openingBalanceService->getAccountsForSetup();
         $balanceDate = $request->input('date', Carbon::now()->startOfMonth()->toDateString());
-        
+
         $existingBalances = $this->openingBalanceService->getAllOpeningBalances()
             ->where('balance_date', $balanceDate)
             ->keyBy('account_id')
@@ -45,7 +45,7 @@ class OpeningBalanceController extends Controller
     public function validate(Request $request)
     {
         $balances = $request->input('balances', []);
-        
+
         $validation = $this->openingBalanceService->validateBalances($balances);
 
         return response()->json($validation);
@@ -109,7 +109,7 @@ class OpeningBalanceController extends Controller
     public function summary(Request $request)
     {
         $balanceDate = $request->input('date', Carbon::now()->startOfMonth()->toDateString());
-        
+
         $summary = $this->openingBalanceService->getSummary($balanceDate);
 
         return response()->json($summary);

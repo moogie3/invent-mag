@@ -2,18 +2,21 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\BelongsToTenant;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 use Spatie\Permission\Traits\HasRoles;
-use App\Models\Concerns\BelongsToTenant;
 
 class User extends Authenticatable implements MustVerifyEmail
 {
-    use HasFactory, Notifiable, HasRoles, HasApiTokens, BelongsToTenant;
+    use BelongsToTenant, HasApiTokens, HasFactory, HasRoles, Notifiable;
+
     protected $table = 'users';
+
     protected $fillable = [
         'name',
         'shopname',
@@ -42,20 +45,18 @@ class User extends Authenticatable implements MustVerifyEmail
     {
         return [
             'email_verified_at' => 'datetime',
-            'password'          => 'hashed',
-            'system_settings'   => 'array',
+            'password' => 'hashed',
+            'system_settings' => 'array',
         ];
     }
 
     /**
      * Get the user's avatar URL
-     *
-     * @return \Illuminate\Database\Eloquent\Casts\Attribute
      */
-    protected function avatar(): \Illuminate\Database\Eloquent\Casts\Attribute
+    protected function avatar(): Attribute
     {
-        return \Illuminate\Database\Eloquent\Casts\Attribute::make(
-            get: fn($value) => $value
+        return Attribute::make(
+            get: fn ($value) => $value
                 ? asset("storage/{$value}")
                 : asset('img/default-avatar.png'),
         );

@@ -4,16 +4,17 @@ namespace Tests\Unit\Services;
 
 use App\Models\Customer;
 use App\Services\CustomerService;
-use Tests\TestCase;
-use PHPUnit\Framework\Attributes\Test;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Validation\ValidationException;
+use PHPUnit\Framework\Attributes\Test;
+use Tests\TestCase;
 use Tests\Traits\CreatesTenant;
 
 class CustomerServiceTest extends TestCase
 {
-    use RefreshDatabase, CreatesTenant;
+    use CreatesTenant, RefreshDatabase;
 
     protected CustomerService $customerService;
 
@@ -21,7 +22,7 @@ class CustomerServiceTest extends TestCase
     {
         parent::setUp();
         $this->setupTenant();
-        $this->customerService = new CustomerService();
+        $this->customerService = new CustomerService;
     }
 
     #[Test]
@@ -83,13 +84,13 @@ class CustomerServiceTest extends TestCase
         $this->assertTrue($result['success']);
         $this->assertEquals('Customer created successfully.', $result['message']);
         $this->assertDatabaseHas('customers', ['name' => 'Jane Doe', 'email' => 'jane.doe@example.com']);
-        Storage::disk('public')->assertExists('image/' . $result['customer']->getRawOriginal('image'));
+        Storage::disk('public')->assertExists('image/'.$result['customer']->getRawOriginal('image'));
     }
 
     #[Test]
     public function it_returns_error_if_customer_already_exists()
     {
-        $this->expectException(\Illuminate\Validation\ValidationException::class);
+        $this->expectException(ValidationException::class);
 
         Customer::factory()->create(['name' => 'John Doe', 'email' => 'john.doe@example.com']);
 
@@ -145,7 +146,7 @@ class CustomerServiceTest extends TestCase
         $this->assertEquals('Customer updated successfully.', $result['message']);
         $this->assertDatabaseHas('customers', ['id' => $customer->id, 'name' => 'New Name', 'email' => 'new@example.com']);
         $this->assertDatabaseMissing('customers', ['id' => $customer->id, 'name' => 'Old Name']);
-        Storage::disk('public')->assertExists('image/' . $oldFileName); // Old image should still exist
+        Storage::disk('public')->assertExists('image/'.$oldFileName); // Old image should still exist
     }
 
     #[Test]
@@ -172,8 +173,8 @@ class CustomerServiceTest extends TestCase
         $this->assertTrue($result['success']);
         $this->assertEquals('Customer updated successfully.', $result['message']);
         $this->assertDatabaseHas('customers', ['id' => $customer->id, 'name' => 'Updated Image Customer']);
-        Storage::disk('public')->assertMissing('image/' . $oldFileName); // Old image should be deleted
-        Storage::disk('public')->assertExists('image/' . $result['customer']->getRawOriginal('image')); // New image should exist
+        Storage::disk('public')->assertMissing('image/'.$oldFileName); // Old image should be deleted
+        Storage::disk('public')->assertExists('image/'.$result['customer']->getRawOriginal('image')); // New image should exist
     }
 
     #[Test]
@@ -201,7 +202,7 @@ class CustomerServiceTest extends TestCase
         $this->assertTrue($result['success']);
         $this->assertEquals('Customer deleted successfully.', $result['message']);
         $this->assertDatabaseMissing('customers', ['id' => $customer->id]);
-        Storage::disk('public')->assertMissing('image/' . $fileName); // Image should be deleted
+        Storage::disk('public')->assertMissing('image/'.$fileName); // Image should be deleted
     }
 
     #[Test]

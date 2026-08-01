@@ -2,9 +2,9 @@
 
 namespace Database\Factories;
 
-use App\Models\PurchaseReturnItem;
-use App\Models\PurchaseReturn;
 use App\Models\Product;
+use App\Models\PurchaseReturn;
+use App\Models\PurchaseReturnItem;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 class PurchaseReturnItemFactory extends Factory

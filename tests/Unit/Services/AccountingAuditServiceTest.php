@@ -4,18 +4,17 @@ namespace Tests\Unit\Services;
 
 use App\Models\AccountingAuditLog;
 use App\Models\JournalEntry;
-use App\Models\User;
 use App\Services\AccountingAuditService;
+use Database\Seeders\RoleSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Auth;
 use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 use Tests\Traits\CreatesTenant;
-use Database\Seeders\RoleSeeder;
-use Illuminate\Support\Facades\Auth;
 
 class AccountingAuditServiceTest extends TestCase
 {
-    use RefreshDatabase, CreatesTenant;
+    use CreatesTenant, RefreshDatabase;
 
     protected AccountingAuditService $service;
 
@@ -25,8 +24,8 @@ class AccountingAuditServiceTest extends TestCase
         $this->setupTenant();
         $this->seed(RoleSeeder::class);
         $this->user->assignRole('superuser');
-        
-        $this->service = new AccountingAuditService();
+
+        $this->service = new AccountingAuditService;
         Auth::login($this->user);
     }
 
@@ -80,7 +79,7 @@ class AccountingAuditServiceTest extends TestCase
         ]);
 
         $oldValues = $journalEntry->toArray();
-        
+
         $journalEntry->description = 'Updated Description';
         $journalEntry->save();
 
@@ -390,7 +389,7 @@ class AccountingAuditServiceTest extends TestCase
         $log = $this->service->logCreate($journalEntry, $transactions);
 
         $newValues = $log->new_values;
-        
+
         $this->assertArrayHasKey('id', $newValues);
         $this->assertArrayHasKey('date', $newValues);
         $this->assertArrayHasKey('description', $newValues);

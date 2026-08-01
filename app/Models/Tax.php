@@ -2,16 +2,18 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\BelongsToTenant;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use App\Models\Concerns\BelongsToTenant;
 
 class Tax extends Model
 {
-    use HasFactory, BelongsToTenant;
+    use BelongsToTenant, HasFactory;
 
     public const TYPE_EXCLUSIVE = 'exclusive';
+
     public const TYPE_INCLUSIVE = 'inclusive';
+
     public const TYPE_NONE = 'none';
 
     public const TYPES = [self::TYPE_EXCLUSIVE, self::TYPE_INCLUSIVE, self::TYPE_NONE];

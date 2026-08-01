@@ -37,6 +37,11 @@
                                     <i class="ti ti-arrows-left-right"></i>
                                 </span>
                             @endif
+                            @if($entry->isReconciled())
+                                <span class="badge bg-teal text-white ms-1" title="{{ __('messages.reconciled_hint') }}">
+                                    <i class="ti ti-circle-check"></i> {{ __('messages.reconciled') }}
+                                </span>
+                            @endif
                         </td>
                         <td class="text-end">{{ $entry->total_debit ? \App\Helpers\CurrencyHelper::format($entry->total_debit) : 'Rp 0,00' }}</td>
                         <td class="text-end">{{ $entry->total_credit ? \App\Helpers\CurrencyHelper::format($entry->total_credit) : 'Rp 0,00' }}</td>

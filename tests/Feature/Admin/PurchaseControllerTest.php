@@ -2,31 +2,31 @@
 
 namespace Tests\Feature\Admin;
 
-use App\Models\User;
-use App\Models\Supplier;
+use App\Models\Account;
 use App\Models\Product;
 use App\Models\Purchase;
-use App\Models\POItem;
+use App\Models\Supplier;
 use App\Models\Warehouse;
-use App\Models\Account;
-use Database\Factories\PurchaseFactory;
-use Database\Factories\POItemFactory;
-use Illuminate\Support\Facades\Storage;
-use Tests\TestCase;
-use Carbon\Carbon;
 use App\Services\PurchaseService;
-use Mockery;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Tests\Traits\CreatesTenant;
-use Database\Seeders\RoleSeeder;
+use Carbon\Carbon;
+use Database\Factories\POItemFactory;
+use Database\Factories\PurchaseFactory;
 use Database\Seeders\AccountSeeder;
+use Database\Seeders\RoleSeeder;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Mockery;
+use Tests\TestCase;
+use Tests\Traits\CreatesTenant;
 
 class PurchaseControllerTest extends TestCase
 {
-    use RefreshDatabase, CreatesTenant;
+    use CreatesTenant, RefreshDatabase;
 
     protected Supplier $supplier;
+
     protected Product $product;
+
     protected Warehouse $warehouse; // Added
 
     protected function setUp(): void
@@ -40,9 +40,9 @@ class PurchaseControllerTest extends TestCase
         // Ensure the current tenant has the necessary accounting settings
         $tenantId = app('currentTenant')->id;
         $this->tenant->accounting_settings = [
-            'cash_account_id' => Account::where('code', '1110-' . $tenantId)->first()->id,
-            'accounts_payable_account_id' => Account::where('code', '2110-' . $tenantId)->first()->id,
-            'inventory_account_id' => Account::where('code', '1140-' . $tenantId)->first()->id,
+            'cash_account_id' => Account::where('code', '1110-'.$tenantId)->first()->id,
+            'accounts_payable_account_id' => Account::where('code', '2110-'.$tenantId)->first()->id,
+            'inventory_account_id' => Account::where('code', '1140-'.$tenantId)->first()->id,
         ];
         $this->tenant->save();
         $this->actingAs($this->user);
@@ -52,7 +52,7 @@ class PurchaseControllerTest extends TestCase
         $this->product = Product::factory()->create();
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         Mockery::close();
         parent::tearDown();
@@ -83,7 +83,7 @@ class PurchaseControllerTest extends TestCase
     public function test_it_can_store_a_new_purchase()
     {
         $purchaseData = [
-            'invoice' => 'PO-' . rand(10000, 99999),
+            'invoice' => 'PO-'.rand(10000, 99999),
             'supplier_id' => $this->supplier->id,
             'warehouse_id' => $this->warehouse->id, // Added
             'order_date' => Carbon::now()->format('Y-m-d'),
@@ -250,10 +250,10 @@ class PurchaseControllerTest extends TestCase
         $response = $this->postJson(route('po.bulk-delete'), ['ids' => $idsToDelete]);
 
         $response->assertOk()
-                 ->assertJson([
-                     'success' => true,
-                     'message' => "Successfully deleted purchase order(s)",
-                 ]);
+            ->assertJson([
+                'success' => true,
+                'message' => 'Successfully deleted purchase order(s)',
+            ]);
 
         foreach ($idsToDelete as $id) {
             $this->assertDatabaseMissing('po', ['id' => $id]);
@@ -278,7 +278,7 @@ class PurchaseControllerTest extends TestCase
                 'total' => 0, // Explicitly set total to 0
             ]);
 
-        foreach($purchases as $purchase) {
+        foreach ($purchases as $purchase) {
             $purchase->update(['total' => $purchase->grand_total]);
         }
 
@@ -287,11 +287,11 @@ class PurchaseControllerTest extends TestCase
         $response = $this->postJson(route('po.bulk-mark-paid'), ['ids' => $idsToMarkPaid]);
 
         $response->assertOk()
-                 ->assertJson([
-                     'success' => true,
-                     'message' => "Successfully marked 3 purchase order(s) as paid.",
-                     'updated_count' => 3,
-                 ]);
+            ->assertJson([
+                'success' => true,
+                'message' => 'Successfully marked 3 purchase order(s) as paid.',
+                'updated_count' => 3,
+            ]);
 
         foreach ($idsToMarkPaid as $id) {
             $this->assertDatabaseHas('po', [
@@ -311,8 +311,8 @@ class PurchaseControllerTest extends TestCase
 
         $mockService = Mockery::mock(PurchaseService::class);
         $mockService->shouldReceive('getPurchaseMetrics')
-                    ->once()
-                    ->andReturn($expectedMetrics);
+            ->once()
+            ->andReturn($expectedMetrics);
         $this->app->instance(PurchaseService::class, $mockService);
 
         $response = $this->get(route('admin.po.metrics'));
@@ -330,8 +330,8 @@ class PurchaseControllerTest extends TestCase
 
         $mockService = Mockery::mock(PurchaseService::class);
         $mockService->shouldReceive('getExpiringPurchases')
-                    ->once()
-                    ->andReturn($expectedPurchases);
+            ->once()
+            ->andReturn($expectedPurchases);
         $this->app->instance(PurchaseService::class, $mockService);
 
         $response = $this->get(route('admin.po.expiring-soon'));
@@ -345,9 +345,9 @@ class PurchaseControllerTest extends TestCase
         $purchase = PurchaseFactory::new()->create();
         $mockService = Mockery::mock(PurchaseService::class);
         $mockService->shouldReceive('getPurchaseForModal')
-                    ->once()
-                    ->with($purchase->id)
-                    ->andReturn($purchase);
+            ->once()
+            ->with($purchase->id)
+            ->andReturn($purchase);
         $this->app->instance(PurchaseService::class, $mockService);
 
         $response = $this->get(route('admin.po.modal-view', $purchase->id));
@@ -361,9 +361,9 @@ class PurchaseControllerTest extends TestCase
     {
         $mockService = Mockery::mock(PurchaseService::class);
         $mockService->shouldReceive('getPurchaseForModal')
-                    ->once()
-                    ->with(999)
-                    ->andThrow(new \Illuminate\Database\Eloquent\ModelNotFoundException());
+            ->once()
+            ->with(999)
+            ->andThrow(new ModelNotFoundException);
         $this->app->instance(PurchaseService::class, $mockService);
 
         $response = $this->get(route('admin.po.modal-view', 999));
@@ -444,8 +444,8 @@ class PurchaseControllerTest extends TestCase
 
         $mockService = Mockery::mock(PurchaseService::class);
         $mockService->shouldReceive('createPurchase')
-                    ->once()
-                    ->andThrow(new \Exception('Service exception'));
+            ->once()
+            ->andThrow(new \Exception('Service exception'));
         $this->app->instance(PurchaseService::class, $mockService);
 
         $response = $this->post(route('admin.po.store'), $purchaseData);
@@ -476,8 +476,8 @@ class PurchaseControllerTest extends TestCase
 
         $mockService = Mockery::mock(PurchaseService::class);
         $mockService->shouldReceive('updatePurchase')
-                    ->once()
-                    ->andThrow(new \Exception('Service exception'));
+            ->once()
+            ->andThrow(new \Exception('Service exception'));
         $this->app->instance(PurchaseService::class, $mockService);
 
         $response = $this->put(route('admin.po.update', $purchase->id), $updateData);
@@ -492,8 +492,8 @@ class PurchaseControllerTest extends TestCase
 
         $mockService = Mockery::mock(PurchaseService::class);
         $mockService->shouldReceive('deletePurchase')
-                    ->once()
-                    ->andThrow(new \Exception('Service exception'));
+            ->once()
+            ->andThrow(new \Exception('Service exception'));
         $this->app->instance(PurchaseService::class, $mockService);
 
         $response = $this->delete(route('admin.po.destroy', $purchase->id));

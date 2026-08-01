@@ -5,12 +5,13 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Services\NotificationService;
 use App\Services\SystemNotificationService;
-use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\View;
 
 class NotificationController extends Controller
 {
     protected $notificationService;
+
     protected $systemNotificationService;
 
     public function __construct(NotificationService $notificationService, SystemNotificationService $systemNotificationService)
@@ -24,10 +25,10 @@ class NotificationController extends Controller
         $notifications = $this->notificationService->getDueNotifications();
         $systemNotifications = $this->systemNotificationService->getSystemNotifications();
 
-        $financialNotifications = $notifications->filter(fn($item) => in_array($item['type'], ['purchase', 'sales']));
-        $inventoryNotifications = $notifications->filter(fn($item) => $item['type'] === 'product');
-        $lowStockNotifications = $inventoryNotifications->filter(fn($item) => $item['status_text'] === 'Low Stock');
-        $expiringNotifications = $inventoryNotifications->filter(fn($item) => str_contains($item['status_text'], 'Expiring'));
+        $financialNotifications = $notifications->filter(fn ($item) => in_array($item['type'], ['purchase', 'sales']));
+        $inventoryNotifications = $notifications->filter(fn ($item) => $item['type'] === 'product');
+        $lowStockNotifications = $inventoryNotifications->filter(fn ($item) => $item['status_text'] === 'Low Stock');
+        $expiringNotifications = $inventoryNotifications->filter(fn ($item) => str_contains($item['status_text'], 'Expiring'));
 
         $hasNotifications = $notifications->isNotEmpty() || $systemNotifications->isNotEmpty();
 
@@ -37,15 +38,17 @@ class NotificationController extends Controller
     public function count()
     {
         try {
-            if (!auth()->check()) {
+            if (! auth()->check()) {
                 return response()->json(['count' => 0]);
             }
-            
+
             $counts = $this->notificationService->getNotificationCounts();
             $systemCount = $this->systemNotificationService->getSystemNotificationCount();
+
             return response()->json(['count' => $counts['total'] + $systemCount]);
         } catch (\Exception $e) {
-            \Illuminate\Support\Facades\Log::error('Notification count error: ' . $e->getMessage());
+            Log::error('Notification count error: '.$e->getMessage());
+
             return response()->json(['count' => 0]);
         }
     }
@@ -55,7 +58,7 @@ class NotificationController extends Controller
         $notifications = $this->notificationService->getDueNotifications();
         $systemNotifications = $this->systemNotificationService->getSystemNotifications();
 
-        $simpleNotifications = $notifications->map(fn($item) => [
+        $simpleNotifications = $notifications->map(fn ($item) => [
             'id' => $item['id'],
             'title' => $item['title'],
             'description' => $item['description'],
@@ -63,7 +66,7 @@ class NotificationController extends Controller
             'route' => $item['route'],
         ]);
 
-        $simpleSystemNotifications = $systemNotifications->map(fn($item) => [
+        $simpleSystemNotifications = $systemNotifications->map(fn ($item) => [
             'id' => $item['id'],
             'title' => $item['title'],
             'description' => $item['description'],
@@ -80,7 +83,7 @@ class NotificationController extends Controller
     {
         [$type, $actualId] = explode('::', $id) + [null, null];
 
-        if (!$actualId) {
+        if (! $actualId) {
             return redirect()->route('admin.notifications')->with('error', 'Invalid notification ID');
         }
 
@@ -92,7 +95,7 @@ class NotificationController extends Controller
             default => null,
         };
 
-        if (!$route) {
+        if (! $route) {
             return redirect()->route('admin.notifications')->with('error', 'Unknown notification type');
         }
 
@@ -116,15 +119,15 @@ class NotificationController extends Controller
         if ($user) {
             $settings = $user->system_settings ?? [];
             $dismissed = $settings['dismissed_notifications'] ?? [];
-            
-            if (!in_array($id, $dismissed)) {
+
+            if (! in_array($id, $dismissed)) {
                 $dismissed[] = $id;
                 $settings['dismissed_notifications'] = $dismissed;
                 $user->system_settings = $settings;
                 $user->save();
             }
         }
-        
+
         return response()->json(['success' => true]);
     }
 
@@ -134,17 +137,17 @@ class NotificationController extends Controller
         if ($user) {
             $notifications = $this->notificationService->getDueNotifications();
             $systemNotifications = $this->systemNotificationService->getSystemNotifications();
-            
+
             $allIds = $notifications->pluck('id')->concat($systemNotifications->pluck('id'))->toArray();
 
             $settings = $user->system_settings ?? [];
             $dismissed = $settings['dismissed_notifications'] ?? [];
-            
+
             $settings['dismissed_notifications'] = array_values(array_unique(array_merge($dismissed, $allIds)));
             $user->system_settings = $settings;
             $user->save();
         }
-        
+
         return response()->json(['success' => true]);
     }
 
@@ -157,6 +160,7 @@ class NotificationController extends Controller
         View::share('totalNotificationCount', $notifications->count() + $systemNotifications->count());
         View::share('notifications', $notifications);
         View::share('systemNotifications', $systemNotifications);
+
         return true;
     }
 }

@@ -4,12 +4,12 @@ namespace Tests\Unit\Services;
 
 use App\Models\User;
 use App\Services\ProfileService;
-use Tests\TestCase;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 use PHPUnit\Framework\Attributes\Test;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\TestCase;
 use Tests\Traits\CreatesTenant;
 
 class ProfileServiceTest extends TestCase
@@ -22,7 +22,7 @@ class ProfileServiceTest extends TestCase
     {
         parent::setUp();
         $this->setupTenant();
-        $this->profileService = new ProfileService();
+        $this->profileService = new ProfileService;
     }
 
     #[Test]

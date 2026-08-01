@@ -2,15 +2,14 @@
 
 namespace Tests\Feature\Admin;
 
-use App\Models\User;
 use App\Models\Categories;
 use App\Services\CategoryService;
+use Database\Seeders\RoleSeeder;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Pagination\LengthAwarePaginator;
 use Mockery;
 use Tests\TestCase;
-use Illuminate\Pagination\LengthAwarePaginator;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Traits\CreatesTenant;
-use Database\Seeders\RoleSeeder;
 
 class CategoryControllerTest extends TestCase
 {
@@ -208,7 +207,7 @@ class CategoryControllerTest extends TestCase
             ->andReturn(['success' => true]);
 
         $response = $this->withHeaders([
-            'X-Requested-With' => 'XMLHttpRequest'
+            'X-Requested-With' => 'XMLHttpRequest',
         ])->json('POST', route('admin.setting.category.store'), $categoryData);
 
         $response->assertStatus(200)
@@ -228,14 +227,14 @@ class CategoryControllerTest extends TestCase
             ->andReturn(['success' => false, 'message' => 'AJAX creation failed.']);
 
         $response = $this->withHeaders([
-            'X-Requested-With' => 'XMLHttpRequest'
+            'X-Requested-With' => 'XMLHttpRequest',
         ])->json('POST', route('admin.setting.category.store'), $categoryData);
 
         $response->assertStatus(422)
             ->assertJson([
                 'success' => false,
                 'message' => 'AJAX creation failed.',
-                'errors' => ['name' => ['AJAX creation failed.']]
+                'errors' => ['name' => ['AJAX creation failed.']],
             ]);
     }
 
@@ -252,7 +251,7 @@ class CategoryControllerTest extends TestCase
             ->andReturn(['success' => true]);
 
         $response = $this->withHeaders([
-            'X-Requested-With' => 'XMLHttpRequest'
+            'X-Requested-With' => 'XMLHttpRequest',
         ])->json('PUT', route('admin.setting.category.update', $category->id), $updateData);
 
         $response->assertStatus(200)
@@ -272,14 +271,14 @@ class CategoryControllerTest extends TestCase
             ->andReturn(['success' => false, 'message' => 'AJAX update failed.']);
 
         $response = $this->withHeaders([
-            'X-Requested-With' => 'XMLHttpRequest'
+            'X-Requested-With' => 'XMLHttpRequest',
         ])->json('PUT', route('admin.setting.category.update', $category->id), $updateData);
 
         $response->assertStatus(422)
             ->assertJson([
                 'success' => false,
                 'message' => 'AJAX update failed.',
-                'errors' => ['name' => ['AJAX update failed.']]
+                'errors' => ['name' => ['AJAX update failed.']],
             ]);
     }
 
@@ -292,7 +291,7 @@ class CategoryControllerTest extends TestCase
             ->andReturn(['success' => true]);
 
         $response = $this->withHeaders([
-            'X-Requested-With' => 'XMLHttpRequest'
+            'X-Requested-With' => 'XMLHttpRequest',
         ])->json('DELETE', route('admin.setting.category.destroy', $category->id));
 
         $response->assertStatus(200)
@@ -323,7 +322,7 @@ class CategoryControllerTest extends TestCase
 
         // AJAX request
         $response = $this->withHeaders([
-            'X-Requested-With' => 'XMLHttpRequest'
+            'X-Requested-With' => 'XMLHttpRequest',
         ])->json('DELETE', route('admin.setting.category.destroy', $category->id));
         $response->assertStatus(500)
             ->assertJson(['success' => false, 'message' => 'AJAX deletion failed.']);

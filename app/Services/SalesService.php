@@ -2,26 +2,28 @@
 
 namespace App\Services;
 
+use App\Helpers\CurrencyHelper;
+use App\Helpers\SalesHelper;
+use App\Models\Account;
+use App\Models\Customer;
+use App\Models\CustomerCredit;
+use App\Models\JournalEntry;
+use App\Models\NsfpPool;
+use App\Models\Payment;
+use App\Models\POItem;
+use App\Models\Product;
+use App\Models\ProductWarehouse;
 use App\Models\Sales;
 use App\Models\SalesItem;
-use App\Models\Product;
-use App\Models\POItem;
-use App\Models\Tax;
-use App\Models\User;
-use App\Models\CustomerCredit;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
-use App\Helpers\SalesHelper;
-use App\Helpers\CurrencyHelper;
-use App\Models\Customer;
-use Carbon\Carbon;
-use App\Models\Account;
 use App\Models\SalesReturn;
 use App\Models\SalesReturnItem;
-use App\Models\Warehouse; // Added
-use App\Models\ProductWarehouse;
+use App\Models\Tax;
+use App\Models\User; // Added
+use App\Models\Warehouse;
+use Carbon\Carbon;
 use Dompdf\Dompdf;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class SalesService
 {
@@ -50,7 +52,7 @@ class SalesService
 
         // Count total before pagination for accurate total
         $totalinvoice = $query->count();
-        
+
         // Now apply pagination
         $sales = $query->paginate($entries);
         $sales->getCollection()->each->setAppends([]); // Prevent N+1
@@ -61,19 +63,19 @@ class SalesService
             ->where('tenant_id', $tenantId)
             ->whereIn('status', ['Unpaid', 'Partial'])
             ->sum('total');
-            
+
         $unpaidCreditUsed = DB::table('sales')
             ->where('tenant_id', $tenantId)
             ->whereIn('status', ['Unpaid', 'Partial'])
             ->sum('customer_credit_used');
-            
+
         $unpaidReturns = DB::table('sales_returns')
             ->join('sales', 'sales_returns.sales_id', '=', 'sales.id')
             ->where('sales_returns.tenant_id', $tenantId)
             ->whereIn('sales.status', ['Unpaid', 'Partial'])
             ->where('sales_returns.status', 'Completed')
             ->sum('sales_returns.total_amount');
-            
+
         $unpaidDebt = max(0, $unpaidSalesTotal - $unpaidCreditUsed - $unpaidReturns);
 
         // Calculate total monthly minus returns
@@ -82,14 +84,14 @@ class SalesService
 
         $monthlySales = DB::table('sales')
             ->where('tenant_id', $tenantId)
-            ->whereBetween('created_at', [$monthStart . ' 00:00:00', $monthEnd . ' 23:59:59'])
+            ->whereBetween('created_at', [$monthStart.' 00:00:00', $monthEnd.' 23:59:59'])
             ->selectRaw('SUM(total) as monthly_total')
             ->first();
-            
+
         $monthlyReturns = DB::table('sales_returns')
             ->join('sales', 'sales_returns.sales_id', '=', 'sales.id')
             ->where('sales_returns.tenant_id', $tenantId)
-            ->whereBetween('sales.created_at', [$monthStart . ' 00:00:00', $monthEnd . ' 23:59:59'])
+            ->whereBetween('sales.created_at', [$monthStart.' 00:00:00', $monthEnd.' 23:59:59'])
             ->where('sales_returns.status', 'Completed')
             ->selectRaw('SUM(sales_returns.total_amount) as returned_total')
             ->first();
@@ -102,7 +104,7 @@ class SalesService
             ->where('type', Sales::TYPE_POS)
             ->selectRaw('SUM(total) as pos_total')
             ->first();
-            
+
         $posReturns = DB::table('sales_returns')
             ->join('sales', 'sales_returns.sales_id', '=', 'sales.id')
             ->where('sales_returns.tenant_id', $tenantId)
@@ -114,18 +116,18 @@ class SalesService
         $posTotal = ($posSales->pos_total ?? 0) - ($posReturns->returned_total ?? 0);
 
         $pendingOrders = Sales::where('tenant_id', $tenantId)->whereIn('status', ['Unpaid', 'Partial'])->count();
-        
+
         $dueInvoices = Sales::where('tenant_id', $tenantId)
             ->whereIn('status', ['Unpaid', 'Partial'])
             ->whereDate('due_date', '>=', now())
             ->whereDate('due_date', '<=', now()->addDays(7))
             ->count();
-            
+
         $overdueInvoices = Sales::where('tenant_id', $tenantId)
             ->whereIn('status', ['Unpaid', 'Partial'])
             ->whereDate('due_date', '<', now())
             ->count();
-            
+
         $shopname = User::where('tenant_id', $tenantId)->whereNotNull('shopname')->value('shopname');
         $address = User::where('tenant_id', $tenantId)->whereNotNull('address')->value('address');
 
@@ -154,27 +156,29 @@ class SalesService
     public function applyCustomerCredit(Sales $sale, float $creditAmount): void
     {
         $availableCredits = $this->getActiveCustomerCredits($sale->customer_id);
-        
+
         $remainingCredit = $creditAmount;
-        
+
         foreach ($availableCredits as $credit) {
-            if ($remainingCredit <= 0) break;
-            
+            if ($remainingCredit <= 0) {
+                break;
+            }
+
             $availableOnThisCredit = $credit->available_amount;
             $creditToUse = min($availableOnThisCredit, $remainingCredit);
-            
+
             if ($creditToUse > 0) {
                 $credit->increment('used_amount', $creditToUse);
                 $credit->decrement('available_amount', $creditToUse);
                 $remainingCredit -= $creditToUse;
-                
+
                 // Check if credit is fully used
                 if ($credit->used_amount >= $credit->amount) {
                     $credit->update(['status' => 'used']);
                 }
             }
         }
-        
+
         // Update sale with credit used amount
         $sale->update(['customer_credit_used' => $creditAmount - $remainingCredit]);
     }
@@ -187,20 +191,22 @@ class SalesService
     public function useCustomerCredit(int $customerId, float $amount, ?int $saleId = null): void
     {
         $credits = CustomerCredit::forCustomer($customerId)->active()->orderBy('created_at', 'asc')->get();
-        
+
         $remainingAmount = $amount;
-        
+
         foreach ($credits as $credit) {
-            if ($remainingAmount <= 0) break;
-            
+            if ($remainingAmount <= 0) {
+                break;
+            }
+
             $availableOnThisCredit = $credit->available_amount;
             $creditToUse = min($availableOnThisCredit, $remainingAmount);
-            
+
             if ($creditToUse > 0) {
                 $credit->increment('used_amount', $creditToUse);
                 $credit->decrement('available_amount', $creditToUse);
                 $remainingAmount -= $creditToUse;
-                
+
                 // Check if credit is fully used
                 if ($credit->used_amount >= $credit->amount) {
                     $credit->update(['status' => 'used']);
@@ -223,7 +229,7 @@ class SalesService
 
     public function getSalesViewData($id)
     {
-        /** @var \App\Models\Sales $sales */
+        /** @var Sales $sales */
         $sales = Sales::with(['salesItems', 'customer', 'payments', 'salesReturns.items', 'fakturPajak'])->find($id);
 
         $customer = $sales->customer;
@@ -279,7 +285,7 @@ class SalesService
         foreach ($sales as $sale) {
             $totalinvoice += $sale->total_amount;
             $unpaidDebt += ($sale->status !== 'Paid') ? $sale->balance : 0;
-            
+
             if ($sale->order_date->isCurrentMonth()) {
                 $totalMonthly += $sale->total_amount;
             }
@@ -315,10 +321,10 @@ class SalesService
     {
         return DB::transaction(function () use ($data) {
             $products = json_decode($data['products'], true);
-            if (!$products || !is_array($products)) {
+            if (! $products || ! is_array($products)) {
                 throw new \Exception('Invalid product data');
             }
-            
+
             if (empty($products)) {
                 throw new \Exception('No products in the order');
             }
@@ -326,9 +332,9 @@ class SalesService
             $subTotal = 0;
             foreach ($products as $product) {
                 $subTotal += SalesHelper::calculateTotal(
-                    $product['customer_price'], 
-                    $product['quantity'], 
-                    $product['discount'] ?? 0, 
+                    $product['customer_price'],
+                    $product['quantity'],
+                    $product['discount'] ?? 0,
                     $product['discountType'] ?? 'fixed'
                 );
             }
@@ -357,9 +363,9 @@ class SalesService
             $grandTotal = max(0, $grandTotal - $pphAmount);
 
             $invoice = $data['invoice'] ?? $this->generateInvoiceNumber();
-            
+
             $warehouseId = $data['warehouse_id'] ?? Product::getMainWarehouseId();
-            if (!$warehouseId) {
+            if (! $warehouseId) {
                 throw new \Exception('No warehouse specified and no main warehouse configured.');
             }
 
@@ -370,30 +376,30 @@ class SalesService
                 'warehouse_id' => $warehouseId,
                 'order_date' => $data['order_date'],
                 'due_date' => $data['due_date'],
-                'tax_id'              => $tax?->id,
-                'tax_rate'            => $taxRate,
-                'total_tax'           => $taxAmount,
-                'tax_type'            => $taxType,
-                'total'               => $grandTotal,
-                'order_discount'      => $orderDiscount,
+                'tax_id' => $tax?->id,
+                'tax_rate' => $taxRate,
+                'total_tax' => $taxAmount,
+                'tax_type' => $taxType,
+                'total' => $grandTotal,
+                'order_discount' => $orderDiscount,
                 'order_discount_type' => $orderDiscountType,
-                'status'              => 'Unpaid',
-                'payment_type'        => '-',
-                'type'                => Sales::TYPE_REGULAR,
-                'customer_credit_used'=> 0,
-                'notes'               => $data['notes'] ?? null,
-                'terms_conditions'    => $data['terms_conditions'] ?? null,
+                'status' => 'Unpaid',
+                'payment_type' => '-',
+                'type' => Sales::TYPE_REGULAR,
+                'customer_credit_used' => 0,
+                'notes' => $data['notes'] ?? null,
+                'terms_conditions' => $data['terms_conditions'] ?? null,
                 // PPN / e-Faktur fields — derived from selected tax's is_ppn flag.
                 // Only applied when tenant's tax jurisdiction is Indonesian.
-                'ppn_enabled'         => app('currentTenant')->isIndonesian() && ($tax?->is_ppn ?? false),
-                'ppn_rate'            => app('currentTenant')->isIndonesian() && ($tax?->is_ppn ?? false) ? $taxRate : null,
-                'ppn_amount'          => app('currentTenant')->isIndonesian() && ($tax?->is_ppn ?? false) ? $taxAmount : 0,
+                'ppn_enabled' => app('currentTenant')->isIndonesian() && ($tax?->is_ppn ?? false),
+                'ppn_rate' => app('currentTenant')->isIndonesian() && ($tax?->is_ppn ?? false) ? $taxRate : null,
+                'ppn_amount' => app('currentTenant')->isIndonesian() && ($tax?->is_ppn ?? false) ? $taxAmount : 0,
                 // PPh / Withholding Tax fields — derived from selected PPh tax's is_pph flag.
                 // Only applied when tenant's tax jurisdiction is Indonesian.
-                'pph_enabled'         => app('currentTenant')->isIndonesian() && ($pphTax?->is_pph ?? false),
-                'pph_rate'            => app('currentTenant')->isIndonesian() && ($pphTax?->is_pph ?? false) ? $pphTaxRate : null,
-                'pph_amount'          => app('currentTenant')->isIndonesian() && ($pphTax?->is_pph ?? false) ? $pphAmount : 0,
-                'pph_tax_id'          => app('currentTenant')->isIndonesian() && ($pphTax?->is_pph ?? false) ? $pphTax?->id : null,
+                'pph_enabled' => app('currentTenant')->isIndonesian() && ($pphTax?->is_pph ?? false),
+                'pph_rate' => app('currentTenant')->isIndonesian() && ($pphTax?->is_pph ?? false) ? $pphTaxRate : null,
+                'pph_amount' => app('currentTenant')->isIndonesian() && ($pphTax?->is_pph ?? false) ? $pphAmount : 0,
+                'pph_tax_id' => app('currentTenant')->isIndonesian() && ($pphTax?->is_pph ?? false) ? $pphTax?->id : null,
             ]);
 
             // Apply customer credit if provided
@@ -401,33 +407,33 @@ class SalesService
             if ($creditAmount > 0) {
                 $this->applyCustomerCredit($sale, $creditAmount);
                 $sale->refresh();
-                
+
                 // Update status based on credit usage
                 $this->updateSaleStatus($sale);
             }
 
             $totalCostOfGoods = 0;
-            
+
             $stockRecords = ProductWarehouse::whereIn('product_id', array_column($products, 'product_id'))
                 ->where('warehouse_id', $warehouseId)
                 ->where('tenant_id', $sale->tenant_id)
                 ->get()
                 ->keyBy('product_id');
-            
+
             $insufficientProducts = [];
             foreach ($products as $productData) {
                 $product = Product::where('id', $productData['product_id'])
-                                  ->where('tenant_id', $sale->tenant_id)
-                                  ->first();
-                if (!$product) {
+                    ->where('tenant_id', $sale->tenant_id)
+                    ->first();
+                if (! $product) {
                     throw new \Exception("Product with ID {$productData['product_id']} not found in this tenant.");
                 }
-                
+
                 $availableStock = 0;
                 if (isset($stockRecords[$product->id])) {
                     $availableStock = (float) $stockRecords[$product->id]->quantity;
                 }
-                
+
                 $requestedQty = (int) $productData['quantity'];
                 if ($availableStock < $requestedQty) {
                     $insufficientProducts[] = [
@@ -439,18 +445,18 @@ class SalesService
                     ];
                 }
             }
-            
-            if (!empty($insufficientProducts)) {
+
+            if (! empty($insufficientProducts)) {
                 $sale->delete();
                 $productList = collect($insufficientProducts)->pluck('name')->implode(', ');
-                throw new \Exception('Insufficient stock for: ' . $productList . '. Please adjust quantities or restock first.');
+                throw new \Exception('Insufficient stock for: '.$productList.'. Please adjust quantities or restock first.');
             }
 
             foreach ($products as $productData) {
                 $product = Product::where('id', $productData['product_id'])
-                                  ->where('tenant_id', $sale->tenant_id)
-                                  ->first();
-                if (!$product) {
+                    ->where('tenant_id', $sale->tenant_id)
+                    ->first();
+                if (! $product) {
                     throw new \Exception("Product with ID {$productData['product_id']} not found in this tenant.");
                 }
 
@@ -503,7 +509,7 @@ class SalesService
             $costOfGoodsSoldAccount = Account::find($accountingSettings['cost_of_goods_sold_account_id'] ?? null);
             $inventoryAccount = Account::find($accountingSettings['inventory_account_id'] ?? null);
 
-            if (!$salesRevenueAccount || !$accountsReceivableAccount || !$costOfGoodsSoldAccount || !$inventoryAccount) {
+            if (! $salesRevenueAccount || ! $accountsReceivableAccount || ! $costOfGoodsSoldAccount || ! $inventoryAccount) {
                 throw new \Exception('One or more required accounts (Sales Revenue, AR, COGS, Inventory) not found. Please check Accounting Settings.');
             }
 
@@ -551,7 +557,7 @@ class SalesService
             if ($creditUsed > 0) {
                 // Check if a customer credit account exists, otherwise use a discount account
                 $customerCreditAccountId = $accountingSettings['customer_credit_account_id'] ?? null;
-                
+
                 if ($customerCreditAccountId) {
                     $customerCreditAccount = Account::find($customerCreditAccountId);
                     if ($customerCreditAccount) {
@@ -578,7 +584,7 @@ class SalesService
     {
         return DB::transaction(function () use ($sale, $data) {
             $products = json_decode($data['products'], true);
-            if (!$products || !is_array($products)) {
+            if (! $products || ! is_array($products)) {
                 throw new \Exception('Invalid product data');
             }
 
@@ -644,37 +650,39 @@ class SalesService
             $grandTotal = max(0, $grandTotal - $pphAmount);
 
             $sale->update([
-                'customer_id'         => $data['customer_id'],
-                'order_date'          => $data['order_date'],
-                'due_date'            => $data['due_date'],
-                'tax_id'              => $tax?->id,
-                'tax_rate'            => $taxRate,
-                'total_tax'           => $taxAmount,
-                'tax_type'            => $taxType,
-                'total'               => $grandTotal,
-                'order_discount'      => $orderDiscount,
+                'customer_id' => $data['customer_id'],
+                'order_date' => $data['order_date'],
+                'due_date' => $data['due_date'],
+                'tax_id' => $tax?->id,
+                'tax_rate' => $taxRate,
+                'total_tax' => $taxAmount,
+                'tax_type' => $taxType,
+                'total' => $grandTotal,
+                'order_discount' => $orderDiscount,
                 'order_discount_type' => $orderDiscountType,
-                'payment_type'        => $data['payment_type'] ?? '-',
-                'notes'               => $data['notes'] ?? $sale->notes,
-                'terms_conditions'    => $data['terms_conditions'] ?? $sale->terms_conditions,
+                'payment_type' => $data['payment_type'] ?? '-',
+                'notes' => $data['notes'] ?? $sale->notes,
+                'terms_conditions' => $data['terms_conditions'] ?? $sale->terms_conditions,
                 // PPN / e-Faktur fields — derived from selected tax's is_ppn flag.
                 // Only applied when tenant's tax jurisdiction is Indonesian.
-                'ppn_enabled'         => app('currentTenant')->isIndonesian() && ($tax?->is_ppn ?? false),
-                'ppn_rate'            => app('currentTenant')->isIndonesian() && ($tax?->is_ppn ?? false) ? $taxRate : null,
-                'ppn_amount'          => app('currentTenant')->isIndonesian() && ($tax?->is_ppn ?? false) ? $taxAmount : 0,
+                'ppn_enabled' => app('currentTenant')->isIndonesian() && ($tax?->is_ppn ?? false),
+                'ppn_rate' => app('currentTenant')->isIndonesian() && ($tax?->is_ppn ?? false) ? $taxRate : null,
+                'ppn_amount' => app('currentTenant')->isIndonesian() && ($tax?->is_ppn ?? false) ? $taxAmount : 0,
                 // PPh / Withholding Tax fields — derived from selected PPh tax's is_pph flag.
                 // Only applied when tenant's tax jurisdiction is Indonesian.
-                'pph_enabled'         => app('currentTenant')->isIndonesian() && ($pphTax?->is_pph ?? false),
-                'pph_rate'            => app('currentTenant')->isIndonesian() && ($pphTax?->is_pph ?? false) ? $pphTaxRate : null,
-                'pph_amount'          => app('currentTenant')->isIndonesian() && ($pphTax?->is_pph ?? false) ? $pphAmount : 0,
-                'pph_tax_id'          => app('currentTenant')->isIndonesian() && ($pphTax?->is_pph ?? false) ? $pphTax?->id : null,
+                'pph_enabled' => app('currentTenant')->isIndonesian() && ($pphTax?->is_pph ?? false),
+                'pph_rate' => app('currentTenant')->isIndonesian() && ($pphTax?->is_pph ?? false) ? $pphTaxRate : null,
+                'pph_amount' => app('currentTenant')->isIndonesian() && ($pphTax?->is_pph ?? false) ? $pphAmount : 0,
+                'pph_tax_id' => app('currentTenant')->isIndonesian() && ($pphTax?->is_pph ?? false) ? $pphTax?->id : null,
             ]);
 
             foreach ($products as $productData) {
                 $product = Product::where('id', $productData['product_id'])
-                                  ->where('tenant_id', $sale->tenant_id)
-                                  ->first();
-                if (!$product) continue;
+                    ->where('tenant_id', $sale->tenant_id)
+                    ->first();
+                if (! $product) {
+                    continue;
+                }
 
                 SalesItem::create([
                     'sales_id' => $sale->id,
@@ -692,11 +700,11 @@ class SalesService
                     [
                         'product_id' => $product->id,
                         'warehouse_id' => $sale->warehouse_id,
-                        'tenant_id' => $sale->tenant_id
+                        'tenant_id' => $sale->tenant_id,
                     ],
                     ['quantity' => 0]
                 );
-                
+
                 $stockRecord->decrement('quantity', $productData['quantity']);
 
                 // Reduct from batch (FEFO)
@@ -706,7 +714,9 @@ class SalesService
                     ->get();
                 $quantityToDecrement = $productData['quantity'];
                 foreach ($poItems as $poItem) {
-                    if ($quantityToDecrement <= 0) break;
+                    if ($quantityToDecrement <= 0) {
+                        break;
+                    }
                     $decrement = min($poItem->remaining_quantity, $quantityToDecrement);
                     $poItem->decrement('remaining_quantity', $decrement);
                     $quantityToDecrement -= $decrement;
@@ -735,39 +745,39 @@ class SalesService
         });
     }
 
-    public function addPayment(Sales $sale, array $data): \App\Models\Payment
+    public function addPayment(Sales $sale, array $data): Payment
     {
         return DB::transaction(function () use ($sale, $data) {
             $cashAmount = $data['amount'] ?? 0;
             $creditAmount = $data['credit_amount'] ?? 0;
             $totalPaymentAmount = $cashAmount + $creditAmount;
-            
+
             if ($totalPaymentAmount <= 0) {
                 throw new \Exception('Payment amount must be greater than zero.');
             }
-            
+
             // Validate credit usage if provided
             if ($creditAmount > 0) {
                 $availableCredit = $this->getCustomerTotalAvailableCredit($sale->customer_id);
                 if ($creditAmount > $availableCredit) {
-                    throw new \Exception('Insufficient customer credit. Available: ' . number_format($availableCredit, 2));
+                    throw new \Exception('Insufficient customer credit. Available: '.number_format($availableCredit, 2));
                 }
-                
+
                 // Calculate remaining balance after credit
                 $balanceAfterCredit = $sale->balance - $creditAmount;
                 if ($balanceAfterCredit < 0) {
                     $creditAmount = $sale->balance; // Cap credit to remaining balance
                     $totalPaymentAmount = $cashAmount + $creditAmount;
                 }
-                
+
                 // Use credits (FIFO - oldest first)
                 $this->useCustomerCredit($sale->customer_id, $creditAmount, $sale->id);
-                
+
                 // Update sale's credit used
                 $newCreditUsed = ($sale->customer_credit_used ?? 0) + $creditAmount;
                 $sale->update(['customer_credit_used' => $newCreditUsed]);
             }
-            
+
             // Create cash payment record
             if ($cashAmount > 0) {
                 $payment = $sale->payments()->create([
@@ -782,7 +792,7 @@ class SalesService
                     'amount' => 0,
                     'payment_date' => $data['payment_date'],
                     'payment_method' => 'Credit',
-                    'notes' => 'Paid via customer credit: ' . number_format($creditAmount, 2),
+                    'notes' => 'Paid via customer credit: '.number_format($creditAmount, 2),
                 ]);
             }
 
@@ -794,7 +804,7 @@ class SalesService
             $accountingSettings = app('currentTenant')->accounting_settings ?? [];
 
             // Only create journal entry for actual cash payments
-            if ($cashAmount > 0 && !empty($accountingSettings) && isset($accountingSettings['cash_account_id']) && isset($accountingSettings['accounts_receivable_account_id'])) {
+            if ($cashAmount > 0 && ! empty($accountingSettings) && isset($accountingSettings['cash_account_id']) && isset($accountingSettings['accounts_receivable_account_id'])) {
                 // Retrieve account names using the IDs from settings
                 $cashAccount = Account::find($accountingSettings['cash_account_id']);
                 $accountsReceivableAccount = Account::find($accountingSettings['accounts_receivable_account_id']);
@@ -845,12 +855,12 @@ class SalesService
     {
         DB::transaction(function () use ($sale) {
             // Reverse associated journal entries for accurate accounting
-            $journalEntries = \App\Models\JournalEntry::where('sourceable_type', get_class($sale))
+            $journalEntries = JournalEntry::where('sourceable_type', get_class($sale))
                 ->where('sourceable_id', $sale->id)
                 ->get();
-                
+
             foreach ($journalEntries as $entry) {
-                if ($entry->status === \App\Models\JournalEntry::STATUS_POSTED && $entry->canBeReversed()) {
+                if ($entry->status === JournalEntry::STATUS_POSTED && $entry->canBeReversed()) {
                     $this->accountingService->reverseJournalEntry($entry, "Auto-reversal due to deleted Sale #{$sale->invoice}");
                 }
             }
@@ -858,30 +868,30 @@ class SalesService
             // Also reverse FakturPajak journal entries (PPN Keluaran)
             $fakturPajak = $sale->fakturPajak()->first();
             if ($fakturPajak) {
-                $fpJournalEntries = \App\Models\JournalEntry::where('sourceable_type', get_class($fakturPajak))
+                $fpJournalEntries = JournalEntry::where('sourceable_type', get_class($fakturPajak))
                     ->where('sourceable_id', $fakturPajak->id)
                     ->get();
 
                 foreach ($fpJournalEntries as $entry) {
-                    if ($entry->status === \App\Models\JournalEntry::STATUS_POSTED && $entry->canBeReversed()) {
+                    if ($entry->status === JournalEntry::STATUS_POSTED && $entry->canBeReversed()) {
                         $this->accountingService->reverseJournalEntry($entry, "Auto-reversal due to deleted Sale #{$sale->invoice} (Faktur Pajak {$fakturPajak->nsfp})");
                     }
                 }
 
                 // Mark NSFP as cancelled and delete FakturPajak
-                \App\Models\NsfpPool::where('nsfp', $fakturPajak->nsfp)->update(['status' => 'cancelled']);
+                NsfpPool::where('nsfp', $fakturPajak->nsfp)->update(['status' => 'cancelled']);
                 $fakturPajak->items()->delete();
                 $fakturPajak->delete();
             }
 
             // Reverse PPh journal entries
             if ($sale->isPph() && $sale->pph_amount > 0) {
-                $pphJournalEntries = \App\Models\JournalEntry::where('sourceable_type', get_class($sale))
+                $pphJournalEntries = JournalEntry::where('sourceable_type', get_class($sale))
                     ->where('sourceable_id', $sale->id)
                     ->where('description', 'like', '%PPh Withholding%')
                     ->get();
                 foreach ($pphJournalEntries as $entry) {
-                    if ($entry->status === \App\Models\JournalEntry::STATUS_POSTED && $entry->canBeReversed()) {
+                    if ($entry->status === JournalEntry::STATUS_POSTED && $entry->canBeReversed()) {
                         $this->accountingService->reverseJournalEntry($entry, "Auto-reversal due to deleted Sale #{$sale->invoice} (PPh)");
                     }
                 }
@@ -948,13 +958,14 @@ class SalesService
                 $updatedCount++;
             }
         });
+
         return $updatedCount;
     }
 
     public function bulkExportSales(array $filters, ?array $ids, string $exportOption)
     {
         $query = Sales::with(['customer', 'salesItems']);
-        
+
         if ($ids) {
             $query->whereIn('id', $ids);
         } else {
@@ -970,10 +981,11 @@ class SalesService
 
         if ($exportOption === 'pdf') {
             $html = view('admin.sales.bulk-export-pdf', compact('sales'))->render();
-            $dompdf = new Dompdf();
+            $dompdf = new Dompdf;
             $dompdf->loadHtml($html);
             $dompdf->setPaper('A4', 'landscape');
             $dompdf->render();
+
             return $dompdf->stream('sales-orders.pdf');
         }
 
@@ -1025,12 +1037,12 @@ class SalesService
         $address = User::where('tenant_id', $tenantId)->whereNotNull('address')->value('address');
 
         $html = view('admin.sales.print-pdf', compact('sales', 'shopname', 'address'))->render();
-        $dompdf = new Dompdf();
+        $dompdf = new Dompdf;
         $dompdf->loadHtml($html);
         $dompdf->setPaper('A4', 'portrait');
         $dompdf->render();
 
-        return $dompdf->stream('invoice-' . $sales->invoice . '.pdf', ['Attachment' => false]);
+        return $dompdf->stream('invoice-'.$sales->invoice.'.pdf', ['Attachment' => false]);
     }
 
     public function getSalesForModal($id)
@@ -1049,12 +1061,12 @@ class SalesService
 
         $pastPrice = 0;
 
-            if ($latestSale) {
-                $saleItem = $latestSale->salesItems()->where('product_id', $product->id)->first();
-                if ($saleItem) {
-                    $pastPrice = $saleItem->customer_price; // Removed floor()
-                }
+        if ($latestSale) {
+            $saleItem = $latestSale->salesItems()->where('product_id', $product->id)->first();
+            if ($saleItem) {
+                $pastPrice = $saleItem->customer_price; // Removed floor()
             }
+        }
 
         return $pastPrice;
     }
@@ -1062,29 +1074,29 @@ class SalesService
     public function generateInvoiceNumber(): string
     {
         $tenantId = auth()->user()->tenant_id ?? null;
-        
+
         $query = Sales::query();
-        
+
         if ($tenantId) {
             $query->where('tenant_id', $tenantId);
         }
-        
+
         $lastSalesInvoice = $query->orderBy('id', 'desc')->first();
-        
+
         $invoiceNumber = 1;
         if ($lastSalesInvoice && preg_match('/INV-(\d+)/', $lastSalesInvoice->invoice, $matches)) {
             $lastNumber = (int) $matches[1];
             $invoiceNumber = $lastNumber + 1;
         }
-        
-        return 'INV-' . str_pad($invoiceNumber, 4, '0', STR_PAD_LEFT);
+
+        return 'INV-'.str_pad($invoiceNumber, 4, '0', STR_PAD_LEFT);
     }
 
     public function getExpiringSalesCount(): int
     {
         return Sales::where('due_date', '<=', Carbon::now()->addDays(10))
-                        ->where('status', '!=', 'Paid')
-                        ->count();
+            ->where('status', '!=', 'Paid')
+            ->count();
     }
 
     public function getExpiringSales()
@@ -1116,11 +1128,11 @@ class SalesService
         return DB::transaction(function () use ($data) {
             $sale = Sales::findOrFail($data['sales_id']);
             $items = json_decode($data['items'], true);
-            if (!$items || !is_array($items)) {
+            if (! $items || ! is_array($items)) {
                 throw new \Exception('Invalid items data');
             }
 
-            $returnedItems = array_filter($items, function($item) {
+            $returnedItems = array_filter($items, function ($item) {
                 return isset($item['returned_quantity']) && $item['returned_quantity'] > 0;
             });
 
@@ -1157,7 +1169,7 @@ class SalesService
                 $product = Product::find($itemData['product_id']);
                 if ($product) {
                     $warehouseId = $sale->warehouse_id ?? Product::getMainWarehouseId();
-                    
+
                     $stockRecord = ProductWarehouse::firstOrCreate(
                         ['product_id' => $product->id, 'warehouse_id' => $warehouseId, 'tenant_id' => $product->tenant_id],
                         ['quantity' => 0]
@@ -1167,7 +1179,7 @@ class SalesService
             }
 
             $totalSoldQuantity = $sale->salesItems()->sum('quantity');
-            $totalReturnedQuantity = $sale->salesReturns()->with('items')->get()->flatMap(function($sr) {
+            $totalReturnedQuantity = $sale->salesReturns()->with('items')->get()->flatMap(function ($sr) {
                 return $sr->items;
             })->sum('quantity');
 
@@ -1178,14 +1190,14 @@ class SalesService
             }
 
             $accountingSettings = app('currentTenant')->accounting_settings ?? [];
-            if (!$accountingSettings || !isset($accountingSettings['inventory_account_id']) || !isset($accountingSettings['accounts_receivable_account_id'])) {
+            if (! $accountingSettings || ! isset($accountingSettings['inventory_account_id']) || ! isset($accountingSettings['accounts_receivable_account_id'])) {
                 throw new \Exception('Accounting settings for inventory or accounts receivable are not configured.');
             }
 
             $inventoryAccount = Account::find($accountingSettings['inventory_account_id']);
             $accountsReceivableAccount = Account::find($accountingSettings['accounts_receivable_account_id']);
 
-            if (!$inventoryAccount || !$accountsReceivableAccount) {
+            if (! $inventoryAccount || ! $accountsReceivableAccount) {
                 throw new \Exception('Required accounts (Inventory, AR) not found for Sales Return. Please check Accounting Settings.');
             }
 

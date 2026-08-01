@@ -3,18 +3,20 @@
 namespace Tests\Unit\Http\Middleware;
 
 use App\Http\Middleware\SetLocale;
+use App\Models\Tenant;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Auth;
-use Tests\TestCase;
 use PHPUnit\Framework\Attributes\Test;
+use Tests\TestCase;
 use Tests\Traits\CreatesTenant;
 
 class SetLocaleTest extends TestCase
 {
-    use RefreshDatabase, CreatesTenant;
+    use CreatesTenant, RefreshDatabase;
 
     private SetLocale $middleware;
 
@@ -22,7 +24,7 @@ class SetLocaleTest extends TestCase
     {
         parent::setUp();
         $this->setupTenant(); // Creates $this->tenant and $this->user, and calls actingAs
-        $this->middleware = new SetLocale();
+        $this->middleware = new SetLocale;
     }
 
     #[Test]
@@ -30,10 +32,10 @@ class SetLocaleTest extends TestCase
     {
         // 1. Arrange
         $this->user->update(['system_settings' => ['system_language' => 'id']]);
-        $request = new Request();
+        $request = new Request;
         $next = function ($req) {
             // This is a dummy "next" middleware in the chain.
-            return new \Illuminate\Http\Response('Success');
+            return new Response('Success');
         };
 
         // 2. Act
@@ -52,9 +54,9 @@ class SetLocaleTest extends TestCase
         // Set a specific fallback for this test
         config(['app.fallback_locale' => 'fr']);
 
-        $request = new Request();
+        $request = new Request;
         $next = function ($req) {
-            return new \Illuminate\Http\Response('Success');
+            return new Response('Success');
         };
 
         // 2. Act
@@ -70,18 +72,17 @@ class SetLocaleTest extends TestCase
         // 1. Arrange
         // Ensure no user is authenticated
         Auth::logout();
-        
-        // Make sure the tenant context is forgotten as well
-        \App\Models\Tenant::forgetCurrent();
 
+        // Make sure the tenant context is forgotten as well
+        Tenant::forgetCurrent();
 
         // Set a known initial locale
         $initialLocale = 'en';
         App::setLocale($initialLocale);
 
-        $request = new Request();
+        $request = new Request;
         $next = function ($req) {
-            return new \Illuminate\Http\Response('Success');
+            return new Response('Success');
         };
 
         // 2. Act

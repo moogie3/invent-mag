@@ -2,7 +2,6 @@
 
 namespace Tests\Unit\Services;
 
-use App\Exceptions\PlanLimitExceededException;
 use App\Models\Plan;
 use App\Models\Tenant;
 use App\Models\User;
@@ -24,8 +23,8 @@ class PlanServiceTest extends TestCase
     {
         parent::setUp();
         $this->setupTenant();
-        $this->planService = new PlanService();
-        
+        $this->planService = new PlanService;
+
         // Ensure plans exist for our tests
         (new PlanSeeder)->run();
     }
@@ -41,9 +40,9 @@ class PlanServiceTest extends TestCase
     {
         // Clear the current tenant context temporarily
         Tenant::current()->forgetCurrent();
-        
+
         $this->assertNull($this->planService->getCurrentPlan());
-        
+
         // Restore context
         $this->tenant->makeCurrent();
     }
@@ -52,7 +51,7 @@ class PlanServiceTest extends TestCase
     public function it_returns_available_plans()
     {
         $plans = $this->planService->getAvailablePlans();
-        
+
         $this->assertCount(3, $plans);
         $this->assertEquals('Starter', $plans[0]->name);
         $this->assertEquals('Professional', $plans[1]->name);
@@ -80,7 +79,7 @@ class PlanServiceTest extends TestCase
         // Starter plan should have 'products' but NOT 'accounting'
         $this->assertTrue($this->planService->tenantHasFeature('products'));
         $this->assertFalse($this->planService->tenantHasFeature('accounting'));
-        
+
         $professionalPlan = Plan::findBySlug('professional');
         $this->tenant->assignPlan($professionalPlan);
         $this->tenant->refresh(); // Clear relation cache
@@ -98,11 +97,11 @@ class PlanServiceTest extends TestCase
         $this->tenant->assignPlan($starterPlan);
 
         // We already created 1 user in setupTenant()
-        
+
         // Second user should be allowed
         $this->assertTrue($this->planService->canAddUser());
         User::factory()->create(['tenant_id' => $this->tenant->id]);
-        
+
         // Third user should be allowed
         $this->assertTrue($this->planService->canAddUser());
         User::factory()->create(['tenant_id' => $this->tenant->id]);
@@ -140,9 +139,9 @@ class PlanServiceTest extends TestCase
     {
         $starterPlan = Plan::findBySlug('starter');
         $this->tenant->assignPlan($starterPlan);
-        
+
         $professionalPlan = Plan::findBySlug('professional');
-        
+
         $this->planService->upgradePlan($this->tenant, $professionalPlan->slug);
 
         $this->tenant->refresh();
@@ -155,9 +154,9 @@ class PlanServiceTest extends TestCase
         $starterPlan = Plan::findBySlug('starter');
         $this->tenant->assignPlan($starterPlan);
         $this->tenant->refresh();
-        
+
         $response = $this->planService->upgradePlan($this->tenant, $starterPlan->slug);
-        
+
         $this->assertFalse($response['success']);
         $this->assertEquals('You are already on this plan.', $response['message']);
     }
@@ -166,13 +165,13 @@ class PlanServiceTest extends TestCase
     public function it_suggests_correct_upgrade_for_feature()
     {
         $suggestion = $this->planService->getSuggestedUpgrade('accounting');
-        
+
         // Accounting is in Professional
         $this->assertNotNull($suggestion);
         $this->assertEquals('professional', $suggestion->slug);
-        
+
         $suggestionEnterprise = $this->planService->getSuggestedUpgrade('api_access');
-        
+
         // API Access is in Enterprise
         $this->assertNotNull($suggestionEnterprise);
         $this->assertEquals('enterprise', $suggestionEnterprise->slug);
@@ -183,18 +182,18 @@ class PlanServiceTest extends TestCase
     {
         $starterPlan = Plan::findBySlug('starter');
         $this->tenant->assignPlan($starterPlan);
-        
+
         Warehouse::factory()->create(['tenant_id' => $this->tenant->id]);
 
         $stats = $this->planService->getUsageStats();
 
         $this->assertArrayHasKey('users', $stats);
         $this->assertArrayHasKey('warehouses', $stats);
-        
+
         $this->assertEquals(1, $stats['users']['current']);
         $this->assertEquals(3, $stats['users']['limit']);
         $this->assertEquals(false, $stats['users']['unlimited']);
-        
+
         $this->assertEquals(1, $stats['warehouses']['current']);
         $this->assertEquals(1, $stats['warehouses']['limit']);
         $this->assertEquals(false, $stats['warehouses']['unlimited']);
@@ -205,10 +204,10 @@ class PlanServiceTest extends TestCase
     {
         // Ensure legacy mode is enabled
         config(['plans.legacy_full_access' => true]);
-        
+
         // Tenant has no plan assigned
         $this->assertNull($this->tenant->plan_id);
-        
+
         // They should have full access
         $this->assertTrue($this->planService->tenantHasFeature('api_access'));
         $this->assertTrue($this->planService->canAddUser());

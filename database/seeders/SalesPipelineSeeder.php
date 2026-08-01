@@ -2,9 +2,8 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
-use Illuminate\Database\Seeder;
 use App\Models\SalesPipeline;
+use Illuminate\Database\Seeder;
 
 class SalesPipelineSeeder extends Seeder
 {
@@ -17,7 +16,7 @@ class SalesPipelineSeeder extends Seeder
         $tenantName = app('currentTenant')->name;
 
         SalesPipeline::updateOrCreate(
-            ['name' => 'Default Pipeline - ' . $tenantName, 'tenant_id' => $tenantId],
+            ['name' => 'Default Pipeline - '.$tenantName, 'tenant_id' => $tenantId],
             [
                 'description' => 'The default sales pipeline.',
                 'is_default' => true,

@@ -4,13 +4,13 @@ namespace App\Services;
 
 use App\Models\Employee;
 use Dompdf\Dompdf;
-use Illuminate\Validation\Rule;
 
 class EmployeeService
 {
     public function getIndexData()
     {
         $employees = Employee::paginate(20);
+
         return compact('employees');
     }
 
@@ -27,6 +27,7 @@ class EmployeeService
     public function create(array $data): Employee
     {
         $validated = $this->validate($data);
+
         return Employee::create($validated);
     }
 
@@ -34,6 +35,7 @@ class EmployeeService
     {
         $validated = $this->validateUpdate($data);
         $employee->update($validated);
+
         return $employee;
     }
 
@@ -52,10 +54,11 @@ class EmployeeService
 
         if ($exportOption === 'pdf') {
             $html = view('admin.hr.employee.export-pdf', compact('employees'))->render();
-            $dompdf = new Dompdf();
+            $dompdf = new Dompdf;
             $dompdf->loadHtml($html);
             $dompdf->setPaper('A4', 'landscape');
             $dompdf->render();
+
             return $dompdf->stream('employees.pdf');
         }
 
@@ -84,6 +87,7 @@ class EmployeeService
                 }
                 fclose($file);
             };
+
             return response()->stream($callback, 200, $headers);
         }
 

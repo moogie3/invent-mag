@@ -2,22 +2,22 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\BelongsToTenant;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use App\Models\Concerns\BelongsToTenant;
 
 class Categories extends Model
 {
+    use BelongsToTenant, HasFactory;
 
-    use HasFactory, BelongsToTenant;
     protected $table = 'categories';
 
     protected $fillable = [
         'name',
         'description',
-        'parent_id'
+        'parent_id',
     ];
 
     protected $guarded = [
@@ -32,8 +32,6 @@ class Categories extends Model
     {
         return $this->belongsTo(Categories::class, 'parent_id');
     }
-
-
 
     /**
      * Get the children categories.

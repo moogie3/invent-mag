@@ -23,7 +23,7 @@ class AuthController extends Controller
         }
 
         return response()->json([
-            'message' => 'Invalid login details'
+            'message' => 'Invalid login details',
         ], 401);
     }
 }

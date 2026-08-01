@@ -4,7 +4,6 @@ namespace App\Http\Controllers\SuperAdmin;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
 
 class CmsController extends Controller
 {
@@ -65,7 +64,7 @@ class CmsController extends Controller
         $defaults = [
             'hero_title' => 'The All-In-One ERP to Streamline Your Business',
             'hero_subtitle' => 'From inventory and sales to a full accounting suite, Invent-MAG provides the tools you need to make smarter, data-driven decisions and accelerate your growth.',
-             'hero_cta_text' => 'Start 30-Day Free Trial',
+            'hero_cta_text' => 'Start 30-Day Free Trial',
             'hero_cta_url' => '/signup',
             'hero_cta_demo_text' => 'Try Live Demo',
             'hero_cta_demo_url' => 'https://demo-pro.invent-mag.web.id/admin/login',
@@ -107,11 +106,11 @@ class CmsController extends Controller
             'cta_title' => 'Ready to streamline your business?',
             'cta_description' => 'Join thousands of businesses using Invent-MAG to manage inventory, sales, and accounting in one place.',
             'contact_email' => 'jefrydwijaya3@gmail.com',
-            'footer_text' => '© ' . date('Y') . ' Invent-MAG. All rights reserved.',
+            'footer_text' => '© '.date('Y').' Invent-MAG. All rights reserved.',
         ];
 
         $path = storage_path('app/cms.json');
-        if (!file_exists($path)) {
+        if (! file_exists($path)) {
             return $defaults;
         }
 

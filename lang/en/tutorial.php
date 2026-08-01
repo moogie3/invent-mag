@@ -313,7 +313,7 @@ return [
     'hr_attendance_step_1' => 'Open Period: Click "Open Period" to start tracking attendance for a new month. You select the Year and Month.',
     'hr_attendance_step_2' => 'View Period: Click the eye icon to view the daily attendance grid for a specific month.',
     'hr_attendance_step_3' => 'Close Period: Once a month is complete and verified, you can close the period to prevent further edits. This is usually done before running payroll.',
-    
+
     'hr_attendance_details' => 'Attendance Tracker',
     'hr_attendance_details_desc' => 'Mark employee attendance for each day of the month.',
     'hr_attendance_details_step_1' => 'Individual Edit: Click on any empty cell in the grid and type a status code: P (Present), A (Absent), S (Sick), L (Leave), H (Holiday), or ½ (Half Day). Click away to auto-save.',
@@ -326,7 +326,7 @@ return [
     'hr_payroll_desc' => 'Generate and process monthly payroll based on attendance data and default allowances/deductions.',
     'hr_payroll_step_1' => 'Run Payroll: Click "Run Payroll" and select an attendance period. The system will automatically calculate pro-rated salaries, overtime pay, and pull default allowances/deductions.',
     'hr_payroll_step_2' => 'Proration Math: Employees are treated as salaried. Paid Days = Present, Sick, Leave, Holiday. Unpaid = Absent. If an employee is absent, the system auto-calculates an "Absence Deduction" and subtracts it from their gross pay.',
-    
+
     'hr_payroll_details' => 'Payroll Details & Accounting',
     'hr_payroll_details_desc' => 'Review individual payslips and process the two-step accounting flow. To remove a payroll run, click the red Delete button (only available while in Draft).',
     'hr_payroll_details_step_1' => 'Edit Drafts: While the run is in "Draft" status, you can click the edit button on any employee to manually adjust their allowances and deductions for this month. Or click Delete to completely delete the run and redo it.',
@@ -561,6 +561,7 @@ return [
     'save_ob' => 'Save: Click "Save Opening Balances" to save all entered balances. Existing balances will be updated.',
     'delete_ob' => 'Delete: Use "Delete Opening Balances" to remove all saved opening balances.',
     'summary_ob' => 'Summary: The bottom section shows the current saved opening balances with total debits and credits.',
+    'opening_balance_vs_recon' => 'Opening Balance vs Bank Reconciliation: Opening Balances are a one-time snapshot of your account balances when you first start using the system (e.g., the first day of your fiscal year). They are not tied to any bank statement. Bank Reconciliation, by contrast, verifies one specific statement period by matching its transactions against your journal entries.',
 
     // Income Statement
     'income_statement' => 'Income Statement',
@@ -627,6 +628,20 @@ return [
     'financing_section' => 'Financing Activities: Shows cash flows from debt, equity, and dividend transactions.',
     'net_change_cf' => 'Net Change in Cash: The bottom section shows the net increase or decrease in cash, plus the opening and closing cash balances.',
     'export_cf' => 'Export: Use the export dropdown to print or download the report as PDF or CSV.',
+
+    // Bank Reconciliation
+    'bank_reconciliation' => 'Bank Reconciliation',
+    'bank_reconciliation_desc' => 'Import bank statements and match them to journal entries to verify your cash balance.',
+    'bank_reconciliation_import' => 'Import Bank Statement',
+    'bank_reconciliation_import_desc' => 'Upload your bank statement export to start reconciling.',
+    'bank_reconciliation_import_why' => 'Why Import a Statement: A reconciliation can only begin once the bank transaction list is inside the system. This page converts your bank statement export (CSV/TXT from BCA, Mandiri, BNI, or BRI) into statement lines that you will match against your journal entries. The matched result proves that your Cash/Bank balance agrees with the bank.',
+    'bank_reconciliation_step_1' => 'Select Bank & Account: Choose the bank (BCA, Mandiri, BNI, BRI) and the cash/bank account you want to reconcile.',
+    'bank_reconciliation_step_2' => 'Upload Statement: Upload the CSV/TXT export from your bank. The system detects the format automatically (BCA, Mandiri, BNI, BRI).',
+    'bank_reconciliation_step_3' => 'Set Balances: Enter the opening and closing balances from your statement, plus an optional period date range.',
+    'bank_reconciliation_step_4' => 'Review Matches: Lines that were auto-matched show the "Matched" badge. Unmatched lines can be manually matched to a journal entry.',
+    'bank_reconciliation_step_5' => 'Manual Matching: Use the "Match to Entry" dropdown to pick the correct journal entry, or "Unmatch" to detach a wrong match.',
+    'bank_reconciliation_step_6' => 'Complete: When the variance is 0, click "Complete Reconciliation" to lock the matched entries from reverse, void, or unpost.',
+    'bank_reconciliation_opening_vs_recon' => 'Statement Start vs System Opening Balance: The opening balance on this form is the starting balance shown on the bank statement you are importing. The field is prefilled from the account Opening Balance (set under Accounting > Opening Balances) as a shortcut, but the two often differ because transactions happened in between. Make sure it matches the statement so the computed variance is meaningful.',
 
     // Activity Log
     'activity_log' => 'Activity Log',

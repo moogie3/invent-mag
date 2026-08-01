@@ -7,12 +7,13 @@ use App\Models\JournalEntry;
 use App\Services\FinancialReportingService;
 use Carbon\Carbon;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Collection;
 use Tests\TestCase;
 use Tests\Traits\CreatesTenant;
 
 class FinancialReportingServiceTest extends TestCase
 {
-    use RefreshDatabase, CreatesTenant;
+    use CreatesTenant, RefreshDatabase;
 
     protected $service;
 
@@ -140,11 +141,11 @@ class FinancialReportingServiceTest extends TestCase
         // The balance sheet should show the asset and liability we just created
         $this->assertGreaterThanOrEqual(0, $result['total_assets']);
         $this->assertGreaterThanOrEqual(0, $result['total_liabilities']);
-        
+
         // Verify the structure is correct
-        $this->assertInstanceOf(\Illuminate\Support\Collection::class, $result['assets']);
-        $this->assertInstanceOf(\Illuminate\Support\Collection::class, $result['liabilities']);
-        $this->assertInstanceOf(\Illuminate\Support\Collection::class, $result['equity']);
+        $this->assertInstanceOf(Collection::class, $result['assets']);
+        $this->assertInstanceOf(Collection::class, $result['liabilities']);
+        $this->assertInstanceOf(Collection::class, $result['equity']);
         $this->assertIsBool($result['equation_balanced']);
     }
 }

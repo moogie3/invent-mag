@@ -2,47 +2,48 @@
 
 namespace Tests\Feature;
 
-use App\Models\User;
-use App\Models\Tenant;
-use App\Models\Plan;
-use App\Models\Employee;
 use App\Models\AttendancePeriod;
 use App\Models\AttendanceRecord;
-use App\Models\PayrollRun;
+use App\Models\Employee;
+use App\Models\Plan;
+use App\Models\User;
+use Database\Seeders\PermissionSeeder;
+use Database\Seeders\RolePermissionSeeder;
+use Database\Seeders\RoleSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 use Tests\Traits\CreatesTenant;
 
 class HrFeatureTest extends TestCase
 {
-    use RefreshDatabase, CreatesTenant;
+    use CreatesTenant, RefreshDatabase;
 
     protected function setUp(): void
     {
         parent::setUp();
-        
+
         $this->setupTenant();
 
         // Assign enterprise plan to access HR features
         $plan = Plan::create([
             'slug' => 'enterprise',
-            'name' => 'Enterprise', 
+            'name' => 'Enterprise',
             'price' => 0,
             'features' => ['hr'],
-            'stripe_price_id' => '123'
+            'stripe_price_id' => '123',
         ]);
-        
+
         $this->tenant->update([
             'plan_id' => $plan->id,
             'plan_status' => 'active',
         ]);
-        
+
         $this->tenant->refresh();
         $this->tenant->makeCurrent();
 
-        $this->seed(\Database\Seeders\PermissionSeeder::class);
-        $this->seed(\Database\Seeders\RoleSeeder::class);
-        $this->seed(\Database\Seeders\RolePermissionSeeder::class);
+        $this->seed(PermissionSeeder::class);
+        $this->seed(RoleSeeder::class);
+        $this->seed(RolePermissionSeeder::class);
 
         $this->user = User::factory()->create(['tenant_id' => $this->tenant->id]);
         // Give user superuser role to bypass permissions
@@ -51,13 +52,13 @@ class HrFeatureTest extends TestCase
 
     public function test_can_view_employee_index(): void
     {
-        $response = $this->actingAs($this->user)->get('http://' . $this->tenant->domain . '/admin/hr/employee');
+        $response = $this->actingAs($this->user)->get('http://'.$this->tenant->domain.'/admin/hr/employee');
         $response->assertStatus(200);
     }
 
     public function test_can_create_employee(): void
     {
-        $response = $this->actingAs($this->user)->post('http://' . $this->tenant->domain . '/admin/hr/employee', [
+        $response = $this->actingAs($this->user)->post('http://'.$this->tenant->domain.'/admin/hr/employee', [
             'name' => 'John Doe',
             'employee_code' => 'EMP001',
             'employment_type' => 'permanent',
@@ -69,13 +70,13 @@ class HrFeatureTest extends TestCase
         $response->assertRedirect();
         $this->assertDatabaseHas('employees', [
             'name' => 'John Doe',
-            'employee_code' => 'EMP001'
+            'employee_code' => 'EMP001',
         ]);
     }
 
     public function test_can_open_attendance_period(): void
     {
-        $response = $this->actingAs($this->user)->post('http://' . $this->tenant->domain . '/admin/hr/attendance/period', [
+        $response = $this->actingAs($this->user)->post('http://'.$this->tenant->domain.'/admin/hr/attendance/period', [
             'year' => 2026,
             'month' => 5,
             'working_days' => 21,
@@ -86,7 +87,7 @@ class HrFeatureTest extends TestCase
             'year' => 2026,
             'month' => 5,
             'working_days' => 21,
-            'status' => 'open'
+            'status' => 'open',
         ]);
     }
 
@@ -95,7 +96,7 @@ class HrFeatureTest extends TestCase
         $employee = Employee::factory()->create([
             'tenant_id' => $this->tenant->id,
             'base_salary' => 5000000,
-            'status' => 'active'
+            'status' => 'active',
         ]);
 
         $period = AttendancePeriod::create([
@@ -103,26 +104,26 @@ class HrFeatureTest extends TestCase
             'year' => 2026,
             'month' => 5,
             'working_days' => 21,
-            'status' => 'closed'
+            'status' => 'closed',
         ]);
 
         // Manually record 21 days present
-        for ($i=1; $i<=21; $i++) {
+        for ($i = 1; $i <= 21; $i++) {
             AttendanceRecord::create([
                 'tenant_id' => $this->tenant->id,
                 'period_id' => $period->id,
                 'employee_id' => $employee->id,
-                'date' => "2026-05-" . str_pad($i, 2, '0', STR_PAD_LEFT),
-                'status' => 'present'
+                'date' => '2026-05-'.str_pad($i, 2, '0', STR_PAD_LEFT),
+                'status' => 'present',
             ]);
         }
 
-        $response = $this->actingAs($this->user)->post('http://' . $this->tenant->domain . '/admin/hr/payroll/run/' . $period->id);
-        
+        $response = $this->actingAs($this->user)->post('http://'.$this->tenant->domain.'/admin/hr/payroll/run/'.$period->id);
+
         $response->assertRedirect();
         $this->assertDatabaseHas('payroll_runs', [
             'period_id' => $period->id,
-            'status' => 'draft'
+            'status' => 'draft',
         ]);
 
         $this->assertDatabaseHas('payroll_items', [

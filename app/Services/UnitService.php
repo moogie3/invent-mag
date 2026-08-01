@@ -10,6 +10,7 @@ class UnitService
     {
         $units = Unit::paginate($entries);
         $totalunit = Unit::count();
+
         return compact('units', 'entries', 'totalunit');
     }
 

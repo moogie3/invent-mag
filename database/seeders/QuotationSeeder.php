@@ -2,13 +2,13 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Seeder;
-use App\Models\Quotation;
 use App\Models\Customer;
 use App\Models\Product;
+use App\Models\Quotation;
 use App\Models\Tax;
 use App\Models\User;
 use Carbon\Carbon;
+use Illuminate\Database\Seeder;
 
 class QuotationSeeder extends Seeder
 {
@@ -25,7 +25,8 @@ class QuotationSeeder extends Seeder
             ?? Tax::where('tenant_id', $tenantId)->where('is_active', true)->first();
 
         if ($customers->isEmpty() || $products->isEmpty()) {
-            $this->command?->warn('Skipping QuotationSeeder for tenant ' . app('currentTenant')->name . ': Missing customers or products.');
+            $this->command?->warn('Skipping QuotationSeeder for tenant '.app('currentTenant')->name.': Missing customers or products.');
+
             return;
         }
 
@@ -44,11 +45,11 @@ class QuotationSeeder extends Seeder
                 $subtotal += $qty * $price;
                 $items[] = [
                     'product_id' => $product->id,
-                    'name'       => $product->name,
-                    'quantity'   => $qty,
-                    'price'      => $price,
-                    'discount'   => 0,
-                    'total'      => $qty * $price,
+                    'name' => $product->name,
+                    'quantity' => $qty,
+                    'price' => $price,
+                    'discount' => 0,
+                    'total' => $qty * $price,
                 ];
             }
 
@@ -67,33 +68,33 @@ class QuotationSeeder extends Seeder
             }
 
             $quotationDate = Carbon::now()->subDays(rand(1, 60));
-            $prefix = 'QTN-' . $quotationDate->format('Ymd');
+            $prefix = 'QTN-'.$quotationDate->format('Ymd');
             $last = Quotation::withoutGlobalScopes()
                 ->where('quotation_number', 'like', "{$prefix}-%")
                 ->orderBy('id', 'desc')
                 ->first();
             $newNum = $last ? (int) substr($last->quotation_number, -4) + 1 : 1;
-            $quotationNumber = "{$prefix}-" . str_pad($newNum, 4, '0', STR_PAD_LEFT);
+            $quotationNumber = "{$prefix}-".str_pad($newNum, 4, '0', STR_PAD_LEFT);
 
             Quotation::create([
-                'quotation_number'    => $quotationNumber,
-                'customer_id'         => $customer->id,
-                'user_id'             => User::first()?->id,
-                'quotation_date'      => $quotationDate,
-                'valid_until'         => $quotationDate->copy()->addDays(30),
-                'subtotal'            => $subtotal,
-                'discount_type'       => 'fixed',
-                'discount_value'      => 0,
-                'discount_amount'     => 0,
-                'tax_id'              => $tax?->id,
-                'tax_type'            => $taxType,
-                'tax_rate'            => $taxRate,
-                'tax_amount'          => $taxAmount,
-                'total'               => $total,
-                'status'              => $statuses[array_rand($statuses)],
-                'items'               => $items,
-                'notes'               => null,
-                'terms_conditions'    => null,
+                'quotation_number' => $quotationNumber,
+                'customer_id' => $customer->id,
+                'user_id' => User::first()?->id,
+                'quotation_date' => $quotationDate,
+                'valid_until' => $quotationDate->copy()->addDays(30),
+                'subtotal' => $subtotal,
+                'discount_type' => 'fixed',
+                'discount_value' => 0,
+                'discount_amount' => 0,
+                'tax_id' => $tax?->id,
+                'tax_type' => $taxType,
+                'tax_rate' => $taxRate,
+                'tax_amount' => $taxAmount,
+                'total' => $total,
+                'status' => $statuses[array_rand($statuses)],
+                'items' => $items,
+                'notes' => null,
+                'terms_conditions' => null,
             ]);
         }
     }

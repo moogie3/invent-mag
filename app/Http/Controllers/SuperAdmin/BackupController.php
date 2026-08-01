@@ -31,11 +31,13 @@ class BackupController extends Controller
         if ($exitCode === 0) {
             session()->flash('success', 'System backup created successfully.');
             session()->save();
+
             return redirect()->route('superadmin.backups.index');
         }
 
         session()->flash('error', 'System backup creation failed. Check logs for details.');
         session()->save();
+
         return redirect()->route('superadmin.backups.index');
     }
 
@@ -48,7 +50,7 @@ class BackupController extends Controller
 
         $tenant = Tenant::findOrFail($request->tenant_id);
         $type = $request->type;
-        $filename = $tenant->domain . '-' . now()->format('Y-m-d-H-i-s') . '.zip';
+        $filename = $tenant->domain.'-'.now()->format('Y-m-d-H-i-s').'.zip';
         $tenantId = $tenant->getKey();
 
         try {
@@ -62,33 +64,37 @@ class BackupController extends Controller
             $process->setTimeout(600);
             $process->run();
 
-            $backupPath = 'backups/' . $filename;
+            $backupPath = 'backups/'.$filename;
             if (Storage::disk('local')->exists($backupPath)) {
                 Log::info("Super admin created tenant backup for {$tenant->name}: {$filename}");
 
                 session()->flash('success', "Backup created for '{$tenant->name}' ({$type}).");
                 session()->save();
+
                 return redirect()->route('superadmin.backups.index');
             }
 
             $errorOutput = $process->getErrorOutput();
-            session()->flash('error', 'Backup creation failed: ' . ($errorOutput ?: 'Unknown error'));
+            session()->flash('error', 'Backup creation failed: '.($errorOutput ?: 'Unknown error'));
             session()->save();
+
             return redirect()->route('superadmin.backups.index');
         } catch (\Exception $e) {
-            session()->flash('error', 'Backup creation failed: ' . $e->getMessage());
+            session()->flash('error', 'Backup creation failed: '.$e->getMessage());
             session()->save();
+
             return redirect()->route('superadmin.backups.index');
         }
     }
 
     public function download($filename)
     {
-        $path = storage_path('app/backups/' . basename($filename));
+        $path = storage_path('app/backups/'.basename($filename));
 
-        if (!file_exists($path)) {
+        if (! file_exists($path)) {
             session()->flash('error', 'Backup file not found.');
             session()->save();
+
             return redirect()->route('superadmin.backups.index');
         }
 
@@ -97,11 +103,12 @@ class BackupController extends Controller
 
     public function destroy($filename)
     {
-        $path = storage_path('app/backups/' . basename($filename));
+        $path = storage_path('app/backups/'.basename($filename));
 
-        if (!file_exists($path)) {
+        if (! file_exists($path)) {
             session()->flash('error', 'Backup file not found.');
             session()->save();
+
             return redirect()->route('superadmin.backups.index');
         }
 
@@ -111,6 +118,7 @@ class BackupController extends Controller
 
         session()->flash('success', 'Backup deleted successfully.');
         session()->save();
+
         return redirect()->route('superadmin.backups.index');
     }
 
@@ -127,14 +135,16 @@ class BackupController extends Controller
         $password = $request->input('password');
 
         if ($tenant->isBackupEncrypted()) {
-            if (!$password) {
+            if (! $password) {
                 session()->flash('error', 'Password is required for encrypted backup restoration.');
                 session()->save();
+
                 return redirect()->route('superadmin.backups.index')->withInput();
             }
             if ($password !== $tenant->backup_password) {
                 session()->flash('error', 'Incorrect backup password.');
                 session()->save();
+
                 return redirect()->route('superadmin.backups.index')->withInput();
             }
         }
@@ -149,13 +159,14 @@ class BackupController extends Controller
             ]);
 
             $zipPath = Storage::disk('local')->path($tempPath);
-            $zip = new \ZipArchive();
+            $zip = new \ZipArchive;
             $openResult = $zip->open($zipPath);
 
             if ($openResult !== true) {
                 Storage::disk('local')->delete($tempPath);
                 session()->flash('error', 'Invalid or corrupted ZIP file.');
                 session()->save();
+
                 return redirect()->route('superadmin.backups.index');
             }
 
@@ -165,6 +176,7 @@ class BackupController extends Controller
                 Storage::disk('local')->delete($tempPath);
                 session()->flash('error', 'backup.sql not found inside the ZIP file.');
                 session()->save();
+
                 return redirect()->route('superadmin.backups.index');
             }
 
@@ -175,6 +187,7 @@ class BackupController extends Controller
             if (empty($sqlContent)) {
                 session()->flash('error', 'backup.sql is empty.');
                 session()->save();
+
                 return redirect()->route('superadmin.backups.index');
             }
 
@@ -186,8 +199,8 @@ class BackupController extends Controller
             $dbPassword = $dbConfig['password'];
             $database = $dbConfig['database'];
 
-            $sqlTempPath = storage_path('app/backup-restore/restore_' . $tenant->getKey() . '_' . time() . '.sql');
-            if (!is_dir(dirname($sqlTempPath))) {
+            $sqlTempPath = storage_path('app/backup-restore/restore_'.$tenant->getKey().'_'.time().'.sql');
+            if (! is_dir(dirname($sqlTempPath))) {
                 mkdir(dirname($sqlTempPath), 0755, true);
             }
             file_put_contents($sqlTempPath, $sqlContent);
@@ -199,7 +212,7 @@ class BackupController extends Controller
                 '-u', $username,
             ];
             if ($dbPassword) {
-                $cmd[] = '-p' . $dbPassword;
+                $cmd[] = '-p'.$dbPassword;
             }
             $cmd[] = $database;
 
@@ -211,11 +224,12 @@ class BackupController extends Controller
 
             @unlink($sqlTempPath);
 
-            if (!$process->isSuccessful()) {
+            if (! $process->isSuccessful()) {
                 $error = $process->getErrorOutput();
                 Log::error('Super admin restore SQL execution failed', ['error' => $error, 'tenant_id' => $tenant->id]);
-                session()->flash('error', 'Restore failed: ' . $error);
+                session()->flash('error', 'Restore failed: '.$error);
                 session()->save();
+
                 return redirect()->route('superadmin.backups.index');
             }
 
@@ -227,25 +241,29 @@ class BackupController extends Controller
 
             session()->flash('success', "Data restored for '{$tenant->name}' successfully.");
             session()->save();
+
             return redirect()->route('superadmin.backups.index');
         } catch (\Exception $e) {
             Log::error('Super admin restore exception', ['error' => $e->getMessage()]);
-            session()->flash('error', 'Restore failed: ' . $e->getMessage());
+            session()->flash('error', 'Restore failed: '.$e->getMessage());
             session()->save();
+
             return redirect()->route('superadmin.backups.index');
         }
     }
 
     private function getSystemBackups(): array
     {
-        $tenantDomains = Tenant::whereNotNull('domain')->pluck('domain')->map(fn($d) => $d . '-')->toArray();
+        $tenantDomains = Tenant::whereNotNull('domain')->pluck('domain')->map(fn ($d) => $d.'-')->toArray();
         $backups = [];
         $backupPath = storage_path('app/backups');
         if (is_dir($backupPath)) {
             $files = array_diff(scandir($backupPath), ['.', '..']);
             foreach ($files as $file) {
-                $path = $backupPath . DIRECTORY_SEPARATOR . $file;
-                if (!is_file($path)) continue;
+                $path = $backupPath.DIRECTORY_SEPARATOR.$file;
+                if (! is_file($path)) {
+                    continue;
+                }
                 // Exclude tenant backup files
                 $isTenantBackup = false;
                 foreach ($tenantDomains as $prefix) {
@@ -254,15 +272,18 @@ class BackupController extends Controller
                         break;
                     }
                 }
-                if ($isTenantBackup) continue;
+                if ($isTenantBackup) {
+                    continue;
+                }
                 $backups[] = [
                     'name' => $file,
                     'size' => filesize($path),
                     'modified' => filemtime($path),
                 ];
             }
-            usort($backups, fn($a, $b) => $b['modified'] <=> $a['modified']);
+            usort($backups, fn ($a, $b) => $b['modified'] <=> $a['modified']);
         }
+
         return $backups;
     }
 
@@ -275,9 +296,12 @@ class BackupController extends Controller
         return collect($allFiles)
             ->filter(function ($file) use ($tenants) {
                 $ext = pathinfo($file, PATHINFO_EXTENSION);
-                if ($ext !== 'zip') return false;
+                if ($ext !== 'zip') {
+                    return false;
+                }
                 $basename = basename($file);
                 $domain = explode('-', $basename)[0] ?? null;
+
                 return $domain && isset($tenants[$domain]);
             })
             ->map(function ($file) use ($tenants) {
@@ -307,7 +331,7 @@ class BackupController extends Controller
             $totalSize += $b['size'] ?? 0;
         }
 
-        $latestBackup = !empty($allBackups) ? reset($allBackups) : null;
+        $latestBackup = ! empty($allBackups) ? reset($allBackups) : null;
 
         return [
             'total_files' => count($allBackups),

@@ -4,11 +4,11 @@ namespace Tests\Unit\Services;
 
 use App\Models\User;
 use App\Services\UserService;
-use Spatie\Permission\Models\Role;
-use Spatie\Permission\Models\Permission;
-use Tests\TestCase;
-use PHPUnit\Framework\Attributes\Test;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use PHPUnit\Framework\Attributes\Test;
+use Spatie\Permission\Models\Permission;
+use Spatie\Permission\Models\Role;
+use Tests\TestCase;
 use Tests\Traits\CreatesTenant;
 
 class UserServiceTest extends TestCase
@@ -21,7 +21,7 @@ class UserServiceTest extends TestCase
     {
         parent::setUp();
         $this->setupTenant();
-        $this->userService = new UserService();
+        $this->userService = new UserService;
 
         // Ensure roles and permissions exist for tests that need them
         Role::findOrCreate('superuser', 'web');

@@ -4,10 +4,8 @@ namespace Tests\Feature\Admin;
 
 use App\Models\Product;
 use App\Models\ProductWarehouse;
-use App\Models\StockAdjustment;
 use App\Models\StockOpname;
 use App\Models\StockOpnameItem;
-use App\Models\User;
 use App\Models\Warehouse;
 use Database\Seeders\RoleSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -140,7 +138,7 @@ class StockOpnameControllerTest extends TestCase
     {
         $warehouse = Warehouse::factory()->create(['tenant_id' => $this->tenant->id]);
         $product = Product::factory()->create(['tenant_id' => $this->tenant->id]);
-        
+
         ProductWarehouse::updateOrCreate(
             ['product_id' => $product->id, 'warehouse_id' => $warehouse->id, 'tenant_id' => $this->tenant->id],
             ['quantity' => 100]
@@ -182,7 +180,7 @@ class StockOpnameControllerTest extends TestCase
     {
         $warehouse = Warehouse::factory()->create(['tenant_id' => $this->tenant->id]);
         $product = Product::factory()->create(['tenant_id' => $this->tenant->id]);
-        
+
         ProductWarehouse::updateOrCreate(
             ['product_id' => $product->id, 'warehouse_id' => $warehouse->id, 'tenant_id' => $this->tenant->id],
             ['quantity' => 100]
@@ -214,7 +212,7 @@ class StockOpnameControllerTest extends TestCase
     {
         $warehouse = Warehouse::factory()->create(['tenant_id' => $this->tenant->id]);
         $product = Product::factory()->create(['tenant_id' => $this->tenant->id, 'price' => 5000]);
-        
+
         ProductWarehouse::updateOrCreate(
             ['product_id' => $product->id, 'warehouse_id' => $warehouse->id, 'tenant_id' => $this->tenant->id],
             ['quantity' => 100]
@@ -320,7 +318,7 @@ class StockOpnameControllerTest extends TestCase
         $response->assertRedirect();
     }
 
-public function test_show_requires_authentication()
+    public function test_show_requires_authentication()
     {
         $warehouse = Warehouse::factory()->create(['tenant_id' => $this->tenant->id]);
         $opname = StockOpname::factory()->create([

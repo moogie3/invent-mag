@@ -13,10 +13,10 @@ use App\Models\Tax;
 use App\Models\Unit;
 use App\Models\User;
 use App\Services\PosService;
-use Tests\TestCase;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Auth;
 use PHPUnit\Framework\Attributes\Test;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\TestCase;
 use Tests\Traits\CreatesTenant;
 
 class PosServiceTest extends TestCase
@@ -33,10 +33,10 @@ class PosServiceTest extends TestCase
 
         // Create a default tax (10% exclusive) so POS tax calculations work in tests
         Tax::create([
-            'name'       => 'Test Tax',
-            'rate'       => 10,
-            'type'       => 'exclusive',
-            'is_active'  => true,
+            'name' => 'Test Tax',
+            'rate' => 10,
+            'type' => 'exclusive',
+            'is_active' => true,
             'is_default' => true,
         ]);
     }
@@ -119,14 +119,14 @@ class PosServiceTest extends TestCase
             'id' => $sale->id,
             'customer_id' => $customer->id,
             'status' => 'Paid',
-            'type' => \App\Models\Sales::TYPE_POS,
+            'type' => Sales::TYPE_POS,
         ]);
 
         // Assert totals
         $this->assertEquals(10, $sale->order_discount);
         $this->assertEquals(34, $sale->total_tax); // (350 - 10) * 0.10 = 34
         $this->assertEquals(374, $sale->total); // 350 - 10 + 34 = 374
-        
+
         $this->assertDatabaseHas('sales_items', ['sales_id' => $sale->id, 'product_id' => $product1->id, 'quantity' => 2]);
         $this->assertDatabaseHas('sales_items', ['sales_id' => $sale->id, 'product_id' => $product2->id, 'quantity' => 3]);
 
@@ -148,11 +148,10 @@ class PosServiceTest extends TestCase
         ]);
         SalesItem::factory()->create(['sales_id' => $sale->id, 'customer_price' => 100, 'quantity' => 2, 'discount' => 0]); // 200
         SalesItem::factory()->create(['sales_id' => $sale->id, 'customer_price' => 50, 'quantity' => 3, 'discount' => 0]);  // 150
-        
+
         // Manually set total because factory creates random total
         $sale->total = 350;
         $sale->save();
-
 
         // 2. Call the service method
         $data = $this->posService->getReceiptData($sale);
@@ -181,8 +180,8 @@ class PosServiceTest extends TestCase
         ]);
 
         $pphReceivableAccount = Account::create([
-            'name' => 'PPh Receivable ' . $this->tenant->id,
-            'code' => '1170-' . $this->tenant->id,
+            'name' => 'PPh Receivable '.$this->tenant->id,
+            'code' => '1170-'.$this->tenant->id,
             'type' => 'asset',
             'tenant_id' => $this->tenant->id,
         ]);

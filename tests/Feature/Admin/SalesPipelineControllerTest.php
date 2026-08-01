@@ -2,19 +2,23 @@
 
 namespace Tests\Feature\Admin;
 
-use App\Models\User;
-use App\Models\SalesPipeline;
-use App\Models\Warehouse;
-use App\Models\ProductWarehouse;
+use App\Models\Customer;
+use App\Models\PipelineStage;
 use App\Models\Product;
-use Tests\TestCase;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Tests\Traits\CreatesTenant;
+use App\Models\ProductWarehouse;
+use App\Models\Sales;
+use App\Models\SalesOpportunity;
+use App\Models\SalesPipeline;
+use App\Models\Tax;
+use App\Models\Warehouse;
 use Database\Seeders\RoleSeeder;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\TestCase;
+use Tests\Traits\CreatesTenant;
 
 class SalesPipelineControllerTest extends TestCase
 {
-    use RefreshDatabase, CreatesTenant;
+    use CreatesTenant, RefreshDatabase;
 
     protected function setUp(): void
     {
@@ -24,13 +28,13 @@ class SalesPipelineControllerTest extends TestCase
         $this->user->assignRole('superuser');
         $this->actingAs($this->user);
 
-        \App\Models\Tax::factory()->create(['is_active' => true, 'rate' => 10]); // Ensure an active tax exists
+        Tax::factory()->create(['is_active' => true, 'rate' => 10]); // Ensure an active tax exists
     }
 
     public function test_it_can_print_sales_opportunity()
     {
         ob_start(); // Start output buffering
-        $opportunity = \App\Models\SalesOpportunity::factory()->create();
+        $opportunity = SalesOpportunity::factory()->create();
 
         $response = $this->get(route('admin.sales_pipeline.opportunities.print', $opportunity));
         $output = ob_get_clean(); // Capture the output
@@ -117,7 +121,7 @@ class SalesPipelineControllerTest extends TestCase
     public function test_it_can_update_a_stage()
     {
         $pipeline = SalesPipeline::factory()->create();
-        $stage = \App\Models\PipelineStage::factory()->create(['sales_pipeline_id' => $pipeline->id]);
+        $stage = PipelineStage::factory()->create(['sales_pipeline_id' => $pipeline->id]);
 
         $updateData = [
             'name' => 'Updated Stage Name',
@@ -136,7 +140,7 @@ class SalesPipelineControllerTest extends TestCase
     public function test_it_can_delete_a_stage()
     {
         $pipeline = SalesPipeline::factory()->create();
-        $stage = \App\Models\PipelineStage::factory()->create(['sales_pipeline_id' => $pipeline->id]);
+        $stage = PipelineStage::factory()->create(['sales_pipeline_id' => $pipeline->id]);
 
         $response = $this->delete(route('admin.sales_pipeline.stages.destroy', $stage));
 
@@ -149,9 +153,9 @@ class SalesPipelineControllerTest extends TestCase
     public function test_it_can_store_a_new_opportunity()
     {
         $pipeline = SalesPipeline::factory()->create();
-        $stage = \App\Models\PipelineStage::factory()->create(['sales_pipeline_id' => $pipeline->id]);
-        $customer = \App\Models\Customer::factory()->create();
-        $product = \App\Models\Product::factory()->create();
+        $stage = PipelineStage::factory()->create(['sales_pipeline_id' => $pipeline->id]);
+        $customer = Customer::factory()->create();
+        $product = Product::factory()->create();
 
         $opportunityData = [
             'customer_id' => $customer->id,
@@ -182,8 +186,8 @@ class SalesPipelineControllerTest extends TestCase
 
     public function test_it_can_update_an_opportunity()
     {
-        $opportunity = \App\Models\SalesOpportunity::factory()->create();
-        $product = \App\Models\Product::factory()->create();
+        $opportunity = SalesOpportunity::factory()->create();
+        $product = Product::factory()->create();
 
         $updateData = [
             'customer_id' => $opportunity->customer_id,
@@ -214,7 +218,7 @@ class SalesPipelineControllerTest extends TestCase
 
     public function test_it_can_delete_an_opportunity()
     {
-        $opportunity = \App\Models\SalesOpportunity::factory()->create();
+        $opportunity = SalesOpportunity::factory()->create();
 
         $response = $this->delete(route('admin.sales_pipeline.opportunities.destroy', $opportunity));
 
@@ -267,9 +271,9 @@ class SalesPipelineControllerTest extends TestCase
     public function test_it_can_reorder_stages()
     {
         $pipeline = SalesPipeline::factory()->create();
-        $stage1 = \App\Models\PipelineStage::factory()->create(['sales_pipeline_id' => $pipeline->id, 'position' => 0]);
-        $stage2 = \App\Models\PipelineStage::factory()->create(['sales_pipeline_id' => $pipeline->id, 'position' => 1]);
-        $stage3 = \App\Models\PipelineStage::factory()->create(['sales_pipeline_id' => $pipeline->id, 'position' => 2]);
+        $stage1 = PipelineStage::factory()->create(['sales_pipeline_id' => $pipeline->id, 'position' => 0]);
+        $stage2 = PipelineStage::factory()->create(['sales_pipeline_id' => $pipeline->id, 'position' => 1]);
+        $stage3 = PipelineStage::factory()->create(['sales_pipeline_id' => $pipeline->id, 'position' => 2]);
 
         $reorderData = [
             'stages' => [
@@ -292,7 +296,7 @@ class SalesPipelineControllerTest extends TestCase
     public function test_it_cannot_reorder_stages_with_invalid_data()
     {
         $pipeline = SalesPipeline::factory()->create();
-        $stage1 = \App\Models\PipelineStage::factory()->create(['sales_pipeline_id' => $pipeline->id, 'position' => 0]);
+        $stage1 = PipelineStage::factory()->create(['sales_pipeline_id' => $pipeline->id, 'position' => 0]);
 
         $invalidReorderData = [
             'stages' => [
@@ -309,10 +313,10 @@ class SalesPipelineControllerTest extends TestCase
 
     public function test_it_can_list_opportunities()
     {
-        \App\Models\SalesOpportunity::query()->delete();
+        SalesOpportunity::query()->delete();
         $pipeline = SalesPipeline::factory()->create();
-        $stage = \App\Models\PipelineStage::factory()->create(['sales_pipeline_id' => $pipeline->id]);
-        \App\Models\SalesOpportunity::factory()->count(3)->create([
+        $stage = PipelineStage::factory()->create(['sales_pipeline_id' => $pipeline->id]);
+        SalesOpportunity::factory()->count(3)->create([
             'sales_pipeline_id' => $pipeline->id,
             'pipeline_stage_id' => $stage->id,
         ]);
@@ -325,7 +329,7 @@ class SalesPipelineControllerTest extends TestCase
 
     public function test_it_can_show_an_opportunity()
     {
-        $opportunity = \App\Models\SalesOpportunity::factory()->create();
+        $opportunity = SalesOpportunity::factory()->create();
 
         $response = $this->getJson(route('admin.sales_pipeline.opportunities.show', $opportunity));
 
@@ -336,9 +340,9 @@ class SalesPipelineControllerTest extends TestCase
     public function test_it_can_move_an_opportunity()
     {
         $pipeline = SalesPipeline::factory()->create();
-        $stage1 = \App\Models\PipelineStage::factory()->create(['sales_pipeline_id' => $pipeline->id, 'position' => 0]);
-        $stage2 = \App\Models\PipelineStage::factory()->create(['sales_pipeline_id' => $pipeline->id, 'position' => 1]);
-        $opportunity = \App\Models\SalesOpportunity::factory()->create([
+        $stage1 = PipelineStage::factory()->create(['sales_pipeline_id' => $pipeline->id, 'position' => 0]);
+        $stage2 = PipelineStage::factory()->create(['sales_pipeline_id' => $pipeline->id, 'position' => 1]);
+        $opportunity = SalesOpportunity::factory()->create([
             'sales_pipeline_id' => $pipeline->id,
             'pipeline_stage_id' => $stage1->id,
         ]);
@@ -360,7 +364,7 @@ class SalesPipelineControllerTest extends TestCase
 
     public function test_it_can_show_convert_form_for_opportunity()
     {
-        $opportunity = \App\Models\SalesOpportunity::factory()->create();
+        $opportunity = SalesOpportunity::factory()->create();
 
         $response = $this->get(route('admin.sales_pipeline.opportunities.convert.show', $opportunity));
 
@@ -378,14 +382,14 @@ class SalesPipelineControllerTest extends TestCase
             [
                 'product_id' => $product->id,
                 'warehouse_id' => $warehouse->id,
-                'tenant_id' => $product->tenant_id
+                'tenant_id' => $product->tenant_id,
             ],
             ['quantity' => 100]
         );
-        
+
         $pipeline = SalesPipeline::factory()->create();
-        $stage = \App\Models\PipelineStage::factory()->create(['sales_pipeline_id' => $pipeline->id]);
-        $opportunity = \App\Models\SalesOpportunity::factory()->create([
+        $stage = PipelineStage::factory()->create(['sales_pipeline_id' => $pipeline->id]);
+        $opportunity = SalesOpportunity::factory()->create([
             'sales_pipeline_id' => $pipeline->id,
             'pipeline_stage_id' => $stage->id,
             'status' => 'won',
@@ -420,9 +424,9 @@ class SalesPipelineControllerTest extends TestCase
 
     public function test_it_cannot_convert_already_converted_opportunity()
     {
-        $opportunity = \App\Models\SalesOpportunity::factory()->create([
+        $opportunity = SalesOpportunity::factory()->create([
             'status' => 'converted',
-            'sales_id' => \App\Models\Sales::factory()->create()->id,
+            'sales_id' => Sales::factory()->create()->id,
         ]);
 
         $response = $this->postJson(route('admin.sales_pipeline.opportunities.convert', $opportunity));
@@ -433,7 +437,7 @@ class SalesPipelineControllerTest extends TestCase
 
     public function test_it_cannot_convert_opportunity_not_in_won_status()
     {
-        $opportunity = \App\Models\SalesOpportunity::factory()->create([
+        $opportunity = SalesOpportunity::factory()->create([
             'status' => 'open', // Not 'won'
         ]);
 
@@ -451,14 +455,14 @@ class SalesPipelineControllerTest extends TestCase
             [
                 'product_id' => $product->id,
                 'warehouse_id' => $warehouse->id,
-                'tenant_id' => $product->tenant_id
+                'tenant_id' => $product->tenant_id,
             ],
             ['quantity' => 2]
         );
-        
+
         $pipeline = SalesPipeline::factory()->create();
-        $stage = \App\Models\PipelineStage::factory()->create(['sales_pipeline_id' => $pipeline->id]);
-        $opportunity = \App\Models\SalesOpportunity::factory()->create([
+        $stage = PipelineStage::factory()->create(['sales_pipeline_id' => $pipeline->id]);
+        $opportunity = SalesOpportunity::factory()->create([
             'sales_pipeline_id' => $pipeline->id,
             'pipeline_stage_id' => $stage->id,
             'status' => 'won',
@@ -472,6 +476,6 @@ class SalesPipelineControllerTest extends TestCase
         $response = $this->postJson(route('admin.sales_pipeline.opportunities.convert', $opportunity));
 
         $response->assertStatus(500)
-            ->assertJsonFragment(['message' => 'Failed to convert opportunity: Insufficient stock for product: ' . $product->name . '. Available: 2, Requested: 5']);
+            ->assertJsonFragment(['message' => 'Failed to convert opportunity: Insufficient stock for product: '.$product->name.'. Available: 2, Requested: 5']);
     }
 }

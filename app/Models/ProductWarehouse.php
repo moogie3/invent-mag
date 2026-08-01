@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class ProductWarehouse extends Model
 {
-    use HasFactory, BelongsToTenant;
+    use BelongsToTenant, HasFactory;
 
     protected $table = 'product_warehouse';
 

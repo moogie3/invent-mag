@@ -2,16 +2,15 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Seeder;
-use App\Models\PurchaseReturn;
-use App\Models\Purchase;
-use App\Models\POItem;
-use App\Models\User;
 use App\Models\Product;
-use App\Models\PurchaseReturnItem;
+use App\Models\ProductWarehouse;
+use App\Models\Purchase;
+use App\Models\PurchaseReturn;
+use App\Models\User;
 use App\Services\AccountingService;
 use Carbon\Carbon;
-use Illuminate\Support\Facades\DB;
+use Faker\Factory;
+use Illuminate\Database\Seeder;
 
 class PurchaseReturnSeeder extends Seeder
 {
@@ -33,7 +32,8 @@ class PurchaseReturnSeeder extends Seeder
 
         $existingReturns = PurchaseReturn::where('tenant_id', $tenantId)->count();
         if ($existingReturns > 0) {
-            $this->command->info("Purchase returns already exist for tenant " . app('currentTenant')->name . ". Skipping to preserve existing data.");
+            $this->command->info('Purchase returns already exist for tenant '.app('currentTenant')->name.'. Skipping to preserve existing data.');
+
             return;
         }
 
@@ -41,13 +41,14 @@ class PurchaseReturnSeeder extends Seeder
         $purchases = Purchase::where('tenant_id', $tenantId)->has('items')->get(); // Only purchases with items
 
         if ($users->isEmpty() || $purchases->isEmpty()) {
-            $this->command->warn('Skipping PurchaseReturnSeeder for tenant ' . app('currentTenant')->name . ': No users or purchases with items found. Please run UserSeeder and PurchaseSeeder first.');
+            $this->command->warn('Skipping PurchaseReturnSeeder for tenant '.app('currentTenant')->name.': No users or purchases with items found. Please run UserSeeder and PurchaseSeeder first.');
+
             return;
         }
 
-        $this->command->info("Seeding Purchase Returns for tenant: " . app('currentTenant')->name);
+        $this->command->info('Seeding Purchase Returns for tenant: '.app('currentTenant')->name);
 
-        $faker = \Faker\Factory::create();
+        $faker = Factory::create();
 
         $count = 0;
         for ($i = 0; $i < 15; $i++) {
@@ -91,17 +92,17 @@ class PurchaseReturnSeeder extends Seeder
 
             // Create the PurchaseReturn — copy tax fields from the parent purchase
             $purchaseReturn = PurchaseReturn::create([
-                'purchase_id'  => $purchase->id,
-                'user_id'      => $user->id,
-                'return_date'  => $returnDate,
-                'reason'       => $faker->sentence(),
+                'purchase_id' => $purchase->id,
+                'user_id' => $user->id,
+                'return_date' => $returnDate,
+                'reason' => $faker->sentence(),
                 'total_amount' => $totalReturnAmount,
-                'status'       => $status,
-                'tax_id'       => $purchase->tax_id,
-                'tax_rate'     => $purchase->tax_rate ?? 0,
-                'tax_type'     => $purchase->tax_type ?? 'none',
-                'tax_amount'   => round($totalReturnAmount * (($purchase->tax_rate ?? 0) / 100), 2),
-                'tenant_id'    => $tenantId,
+                'status' => $status,
+                'tax_id' => $purchase->tax_id,
+                'tax_rate' => $purchase->tax_rate ?? 0,
+                'tax_type' => $purchase->tax_type ?? 'none',
+                'tax_amount' => round($totalReturnAmount * (($purchase->tax_rate ?? 0) / 100), 2),
+                'tenant_id' => $tenantId,
             ]);
 
             // Create PurchaseReturnItems
@@ -112,8 +113,8 @@ class PurchaseReturnSeeder extends Seeder
                 // Note: Purchase return usually means returning TO supplier, so stock should DECREMENT.
                 // But if the logic implies reversing a purchase, it depends on when stock was added.
                 // Assuming Purchase adds to stock, Return reduces stock.
-                
-                $stockRecord = \App\Models\ProductWarehouse::where('product_id', $purchaseReturnItem->product_id)
+
+                $stockRecord = ProductWarehouse::where('product_id', $purchaseReturnItem->product_id)
                     ->where('warehouse_id', $purchase->warehouse_id)
                     ->where('tenant_id', $tenantId)
                     ->first();
@@ -130,19 +131,19 @@ class PurchaseReturnSeeder extends Seeder
             // Debit Accounts Payable / Cash (depending on original payment type or refund status)
             // For simplicity, we'll assume a credit to a Purchase Returns account and debit to AP/Cash
             // More complex logic might be needed here based on refund status
-            $transactions[] = ['account_code' => '2110-' . $tenantId, 'type' => 'debit', 'amount' => $totalReturnAmount];
-            $transactions[] = ['account_code' => '1140-' . $tenantId, 'type' => 'credit', 'amount' => $totalReturnAmount]; // Adjust inventory
+            $transactions[] = ['account_code' => '2110-'.$tenantId, 'type' => 'debit', 'amount' => $totalReturnAmount];
+            $transactions[] = ['account_code' => '1140-'.$tenantId, 'type' => 'credit', 'amount' => $totalReturnAmount]; // Adjust inventory
 
             try {
                 $this->accountingService->createJournalEntry($description, Carbon::parse($returnDate), $transactions, $purchaseReturn);
             } catch (\Exception $e) {
-                $this->command->error("Failed to create journal entry for purchase return {$purchaseReturn->id}: " . $e->getMessage());
+                $this->command->error("Failed to create journal entry for purchase return {$purchaseReturn->id}: ".$e->getMessage());
             }
-            
+
             $count++;
         }
-        
-        $this->command->info("Purchase Return seeding completed!");
+
+        $this->command->info('Purchase Return seeding completed!');
         $this->command->info("Created {$count} purchase returns with items, stock updates, and journal entries.");
     }
 }

@@ -2,16 +2,16 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\BelongsToTenant;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
-use App\Models\Concerns\BelongsToTenant;
-use App\Models\Tax;
+
 class SalesReturn extends Model
 {
-    use HasFactory, BelongsToTenant;
+    use BelongsToTenant, HasFactory;
 
     protected $fillable = [
         'sales_id',
@@ -39,7 +39,7 @@ class SalesReturn extends Model
         'Completed',
         'Canceled',
     ];
-    
+
     /**
      * Get the sale that the return belongs to.
      */
@@ -94,9 +94,9 @@ class SalesReturn extends Model
     }
 
     protected $casts = [
-        'return_date'  => 'date',
+        'return_date' => 'date',
         'total_amount' => 'float',
-        'tax_rate'     => 'float',
-        'tax_amount'   => 'float',
+        'tax_rate' => 'float',
+        'tax_amount' => 'float',
     ];
 }

@@ -2,27 +2,27 @@
 
 namespace Tests\Feature\Admin;
 
-use App\Models\User;
-use App\Models\Sales;
-use App\Models\SalesReturn;
-use App\Models\Product;
+use App\Models\Account;
 use App\Models\Customer;
+use App\Models\Product;
+use App\Models\Sales;
 use App\Models\SalesItem;
+use App\Models\SalesReturn;
 use App\Models\SalesReturnItem;
 use App\Models\Warehouse;
+use Carbon\Carbon;
+use Database\Seeders\AccountSeeder;
+use Database\Seeders\RoleSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
-use Carbon\Carbon;
 use Tests\Traits\CreatesTenant;
-use Database\Seeders\RoleSeeder;
-use Database\Seeders\AccountSeeder;
-use App\Models\Account;
 
 class SalesReturnControllerTest extends TestCase
 {
-    use RefreshDatabase, CreatesTenant;
+    use CreatesTenant, RefreshDatabase;
 
     protected Sales $sale;
+
     protected Product $product;
 
     protected function setUp(): void
@@ -36,12 +36,12 @@ class SalesReturnControllerTest extends TestCase
         // Ensure the current tenant has the necessary accounting settings
         $tenantId = app('currentTenant')->id;
         $this->tenant->accounting_settings = [
-            'cash_account_id' => Account::where('code', '1110-' . $tenantId)->first()->id,
-            'accounts_receivable_account_id' => Account::where('code', '1130-' . $tenantId)->first()->id,
-            'sales_revenue_account_id' => Account::where('code', '4100-' . $tenantId)->first()->id,
-            'sales_returns_account_id' => Account::where('code', '4200-' . $tenantId)->first()?->id ?? 1, // Fallback if seeder differs
-            'cost_of_goods_sold_account_id' => Account::where('code', '5200-' . $tenantId)->first()->id,
-            'inventory_account_id' => Account::where('code', '1140-' . $tenantId)->first()->id,
+            'cash_account_id' => Account::where('code', '1110-'.$tenantId)->first()->id,
+            'accounts_receivable_account_id' => Account::where('code', '1130-'.$tenantId)->first()->id,
+            'sales_revenue_account_id' => Account::where('code', '4100-'.$tenantId)->first()->id,
+            'sales_returns_account_id' => Account::where('code', '4200-'.$tenantId)->first()?->id ?? 1, // Fallback if seeder differs
+            'cost_of_goods_sold_account_id' => Account::where('code', '5200-'.$tenantId)->first()->id,
+            'inventory_account_id' => Account::where('code', '1140-'.$tenantId)->first()->id,
         ];
         $this->tenant->save();
         $this->actingAs($this->user);
@@ -61,7 +61,7 @@ class SalesReturnControllerTest extends TestCase
             'product_id' => $this->product->id,
             'quantity' => 5,
             'customer_price' => 100,
-            'total' => 500
+            'total' => 500,
         ]);
 
         // Ensure pivot reflects post-sale state (10 - 5 = 5)
@@ -118,7 +118,7 @@ class SalesReturnControllerTest extends TestCase
             'sales_id' => $this->sale->id,
             'return_date' => Carbon::now()->format('Y-m-d'),
             'items' => json_encode([
-                ['product_id' => $this->product->id, 'returned_quantity' => 1, 'price' => 100]
+                ['product_id' => $this->product->id, 'returned_quantity' => 1, 'price' => 100],
             ]),
             'total_amount' => 100,
             'status' => 'Completed',
@@ -195,7 +195,7 @@ class SalesReturnControllerTest extends TestCase
             'sales_id' => $this->sale->id,
             'return_date' => Carbon::now()->addDay()->format('Y-m-d'),
             'items' => json_encode([
-                ['product_id' => $this->product->id, 'returned_quantity' => 2, 'price' => 150]
+                ['product_id' => $this->product->id, 'returned_quantity' => 2, 'price' => 150],
             ]),
             'total_amount' => 300,
             'status' => 'Pending',
@@ -208,7 +208,7 @@ class SalesReturnControllerTest extends TestCase
         $response->assertSessionHas('success', 'Sales return updated successfully.');
         $this->assertDatabaseHas('sales_returns', [
             'id' => $salesReturn->id,
-            'status' => 'Pending'
+            'status' => 'Pending',
         ]);
     }
 

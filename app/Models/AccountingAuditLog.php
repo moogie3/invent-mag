@@ -2,13 +2,13 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\BelongsToTenant;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use App\Models\Concerns\BelongsToTenant;
 
 class AccountingAuditLog extends Model
 {
-    use HasFactory, BelongsToTenant;
+    use BelongsToTenant, HasFactory;
 
     protected $fillable = [
         'tenant_id',
@@ -30,13 +30,21 @@ class AccountingAuditLog extends Model
     ];
 
     public const ACTION_CREATE = 'create';
+
     public const ACTION_UPDATE = 'update';
+
     public const ACTION_DELETE = 'delete';
+
     public const ACTION_POST = 'post';
+
     public const ACTION_UNPOST = 'unpost';
+
     public const ACTION_VOID = 'void';
+
     public const ACTION_REVERSE = 'reverse';
+
     public const ACTION_APPROVE = 'approve';
+
     public const ACTION_REJECT = 'reject';
 
     public function user()
@@ -50,6 +58,7 @@ class AccountingAuditLog extends Model
         if (class_exists($entityType)) {
             return $entityType::find($this->entity_id);
         }
+
         return null;
     }
 }

@@ -6,8 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Models\User;
 use App\Services\UserService;
 use Illuminate\Http\Request;
-use Spatie\Permission\Models\Role;
 use Spatie\Permission\Models\Permission;
+use Spatie\Permission\Models\Role;
 
 class UserController extends Controller
 {
@@ -25,6 +25,7 @@ class UserController extends Controller
     public function index()
     {
         $data = $this->userService->getUserIndexData();
+
         return view('admin.users.index', $data);
     }
 
@@ -40,15 +41,17 @@ class UserController extends Controller
 
         try {
             $this->userService->createUser($request->all());
+
             return redirect()->route('admin.users.index')->with('success', 'User created successfully.');
         } catch (\Exception $e) {
-            return back()->with('error', 'Error creating user: ' . $e->getMessage())->withInput();
+            return back()->with('error', 'Error creating user: '.$e->getMessage())->withInput();
         }
     }
 
     public function show(User $user)
     {
         $data = $this->userService->getUserEditData($user);
+
         return response()->json($data);
     }
 
@@ -67,7 +70,7 @@ class UserController extends Controller
     {
         $request->validate([
             'name' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:users,email,' . $user->id,
+            'email' => 'required|string|email|max:255|unique:users,email,'.$user->id,
             'password' => 'nullable|string|min:8|confirmed',
             'roles' => 'nullable|array',
             'permissions' => 'nullable|array',
@@ -78,6 +81,7 @@ class UserController extends Controller
 
             if (request()->ajax()) {
                 $user->load('roles', 'permissions');
+
                 return response()->json([
                     'success' => true,
                     'message' => 'User updated successfully.',
@@ -94,9 +98,10 @@ class UserController extends Controller
             return redirect()->route('admin.users.index')->with('success', 'User updated successfully.');
         } catch (\Exception $e) {
             if (request()->ajax()) {
-                return response()->json(['success' => false, 'message' => 'Error updating user: ' . $e->getMessage()], 500);
+                return response()->json(['success' => false, 'message' => 'Error updating user: '.$e->getMessage()], 500);
             }
-            return back()->with('error', 'Error updating user: ' . $e->getMessage())->withInput();
+
+            return back()->with('error', 'Error updating user: '.$e->getMessage())->withInput();
         }
     }
 
@@ -112,9 +117,10 @@ class UserController extends Controller
             return redirect()->route('admin.users.index')->with('success', 'User deleted successfully.');
         } catch (\Exception $e) {
             if ($request->ajax()) {
-                return response()->json(['success' => false, 'message' => 'Error deleting user: ' . $e->getMessage()], 500);
+                return response()->json(['success' => false, 'message' => 'Error deleting user: '.$e->getMessage()], 500);
             }
-            return redirect()->route('admin.users.index')->with('error', 'Error deleting user: ' . $e->getMessage());
+
+            return redirect()->route('admin.users.index')->with('error', 'Error deleting user: '.$e->getMessage());
         }
     }
 

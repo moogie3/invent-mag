@@ -4,18 +4,16 @@ namespace Tests\Feature\Admin;
 
 use App\Models\Account;
 use App\Models\JournalEntry;
-use App\Models\User;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use PHPUnit\Framework\Attributes\Test;
-use Spatie\Permission\Models\Role;
-use Tests\TestCase;
-use Tests\Traits\CreatesTenant;
 use Database\Seeders\AccountSeeder;
 use Database\Seeders\RoleSeeder;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use PHPUnit\Framework\Attributes\Test;
+use Tests\TestCase;
+use Tests\Traits\CreatesTenant;
 
 class JournalEntryControllerTest extends TestCase
 {
-    use RefreshDatabase, CreatesTenant;
+    use CreatesTenant, RefreshDatabase;
 
     protected function setUp(): void
     {
@@ -256,14 +254,14 @@ class JournalEntryControllerTest extends TestCase
     {
         $cashAccount = Account::where('code', 'like', '1110-%')->first();
         $expenseAccount = Account::where('code', 'like', '5000-%')->first();
-        
+
         $entry = JournalEntry::factory()->create([
             'tenant_id' => $this->tenant->id,
             'status' => 'posted',
             'sourceable_type' => null,
             'sourceable_id' => null,
         ]);
-        
+
         // Add transactions to the entry
         $entry->transactions()->create([
             'account_id' => $cashAccount->id,
@@ -281,7 +279,7 @@ class JournalEntryControllerTest extends TestCase
         ]);
 
         $response->assertRedirect();
-        
+
         // Check that reversal entry was created with reversed_entry_id pointing to original
         $this->assertDatabaseHas('journal_entries', [
             'reversed_entry_id' => $entry->id,
@@ -327,14 +325,14 @@ class JournalEntryControllerTest extends TestCase
     {
         $cashAccount = Account::where('code', 'like', '1110-%')->first();
         $expenseAccount = Account::where('code', 'like', '5000-%')->first();
-        
+
         $entry = JournalEntry::factory()->create([
             'tenant_id' => $this->tenant->id,
             'status' => 'posted',
             'sourceable_type' => null,
             'sourceable_id' => null,
         ]);
-        
+
         // Add transactions to the entry
         $entry->transactions()->create([
             'account_id' => $cashAccount->id,
@@ -350,10 +348,10 @@ class JournalEntryControllerTest extends TestCase
         $response = $this->post(route('admin.accounting.journal-entries.duplicate', $entry));
 
         $response->assertRedirect();
-        
+
         // Check new entry was created
         $this->assertDatabaseHas('journal_entries', [
-            'description' => 'COPY - ' . $entry->description,
+            'description' => 'COPY - '.$entry->description,
             'tenant_id' => $this->tenant->id,
         ]);
     }

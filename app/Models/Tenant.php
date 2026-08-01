@@ -3,8 +3,9 @@
 namespace App\Models;
 
 use Carbon\Carbon;
-use Spatie\Multitenancy\Models\Tenant as BaseTenant;
+use Illuminate\Support\Facades\Log;
 use Spatie\Multitenancy\Models\Concerns\UsesTenantConnection;
+use Spatie\Multitenancy\Models\Tenant as BaseTenant;
 
 class Tenant extends BaseTenant
 {
@@ -15,14 +16,14 @@ class Tenant extends BaseTenant
     protected function casts(): array
     {
         return [
-            'trial_ends_at'             => 'datetime',
-            'plan_expires_at'           => 'datetime',
-            'plan_changed_at'           => 'datetime',
+            'trial_ends_at' => 'datetime',
+            'plan_expires_at' => 'datetime',
+            'plan_changed_at' => 'datetime',
             'pending_plan_effective_at' => 'datetime',
-            'billing_period_start'      => 'date',
-            'billing_period_end'        => 'date',
-            'accounting_settings'       => 'array',
-            'backup_password'           => 'encrypted',
+            'billing_period_start' => 'date',
+            'billing_period_end' => 'date',
+            'accounting_settings' => 'array',
+            'backup_password' => 'encrypted',
         ];
     }
 
@@ -179,10 +180,8 @@ class Tenant extends BaseTenant
      * - Expired trial: trial_ends_at (mirrors the actual end date)
      * - Paid with billing period: billing_period_end
      * - Paid without billing period: plan_changed_at + billing cycle days
-     *
-     * @return \Carbon\Carbon|null
      */
-    public function getSubscriptionExpiryDate(): ?\Carbon\Carbon
+    public function getSubscriptionExpiryDate(): ?Carbon
     {
         if (! $this->hasPlan()) {
             return null;
@@ -208,13 +207,14 @@ class Tenant extends BaseTenant
 
         // Priority 4: If has billing period, use that
         if ($this->billing_period_start && $this->billing_period_end) {
-            return \Carbon\Carbon::parse($this->billing_period_end)->endOfDay();
+            return Carbon::parse($this->billing_period_end)->endOfDay();
         }
 
         // Priority 5: Calculate from plan_changed_at + billing cycle
         $plan = $this->getEffectivePlan();
         if ($this->plan_changed_at && $plan) {
             $billingDays = $plan->getBillingPeriodDays() ?? 30;
+
             return $this->plan_changed_at->copy()->addDays($billingDays)->endOfDay();
         }
 
@@ -225,8 +225,6 @@ class Tenant extends BaseTenant
      * Get the number of days remaining in the subscription.
      * Returns 0 if expired, negative if unlimited/error.
      * Uses trialDaysRemaining() when on trial for consistency with trial badge.
-     *
-     * @return int
      */
     public function subscriptionDaysRemaining(): int
     {
@@ -250,14 +248,12 @@ class Tenant extends BaseTenant
 
         // Return 0 if expired, otherwise return days remaining
         $days = now()->diffInDays($expiryDate, false);
+
         return $days < 0 ? 0 : (int) $days;
     }
 
     /**
      * Check if the subscription is expiring soon (within specified days).
-     *
-     * @param int $days
-     * @return bool
      */
     public function isSubscriptionExpiringSoon(int $days = 7): bool
     {
@@ -305,13 +301,14 @@ class Tenant extends BaseTenant
         }
 
         if ($this->billing_period_end) {
-            return \Carbon\Carbon::parse($this->billing_period_end)->isPast();
+            return Carbon::parse($this->billing_period_end)->isPast();
         }
 
         if ($this->plan_changed_at) {
             $plan = $this->getCurrentPlan();
             if ($plan) {
                 $expiryDate = $this->plan_changed_at->copy()->addDays($plan->getBillingPeriodDays());
+
                 return $expiryDate->isPast();
             }
         }
@@ -369,7 +366,7 @@ class Tenant extends BaseTenant
      */
     public function canDisableIndonesianJurisdiction(): array
     {
-        $draftCount = \App\Models\FakturPajak::where('status', 'draft')->count();
+        $draftCount = FakturPajak::where('status', 'draft')->count();
         if ($draftCount > 0) {
             return [
                 'safe' => false,
@@ -378,7 +375,7 @@ class Tenant extends BaseTenant
             ];
         }
 
-        $unissuedCount = \App\Models\Sales::where('ppn_enabled', true)
+        $unissuedCount = Sales::where('ppn_enabled', true)
             ->where('ppn_amount', '>', 0)
             ->where('faktur_pajak_id', null)
             ->count();
@@ -486,7 +483,7 @@ class Tenant extends BaseTenant
      */
     public function getCurrentBillingPeriod(): ?array
     {
-        if (!$this->billing_period_start || !$this->billing_period_end) {
+        if (! $this->billing_period_start || ! $this->billing_period_end) {
             return null;
         }
 
@@ -505,7 +502,7 @@ class Tenant extends BaseTenant
      */
     public function hasScheduledDowngrade(): bool
     {
-        return $this->pending_plan_id !== null 
+        return $this->pending_plan_id !== null
             && $this->pending_plan_effective_at !== null
             && $this->pending_plan_effective_at->isFuture();
     }
@@ -515,7 +512,7 @@ class Tenant extends BaseTenant
      */
     public function getScheduledPlan(): ?Plan
     {
-        if (!$this->hasScheduledDowngrade()) {
+        if (! $this->hasScheduledDowngrade()) {
             return null;
         }
 
@@ -565,7 +562,7 @@ class Tenant extends BaseTenant
      */
     public function applyScheduledDowngrade(): self
     {
-        if (!$this->hasScheduledDowngrade()) {
+        if (! $this->hasScheduledDowngrade()) {
             return $this;
         }
 
@@ -574,13 +571,13 @@ class Tenant extends BaseTenant
 
         $this->plan_id = $this->pending_plan_id;
         $this->plan_changed_at = now();
-        
+
         $this->pending_plan_id = null;
         $this->pending_plan_effective_at = null;
-        
+
         $this->save();
 
-        \Illuminate\Support\Facades\Log::info("Scheduled downgrade applied for tenant {$this->name}: {$oldPlan?->name} -> {$newPlan->name}");
+        Log::info("Scheduled downgrade applied for tenant {$this->name}: {$oldPlan?->name} -> {$newPlan->name}");
 
         return $this;
     }
@@ -594,7 +591,7 @@ class Tenant extends BaseTenant
      */
     public function hasBackupPassword(): bool
     {
-        return !empty($this->backup_password);
+        return ! empty($this->backup_password);
     }
 
     /**

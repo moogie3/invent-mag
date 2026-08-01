@@ -12,6 +12,7 @@ class CategoryService
     {
         $categories = Categories::paginate($entries);
         $totalcategory = Categories::count();
+
         return compact('categories', 'entries', 'totalcategory');
     }
 
@@ -25,7 +26,7 @@ class CategoryService
                 Rule::unique('categories', 'name')->where('tenant_id', auth()->user()->tenant_id),
             ],
         ])->validate();
-        
+
         $category = Categories::create($data);
 
         return ['success' => true, 'message' => 'Category created successfully.', 'category' => $category];

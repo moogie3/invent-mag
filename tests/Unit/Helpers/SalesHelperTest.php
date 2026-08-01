@@ -143,7 +143,7 @@ class SalesHelperTest extends TestCase
     public function it_calculates_invoice_summary_with_single_item_no_order_discount_no_tax()
     {
         $items = [
-            (object)['customer_price' => 100, 'quantity' => 1, 'discount' => 0, 'discount_type' => 'fixed']
+            (object) ['customer_price' => 100, 'quantity' => 1, 'discount' => 0, 'discount_type' => 'fixed'],
         ];
         $summary = SalesHelper::calculateInvoiceSummary($items, 0, 'fixed', 0);
         $this->assertEquals([
@@ -161,16 +161,16 @@ class SalesHelperTest extends TestCase
     public function it_calculates_invoice_summary_with_multiple_items_and_order_discount_and_tax()
     {
         $items = [
-            (object)['customer_price' => 100, 'quantity' => 1, 'discount' => 10, 'discount_type' => 'percentage'], // 90
-            (object)['customer_price' => 50, 'quantity' => 2, 'discount' => 5, 'discount_type' => 'fixed'], // (50-5)*2 = 90
+            (object) ['customer_price' => 100, 'quantity' => 1, 'discount' => 10, 'discount_type' => 'percentage'], // 90
+            (object) ['customer_price' => 50, 'quantity' => 2, 'discount' => 5, 'discount_type' => 'fixed'], // (50-5)*2 = 90
         ]; // Subtotal after product discounts = 90 + 90 = 180
-        
-        $summary = SalesHelper::calculateInvoiceSummary($items, 10, 'percentage', 10); 
+
+        $summary = SalesHelper::calculateInvoiceSummary($items, 10, 'percentage', 10);
         // Order discount 10% of 180 (Subtotal) = 18.0
         // Taxable amount = 180 - 18 = 162
         // Tax amount = 10% of 162 = 16.2
         // Final total = 162 + 16.2 = 178.2
-        
+
         $this->assertEquals([
             'subtotal' => 180.0,
             'itemCount' => 2,
@@ -186,7 +186,7 @@ class SalesHelperTest extends TestCase
     public function it_calculates_invoice_summary_with_price_fallback()
     {
         $items = [
-            (object)['price' => 100, 'quantity' => 1, 'discount' => 0, 'discount_type' => 'fixed']
+            (object) ['price' => 100, 'quantity' => 1, 'discount' => 0, 'discount_type' => 'fixed'],
         ];
         $summary = SalesHelper::calculateInvoiceSummary($items, 0, 'fixed', 0);
         $this->assertEquals([
@@ -205,7 +205,7 @@ class SalesHelperTest extends TestCase
     public function it_calculates_invoice_summary_with_pph_only()
     {
         $items = [
-            (object)['customer_price' => 1000, 'quantity' => 1, 'discount' => 0, 'discount_type' => 'fixed']
+            (object) ['customer_price' => 1000, 'quantity' => 1, 'discount' => 0, 'discount_type' => 'fixed'],
         ];
         $summary = SalesHelper::calculateInvoiceSummary($items, 0, 'fixed', 0, 'exclusive', 2);
         // Taxable = 1000, PPh = 20, no regular tax
@@ -218,7 +218,7 @@ class SalesHelperTest extends TestCase
     public function it_calculates_invoice_summary_with_ppn_and_pph()
     {
         $items = [
-            (object)['customer_price' => 1000, 'quantity' => 1, 'discount' => 0, 'discount_type' => 'fixed']
+            (object) ['customer_price' => 1000, 'quantity' => 1, 'discount' => 0, 'discount_type' => 'fixed'],
         ];
         $summary = SalesHelper::calculateInvoiceSummary($items, 0, 'fixed', 11, 'exclusive', 2);
         // Taxable = 1000, PPN = 110, PPh = 20
@@ -232,7 +232,7 @@ class SalesHelperTest extends TestCase
     public function it_calculates_invoice_summary_with_pph_default_rate_zero()
     {
         $items = [
-            (object)['customer_price' => 1000, 'quantity' => 1, 'discount' => 0, 'discount_type' => 'fixed']
+            (object) ['customer_price' => 1000, 'quantity' => 1, 'discount' => 0, 'discount_type' => 'fixed'],
         ];
         // Default pphRate is 0
         $summary = SalesHelper::calculateInvoiceSummary($items, 0, 'fixed', 0, 'exclusive');

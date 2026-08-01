@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Log;
 class ProcessScheduledPlanChanges extends Command
 {
     protected $signature = 'billing:process-scheduled-changes';
+
     protected $description = 'Activate scheduled plan downgrades at the start of each billing period';
 
     public function handle(): int
@@ -21,6 +22,7 @@ class ProcessScheduledPlanChanges extends Command
 
         if ($tenants->isEmpty()) {
             $this->info('No scheduled plan changes to process.');
+
             return Command::SUCCESS;
         }
 
@@ -40,11 +42,12 @@ class ProcessScheduledPlanChanges extends Command
         $oldPlan = $tenant->getCurrentPlan();
         $newPlan = $tenant->pendingPlan;
 
-        if (!$newPlan) {
+        if (! $newPlan) {
             Log::warning("Scheduled plan change for tenant {$tenant->name} has no pending plan. Clearing.");
             $tenant->pending_plan_id = null;
             $tenant->pending_plan_effective_at = null;
             $tenant->save();
+
             return;
         }
 

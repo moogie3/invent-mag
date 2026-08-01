@@ -2,26 +2,25 @@
 
 namespace Tests\Feature\Admin;
 
-use App\Models\User;
+use App\Models\Account;
+use App\Models\POItem;
+use App\Models\Product;
 use App\Models\Purchase;
 use App\Models\PurchaseReturn;
-use App\Models\Product;
-use App\Models\Supplier;
-use App\Models\POItem;
 use App\Models\PurchaseReturnItem;
-use App\Models\Account;
+use Carbon\Carbon;
+use Database\Seeders\AccountSeeder;
+use Database\Seeders\RoleSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
-use Carbon\Carbon;
 use Tests\Traits\CreatesTenant;
-use Database\Seeders\RoleSeeder;
-use Database\Seeders\AccountSeeder;
 
 class PurchaseReturnControllerTest extends TestCase
 {
-    use RefreshDatabase, CreatesTenant;
+    use CreatesTenant, RefreshDatabase;
 
     protected Purchase $purchase;
+
     protected Product $product;
 
     protected function setUp(): void
@@ -35,10 +34,10 @@ class PurchaseReturnControllerTest extends TestCase
         // Ensure the current tenant has the necessary accounting settings
         $tenantId = app('currentTenant')->id;
         $this->tenant->accounting_settings = [
-            'cash_account_id' => Account::where('code', '1110-' . $tenantId)->first()->id,
-            'accounts_payable_account_id' => Account::where('code', '2110-' . $tenantId)->first()->id,
-            'inventory_account_id' => Account::where('code', '1140-' . $tenantId)->first()->id,
-            'cost_of_goods_sold_account_id' => Account::where('code', '5100-' . $tenantId)->first()->id,
+            'cash_account_id' => Account::where('code', '1110-'.$tenantId)->first()->id,
+            'accounts_payable_account_id' => Account::where('code', '2110-'.$tenantId)->first()->id,
+            'inventory_account_id' => Account::where('code', '1140-'.$tenantId)->first()->id,
+            'cost_of_goods_sold_account_id' => Account::where('code', '5100-'.$tenantId)->first()->id,
         ];
         $this->tenant->save();
         $this->actingAs($this->user);
@@ -75,12 +74,12 @@ class PurchaseReturnControllerTest extends TestCase
     {
         // Set up accounting settings with all required accounts on the tenant
         $tenantId = app('currentTenant')->id;
-        
-        $cashAccount = \App\Models\Account::where('code', '1110-' . $tenantId)->first();
-        $apAccount = \App\Models\Account::where('code', '2110-' . $tenantId)->first();
-        $inventoryAccount = \App\Models\Account::where('code', '1140-' . $tenantId)->first();
-        $cogsAccount = \App\Models\Account::where('code', '5100-' . $tenantId)->first();
-        
+
+        $cashAccount = Account::where('code', '1110-'.$tenantId)->first();
+        $apAccount = Account::where('code', '2110-'.$tenantId)->first();
+        $inventoryAccount = Account::where('code', '1140-'.$tenantId)->first();
+        $cogsAccount = Account::where('code', '5100-'.$tenantId)->first();
+
         $this->tenant->accounting_settings = [
             'cash_account_id' => $cashAccount->id ?? null,
             'accounts_payable_account_id' => $apAccount->id ?? null,
@@ -93,7 +92,7 @@ class PurchaseReturnControllerTest extends TestCase
         $this->purchase->update(['status' => 'Paid', 'amount_received' => 100]);
 
         // Add product to purchase
-        \App\Models\POItem::factory()->create([
+        POItem::factory()->create([
             'po_id' => $this->purchase->id,
             'product_id' => $this->product->id,
             'quantity' => 2,
@@ -105,7 +104,7 @@ class PurchaseReturnControllerTest extends TestCase
             'purchase_id' => $this->purchase->id,
             'return_date' => Carbon::now()->format('Y-m-d'),
             'items' => json_encode([
-                ['product_id' => $this->product->id, 'returned_quantity' => 1, 'price' => 50]
+                ['product_id' => $this->product->id, 'returned_quantity' => 1, 'price' => 50],
             ]),
             'total_amount' => 50,
             'status' => 'Completed', // This is for purchase return status
@@ -149,7 +148,7 @@ class PurchaseReturnControllerTest extends TestCase
             'purchase_id' => $this->purchase->id,
             'return_date' => Carbon::now()->addDay()->format('Y-m-d'),
             'items' => json_encode([
-                ['product_id' => $this->product->id, 'returned_quantity' => 2, 'price' => 150]
+                ['product_id' => $this->product->id, 'returned_quantity' => 2, 'price' => 150],
             ]),
             'total_amount' => 300,
             'status' => 'Pending',
@@ -161,7 +160,7 @@ class PurchaseReturnControllerTest extends TestCase
         $response->assertSessionHas('success', 'Purchase return updated successfully.');
         $this->assertDatabaseHas('purchase_returns', [
             'id' => $purchaseReturn->id,
-            'status' => 'Pending'
+            'status' => 'Pending',
         ]);
     }
 

@@ -2,15 +2,12 @@
 
 namespace Tests\Unit\Models;
 
-use App\Models\Categories;
 use App\Models\Product;
-use App\Models\Supplier;
-use App\Models\Unit;
-use App\Models\Warehouse;
 use App\Models\ProductWarehouse;
-use Tests\TestCase;
-use PHPUnit\Framework\Attributes\Test;
+use App\Models\Warehouse;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use PHPUnit\Framework\Attributes\Test;
+use Tests\TestCase;
 use Tests\Traits\CreatesTenant;
 
 class ProductStockTest extends TestCase
@@ -29,15 +26,15 @@ class ProductStockTest extends TestCase
         $mainWarehouse = Warehouse::factory()->create(['is_main' => true]);
         $otherWarehouse = Warehouse::factory()->create(['is_main' => false]);
         $product = Product::factory()->create();
-        
+
         // Clear any existing stock first
         $product->productWarehouses()->delete();
-        
+
         ProductWarehouse::updateOrCreate(
             ['product_id' => $product->id, 'warehouse_id' => $mainWarehouse->id, 'tenant_id' => $product->tenant_id],
             ['quantity' => 50]
         );
-        
+
         ProductWarehouse::updateOrCreate(
             ['product_id' => $product->id, 'warehouse_id' => $otherWarehouse->id, 'tenant_id' => $product->tenant_id],
             ['quantity' => 30]
@@ -51,7 +48,7 @@ class ProductStockTest extends TestCase
     {
         $otherWarehouse = Warehouse::factory()->create(['is_main' => false]);
         $product = Product::factory()->create();
-        
+
         // Clear any existing stock first
         $product->productWarehouses()->delete();
 
@@ -73,15 +70,15 @@ class ProductStockTest extends TestCase
         $warehouse1 = Warehouse::factory()->create();
         $warehouse2 = Warehouse::factory()->create();
         $product = Product::factory()->create();
-        
+
         // Clear any existing stock first
         $product->productWarehouses()->delete();
-        
+
         ProductWarehouse::updateOrCreate(
             ['product_id' => $product->id, 'warehouse_id' => $warehouse1->id, 'tenant_id' => $product->tenant_id],
             ['quantity' => 25]
         );
-        
+
         ProductWarehouse::updateOrCreate(
             ['product_id' => $product->id, 'warehouse_id' => $warehouse2->id, 'tenant_id' => $product->tenant_id],
             ['quantity' => 15]
@@ -108,10 +105,10 @@ class ProductStockTest extends TestCase
     {
         $warehouse = Warehouse::factory()->create();
         $product = Product::factory()->create();
-        
+
         // Clear any existing stock first
         $product->productWarehouses()->delete();
-        
+
         ProductWarehouse::updateOrCreate(
             ['product_id' => $product->id, 'warehouse_id' => $warehouse->id, 'tenant_id' => $product->tenant_id],
             ['quantity' => 10]
@@ -127,17 +124,17 @@ class ProductStockTest extends TestCase
     {
         $warehouse = Warehouse::factory()->create();
         $product = Product::factory()->create();
-        
+
         // Clear any existing stock first
         $product->productWarehouses()->delete();
-        
+
         ProductWarehouse::updateOrCreate(
             ['product_id' => $product->id, 'warehouse_id' => $warehouse->id, 'tenant_id' => $product->tenant_id],
             ['quantity' => 20]
         );
 
         $product->deductStock(5, $warehouse->id);
-        
+
         $this->assertEquals(15, $product->fresh()->getWarehouseStock($warehouse->id));
     }
 
@@ -146,17 +143,17 @@ class ProductStockTest extends TestCase
     {
         $warehouse = Warehouse::factory()->create();
         $product = Product::factory()->create();
-        
+
         // Clear any existing stock first
         $product->productWarehouses()->delete();
-        
+
         ProductWarehouse::updateOrCreate(
             ['product_id' => $product->id, 'warehouse_id' => $warehouse->id, 'tenant_id' => $product->tenant_id],
             ['quantity' => 10]
         );
 
         $product->addStock(5, $warehouse->id);
-        
+
         $this->assertEquals(15, $product->fresh()->getWarehouseStock($warehouse->id));
     }
 
@@ -165,10 +162,10 @@ class ProductStockTest extends TestCase
     {
         $warehouse = Warehouse::factory()->create();
         $product = Product::factory()->create(['low_stock_threshold' => 10]);
-        
+
         // Clear any existing stock first
         $product->productWarehouses()->delete();
-        
+
         ProductWarehouse::updateOrCreate(
             ['product_id' => $product->id, 'warehouse_id' => $warehouse->id, 'tenant_id' => $product->tenant_id],
             ['quantity' => 5]
@@ -182,10 +179,10 @@ class ProductStockTest extends TestCase
     {
         $warehouse = Warehouse::factory()->create();
         $product = Product::factory()->create();
-        
+
         // Clear any existing stock first
         $product->productWarehouses()->delete();
-        
+
         ProductWarehouse::updateOrCreate(
             ['product_id' => $product->id, 'warehouse_id' => $warehouse->id, 'tenant_id' => $product->tenant_id],
             ['quantity' => 0]
@@ -200,15 +197,15 @@ class ProductStockTest extends TestCase
         $warehouse1 = Warehouse::factory()->create();
         $warehouse2 = Warehouse::factory()->create();
         $product = Product::factory()->create();
-        
+
         // Clear any existing stock first
         $product->productWarehouses()->delete();
-        
+
         ProductWarehouse::updateOrCreate(
             ['product_id' => $product->id, 'warehouse_id' => $warehouse1->id, 'tenant_id' => $product->tenant_id],
             ['quantity' => 30]
         );
-        
+
         ProductWarehouse::updateOrCreate(
             ['product_id' => $product->id, 'warehouse_id' => $warehouse2->id, 'tenant_id' => $product->tenant_id],
             ['quantity' => 20]

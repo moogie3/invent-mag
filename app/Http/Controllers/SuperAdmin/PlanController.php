@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers\SuperAdmin;
 
-use App\Http\Controllers\SuperAdmin\FeatureController;
 use App\Http\Controllers\Controller;
 use App\Models\Plan;
 use App\Services\CurrencyService;
@@ -13,6 +12,7 @@ class PlanController extends Controller
     public function index()
     {
         $plans = Plan::withCount('tenants')->ordered()->get();
+
         return view('superadmin.plans.index', compact('plans'));
     }
 
@@ -20,6 +20,7 @@ class PlanController extends Controller
     {
         $allFeatures = FeatureController::getAllFeatures();
         $predefinedCurrencies = (new CurrencyService)->getPredefinedCurrencies();
+
         return view('superadmin.plans.create', compact('allFeatures', 'predefinedCurrencies'));
     }
 
@@ -54,13 +55,14 @@ class PlanController extends Controller
     {
         $allFeatures = FeatureController::getAllFeatures();
         $predefinedCurrencies = (new CurrencyService)->getPredefinedCurrencies();
+
         return view('superadmin.plans.edit', compact('plan', 'allFeatures', 'predefinedCurrencies'));
     }
 
     public function update(Request $request, Plan $plan)
     {
         $validated = $request->validate([
-            'slug' => 'required|string|unique:plans,slug,' . $plan->id,
+            'slug' => 'required|string|unique:plans,slug,'.$plan->id,
             'name' => 'required|string|max:255',
             'price' => 'required|numeric|min:0',
             'currency_code' => 'nullable|string|max:3',

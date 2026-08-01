@@ -3,12 +3,11 @@
 namespace App\Services;
 
 use App\Models\Supplier;
-use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Str;
-use Illuminate\Http\UploadedFile;
 use Dompdf\Dompdf;
-use App\Helpers\CurrencyHelper;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 
 class SupplierService
@@ -19,6 +18,7 @@ class SupplierService
         $inCount = Supplier::where('location', 'IN')->count();
         $outCount = Supplier::where('location', 'OUT')->count();
         $totalsupplier = Supplier::count();
+
         return compact('suppliers', 'entries', 'totalsupplier', 'inCount', 'outCount');
     }
 
@@ -69,8 +69,8 @@ class SupplierService
 
         if (isset($data['image'])) {
             $oldImage = $supplier->getRawOriginal('image');
-            if ($oldImage && !filter_var($oldImage, FILTER_VALIDATE_URL)) {
-                Storage::disk('public')->delete('image/' . $oldImage);
+            if ($oldImage && ! filter_var($oldImage, FILTER_VALIDATE_URL)) {
+                Storage::disk('public')->delete('image/'.$oldImage);
             }
             if ($data['image'] instanceof UploadedFile) {
                 $data['image'] = $this->storeImage($data['image']);
@@ -85,8 +85,8 @@ class SupplierService
     public function deleteSupplier(Supplier $supplier)
     {
         $image = $supplier->getRawOriginal('image');
-        if ($image && !filter_var($image, FILTER_VALIDATE_URL)) {
-            Storage::disk('public')->delete('image/' . $image);
+        if ($image && ! filter_var($image, FILTER_VALIDATE_URL)) {
+            Storage::disk('public')->delete('image/'.$image);
         }
 
         $supplier->delete();
@@ -96,8 +96,9 @@ class SupplierService
 
     private function storeImage($image): string
     {
-        $imageName = Str::random(10) . '_' . $image->getClientOriginalName();
+        $imageName = Str::random(10).'_'.$image->getClientOriginalName();
         $image->storeAs('image', $imageName, 'public');
+
         return $imageName;
     }
 
@@ -106,6 +107,7 @@ class SupplierService
         $inCount = Supplier::where('location', 'IN')->count();
         $outCount = Supplier::where('location', 'OUT')->count();
         $totalsupplier = Supplier::count();
+
         return [
             'totalsupplier' => $totalsupplier,
             'inCount' => $inCount,
@@ -119,10 +121,11 @@ class SupplierService
 
         if ($exportOption === 'pdf') {
             $html = view('admin.supplier.export-pdf', compact('suppliers'))->render();
-            $dompdf = new Dompdf();
+            $dompdf = new Dompdf;
             $dompdf->loadHtml($html);
             $dompdf->setPaper('A4', 'landscape');
             $dompdf->render();
+
             return $dompdf->stream('suppliers.pdf');
         }
 

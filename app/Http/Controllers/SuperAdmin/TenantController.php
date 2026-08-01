@@ -12,12 +12,14 @@ class TenantController extends Controller
     public function index()
     {
         $tenants = Tenant::with('plan')->latest()->paginate(20);
+
         return view('superadmin.tenants.index', compact('tenants'));
     }
 
     public function show(Tenant $tenant)
     {
         $tenant->load('plan');
+
         return view('superadmin.tenants.show', compact('tenant'));
     }
 
@@ -51,17 +53,17 @@ class TenantController extends Controller
         $returnUrl = url()->previous() ?: route('superadmin.tenants.index');
 
         $impersonationToken = encrypt([
-            'impersonating_tenant_id'   => $tenant->id,
+            'impersonating_tenant_id' => $tenant->id,
             'impersonating_tenant_name' => $tenant->name,
-            'impersonating_user_id'     => $tenantUser->id,
-            'impersonating_user_name'   => $tenantUser->name,
-            'superadmin_return_url'     => $returnUrl,
+            'impersonating_user_id' => $tenantUser->id,
+            'impersonating_user_name' => $tenantUser->name,
+            'superadmin_return_url' => $returnUrl,
         ]);
 
         // tenant->domain is the full hostname (e.g. acme.invent-mag.web.id)
         $protocol = request()->isSecure() ? 'https' : 'http';
-        $tenantAdminUrl = $protocol . '://' . $tenant->domain . '/admin/dashboard'
-            . '?' . http_build_query(['impersonation_token' => $impersonationToken]);
+        $tenantAdminUrl = $protocol.'://'.$tenant->domain.'/admin/dashboard'
+            .'?'.http_build_query(['impersonation_token' => $impersonationToken]);
 
         return redirect()->away($tenantAdminUrl);
     }
@@ -91,14 +93,15 @@ class TenantController extends Controller
 
     public function toggleActive(Tenant $tenant)
     {
-        $tenant->update(['is_active' => !$tenant->is_active]);
+        $tenant->update(['is_active' => ! $tenant->is_active]);
+
         return back()->with('success', 'Tenant status updated.');
     }
 
     public function updateDomain(Request $request, Tenant $tenant)
     {
         $data = $request->validate([
-            'domain' => 'required|string|max:255|unique:tenants,domain,' . $tenant->id,
+            'domain' => 'required|string|max:255|unique:tenants,domain,'.$tenant->id,
         ]);
 
         $tenant->update(['domain' => $data['domain']]);

@@ -2,14 +2,17 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\BelongsToTenant;
+use Database\Factories\POItemFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use App\Models\Concerns\BelongsToTenant;
 
 class POItem extends Model
 {
-    use HasFactory, BelongsToTenant;
+    use BelongsToTenant, HasFactory;
+
     protected $table = 'po_items';
+
     protected $fillable = [
         'po_id',
         'product_id',
@@ -19,7 +22,7 @@ class POItem extends Model
         'discount_type',
         'total',
         'expiry_date',
-        'remaining_quantity'
+        'remaining_quantity',
     ];
 
     protected $guarded = [
@@ -33,17 +36,20 @@ class POItem extends Model
         'expiry_date' => 'date:Y-m-d',
     ];
 
-    public function product() {
+    public function product()
+    {
         return $this->belongsTo(Product::class);
     }
 
-    public function purchaseOrder() {
-        return $this->belongsTo(Purchase::class , 'po_id');
+    public function purchaseOrder()
+    {
+        return $this->belongsTo(Purchase::class, 'po_id');
     }
 
     public static function getExpiringSoonItems()
     {
         $thirtyDaysFromNow = now()->addDays(30);
+
         return self::with(['product', 'purchaseOrder.warehouse'])
             ->whereNotNull('expiry_date')
             ->where('expiry_date', '>', now())
@@ -55,6 +61,6 @@ class POItem extends Model
     // Explicitly define the factory for the model
     protected static function newFactory()
     {
-        return \Database\Factories\POItemFactory::new();
+        return POItemFactory::new();
     }
 }

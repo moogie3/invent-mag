@@ -2,21 +2,21 @@
 
 namespace Tests\Feature\Admin;
 
-use App\Models\User;
 use App\Services\NotificationService;
+use App\Services\SystemNotificationService;
+use Database\Seeders\RoleSeeder;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Mockery;
-use Spatie\Permission\Models\Role;
 use Tests\TestCase;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Traits\CreatesTenant;
-use Database\Seeders\RoleSeeder;
 
 class NotificationControllerTest extends TestCase
 {
-    use WithFaker, RefreshDatabase, CreatesTenant;
+    use CreatesTenant, RefreshDatabase, WithFaker;
 
     protected $notificationServiceMock;
+
     protected $systemNotificationServiceMock;
 
     protected function setUp(): void
@@ -31,10 +31,10 @@ class NotificationControllerTest extends TestCase
         $this->app->instance(NotificationService::class, $this->notificationServiceMock);
 
         // Mock the SystemNotificationService
-        $this->systemNotificationServiceMock = Mockery::mock(\App\Services\SystemNotificationService::class);
+        $this->systemNotificationServiceMock = Mockery::mock(SystemNotificationService::class);
         $this->systemNotificationServiceMock->shouldReceive('getSystemNotifications')->andReturn(collect([]))->byDefault();
         $this->systemNotificationServiceMock->shouldReceive('getSystemNotificationCount')->andReturn(0)->byDefault();
-        $this->app->instance(\App\Services\SystemNotificationService::class, $this->systemNotificationServiceMock);
+        $this->app->instance(SystemNotificationService::class, $this->systemNotificationServiceMock);
     }
 
     public function test_index_displays_notifications_page()

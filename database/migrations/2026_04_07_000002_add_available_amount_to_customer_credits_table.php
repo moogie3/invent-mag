@@ -16,8 +16,8 @@ return new class extends Migration
         });
 
         // Populate existing records
-        \DB::table('customer_credits')->update([
-            'available_amount' => \DB::raw('amount - used_amount')
+        DB::table('customer_credits')->update([
+            'available_amount' => DB::raw('amount - used_amount'),
         ]);
     }
 

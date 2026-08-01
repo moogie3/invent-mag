@@ -2,28 +2,27 @@
 
 namespace App\Services;
 
-use App\Models\SalesReturn;
-use Illuminate\Http\Request;
-use App\Models\Sales;
-use Carbon\Carbon;
-use App\Models\User;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Auth;
-use App\Models\SalesReturnItem;
-use App\Models\Product;
-use App\Models\Account;
-use Dompdf\Dompdf;
 use App\Helpers\CurrencyHelper;
 use App\Helpers\SalesHelper;
-use App\Models\JournalEntry;
-use App\Models\ProductWarehouse;
-use App\Models\POItem;
+use App\Models\Account;
 use App\Models\CustomerCredit;
-use App\Services\SalesService;
+use App\Models\JournalEntry;
+use App\Models\POItem;
+use App\Models\Product;
+use App\Models\ProductWarehouse;
+use App\Models\Sales;
+use App\Models\SalesReturn;
+use App\Models\SalesReturnItem;
+use App\Models\User;
+use Carbon\Carbon;
+use Dompdf\Dompdf;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class SalesReturnService
 {
     protected AccountingService $accountingService;
+
     protected SalesService $salesService;
 
     public function __construct(AccountingService $accountingService, SalesService $salesService)
@@ -41,7 +40,9 @@ class SalesReturnService
             ->get();
 
         foreach ($poItems as $poItem) {
-            if ($quantity <= 0) break;
+            if ($quantity <= 0) {
+                break;
+            }
             $decrement = min($poItem->remaining_quantity, $quantity);
             $poItem->decrement('remaining_quantity', $decrement);
             $quantity -= $decrement;
@@ -57,7 +58,9 @@ class SalesReturnService
             ->get();
 
         foreach ($poItems as $poItem) {
-            if ($quantity <= 0) break;
+            if ($quantity <= 0) {
+                break;
+            }
             $availableSpace = $poItem->quantity - $poItem->remaining_quantity;
             $increment = min($availableSpace, $quantity);
             $poItem->increment('remaining_quantity', $increment);
@@ -94,8 +97,6 @@ class SalesReturnService
         ];
     }
 
-
-
     public function createSalesReturn(array $data): SalesReturn
     {
         return DB::transaction(function () use ($data) {
@@ -105,7 +106,7 @@ class SalesReturnService
                 throw new \Exception('No items selected for return.');
             }
 
-            $returnedItems = array_filter($items, function($item) {
+            $returnedItems = array_filter($items, function ($item) {
                 return isset($item['returned_quantity']) && $item['returned_quantity'] > 0;
             });
 
@@ -123,7 +124,7 @@ class SalesReturnService
             $sale->load('payments');
             $originalSaleStatus = $sale->status;
             $wasPaid = $sale->total_paid >= $sale->grand_total;
-            
+
             // Calculate return quantities
             $totalOriginalQuantitySold = $sale->salesItems()->sum('quantity');
             $totalQuantityReturnedSoFar = $sale->salesReturns()->with('items')->get()->flatMap(function ($sr) {
@@ -136,20 +137,20 @@ class SalesReturnService
             // Note: We check $wasPaid (actual payment status) not stored status
             if ($totalQuantityReturnedSoFar >= $totalOriginalQuantitySold) {
                 // Only change to Returned if was NOT paid
-                if (!$wasPaid) {
+                if (! $wasPaid) {
                     $sale->update(['status' => 'Returned']);
                 }
             } elseif ($totalQuantityReturnedSoFar > 0) {
                 // Only change to Partial if was NOT paid
-                if (!$wasPaid) {
+                if (! $wasPaid) {
                     $sale->update(['status' => 'Partial']);
                 }
             }
 
             // Copy tax data from the original sale.
             // Compute whenever rate > 0 — tax_id may be null for legacy records.
-            $taxRate   = (float) ($sale->tax_rate ?? 0);
-            $taxType   = $sale->tax_type ?? 'none';
+            $taxRate = (float) ($sale->tax_rate ?? 0);
+            $taxType = $sale->tax_type ?? 'none';
             $taxAmount = $taxRate > 0
                 ? SalesHelper::calculateTaxAmount($totalAmount, $taxRate, $taxType)
                 : 0.0;
@@ -164,7 +165,7 @@ class SalesReturnService
                 'tax_rate' => $sale->tax_rate ?? 0,
                 'tax_amount' => $taxAmount,
                 'tax_type' => $sale->tax_type ?? 'none',
-                'user_id'  => Auth::id(),
+                'user_id' => Auth::id(),
             ]);
 
             // Create return items - each item tracks which sales line item it came from
@@ -176,11 +177,11 @@ class SalesReturnService
 
                 SalesReturnItem::create([
                     'sales_return_id' => $salesReturn->id,
-                    'sales_item_id'   => $salesItemId,
-                    'product_id'      => $itemData['product_id'],
-                    'quantity'        => $returnedQuantity,
-                    'price'           => $price,
-                    'total'           => $price * $returnedQuantity,
+                    'sales_item_id' => $salesItemId,
+                    'product_id' => $itemData['product_id'],
+                    'quantity' => $returnedQuantity,
+                    'price' => $price,
+                    'total' => $price * $returnedQuantity,
                 ]);
 
                 $product = Product::find($itemData['product_id']);
@@ -204,7 +205,7 @@ class SalesReturnService
             // This duplicate code is kept for backward compatibility but should be cleaned up later
 
             $accountingSettings = app('currentTenant')->accounting_settings ?? [];
-            if (!$accountingSettings || !isset($accountingSettings['inventory_account_id']) || !isset($accountingSettings['accounts_receivable_account_id'])) {
+            if (! $accountingSettings || ! isset($accountingSettings['inventory_account_id']) || ! isset($accountingSettings['accounts_receivable_account_id'])) {
                 throw new \Exception('Accounting settings for inventory or accounts receivable are not configured.');
             }
 
@@ -213,7 +214,7 @@ class SalesReturnService
             $costOfGoodsSoldAccount = Account::find($accountingSettings['cost_of_goods_sold_account_id'] ?? null);
             $inventoryAccount = Account::find($accountingSettings['inventory_account_id'] ?? null);
 
-            if (!$salesRevenueAccount || !$accountsReceivableAccount || !$costOfGoodsSoldAccount || !$inventoryAccount) {
+            if (! $salesRevenueAccount || ! $accountsReceivableAccount || ! $costOfGoodsSoldAccount || ! $inventoryAccount) {
                 throw new \Exception('Required accounts (Sales Revenue, AR, COGS, Inventory) not found for Sales Return. Please check Accounting Settings.');
             }
 
@@ -308,7 +309,7 @@ class SalesReturnService
                     'amount' => $totalAmount,
                     'used_amount' => 0,
                     'available_amount' => $totalAmount,
-                    'reason' => 'Sales Return for Invoice #' . $sale->invoice,
+                    'reason' => 'Sales Return for Invoice #'.$sale->invoice,
                     'status' => 'active',
                 ]);
 
@@ -323,13 +324,11 @@ class SalesReturnService
         });
     }
 
-
-
     public function updateSalesReturn(SalesReturn $salesReturn, array $data): SalesReturn
     {
         return DB::transaction(function () use ($salesReturn, $data) {
             $items = json_decode($data['items'], true);
-            if (!$items || !is_array($items)) {
+            if (! $items || ! is_array($items)) {
                 throw new \Exception('Invalid items data');
             }
 
@@ -351,7 +350,7 @@ class SalesReturnService
             }
             $salesReturn->items()->delete();
 
-            $returnedItems = array_filter($items, function($item) {
+            $returnedItems = array_filter($items, function ($item) {
                 return isset($item['returned_quantity']) && $item['returned_quantity'] > 0;
             });
 
@@ -363,21 +362,21 @@ class SalesReturnService
             // Recalculate tax for updated return amount.
             // Compute whenever rate > 0 — tax_id may be null for legacy records.
             $sale->load('tax');
-            $updatedTaxRate   = (float) ($sale->tax_rate ?? 0);
-            $updatedTaxType   = $sale->tax_type ?? 'none';
+            $updatedTaxRate = (float) ($sale->tax_rate ?? 0);
+            $updatedTaxType = $sale->tax_type ?? 'none';
             $updatedTaxAmount = $updatedTaxRate > 0
                 ? SalesHelper::calculateTaxAmount($totalReturnAmount, $updatedTaxRate, $updatedTaxType)
                 : 0.0;
 
             $salesReturn->update([
-                'return_date'  => $data['return_date'],
-                'reason'       => $data['reason'],
+                'return_date' => $data['return_date'],
+                'reason' => $data['reason'],
                 'total_amount' => $totalReturnAmount,
-                'tax_amount'   => $updatedTaxAmount,
-                'tax_rate'     => $updatedTaxRate,
-                'tax_type'     => $updatedTaxType,
-                'status'       => $data['status'],
-                'user_id'      => Auth::id(),
+                'tax_amount' => $updatedTaxAmount,
+                'tax_rate' => $updatedTaxRate,
+                'tax_type' => $updatedTaxType,
+                'status' => $data['status'],
+                'user_id' => Auth::id(),
             ]);
 
             // Update return items - each item tracks which sales line item it came from
@@ -389,11 +388,11 @@ class SalesReturnService
 
                 SalesReturnItem::create([
                     'sales_return_id' => $salesReturn->id,
-                    'sales_item_id'   => $salesItemId,
-                    'product_id'      => $itemData['product_id'],
-                    'quantity'        => $returnedQuantity,
-                    'price'           => $price,
-                    'total'           => $price * $returnedQuantity,
+                    'sales_item_id' => $salesItemId,
+                    'product_id' => $itemData['product_id'],
+                    'quantity' => $returnedQuantity,
+                    'price' => $price,
+                    'total' => $price * $returnedQuantity,
                 ]);
 
                 $product = Product::find($itemData['product_id']);
@@ -427,12 +426,12 @@ class SalesReturnService
             // Note: We check $wasPaid (actual payment status) not stored status
             if ($totalQuantityReturnedSoFar >= $totalOriginalQuantitySold) {
                 // Only change to Returned if was NOT paid
-                if (!$wasPaid) {
+                if (! $wasPaid) {
                     $sale->update(['status' => 'Returned']);
                 }
             } elseif ($totalQuantityReturnedSoFar > 0) {
                 // Only change to Partial if was NOT paid
-                if (!$wasPaid) {
+                if (! $wasPaid) {
                     $sale->update(['status' => 'Partial']);
                 }
             }
@@ -441,8 +440,8 @@ class SalesReturnService
             // Use actual payment status (wasPaid) instead of stored status
             $oldStatus = $salesReturn->getOriginal('status');
             $oldTotalAmount = $salesReturn->getOriginal('total_amount');
-            
-            if ($data['status'] === 'Completed' && $wasPaid && !$salesReturn->customer_credit_id) {
+
+            if ($data['status'] === 'Completed' && $wasPaid && ! $salesReturn->customer_credit_id) {
                 $credit = CustomerCredit::create([
                     'tenant_id' => $sale->tenant_id,
                     'customer_id' => $sale->customer_id,
@@ -450,7 +449,7 @@ class SalesReturnService
                     'amount' => $totalReturnAmount,
                     'used_amount' => 0,
                     'available_amount' => $totalReturnAmount,
-                    'reason' => 'Sales Return for Invoice #' . $sale->invoice,
+                    'reason' => 'Sales Return for Invoice #'.$sale->invoice,
                     'status' => 'active',
                 ]);
 
@@ -461,7 +460,7 @@ class SalesReturnService
                 if ($credit) {
                     $credit->update([
                         'amount' => $totalReturnAmount,
-                        'available_amount' => $totalReturnAmount - $credit->used_amount
+                        'available_amount' => $totalReturnAmount - $credit->used_amount,
                     ]);
                 }
             }
@@ -495,10 +494,11 @@ class SalesReturnService
 
         if ($exportOption === 'pdf') {
             $html = view('admin.sales-returns.bulk-export-pdf', compact('salesReturns'))->render();
-            $dompdf = new Dompdf();
+            $dompdf = new Dompdf;
             $dompdf->loadHtml($html);
             $dompdf->setPaper('A4', 'landscape');
             $dompdf->render();
+
             return $dompdf->stream('sales-returns.pdf');
         }
 
@@ -640,7 +640,7 @@ class SalesReturnService
                     'amount' => $salesReturn->total_amount,
                     'used_amount' => 0,
                     'available_amount' => $salesReturn->total_amount,
-                    'reason' => 'Sales Return for Invoice #' . $sale->invoice,
+                    'reason' => 'Sales Return for Invoice #'.$sale->invoice,
                     'status' => 'active',
                 ]);
                 $salesReturn->update(['customer_credit_id' => $credit->id]);
@@ -656,7 +656,7 @@ class SalesReturnService
     private function createSalesReturnJournalEntry(SalesReturn $salesReturn, Sales $sale): void
     {
         $accountingSettings = app('currentTenant')->accounting_settings ?? [];
-        if (empty($accountingSettings) || !isset($accountingSettings['accounts_receivable_account_id'])) {
+        if (empty($accountingSettings) || ! isset($accountingSettings['accounts_receivable_account_id'])) {
             return;
         }
 
@@ -665,7 +665,7 @@ class SalesReturnService
         $costOfGoodsSoldAccount = Account::find($accountingSettings['cost_of_goods_sold_account_id'] ?? null);
         $inventoryAccount = Account::find($accountingSettings['inventory_account_id'] ?? null);
 
-        if (!$salesRevenueAccount || !$accountsReceivableAccount || !$costOfGoodsSoldAccount || !$inventoryAccount) {
+        if (! $salesRevenueAccount || ! $accountsReceivableAccount || ! $costOfGoodsSoldAccount || ! $inventoryAccount) {
             return;
         }
 
@@ -809,11 +809,11 @@ class SalesReturnService
         $address = User::where('tenant_id', $tenantId)->whereNotNull('address')->value('address');
 
         $html = view('admin.sales-returns.print-pdf', compact('salesReturn', 'shopname', 'address'))->render();
-        $dompdf = new Dompdf();
+        $dompdf = new Dompdf;
         $dompdf->loadHtml($html);
         $dompdf->setPaper('A4', 'portrait');
         $dompdf->render();
 
-        return $dompdf->stream('sales-return-' . $salesReturn->id . '.pdf', ['Attachment' => false]);
+        return $dompdf->stream('sales-return-'.$salesReturn->id.'.pdf', ['Attachment' => false]);
     }
 }

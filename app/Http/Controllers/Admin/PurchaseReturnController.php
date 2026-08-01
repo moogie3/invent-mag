@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Helpers\PurchaseReturnHelper;
 use App\Http\Controllers\Controller;
 use App\Models\ActivityLog;
 use App\Models\Purchase;
@@ -9,12 +10,12 @@ use App\Models\PurchaseReturn;
 use App\Services\ActivityLogService;
 use App\Services\PurchaseReturnService;
 use App\Services\PurchaseService;
-use App\Helpers\PurchaseReturnHelper;
 use Illuminate\Http\Request;
 
 class PurchaseReturnController extends Controller
 {
     protected $purchaseReturnService;
+
     protected $purchaseService;
 
     public function __construct(PurchaseReturnService $purchaseReturnService, PurchaseService $purchaseService)
@@ -28,12 +29,14 @@ class PurchaseReturnController extends Controller
         $entries = $request->input('entries', 10);
         $filters = $request->only(['month', 'year']);
         $data = $this->purchaseReturnService->getPurchaseReturnIndexData($filters, $entries);
+
         return view('admin.por.index', $data);
     }
 
     public function create()
     {
         $purchases = Purchase::whereHas('items')->get();
+
         return view('admin.por.create', compact('purchases'));
     }
 
@@ -66,6 +69,7 @@ class PurchaseReturnController extends Controller
     {
         $purchases = Purchase::all();
         $isCompletedOrCanceled = in_array($por->status, ['Completed', 'Canceled']);
+
         return view('admin.por.edit', compact('por', 'purchases', 'isCompletedOrCanceled'));
     }
 
@@ -87,23 +91,26 @@ class PurchaseReturnController extends Controller
     public function destroy(PurchaseReturn $por)
     {
         $this->purchaseReturnService->deletePurchaseReturn($por);
+
         return redirect()->route('admin.por.index')->with('success', 'Purchase return deleted successfully.');
     }
+
     public function getPurchaseItems(Purchase $purchase)
     {
         $purchase->load(['items.product', 'purchaseReturns.items']);
-        
+
         $items = $purchase->items->map(function ($item) use ($purchase) {
             $returnedQuantity = $purchase->purchaseReturns
                 ->where('status', 'Completed')
-                ->flatMap(fn($pr) => $pr->items ?? collect())
+                ->flatMap(fn ($pr) => $pr->items ?? collect())
                 ->where('product_id', $item->product_id)
                 ->sum('quantity');
-                
+
             $item->available_quantity = max(0, $item->quantity - $returnedQuantity);
+
             return $item;
         });
-        
+
         return response()->json($items);
     }
 
@@ -111,6 +118,7 @@ class PurchaseReturnController extends Controller
     {
         $ids = $request->input('ids');
         $this->purchaseReturnService->bulkDeletePurchaseReturns($ids);
+
         return response()->json(['success' => true, 'message' => 'Selected purchase returns have been deleted.']);
     }
 
@@ -126,6 +134,7 @@ class PurchaseReturnController extends Controller
                 $pr
             );
         }
+
         return response()->json(['success' => true, 'message' => 'Selected purchase returns have been marked as completed.']);
     }
 
@@ -141,6 +150,7 @@ class PurchaseReturnController extends Controller
                 $pr
             );
         }
+
         return response()->json(['success' => true, 'message' => 'Selected purchase returns have been marked as canceled.']);
     }
 
@@ -159,15 +169,18 @@ class PurchaseReturnController extends Controller
         try {
             return $this->purchaseReturnService->printReturn($id);
         } catch (\Exception $e) {
-            return back()->with('error', 'Error generating return slip. ' . $e->getMessage());
+            return back()->with('error', 'Error generating return slip. '.$e->getMessage());
         }
     }
 
     /**
      * @group Purchase Returns
+     *
      * @summary Bulk Export Purchase Returns
+     *
      * @bodyParam ids array required An array of purchase return IDs to export. Example: [1, 2, 3]
      * @bodyParam export_option string required The export format ('pdf' or 'csv'). Example: "csv"
+     *
      * @response 200 "The exported file."
      */
     public function bulkExport(Request $request)
@@ -180,6 +193,7 @@ class PurchaseReturnController extends Controller
 
         try {
             $file = $this->purchaseReturnService->bulkExportPurchaseReturns($request->all(), $request->ids, $request->export_option);
+
             return $file;
         } catch (\Exception $e) {
             return response()->json([

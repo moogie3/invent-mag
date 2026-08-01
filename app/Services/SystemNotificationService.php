@@ -3,10 +3,11 @@
 namespace App\Services;
 
 use App\Models\POItem;
+use App\Models\Product;
 use App\Models\Tenant;
 use App\Models\User;
 use App\Models\Warehouse;
-use App\Models\Product;
+use Carbon\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
@@ -32,7 +33,7 @@ class SystemNotificationService
             ->concat($this->getRecentPlanUpgradeNotifications())
             ->concat($this->getProductExpiryNotifications())
             ->concat($this->getBackupStatusNotifications())
-            ->filter(fn($item) => !in_array($item['id'], $dismissed))
+            ->filter(fn ($item) => ! in_array($item['id'], $dismissed))
             ->values();
     }
 
@@ -54,7 +55,7 @@ class SystemNotificationService
     {
         $tenant = $this->getCurrentTenant();
 
-        if ($tenant === null || !$tenant->hasPlan()) {
+        if ($tenant === null || ! $tenant->hasPlan()) {
             return collect();
         }
 
@@ -109,7 +110,7 @@ class SystemNotificationService
     {
         $tenant = $this->getCurrentTenant();
 
-        if ($tenant === null || !$tenant->hasPlan()) {
+        if ($tenant === null || ! $tenant->hasPlan()) {
             return collect();
         }
 
@@ -184,7 +185,7 @@ class SystemNotificationService
     {
         $tenant = $this->getCurrentTenant();
 
-        if ($tenant === null || !$tenant->hasPlan()) {
+        if ($tenant === null || ! $tenant->hasPlan()) {
             return collect();
         }
 
@@ -283,7 +284,7 @@ class SystemNotificationService
 
         // Check if this tenant has the accounting feature
         $tenant = $this->getCurrentTenant();
-        if ($tenant !== null && !$tenant->hasFeature('accounting')) {
+        if ($tenant !== null && ! $tenant->hasFeature('accounting')) {
             return collect();
         }
 
@@ -386,7 +387,7 @@ class SystemNotificationService
             return collect();
         }
 
-        if (!$tenant->hasScheduledDowngrade()) {
+        if (! $tenant->hasScheduledDowngrade()) {
             return collect();
         }
 
@@ -394,7 +395,7 @@ class SystemNotificationService
         $effectiveDate = $tenant->pending_plan_effective_at;
         $prorationCredit = $tenant->proration_credit ?? 0;
 
-        if (!$scheduledPlan || !$effectiveDate) {
+        if (! $scheduledPlan || ! $effectiveDate) {
             return collect();
         }
 
@@ -439,7 +440,7 @@ class SystemNotificationService
             return collect();
         }
 
-        if (!$tenant->plan_changed_at) {
+        if (! $tenant->plan_changed_at) {
             return collect();
         }
 
@@ -451,7 +452,7 @@ class SystemNotificationService
 
         $currentPlan = $tenant->getEffectivePlan();
 
-        if (!$currentPlan) {
+        if (! $currentPlan) {
             return collect();
         }
 
@@ -483,7 +484,7 @@ class SystemNotificationService
     {
         // Count items expiring within 30 days with remaining stock
         $thirtyDaysFromNow = now()->addDays(30);
-        $sevenDaysFromNow  = now()->addDays(7);
+        $sevenDaysFromNow = now()->addDays(7);
 
         $critical = POItem::whereNotNull('expiry_date')
             ->where('expiry_date', '>=', now())
@@ -502,22 +503,22 @@ class SystemNotificationService
         }
 
         $urgency = $critical > 0 ? 'high' : 'medium';
-        $color   = $critical > 0 ? 'danger' : 'warning';
+        $color = $critical > 0 ? 'danger' : 'warning';
 
         return collect([
             [
-                'id'           => 'system::product_expiry',
-                'title'        => __('plan.notif_product_expiry_title'),
-                'description'  => $critical > 0
+                'id' => 'system::product_expiry',
+                'title' => __('plan.notif_product_expiry_title'),
+                'description' => $critical > 0
                     ? __('plan.notif_product_expiry_critical_desc', ['critical' => $critical, 'total' => $total])
                     : __('plan.notif_product_expiry_desc', ['count' => $total]),
-                'icon'         => 'ti ti-calendar-exclamation',
-                'color'        => $color,
-                'urgency'      => $urgency,
-                'category'     => 'inventory',
+                'icon' => 'ti ti-calendar-exclamation',
+                'color' => $color,
+                'urgency' => $urgency,
+                'category' => 'inventory',
                 'action_label' => __('plan.notif_view_products'),
                 'action_route' => route('admin.product'),
-                'type'         => 'system',
+                'type' => 'system',
                 'show_notification' => true,
             ],
         ]);
@@ -537,7 +538,7 @@ class SystemNotificationService
                 return collect();
             }
 
-            $domainPrefix = $tenant->domain . '-';
+            $domainPrefix = $tenant->domain.'-';
             $allFiles = Storage::disk('local')->files('backups');
 
             // Filter to this tenant's backup files
@@ -550,16 +551,16 @@ class SystemNotificationService
                 // No backups at all — suggest creating one
                 return collect([
                     [
-                        'id'           => 'system::no_backup',
-                        'title'        => __('plan.notif_no_backup_title'),
-                        'description'  => __('plan.notif_no_backup_desc'),
-                        'icon'         => 'ti ti-device-floppy',
-                        'color'        => 'warning',
-                        'urgency'      => 'medium',
-                        'category'     => 'backup',
+                        'id' => 'system::no_backup',
+                        'title' => __('plan.notif_no_backup_title'),
+                        'description' => __('plan.notif_no_backup_desc'),
+                        'icon' => 'ti ti-device-floppy',
+                        'color' => 'warning',
+                        'urgency' => 'medium',
+                        'category' => 'backup',
                         'action_label' => __('plan.notif_go_to_backup'),
                         'action_route' => route('admin.setting.backup.index'),
-                        'type'         => 'system',
+                        'type' => 'system',
                         'show_notification' => true,
                     ],
                 ]);
@@ -570,26 +571,26 @@ class SystemNotificationService
                 return Storage::disk('local')->lastModified($file);
             })->max();
 
-            $latestDate = \Carbon\Carbon::createFromTimestamp($latestTimestamp);
+            $latestDate = Carbon::createFromTimestamp($latestTimestamp);
             $hoursSince = now()->diffInHours($latestDate, false);
-            $daysSince  = now()->diffInDays($latestDate, false);
+            $daysSince = now()->diffInDays($latestDate, false);
 
             // Recent backup (within 24 hours) — success confirmation
             if ($hoursSince >= 0 && $hoursSince <= 24) {
                 return collect([
                     [
-                        'id'           => 'system::backup_recent',
-                        'title'        => __('plan.notif_backup_recent_title'),
-                        'description'  => __('plan.notif_backup_recent_desc', [
+                        'id' => 'system::backup_recent',
+                        'title' => __('plan.notif_backup_recent_title'),
+                        'description' => __('plan.notif_backup_recent_desc', [
                             'time' => $latestDate->diffForHumans(),
                         ]),
-                        'icon'         => 'ti ti-circle-check',
-                        'color'        => 'success',
-                        'urgency'      => 'low',
-                        'category'     => 'backup',
+                        'icon' => 'ti ti-circle-check',
+                        'color' => 'success',
+                        'urgency' => 'low',
+                        'category' => 'backup',
                         'action_label' => __('plan.notif_go_to_backup'),
                         'action_route' => route('admin.setting.backup.index'),
-                        'type'         => 'system',
+                        'type' => 'system',
                         'show_notification' => true,
                     ],
                 ]);
@@ -599,18 +600,18 @@ class SystemNotificationService
             if ($daysSince > 7) {
                 return collect([
                     [
-                        'id'           => 'system::backup_overdue',
-                        'title'        => __('plan.notif_backup_overdue_title'),
-                        'description'  => __('plan.notif_backup_overdue_desc', [
+                        'id' => 'system::backup_overdue',
+                        'title' => __('plan.notif_backup_overdue_title'),
+                        'description' => __('plan.notif_backup_overdue_desc', [
                             'days' => (int) $daysSince,
                         ]),
-                        'icon'         => 'ti ti-device-floppy',
-                        'color'        => 'warning',
-                        'urgency'      => $daysSince > 30 ? 'high' : 'medium',
-                        'category'     => 'backup',
+                        'icon' => 'ti ti-device-floppy',
+                        'color' => 'warning',
+                        'urgency' => $daysSince > 30 ? 'high' : 'medium',
+                        'category' => 'backup',
                         'action_label' => __('plan.notif_go_to_backup'),
                         'action_route' => route('admin.setting.backup.index'),
-                        'type'         => 'system',
+                        'type' => 'system',
                         'show_notification' => true,
                     ],
                 ]);
@@ -632,6 +633,7 @@ class SystemNotificationService
     {
         try {
             $tenant = app('currentTenant');
+
             return $tenant instanceof Tenant ? $tenant : null;
         } catch (\Exception $e) {
             return null;

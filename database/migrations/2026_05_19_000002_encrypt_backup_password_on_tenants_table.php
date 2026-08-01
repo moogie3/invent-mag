@@ -2,9 +2,9 @@
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Support\Facades\Schema;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Crypt;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
@@ -28,7 +28,7 @@ return new class extends Migration
             try {
                 Crypt::decryptString($value);
                 // Already encrypted — skip
-            } catch (\Exception $e) {
+            } catch (Exception $e) {
                 // Plaintext — encrypt it now
                 DB::table('tenants')->where('id', $tenant->id)->update([
                     'backup_password' => Crypt::encryptString($value),
@@ -48,7 +48,7 @@ return new class extends Migration
                 DB::table('tenants')->where('id', $tenant->id)->update([
                     'backup_password' => substr($plain, 0, 100),
                 ]);
-            } catch (\Exception $e) {
+            } catch (Exception $e) {
                 // Already plaintext, nothing to do
             }
         }

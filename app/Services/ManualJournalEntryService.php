@@ -42,7 +42,7 @@ class ManualJournalEntryService
     public function update(JournalEntry $journalEntry, array $data): JournalEntry
     {
         if ($journalEntry->status !== JournalEntry::STATUS_DRAFT) {
-            throw new Exception("Only draft entries can be updated.");
+            throw new Exception('Only draft entries can be updated.');
         }
 
         $validated = $this->validate($data);
@@ -96,7 +96,7 @@ class ManualJournalEntryService
      */
     public function getDraftEntries(array $filters = [])
     {
-        $query = JournalEntry::draft()->manual()->with('transactions.account');
+        $query = JournalEntry::draft()->manual()->with('transactions.account')->withReconciledStatus();
 
         if (isset($filters['start_date'])) {
             $query->whereDate('date', '>=', $filters['start_date']);
@@ -118,7 +118,7 @@ class ManualJournalEntryService
      */
     public function getPostedEntries(array $filters = [])
     {
-        $query = JournalEntry::posted()->manual()->with('transactions.account');
+        $query = JournalEntry::posted()->manual()->with('transactions.account')->withReconciledStatus();
 
         if (isset($filters['start_date'])) {
             $query->whereDate('date', '>=', $filters['start_date']);
@@ -145,7 +145,7 @@ class ManualJournalEntryService
             'approvedBy',
             'reversedEntry',
             'reversingEntry',
-        ])->find($journalEntry->id);
+        ])->withReconciledStatus()->find($journalEntry->id);
     }
 
     /**
@@ -229,7 +229,7 @@ class ManualJournalEntryService
             ->where('allow_manual_entry', true)
             ->where(function ($q) use ($query) {
                 $q->where('code', 'like', "%{$query}%")
-                  ->orWhere('name', 'like', "%{$query}%");
+                    ->orWhere('name', 'like', "%{$query}%");
             })
             ->orderBy('code')
             ->limit(10)

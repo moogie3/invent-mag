@@ -2,17 +2,19 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\BelongsToTenant;
+use App\Services\BankReconciliationService;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
-use App\Models\Concerns\BelongsToTenant;
 
 class JournalEntry extends Model
 {
-    use HasFactory, BelongsToTenant;
+    use BelongsToTenant, HasFactory;
 
     protected $fillable = [
         'date',
@@ -38,13 +40,19 @@ class JournalEntry extends Model
     ];
 
     public const STATUS_DRAFT = 'draft';
+
     public const STATUS_POSTED = 'posted';
+
     public const STATUS_VOID = 'void';
 
     public const ENTRY_TYPE_STANDARD = 'standard';
+
     public const ENTRY_TYPE_OPENING = 'opening';
+
     public const ENTRY_TYPE_REVERSAL = 'reversal';
+
     public const ENTRY_TYPE_ADJUSTING = 'adjusting';
+
     public const ENTRY_TYPE_CLOSING = 'closing';
 
     /**
@@ -80,6 +88,40 @@ class JournalEntry extends Model
     }
 
     /**
+     * Get the bank reconciliation items that match this entry.
+     */
+    public function bankReconciliationItems(): HasMany
+    {
+        return $this->hasMany(BankReconciliationItem::class);
+    }
+
+    /**
+     * Scope to eager-load whether each entry belongs to a completed reconciliation.
+     */
+    public function scopeWithReconciledStatus($query): Builder
+    {
+        return $query->withCount([
+            'bankReconciliationItems as reconciled_items_count' => function ($q) {
+                $q->whereHas('reconciliation', function ($r) {
+                    $r->where('status', BankReconciliation::STATUS_COMPLETED);
+                });
+            },
+        ]);
+    }
+
+    /**
+     * Check if this entry is part of a completed bank reconciliation.
+     */
+    public function isReconciled(): bool
+    {
+        if (array_key_exists('reconciled_items_count', $this->attributes)) {
+            return (int) $this->attributes['reconciled_items_count'] > 0;
+        }
+
+        return app(BankReconciliationService::class)->isJournalEntryReconciled($this);
+    }
+
+    /**
      * Get the user who approved this entry.
      */
     public function approvedBy(): BelongsTo
@@ -94,6 +136,7 @@ class JournalEntry extends Model
     {
         $debits = $this->transactions->where('type', 'debit')->sum('amount');
         $credits = $this->transactions->where('type', 'credit')->sum('amount');
+
         return round($debits, 2) === round($credits, 2);
     }
 

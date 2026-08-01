@@ -2,13 +2,15 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\BelongsToTenant;
+use Database\Factories\SalesOpportunityFactory;
+use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use App\Models\Concerns\BelongsToTenant;
 
 class SalesOpportunity extends Model
 {
-    use HasFactory, BelongsToTenant;
+    use BelongsToTenant, HasFactory;
 
     protected $fillable = [
         'customer_id',
@@ -66,7 +68,6 @@ class SalesOpportunity extends Model
     /**
      * Calculate the total amount from items before saving.
      *
-     * @param array $options
      * @return bool
      */
     public function save(array $options = [])
@@ -83,10 +84,10 @@ class SalesOpportunity extends Model
     /**
      * Create a new factory instance for the model.
      *
-     * @return \Illuminate\Database\Eloquent\Factories\Factory
+     * @return Factory
      */
     protected static function newFactory()
     {
-        return \Database\Factories\SalesOpportunityFactory::new();
+        return SalesOpportunityFactory::new();
     }
 }

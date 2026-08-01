@@ -11,13 +11,11 @@ class AgingReportService
 {
     /**
      * Generate Aged Receivables report.
-     *
-     * @return array
      */
     public function generateAgedReceivables(): array
     {
         $now = Carbon::now();
-        
+
         $unpaidSales = Sales::with('customer')
             ->whereIn('status', ['Unpaid', 'Partial'])
             ->whereNotNull('due_date')
@@ -25,6 +23,7 @@ class AgingReportService
             ->map(function ($sale) use ($now) {
                 $daysOverdue = $now->diffInDays($sale->due_date, false);
                 $sale->days_overdue = $daysOverdue < 0 ? round(abs($daysOverdue)) : 0;
+
                 return $sale;
             });
 
@@ -33,13 +32,11 @@ class AgingReportService
 
     /**
      * Generate Aged Payables report.
-     *
-     * @return array
      */
     public function generateAgedPayables(): array
     {
         $now = Carbon::now();
-        
+
         $unpaidPurchases = Purchase::with('supplier')
             ->whereIn('status', ['Unpaid', 'Partial'])
             ->whereNotNull('due_date')
@@ -47,6 +44,7 @@ class AgingReportService
             ->map(function ($purchase) use ($now) {
                 $daysOverdue = $now->diffInDays($purchase->due_date, false);
                 $purchase->days_overdue = $daysOverdue < 0 ? round(abs($daysOverdue)) : 0;
+
                 return $purchase;
             });
 
@@ -55,9 +53,6 @@ class AgingReportService
 
     /**
      * Categorize invoices into aging buckets.
-     *
-     * @param Collection $invoices
-     * @return array
      */
     protected function categorizeAging(Collection $invoices): array
     {
@@ -72,8 +67,6 @@ class AgingReportService
 
     /**
      * Get aging bucket labels.
-     *
-     * @return array
      */
     public function getAgingBucketLabels(): array
     {

@@ -3,17 +3,20 @@
 namespace Tests\Unit\Services;
 
 use App\Models\Account;
+use App\Models\Transaction;
+use App\Models\User;
 use App\Services\AccountService;
+use Database\Seeders\AccountSeeder;
+use Database\Seeders\RoleSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Collection;
+use Mockery;
 use Tests\TestCase;
 use Tests\Traits\CreatesTenant;
-use Database\Seeders\RoleSeeder;
-use Database\Seeders\AccountSeeder;
-use Mockery;
 
 class AccountServiceTest extends TestCase
 {
-    use RefreshDatabase, CreatesTenant;
+    use CreatesTenant, RefreshDatabase;
 
     protected AccountService $service;
 
@@ -23,10 +26,10 @@ class AccountServiceTest extends TestCase
         $this->setupTenant();
         $this->seed(RoleSeeder::class);
         $this->seed(AccountSeeder::class);
-        $this->service = new AccountService();
+        $this->service = new AccountService;
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         Mockery::close();
         parent::tearDown();
@@ -36,20 +39,20 @@ class AccountServiceTest extends TestCase
     {
         $result = $this->service->getAccountsWithChildren();
 
-        $this->assertInstanceOf(\Illuminate\Support\Collection::class, $result);
+        $this->assertInstanceOf(Collection::class, $result);
     }
 
     public function test_it_gets_all_accounts_ordered()
     {
         $result = $this->service->getAllAccountsOrdered();
 
-        $this->assertInstanceOf(\Illuminate\Support\Collection::class, $result);
+        $this->assertInstanceOf(Collection::class, $result);
     }
 
     public function test_it_gets_accounts_except_given_id()
     {
         $account = Account::first();
-        
+
         $result = $this->service->getAllAccountsExcept($account->id);
 
         $this->assertTrue($result->every(fn ($a) => $a->id !== $account->id));
@@ -59,20 +62,20 @@ class AccountServiceTest extends TestCase
     {
         $result = $this->service->getAccountsGroupedByType();
 
-        $this->assertInstanceOf(\Illuminate\Support\Collection::class, $result);
+        $this->assertInstanceOf(Collection::class, $result);
     }
 
     public function test_it_creates_an_account()
     {
-        $user = \App\Models\User::factory()->create();
+        $user = User::factory()->create();
         $user->assignRole('superuser');
         $this->actingAs($user);
 
         $tenantId = app('currentTenant')->id;
-        
+
         $data = [
             'name' => 'Test Account',
-            'code' => 'TEST-' . $tenantId . '-001',
+            'code' => 'TEST-'.$tenantId.'-001',
             'type' => 'asset',
             'tenant_id' => $tenantId,
         ];
@@ -85,7 +88,7 @@ class AccountServiceTest extends TestCase
 
     public function test_it_updates_an_account()
     {
-        $user = \App\Models\User::factory()->create();
+        $user = User::factory()->create();
         $user->assignRole('superuser');
         $this->actingAs($user);
 
@@ -105,8 +108,8 @@ class AccountServiceTest extends TestCase
     public function test_it_prevents_delete_of_account_with_transactions()
     {
         $account = Account::first();
-        
-        \App\Models\Transaction::factory()->create([
+
+        Transaction::factory()->create([
             'account_id' => $account->id,
         ]);
 
@@ -142,7 +145,7 @@ class AccountServiceTest extends TestCase
     public function test_it_calculates_account_level()
     {
         $parent = Account::factory()->create(['level' => 0]);
-        
+
         $reflection = new \ReflectionClass($this->service);
         $method = $reflection->getMethod('calculateAccountLevel');
         $method->setAccessible(true);
@@ -180,8 +183,8 @@ class AccountServiceTest extends TestCase
     public function test_it_returns_false_when_account_has_transactions()
     {
         $account = Account::first();
-        
-        \App\Models\Transaction::factory()->create([
+
+        Transaction::factory()->create([
             'account_id' => $account->id,
         ]);
 

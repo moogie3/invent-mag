@@ -4,42 +4,42 @@ namespace App\Services;
 
 use App\Models\Account;
 use App\Models\JournalEntry;
-use Carbon\Carbon;
 use Illuminate\Support\Collection;
 
 class AccountingReportService
 {
     /**
      * Generate trial balance report.
-     *
-     * @param string $endDate
-     * @return array
      */
     public function generateTrialBalance(string $endDate): array
     {
         $tenantId = app('currentTenant')->id ?? null;
 
         $accountsQuery = Account::orderBy('code');
-        
+
         if ($tenantId) {
             $accountsQuery->where('tenant_id', $tenantId);
         }
-        
+
         $accounts = $accountsQuery->withSum(['transactions as total_debits' => function ($query) use ($endDate, $tenantId) {
-                $query->where('type', 'debit')
-                      ->whereHas('journalEntry', function ($q) use ($endDate, $tenantId) {
-                          if ($tenantId) $q->where('tenant_id', $tenantId);
-                          $q->where('date', '<=', $endDate)
-                            ->where('status', JournalEntry::STATUS_POSTED);
-                      });
-            }], 'amount')
+            $query->where('type', 'debit')
+                ->whereHas('journalEntry', function ($q) use ($endDate, $tenantId) {
+                    if ($tenantId) {
+                        $q->where('tenant_id', $tenantId);
+                    }
+                    $q->where('date', '<=', $endDate)
+                        ->where('status', JournalEntry::STATUS_POSTED);
+                });
+        }], 'amount')
             ->withSum(['transactions as total_credits' => function ($query) use ($endDate, $tenantId) {
                 $query->where('type', 'credit')
-                      ->whereHas('journalEntry', function ($q) use ($endDate, $tenantId) {
-                          if ($tenantId) $q->where('tenant_id', $tenantId);
-                          $q->where('date', '<=', $endDate)
+                    ->whereHas('journalEntry', function ($q) use ($endDate, $tenantId) {
+                        if ($tenantId) {
+                            $q->where('tenant_id', $tenantId);
+                        }
+                        $q->where('date', '<=', $endDate)
                             ->where('status', JournalEntry::STATUS_POSTED);
-                      });
+                    });
             }], 'amount')
             ->get();
 
@@ -100,8 +100,6 @@ class AccountingReportService
 
     /**
      * Get accounts for chart of accounts.
-     *
-     * @return Collection
      */
     public function getChartOfAccounts(): Collection
     {
@@ -113,10 +111,6 @@ class AccountingReportService
 
     /**
      * Flatten account hierarchy for export.
-     *
-     * @param Collection $accounts
-     * @param int $level
-     * @return array
      */
     public function flattenAccountHierarchy(Collection $accounts, int $level = 0): array
     {
@@ -125,7 +119,7 @@ class AccountingReportService
         foreach ($accounts as $account) {
             $flatList[] = [
                 'code' => $account->code,
-                'name' => str_repeat('-', $level) . ' ' . $account->name,
+                'name' => str_repeat('-', $level).' '.$account->name,
                 'type' => $account->type,
                 'level' => $account->level,
             ];

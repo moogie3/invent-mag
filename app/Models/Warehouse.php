@@ -2,14 +2,17 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\BelongsToTenant;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use App\Models\Concerns\BelongsToTenant;
 
 class Warehouse extends Model
 {
-    use HasFactory, BelongsToTenant;
+    use BelongsToTenant, HasFactory;
+
     protected $table = 'warehouses';
+
     protected $fillable = [
         'name',
         'address',
@@ -25,8 +28,8 @@ class Warehouse extends Model
     /**
      * Scope a query to only include the main warehouse.
      *
-     * @param  \Illuminate\Database\Eloquent\Builder  $query
-     * @return \Illuminate\Database\Eloquent\Builder
+     * @param  Builder  $query
+     * @return Builder
      */
     public function scopeMain($query)
     {
@@ -36,7 +39,7 @@ class Warehouse extends Model
     /**
      * Check if there is already a main warehouse other than this one
      *
-     * @return boolean
+     * @return bool
      */
     public static function hasMainWarehouse($exceptId = null)
     {

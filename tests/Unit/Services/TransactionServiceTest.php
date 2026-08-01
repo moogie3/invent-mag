@@ -2,15 +2,17 @@
 
 namespace Tests\Unit\Services;
 
+use App\Models\Account;
+use App\Models\Product;
 use App\Models\Purchase;
 use App\Models\Sales;
-use App\Models\Account;
+use App\Models\SalesItem;
 use App\Services\TransactionService;
-use Tests\TestCase;
-use PHPUnit\Framework\Attributes\Test;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Tests\Traits\CreatesTenant;
 use Database\Seeders\AccountSeeder;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use PHPUnit\Framework\Attributes\Test;
+use Tests\TestCase;
+use Tests\Traits\CreatesTenant;
 
 class TransactionServiceTest extends TestCase
 {
@@ -22,19 +24,19 @@ class TransactionServiceTest extends TestCase
     {
         parent::setUp();
         $this->setupTenant();
-        
+
         // Seed accounts
         $this->seed(AccountSeeder::class);
-        
+
         // Configure tenant accounting settings (settings belong to the tenant, not the user)
         $tenantId = app('currentTenant')->id;
         $this->tenant->accounting_settings = [
-            'cash_account_id' => Account::where('code', '1110-' . $tenantId)->first()->id,
-            'accounts_receivable_account_id' => Account::where('code', '1130-' . $tenantId)->first()->id,
-            'sales_revenue_account_id' => Account::where('code', '4100-' . $tenantId)->first()->id,
-            'cost_of_goods_sold_account_id' => Account::where('code', '5200-' . $tenantId)->first()->id,
-            'inventory_account_id' => Account::where('code', '1140-' . $tenantId)->first()->id,
-            'accounts_payable_account_id' => Account::where('code', '2110-' . $tenantId)->first()->id,
+            'cash_account_id' => Account::where('code', '1110-'.$tenantId)->first()->id,
+            'accounts_receivable_account_id' => Account::where('code', '1130-'.$tenantId)->first()->id,
+            'sales_revenue_account_id' => Account::where('code', '4100-'.$tenantId)->first()->id,
+            'cost_of_goods_sold_account_id' => Account::where('code', '5200-'.$tenantId)->first()->id,
+            'inventory_account_id' => Account::where('code', '1140-'.$tenantId)->first()->id,
+            'accounts_payable_account_id' => Account::where('code', '2110-'.$tenantId)->first()->id,
         ];
         $this->tenant->save();
 
@@ -129,15 +131,15 @@ class TransactionServiceTest extends TestCase
     #[Test]
     public function it_can_bulk_mark_transactions_as_paid()
     {
-        $product = \App\Models\Product::factory()->create();
+        $product = Product::factory()->create();
         $sale = Sales::factory()->create(['status' => 'Unpaid', 'amount_received' => 0, 'total' => 100]);
-        \App\Models\SalesItem::factory()->create(['sales_id' => $sale->id, 'product_id' => $product->id, 'quantity' => 1, 'total' => 100]);
-        
+        SalesItem::factory()->create(['sales_id' => $sale->id, 'product_id' => $product->id, 'quantity' => 1, 'total' => 100]);
+
         $purchase = Purchase::factory()->create(['status' => 'Unpaid', 'total' => 0]);
 
         $this->transactionService->bulkMarkAsPaid([
             ['id' => $sale->id, 'type' => 'sale'],
-            ['id' => $purchase->id, 'type' => 'purchase']
+            ['id' => $purchase->id, 'type' => 'purchase'],
         ]);
 
         $this->assertEquals('Paid', $sale->fresh()->status);
@@ -165,7 +167,7 @@ class TransactionServiceTest extends TestCase
         Purchase::factory()->create();
 
         $filters = ['date_range' => null, 'start_date' => null, 'end_date' => null, 'status' => null, 'type' => null, 'search' => null];
-        $transactions = $this->transactionService->getTransactionsForExport($filters, ['sale_' . $sale1->id, 'purchase_' . $purchase1->id]);
+        $transactions = $this->transactionService->getTransactionsForExport($filters, ['sale_'.$sale1->id, 'purchase_'.$purchase1->id]);
 
         $this->assertCount(2, $transactions);
     }

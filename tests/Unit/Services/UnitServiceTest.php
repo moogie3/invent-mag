@@ -4,14 +4,14 @@ namespace Tests\Unit\Services;
 
 use App\Models\Unit;
 use App\Services\UnitService;
-use Tests\TestCase;
-use PHPUnit\Framework\Attributes\Test;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use PHPUnit\Framework\Attributes\Test;
+use Tests\TestCase;
 use Tests\Traits\CreatesTenant;
 
 class UnitServiceTest extends TestCase
 {
-    use RefreshDatabase, CreatesTenant;
+    use CreatesTenant, RefreshDatabase;
 
     protected UnitService $unitService;
 
@@ -20,7 +20,7 @@ class UnitServiceTest extends TestCase
         parent::setUp();
         $this->setupTenant(); // Creates $this->tenant and $this->user, and calls actingAs
         $this->user->assignRole('superuser'); // Ensure the user has permissions for services
-        $this->unitService = new UnitService();
+        $this->unitService = new UnitService;
     }
 
     #[Test]

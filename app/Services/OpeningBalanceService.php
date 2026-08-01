@@ -3,9 +3,8 @@
 namespace App\Services;
 
 use App\Models\Account;
-use App\Models\OpeningBalance;
 use App\Models\JournalEntry;
-use App\Models\Transaction;
+use App\Models\OpeningBalance;
 use Carbon\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
@@ -22,14 +21,12 @@ class OpeningBalanceService
 
     /**
      * Get all balance sheet accounts for opening balance setup.
-     *
-     * @return Collection
      */
     public function getAccountsForSetup(): Collection
     {
         $openingBalanceEquityAccount = $this->getOpeningBalanceEquityAccount();
         $excludeIds = $openingBalanceEquityAccount ? [$openingBalanceEquityAccount->id] : [];
-        
+
         return Account::whereIn('type', ['asset', 'liability', 'equity'])
             ->where('level', '>=', 1)
             ->where('is_active', true)
@@ -41,9 +38,6 @@ class OpeningBalanceService
 
     /**
      * Get existing opening balances for an account.
-     *
-     * @param int $accountId
-     * @return OpeningBalance|null
      */
     public function getOpeningBalanceForAccount(int $accountId): ?OpeningBalance
     {
@@ -54,8 +48,6 @@ class OpeningBalanceService
 
     /**
      * Get all existing opening balances.
-     *
-     * @return Collection
      */
     public function getAllOpeningBalances(): Collection
     {
@@ -66,8 +58,6 @@ class OpeningBalanceService
 
     /**
      * Get the opening balance equity account.
-     *
-     * @return Account|null
      */
     public function getOpeningBalanceEquityAccount(): ?Account
     {
@@ -79,7 +69,6 @@ class OpeningBalanceService
     /**
      * Validate opening balances before saving.
      *
-     * @param array $balances
      * @return array ['valid' => bool, 'totalDebit' => float, 'totalCredit' => float, 'errors' => array]
      */
     public function validateBalances(array $balances): array
@@ -99,6 +88,7 @@ class OpeningBalanceService
 
             if ($amount < 0) {
                 $errors[] = "Account ID $accountId: Amount cannot be negative.";
+
                 continue;
             }
 
@@ -111,8 +101,8 @@ class OpeningBalanceService
 
         $isValid = count($errors) === 0 && abs($totalDebit - $totalCredit) < 0.01;
 
-        if (!$isValid && count($errors) === 0) {
-            $errors[] = "Total Debit (" . number_format($totalDebit, 2) . ") must equal Total Credit (" . number_format($totalCredit, 2) . ")";
+        if (! $isValid && count($errors) === 0) {
+            $errors[] = 'Total Debit ('.number_format($totalDebit, 2).') must equal Total Credit ('.number_format($totalCredit, 2).')';
         }
 
         return [
@@ -127,16 +117,13 @@ class OpeningBalanceService
     /**
      * Save opening balances and create journal entries.
      *
-     * @param array $balances
-     * @param string $balanceDate
-     * @param string|null $notes
      * @return array ['success' => bool, 'message' => string, 'journalEntry' => JournalEntry|null]
      */
     public function saveOpeningBalances(array $balances, string $balanceDate, ?string $notes = null): array
     {
         $validation = $this->validateBalances($balances);
 
-        if (!$validation['valid']) {
+        if (! $validation['valid']) {
             return [
                 'success' => false,
                 'message' => implode(' ', $validation['errors']),
@@ -154,7 +141,7 @@ class OpeningBalanceService
 
         $openingBalanceEquity = $this->getOpeningBalanceEquityAccount();
 
-        if (!$openingBalanceEquity) {
+        if (! $openingBalanceEquity) {
             return [
                 'success' => false,
                 'message' => 'Opening Balance Equity account not found. Please reset your Chart of Accounts.',
@@ -190,7 +177,7 @@ class OpeningBalanceService
                     }
 
                     $account = Account::find($accountId);
-                    if (!$account) {
+                    if (! $account) {
                         continue;
                     }
 
@@ -234,7 +221,7 @@ class OpeningBalanceService
                 }
 
                 // Create the journal entry
-                if (!empty($transactions)) {
+                if (! empty($transactions)) {
                     $this->accountingService->createOpeningBalanceEntry(
                         $balanceDateCarbon,
                         $transactions
@@ -250,7 +237,7 @@ class OpeningBalanceService
         } catch (\Exception $e) {
             return [
                 'success' => false,
-                'message' => 'Error saving opening balances: ' . $e->getMessage(),
+                'message' => 'Error saving opening balances: '.$e->getMessage(),
                 'journalEntry' => null,
             ];
         }
@@ -258,9 +245,6 @@ class OpeningBalanceService
 
     /**
      * Delete opening balances for a specific date.
-     *
-     * @param string $balanceDate
-     * @return array
      */
     public function deleteOpeningBalances(string $balanceDate): array
     {
@@ -288,16 +272,13 @@ class OpeningBalanceService
         } catch (\Exception $e) {
             return [
                 'success' => false,
-                'message' => 'Error deleting opening balances: ' . $e->getMessage(),
+                'message' => 'Error deleting opening balances: '.$e->getMessage(),
             ];
         }
     }
 
     /**
      * Get summary of opening balances.
-     *
-     * @param string|null $balanceDate
-     * @return array
      */
     public function getSummary(?string $balanceDate = null): array
     {

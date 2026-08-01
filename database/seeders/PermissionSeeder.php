@@ -17,25 +17,25 @@ class PermissionSeeder extends Seeder
             'create-products',
             'edit-products',
             'delete-products',
-            
+
             // Purchase Orders
             'view-purchase-orders',
             'create-purchase-orders',
             'edit-purchase-orders',
             'delete-purchase-orders',
-            
+
             // Sales
             'view-sales',
             'create-sales',
             'edit-sales',
             'delete-sales',
-            
+
             // Warehouses
             'view-warehouses',
             'create-warehouses',
             'edit-warehouses',
             'delete-warehouses',
-            
+
             // Reports
             'view-reports',
             'view-financial-reports',
@@ -44,7 +44,6 @@ class PermissionSeeder extends Seeder
             'view-stock-opname',
             'manage-stock-opname',
 
-            
             // Accounting
             'view-accounting',
             'view-chart-of-accounts',
@@ -54,20 +53,20 @@ class PermissionSeeder extends Seeder
             'view-general-ledger',
             'view-trial-balance',
             'manage-opening-balance',
-            
+
             // POS
             'access-pos',
             'view-pos',
             'create-pos',
             'edit-pos',
             'delete-pos-transactions',
-            
+
             // Suppliers
             'view-supplier',
             'create-supplier',
             'edit-supplier',
             'delete-supplier',
-            
+
             // Customers
             'view-customer',
             'create-customer',
@@ -138,7 +137,7 @@ class PermissionSeeder extends Seeder
 
             // Audit Log (superuser only - no plan restriction)
             'view-audit-log',
-            
+
             // HR
             'view-hr',
             'manage-employees',
@@ -163,27 +162,27 @@ class PermissionSeeder extends Seeder
             'manage-efaktur-settings',
         ];
 
-        $this->command->info("Creating " . count($permissions) . " permissions...");
-        
+        $this->command->info('Creating '.count($permissions).' permissions...');
+
         // Create all permissions
         foreach ($permissions as $permission) {
             Permission::firstOrCreate(['name' => $permission]);
         }
 
-        $this->command->info("Permissions created successfully!");
-        $this->command->info("Assigning permissions to roles...");
-        
+        $this->command->info('Permissions created successfully!');
+        $this->command->info('Assigning permissions to roles...');
+
         // Assign permissions to roles
         $this->assignToSuperuser();
-        $this->command->info("  - Superuser: All permissions assigned");
-        
+        $this->command->info('  - Superuser: All permissions assigned');
+
         $this->assignToPos();
-        $this->command->info("  - POS: Limited permissions assigned");
-        
+        $this->command->info('  - POS: Limited permissions assigned');
+
         $this->assignToStaff();
-        $this->command->info("  - Staff: Standard permissions assigned");
-        
-        $this->command->info("Permission seeding completed!");
+        $this->command->info('  - Staff: Standard permissions assigned');
+
+        $this->command->info('Permission seeding completed!');
     }
 
     private function assignToSuperuser()
@@ -205,6 +204,7 @@ class PermissionSeeder extends Seeder
         ];
         $role->syncPermissions($permissions);
     }
+
     private function assignToStaff()
     {
         $role = Role::findOrCreate('staff');
@@ -246,4 +246,3 @@ class PermissionSeeder extends Seeder
         $role->syncPermissions($permissions);
     }
 }
-

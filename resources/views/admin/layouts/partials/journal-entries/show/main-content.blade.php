@@ -9,6 +9,11 @@
             @else
                 <span class="badge bg-danger text-white">{{ __('messages.void') }}</span>
             @endif
+            @if($entry->isReconciled())
+                <span class="badge bg-teal text-white ms-1" title="{{ __('messages.reconciled_hint') }}">
+                    <i class="ti ti-circle-check"></i> {{ __('messages.reconciled') }}
+                </span>
+            @endif
         </div>
     </div>
     <div class="card-body">

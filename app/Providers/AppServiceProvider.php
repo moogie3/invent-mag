@@ -2,20 +2,53 @@
 
 namespace App\Providers;
 
-use App\Helpers\CurrencyHelper;
+use App\Models\Account;
+use App\Models\ActivityLog;
+use App\Models\AttendancePeriod;
+use App\Models\AttendanceRecord;
+use App\Models\Categories;
+use App\Models\CurrencySetting;
+use App\Models\Customer;
+use App\Models\CustomerCredit;
+use App\Models\CustomerInteraction;
+use App\Models\Employee;
+use App\Models\JournalEntry;
+use App\Models\OpeningBalance;
+use App\Models\Payment;
+use App\Models\PayrollRun;
+use App\Models\PipelineStage;
+use App\Models\Product;
+use App\Models\Purchase;
+use App\Models\PurchaseReturn;
+use App\Models\Sales;
+use App\Models\SalesOpportunity;
+use App\Models\SalesPipeline;
+use App\Models\SalesReturn;
+use App\Models\StockAdjustment;
+use App\Models\StockOpname;
+use App\Models\Supplier;
+use App\Models\SupplierInteraction;
+use App\Models\Tax;
+use App\Models\Tenant;
+use App\Models\Unit;
+use App\Models\User;
+use App\Models\Warehouse;
+use App\Observers\ActivityObserver;
+use App\Observers\CustomerCreditObserver;
 use App\Services\ActivityLogService;
 use App\Services\NotificationService;
 use App\Services\SystemNotificationService;
-use App\Observers\ActivityObserver;
-use App\Observers\CustomerCreditObserver;
-use Illuminate\Support\ServiceProvider;
+use Illuminate\Auth\Notifications\ResetPassword;
+use Illuminate\Auth\Notifications\VerifyEmail;
+use Illuminate\Cache\RateLimiting\Limit;
+use Illuminate\Http\Request;
+use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\View;
-use App\Models\Purchase;
-use Illuminate\Auth\Notifications\VerifyEmail;
+use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Facades\URL;
-use Spatie\Multitenancy\Multitenancy;
+use Illuminate\Support\Facades\View;
+use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -33,11 +66,11 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         // Register CustomerCredit observer
-        \App\Models\CustomerCredit::observe(CustomerCreditObserver::class);
+        CustomerCredit::observe(CustomerCreditObserver::class);
 
         VerifyEmail::createUrlUsing(function ($notifiable) {
             $tenantDomain = $notifiable->tenant->domain;
-            
+
             // Temporarily force the root URL to the tenant subdomain for signing
             URL::forceRootUrl("https://{$tenantDomain}");
 
@@ -57,22 +90,22 @@ class AppServiceProvider extends ServiceProvider
         });
 
         // Custom Reset Password URL using tenant subdomain
-        \Illuminate\Auth\Notifications\ResetPassword::createUrlUsing(function ($user, string $token) {
+        ResetPassword::createUrlUsing(function ($user, string $token) {
             return "https://{$user->tenant->domain}/admin/reset-password/{$token}?email={$user->email}";
         });
 
         // // NOTE: Pass the user object to the custom email notification view
         // This fixes the "your email address" bug in the template
         VerifyEmail::toMailUsing(function ($notifiable, $url) {
-            return (new \Illuminate\Notifications\Messages\MailMessage)
+            return (new MailMessage)
                 ->subject(__('Verify Email Address'))
                 ->view('vendor.notifications.email', [
                     'notifiable' => $notifiable,
-                    'actionUrl'  => $url,
+                    'actionUrl' => $url,
                     'actionText' => __('Verify Email Address'),
-                    'level'      => 'info',
+                    'level' => 'info',
                     'introLines' => [__('Please click the button below to verify your email address.')],
-                    'outroLines' => [__('If you did not create an account, no further action is required.')]
+                    'outroLines' => [__('If you did not create an account, no further action is required.')],
                 ]);
         });
 
@@ -88,7 +121,8 @@ class AppServiceProvider extends ServiceProvider
         Blade::if('planHas', function (string $feature) {
             try {
                 $tenant = app('currentTenant');
-                return $tenant instanceof \App\Models\Tenant ? $tenant->hasFeature($feature) : true;
+
+                return $tenant instanceof Tenant ? $tenant->hasFeature($feature) : true;
             } catch (\Exception $e) {
                 return true; // No tenant context, allow content
             }
@@ -107,10 +141,11 @@ class AppServiceProvider extends ServiceProvider
                 $query->where('tenant_id', $tenantId);
             } elseif ($requireTenant) {
                 throw new \RuntimeException(
-                    'DB::tenantTable() called without a tenant context. ' .
+                    'DB::tenantTable() called without a tenant context. '.
                     'Pass $tenantId explicitly or set $requireTenant = false if this is intentional.'
                 );
             }
+
             return $query;
         });
 
@@ -121,7 +156,8 @@ class AppServiceProvider extends ServiceProvider
         Blade::if('onTrial', function () {
             try {
                 $tenant = app('currentTenant');
-                return $tenant instanceof \App\Models\Tenant && $tenant->onTrial();
+
+                return $tenant instanceof Tenant && $tenant->onTrial();
             } catch (\Exception $e) {
                 return false;
             }
@@ -136,11 +172,11 @@ class AppServiceProvider extends ServiceProvider
                     $fluidLayout = auth()->user()->system_settings['fluid_layout'] ?? false;
                     $view->with('containerClass', $fluidLayout ? 'container-fluid' : 'container-xl');
                 } else {
-                     // Default for guests (e.g., login page) - usually narrow, but let's stick to standard
+                    // Default for guests (e.g., login page) - usually narrow, but let's stick to standard
                     $view->with('containerClass', 'container-xl');
                 }
             });
-            
+
             View::composer(['admin.layouts.*', 'admin.*'], function ($view) {
                 if (app()->has('currentTenant')) { // Check if a tenant is active
                     $notificationService = app(NotificationService::class);
@@ -191,13 +227,13 @@ class AppServiceProvider extends ServiceProvider
             URL::forceScheme('https');
         }
 
-        \Illuminate\Support\Facades\RateLimiter::for('api', function (\Illuminate\Http\Request $request) {
-            return \Illuminate\Cache\RateLimiting\Limit::perMinute(60)
+        RateLimiter::for('api', function (Request $request) {
+            return Limit::perMinute(60)
                 ->by($request->user()?->id ?: $request->ip())
-                ->response(function (\Illuminate\Http\Request $request, array $headers) {
+                ->response(function (Request $request, array $headers) {
                     return response()->json([
                         'message' => 'Too many requests. Please try again later.',
-                        'retry_after' => $headers['Retry-After'] ?? 60
+                        'retry_after' => $headers['Retry-After'] ?? 60,
                     ], 429);
                 });
         });
@@ -214,34 +250,34 @@ class AppServiceProvider extends ServiceProvider
         // handles null users gracefully.
 
         $map = [
-            \App\Models\Product::class            => \App\Models\ActivityLog::MODULE_PRODUCT,
-            \App\Models\Sales::class              => \App\Models\ActivityLog::MODULE_SALES,
-            \App\Models\Purchase::class           => \App\Models\ActivityLog::MODULE_PURCHASE_ORDER,
-            \App\Models\SalesReturn::class        => \App\Models\ActivityLog::MODULE_SALES_RETURN,
-            \App\Models\PurchaseReturn::class     => \App\Models\ActivityLog::MODULE_PURCHASE_RETURN,
-            \App\Models\Customer::class           => \App\Models\ActivityLog::MODULE_CUSTOMER,
-            \App\Models\Supplier::class           => \App\Models\ActivityLog::MODULE_SUPPLIER,
-            \App\Models\Warehouse::class          => \App\Models\ActivityLog::MODULE_WAREHOUSE,
-            \App\Models\Categories::class         => \App\Models\ActivityLog::MODULE_CATEGORY,
-            \App\Models\Unit::class               => \App\Models\ActivityLog::MODULE_UNIT,
-            \App\Models\Tax::class                => \App\Models\ActivityLog::MODULE_TAX,
-            \App\Models\CurrencySetting::class    => \App\Models\ActivityLog::MODULE_CURRENCY,
-            \App\Models\User::class               => \App\Models\ActivityLog::MODULE_USER,
-            \App\Models\JournalEntry::class       => \App\Models\ActivityLog::MODULE_JOURNAL_ENTRY,
-            \App\Models\StockAdjustment::class    => \App\Models\ActivityLog::MODULE_STOCK_ADJUSTMENT,
-            \App\Models\StockOpname::class        => \App\Models\ActivityLog::MODULE_STOCK_OPNAME,
-            \App\Models\Payment::class            => \App\Models\ActivityLog::MODULE_PAYMENT,
-            \App\Models\Account::class            => \App\Models\ActivityLog::MODULE_ACCOUNTING,
-            \App\Models\OpeningBalance::class     => \App\Models\ActivityLog::MODULE_ACCOUNTING,
-            \App\Models\Employee::class           => \App\Models\ActivityLog::MODULE_EMPLOYEE,
-            \App\Models\AttendanceRecord::class   => \App\Models\ActivityLog::MODULE_ATTENDANCE,
-            \App\Models\AttendancePeriod::class   => \App\Models\ActivityLog::MODULE_ATTENDANCE,
-            \App\Models\PayrollRun::class         => \App\Models\ActivityLog::MODULE_PAYROLL,
-            \App\Models\SalesOpportunity::class   => \App\Models\ActivityLog::MODULE_SALES_PIPELINE,
-            \App\Models\SalesPipeline::class      => \App\Models\ActivityLog::MODULE_SALES_PIPELINE,
-            \App\Models\PipelineStage::class      => \App\Models\ActivityLog::MODULE_SALES_PIPELINE,
-            \App\Models\CustomerInteraction::class => \App\Models\ActivityLog::MODULE_CRM,
-            \App\Models\SupplierInteraction::class => \App\Models\ActivityLog::MODULE_SRM,
+            Product::class => ActivityLog::MODULE_PRODUCT,
+            Sales::class => ActivityLog::MODULE_SALES,
+            Purchase::class => ActivityLog::MODULE_PURCHASE_ORDER,
+            SalesReturn::class => ActivityLog::MODULE_SALES_RETURN,
+            PurchaseReturn::class => ActivityLog::MODULE_PURCHASE_RETURN,
+            Customer::class => ActivityLog::MODULE_CUSTOMER,
+            Supplier::class => ActivityLog::MODULE_SUPPLIER,
+            Warehouse::class => ActivityLog::MODULE_WAREHOUSE,
+            Categories::class => ActivityLog::MODULE_CATEGORY,
+            Unit::class => ActivityLog::MODULE_UNIT,
+            Tax::class => ActivityLog::MODULE_TAX,
+            CurrencySetting::class => ActivityLog::MODULE_CURRENCY,
+            User::class => ActivityLog::MODULE_USER,
+            JournalEntry::class => ActivityLog::MODULE_JOURNAL_ENTRY,
+            StockAdjustment::class => ActivityLog::MODULE_STOCK_ADJUSTMENT,
+            StockOpname::class => ActivityLog::MODULE_STOCK_OPNAME,
+            Payment::class => ActivityLog::MODULE_PAYMENT,
+            Account::class => ActivityLog::MODULE_ACCOUNTING,
+            OpeningBalance::class => ActivityLog::MODULE_ACCOUNTING,
+            Employee::class => ActivityLog::MODULE_EMPLOYEE,
+            AttendanceRecord::class => ActivityLog::MODULE_ATTENDANCE,
+            AttendancePeriod::class => ActivityLog::MODULE_ATTENDANCE,
+            PayrollRun::class => ActivityLog::MODULE_PAYROLL,
+            SalesOpportunity::class => ActivityLog::MODULE_SALES_PIPELINE,
+            SalesPipeline::class => ActivityLog::MODULE_SALES_PIPELINE,
+            PipelineStage::class => ActivityLog::MODULE_SALES_PIPELINE,
+            CustomerInteraction::class => ActivityLog::MODULE_CRM,
+            SupplierInteraction::class => ActivityLog::MODULE_SRM,
         ];
 
         $logService = $this->app->make(ActivityLogService::class);

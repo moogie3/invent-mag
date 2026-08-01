@@ -4,7 +4,6 @@ namespace App\Services;
 
 use App\Models\Account;
 use App\Models\JournalEntry;
-use Carbon\Carbon;
 use Illuminate\Support\Collection;
 
 class CashFlowService
@@ -18,25 +17,25 @@ class CashFlowService
         $tenantId = app('currentTenant')->id ?? null;
 
         $incomeData = $this->financialReportingService->generateIncomeStatement($startDate, $endDate);
-        $netIncome  = $incomeData['net_income'];
+        $netIncome = $incomeData['net_income'];
 
         $startAccounts = $this->getAccountsWithBalancesAt($startDate, $tenantId);
-        $endAccounts   = $this->getAccountsWithBalancesAt($endDate, $tenantId);
+        $endAccounts = $this->getAccountsWithBalancesAt($endDate, $tenantId);
 
         $startMap = $startAccounts->keyBy('id');
-        $endMap   = $endAccounts->keyBy('id');
+        $endMap = $endAccounts->keyBy('id');
 
         $nonCashItems = $this->collectNonCashItems($endAccounts, $startDate, $endDate, $tenantId);
         $workingCapitalChanges = $this->collectWorkingCapitalChanges($endAccounts, $startMap, $endMap);
         $investingActivities = $this->collectInvestingActivities($endAccounts, $startMap, $endMap);
         $financingActivities = $this->collectFinancingActivities($endAccounts, $startMap, $endMap);
 
-        $nonCashTotal        = array_sum(array_column($nonCashItems, 'amount'));
+        $nonCashTotal = array_sum(array_column($nonCashItems, 'amount'));
         $workingCapitalTotal = array_sum(array_column($workingCapitalChanges, 'amount'));
-        $operatingCashFlow   = $netIncome + $nonCashTotal + $workingCapitalTotal;
+        $operatingCashFlow = $netIncome + $nonCashTotal + $workingCapitalTotal;
 
-        $investingCashFlow  = array_sum(array_column($investingActivities, 'amount'));
-        $financingCashFlow  = array_sum(array_column($financingActivities, 'amount'));
+        $investingCashFlow = array_sum(array_column($investingActivities, 'amount'));
+        $financingCashFlow = array_sum(array_column($financingActivities, 'amount'));
 
         $netChangeInCash = $operatingCashFlow + $investingCashFlow + $financingCashFlow;
 
@@ -44,21 +43,21 @@ class CashFlowService
         $closingCashBalance = $this->getCashBalance($endMap);
 
         return [
-            'net_income'              => $netIncome,
-            'non_cash_items'          => $nonCashItems,
-            'non_cash_total'          => $nonCashTotal,
+            'net_income' => $netIncome,
+            'non_cash_items' => $nonCashItems,
+            'non_cash_total' => $nonCashTotal,
             'working_capital_changes' => $workingCapitalChanges,
-            'working_capital_total'   => $workingCapitalTotal,
-            'operating_cash_flow'     => $operatingCashFlow,
-            'investing_activities'    => $investingActivities,
-            'investing_cash_flow'     => $investingCashFlow,
-            'financing_activities'    => $financingActivities,
-            'financing_cash_flow'     => $financingCashFlow,
-            'net_change_in_cash'      => $netChangeInCash,
-            'opening_cash_balance'    => $openingCashBalance,
-            'closing_cash_balance'    => $closingCashBalance,
-            'start_date'              => $startDate,
-            'end_date'                => $endDate,
+            'working_capital_total' => $workingCapitalTotal,
+            'operating_cash_flow' => $operatingCashFlow,
+            'investing_activities' => $investingActivities,
+            'investing_cash_flow' => $investingCashFlow,
+            'financing_activities' => $financingActivities,
+            'financing_cash_flow' => $financingCashFlow,
+            'net_change_in_cash' => $netChangeInCash,
+            'opening_cash_balance' => $openingCashBalance,
+            'closing_cash_balance' => $closingCashBalance,
+            'start_date' => $startDate,
+            'end_date' => $endDate,
         ];
     }
 
@@ -72,26 +71,30 @@ class CashFlowService
         return $query
             ->withSum(['transactions as total_debits' => function ($q) use ($date, $tenantId) {
                 $q->where('type', 'debit')
-                  ->whereHas('journalEntry', function ($jq) use ($date, $tenantId) {
-                      if ($tenantId) $jq->where('tenant_id', $tenantId);
-                      $jq->where('date', '<=', $date)
-                         ->where('status', JournalEntry::STATUS_POSTED);
-                  });
+                    ->whereHas('journalEntry', function ($jq) use ($date, $tenantId) {
+                        if ($tenantId) {
+                            $jq->where('tenant_id', $tenantId);
+                        }
+                        $jq->where('date', '<=', $date)
+                            ->where('status', JournalEntry::STATUS_POSTED);
+                    });
             }], 'amount')
             ->withSum(['transactions as total_credits' => function ($q) use ($date, $tenantId) {
                 $q->where('type', 'credit')
-                  ->whereHas('journalEntry', function ($jq) use ($date, $tenantId) {
-                      if ($tenantId) $jq->where('tenant_id', $tenantId);
-                      $jq->where('date', '<=', $date)
-                         ->where('status', JournalEntry::STATUS_POSTED);
-                  });
+                    ->whereHas('journalEntry', function ($jq) use ($date, $tenantId) {
+                        if ($tenantId) {
+                            $jq->where('tenant_id', $tenantId);
+                        }
+                        $jq->where('date', '<=', $date)
+                            ->where('status', JournalEntry::STATUS_POSTED);
+                    });
             }], 'amount')
             ->get();
     }
 
     protected function accountBalance(Account $account): float
     {
-        $debits  = (float) ($account->total_debits  ?? 0);
+        $debits = (float) ($account->total_debits ?? 0);
         $credits = (float) ($account->total_credits ?? 0);
 
         if (in_array($account->type, ['asset', 'expense'])) {
@@ -117,6 +120,7 @@ class CashFlowService
                 return true;
             }
         }
+
         return false;
     }
 
@@ -134,19 +138,23 @@ class CashFlowService
         $deprAccounts = $query
             ->withSum(['transactions as period_debits' => function ($q) use ($startDate, $endDate, $tenantId) {
                 $q->where('type', 'debit')
-                  ->whereHas('journalEntry', function ($jq) use ($startDate, $endDate, $tenantId) {
-                      if ($tenantId) $jq->where('tenant_id', $tenantId);
-                      $jq->whereBetween('date', [$startDate, $endDate])
-                         ->where('status', JournalEntry::STATUS_POSTED);
-                  });
+                    ->whereHas('journalEntry', function ($jq) use ($startDate, $endDate, $tenantId) {
+                        if ($tenantId) {
+                            $jq->where('tenant_id', $tenantId);
+                        }
+                        $jq->whereBetween('date', [$startDate, $endDate])
+                            ->where('status', JournalEntry::STATUS_POSTED);
+                    });
             }], 'amount')
             ->withSum(['transactions as period_credits' => function ($q) use ($startDate, $endDate, $tenantId) {
                 $q->where('type', 'credit')
-                  ->whereHas('journalEntry', function ($jq) use ($startDate, $endDate, $tenantId) {
-                      if ($tenantId) $jq->where('tenant_id', $tenantId);
-                      $jq->whereBetween('date', [$startDate, $endDate])
-                         ->where('status', JournalEntry::STATUS_POSTED);
-                  });
+                    ->whereHas('journalEntry', function ($jq) use ($startDate, $endDate, $tenantId) {
+                        if ($tenantId) {
+                            $jq->where('tenant_id', $tenantId);
+                        }
+                        $jq->whereBetween('date', [$startDate, $endDate])
+                            ->where('status', JournalEntry::STATUS_POSTED);
+                    });
             }], 'amount')
             ->get();
 
@@ -155,15 +163,15 @@ class CashFlowService
             if (! $this->inRanges($account->code, [[6200, 6299]])) {
                 continue;
             }
-            $activity = (float)($account->period_debits ?? 0) - (float)($account->period_credits ?? 0);
+            $activity = (float) ($account->period_debits ?? 0) - (float) ($account->period_credits ?? 0);
             if (abs($activity) < 0.001) {
                 continue;
             }
             $items[] = [
-                'account_id'   => $account->id,
+                'account_id' => $account->id,
                 'account_name' => __($account->name),
                 'account_code' => $account->code,
-                'amount'       => $activity, 
+                'amount' => $activity,
             ];
         }
 
@@ -180,18 +188,18 @@ class CashFlowService
         foreach ($endAccounts as $account) {
             $code = $account->code ?? '';
 
-            $isCash             = $this->inRanges($code, [[1110, 1110], [1120, 1120]]);
-            $isCurrentAsset     = $this->inRanges($code, [[1100, 1199]]) && !$isCash;
+            $isCash = $this->inRanges($code, [[1110, 1110], [1120, 1120]]);
+            $isCurrentAsset = $this->inRanges($code, [[1100, 1199]]) && ! $isCash;
             $isCurrentLiability = $this->inRanges($code, [[2100, 2199]]);
 
             if (! $isCurrentAsset && ! $isCurrentLiability) {
                 continue;
             }
 
-            $endBalance   = $this->accountBalance($account);
+            $endBalance = $this->accountBalance($account);
             $startAccount = $startMap->get($account->id);
             $startBalance = $startAccount ? $this->accountBalance($startAccount) : 0.0;
-            $delta        = $endBalance - $startBalance;
+            $delta = $endBalance - $startBalance;
 
             if (abs($delta) < 0.001) {
                 continue;
@@ -200,12 +208,12 @@ class CashFlowService
             $cfImpact = $isCurrentAsset ? -$delta : $delta;
 
             $items[] = [
-                'account_id'   => $account->id,
+                'account_id' => $account->id,
                 'account_name' => __($account->name),
                 'account_code' => $code,
-                'delta'        => $delta,
-                'amount'       => $cfImpact,
-                'type'         => $isCurrentAsset ? 'asset' : 'liability',
+                'delta' => $delta,
+                'amount' => $cfImpact,
+                'type' => $isCurrentAsset ? 'asset' : 'liability',
             ];
         }
 
@@ -230,10 +238,10 @@ class CashFlowService
                 continue;
             }
 
-            $endBalance   = $this->accountBalance($account);
+            $endBalance = $this->accountBalance($account);
             $startAccount = $startMap->get($account->id);
             $startBalance = $startAccount ? $this->accountBalance($startAccount) : 0.0;
-            $delta        = $endBalance - $startBalance;
+            $delta = $endBalance - $startBalance;
 
             if (abs($delta) < 0.001) {
                 continue;
@@ -242,11 +250,11 @@ class CashFlowService
             $cfImpact = -$delta;
 
             $items[] = [
-                'account_id'   => $account->id,
+                'account_id' => $account->id,
                 'account_name' => __($account->name),
                 'account_code' => $account->code,
-                'delta'        => $delta,
-                'amount'       => $cfImpact,
+                'delta' => $delta,
+                'amount' => $cfImpact,
             ];
         }
 
@@ -264,8 +272,8 @@ class CashFlowService
             $code = $account->code ?? '';
 
             $isLongTermLiability = $this->inRanges($code, [[2200, 2299]]);
-            $isEquity            = $this->inRanges($code, [[3000, 3999]]);
-            $isRetainedEarnings  = $this->inRanges($code, [[3200, 3299]]);
+            $isEquity = $this->inRanges($code, [[3000, 3999]]);
+            $isRetainedEarnings = $this->inRanges($code, [[3200, 3299]]);
 
             if (! $isLongTermLiability && ! $isEquity) {
                 continue;
@@ -277,10 +285,10 @@ class CashFlowService
                 continue;
             }
 
-            $endBalance   = $this->accountBalance($account);
+            $endBalance = $this->accountBalance($account);
             $startAccount = $startMap->get($account->id);
             $startBalance = $startAccount ? $this->accountBalance($startAccount) : 0.0;
-            $delta        = $endBalance - $startBalance;
+            $delta = $endBalance - $startBalance;
 
             if (abs($delta) < 0.001) {
                 continue;
@@ -289,12 +297,12 @@ class CashFlowService
             $cfImpact = $delta;
 
             $items[] = [
-                'account_id'   => $account->id,
+                'account_id' => $account->id,
                 'account_name' => __($account->name),
                 'account_code' => $code,
-                'delta'        => $delta,
-                'amount'       => $cfImpact,
-                'type'         => $isLongTermLiability ? 'liability' : 'equity',
+                'delta' => $delta,
+                'amount' => $cfImpact,
+                'type' => $isLongTermLiability ? 'liability' : 'equity',
             ];
         }
 
@@ -309,6 +317,7 @@ class CashFlowService
                 $total += $this->accountBalance($account);
             }
         }
+
         return $total;
     }
 }

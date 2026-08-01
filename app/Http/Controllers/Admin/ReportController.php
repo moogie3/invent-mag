@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Helpers\CurrencyHelper;
 use App\Http\Controllers\Controller;
 use App\Models\ActivityLog;
 use App\Models\StockAdjustment;
+use App\Models\Warehouse;
 use App\Services\ActivityLogService;
 use App\Services\AgingReportService;
 use App\Services\CashFlowService;
@@ -19,9 +19,13 @@ use Illuminate\Support\Facades\Log;
 class ReportController extends Controller
 {
     protected $transactionService;
+
     protected $cashFlowService;
+
     protected $financialReportingService;
+
     protected $agingReportService;
+
     protected $reportExporter;
 
     public function __construct(
@@ -55,7 +59,7 @@ class ReportController extends Controller
 
         $adjustments = $query->orderBy('created_at', 'desc')->paginate(20);
 
-        $warehouses = \App\Models\Warehouse::all();
+        $warehouses = Warehouse::all();
         $types = ['adjustment', 'increase', 'decrease', 'correction', 'transfer'];
 
         // Eager load user roles
@@ -63,6 +67,7 @@ class ReportController extends Controller
             if ($adj->adjustedBy) {
                 $adj->adjustedBy->role = $adj->adjustedBy->getRoleNames()->first() ?? null;
             }
+
             return $adj;
         });
 
@@ -92,6 +97,7 @@ class ReportController extends Controller
         if ($request->get('export') === 'excel') {
             return $this->exportTransactions($request, $filters);
         }
+
         return view('admin.reports.recentts', array_merge(compact('transactions', 'summary'), $filters));
     }
 
@@ -119,7 +125,7 @@ class ReportController extends Controller
             if (empty($transactions)) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'No transactions selected.'
+                    'message' => 'No transactions selected.',
                 ], 400);
             }
 
@@ -128,15 +134,15 @@ class ReportController extends Controller
             return response()->json([
                 'success' => true,
                 'message' => "Successfully marked {$updatedCount} transaction(s) as paid.",
-                'updated_count' => $updatedCount
+                'updated_count' => $updatedCount,
             ]);
 
         } catch (\Exception $e) {
-            Log::error('Bulk mark as paid error: ' . $e->getMessage());
+            Log::error('Bulk mark as paid error: '.$e->getMessage());
 
             return response()->json([
                 'success' => false,
-                'message' => 'An error occurred while updating transactions.'
+                'message' => 'An error occurred while updating transactions.',
             ], 500);
         }
     }
@@ -151,7 +157,7 @@ class ReportController extends Controller
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Error updating transaction: ' . $e->getMessage(),
+                'message' => 'Error updating transaction: '.$e->getMessage(),
             ], 500);
         }
     }
@@ -211,8 +217,8 @@ class ReportController extends Controller
                 return $this->reportExporter->exportIncomeStatementToCsv($reportData, 'income-statement.csv');
             }
         } catch (\Exception $e) {
-            Log::error('Error exporting income statement: ' . $e->getMessage());
-            
+            Log::error('Error exporting income statement: '.$e->getMessage());
+
             return response()->json([
                 'success' => false,
                 'message' => 'Error exporting income statement. Please try again.',
@@ -274,8 +280,8 @@ class ReportController extends Controller
                 return $this->reportExporter->exportBalanceSheetToCsv($reportData, 'balance-sheet.csv');
             }
         } catch (\Exception $e) {
-            Log::error('Error exporting balance sheet: ' . $e->getMessage());
-            
+            Log::error('Error exporting balance sheet: '.$e->getMessage());
+
             return response()->json([
                 'success' => false,
                 'message' => 'Error exporting balance sheet. Please try again.',
@@ -323,8 +329,8 @@ class ReportController extends Controller
                 return $this->reportExporter->exportAgingToCsv($aging, 'aged-receivables.csv', 'receivables');
             }
         } catch (\Exception $e) {
-            Log::error('Error exporting aged receivables: ' . $e->getMessage());
-            
+            Log::error('Error exporting aged receivables: '.$e->getMessage());
+
             return response()->json([
                 'success' => false,
                 'message' => 'Error exporting aged receivables report. Please try again.',
@@ -372,8 +378,8 @@ class ReportController extends Controller
                 return $this->reportExporter->exportAgingToCsv($aging, 'aged-payables.csv', 'payables');
             }
         } catch (\Exception $e) {
-            Log::error('Error exporting aged payables: ' . $e->getMessage());
-            
+            Log::error('Error exporting aged payables: '.$e->getMessage());
+
             return response()->json([
                 'success' => false,
                 'message' => 'Error exporting aged payables report. Please try again.',
@@ -413,8 +419,8 @@ class ReportController extends Controller
                 return $this->reportExporter->exportAdjustmentLogToCsv($adjustments, 'adjustment-log.csv');
             }
         } catch (\Exception $e) {
-            Log::error('Error exporting adjustment log: ' . $e->getMessage());
-            
+            Log::error('Error exporting adjustment log: '.$e->getMessage());
+
             return response()->json([
                 'success' => false,
                 'message' => 'Error exporting adjustment log. Please try again.',
@@ -462,8 +468,8 @@ class ReportController extends Controller
                 return $this->reportExporter->exportRecentTransactionsToCsv($transactions, 'recent-transactions.csv');
             }
         } catch (\Exception $e) {
-            Log::error('Error exporting recent transactions: ' . $e->getMessage());
-            
+            Log::error('Error exporting recent transactions: '.$e->getMessage());
+
             return response()->json([
                 'success' => false,
                 'message' => 'Error exporting recent transactions. Please try again.',
@@ -519,8 +525,8 @@ class ReportController extends Controller
                 return $this->reportExporter->exportCashFlowToCsv($reportData, 'cash-flow.csv');
             }
         } catch (\Exception $e) {
-            Log::error('Error exporting cash flow statement: ' . $e->getMessage());
-            
+            Log::error('Error exporting cash flow statement: '.$e->getMessage());
+
             return response()->json([
                 'success' => false,
                 'message' => 'Error exporting cash flow statement. Please try again.',

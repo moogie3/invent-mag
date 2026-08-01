@@ -3,16 +3,15 @@
 namespace Tests\Feature\Admin;
 
 use App\Models\User;
-use Illuminate\Foundation\Testing\WithFaker;
-use Spatie\Permission\Models\Role;
-use Tests\TestCase;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Tests\Traits\CreatesTenant;
 use Database\Seeders\RoleSeeder;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\WithFaker;
+use Tests\TestCase;
+use Tests\Traits\CreatesTenant;
 
 class SettingsControllerTest extends TestCase
 {
-    use WithFaker, CreatesTenant, RefreshDatabase;
+    use CreatesTenant, RefreshDatabase, WithFaker;
 
     protected function setUp(): void
     {
@@ -112,14 +111,14 @@ class SettingsControllerTest extends TestCase
     public function test_update_theme_mode_successfully()
     {
         $response = $this->actingAs($this->user)->put(route('admin.setting.update-theme-mode'), [
-            'theme_mode' => 'dark'
+            'theme_mode' => 'dark',
         ]);
 
         $response->assertStatus(200);
         $response->assertJson([
             'success' => true,
             'message' => 'Theme mode updated successfully.',
-            'theme_mode' => 'dark'
+            'theme_mode' => 'dark',
         ]);
 
         $this->user->refresh();
@@ -129,9 +128,9 @@ class SettingsControllerTest extends TestCase
     public function test_update_theme_mode_with_invalid_data_returns_validation_errors()
     {
         $response = $this->actingAs($this->user)->putJson(route('admin.setting.update-theme-mode'), [
-                'theme_mode' => 'invalid'
-            ]);
+            'theme_mode' => 'invalid',
+        ]);
 
-            $response->assertStatus(422)->assertJsonValidationErrors(['theme_mode']);
-        }
+        $response->assertStatus(422)->assertJsonValidationErrors(['theme_mode']);
+    }
 }

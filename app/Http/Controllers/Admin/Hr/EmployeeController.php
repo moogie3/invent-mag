@@ -23,6 +23,7 @@ class EmployeeController extends Controller
     public function index()
     {
         $data = $this->service->getIndexData();
+
         return view('admin.hr.employee.index', $data);
     }
 
@@ -30,6 +31,7 @@ class EmployeeController extends Controller
     {
         try {
             $this->service->create($request->all());
+
             return redirect()->route('admin.hr.employee.index')->with('success', __('messages.record_created'));
         } catch (\Exception $e) {
             return back()->with('error', $e->getMessage())->withInput();
@@ -40,6 +42,7 @@ class EmployeeController extends Controller
     {
         try {
             $this->service->update($employee, $request->all());
+
             return redirect()->route('admin.hr.employee.index')->with('success', __('messages.record_updated'));
         } catch (\Exception $e) {
             return back()->with('error', $e->getMessage())->withInput();
@@ -50,6 +53,7 @@ class EmployeeController extends Controller
     {
         try {
             $this->service->delete($employee);
+
             return redirect()->route('admin.hr.employee.index')->with('success', __('messages.record_deleted'));
         } catch (\Exception $e) {
             return back()->with('error', $e->getMessage());
@@ -69,6 +73,7 @@ class EmployeeController extends Controller
                 ActivityLog::MODULE_EMPLOYEE,
                 'Exported Employees'
             );
+
             return $this->service->exportEmployees($request->ids, $request->export_option);
         } catch (\Exception $e) {
             return response()->json([

@@ -2,33 +2,36 @@
 
 namespace App\Providers;
 
-use App\Models\User; // Added
-use App\Scopes\TenantScope; // Added
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\RateLimiter;
-use Illuminate\Support\ServiceProvider;
-use Illuminate\Support\Str;
-use Illuminate\Cache\RateLimiting\Limit;
-use Illuminate\Validation\ValidationException;
-use App\Actions\Fortify\CreateNewUser;
-use App\Actions\Fortify\ResetUserPassword;
+use App\Actions\Fortify\CreateNewUser; // Added
+use App\Actions\Fortify\ResetUserPassword; // Added
 use App\Actions\Fortify\UpdateUserPassword;
 use App\Actions\Fortify\UpdateUserProfileInformation;
 use App\Http\Responses\CustomLoginResponse;
 use App\Http\Responses\CustomRegisterResponse;
 use App\Http\Responses\VerifyEmailResponse;
-use Laravel\Fortify\Fortify;
-use Laravel\Fortify\Contracts\LoginResponse;
-use Laravel\Fortify\Contracts\RegisterResponse;
-use Laravel\Fortify\Contracts\VerifyEmailResponse as VerifyEmailResponseContract;
-use Laravel\Fortify\Features;
+use App\Models\User;
+use App\Scopes\TenantScope;
+use Illuminate\Cache\RateLimiting\Limit;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\RateLimiter;
+use Illuminate\Support\ServiceProvider;
+use Illuminate\Support\Str;
+use Illuminate\Validation\ValidationException;
 use Laravel\Fortify\Actions\AttemptToAuthenticate;
 use Laravel\Fortify\Actions\EnsureLoginIsNotThrottled;
 use Laravel\Fortify\Actions\PrepareAuthenticatedSession;
 use Laravel\Fortify\Actions\RedirectIfTwoFactorAuthenticatable;
-use Symfony\Component\HttpFoundation\Response;
-use Illuminate\Support\Facades\Auth; // Added for Auth::attempt in case needed.
+use Laravel\Fortify\Contracts\LoginResponse;
+use Laravel\Fortify\Contracts\PasswordResetResponse;
+use Laravel\Fortify\Contracts\RegisterResponse;
+use Laravel\Fortify\Contracts\VerifyEmailResponse as VerifyEmailResponseContract;
+use Laravel\Fortify\Features;
+use Laravel\Fortify\Fortify;
+
+// Added for Auth::attempt in case needed.
 
 class FortifyServiceProvider extends ServiceProvider
 {
@@ -40,7 +43,7 @@ class FortifyServiceProvider extends ServiceProvider
         $this->app->singleton(LoginResponse::class, CustomLoginResponse::class);
         $this->app->singleton(RegisterResponse::class, CustomRegisterResponse::class);
         $this->app->singleton(VerifyEmailResponseContract::class, VerifyEmailResponse::class);
-        $this->app->singleton(\Laravel\Fortify\Contracts\PasswordResetResponse::class, \App\Http\Responses\PasswordResetResponse::class);
+        $this->app->singleton(PasswordResetResponse::class, \App\Http\Responses\PasswordResetResponse::class);
     }
 
     /**
@@ -49,12 +52,12 @@ class FortifyServiceProvider extends ServiceProvider
     public function boot(): void
     {
         // Configure views for admin routes
-        Fortify::loginView(fn() => view('admin.auth.login'));
-        Fortify::registerView(fn() => view('admin.auth.register'));
-        Fortify::requestPasswordResetLinkView(fn() => view('admin.auth.forgot-password'));
-        Fortify::resetPasswordView(fn($request) => view('admin.auth.reset-password', ['request' => $request]));
-        Fortify::verifyEmailView(fn() => view('admin.auth.verify-email'));
-        Fortify::confirmPasswordView(fn() => view('admin.auth.confirm-password'));
+        Fortify::loginView(fn () => view('admin.auth.login'));
+        Fortify::registerView(fn () => view('admin.auth.register'));
+        Fortify::requestPasswordResetLinkView(fn () => view('admin.auth.forgot-password'));
+        Fortify::resetPasswordView(fn ($request) => view('admin.auth.reset-password', ['request' => $request]));
+        Fortify::verifyEmailView(fn () => view('admin.auth.verify-email'));
+        Fortify::confirmPasswordView(fn () => view('admin.auth.confirm-password'));
 
         // Register Fortify actions
         Fortify::createUsersUsing(CreateNewUser::class);
@@ -68,10 +71,10 @@ class FortifyServiceProvider extends ServiceProvider
                 // EnsureLoginIsNotThrottled::class has been removed
                 Features::enabled(Features::twoFactorAuthentication()) ? RedirectIfTwoFactorAuthenticatable::class : null,
                 AttemptToAuthenticate::class,
-                PrepareAuthenticatedSession::class
+                PrepareAuthenticatedSession::class,
             ]);
         });
-        
+
         // Custom, self-contained authentication logic for multi-tenancy with direct rate limiting
         Fortify::authenticateUsing(function (Request $request) {
             $email = Str::lower($request->input('email', ''));
@@ -86,7 +89,7 @@ class FortifyServiceProvider extends ServiceProvider
             if (RateLimiter::tooManyAttempts($throttleKey, 5) || RateLimiter::tooManyAttempts($ipKey, 10)) {
                 $key = RateLimiter::tooManyAttempts($throttleKey, 5) ? $throttleKey : $ipKey;
                 $seconds = RateLimiter::availableIn($key);
-                \Illuminate\Support\Facades\Log::warning("Rate limit hit for {$email} at {$ip}");
+                Log::warning("Rate limit hit for {$email} at {$ip}");
                 // Abort directly with the 429 error page. This stops everything.
                 abort(response()->view('errors.429', ['seconds' => $seconds], 429));
             }
@@ -96,7 +99,7 @@ class FortifyServiceProvider extends ServiceProvider
 
             // If user not found (in this tenant) or password fails:
             if (! $user || ! Hash::check($request->password, $user->password)) {
-                \Illuminate\Support\Facades\Log::info("Failed login attempt for {$email} at {$ip}");
+                Log::info("Failed login attempt for {$email} at {$ip}");
                 RateLimiter::hit($throttleKey, 60);
                 RateLimiter::hit($ipKey, 60);
                 throw ValidationException::withMessages(['email' => [__('auth.failed')]]);
@@ -105,6 +108,7 @@ class FortifyServiceProvider extends ServiceProvider
             // If we get here, the user exists IN THIS TENANT and password is correct.
             RateLimiter::clear($throttleKey);
             RateLimiter::clear($ipKey);
+
             return $user;
         });
 
@@ -127,7 +131,7 @@ class FortifyServiceProvider extends ServiceProvider
                 ->response(function (Request $request, array $headers) {
                     return response()->json([
                         'message' => 'Too many requests. Please try again later.',
-                        'retry_after' => $headers['Retry-After'] ?? 60
+                        'retry_after' => $headers['Retry-After'] ?? 60,
                     ], 429);
                 });
         });
@@ -137,8 +141,8 @@ class FortifyServiceProvider extends ServiceProvider
                 ->by($request->ip())
                 ->response(function (Request $request, array $headers) {
                     return response()->json([
-                        'message' => 'Too many login attempts. Please try again in ' . 
-                                     ($headers['Retry-After'] ?? 60) . ' seconds.',
+                        'message' => 'Too many login attempts. Please try again in '.
+                                     ($headers['Retry-After'] ?? 60).' seconds.',
                     ], 429);
                 });
         });

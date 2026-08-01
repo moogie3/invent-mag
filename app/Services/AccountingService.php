@@ -3,14 +3,13 @@
 namespace App\Services;
 
 use App\Models\Account;
-use App\Models\JournalEntry;
-use App\Models\Transaction;
 use App\Models\AccountingAuditLog;
+use App\Models\JournalEntry;
+use Carbon\Carbon;
 use Exception;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
-use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
 
 class AccountingService
 {
@@ -53,12 +52,12 @@ class AccountingService
                 $tenantId = app('currentTenant')->id;
                 $account = $this->findAccount($tx, $tenantId);
 
-                if (!$account) {
+                if (! $account) {
                     $identifier = $tx['account_code'] ?? $tx['account_name'] ?? 'Unknown';
                     throw new Exception("Account '{$identifier}' not found for the current tenant.");
                 }
 
-                if (!$account->allow_manual_entry && !$sourceDocument) {
+                if (! $account->allow_manual_entry && ! $sourceDocument) {
                     throw new Exception("Account '{$account->name}' does not allow manual entries.");
                 }
 
@@ -69,7 +68,7 @@ class AccountingService
                 ]);
             }
 
-            if (!$skipAudit && Auth::check()) {
+            if (! $skipAudit && Auth::check()) {
                 $this->auditService->logCreate($journalEntry, $transactions);
             }
 
@@ -124,11 +123,11 @@ class AccountingService
     public function postJournalEntry(JournalEntry $journalEntry): JournalEntry
     {
         if ($journalEntry->status !== JournalEntry::STATUS_DRAFT) {
-            throw new Exception("Only draft entries can be posted.");
+            throw new Exception('Only draft entries can be posted.');
         }
 
-        if (!$journalEntry->isBalanced()) {
-            throw new Exception("Journal entry is not balanced and cannot be posted.");
+        if (! $journalEntry->isBalanced()) {
+            throw new Exception('Journal entry is not balanced and cannot be posted.');
         }
 
         $oldValues = $journalEntry->toArray();
@@ -151,15 +150,17 @@ class AccountingService
      */
     public function voidJournalEntry(JournalEntry $journalEntry, string $reason): JournalEntry
     {
+        $this->assertNotReconciled($journalEntry, 'voided');
+
         if ($journalEntry->status !== JournalEntry::STATUS_POSTED) {
-            throw new Exception("Only posted entries can be voided.");
+            throw new Exception('Only posted entries can be voided.');
         }
 
         $oldValues = $journalEntry->toArray();
 
         $journalEntry->update([
             'status' => JournalEntry::STATUS_VOID,
-            'notes' => $journalEntry->notes . "\n\nVoided: {$reason}",
+            'notes' => $journalEntry->notes."\n\nVoided: {$reason}",
         ]);
 
         if (Auth::check()) {
@@ -174,8 +175,10 @@ class AccountingService
      */
     public function reverseJournalEntry(JournalEntry $journalEntry, ?string $notes = null): JournalEntry
     {
-        if (!$journalEntry->canBeReversed()) {
-            throw new Exception("This journal entry cannot be reversed.");
+        $this->assertNotReconciled($journalEntry, 'reversed');
+
+        if (! $journalEntry->canBeReversed()) {
+            throw new Exception('This journal entry cannot be reversed.');
         }
 
         $reversalTransactions = [];
@@ -192,7 +195,7 @@ class AccountingService
         $reversalEntry = $this->createJournalEntry(
             $description,
             Carbon::now(),
-            array_map(function ($tx, $index) use ($journalEntry) {
+            array_map(function ($tx, $index) {
                 return [
                     'account_id' => $tx['account_id'],
                     'type' => $tx['type'],
@@ -222,12 +225,14 @@ class AccountingService
      */
     public function unpostJournalEntry(JournalEntry $journalEntry): JournalEntry
     {
+        $this->assertNotReconciled($journalEntry, 'unposted');
+
         if ($journalEntry->status !== JournalEntry::STATUS_POSTED) {
-            throw new Exception("Only posted entries can be unposted.");
+            throw new Exception('Only posted entries can be unposted.');
         }
 
         if ($journalEntry->hasDependentEntries()) {
-            throw new Exception("This entry has dependent entries and cannot be unposted.");
+            throw new Exception('This entry has dependent entries and cannot be unposted.');
         }
 
         $oldValues = $journalEntry->toArray();
@@ -251,7 +256,7 @@ class AccountingService
     public function updateDraftJournalEntry(JournalEntry $journalEntry, array $data, array $transactions): JournalEntry
     {
         if ($journalEntry->status !== JournalEntry::STATUS_DRAFT) {
-            throw new Exception("Only draft entries can be updated.");
+            throw new Exception('Only draft entries can be updated.');
         }
 
         $oldValues = $journalEntry->toArray();
@@ -289,7 +294,7 @@ class AccountingService
     public function deleteDraftJournalEntry(JournalEntry $journalEntry): bool
     {
         if ($journalEntry->status !== JournalEntry::STATUS_DRAFT) {
-            throw new Exception("Only draft entries can be deleted.");
+            throw new Exception('Only draft entries can be deleted.');
         }
 
         $oldValues = $journalEntry->toArray();
@@ -317,7 +322,20 @@ class AccountingService
         if (isset($tx['account_id'])) {
             return Account::where('id', $tx['account_id'])->where('tenant_id', $tenantId)->first();
         }
+
         return null;
+    }
+
+    /**
+     * Block journal-entry mutations that would corrupt a completed reconciliation.
+     */
+    protected function assertNotReconciled(JournalEntry $journalEntry, string $action): void
+    {
+        if (app(BankReconciliationService::class)->isJournalEntryReconciled($journalEntry)) {
+            throw new Exception(
+                "This journal entry is part of a completed bank reconciliation and cannot be {$action}."
+            );
+        }
     }
 
     /**
@@ -329,11 +347,11 @@ class AccountingService
         $credits = 0;
 
         foreach ($transactions as $tx) {
-            if ((!isset($tx['account_name']) && !isset($tx['account_code']) && !isset($tx['account_id'])) || !isset($tx['type'], $tx['amount'])) {
+            if ((! isset($tx['account_name']) && ! isset($tx['account_code']) && ! isset($tx['account_id'])) || ! isset($tx['type'], $tx['amount'])) {
                 throw new Exception('Each transaction must have an account_id, account_name, or account_code, type, and amount.');
             }
 
-            if (!in_array($tx['type'], ['debit', 'credit'])) {
+            if (! in_array($tx['type'], ['debit', 'credit'])) {
                 throw new Exception("Invalid transaction type: {$tx['type']}. Must be 'debit' or 'credit'.");
             }
 
@@ -345,7 +363,7 @@ class AccountingService
         }
 
         if (count($transactions) < 2) {
-            throw new Exception("At least two transactions (debit and credit) are required.");
+            throw new Exception('At least two transactions (debit and credit) are required.');
         }
 
         if (round($debits, 2) !== round($credits, 2)) {
@@ -363,7 +381,7 @@ class AccountingService
         $accounts = Account::with(['transactions' => function ($query) use ($endDate) {
             $query->whereHas('journalEntry', function ($q) use ($endDate) {
                 $q->where('date', '<=', $endDate)
-                  ->where('status', JournalEntry::STATUS_POSTED);
+                    ->where('status', JournalEntry::STATUS_POSTED);
             });
         }])->orderBy('code')->get();
 

@@ -3,16 +3,17 @@
 namespace Tests\Unit\Services;
 
 use App\Models\Tenant;
+use App\Services\PlanService;
 use App\Services\TenantSetupService;
-use Tests\TestCase;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Tests\Traits\CreatesTenant;
 use Database\Seeders\RoleSeeder;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Mockery;
+use Tests\TestCase;
+use Tests\Traits\CreatesTenant;
 
 class TenantSetupServiceTest extends TestCase
 {
-    use RefreshDatabase, CreatesTenant;
+    use CreatesTenant, RefreshDatabase;
 
     protected TenantSetupService $service;
 
@@ -21,10 +22,10 @@ class TenantSetupServiceTest extends TestCase
         parent::setUp();
         $this->setupTenant();
         $this->seed(RoleSeeder::class);
-        $this->service = new TenantSetupService();
+        $this->service = new TenantSetupService;
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         Mockery::close();
         parent::tearDown();
@@ -38,7 +39,7 @@ class TenantSetupServiceTest extends TestCase
 
         $planService = $property->getValue($this->service);
 
-        $this->assertInstanceOf(\App\Services\PlanService::class, $planService);
+        $this->assertInstanceOf(PlanService::class, $planService);
     }
 
     public function test_setup_handles_exception_gracefully()

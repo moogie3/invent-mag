@@ -3,13 +3,12 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\Customer;
-use Illuminate\Http\Request;
-use App\Models\SalesPipeline;
 use App\Models\PipelineStage;
 use App\Models\SalesOpportunity;
-use Illuminate\Validation\Rule;
+use App\Models\SalesPipeline;
 use App\Services\SalesPipelineService;
+use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 
 class SalesPipelineController extends Controller
 {
@@ -30,6 +29,7 @@ class SalesPipelineController extends Controller
     public function indexPipelines()
     {
         $pipelines = SalesPipeline::with('stages')->get();
+
         return response()->json($pipelines);
     }
 
@@ -42,6 +42,7 @@ class SalesPipelineController extends Controller
         ]);
 
         $pipeline = $this->salesPipelineService->createPipeline($request->all());
+
         return response()->json($pipeline, 201);
     }
 
@@ -54,12 +55,14 @@ class SalesPipelineController extends Controller
         ]);
 
         $pipeline = $this->salesPipelineService->updatePipeline($pipeline, $request->all());
+
         return response()->json($pipeline);
     }
 
     public function destroyPipeline(SalesPipeline $pipeline)
     {
         $this->salesPipelineService->deletePipeline($pipeline);
+
         return redirect()->route('admin.sales_pipeline.index')->with('success', 'Pipeline deleted successfully!');
     }
 
@@ -73,6 +76,7 @@ class SalesPipelineController extends Controller
         ]);
 
         $stage = $this->salesPipelineService->createStage($pipeline, $request->all());
+
         return response()->json($stage, 201);
     }
 
@@ -87,12 +91,14 @@ class SalesPipelineController extends Controller
         ]);
 
         $stage = $this->salesPipelineService->updateStage($stage, $request->all());
+
         return response()->json($stage);
     }
 
     public function destroyStage(PipelineStage $stage)
     {
         $this->salesPipelineService->deleteStage($stage);
+
         return redirect()->route('admin.sales_pipeline.index')->with('success', 'Stage deleted successfully!');
     }
 
@@ -150,9 +156,10 @@ class SalesPipelineController extends Controller
 
         try {
             $opportunity = $this->salesPipelineService->createOpportunity($validatedData);
+
             return response()->json($opportunity->load('items'), 201);
         } catch (\Exception $e) {
-            return response()->json(['message' => 'Failed to create opportunity: ' . $e->getMessage(), 'type' => 'error'], 500);
+            return response()->json(['message' => 'Failed to create opportunity: '.$e->getMessage(), 'type' => 'error'], 500);
         }
     }
 
@@ -176,15 +183,17 @@ class SalesPipelineController extends Controller
 
         try {
             $opportunity = $this->salesPipelineService->updateOpportunity($opportunity, $validatedData);
+
             return response()->json($opportunity->load('items'), 200);
         } catch (\Exception $e) {
-            return response()->json(['message' => 'Failed to update opportunity: ' . $e->getMessage(), 'type' => 'error'], 500);
+            return response()->json(['message' => 'Failed to update opportunity: '.$e->getMessage(), 'type' => 'error'], 500);
         }
     }
 
     public function destroyOpportunity(SalesOpportunity $opportunity)
     {
         $this->salesPipelineService->deleteOpportunity($opportunity);
+
         return redirect()->route('admin.sales_pipeline.index')->with('success', 'Opportunity deleted successfully!');
     }
 
@@ -192,7 +201,8 @@ class SalesPipelineController extends Controller
     {
         try {
             return response()->json($opportunity->load('customer', 'pipeline', 'stage', 'items.product'));
-        } catch (\Exception $e) {return response()->json(['message' => 'Failed to fetch opportunity details.', 'error' => $e->getMessage()], 500);
+        } catch (\Exception $e) {
+            return response()->json(['message' => 'Failed to fetch opportunity details.', 'error' => $e->getMessage()], 500);
         }
     }
 
@@ -203,6 +213,7 @@ class SalesPipelineController extends Controller
         ]);
 
         $opportunity = $this->salesPipelineService->moveOpportunity($opportunity, $request->pipeline_stage_id);
+
         return response()->json($opportunity);
     }
 
@@ -213,10 +224,10 @@ class SalesPipelineController extends Controller
 
     public function print($id)
     {
-         try {
+        try {
             return $this->salesPipelineService->printOpportunity($id);
         } catch (\Exception $e) {
-            return back()->with('error', 'Error generating quotation. ' . $e->getMessage());
+            return back()->with('error', 'Error generating quotation. '.$e->getMessage());
         }
     }
 
@@ -224,10 +235,11 @@ class SalesPipelineController extends Controller
     {
         try {
             $quotation = $this->salesPipelineService->generateQuotation($id);
+
             return redirect()->route('admin.quotations.edit', $quotation->id)
                 ->with('success', 'Quotation generated from opportunity. You can review and send it.');
         } catch (\Exception $e) {
-            return back()->with('error', 'Error generating quotation: ' . $e->getMessage());
+            return back()->with('error', 'Error generating quotation: '.$e->getMessage());
         }
     }
 
@@ -235,9 +247,10 @@ class SalesPipelineController extends Controller
     {
         try {
             $salesOrder = $this->salesPipelineService->convertToSalesOrder($opportunity);
+
             return response()->json(['message' => 'Opportunity successfully converted to Sales Order.', 'type' => 'success', 'sales_id' => $salesOrder->id], 200);
         } catch (\Exception $e) {
-            return response()->json(['message' => 'Failed to convert opportunity: ' . $e->getMessage(), 'type' => 'error'], 500);
+            return response()->json(['message' => 'Failed to convert opportunity: '.$e->getMessage(), 'type' => 'error'], 500);
         }
     }
 }

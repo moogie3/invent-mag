@@ -6,7 +6,6 @@ use App\Models\Plan;
 use App\Models\SubscriptionOrder;
 use App\Models\Tenant;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Facades\Log;
 use Tests\TestCase;
 
 class MidtransWebhookTest extends TestCase
@@ -38,7 +37,7 @@ class MidtransWebhookTest extends TestCase
             'status_code' => '200',
             'gross_amount' => '49000.00',
             'transaction_status' => 'settlement',
-            'signature_key' => 'invalid_signature'
+            'signature_key' => 'invalid_signature',
         ];
 
         $response = $this->postJson('/webhooks/midtrans', $payload);
@@ -53,19 +52,19 @@ class MidtransWebhookTest extends TestCase
     {
         $serverKey = 'test_server_key';
         config(['midtrans.server_key' => $serverKey]);
-        
+
         $orderId = 'INV-NONEXISTENT-001';
         $statusCode = '200';
         $grossAmount = '49000.00';
 
-        $signature = hash('sha512', $orderId . $statusCode . $grossAmount . $serverKey);
+        $signature = hash('sha512', $orderId.$statusCode.$grossAmount.$serverKey);
 
         $payload = [
             'order_id' => $orderId,
             'status_code' => $statusCode,
             'gross_amount' => $grossAmount,
             'transaction_status' => 'settlement',
-            'signature_key' => $signature
+            'signature_key' => $signature,
         ];
 
         $response = $this->postJson('/webhooks/midtrans', $payload);
@@ -107,7 +106,7 @@ class MidtransWebhookTest extends TestCase
         $statusCode = '200';
         $grossAmount = '49000.00';
 
-        $signature = hash('sha512', $orderId . $statusCode . $grossAmount . $serverKey);
+        $signature = hash('sha512', $orderId.$statusCode.$grossAmount.$serverKey);
 
         $payload = [
             'order_id' => $orderId,
@@ -170,7 +169,7 @@ class MidtransWebhookTest extends TestCase
         $statusCode = '200';
         $grossAmount = '89000.00';
 
-        $signature = hash('sha512', $orderId . $statusCode . $grossAmount . $serverKey);
+        $signature = hash('sha512', $orderId.$statusCode.$grossAmount.$serverKey);
 
         $payload = [
             'order_id' => $orderId,
@@ -222,7 +221,7 @@ class MidtransWebhookTest extends TestCase
         $statusCode = '202';
         $grossAmount = '49000.00';
 
-        $signature = hash('sha512', $orderId . $statusCode . $grossAmount . $serverKey);
+        $signature = hash('sha512', $orderId.$statusCode.$grossAmount.$serverKey);
 
         $payload = [
             'order_id' => $orderId,

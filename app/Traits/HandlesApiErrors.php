@@ -2,19 +2,16 @@
 
 namespace App\Traits;
 
-use Illuminate\Support\Facades\Log;
+use Illuminate\Auth\Access\AuthorizationException;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Validation\ValidationException;
 
 trait HandlesApiErrors
 {
     /**
      * Handle exceptions and return a safe JSON response.
-     *
-     * @param \Exception $exception
-     * @param string $userMessage
-     * @param int $statusCode
-     * @param array $context
-     * @return \Illuminate\Http\JsonResponse
      */
     protected function handleException(
         \Exception $exception,
@@ -44,11 +41,8 @@ trait HandlesApiErrors
 
     /**
      * Handle validation exceptions.
-     *
-     * @param \Illuminate\Validation\ValidationException $exception
-     * @return \Illuminate\Http\JsonResponse
      */
-    protected function handleValidationException(\Illuminate\Validation\ValidationException $exception): JsonResponse
+    protected function handleValidationException(ValidationException $exception): JsonResponse
     {
         return response()->json([
             'success' => false,
@@ -59,13 +53,9 @@ trait HandlesApiErrors
 
     /**
      * Handle model not found exceptions.
-     *
-     * @param \Illuminate\Database\Eloquent\ModelNotFoundException $exception
-     * @param string $resourceName
-     * @return \Illuminate\Http\JsonResponse
      */
     protected function handleModelNotFoundException(
-        \Illuminate\Database\Eloquent\ModelNotFoundException $exception,
+        ModelNotFoundException $exception,
         string $resourceName = 'Resource'
     ): JsonResponse {
         Log::warning("$resourceName not found", [
@@ -82,11 +72,8 @@ trait HandlesApiErrors
 
     /**
      * Handle authorization exceptions.
-     *
-     * @param \Illuminate\Auth\Access\AuthorizationException $exception
-     * @return \Illuminate\Http\JsonResponse
      */
-    protected function handleAuthorizationException(\Illuminate\Auth\Access\AuthorizationException $exception): JsonResponse
+    protected function handleAuthorizationException(AuthorizationException $exception): JsonResponse
     {
         Log::warning('Unauthorized access attempt', [
             'message' => $exception->getMessage(),

@@ -2,18 +2,17 @@
 
 namespace Tests\Feature\Auth;
 
-use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 use Tests\Traits\CreatesTenant;
-use PHPUnit\Framework\Attributes\Test;
 
 class PasswordConfirmationTest extends TestCase
 {
-    use RefreshDatabase, CreatesTenant;
-    use RefreshDatabase, CreatesTenant;
+    use CreatesTenant, RefreshDatabase;
+    use CreatesTenant, RefreshDatabase;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
         $this->setupTenant();

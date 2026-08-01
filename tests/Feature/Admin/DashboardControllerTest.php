@@ -2,20 +2,19 @@
 
 namespace Tests\Feature\Admin;
 
-use App\Models\User;
-use App\Services\DashboardService;
-use Illuminate\Foundation\Testing\WithFaker;
-use Tests\TestCase;
-use Mockery;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Tests\Traits\CreatesTenant;
-use Illuminate\Support\Facades\Auth;
 use App\Models\Tenant;
+use App\Services\DashboardService;
 use Database\Seeders\RoleSeeder;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\WithFaker;
+use Illuminate\Support\Facades\Auth;
+use Mockery;
+use Tests\TestCase;
+use Tests\Traits\CreatesTenant;
 
 class DashboardControllerTest extends TestCase
 {
-    use WithFaker, CreatesTenant, RefreshDatabase;
+    use CreatesTenant, RefreshDatabase, WithFaker;
 
     protected function setUp(): void
     {
@@ -180,59 +179,85 @@ class DashboardControllerTest extends TestCase
                 '1'
             )
             ->andReturn([
-            'topCategories' => [],
-            'monthlyData' => [],
-            'chartLabels' => [],
-            'chartData' => [],
-            'purchaseChartLabels' => [],
-            'purchaseChartData' => [],
-            'customerAnalytics' => [
-                'totalCustomers' => 0,
-                'activeCustomers' => 0,
-                'retentionRate' => 0,
-                'avgOrderValue' => 0,
-                'customerLifetimeValue' => 0,
-                'topCustomers' => [],
-            ],
-            'supplierAnalytics' => [
-                'totalSuppliers' => 0,
-                'activeSuppliers' => 0,
-                'supplierPaymentPerformance' => 0,
-                'avgPurchaseValue' => 0,
-                'totalOutstanding' => 0,
-                'topSuppliers' => [],
-            ],
-            'recentTransactions' => collect([]),
-            'topSellingProducts' => collect([]),
-            'recentSales' => [],
-            'recentPurchases' => [],
-            'lowStockCount' => 0,
-            'lowStockProducts' => collect([]),
-            'expiringSoonItems' => collect([]),
-            'totalliability' => 0,
-            'countliability' => 0,
-            'paidDebtMonthly' => 0,
-            'countRevenue' => 0,
-            'countSales' => 0,
-            'liabilitypaymentMonthly' => 0,
-            'inCountUnpaid' => 0,
-            'outCountUnpaid' => 0,
-            'totalRevenue' => 0,
-            'avgDueDays' => 0,
-            'collectionRate' => 0,
-            'keyMetrics' => [],
-            'financialItems' => [],
-            'invoiceStatusData' => [
-                'totalInvoices' => 0,
-                'collectionRate' => 0,
-                'collectionRateDisplay' => 0,
-                'outCount' => 0,
-                'inCount' => 0,
-                'outCountUnpaid' => 0,
+                'topCategories' => [],
+                'monthlyData' => [],
+                'chartLabels' => [],
+                'chartData' => [],
+                'purchaseChartLabels' => [],
+                'purchaseChartData' => [],
+                'customerAnalytics' => [
+                    'totalCustomers' => 0,
+                    'activeCustomers' => 0,
+                    'retentionRate' => 0,
+                    'avgOrderValue' => 0,
+                    'customerLifetimeValue' => 0,
+                    'topCustomers' => [],
+                ],
+                'supplierAnalytics' => [
+                    'totalSuppliers' => 0,
+                    'activeSuppliers' => 0,
+                    'supplierPaymentPerformance' => 0,
+                    'avgPurchaseValue' => 0,
+                    'totalOutstanding' => 0,
+                    'topSuppliers' => [],
+                ],
+                'recentTransactions' => collect([]),
+                'topSellingProducts' => collect([]),
+                'recentSales' => [],
+                'recentPurchases' => [],
+                'lowStockCount' => 0,
+                'lowStockProducts' => collect([]),
+                'expiringSoonItems' => collect([]),
+                'totalliability' => 0,
+                'countliability' => 0,
+                'paidDebtMonthly' => 0,
+                'countRevenue' => 0,
+                'countSales' => 0,
+                'liabilitypaymentMonthly' => 0,
                 'inCountUnpaid' => 0,
-                'outPercentage' => 0,
-                'inPercentage' => 0,
+                'outCountUnpaid' => 0,
+                'totalRevenue' => 0,
                 'avgDueDays' => 0,
+                'collectionRate' => 0,
+                'keyMetrics' => [],
+                'financialItems' => [],
+                'invoiceStatusData' => [
+                    'totalInvoices' => 0,
+                    'collectionRate' => 0,
+                    'collectionRateDisplay' => 0,
+                    'outCount' => 0,
+                    'inCount' => 0,
+                    'outCountUnpaid' => 0,
+                    'inCountUnpaid' => 0,
+                    'outPercentage' => 0,
+                    'inPercentage' => 0,
+                    'avgDueDays' => 0,
+                    'arAging' => [
+                        'current' => 0,
+                        '1-30' => 0,
+                        '31-60' => 0,
+                        '61-90' => 0,
+                        '90+' => 0,
+                        'total_overdue' => 0,
+                    ],
+                    'apAging' => [
+                        'current' => 0,
+                        '1-30' => 0,
+                        '31-60' => 0,
+                        '61-90' => 0,
+                        '90+' => 0,
+                        'total_overdue' => 0,
+                    ],
+                ],
+                'customerInsights' => [
+                    'avgDueDays' => 0,
+                    'collectionRate' => 0,
+                    'paymentTerms' => [],
+                    'totalCustomers' => 0,
+                    'activeCustomers' => 0,
+                    'bgColor' => 'bg-success',
+                    'percentage' => 0,
+                ],
                 'arAging' => [
                     'current' => 0,
                     '1-30' => 0,
@@ -249,38 +274,12 @@ class DashboardControllerTest extends TestCase
                     '90+' => 0,
                     'total_overdue' => 0,
                 ],
-            ],
-            'customerInsights' => [
-                'avgDueDays' => 0,
-                'collectionRate' => 0,
-                'paymentTerms' => [],
-                'totalCustomers' => 0,
-                'activeCustomers' => 0,
-                'bgColor' => 'bg-success',
-                'percentage' => 0,
-            ],
-            'arAging' => [
-                'current' => 0,
-                '1-30' => 0,
-                '31-60' => 0,
-                '61-90' => 0,
-                '90+' => 0,
-                'total_overdue' => 0,
-            ],
-            'apAging' => [
-                'current' => 0,
-                '1-30' => 0,
-                '31-60' => 0,
-                '61-90' => 0,
-                '90+' => 0,
-                'total_overdue' => 0,
-            ],
-            'salesForecast' => [
-                'labels' => [],
-                'historical' => [],
-                'forecast' => [],
-            ],
-        ]);
+                'salesForecast' => [
+                    'labels' => [],
+                    'historical' => [],
+                    'forecast' => [],
+                ],
+            ]);
 
         $this->app->instance(DashboardService::class, $mockDashboardService);
 

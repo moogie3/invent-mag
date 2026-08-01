@@ -2,28 +2,33 @@
 
 namespace Tests\Unit\Services;
 
-use App\Models\User;
-use App\Models\Purchase;
+use App\Models\POItem;
 use App\Models\Product;
+use App\Models\ProductWarehouse;
+use App\Models\Purchase;
 use App\Models\PurchaseReturn;
 use App\Models\PurchaseReturnItem;
-use App\Services\PurchaseReturnService;
+use App\Models\User;
 use App\Services\AccountingService;
+use App\Services\PurchaseReturnService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Facades\Auth;
 use Mockery;
-use Tests\TestCase;
 use PHPUnit\Framework\Attributes\Test;
+use Tests\TestCase;
 use Tests\Traits\CreatesTenant;
 
 class PurchaseReturnServiceTest extends TestCase
 {
-    use RefreshDatabase, CreatesTenant;
+    use CreatesTenant, RefreshDatabase;
 
     protected User $user;
+
     protected Purchase $purchase;
+
     protected Product $product;
+
     protected PurchaseReturnService $purchaseReturnService;
+
     protected $accountingServiceMock;
 
     protected function setUp(): void
@@ -31,16 +36,16 @@ class PurchaseReturnServiceTest extends TestCase
         parent::setUp();
         $this->setupTenant(); // Creates $this->tenant and $this->user, and calls actingAs
         $this->user->assignRole('superuser'); // Ensure the user has permissions for services
-        
+
         $this->product = Product::factory()->withStock(100)->create();
         $this->purchase = Purchase::factory()->create();
-        
+
         // Sync product warehouse to match purchase warehouse for consistent testing
         $productWarehouse = $this->product->productWarehouses()->first();
         if ($productWarehouse) {
             $productWarehouse->update(['warehouse_id' => $this->purchase->warehouse_id]);
         }
-        
+
         // Mock AccountingService
         $this->accountingServiceMock = Mockery::mock(AccountingService::class);
         $this->purchaseReturnService = new PurchaseReturnService($this->accountingServiceMock);
@@ -69,25 +74,25 @@ class PurchaseReturnServiceTest extends TestCase
         ]);
 
         // Create a stock record so the service can decrement
-        \App\Models\ProductWarehouse::firstOrCreate(
+        ProductWarehouse::firstOrCreate(
             [
-                'product_id'   => $this->product->id,
+                'product_id' => $this->product->id,
                 'warehouse_id' => $this->purchase->warehouse_id,
-                'tenant_id'    => $this->purchase->tenant_id,
+                'tenant_id' => $this->purchase->tenant_id,
             ],
             ['quantity' => 50]
         );
 
         // Create a POItem so decrementPOItemRemaining has something to work with
-        \App\Models\POItem::firstOrCreate(
+        POItem::firstOrCreate(
             ['po_id' => $this->purchase->id, 'product_id' => $this->product->id],
             [
-                'quantity'           => 10,
+                'quantity' => 10,
                 'remaining_quantity' => 10,
-                'price'              => 100,
-                'total'              => 1000,
-                'discount'           => 0,
-                'discount_type'      => 'fixed',
+                'price' => 100,
+                'total' => 1000,
+                'discount' => 0,
+                'discount_type' => 'fixed',
             ]
         );
 
@@ -96,9 +101,9 @@ class PurchaseReturnServiceTest extends TestCase
         $returnData = [
             'purchase_id' => $this->purchase->id,
             'return_date' => now()->format('Y-m-d'),
-            'reason'      => 'Damaged on arrival',
-            'status'      => 'Pending',
-            'items'       => json_encode([
+            'reason' => 'Damaged on arrival',
+            'status' => 'Pending',
+            'items' => json_encode([
                 ['product_id' => $this->product->id, 'returned_quantity' => 2, 'price' => 100, 'return_price' => 100],
             ]),
         ];
@@ -107,11 +112,11 @@ class PurchaseReturnServiceTest extends TestCase
 
         $this->assertNotNull($purchaseReturn);
         // Tax fields must be copied from the parent purchase
-        $this->assertEquals($this->purchase->tax_id,   $purchaseReturn->tax_id);
-        $this->assertEquals(11.0,                      $purchaseReturn->tax_rate);
-        $this->assertEquals('exclusive',                $purchaseReturn->tax_type);
+        $this->assertEquals($this->purchase->tax_id, $purchaseReturn->tax_id);
+        $this->assertEquals(11.0, $purchaseReturn->tax_rate);
+        $this->assertEquals('exclusive', $purchaseReturn->tax_type);
         // tax_amount = 11% of 200 = 22
-        $this->assertEquals(22.0,                      $purchaseReturn->tax_amount);
+        $this->assertEquals(22.0, $purchaseReturn->tax_amount);
     }
 
     #[Test]
@@ -131,14 +136,14 @@ class PurchaseReturnServiceTest extends TestCase
     {
         $purchaseReturn = PurchaseReturn::factory()->create([
             'purchase_id' => $this->purchase->id,
-            'total_amount' => 100
+            'total_amount' => 100,
         ]);
         PurchaseReturnItem::factory()->create([
             'purchase_return_id' => $purchaseReturn->id,
             'product_id' => $this->product->id,
-            'quantity' => 1
+            'quantity' => 1,
         ]);
-        
+
         // Decrement stock from ProductWarehouse instead of Product directly
         $stockRecord = $this->product->productWarehouses()->first();
         $stockRecord->decrement('quantity', 1);
@@ -150,7 +155,7 @@ class PurchaseReturnServiceTest extends TestCase
             'reason' => 'Updated reason',
             'status' => 'Completed',
             'items' => json_encode([
-                ['product_id' => $this->product->id, 'returned_quantity' => 3, 'price' => 50]
+                ['product_id' => $this->product->id, 'returned_quantity' => 3, 'price' => 50],
             ]),
         ];
 
@@ -159,14 +164,14 @@ class PurchaseReturnServiceTest extends TestCase
         $this->assertEquals('Completed', $updatedReturn->status);
         $this->assertEquals(150, $updatedReturn->total_amount);
         $this->assertCount(1, $updatedReturn->items);
-        
+
         $this->product->refresh();
         // Initial stock 100. Factory creates item, stock becomes 99.
         // Update reverts old item (+1), new item is 3, so stock is 100 + 1 - 3 = 97.
         // But the service logic is incrementing from the old value, so it's 99 + 1 - 3 = 97
         $this->assertEquals(97, $this->product->stock_quantity);
     }
-    
+
     #[Test]
     public function test_update_throws_exception_for_invalid_items_data()
     {

@@ -2,31 +2,36 @@
 
 namespace Tests\Unit\Services;
 
-use App\Models\User;
-use App\Models\Sales;
+use App\Models\Account;
 use App\Models\Product;
+use App\Models\Sales;
 use App\Models\SalesReturn;
 use App\Models\SalesReturnItem;
 use App\Models\Tax;
-use App\Services\SalesReturnService;
+use App\Models\User;
 use App\Services\AccountingService;
+use App\Services\SalesReturnService;
 use App\Services\SalesService;
+use Carbon\Carbon;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Facades\Auth;
 use Mockery;
 use Tests\TestCase;
-use Carbon\Carbon;
 use Tests\Traits\CreatesTenant;
 
 class SalesReturnServiceTest extends TestCase
 {
-    use RefreshDatabase, CreatesTenant;
+    use CreatesTenant, RefreshDatabase;
 
     protected User $user;
+
     protected Sales $sale;
+
     protected Product $product;
+
     protected SalesReturnService $salesReturnService;
+
     protected $accountingServiceMock;
+
     protected $salesServiceMock;
 
     protected function setUp(): void
@@ -37,7 +42,7 @@ class SalesReturnServiceTest extends TestCase
 
         $this->product = Product::factory()->withStock(100)->create();
         $this->sale = Sales::factory()->create();
-        
+
         // Mock AccountingService
         $this->accountingServiceMock = Mockery::mock(AccountingService::class);
         // Mock SalesService - allow updateSaleStatus to be called without errors
@@ -77,22 +82,22 @@ class SalesReturnServiceTest extends TestCase
         ]);
 
         $this->sale->salesItems()->create([
-            'product_id'     => $this->product->id,
-            'quantity'       => 5,
-            'price'          => 100,
+            'product_id' => $this->product->id,
+            'quantity' => 5,
+            'price' => 100,
             'customer_price' => 100,
-            'discount'       => 0,
-            'total'          => 500,
+            'discount' => 0,
+            'total' => 500,
         ]);
 
         $this->accountingServiceMock->shouldReceive('createJournalEntry')->once();
 
         $returnData = [
-            'sales_id'     => $this->sale->id,
-            'return_date'  => Carbon::now()->format('Y-m-d'),
-            'reason'       => 'Defective product',
-            'status'       => 'Pending',
-            'items'        => json_encode([
+            'sales_id' => $this->sale->id,
+            'return_date' => Carbon::now()->format('Y-m-d'),
+            'reason' => 'Defective product',
+            'status' => 'Pending',
+            'items' => json_encode([
                 ['product_id' => $this->product->id, 'returned_quantity' => 2, 'price' => 100, 'return_price' => 100],
             ]),
             'total_amount' => 200,
@@ -103,10 +108,10 @@ class SalesReturnServiceTest extends TestCase
         $this->assertNotNull($salesReturn);
         // Tax fields must be copied from the parent sale
         $this->assertEquals($tax->id, $salesReturn->tax_id);
-        $this->assertEquals(11.0,                $salesReturn->tax_rate);
-        $this->assertEquals('exclusive',          $salesReturn->tax_type);
+        $this->assertEquals(11.0, $salesReturn->tax_rate);
+        $this->assertEquals('exclusive', $salesReturn->tax_type);
         // tax_amount = 11% of 200 = 22
-        $this->assertEquals(22.0,                $salesReturn->tax_amount);
+        $this->assertEquals(22.0, $salesReturn->tax_amount);
     }
 
     public function test_it_can_filter_index_data_by_month_and_year()
@@ -133,22 +138,22 @@ class SalesReturnServiceTest extends TestCase
 
         $this->product->refresh();
         $initialStock = $this->product->stock_quantity;
-        
+
         // Create a sale that is unpaid first - the factory creates Paid status by default
         // so let's create a fresh sale for testing
         $unpaidSale = Sales::factory()->create(['status' => 'Unpaid']);
-        
+
         $returnData = [
             'sales_id' => $unpaidSale->id,
             'return_date' => Carbon::now()->format('Y-m-d'),
             'reason' => 'Customer changed mind',
             'status' => 'Pending',
             'items' => json_encode([
-                ['product_id' => $this->product->id, 'returned_quantity' => 2, 'price' => 100, 'return_price' => 100]
+                ['product_id' => $this->product->id, 'returned_quantity' => 2, 'price' => 100, 'return_price' => 100],
             ]),
             'total_amount' => 200,
         ];
-        
+
         // Mock accounting service for journal entry creation
         $this->accountingServiceMock->shouldReceive('createJournalEntry')->once();
 
@@ -158,7 +163,7 @@ class SalesReturnServiceTest extends TestCase
         $this->assertEquals('Pending', $salesReturn->status);
         $this->assertEquals(200, $salesReturn->total_amount);
         $this->assertDatabaseHas('sales_returns', ['id' => $salesReturn->id]);
-        
+
         $this->product->refresh();
         $this->assertEquals($initialStock + 2, $this->product->stock_quantity); // Stock should increase by returned quantity
         $unpaidSale->refresh();
@@ -183,7 +188,6 @@ class SalesReturnServiceTest extends TestCase
         $this->salesReturnService->createSalesReturn($returnData);
     }
 
-
     public function test_it_can_update_a_sales_return()
     {
         $this->sale->salesItems()->create([
@@ -192,22 +196,22 @@ class SalesReturnServiceTest extends TestCase
             'price' => 100,
             'customer_price' => 100,
             'discount' => 0,
-            'total' => 500
+            'total' => 500,
         ]);
-        
+
         $salesReturn = SalesReturn::factory()->create([
             'sales_id' => $this->sale->id,
             'total_amount' => 100,
-            'status' => 'Pending'
+            'status' => 'Pending',
         ]);
         SalesReturnItem::factory()->create([
             'sales_return_id' => $salesReturn->id,
             'product_id' => $this->product->id,
             'quantity' => 1,
             'price' => 100,
-            'total' => 100
+            'total' => 100,
         ]);
-        
+
         $this->product->refresh();
         $this->assertEquals(100, $this->product->stock_quantity); // Initial stock
 
@@ -217,23 +221,23 @@ class SalesReturnServiceTest extends TestCase
             'reason' => 'Updated reason',
             'status' => 'Completed',
             'items' => json_encode([
-                ['product_id' => $this->product->id, 'returned_quantity' => 3, 'price' => 50]
+                ['product_id' => $this->product->id, 'returned_quantity' => 3, 'price' => 50],
             ]),
         ];
-        
+
         $updatedReturn = $this->salesReturnService->updateSalesReturn($salesReturn, $updateData);
 
         $this->assertEquals('Completed', $updatedReturn->status);
         $this->assertEquals(150, $updatedReturn->total_amount); // 3 items * 50 price
         $this->assertCount(1, $updatedReturn->items);
-        
+
         $this->product->refresh();
         // Initial stock (100) + first return (1) - old return (1) + new return (3) = 100 + 1 - 1 + 3 = 103
-        $this->assertEquals(100 + 1 - 1 + 3, $this->product->stock_quantity); 
+        $this->assertEquals(100 + 1 - 1 + 3, $this->product->stock_quantity);
         $this->sale->refresh();
         $this->assertEquals('Partial', $this->sale->status); // Still partial as 3/5 returned
     }
-    
+
     public function test_update_sales_return_throws_exception_for_invalid_items_data()
     {
         $this->expectException(\Exception::class);
@@ -261,9 +265,9 @@ class SalesReturnServiceTest extends TestCase
     {
         $this->tenant->update(['tax_jurisdiction' => 'ID']);
 
-        $pphReceivableAccount = \App\Models\Account::create([
-            'name' => 'PPh Receivable ' . $this->tenant->id,
-            'code' => '1170-' . $this->tenant->id,
+        $pphReceivableAccount = Account::create([
+            'name' => 'PPh Receivable '.$this->tenant->id,
+            'code' => '1170-'.$this->tenant->id,
             'type' => 'asset',
             'tenant_id' => $this->tenant->id,
         ]);
@@ -282,22 +286,22 @@ class SalesReturnServiceTest extends TestCase
         ]);
 
         $this->sale->salesItems()->create([
-            'product_id'     => $this->product->id,
-            'quantity'       => 5,
-            'price'          => 100,
+            'product_id' => $this->product->id,
+            'quantity' => 5,
+            'price' => 100,
             'customer_price' => 100,
-            'discount'       => 0,
-            'total'          => 500,
+            'discount' => 0,
+            'total' => 500,
         ]);
 
         $this->accountingServiceMock->shouldReceive('createJournalEntry')->once();
 
         $returnData = [
-            'sales_id'     => $this->sale->id,
-            'return_date'  => Carbon::now()->format('Y-m-d'),
-            'reason'       => 'PPh reversal test',
-            'status'       => 'Pending',
-            'items'        => json_encode([
+            'sales_id' => $this->sale->id,
+            'return_date' => Carbon::now()->format('Y-m-d'),
+            'reason' => 'PPh reversal test',
+            'status' => 'Pending',
+            'items' => json_encode([
                 ['product_id' => $this->product->id, 'returned_quantity' => 2, 'price' => 100],
             ]),
         ];

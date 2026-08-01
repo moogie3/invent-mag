@@ -10,6 +10,7 @@ use Illuminate\Http\Request;
 class DashboardController extends Controller
 {
     protected $dashboardService;
+
     protected $salesForecastService;
 
     public function __construct(
@@ -37,13 +38,13 @@ class DashboardController extends Controller
             // Defer heavy sales forecasting to an AJAX call after page load
             if ($request->get('action') === 'forecast') {
                 $tenant = app('currentTenant');
-                if (!$tenant || !$tenant->hasFeature('sales_forecasting')) {
+                if (! $tenant || ! $tenant->hasFeature('sales_forecasting')) {
                     return response()->json(['labels' => [], 'historical' => [], 'forecast' => [], 'metrics' => null]);
                 }
 
                 $forecastData = $this->salesForecastService->generateForecast();
 
-                if (!empty($forecastData['labels'])) {
+                if (! empty($forecastData['labels'])) {
                     $historicalCount = count($forecastData['historical']);
                     $labelsCount = count($forecastData['labels']);
 
@@ -54,10 +55,10 @@ class DashboardController extends Controller
                         'labels' => $forecastData['labels'],
                         'historical' => $historicalSeries,
                         'forecast' => $forecastSeries,
-                        'metrics' => $forecastData['metrics'] ?? null
+                        'metrics' => $forecastData['metrics'] ?? null,
                     ]);
                 }
-                
+
                 return response()->json(['labels' => [], 'historical' => [], 'forecast' => [], 'metrics' => null]);
             }
 
@@ -65,13 +66,13 @@ class DashboardController extends Controller
             // use the monthly aggregation so the refreshed chart matches the initial view.
             if ($request->has('date_range')) {
                 $ajaxDateRange = $request->get('date_range', 'this_year');
-                $ajaxStart     = $request->get('start_date');
-                $ajaxEnd       = $request->get('end_date');
+                $ajaxStart = $request->get('start_date');
+                $ajaxEnd = $request->get('end_date');
                 $data = $this->dashboardService->getChartDataByDateRange($ajaxDateRange, $type, $ajaxStart, $ajaxEnd);
             } else {
                 // Legacy path: rolling period (7days / 30days / 3months / year) → daily granularity
                 $period = $request->get('period', '30days');
-                $data   = $this->dashboardService->getChartData($period, $type);
+                $data = $this->dashboardService->getChartData($period, $type);
             }
 
             return response()->json($data);
@@ -86,7 +87,7 @@ class DashboardController extends Controller
                 'labels' => [],
                 'historical' => [],
                 'forecast' => [],
-                'deferred' => true
+                'deferred' => true,
             ];
         } else {
             $data['salesForecast'] = null;

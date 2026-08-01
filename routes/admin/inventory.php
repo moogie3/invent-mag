@@ -1,9 +1,9 @@
 <?php
 
-use App\Http\Controllers\Admin\StockOpnameController;
-use App\Http\Controllers\Admin\WarehouseController;
 use App\Http\Controllers\Admin\POSController;
+use App\Http\Controllers\Admin\StockOpnameController;
 use App\Http\Controllers\Admin\StockTransferController;
+use App\Http\Controllers\Admin\WarehouseController;
 
 // Stock Opname Routes
 Route::prefix('stock-opname')->middleware('plan.feature:stock_opname')->group(function () {

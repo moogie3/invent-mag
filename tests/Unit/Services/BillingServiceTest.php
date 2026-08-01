@@ -3,8 +3,6 @@
 namespace Tests\Unit\Services;
 
 use App\Models\Plan;
-use App\Models\Tenant;
-use App\Models\User;
 use App\Services\BillingService;
 use Carbon\Carbon;
 use Database\Seeders\PlanSeeder;
@@ -23,8 +21,8 @@ class BillingServiceTest extends TestCase
     {
         parent::setUp();
         $this->setupTenant();
-        $this->service = new BillingService();
-        
+        $this->service = new BillingService;
+
         (new PlanSeeder)->run();
     }
 
@@ -259,7 +257,7 @@ class BillingServiceTest extends TestCase
         $this->tenant->assignPlan($professional);
         $this->tenant->update([
             'pending_plan_id' => $starter->id,
-            'pending_plan_effective_at' => now()->addMonth()->toDateString() . ' 00:00:00',
+            'pending_plan_effective_at' => now()->addMonth()->toDateString().' 00:00:00',
             'proration_credit' => 50.00,
         ]);
 

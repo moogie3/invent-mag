@@ -2,9 +2,10 @@
 
 namespace App\Http\Controllers\SuperAdmin;
 
-use App\Http\Controllers\Controller;
 use App\Helpers\CurrencyHelper;
+use App\Http\Controllers\Controller;
 use App\Models\PlatformCurrencySetting;
+use App\Models\SuperAdmin;
 use App\Services\CurrencyService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -40,9 +41,9 @@ class SettingController extends Controller
         $envFile = base_path('.env');
         $env = file_get_contents($envFile);
 
-        $env = preg_replace('/^APP_NAME=.*/m', 'APP_NAME="' . $validated['app_name'] . '"', $env);
-        $env = preg_replace('/^APP_URL=.*/m', 'APP_URL=' . $validated['app_url'], $env);
-        $env = preg_replace('/^APP_DEBUG=.*/m', 'APP_DEBUG=' . ($request->boolean('app_debug') ? 'true' : 'false'), $env);
+        $env = preg_replace('/^APP_NAME=.*/m', 'APP_NAME="'.$validated['app_name'].'"', $env);
+        $env = preg_replace('/^APP_URL=.*/m', 'APP_URL='.$validated['app_url'], $env);
+        $env = preg_replace('/^APP_DEBUG=.*/m', 'APP_DEBUG='.($request->boolean('app_debug') ? 'true' : 'false'), $env);
 
         if (file_put_contents($envFile, $env) === false) {
             return back()->with('error', 'Could not write .env file.');
@@ -55,7 +56,7 @@ class SettingController extends Controller
 
     public function preferences()
     {
-        /** @var \App\Models\SuperAdmin $user */
+        /** @var SuperAdmin $user */
         $user = Auth::guard('super_admin')->user();
 
         $settings = $user->system_settings ?? [];
@@ -88,7 +89,7 @@ class SettingController extends Controller
 
     public function updatePreferences(Request $request)
     {
-        /** @var \App\Models\SuperAdmin $user */
+        /** @var SuperAdmin $user */
         $user = Auth::guard('super_admin')->user();
 
         $validatedData = $request->validate([
@@ -139,7 +140,7 @@ class SettingController extends Controller
             'theme_mode' => 'required|in:light,dark',
         ]);
 
-        /** @var \App\Models\SuperAdmin $user */
+        /** @var SuperAdmin $user */
         $user = Auth::guard('super_admin')->user();
 
         $existingSettings = $user->system_settings ?? [];

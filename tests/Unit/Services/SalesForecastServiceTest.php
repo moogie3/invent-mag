@@ -4,15 +4,15 @@ namespace Tests\Unit\Services;
 
 use App\Models\Sales;
 use App\Services\SalesForecastService;
+use Carbon\Carbon;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
-use Carbon\Carbon;
 use Tests\Traits\CreatesTenant;
 
 class SalesForecastServiceTest extends TestCase
 {
-    use RefreshDatabase, CreatesTenant;
+    use CreatesTenant, RefreshDatabase;
 
     protected SalesForecastService $salesForecastService;
 
@@ -20,7 +20,7 @@ class SalesForecastServiceTest extends TestCase
     {
         parent::setUp();
         $this->setupTenant();
-        $this->salesForecastService = new SalesForecastService();
+        $this->salesForecastService = new SalesForecastService;
     }
 
     #[Test]
@@ -50,7 +50,7 @@ class SalesForecastServiceTest extends TestCase
         for ($i = 5; $i >= 0; $i--) {
             Sales::factory()->create([
                 'order_date' => Carbon::now()->subMonths($i)->startOfMonth(),
-                'total' => 1000 * (6 - $i) // Create a simple linear trend
+                'total' => 1000 * (6 - $i), // Create a simple linear trend
             ]);
         }
 
@@ -73,7 +73,7 @@ class SalesForecastServiceTest extends TestCase
         for ($i = 13; $i >= 0; $i--) {
             Sales::factory()->create([
                 'order_date' => Carbon::now()->subMonths($i)->startOfMonth(),
-                'total' => 1000 + ($i % 6 * 100) // Create some seasonality
+                'total' => 1000 + ($i % 6 * 100), // Create some seasonality
             ]);
         }
 

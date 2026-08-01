@@ -2,17 +2,18 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Helpers\SalesReturnHelper;
 use App\Http\Controllers\Controller;
 use App\Models\Sales;
 use App\Models\SalesReturn;
 use App\Services\SalesReturnService;
 use App\Services\SalesService;
-use App\Helpers\SalesReturnHelper;
 use Illuminate\Http\Request;
 
 class SalesReturnController extends Controller
 {
     protected $salesReturnService;
+
     protected $salesService;
 
     public function __construct(SalesReturnService $salesReturnService, SalesService $salesService)
@@ -26,12 +27,14 @@ class SalesReturnController extends Controller
         $entries = $request->input('entries', 10);
         $filters = $request->only(['month', 'year']);
         $data = $this->salesReturnService->getSalesReturnIndexData($filters, $entries);
+
         return view('admin.sales-returns.index', $data);
     }
 
     public function create()
     {
         $sales = Sales::whereHas('salesItems')->get();
+
         return view('admin.sales-returns.create', compact('sales'));
     }
 
@@ -68,6 +71,7 @@ class SalesReturnController extends Controller
     public function destroy(SalesReturn $salesReturn)
     {
         $this->salesReturnService->deleteSalesReturn($salesReturn);
+
         return redirect()->route('admin.sales-returns.index')->with('success', 'Sales return deleted successfully.');
     }
 
@@ -86,6 +90,7 @@ class SalesReturnController extends Controller
         $salesReturn->load('items.salesItem');
         $sales = Sales::whereHas('salesItems')->get();
         $isCompletedOrCanceled = in_array($salesReturn->status, ['Completed', 'Canceled']);
+
         return view('admin.sales-returns.edit', compact('salesReturn', 'sales', 'isCompletedOrCanceled'));
     }
 
@@ -109,7 +114,7 @@ class SalesReturnController extends Controller
         foreach ($completedReturns as $sr) {
             foreach ($sr->items as $item) {
                 if ($item->sales_item_id) {
-                    if (!isset($returnedBySalesItem[$item->sales_item_id])) {
+                    if (! isset($returnedBySalesItem[$item->sales_item_id])) {
                         $returnedBySalesItem[$item->sales_item_id] = 0;
                     }
                     $returnedBySalesItem[$item->sales_item_id] += $item->quantity;
@@ -121,6 +126,7 @@ class SalesReturnController extends Controller
         $items = $sale->salesItems->map(function ($item) use ($returnedBySalesItem) {
             $returnedQty = $returnedBySalesItem[$item->id] ?? 0;
             $item->available_quantity = max(0, $item->quantity - $returnedQty);
+
             return $item;
         });
 
@@ -131,6 +137,7 @@ class SalesReturnController extends Controller
     {
         $ids = $request->input('ids');
         $this->salesReturnService->bulkDeleteSalesReturns($ids);
+
         return response()->json(['success' => true, 'message' => 'Selected sales returns have been deleted.']);
     }
 
@@ -138,6 +145,7 @@ class SalesReturnController extends Controller
     {
         $ids = $request->input('ids');
         $this->salesReturnService->bulkCompleteSalesReturns($ids);
+
         return response()->json(['success' => true, 'message' => 'Selected sales returns have been marked as completed.']);
     }
 
@@ -145,6 +153,7 @@ class SalesReturnController extends Controller
     {
         $ids = $request->input('ids');
         $this->salesReturnService->bulkCancelSalesReturns($ids);
+
         return response()->json(['success' => true, 'message' => 'Selected sales returns have been marked as canceled.']);
     }
 
@@ -162,15 +171,18 @@ class SalesReturnController extends Controller
         try {
             return $this->salesReturnService->printReturn($id);
         } catch (\Exception $e) {
-            return back()->with('error', 'Error generating return slip. ' . $e->getMessage());
+            return back()->with('error', 'Error generating return slip. '.$e->getMessage());
         }
     }
 
     /**
      * @group Sales Returns
+     *
      * @summary Bulk Export Sales Returns
+     *
      * @bodyParam ids array required An array of sales return IDs to export. Example: [1, 2, 3]
      * @bodyParam export_option string required The export format ('pdf' or 'csv'). Example: "csv"
+     *
      * @response 200 "The exported file."
      */
     public function bulkExport(Request $request)
@@ -183,6 +195,7 @@ class SalesReturnController extends Controller
 
         try {
             $file = $this->salesReturnService->bulkExportSalesReturns($request->all(), $request->ids, $request->export_option);
+
             return $file;
         } catch (\Exception $e) {
             return response()->json([

@@ -11,8 +11,6 @@ class AccountService
 {
     /**
      * Get all accounts with their children (hierarchical).
-     *
-     * @return Collection
      */
     public function getAccountsWithChildren(): Collection
     {
@@ -24,8 +22,6 @@ class AccountService
 
     /**
      * Get all accounts ordered by name.
-     *
-     * @return Collection
      */
     public function getAllAccountsOrdered(): Collection
     {
@@ -34,9 +30,6 @@ class AccountService
 
     /**
      * Get all accounts except the given one, ordered by name.
-     *
-     * @param int $excludeId
-     * @return Collection
      */
     public function getAllAccountsExcept(int $excludeId): Collection
     {
@@ -47,8 +40,6 @@ class AccountService
 
     /**
      * Get accounts grouped by type.
-     *
-     * @return Collection
      */
     public function getAccountsGroupedByType(): Collection
     {
@@ -58,8 +49,6 @@ class AccountService
     /**
      * Create a new account.
      *
-     * @param array $data
-     * @return Account
      * @throws ValidationException
      */
     public function createAccount(array $data): Account
@@ -74,9 +63,6 @@ class AccountService
     /**
      * Update an existing account.
      *
-     * @param Account $account
-     * @param array $data
-     * @return Account
      * @throws ValidationException
      */
     public function updateAccount(Account $account, array $data): Account
@@ -93,7 +79,6 @@ class AccountService
     /**
      * Delete an account if it has no transactions or children.
      *
-     * @param Account $account
      * @return array ['success' => bool, 'message' => string]
      */
     public function deleteAccount(Account $account): array
@@ -122,26 +107,21 @@ class AccountService
 
     /**
      * Calculate the level for an account based on its parent.
-     *
-     * @param int|null $parentId
-     * @return int
      */
     protected function calculateAccountLevel(?int $parentId): int
     {
-        if (!$parentId) {
+        if (! $parentId) {
             return 0;
         }
 
         $parent = Account::find($parentId);
+
         return $parent ? $parent->level + 1 : 0;
     }
 
     /**
      * Validate account data.
      *
-     * @param array $data
-     * @param int|null $ignoreId
-     * @return void
      * @throws ValidationException
      */
     protected function validateAccountData(array $data, ?int $ignoreId = null): void
@@ -151,13 +131,13 @@ class AccountService
                 'required',
                 'string',
                 'max:255',
-                Rule::unique('accounts', 'name')->where('tenant_id', auth()->user()->tenant_id)->ignore($ignoreId)
+                Rule::unique('accounts', 'name')->where('tenant_id', auth()->user()->tenant_id)->ignore($ignoreId),
             ],
             'code' => [
                 'required',
                 'string',
                 'max:255',
-                Rule::unique('accounts', 'code')->where('tenant_id', auth()->user()->tenant_id)->ignore($ignoreId)
+                Rule::unique('accounts', 'code')->where('tenant_id', auth()->user()->tenant_id)->ignore($ignoreId),
             ],
             'type' => 'required|in:asset,liability,equity,revenue,expense',
             'parent_id' => 'nullable|exists:accounts,id',
@@ -172,9 +152,6 @@ class AccountService
 
     /**
      * Get account by ID.
-     *
-     * @param int $id
-     * @return Account|null
      */
     public function findById(int $id): ?Account
     {
@@ -183,12 +160,9 @@ class AccountService
 
     /**
      * Check if account can be deleted.
-     *
-     * @param Account $account
-     * @return bool
      */
     public function canDelete(Account $account): bool
     {
-        return !$account->transactions()->exists() && !$account->children()->exists();
+        return ! $account->transactions()->exists() && ! $account->children()->exists();
     }
 }

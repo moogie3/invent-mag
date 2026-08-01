@@ -1,7 +1,7 @@
 # Invent-MAG — Product Roadmap
 
-> **Last updated:** July 2026  
-> **Version:** 2.4  
+> **Last updated:** August 2026  
+> **Version:** 2.5  
 > **Stack:** Laravel 11 · Blade/Alpine.js · MySQL · Redis · Dompdf · Spatie Multitenancy · Spatie Permission  
 > **Deployment:** Docker · DigitalOcean (backend) · Vercel (frontend/marketing)  
 > **Domain:** https://invent-mag.web.id
@@ -1656,7 +1656,7 @@ Tax double-submissions to DJP are a legal problem. Protection at 5 levels:
 
 ## 5. Other Planned Features
 
-### 5.1 Bank Reconciliation
+### 5.1 Bank Reconciliation ✅ DONE
 
 **Why:** Essential for the accounting module. Without reconciliation, GL balance and bank statement can drift. Required for accurate financial statements.
 
@@ -1667,7 +1667,21 @@ Tax double-submissions to DJP are a legal problem. Protection at 5 levels:
 - Reconciliation lock (prevent editing reconciled journal entries)
 - Reconciliation report per period
 
-**Complexity:** Medium (~3 weeks). Bank CSV parsers are the tricky part — each bank uses a different format and column layout. Build a `BankStatementParser` interface with implementations per bank.
+**Implementation (CSV-based, no bank API — decision):**
+- `BankStatementParser` interface + `AbstractBankStatementParser` (delimiter sniffing, Indonesian/US number normalization, date parsing) with per-bank subclasses (BCA, Mandiri, BNI, BRI) and a `BankStatementParserFactory`
+- `BankReconciliationService` — import, auto-match (±5 day window, exact amount), manual match, unmatch, complete, delete, totals recalc, journal-entry candidate listing, and `isJournalEntryReconciled()` lock check
+- Models: `BankReconciliation` (open/completed) + `BankReconciliationItem` (unmatched/matched/manually_matched) with computed closing balance & variance
+- Reconciliation lock wired into `AccountingService::reverseJournalEntry / voidJournalEntry / unpostJournalEntry` via `assertNotReconciled()`
+- Controller + routes under `admin/bank-reconciliation.*`; plan feature `bank_reconciliation` gated to Professional+; nav item under Reports
+- EN/ID translations; full feature tests (`BankReconciliationControllerTest`) + parser unit tests (`BankStatementParserTest`)
+
+**Post-completion hardening (Aug 2026):**
+- **Variance gate** — `complete()` throws `DomainException` when `abs(variance) > 0.005`; Complete button disabled out-of-balance with tooltip; error surfaced via flash
+- **Reconciled visibility** — `JournalEntry::withReconciledStatus()` scope (eager-loads count of items in completed reconciliations, no N+1) + `isReconciled()`; "Terekonsiliasi" badges in Journal, Ledger, manual-entry lists/details
+- **Opening-balance prefill** — `getCreateData()` returns per-account opening balances; create form prefills the statement opening balance from the account Opening Balance (swap on account change, hint text)
+- **Tutorial clarity** — new Opening Balance vs Bank Reconciliation steps in `config/tutorial.php` + EN/ID `lang/tutorial.php`
+
+**Complexity:** Medium (~3 weeks). Bank CSV parsers are the tricky part — each bank uses a different format and column layout. ✅ Completed. CSV-based scope replaces the bank-API roadmap below.
 
 ---
 
@@ -1745,16 +1759,16 @@ Tax double-submissions to DJP are a legal problem. Protection at 5 levels:
 
 ---
 
-### 5.7 Bank Integrations (BCA, BNI, Mandiri)
+### 5.7 Bank Integrations (BCA, BNI, Mandiri) — Optional future enhancement
 
-**Why:** Direct bank API integration enables real-time balance checking and automated transaction matching for bank reconciliation.
+**Why:** Direct bank API integration enables real-time balance checking and automated transaction matching. Bank Reconciliation (5.1) already ships as CSV-based; this is a possible Phase-2 automation layer on top of it.
 
 **What:**
 - BCA, BNI, Mandiri API connections
 - Automated bank statement import (replaces manual CSV upload)
 - Real-time balance verification
 
-**Complexity:** High (~2-3 weeks per bank). Each bank has different API requirements and authentication flows.
+**Complexity:** High (~2-3 weeks per bank). Each bank has different API requirements and authentication flows. Not currently planned — CSV import covers the UMKM workflow at zero per-bank integration cost.
 
 ---
 

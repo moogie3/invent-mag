@@ -7,7 +7,6 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Str;
-use Illuminate\Validation\ValidationException;
 
 class LoginController extends Controller
 {
@@ -25,15 +24,17 @@ class LoginController extends Controller
 
         $email = Str::lower($request->input('email', ''));
         $ip = $request->ip() ?? 'unknown';
-        $throttleKey = 'superadmin_login|' . $email . '|' . $ip;
+        $throttleKey = 'superadmin_login|'.$email.'|'.$ip;
 
         if (RateLimiter::tooManyAttempts($throttleKey, 5)) {
             $seconds = RateLimiter::availableIn($throttleKey);
+
             return response()->view('errors.429', ['seconds' => $seconds], 429);
         }
 
-        if (!Auth::guard('super_admin')->attempt($request->only('email', 'password'), $request->boolean('remember'))) {
+        if (! Auth::guard('super_admin')->attempt($request->only('email', 'password'), $request->boolean('remember'))) {
             RateLimiter::hit($throttleKey, 60);
+
             return back()->withInput($request->only('email', 'remember'))
                 ->with('error', __('auth.failed'));
         }
@@ -44,7 +45,7 @@ class LoginController extends Controller
         $user = Auth::guard('super_admin')->user();
 
         return redirect()->route('superadmin.dashboard')
-            ->with('success', 'Welcome back, ' . ($user->name ?? 'Super Admin') . '!');
+            ->with('success', 'Welcome back, '.($user->name ?? 'Super Admin').'!');
     }
 
     public function destroy(Request $request)

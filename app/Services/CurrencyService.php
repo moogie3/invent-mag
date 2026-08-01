@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Helpers\CurrencyHelper;
 use App\Models\CurrencySetting;
 use App\Models\Unit;
 
@@ -20,7 +21,7 @@ class CurrencyService
     public function updateCurrency(array $data)
     {
         CurrencySetting::updateOrCreate([], $data);
-        \App\Helpers\CurrencyHelper::clearSettingsCache();
+        CurrencyHelper::clearSettingsCache();
 
         return ['success' => true, 'message' => 'Currency settings updated successfully.'];
     }

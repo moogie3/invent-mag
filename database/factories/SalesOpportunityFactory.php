@@ -4,11 +4,12 @@ namespace Database\Factories;
 
 use App\Models\Customer;
 use App\Models\PipelineStage;
+use App\Models\SalesOpportunity;
 use App\Models\SalesPipeline;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\SalesOpportunity>
+ * @extends Factory<SalesOpportunity>
  */
 class SalesOpportunityFactory extends Factory
 {

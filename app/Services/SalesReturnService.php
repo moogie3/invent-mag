@@ -255,9 +255,11 @@ class SalesReturnService
                 ['account_name' => $inventoryAccount->name, 'type' => 'debit', 'amount' => $proportionalCOGS],
             ];
 
-            // PPN reversal: if the original sale had PPN enabled and a Faktur Pajak,
-            // reverse the PPN Keluaran journal entry proportionally
-            if ($sale->isPpn() && $sale->ppn_amount > 0 && $sale->fakturPajak) {
+            // PPN reversal: the original sale recognised output VAT at creation
+            // (VAT split — Dr AR / Cr Revenue / Cr PPN Keluaran), so a return
+            // reverses the PPN Keluaran proportionally regardless of whether a
+            // Faktur Pajak has been issued for the sale.
+            if ($sale->isPpn() && $sale->ppn_amount > 0) {
                 $ppnKeluaranAccountId = $accountingSettings['ppn_keluaran_account_id'] ?? null;
                 if ($ppnKeluaranAccountId) {
                     $ppnKeluaranAccount = Account::find($ppnKeluaranAccountId);
@@ -700,9 +702,11 @@ class SalesReturnService
             ['account_name' => $inventoryAccount->name, 'type' => 'debit', 'amount' => $proportionalCOGS],
         ];
 
-        // PPN reversal: if the original sale had PPN enabled and a Faktur Pajak,
-        // reverse the PPN Keluaran journal entry proportionally
-        if ($sale->isPpn() && $sale->ppn_amount > 0 && $sale->fakturPajak) {
+        // PPN reversal: the original sale recognised output VAT at creation
+        // (VAT split — Dr AR / Cr Revenue / Cr PPN Keluaran), so a return
+        // reverses the PPN Keluaran proportionally regardless of whether a
+        // Faktur Pajak has been issued for the sale.
+        if ($sale->isPpn() && $sale->ppn_amount > 0) {
             $ppnKeluaranAccountId = $accountingSettings['ppn_keluaran_account_id'] ?? null;
             if ($ppnKeluaranAccountId) {
                 $ppnKeluaranAccount = Account::find($ppnKeluaranAccountId);

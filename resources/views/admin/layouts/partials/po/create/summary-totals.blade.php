@@ -12,6 +12,13 @@
     </div>
     @php $currentTenant = app('currentTenant'); @endphp
     @if($currentTenant->isIndonesian() && $currentTenant->hasFeature('ppn'))
+    <div class="d-flex justify-content-between mb-2" id="ppnMasukanRow" style="{{ ($defaultTax?->is_ppn ?? false) ? '' : 'display:none!important' }}">
+        <span class="text-muted">{{ __('messages.ppn_masukan') }} (<span id="ppnMasukanRateLabel">{{ ($defaultTax?->is_ppn ?? false) ? $defaultTax->rate : 0 }}</span>%)</span>
+        <span id="ppnMasukanTotal" class="fw-bold text-info">Rp 0</span>
+    </div>
+    <input type="hidden" id="ppnEnabledInput" name="ppn_enabled" value="{{ ($defaultTax?->is_ppn ?? false) ? 1 : 0 }}">
+    <input type="hidden" id="ppnRateInput" name="ppn_rate" value="{{ ($defaultTax?->is_ppn ?? false) ? $defaultTax->rate : 0 }}">
+    <input type="hidden" id="ppnAmountInput" name="ppn_amount" value="0">
     <div class="d-flex justify-content-between mb-2">
         <span class="text-muted">{{ __('messages.withholding_tax') }}</span>
         <div class="d-flex align-items-center">

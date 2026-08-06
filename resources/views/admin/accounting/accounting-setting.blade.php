@@ -177,6 +177,20 @@
                                                         @error('ppn_keluaran_account_id')<div class="invalid-feedback">{{ $message }}</div>@enderror
                                                     </div>
                                                     <div class="col-md-6">
+                                                        <label class="form-label" for="ppn_masukan_account_id">{{ __('messages.ppn_masukan_account') }}</label>
+                                                        <select name="ppn_masukan_account_id" id="ppn_masukan_account_id" class="form-select @error('ppn_masukan_account_id') is-invalid @enderror">
+                                                            <option value="">{{ __('messages.select_account') }}
+                                                            </option>
+                                                            @foreach ($accounts['asset'] ?? [] as $account)
+                                                                <option value="{{ $account->id }}"
+                                                                    @if (old('ppn_masukan_account_id', $settings['ppn_masukan_account_id'] ?? null) == $account->id) selected @endif>
+                                                                    {{ __($account->name) }} ({{ $account->code }})
+                                                                </option>
+                                                            @endforeach
+                                                        </select>
+                                                        @error('ppn_masukan_account_id')<div class="invalid-feedback">{{ $message }}</div>@enderror
+                                                    </div>
+                                                    <div class="col-md-6">
                                                         <label class="form-label" for="pph_receivable_account_id">{{ __('messages.pph_receivable_account') }}</label>
                                                         <select name="pph_receivable_account_id" id="pph_receivable_account_id" class="form-select @error('pph_receivable_account_id') is-invalid @enderror">
                                                             <option value="">{{ __('messages.select_account') }}

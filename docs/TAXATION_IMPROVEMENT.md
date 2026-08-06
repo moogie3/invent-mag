@@ -980,3 +980,35 @@ public static function getDefaultPph(): ?Tax
 | QuotationController   | Yes (if enabled)       | Yes (id, rate, amount)       | User select / default   | SalesHelper        |
 | PosService            | No (PPH not applicable)| N/A                          | N/A                     | N/A                |
 | SalesPipelineService  | No (default only)      | No (transient only)          | Tax model default       | SalesHelper        |
+
+---
+
+## 14. Indonesian Auto-Seed & Jurisdiction Clarity (Aug 2026)
+
+### 14.1 Auto-Seed PPN/PPh on Switching to Indonesia
+
+Switching the **Tax Jurisdiction** to Indonesia (either from the **System Settings → Tax Region** card or the **e-Faktur settings** page) now **automatically creates** the standard Indonesian tax records via `TaxService::ensureIndonesianDefaults()`, so users never have to configure compliance rates by hand:
+
+| Record   | Rate | Type      | Flags                     | Default?                                          |
+| -------- | ---- | --------- | ------------------------- | ------------------------------------------------- |
+| PPN 11%  | 11%  | Exclusive | `is_ppn = true`           | Yes, **only if no default tax exists yet**        |
+| PPH 23   | 2%   | Exclusive | `is_pph = true`           | No                                                |
+
+Rules:
+
+- **Idempotent** — if the tenant already has an `is_ppn = true` or `is_pph = true` record, it is left untouched and no duplicate is created. Toggling jurisdiction back and forth never duplicates records.
+- **Existing default preserved** — a user's current default tax is never overridden; PPN 11% only becomes default when the tenant has no default at all.
+- **No removal on switch-off** — switching away from Indonesia leaves existing tax records intact (users keep their data; only compliance features are gated by jurisdiction).
+
+### 14.2 Jurisdiction vs Tax Configuration — What the User Should Understand
+
+These two concepts are easy to confuse, and the tutorial system now explains the difference on both pages:
+
+- **Tax Jurisdiction** (`None / Indonesia`) is a *compliance switch* on the **System Settings** page. Choosing Indonesia turns on PPN/e-Faktur features (Faktur Pajak, NSFP, NPWP) across the app. It does **not** by itself add a tax rate to any transaction.
+- **Tax Configuration** (the **Tax** page) defines the actual *tax records* — name, rate, and type (Exclusive / Inclusive / None) — that get applied to products, sales, and purchases (e.g. PPN 11%, PPh 23 2%). A record only takes effect once it is assigned to a product or order, and PPN additionally requires the jurisdiction to be Indonesia.
+
+New tutorial steps: `tax_jurisdiction_vs_config` (System Settings) and `tax_config_vs_jurisdiction` (Tax page), EN + ID. The stale `define_tax_rates` ("only one tax rate can be configured at a time") and `sales_application` ("tax is not applied to purchase orders") steps were corrected to reflect multi-record configuration and purchase/POS application.
+
+### 14.3 Safeguard Fix — `canDisableIndonesianJurisdiction()`
+
+The disable-safeguard previously queried a nonexistent `sales.faktur_pajak_id` column (the FK lives on `faktur_pajak.sales_id`), which produced a SQL error → 500 → a generic "An error occurred" alert when switching away from Indonesia. It now uses `whereDoesntHave('fakturPajak')`, and the Settings page JS reloads on 419/401 and surfaces the real error message.

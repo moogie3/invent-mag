@@ -36,10 +36,22 @@ describe('POS Cart Totals Calculation', () => {
             <input id="grandTotalInput" />
             <button id="processPaymentBtn"></button>
             <input id="orderDiscount" value="0" />
-            <input id="discountType" value="fixed" />
-            <input id="taxRate" value="0" />
+            <select id="discountType">
+                <option value="fixed">Fixed</option>
+                <option value="percentage">%</option>
+            </select>
+            <select id="taxSelector">
+                <option value="" data-name="None">None (0%)</option>
+                <option value="1" data-name="PPN" data-rate="10" data-type="exclusive">PPN (10%)</option>
+            </select>
         `;
+        document.getElementById('discountType').value = 'fixed';
+        document.getElementById('taxSelector').selectedIndex = 0;
     });
+
+    const selectTax = (index) => {
+        document.getElementById('taxSelector').selectedIndex = index;
+    };
 
     it('should calculate totals correctly with no items', () => {
         // Arrange
@@ -90,7 +102,7 @@ describe('POS Cart Totals Calculation', () => {
         // Arrange
         getProducts.mockReturnValue([{ total: 200 }]);
         document.getElementById('orderDiscount').value = '10';
-        document.getElementById('discountType').value = 'percent';
+        document.getElementById('discountType').value = 'percentage';
 
         // Act
         calculateTotals();
@@ -104,7 +116,7 @@ describe('POS Cart Totals Calculation', () => {
     it('should calculate totals correctly with tax', () => {
         // Arrange
         getProducts.mockReturnValue([{ total: 100 }]);
-        document.getElementById('taxRate').value = '10';
+        selectTax(1);
 
         // Act
         calculateTotals();
@@ -121,7 +133,7 @@ describe('POS Cart Totals Calculation', () => {
         getProducts.mockReturnValue([{ total: 100 }]);
         document.getElementById('orderDiscount').value = '20';
         document.getElementById('discountType').value = 'fixed';
-        document.getElementById('taxRate').value = '10';
+        selectTax(1);
 
         // Act
         calculateTotals();
@@ -139,7 +151,7 @@ describe('POS Cart Totals Calculation', () => {
         getProducts.mockReturnValue([{ total: 100 }]);
         document.getElementById('orderDiscount').value = '10';
         document.getElementById('discountType').value = 'fixed';
-        document.getElementById('taxRate').value = '10';
+        selectTax(1);
 
         // Act
         calculateTotals();

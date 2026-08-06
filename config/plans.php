@@ -37,66 +37,12 @@ return [
         'bank_reconciliation' => 'Bank Reconciliation',
     ],
 
-    'feature_routes' => [
-        'stock_opname' => [
-            'admin.stock-opname.*',
-        ],
-        'pos' => [
-            'admin.pos',
-            'admin.pos.*',
-        ],
-        'accounting' => [
-            'admin.accounting.*',
-            'admin.setting.accounting',
-            'admin.setting.accounting.*',
-            'admin.setting.reset-coa-default',
-            'admin.accounting.opening-balance.*',
-        ],
-        'crm' => [
-            'admin.sales_pipeline.*',
-        ],
-        'sales_pipeline' => [
-            'admin.sales_pipeline.*',
-        ],
-        'financial_reports' => [
-            'admin.reports.income-statement',
-            'admin.reports.income-statement.*',
-            'admin.reports.balance-sheet',
-            'admin.reports.balance-sheet.*',
-            'admin.reports.aged-receivables',
-            'admin.reports.aged-receivables.*',
-            'admin.reports.aged-payables',
-            'admin.reports.aged-payables.*',
-        ],
-        'cash_flow' => [
-            'admin.reports.cash-flow',
-            'admin.reports.cash-flow.*',
-        ],
-        'multi_currency' => [
-            'admin.setting.currency.*',
-        ],
-        'sales_returns' => [
-            'admin.sales-returns.*',
-        ],
-        'purchase_returns' => [
-            'admin.por.*',
-        ],
-        'api_access' => [
-            'admin.setting.profile.token',
-        ],
-        'hr' => [
-            'admin.hr.*',
-        ],
-        'quotations' => [
-            'admin.quotations.*',
-        ],
-        'ppn' => [
-            'admin.efaktur.*',
-        ],
-        'bank_reconciliation' => [
-            'admin.bank-reconciliation.*',
-        ],
-    ],
+    // NOTE: Feature gating is enforced at the ROUTE layer via the
+    // `plan.feature:<slug>` middleware on each route group (see routes/admin/*.php),
+    // plus controller-level checks for dashboard widgets (sales_forecasting).
+    // Covered by tests/Feature/Admin/PlanFeatureGateTest.php.
+    // There is intentionally NO route-name mapping here — keeping enforcement
+    // explicit per route file is more precise than a global route-name matcher.
 
     'upgrade_messages' => [
         'stock_opname' => 'Stock Opname is available on the Professional plan and above.',

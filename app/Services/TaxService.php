@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\Tax;
+use App\Models\Tenant;
 use Illuminate\Support\Facades\DB;
 
 class TaxService
@@ -93,6 +94,63 @@ class TaxService
                 }
             }
         });
+    }
+
+    /**
+     * Create the standard Indonesian tax records (PPN 11%, PPH 23 2% and
+     * PPh Final 0.5%) for a tenant when they switch to the Indonesian tax
+     * jurisdiction. Idempotent: existing PPN/PPh records are never duplicated,
+     * and an existing default tax is left untouched.
+     *
+     * @return array<int, string> Names of the tax records that were created.
+     */
+    public function ensureIndonesianDefaults(Tenant $tenant): array
+    {
+        $created = [];
+
+        if (! Tax::where('tenant_id', $tenant->id)->where('is_ppn', true)->exists()) {
+            Tax::create([
+                'name' => 'PPN 11%',
+                'rate' => 11,
+                'type' => Tax::TYPE_EXCLUSIVE,
+                'description' => 'Pajak Pertambahan Nilai 11% (Standard VAT for Indonesia)',
+                'is_active' => true,
+                'is_default' => ! Tax::where('tenant_id', $tenant->id)->where('is_default', true)->exists(),
+                'is_ppn' => true,
+                'is_pph' => false,
+            ]);
+            $created[] = 'PPN 11%';
+        }
+
+        if (! Tax::where('tenant_id', $tenant->id)->where('is_pph', true)->exists()) {
+            Tax::create([
+                'name' => 'PPH 23',
+                'rate' => 2,
+                'type' => Tax::TYPE_EXCLUSIVE,
+                'description' => 'Pajak Penghasilan Pasal 23 (Withholding tax on services)',
+                'is_active' => true,
+                'is_default' => false,
+                'is_ppn' => false,
+                'is_pph' => true,
+            ]);
+            $created[] = 'PPH 23';
+        }
+
+        if (! Tax::where('tenant_id', $tenant->id)->where('name', 'PPh Final 0.5%')->exists()) {
+            Tax::create([
+                'name' => 'PPh Final 0.5%',
+                'rate' => 0.5,
+                'type' => Tax::TYPE_EXCLUSIVE,
+                'description' => 'Pajak Penghasilan Final 0,5% berdasarkan PP 23/2018 (UMKM, omzet ≤ Rp4,8 miliar)',
+                'is_active' => true,
+                'is_default' => false,
+                'is_ppn' => false,
+                'is_pph' => true,
+            ]);
+            $created[] = 'PPh Final 0.5%';
+        }
+
+        return $created;
     }
 
     public function hasReferences(Tax $tax): bool

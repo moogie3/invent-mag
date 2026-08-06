@@ -195,7 +195,7 @@ class PosService
             throw new \Exception('Insufficient stock for: '.$productList.'. Please adjust quantities or restock.');
         }
 
-        return DB::transaction(function () use ($data, $products, $dbProducts, $grandTotal, $orderDiscount, $orderDiscountType, $taxAmount, $taxRateVal, $taxId, $taxType, $mainWarehouse, $invoice, $amountReceived, $taxable) {
+        return DB::transaction(function () use ($data, $products, $dbProducts, $grandTotal, $orderDiscount, $orderDiscountType, $tax, $taxAmount, $taxRateVal, $taxId, $taxType, $mainWarehouse, $invoice, $amountReceived, $taxable) {
             $pphTaxId = $data['pph_tax_id'] ?? null;
             $pphTax = $pphTaxId ? Tax::find($pphTaxId) : null;
             $pphTaxRate = $pphTax ? (float) $pphTax->rate : 0;
@@ -283,6 +283,27 @@ class PosService
                         ['account_name' => $costOfGoodsSoldAccount->name, 'type' => 'debit', 'amount' => $totalCostOfGoods],
                         ['account_name' => $inventoryAccount->name, 'type' => 'credit', 'amount' => $totalCostOfGoods],
                     ];
+
+                    // VAT split — Indonesian PPN sales book output VAT to the PPN
+                    // Keluaran liability at sale creation:
+                    //   Dr AR (gross) / Cr Revenue (net of VAT) / Cr PPN Keluaran (ppn)
+                    // Matches standard VAT accounting and avoids the AR overstatement
+                    // that occurred when PPN was only recognized on Faktur Pajak issue.
+                    if (app('currentTenant')->isIndonesian() && ($tax?->is_ppn ?? false) && $taxAmount > 0) {
+                        $ppnKeluaranAccountId = $accountingSettings['ppn_keluaran_account_id'] ?? null;
+                        $ppnKeluaranAccount = $ppnKeluaranAccountId ? Account::find($ppnKeluaranAccountId) : null;
+
+                        if ($ppnKeluaranAccount) {
+                            $transactions[] = ['account_name' => $ppnKeluaranAccount->name, 'type' => 'credit', 'amount' => $taxAmount];
+
+                            foreach ($transactions as &$transaction) {
+                                if ($transaction['account_name'] === $salesRevenueAccount->name && $transaction['type'] === 'credit') {
+                                    $transaction['amount'] = round($grandTotal - $taxAmount, 2);
+                                }
+                            }
+                            unset($transaction);
+                        }
+                    }
 
                     $this->accountingService->createJournalEntry(
                         "POS Sale Invoice #{$sale->invoice}",

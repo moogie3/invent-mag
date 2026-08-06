@@ -35,6 +35,12 @@
         $currentTenant = app('currentTenant');
         $showPph = $currentTenant instanceof \App\Models\Tenant && $currentTenant->isIndonesian() && $currentTenant->hasFeature('ppn');
     @endphp
+    @if($showPph && $pos->isPpn())
+    <div id="ppn-masukan-row" class="d-flex justify-content-between mb-2">
+        <span class="text-muted">{{ __('messages.ppn_masukan') }} ({{ $pos->ppn_rate }}%)</span>
+        <span class="fw-bold text-info">{{ \App\Helpers\CurrencyHelper::format($pos->ppn_amount) }}</span>
+    </div>
+    @endif
     @if($showPph && $pos->isPph())
     <div class="d-flex justify-content-between mb-2">
         <span class="text-muted">{{ __('messages.withholding_tax') }} ({{ $pos->pph_rate }}%)</span>

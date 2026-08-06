@@ -839,4 +839,140 @@ class SalesServiceTest extends TestCase
         $this->assertEquals(4.0, $sale->fresh()->pph_amount);
         $this->assertTrue($sale->fresh()->pph_enabled);
     }
+
+    #[Test]
+    public function it_splits_vat_out_of_revenue_on_indonesian_ppn_sale()
+    {
+        $this->tenant->update(['tax_jurisdiction' => 'ID']);
+
+        $ppnTax = Tax::create([
+            'name' => 'PPN 11%',
+            'rate' => 11,
+            'type' => 'exclusive',
+            'is_active' => true,
+            'is_default' => true,
+            'is_ppn' => true,
+        ]);
+
+        // AccountSeeder already creates the Output VAT account (2130-{tenant}).
+        $ppnKeluaranAccount = Account::where('code', '2130-'.$this->tenant->id)->first();
+        $this->assertNotNull($ppnKeluaranAccount);
+        $this->tenant->update([
+            'accounting_settings' => array_merge(
+                $this->tenant->accounting_settings ?? [],
+                ['ppn_keluaran_account_id' => $ppnKeluaranAccount->id]
+            ),
+        ]);
+
+        $customer = Customer::factory()->create();
+        $warehouse = Warehouse::factory()->create(['is_main' => true]);
+        $product = Product::factory()->create(['price' => 50]);
+        ProductWarehouse::updateOrCreate(
+            ['product_id' => $product->id, 'warehouse_id' => $warehouse->id, 'tenant_id' => $product->tenant_id],
+            ['quantity' => 10]
+        );
+
+        $products = json_encode([
+            ['product_id' => $product->id, 'quantity' => 2, 'customer_price' => 100, 'discount' => 0, 'discount_type' => 'fixed'],
+        ]);
+        $data = [
+            'products' => $products,
+            'customer_id' => $customer->id,
+            'warehouse_id' => $warehouse->id,
+            'order_date' => now()->toDateString(),
+            'due_date' => now()->addMonth()->toDateString(),
+            'tax_id' => $ppnTax->id,
+        ];
+
+        $accountingSettings = app('currentTenant')->accounting_settings;
+        $salesRevenueAccountName = Account::find($accountingSettings['sales_revenue_account_id'])->name;
+        $accountsReceivableAccountName = Account::find($accountingSettings['accounts_receivable_account_id'])->name;
+        $ppnKeluaranAccountName = Account::find($accountingSettings['ppn_keluaran_account_id'])->name;
+
+        $this->accountingServiceMock
+            ->shouldReceive('createJournalEntry')
+            ->once()
+            ->with(
+                Mockery::any(),
+                Mockery::any(),
+                Mockery::on(function ($transactions) use ($salesRevenueAccountName, $accountsReceivableAccountName, $ppnKeluaranAccountName) {
+                    // Subtotal 200 + PPN 11% = 222 gross
+                    $this->assertCount(5, $transactions);
+                    $this->assertEquals(222.0, $this->findTransactionAmount($transactions, $accountsReceivableAccountName, 'debit'));
+                    $this->assertEquals(200.0, $this->findTransactionAmount($transactions, $salesRevenueAccountName, 'credit'));
+                    $this->assertEquals(22.0, $this->findTransactionAmount($transactions, $ppnKeluaranAccountName, 'credit'));
+
+                    return true;
+                }),
+                Mockery::type(Sales::class)
+            );
+
+        $sale = $this->salesService->createSale($data);
+
+        $this->assertTrue($sale->fresh()->ppn_enabled);
+        $this->assertEquals(11.0, $sale->fresh()->ppn_rate);
+        $this->assertEquals(22.0, $sale->fresh()->ppn_amount);
+        $this->assertEquals(222.0, $sale->fresh()->total);
+    }
+
+    #[Test]
+    public function it_does_not_split_vat_when_ppn_keluaran_account_is_missing()
+    {
+        $this->tenant->update(['tax_jurisdiction' => 'ID']);
+
+        $ppnTax = Tax::create([
+            'name' => 'PPN 11%',
+            'rate' => 11,
+            'type' => 'exclusive',
+            'is_active' => true,
+            'is_default' => true,
+            'is_ppn' => true,
+        ]);
+
+        $customer = Customer::factory()->create();
+        $warehouse = Warehouse::factory()->create(['is_main' => true]);
+        $product = Product::factory()->create(['price' => 50]);
+        ProductWarehouse::updateOrCreate(
+            ['product_id' => $product->id, 'warehouse_id' => $warehouse->id, 'tenant_id' => $product->tenant_id],
+            ['quantity' => 10]
+        );
+
+        $products = json_encode([
+            ['product_id' => $product->id, 'quantity' => 2, 'customer_price' => 100, 'discount' => 0, 'discount_type' => 'fixed'],
+        ]);
+        $data = [
+            'products' => $products,
+            'customer_id' => $customer->id,
+            'warehouse_id' => $warehouse->id,
+            'order_date' => now()->toDateString(),
+            'due_date' => now()->addMonth()->toDateString(),
+            'tax_id' => $ppnTax->id,
+        ];
+
+        $accountingSettings = app('currentTenant')->accounting_settings;
+        $salesRevenueAccountName = Account::find($accountingSettings['sales_revenue_account_id'])->name;
+        $accountsReceivableAccountName = Account::find($accountingSettings['accounts_receivable_account_id'])->name;
+
+        $this->accountingServiceMock
+            ->shouldReceive('createJournalEntry')
+            ->once()
+            ->with(
+                Mockery::any(),
+                Mockery::any(),
+                Mockery::on(function ($transactions) use ($salesRevenueAccountName, $accountsReceivableAccountName) {
+                    // Graceful fallback: gross to revenue, no PPN Keluaran line
+                    $this->assertCount(4, $transactions);
+                    $this->assertEquals(222.0, $this->findTransactionAmount($transactions, $accountsReceivableAccountName, 'debit'));
+                    $this->assertEquals(222.0, $this->findTransactionAmount($transactions, $salesRevenueAccountName, 'credit'));
+
+                    return true;
+                }),
+                Mockery::type(Sales::class)
+            );
+
+        $sale = $this->salesService->createSale($data);
+
+        $this->assertTrue($sale->fresh()->ppn_enabled);
+        $this->assertEquals(222.0, $sale->fresh()->total);
+    }
 }

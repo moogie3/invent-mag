@@ -324,6 +324,7 @@
 - [x] **Opening balance prefill** — statement opening balance prefilled from the account's Opening Balance (adjustable to the statement)
 - [x] **Reconciled status badges** — matched entries show "Terekonsiliasi" in Journal, Ledger, and manual-entry lists (`withReconciledStatus()` scope, no N+1)
 - [x] Open → Completed status workflow with reconciliation history list
+- [x] **Import page tutorial** — page-specific context (`admin.bank-reconciliation.create`) explaining why the statement must be imported first; "Statement Start vs System Opening Balance" step clarifies the prefill
 
 ---
 
@@ -402,6 +403,7 @@
 - [x] Platform currency setting (Super Admin) — independent from tenant currencies
 - [x] Tax configuration
 - [x] Dynamic tax rates
+- [x] **Auto-seeded Indonesian defaults** — PPN 11% + PPh 23 2% + PPh Final 0.5% created automatically when Tax Jurisdiction is switched to Indonesia (no manual setup needed); full six-record catalog via `TaxSeeder` (adds PPN 12%, Non-PKP, PPN Inclusive)
 - [x] Theme settings (Dark/Light mode)
 - [x] Theme persistence
 - [x] Category management
@@ -487,6 +489,12 @@
 - [x] e-Faktur nav menu entry (Professional+ only)
 - [x] Tax Region configurable from Settings page (no e-Faktur access required)
 - [x] Navigation jurisdiction filtering — e-Faktur menu hidden for non-Indonesian tenants
+- [x] **Tax Jurisdiction auto-seed** — switching to Indonesia auto-creates PPN 11% (`is_ppn`) + PPh 23 2% + PPh Final 0.5% (`is_pph`) records via `TaxService::ensureIndonesianDefaults()` (idempotent; preserves existing default)
+- [x] **VAT split at sale creation (Phase 1E)** — PPN Keluaran recognized when the sale is created: `Dr AR (grand total) / Cr Revenue (net of VAT) / Cr PPN Keluaran` for Indonesian PPN sales (5-leg journal, graceful 4-leg gross fallback). Faktur Pajak issuance is compliance-only (no journal). Sales returns reverse PPN whenever the sale `isPpn()` (no Faktur Pajak required). PPh 22 seed replaced by **PPh Final 0.5%** (PP 23/2018); existing rows converted in place via migration `2026_08_05_000002`
+- [x] **Jurisdiction vs Tax Configuration tutorial** — 2 new tutorial steps (System Settings + Tax page) clarifying the jurisdiction switch vs tax records; stale tax steps refreshed
+- [x] **PPN Masukan (Input VAT) on Purchases** — `ppn_enabled/rate/amount` snapshot fields on `po`; PPN Masukan debited to Input VAT asset account (1160) instead of capitalizing into inventory; `ppn_masukan_account_id` wired into accounting settings (seeder + backfill + registration); select on Accounting Settings page
+- [x] **SPT Masa PPN summary includes PPN Masukan** — `EFakturService::getSptMasaSummary()` now returns `total_ppn_masukan`, `net_ppn_payable` and `ppn_credit` from `po` records (auto-scoped to tenant, filtered by period + `ppn_enabled`)
+- [x] **PPN Keluaran recognized at sale creation (Phase 1E)** — VAT split journal (`Dr AR gross / Cr Revenue net / Cr PPN Keluaran`) posted in `SalesService::createSale()` and `PosService` for Indonesian PPN sales; Faktur Pajak generation no longer posts a PPN journal (compliance-only); sales returns reverse PPN without requiring a Faktur Pajak
 - [ ] **Phase 2 — PLANNED:** Klikpajak PJAP API direct DJP submission (Enterprise only)
 
 ---
@@ -532,7 +540,8 @@
 ### 🧪 Testing
 
 - [x] PHPUnit 11+ configured
-- [x] 552 PHP test methods / 2541 PHP assertions (42 Feature + 56 Unit PHP, 169 JS Vitest files)
+- [x] 1182 PHP test methods / 3698 PHP assertions (Feature + Unit PHP, 169 JS Vitest files)
+- [x] **Plan-tier gating regression suite** — `PlanFeatureGateTest` (15 tests) verifying every Professional/Enterprise feature slug is enforced at the route layer (`plan.feature:*` middleware) or controller layer (sales forecasting), including the JSON 403 response for API clients and the legacy no-plan full-access path
 - [x] Feature tests (controllers, routes)
 - [x] Unit tests (services, helpers)
 - [x] Multi-tenancy tests
@@ -616,6 +625,8 @@
 - [x] **Tutorial modal** - Multi-step modal covering setup workflow, topic grid, and page-specific quick guide with 50+ page contexts covered including Sales Pipeline stages and Quotation lifecycle
 - [x] **Sub-topic drill-down navigation** - Topics grid drills into category-specific page lists (Configuration → System Settings, Units, Categories...), clicking navigates to that page and auto-shows its contextual tutorial
 - [x] **Click-outside to close** - Clicking the modal backdrop now closes the tutorial modal (was static before)
+- [x] **Tax Jurisdiction vs Tax Configuration steps** - Tutorial steps on System Settings and Tax pages explaining the difference between the jurisdiction switch and actual tax records (incl. auto-seed note); refreshed stale tax steps (`define_tax_rates`, `sales_application`, `tax_configuration_desc`)
+- [x] **Bank Reconciliation import page tutorial** - `admin.bank-reconciliation.create` context explaining statement import; "Statement Start vs System Opening Balance" step
 
 ---
 
@@ -631,7 +642,7 @@
 
 - [x] **Indonesian tax compliance (PPN 11%)** — Phase 1 complete (see e-Faktur section below)
 - [x] **e-Faktur CSV export** — DJP FK/OF format with UTF-8 BOM, amounts in cents
-- [ ] SPT report templates (SPT Masa PPN) — PPN Keluaran summary exists; requires PPN Masukan/input VAT tracking on Purchase Invoices first (POs carry no tax by design)
+- [x] **PPN Masukan (Input VAT) tracking** — PPN on purchases (`po.ppn_enabled`) recorded as Input VAT (1160) with SPT Masa PPN summary showing Keluaran − Masukan = Kurang/Lebih Bayar
 - [ ] Bank integrations (BCA, BNI, Mandiri)
 - [ ] WhatsApp invoice delivery
 - [ ] Midtrans payment links on invoices
@@ -640,7 +651,7 @@
 
 - [x] PPh 23 (Withholding Tax on services) — completed via seeded `is_pph` Tax record (2%)
 - [ ] PPh 21 (employee withholding) — UMKM-flat "Payroll Tax" picker on payroll screen (withholding line in payment journal); explicitly NOT a full TER/PTKP/1721-II engine
-- [ ] PPh 22 (goods withholding) — trivial: seed a `PPH 22` Tax record (1.5%, `is_pph = true`); flows through existing PPh dropdowns + shared PPh Payable (2150) unchanged
+- [x] PPh Final 0.5% (UMKM final income tax, PP 23/2018 & PP 20/2026) — completed via seeded `PPh Final 0.5%` Tax record (0.5%, `is_pph = true`, added to `TaxSeeder` + `TaxService::ensureIndonesianDefaults()` + backfill migration `2026_08_05_000002` converting existing `PPH 22` rows in place); flows through existing PPh dropdowns + shared PPh Payable (2150) unchanged. `PPH 22` (1.5%) remains creatable on the Tax page but is no longer seeded
 - [ ] PPh 25 (installment tax payments) — deferred; manual journal entry suffices for UMKM
 - [ ] Mobile app (React Native/Flutter)
 - [ ] Advanced BI dashboards
@@ -656,8 +667,8 @@
 | **Services**         | 46        |
 | **Models**           | 51        |
 | **Helpers**          | 6         |
-| **Test Methods (PHP)** | 552      |
-| **Test Assertions (PHP)** | 2541   |
+| **Test Methods (PHP)** | 1182     |
+| **Test Assertions (PHP)** | 3698   |
 | **JS Test Files**    | 169       |
 | **API Endpoints**    | 50+       |
 | **Database Tables**  | 55        |
@@ -678,12 +689,12 @@
 2. **Complete Accounting** - Double-entry with manual journal entries
 3. **Multi-tenant SaaS** - True isolation, single codebase
 4. **Sales Pipeline** - Kanban with forecasting
-5. **552 PHP Tests / 2541 Assertions + 169 Vitest Files** - Enterprise-grade testing (PHP + JS)
+5. **1182 PHP Tests / 3698 Assertions + 169 Vitest Files** - Enterprise-grade testing (PHP + JS)
 6. **Docker + CI/CD** - Modern DevOps ready
 7. **Comprehensive Audit Trail** - Security and accounting
 8. **Contextual Tutorial System** - 50+ page-specific help guides with drill-down navigation - users click a topic category, see all pages in that category, click one to navigate there with its contextual tutorial auto-opened
 
 ---
 
-**Document Version:** 2.5  
-**Last Updated:** July 2026
+**Document Version:** 2.7  
+**Last Updated:** August 2026

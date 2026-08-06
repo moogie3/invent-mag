@@ -33,6 +33,13 @@ class Customer extends Model
         'tenant_id',
     ];
 
+    protected function casts(): array
+    {
+        return [
+            'pkp_date' => 'date',
+        ];
+    }
+
     protected function image(): Attribute
     {
         return Attribute::make(

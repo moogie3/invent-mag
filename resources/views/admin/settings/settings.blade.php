@@ -459,13 +459,23 @@ document.addEventListener('DOMContentLoaded', function() {
                 },
                 body: JSON.stringify({ tax_jurisdiction: jurisdiction })
             })
-            .then(function(response) { return response.json(); })
-            .then(function(data) {
-                if (data.success) {
+            .then(function(response) {
+                return response.json().then(function(data) {
+                    return { ok: response.ok, status: response.status, data: data };
+                }).catch(function() {
+                    return { ok: response.ok, status: response.status, data: null };
+                });
+            })
+            .then(function(result) {
+                if (result.data && result.data.success) {
                     window.location.reload();
-                } else {
-                    alert(data.message || 'Failed to update tax jurisdiction.');
+                    return;
                 }
+                if (result.status === 419 || result.status === 401) {
+                    window.location.reload();
+                    return;
+                }
+                alert((result.data && result.data.message) || 'Failed to update tax jurisdiction.');
             })
             .catch(function(err) { alert('An error occurred while updating tax jurisdiction.'); });
         });

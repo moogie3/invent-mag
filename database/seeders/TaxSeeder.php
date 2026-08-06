@@ -51,6 +51,18 @@ class TaxSeeder extends Seeder
         );
 
         Tax::updateOrCreate(
+            ['name' => 'PPh Final 0.5%', 'tenant_id' => $tenantId],
+            [
+                'rate' => 0.5,
+                'type' => Tax::TYPE_EXCLUSIVE,
+                'description' => 'Pajak Penghasilan Final 0,5% berdasarkan PP 23/2018 (UMKM, omzet ≤ Rp4,8 miliar)',
+                'is_active' => true,
+                'is_default' => false,
+                'is_pph' => true,
+            ]
+        );
+
+        Tax::updateOrCreate(
             ['name' => 'Non-PKP', 'tenant_id' => $tenantId],
             [
                 'rate' => 0,

@@ -7,8 +7,10 @@ use App\Models\FakturPajak;
 use App\Models\NsfpPool;
 use App\Models\Sales;
 use App\Services\EFakturService;
+use App\Services\TaxService;
 use Dompdf\Dompdf;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 class EFakturController extends Controller
 {
@@ -171,6 +173,16 @@ class EFakturController extends Controller
         }
 
         $tenant->update($validated);
+
+        if ($willBeIndonesian) {
+            $created = app(TaxService::class)->ensureIndonesianDefaults($tenant);
+            if (! empty($created)) {
+                Log::info('Auto-created default Indonesian tax records', [
+                    'tenant_id' => $tenant->id,
+                    'taxes' => $created,
+                ]);
+            }
+        }
 
         return back()->with('success', __('messages.efaktur_settings_saved'));
     }

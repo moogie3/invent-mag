@@ -53,6 +53,10 @@ class Purchase extends Model
         'pph_rate',
         'pph_amount',
         'pph_tax_id',
+        // PPN / Input VAT (PPN Masukan)
+        'ppn_enabled',
+        'ppn_rate',
+        'ppn_amount',
     ];
 
     protected $guarded = [
@@ -113,6 +117,11 @@ class Purchase extends Model
     public function isPph(): bool
     {
         return (bool) $this->pph_enabled;
+    }
+
+    public function isPpn(): bool
+    {
+        return (bool) $this->ppn_enabled;
     }
 
     public function getSubTotalAttribute()
@@ -214,7 +223,12 @@ class Purchase extends Model
         'discount_total' => 'float',
         'tax_rate' => 'float',
         'total_tax' => 'float',
+        'pph_enabled' => 'boolean',
+        'pph_rate' => 'float',
         'pph_amount' => 'float',
+        'ppn_enabled' => 'boolean',
+        'ppn_rate' => 'float',
+        'ppn_amount' => 'float',
         'order_date' => 'datetime',
         'due_date' => 'datetime',
     ];

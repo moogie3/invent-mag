@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\ActivityLog;
 use App\Models\User;
 use App\Services\ActivityLogService;
+use App\Services\TaxService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
@@ -157,6 +158,16 @@ class SettingsController extends Controller
         }
 
         $tenant->update(['tax_jurisdiction' => $jurisdiction]);
+
+        if ($jurisdiction === 'ID') {
+            $created = app(TaxService::class)->ensureIndonesianDefaults($tenant);
+            if (! empty($created)) {
+                Log::info('Auto-created default Indonesian tax records', [
+                    'tenant_id' => $tenant->id,
+                    'taxes' => $created,
+                ]);
+            }
+        }
 
         if ($request->ajax()) {
             return response()->json([

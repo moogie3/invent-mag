@@ -5,6 +5,7 @@ namespace Tests\Unit\Services;
 use App\Models\Account;
 use App\Models\Categories;
 use App\Models\Customer;
+use App\Models\JournalEntry;
 use App\Models\Product;
 use App\Models\Sales;
 use App\Models\SalesItem;
@@ -223,5 +224,75 @@ class PosServiceTest extends TestCase
         $this->assertEquals(4.0, $sale->fresh()->pph_amount);
         $this->assertEquals($pphTax->id, $sale->fresh()->pph_tax_id);
         $this->assertEquals(216.0, $sale->fresh()->total);
+    }
+
+    #[Test]
+    public function it_splits_vat_out_of_revenue_on_indonesian_ppn_pos_sale()
+    {
+        $this->tenant->update(['tax_jurisdiction' => 'ID']);
+
+        $ppnTax = Tax::create([
+            'name' => 'PPN 11%',
+            'rate' => 11,
+            'type' => 'exclusive',
+            'is_active' => true,
+            'is_default' => true,
+            'is_ppn' => true,
+        ]);
+
+        $ppnKeluaranAccount = Account::create([
+            'name' => 'PPN Keluaran '.$this->tenant->id,
+            'code' => '2130-'.$this->tenant->id,
+            'type' => 'liability',
+            'tenant_id' => $this->tenant->id,
+        ]);
+        $this->tenant->update([
+            'accounting_settings' => array_merge(
+                $this->tenant->accounting_settings ?? [],
+                ['ppn_keluaran_account_id' => $ppnKeluaranAccount->id]
+            ),
+        ]);
+
+        $user = User::factory()->create();
+        Auth::login($user);
+
+        $customer = Customer::factory()->create();
+        $product = Product::factory()->withStock(10)->create(['selling_price' => 100]);
+
+        $productsPayload = json_encode([
+            ['id' => $product->id, 'quantity' => 2, 'price' => 100],
+        ]);
+
+        $data = [
+            'products' => $productsPayload,
+            'customer_id' => $customer->id,
+            'transaction_date' => now()->format('Y-m-d'),
+            'payment_method' => 'Cash',
+            'discount_total' => 0,
+            'discount_total_type' => 'fixed',
+            'tax_id' => $ppnTax->id,
+            'amount_received' => 300,
+        ];
+
+        $sale = $this->posService->createSale($data);
+
+        // Subtotal 200 + PPN 11% = 222
+        $this->assertEquals(222.0, $sale->fresh()->total);
+
+        // The sale journal must split VAT: Dr AR 222 / Cr Revenue 200 / Cr PPN Keluaran 22
+        $saleJournal = JournalEntry::where('sourceable_type', Sales::class)
+            ->where('sourceable_id', $sale->id)
+            ->where('description', 'like', 'POS Sale%')
+            ->first();
+
+        $this->assertNotNull($saleJournal);
+
+        $accountingSettings = $this->tenant->accounting_settings;
+        $revenueAccount = Account::find($accountingSettings['sales_revenue_account_id']);
+        $arAccount = Account::find($accountingSettings['accounts_receivable_account_id']);
+
+        $this->assertEquals(222.0, $saleJournal->transactions->where('account_id', $arAccount->id)->where('type', 'debit')->first()?->amount);
+        $this->assertEquals(200.0, $saleJournal->transactions->where('account_id', $revenueAccount->id)->where('type', 'credit')->first()?->amount);
+        $this->assertEquals(22.0, $saleJournal->transactions->where('account_id', $ppnKeluaranAccount->id)->where('type', 'credit')->first()?->amount);
     }
 }

@@ -32,6 +32,7 @@
                         data-name="{{ $taxOption->name }}"
                         data-rate="{{ $taxOption->rate }}"
                         data-type="{{ $taxOption->type }}"
+                        data-is-ppn="{{ $taxOption->is_ppn ? '1' : '0' }}"
                         {{ old('tax_id') && old('tax_id') == $taxOption->id ? 'selected' : ($defaultTax && $defaultTax->id === $taxOption->id ? 'selected' : '') }}>
                     {{ $taxOption->name }} ({{ $taxOption->rate }}%{{ $taxOption->type !== 'none' ? ', ' . ucfirst($taxOption->type) : '' }})
                 </option>

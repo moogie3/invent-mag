@@ -119,6 +119,28 @@
             </div>
             <div class="col-md-3">
                 <div class="card border-0 shadow-sm rounded-3 text-center py-3 h-100">
+                    <div class="text-muted small mb-1">{{ __('messages.efaktur_total_ppn_masukan') }}</div>
+                    <div class="fs-5 fw-bold text-info align-self-center">
+                        Rp {{ number_format($summary['total_ppn_masukan'], 0, ',', '.') }}
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card border-0 shadow-sm rounded-3 text-center py-3 h-100">
+                    <div class="text-muted small mb-1">{{ __('messages.efaktur_net_ppn_payable') }}</div>
+                    @if($summary['ppn_credit'] > 0)
+                        <div class="fs-5 fw-bold text-warning align-self-center">
+                            {{ __('messages.efaktur_ppn_credit') }}: Rp {{ number_format($summary['ppn_credit'], 0, ',', '.') }}
+                        </div>
+                    @else
+                        <div class="fs-5 fw-bold text-danger align-self-center">
+                            Rp {{ number_format($summary['net_ppn_payable'], 0, ',', '.') }}
+                        </div>
+                    @endif
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card border-0 shadow-sm rounded-3 text-center py-3 h-100">
                     <div class="text-muted small mb-1">{{ __('messages.efaktur_nsfp_available') }}</div>
                     <div class="fs-2 fw-bold align-self-center {{ $nsfpCount < 10 ? 'text-danger' : 'text-success' }}">
                         {{ $nsfpCount }}

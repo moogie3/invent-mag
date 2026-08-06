@@ -38,6 +38,7 @@
                             data-name="{{ $taxOption->name }}"
                             data-rate="{{ $taxOption->rate }}"
                             data-type="{{ $taxOption->type }}"
+                            data-is-ppn="{{ $taxOption->is_ppn ? '1' : '0' }}"
                             {{ ($pos->tax_id ?? $defaultTax?->id) == $taxOption->id ? 'selected' : '' }}>
                         {{ $taxOption->name }} ({{ $taxOption->rate }}%{{ $taxOption->type !== 'none' ? ', ' . ucfirst($taxOption->type) : '' }})
                     </option>
@@ -49,6 +50,18 @@
         </div>
     </div>
     @php $currentTenant = app('currentTenant'); @endphp
+    @if($currentTenant->isIndonesian() && $currentTenant->hasFeature('ppn'))
+    <div class="d-flex justify-content-between mb-2" id="ppnMasukanRow" style="{{ ($pos->ppn_enabled ?? false) ? '' : 'display:none!important' }}">
+        <div>
+            {{ __('messages.ppn_masukan') }}
+            <small class="text-muted">(<span id="ppnMasukanRateLabel">{{ $pos->ppn_rate ?? 0 }}</span>%)</small>
+        </div>
+        <div class="text-info" id="ppnMasukanTotal">{{ \App\Helpers\CurrencyHelper::format($pos->ppn_amount ?? 0) }}</div>
+    </div>
+    <input type="hidden" id="ppnEnabledInput" name="ppn_enabled" value="{{ ($pos->ppn_enabled ?? false) ? 1 : 0 }}">
+    <input type="hidden" id="ppnRateInput" name="ppn_rate" value="{{ $pos->ppn_rate ?? 0 }}">
+    <input type="hidden" id="ppnAmountInput" name="ppn_amount" value="{{ $pos->ppn_amount ?? 0 }}">
+    @endif
     @if($currentTenant->isIndonesian() && $currentTenant->hasFeature('ppn') && ($pos->pph_enabled ?? false))
     <div class="d-flex justify-content-between mb-2">
         <div>

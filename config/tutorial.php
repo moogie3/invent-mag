@@ -297,7 +297,7 @@ return [
             'title' => 'tutorial.create_purchase_order',
             'icon' => 'ti-plus',
             'desc' => 'tutorial.create_purchase_order_desc',
-            'steps' => ['tutorial.purchase_info', 'tutorial.product_selection_po', 'tutorial.supplier_price_po', 'tutorial.autofill_info', 'tutorial.quantity_po', 'tutorial.invoice_discount_po', 'tutorial.order_summary_po', 'tutorial.submit_po'],
+            'steps' => ['tutorial.purchase_info', 'tutorial.product_selection_po', 'tutorial.supplier_price_po', 'tutorial.autofill_info', 'tutorial.quantity_po', 'tutorial.invoice_discount_po', 'tutorial.order_summary_po', 'tutorial.ppn_masukan_po', 'tutorial.submit_po'],
         ],
         'admin.po.edit' => [
             'title' => 'tutorial.edit_purchase_order',
@@ -309,7 +309,7 @@ return [
             'title' => 'tutorial.view_purchase_order',
             'icon' => 'ti-eye',
             'desc' => 'tutorial.view_purchase_order_desc',
-            'steps' => ['tutorial.order_info_po_view', 'tutorial.supplier_info_view', 'tutorial.items_table_po_view', 'tutorial.returned_items_po_view', 'tutorial.amount_display_po_view', 'tutorial.returned_adjusted_po', 'tutorial.create_return_po', 'tutorial.actions_po_view'],
+            'steps' => ['tutorial.order_info_po_view', 'tutorial.supplier_info_view', 'tutorial.items_table_po_view', 'tutorial.returned_items_po_view', 'tutorial.amount_display_po_view', 'tutorial.ppn_masukan_po_view', 'tutorial.returned_adjusted_po', 'tutorial.create_return_po', 'tutorial.actions_po_view'],
         ],
         'admin.po*' => [
             'title' => 'tutorial.purchase_orders',
@@ -369,7 +369,7 @@ return [
             'title' => 'tutorial.tax_configuration',
             'icon' => 'ti-receipt-tax',
             'desc' => 'tutorial.tax_configuration_desc',
-            'steps' => ['tutorial.define_tax_rates', 'tutorial.sales_application'],
+            'steps' => ['tutorial.define_tax_rates', 'tutorial.sales_application', 'tutorial.tax_config_vs_jurisdiction'],
         ],
         'admin.setting.currency*' => [
             'title' => 'tutorial.currency_settings',
@@ -411,7 +411,7 @@ return [
             'title' => 'tutorial.system_settings',
             'icon' => 'ti-settings',
             'desc' => 'tutorial.system_settings_desc',
-            'steps' => ['tutorial.interface_layout', 'tutorial.theme_config', 'tutorial.notifications', 'tutorial.session_security', 'tutorial.performance', 'tutorial.language_localization', 'tutorial.tax_region', 'tutorial.advanced_options'],
+            'steps' => ['tutorial.interface_layout', 'tutorial.theme_config', 'tutorial.notifications', 'tutorial.session_security', 'tutorial.performance', 'tutorial.language_localization', 'tutorial.tax_region', 'tutorial.tax_jurisdiction_vs_config', 'tutorial.advanced_options'],
         ],
         'admin.accounting.ledger*' => [
             'title' => 'tutorial.general_ledger',

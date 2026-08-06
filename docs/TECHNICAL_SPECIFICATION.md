@@ -1,8 +1,8 @@
 # Invent-MAG: Technical Specification Document
 
-**Document Version:** 2.1
-**Last Updated:** July 2026
-**System Version:** 2.1
+**Document Version:** 2.4
+**Last Updated:** Aug 2026
+**System Version:** 2.4
 
 ---
 
@@ -850,10 +850,10 @@ Indonesia's DJP (Direktorat Jenderal Pajak) requires PKP businesses to issue ele
 - `nsfp_pool` — Available NSFP numbers imported from DJP, allocated FIFO with `lockForUpdate()` for race condition safety
 
 **Service Layer (`EFakturService`):**
-- `generateFakturPajak(Sales)` — Atomic: NSFP allocation → FakturPajak + items → PPN Keluaran journal entry via `AccountingService`
+- `generateFakturPajak(Sales)` — Atomic, **compliance-only since Phase 1E (Aug 2026)**: NSFP allocation → FakturPajak + items. PPN Keluaran is no longer journaled here — it is recognized at **sale creation** by `SalesService::createSale()` / `PosService` (5-leg VAT split: `Dr AR gross / Cr Revenue net / Cr PPN Keluaran`, with a 4-leg gross fallback when `ppn_keluaran_account_id` is unconfigured)
 - `exportCsvForDjp(masa, tahun)` — Streamed CSV with UTF-8 BOM, DJP FK/OF row format, amounts in cents
 - `importNsfpPool(string)` — Idempotent import, format validation (`XXX.XXX-YY.XXXXXXXX`)
-- `getSptMasaSummary(masa, tahun)` — SPT Masa PPN monthly totals
+- `getSptMasaSummary(masa, tahun)` — SPT Masa PPN monthly totals (PPN Keluaran + PPN Masukan + net payable/credit)
 
 **Plan Gating:**
 - Feature slug: `ppn` (Professional & Enterprise)
@@ -866,6 +866,13 @@ Indonesia's DJP (Direktorat Jenderal Pajak) requires PKP businesses to issue ele
 - PJAP API direct submission via Klikpajak (`PjapInterface` contract)
 - Real-time approval/rejection status from DJP
 - Enterprise-only premium automation
+
+**PPN Masukan (Input VAT on Purchases):**
+- `po` snapshot fields: `ppn_enabled` (bool), `ppn_rate` (nullable decimal), `ppn_amount` (decimal, default 0)
+- Auto-derived from the selected `Tax.is_ppn` flag, gated by `isIndonesian()`
+- Does **not** reduce payable to supplier; instead debited to asset account `1160 - Input VAT` (does not capitalize into inventory cost)
+- `ppn_masukan_account_id` wired into `tenants.accounting_settings` (AccountSeeder + registration + backfill migration); selectable on the Accounting Settings page (from `asset` accounts)
+- `getSptMasaSummary()` returns `total_ppn_masukan` (sum of `po.ppn_amount` where `ppn_enabled = true` for the period), `net_ppn_payable` (Keluaran − Masukan, floored at 0) and `ppn_credit` (Lebih Bayar when Masukan exceeds Keluaran)
 
 ### 9.4 PPh (Withholding Tax) Implementation
 
@@ -895,7 +902,7 @@ PPh (Pajak Penghasilan) is implemented as a second independent dropdown on sales
 | Account              | Code              | Type     | Purpose                                      |
 |----------------------|-------------------|----------|----------------------------------------------|
 | PPh Receivable       | `1170-{tenant_id}` | Asset    | Tracks withholding tax receivable from customers |
-| PPh 23 Payable       | `2150-{tenant_id}` | Liability | Tracks PPh 23 payable to tax authorities    |
+| PPh Payable          | `2150-{tenant_id}` | Liability | Shared PPh liability to tax authorities (all PPh types — PPh 23, PPh Final 0.5%) |
 
 ---
 
@@ -933,6 +940,9 @@ PPh (Pajak Penghasilan) is implemented as a second independent dropdown on sales
 
 | Version | Date          | Changes                                                                                                                                                                                                                                                                                                                                                                                            |
 | ------- | ------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 2.5     | Aug 2026     | VAT accounting fix (Phase 1E): PPN Keluaran recognized at **sale creation** — `SalesService::createSale()` + `PosService` post a 5-leg VAT-split journal (`Dr AR gross / Cr Revenue net / Cr PPN Keluaran`) for Indonesian PPN sales, with a 4-leg gross-revenue fallback when `ppn_keluaran_account_id` is unconfigured. `EFakturService::generateFakturPajak()` is now compliance-only (PPN journal post + `postPpnKeluaranJournalEntry()` removed; `cancelFakturPajak()` still reverses legacy FP-sourced PPN journals). `SalesReturnService` PPN reversals no longer require a Faktur Pajak — they trigger whenever the sale `isPpn()`. Seed set: `PPH 22` (1.5%) replaced by **`PPh Final 0.5%`** (PP 23/2018) in `TaxService::ensureIndonesianDefaults()` + `TaxSeeder`; migration `2026_08_05_000002_backfill_pph_final_tax_record.php` converts existing rows in place (preserving `pph_tax_id` refs + historical snapshots). Tests: +3 new tax tests. |
+| 2.4     | Aug 2026     | PPN Masukan (Input VAT on Purchases): `po` snapshot fields `ppn_enabled`/`ppn_rate`/`ppn_amount`; PurchaseService journal now splits `Dr Inventory (net)` + `Dr Input VAT (1160)` instead of capitalizing PPN into inventory (falls back to gross when the Input VAT account is unconfigured); `ppn_masukan_account_id` wired into `tenants.accounting_settings` (AccountSeeder + CreateNewUser + backfill migration) with an "Input VAT (PPN Masukan) Account" select on the Accounting Settings page; `EFakturService::getSptMasaSummary()` returns `total_ppn_masukan`, `net_ppn_payable` and `ppn_credit` from period PPN purchases; SPT Masa PPN summary cards show PPN Masukan + Kurang/Lebih Bayar. Tutorial steps `ppn_masukan_po` + `ppn_masukan_po_view` (EN/ID). Tests: `PurchaseServicePpnMasukanTest` (6) + `EFakturServiceSptMasukanTest` (3). |
+| 2.3     | Aug 2026     | Tax Jurisdiction auto-seed & tutorial clarity: `TaxService::ensureIndonesianDefaults()` auto-creates PPN 11% + PPh 23 2% (idempotent, preserves existing default) whenever a tenant switches to Indonesia (Settings page + e-Faktur settings). 2 new tutorial steps (`tax_jurisdiction_vs_config` on System Settings, `tax_config_vs_jurisdiction` on Tax page) explaining jurisdiction vs tax-configuration; refreshed stale tax steps (`define_tax_rates`, `sales_application`, `tax_configuration_desc`). Bank Recon Import page tutorial context (`admin.bank-reconciliation.create`) + reworded "Statement Start vs System Opening Balance" step. Bug fixes: `bootstrap/app.php` ValidationException renderer preserves Fortify named error bag; `Tenant::canDisableIndonesianJurisdiction()` rewritten to `whereDoesntHave('fakturPajak')` (was querying nonexistent `sales.faktur_pajak_id`); Settings page JS hardened (419/401 reload + real error message); `pkp_date` now date-cast on `Tenant` and `Customer` models (fixes "Call to a member function format() on string" 500 on the e-Faktur Settings page and the identical latent bug in the Customers list when a PKP date is set). Tests: 1151 passing (3480 assertions). |
 | 2.2     | Aug 2026     | Bank Reconciliation module: `BankReconciliationService` + `BankStatementParserFactory` with BCA/Mandiri/BNI/BRI CSV/TXT parsers (auto format detection), auto + manual matching, opening-balance prefill from account Opening Balance, variance gate (completion blocked when variance ≠ 0), entry locking from reverse/void/unpost, and reconciled status badges in Journal/Ledger via `JournalEntry::withReconciledStatus()` (no N+1). Plan feature `bank_reconciliation` gated to Professional+. Migration: `bank_reconciliations` & `bank_reconciliation_items` tables. Tutorial: Opening Balance vs Bank Reconciliation steps (EN/ID). Tests: 23 bank-recon/parser + 46 accounting/journal passing. |
 | 2.1     | Jul 2026     | Tax UX improvements: per-item discount type selector (% vs Fixed) on quotations, tax auto-sync on sales create/edit page load, tax breakdown row on sales-returns show page, pipeline opportunity amount now tax-inclusive grand total. Migration: `notes` & `terms_conditions` columns on `sales` and `sales_opportunities`. Tutorial: 4 new step keys (`tax_auto_sync`, `tax_breakdown_ret`, `opportunity_amount_tax`, `item_discount_type_qt`) with EN/ID translations. Test suite: fixed 17 failing unit tests (528 passed, 0 failed). |
 | 1.9     | June 2026    | Sales Pipeline enhancements: Kanban/List view toggle, currency-formatted list view amounts, notes & terms conditions on opportunities, `onPageLoad` deduplication fix preventing double card rendering. Tutorial expansion: Added pipeline and quotation lifecycle tutorial contexts (50+ total contexts), orphaned lang key cleanup, missing Indonesian translations. |
@@ -1028,6 +1038,7 @@ Common extension points:
 | 1.7     | May 2026     | Tutorial HR Expansion: Added HR & Payroll to welcome setup workflow. Added Employees, Attendance, Payroll to Master Data sub-topics. Tech spec category count updated (6→7), context count updated (30+→40+). |
 | 2.0     | Jul 2026     | Platform Currency System: Added `PlatformCurrencySetting` model for super admin panel, `CurrencyHelper::formatPlatform()` method, `currency_code` columns on `plans` and `subscription_orders` tables. Super admin currency is now fully independent from tenant `CurrencySetting`. All hardcoded `$` displays replaced with dynamic `formatPlatform()`. |
 | 2.1     | Jul 2026     | Tax UX improvements and tutorial expansion (per-item discount type on quotations, tax auto-sync on sales, sales return tax breakdown, pipeline opportunity amount tax-inclusive, notes/terms columns migration, 4 new tutorial step keys, 17 failing unit tests fixed — 528 passing, 0 failed). |
+| 2.3     | Aug 2026     | Tax Jurisdiction auto-seed (PPN 11% + PPh 23 2% auto-created on switch to Indonesia), 2 new Tax Jurisdiction vs Tax Configuration tutorial steps + refreshed stale tax steps, Bank Recon Import page tutorial, bug fixes (Fortify error bag, `canDisableIndonesianJurisdiction()` whereDoesntHave, Settings JS hardening, `pkp_date` date cast on Tenant/Customer fixing the e-Faktur Settings page crash). 1151 tests passing. |
 | 2.2     | Aug 2026     | Bank Reconciliation module: BCA/Mandiri/BNI/BRI CSV/TXT import with auto format detection, auto + manual matching, opening-balance prefill, variance gate, entry locking, reconciled status badges in Journal/Ledger. New tables `bank_reconciliations` & `bank_reconciliation_items`. Feature gated to Professional+. Opening Balance vs Bank Reconciliation tutorial steps added. |
 
 ---

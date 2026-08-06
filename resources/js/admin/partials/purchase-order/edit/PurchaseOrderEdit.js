@@ -202,6 +202,34 @@ export class PurchaseOrderEdit extends PurchaseOrderModule {
         if (pphAmountInput) pphAmountInput.value = pphAmount;
         const finalTotal = baseTotal - pphAmount;
 
+        // PPN Masukan (Input VAT) — auto-derived from the selected tax is_ppn flag
+        const taxSelector = document.getElementById("taxSelector");
+        const selectedTaxOpt =
+            taxSelector && taxSelector.selectedIndex >= 0
+                ? taxSelector.options[taxSelector.selectedIndex]
+                : null;
+        const ppnEnabled =
+            !!selectedTaxOpt && selectedTaxOpt.dataset.isPpn === "1";
+        const ppnRate = ppnEnabled
+            ? parseFloat(selectedTaxOpt.dataset.rate) || 0
+            : 0;
+        const ppnAmount = ppnEnabled ? taxAmount : 0;
+
+        const ppnRow = document.getElementById("ppnMasukanRow");
+        const ppnRateLabel = document.getElementById("ppnMasukanRateLabel");
+        const ppnTotalDisplay = document.getElementById("ppnMasukanTotal");
+        const ppnEnabledInput = document.getElementById("ppnEnabledInput");
+        const ppnRateInput = document.getElementById("ppnRateInput");
+        const ppnAmountInput = document.getElementById("ppnAmountInput");
+
+        if (ppnRow) ppnRow.style.display = ppnEnabled ? "" : "none";
+        if (ppnRateLabel) ppnRateLabel.textContent = ppnRate;
+        if (ppnTotalDisplay)
+            ppnTotalDisplay.textContent = this.formatCurrency(ppnAmount);
+        if (ppnEnabledInput) ppnEnabledInput.value = ppnEnabled ? "1" : "0";
+        if (ppnRateInput) ppnRateInput.value = ppnRate;
+        if (ppnAmountInput) ppnAmountInput.value = ppnAmount;
+
         if (this.elements.subtotalElement) {
             this.elements.subtotalElement.textContent =
                 this.formatCurrency(subtotal);

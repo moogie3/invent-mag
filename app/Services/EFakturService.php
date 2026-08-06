@@ -2,13 +2,12 @@
 
 namespace App\Services;
 
-use App\Models\Account;
 use App\Models\FakturPajak;
 use App\Models\FakturPajakItem;
 use App\Models\JournalEntry;
 use App\Models\NsfpPool;
+use App\Models\Purchase;
 use App\Models\Sales;
-use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -115,8 +114,11 @@ class EFakturService
                 ]);
             }
 
-            // Post PPN Keluaran journal entry via AccountingService
-            $this->postPpnKeluaranJournalEntry($faktur, $sale);
+            // PPN is recognized at sale creation (VAT split in SalesService/PosService):
+            // Dr AR (gross) / Cr Revenue (net) / Cr PPN Keluaran (ppn).
+            // Issuing the Faktur Pajak is purely a compliance event and no longer
+            // posts an additional journal entry. This prevents AR from being
+            // overstated by the VAT amount (see SalesService::createSale()).
 
             Log::info('FakturPajak generated', [
                 'faktur_id' => $faktur->id,
@@ -145,7 +147,10 @@ class EFakturService
         }
 
         DB::transaction(function () use ($faktur) {
-            // Reverse the PPN Keluaran journal entry if one was posted
+            // Reverse any PPN Keluaran journal entry still attached to this
+            // faktur. New fakturs never post one (PPN is recognized at sale
+            // creation), so this only cleans up legacy fakturs generated before
+            // that change.
             $ppnJournalEntry = JournalEntry::where('sourceable_type', FakturPajak::class)
                 ->where('sourceable_id', $faktur->id)
                 ->where('status', 'posted')
@@ -163,71 +168,6 @@ class EFakturService
 
             $faktur->update(['status' => 'cancelled']);
         });
-    }
-
-    // -----------------------------------------------------------------------
-    // Journal Entry for PPN Keluaran
-    // -----------------------------------------------------------------------
-
-    /**
-     * Post PPN Keluaran (output VAT) journal entry.
-     *
-     * When a Faktur Pajak is issued:
-     *   Dr. Accounts Receivable     ppn_amount   (customer owes us the PPN)
-     *   Cr. PPN Keluaran (Liability) ppn_amount  (we owe DJP the PPN)
-     *
-     * Account IDs come from tenant's accounting_settings JSON — same pattern
-     * as SalesService::createSale() and PosService.
-     */
-    protected function postPpnKeluaranJournalEntry(FakturPajak $faktur, Sales $sale): void
-    {
-        $tenant = app('currentTenant');
-        $accountingSettings = $tenant->accounting_settings ?? [];
-
-        $ppnKeluaranAccountId = $accountingSettings['ppn_keluaran_account_id'] ?? null;
-        $arAccountId = $accountingSettings['accounts_receivable_account_id'] ?? null;
-
-        // If PPN accounts not yet configured, skip posting (don't crash — warn in log)
-        if (! $ppnKeluaranAccountId || ! $arAccountId) {
-            Log::warning('PPN journal entry skipped — ppn_keluaran_account_id or AR account not configured in accounting settings.', [
-                'faktur_id' => $faktur->id,
-                'tenant_id' => $tenant->id,
-            ]);
-
-            return;
-        }
-
-        $ppnKeluaranAccount = Account::find($ppnKeluaranAccountId);
-        $arAccount = Account::find($arAccountId);
-
-        if (! $ppnKeluaranAccount || ! $arAccount) {
-            Log::warning('PPN journal entry skipped — configured account not found.', [
-                'faktur_id' => $faktur->id,
-                'ppn_keluaran_account_id' => $ppnKeluaranAccountId,
-                'ar_account_id' => $arAccountId,
-            ]);
-
-            return;
-        }
-
-        // Use AccountingService — never create journal entries directly
-        $this->accountingService->createJournalEntry(
-            description: 'PPN Keluaran — FP '.$faktur->nsfp.' / '.$faktur->nama_pembeli,
-            date: Carbon::parse($faktur->tanggal_faktur),
-            transactions: [
-                [
-                    'account_id' => $arAccount->id,
-                    'type' => 'debit',
-                    'amount' => $faktur->ppn,
-                ],
-                [
-                    'account_id' => $ppnKeluaranAccount->id,
-                    'type' => 'credit',
-                    'amount' => $faktur->ppn,
-                ],
-            ],
-            sourceDocument: $faktur   // FakturPajak is the sourceable
-        );
     }
 
     // -----------------------------------------------------------------------
@@ -399,8 +339,8 @@ class EFakturService
     /**
      * Get summary data for SPT Masa PPN monthly report.
      *
-     * Returns totals for PPN Keluaran (output VAT) and faktur counts.
-     * Note: PPN Masukan (input VAT from purchases) tracking is not in Phase 1 scope.
+     * Returns totals for PPN Keluaran (output VAT), PPN Masukan (input VAT
+     * from purchases) and the net PPN payable/credit for the period.
      */
     public function getSptMasaSummary(int $masaPajak, int $tahunPajak): array
     {
@@ -408,6 +348,13 @@ class EFakturService
             ->where('tahun_pajak', $tahunPajak);
 
         $active = (clone $base)->whereIn('status', ['draft', 'submitted', 'approved']);
+
+        $totalPpnMasukan = Purchase::whereYear('order_date', $tahunPajak)
+            ->whereMonth('order_date', $masaPajak)
+            ->where('ppn_enabled', true)
+            ->sum('ppn_amount');
+
+        $totalPpnKeluaran = $active->sum('ppn');
 
         return [
             'masa_pajak' => $masaPajak,
@@ -419,7 +366,10 @@ class EFakturService
             'rejected' => (clone $base)->where('status', 'rejected')->count(),
             'cancelled' => (clone $base)->where('status', 'cancelled')->count(),
             'total_dpp' => $active->sum('dpp'),
-            'total_ppn' => $active->sum('ppn'),
+            'total_ppn' => $totalPpnKeluaran,
+            'total_ppn_masukan' => (float) $totalPpnMasukan,
+            'net_ppn_payable' => max(0, round($totalPpnKeluaran - $totalPpnMasukan, 2)),
+            'ppn_credit' => max(0, round($totalPpnMasukan - $totalPpnKeluaran, 2)),
         ];
     }
 }

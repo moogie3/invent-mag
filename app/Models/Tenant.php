@@ -22,6 +22,7 @@ class Tenant extends BaseTenant
             'pending_plan_effective_at' => 'datetime',
             'billing_period_start' => 'date',
             'billing_period_end' => 'date',
+            'pkp_date' => 'date',
             'accounting_settings' => 'array',
             'backup_password' => 'encrypted',
         ];
@@ -377,7 +378,7 @@ class Tenant extends BaseTenant
 
         $unissuedCount = Sales::where('ppn_enabled', true)
             ->where('ppn_amount', '>', 0)
-            ->where('faktur_pajak_id', null)
+            ->whereDoesntHave('fakturPajak')
             ->count();
         if ($unissuedCount > 0) {
             return [

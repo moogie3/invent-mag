@@ -2,7 +2,8 @@
 
 use App\Http\Controllers\Admin\QuotationController;
 
-Route::prefix('quotations')->group(function () {
+// Quotation Routes - Protected by plan feature (Professional+)
+Route::prefix('quotations')->middleware('plan.feature:quotations')->group(function () {
     Route::get('/', [QuotationController::class, 'index'])
         ->name('admin.quotations')
         ->middleware('can:view-quotations');

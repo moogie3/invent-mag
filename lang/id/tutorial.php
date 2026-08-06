@@ -202,6 +202,7 @@ return [
     'quantity_po' => 'Jumlah: Masukkan jumlah untuk setiap produk.',
     'invoice_discount_po' => 'Diskon Faktur: Terapkan diskon global ke seluruh pesanan.',
     'order_summary_po' => 'Ringkasan Pesanan: Lihat subtotal, diskon, dan total kotor.',
+    'ppn_masukan_po' => 'PPN Masukan (Pajak Masukan): Jika pajak yang dipilih ditandai sebagai PPN (is_ppn), baris ini menampilkan jumlah PPN Masukan secara otomatis. PPN Masukan dicatat sebagai debit ke akun aset PPN Masukan (1160) — tidak mengurangi utang kepada pemasok, namun mengimbangi PPN Keluaran saat pelaporan SPT Masa PPN.',
     'submit_po' => 'Kirim: Klik "Buat Pesanan Pembelian" untuk menyimpan.',
     'view_details_po' => 'Lihat Detail: Klik tombol Lihat untuk membuka modal detail.',
     'payment_status_po' => 'Status Pembayaran: Status pesanan pembelian menunjukkan Lunas, Sebagian Lunas, Belum Lunas.',
@@ -226,6 +227,7 @@ return [
     'items_table_po_view' => 'Tabel Item: Menampilkan semua produk yang dibeli.',
     'returned_items_po_view' => 'Item Dikembalikan: Ikon dikembalikan muncul jika item telah dikembalikan.',
     'amount_display_po_view' => 'Tampilan Jumlah: Jumlah yang ditampilkan sudah Disesuaikan.',
+    'ppn_masukan_po_view' => 'PPN Masukan pada Pesanan Ini: Baris PPN Masukan menampilkan kredit pajak masukan untuk pembelian ini. Jumlah ini didebit ke akun PPN Masukan (1160) dalam jurnal dan dapat dikreditkan terhadap PPN Keluaran pada SPT Masa PPN.',
     'returned_adjusted_po' => 'Dikembalikan (Disesuaikan): Bagian bawah menunjukkan baris "Dikembalikan".',
     'create_return_po' => 'Untuk Membuat Pengembalian: Buka menu Pengembalian Pesanan Pembelian.',
     'actions_po_view' => 'Aksi: Gunakan tombol "Cetak Faktur" untuk mencetak.',
@@ -381,7 +383,8 @@ return [
     'session_security' => 'Sesi & Keamanan: Konfigurasi logout otomatis.',
     'performance' => 'Performance: Toggle animasi UI, lazy loading.',
     'language_localization' => 'Bahasa & Lokalisasi: Atur bahasa sistem.',
-    'tax_region' => 'Wilayah Pajak: Atur yurisdiksi pajak bisnis Anda. Pilih "Indonesia" untuk mengaktifkan fitur PPN dan e-Faktur. Pengaturan ini hanya tersedia untuk paket Professional ke atas.',
+    'tax_region' => 'Wilayah Pajak: Atur yurisdiksi pajak bisnis Anda. Pilih "Indonesia" untuk mengaktifkan fitur PPN dan e-Faktur (Faktur Pajak, NSFP, NPWP). Saat beralih ke Indonesia, catatan pajak standar PPN 11% dan PPh 23 2% dibuat otomatis untuk Anda. Pengaturan ini hanya tersedia untuk paket Professional ke atas.',
+    'tax_jurisdiction_vs_config' => 'Yurisdiksi Pajak vs Konfigurasi Pajak: Sakelar Yurisdiksi Pajak (None / Indonesia) memilih kerangka kepatuhan negara Anda. Memilih "Indonesia" mengaktifkan fitur PPN dan e-Faktur (Faktur Pajak, NSFP, NPWP) di seluruh aplikasi. Ini tidak dengan sendirinya menambahkan tarif pajak ke transaksi Anda. Tarif yang sebenarnya diterapkan pada penjualan dan pembelian didefinisikan di halaman Pajak (Pengaturan → Pajak), seperti PPN 11% atau PPh 23 2%. Saat Anda beralih ke Indonesia, catatan pajak standar PPN 11% dan PPh 23 2% dibuat otomatis untuk Anda.',
     'advanced_options' => 'Opsi Lanjutan: Aktifkan mode debug.',
 
     // Settings - Unit Management
@@ -400,9 +403,10 @@ return [
 
     // Settings - Tax
     'tax_configuration' => 'Konfigurasi Pajak',
-    'tax_configuration_desc' => 'Konfigurasi aturan dan tarif pajak global.',
-    'define_tax_rates' => 'Definisikan Tarif Pajak: Buat tipe pajak utama dan atur persentase.',
-    'sales_application' => 'Aplikasi Penjualan: Aktifkan atau nonaktifkan perhitungan pajak.',
+    'tax_configuration_desc' => 'Konfigurasi catatan pajak (nama, tarif, dan tipe) yang diterapkan pada produk, penjualan, dan pembelian.',
+    'define_tax_rates' => 'Definisikan Tarif Pajak: Buat catatan pajak seperti PPN 11% atau PPh 23 2%. Setiap catatan memiliki nama, persentase tarif, dan tipe (Exclusive, Inclusive, atau None). Gunakan "Jadikan default" untuk tarif yang diterapkan secara default pada produk baru, dan aktifkan bendera PPN / PPh agar pajak dikenali dalam perhitungan kepatuhan. Beberapa catatan pajak dapat dikonfigurasi sekaligus.',
+    'sales_application' => 'Aplikasi Penjualan: Aktifkan atau nonaktifkan catatan pajak untuk mengontrol di mana catatan tersebut tersedia. Catatan pajak aktif diterapkan pada pesanan penjualan, faktur, pembelian, dan transaksi POS. Pajak hanya memengaruhi transaksi setelah ditetapkan ke produk atau pesanan, dan PPN memerlukan Yurisdiksi Pajak yang diatur ke Indonesia.',
+    'tax_config_vs_jurisdiction' => 'Konfigurasi Pajak vs Yurisdiksi Pajak: Halaman ini mendefinisikan catatan pajak yang sebenarnya (nama, tarif, dan tipe — Exclusive / Inclusive / None) yang diterapkan pada produk, penjualan, dan pembelian, misalnya PPN 11% atau PPh 23 2%. Sakelar Yurisdiksi Pajak di halaman Pengaturan Sistem berbeda: ia memilih kerangka kepatuhan negara Anda. Memilih "Indonesia" di sana mengaktifkan fitur PPN dan e-Faktur. Catatan pajak di sini hanya berpengaruh setelah ditetapkan ke produk atau pesanan — dan untuk PPN, yurisdiksi harus diatur ke Indonesia. Saat Anda beralih ke Indonesia, catatan standar PPN 11% dan PPh 23 2% muncul di sini secara otomatis.',
 
     // Settings - Currency
     'currency_settings' => 'Pengaturan Mata Uang',

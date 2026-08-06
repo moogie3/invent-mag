@@ -525,6 +525,29 @@ class SalesService
                 ['account_name' => $inventoryAccountName, 'type' => 'credit', 'amount' => $totalCostOfGoods],
             ];
 
+            // VAT split — Indonesian PPN sales book the output VAT to the PPN
+            // Keluaran liability at sale creation instead of inflating revenue:
+            //   Dr AR (gross) / Cr Revenue (net of VAT) / Cr PPN Keluaran (ppn)
+            // This matches standard VAT accounting and avoids AR being overstated
+            // by the VAT amount when a Faktur Pajak is issued later. If the PPN
+            // Keluaran account is not configured we gracefully fall back to booking
+            // the full gross to revenue (legacy behaviour).
+            if (app('currentTenant')->isIndonesian() && ($tax?->is_ppn ?? false) && $taxAmount > 0) {
+                $ppnKeluaranAccountId = $accountingSettings['ppn_keluaran_account_id'] ?? null;
+                $ppnKeluaranAccount = $ppnKeluaranAccountId ? Account::find($ppnKeluaranAccountId) : null;
+
+                if ($ppnKeluaranAccount) {
+                    $transactions[] = ['account_name' => $ppnKeluaranAccount->name, 'type' => 'credit', 'amount' => $taxAmount];
+
+                    foreach ($transactions as &$transaction) {
+                        if ($transaction['account_name'] === $salesRevenueAccountName && $transaction['type'] === 'credit') {
+                            $transaction['amount'] = round($grandTotal - $taxAmount, 2);
+                        }
+                    }
+                    unset($transaction);
+                }
+            }
+
             $this->accountingService->createJournalEntry(
                 "Sale Invoice #{$sale->invoice}",
                 Carbon::parse($data['order_date']),

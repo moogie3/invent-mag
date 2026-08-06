@@ -1,57 +1,68 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
-import '../../resources/js/app.js';
 
-describe('Theme application', () => {
+const importInitializer = () => import('@/js/admin/layouts/theme-initializer.js');
+
+const matchMediaMock = (prefersDark) => {
+    window.matchMedia = vi.fn().mockImplementation((query) => ({
+        matches: query === '(prefers-color-scheme: dark)' && prefersDark,
+        media: query,
+        addEventListener: vi.fn(),
+        removeEventListener: vi.fn(),
+        addListener: vi.fn(),
+        removeListener: vi.fn(),
+        dispatchEvent: vi.fn(),
+    }));
+};
+
+describe('Theme initializer', () => {
 
     beforeEach(() => {
-        // Reset the body for each test
-        document.body.removeAttribute('data-bs-theme');
-        document.body.removeAttribute('data-theme-mode');
-        document.body.classList.remove('theme-dark', 'dark-mode', 'light-mode');
-        
-        // Mock console.log to prevent logs from appearing in test output
-        vi.spyOn(console, 'log').mockImplementation(() => {});
+        vi.resetModules();
+        localStorage.clear();
+        document.documentElement.removeAttribute('data-bs-theme');
     });
 
-    it('should apply dark theme correctly', () => {
-        // Act
-        window.applyTheme('dark');
-
-        // Assert
-        expect(document.body.getAttribute('data-bs-theme')).toBe('dark');
-        expect(document.body.getAttribute('data-theme-mode')).toBe('dark');
-        expect(document.body.classList.contains('theme-dark')).toBe(true);
-        expect(document.body.classList.contains('dark-mode')).toBe(true);
-        expect(document.body.classList.contains('light-mode')).toBe(false);
-    });
-
-    it('should apply light theme correctly', () => {
-        // Arrange: start with dark theme
-        window.applyTheme('dark');
-
-        // Act
-        window.applyTheme('light');
-
-        // Assert
-        expect(document.body.getAttribute('data-bs-theme')).toBe('light');
-        expect(document.body.getAttribute('data-theme-mode')).toBe('light');
-        expect(document.body.classList.contains('theme-dark')).toBe(false);
-        expect(document.body.classList.contains('dark-mode')).toBe(false);
-        expect(document.body.classList.contains('light-mode')).toBe(true);
-    });
-
-    it('should remove dark classes when switching to light theme', () => {
+    it('should apply dark theme from localStorage', async () => {
         // Arrange
-        document.body.classList.add('theme-dark', 'dark-mode');
-        document.body.setAttribute('data-bs-theme', 'dark');
+        localStorage.setItem('theme', 'dark');
 
         // Act
-        window.applyTheme('light');
+        await importInitializer();
 
         // Assert
-        expect(document.body.classList.contains('theme-dark')).toBe(false);
-        expect(document.body.classList.contains('dark-mode')).toBe(false);
-        expect(document.body.classList.contains('light-mode')).toBe(true);
-        expect(document.body.getAttribute('data-bs-theme')).toBe('light');
+        expect(document.documentElement.getAttribute('data-bs-theme')).toBe('dark');
+    });
+
+    it('should apply light theme from localStorage', async () => {
+        // Arrange
+        localStorage.setItem('theme', 'light');
+
+        // Act
+        await importInitializer();
+
+        // Assert
+        expect(document.documentElement.getAttribute('data-bs-theme')).toBe('light');
+    });
+
+    it('should fall back to the OS dark preference when no theme is stored', async () => {
+        // Arrange
+        matchMediaMock(true);
+
+        // Act
+        await importInitializer();
+
+        // Assert
+        expect(document.documentElement.getAttribute('data-bs-theme')).toBe('dark');
+    });
+
+    it('should default to light when no theme is stored and no dark OS preference', async () => {
+        // Arrange
+        matchMediaMock(false);
+
+        // Act
+        await importInitializer();
+
+        // Assert
+        expect(document.documentElement.getAttribute('data-bs-theme')).toBe('light');
     });
 });

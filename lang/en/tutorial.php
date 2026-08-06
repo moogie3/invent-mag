@@ -193,6 +193,7 @@ return [
     'quantity_po' => 'Quantity: Enter quantity for each product. The system calculates line totals automatically. Quantity cannot exceed available stock.',
     'invoice_discount_po' => 'Invoice Discount: Apply a global discount to the entire order (percentage or fixed amount) at the bottom.',
     'order_summary_po' => 'Order Summary: View subtotal, discount, and grand total.',
+    'ppn_masukan_po' => 'PPN Masukan (Input VAT): If the selected tax is flagged as PPN (is_ppn), this row shows the Input VAT (PPN Masukan) amount automatically. PPN Masukan is recorded as a debit to your Input VAT asset account (1160) — it does not reduce your payable to the supplier, but it offsets your PPN Keluaran (output VAT) liability when filing SPT Masa PPN.',
     'submit_po' => 'Submit: Click "Create Purchase Order" to save. The order will be created as "Unpaid/Pending" and you can record payments later on the Purchase Order Edit page.',
     'view_details_po' => 'View Details: Click the View button to open a detailed modal showing the full PO including supplier info, order details, items with prices, totals, and payment status.',
     'payment_status_po' => 'Payment Status: Purchase order status shows Paid (fully paid), Partially Paid (partial payment made), Pending (awaiting payment, shows as Due Today, Due in X Days, or Overdue based on due date), or Returned (items returned to supplier). Status is updated based on payment records and due date.',
@@ -217,6 +218,7 @@ return [
     'items_table_po_view' => 'Items Table: Shows all products purchased in this order. The quantity shown is the FINAL quantity (original quantity minus any returned items).',
     'returned_items_po_view' => 'Returned Items: If items have been returned, a returned icon appears in the items list. The quantity reflects the adjusted amount after returns.',
     'amount_display_po_view' => 'Amount Display: The amounts shown are already ADJUSTED - they reflect the final quantity after returns. The original total is not shown here.',
+    'ppn_masukan_po_view' => 'PPN Masukan on This Order: The PPN Masukan row shows the input VAT credit for this purchase. This amount is debited to Input VAT (account 1160) in the journal entry and can be offset against PPN Keluaran in your SPT Masa PPN.',
     'returned_adjusted_po' => 'Returned (Adjusted): At the bottom in the amount summary, the "Returned" row shows only the returned amount, not the original total. The adjusted subtotal shows the final total after deducting returns.',
     'create_return_po' => 'To Create Return: To process a new return for this purchase order, go to the Purchase Order Returns menu and create a new return for this invoice.',
     'actions_po_view' => 'Actions: Use the "Print Invoice" button to print or download PDF. Click "Edit Invoice" to modify the order.',
@@ -372,7 +374,8 @@ return [
     'session_security' => 'Session & Security: Configure auto-logout after inactivity (15 min, 30 min, 1 hour, 2 hours, or disabled). Enable "Remember Last Page" to return to your previous location after login.',
     'performance' => 'Performance: Toggle UI animations, lazy loading for images, and fluid layout. Set automatic data refresh rate (15s, 30s, 1min, 5min, or manual only).',
     'language_localization' => 'Language & Localization: Set the system language for translations (English or Bahasa Indonesia).',
-    'tax_region' => 'Tax Region: Set your business tax jurisdiction. Select "Indonesia" to enable PPN and e-Faktur features. This setting is only available on Professional plans and above.',
+    'tax_region' => 'Tax Region: Set your business tax jurisdiction. Select "Indonesia" to enable PPN and e-Faktur features (Faktur Pajak, NSFP, NPWP). Switching to Indonesia automatically creates standard PPN 11% and PPh 23 2% tax records for you. This setting is only available on Professional plans and above.',
+    'tax_jurisdiction_vs_config' => 'Tax Jurisdiction vs Tax Configuration: The Tax Jurisdiction switch (None / Indonesia) selects your country\'s compliance framework. Choosing "Indonesia" turns on the PPN and e-Faktur features (Faktur Pajak, NSFP, NPWP) across the app. It does not, by itself, add a tax rate to your transactions. The actual rates applied to sales and purchases are defined on the Tax page (Settings → Taxes), such as PPN 11% or PPh 23 2%. When you switch to Indonesia, standard PPN 11% and PPh 23 2% tax records are created automatically for you.',
     'advanced_options' => 'Advanced Options: Enable debug mode for development information, keyboard shortcuts for power users, and help tooltips throughout the interface. Click "View Shortcuts" to see available keyboard commands.',
 
     // Settings - Unit Management
@@ -391,9 +394,10 @@ return [
 
     // Settings - Tax
     'tax_configuration' => 'Tax Configuration',
-    'tax_configuration_desc' => 'Configure global tax rules and rates applied to sales orders and invoices.',
-    'define_tax_rates' => 'Define Tax Rates: Create a primary tax type (e.g., VAT, GST, Sales Tax) and set the percentage rate (such as 10%, 15%, or 20%). Only one tax rate can be configured at a time.',
-    'sales_application' => 'Sales Application: Enable or disable tax calculations for sales orders. When enabled, tax is automatically calculated on sales invoices. Note: Tax is not applied to purchase orders.',
+    'tax_configuration_desc' => 'Configure tax records (name, rate, and type) applied to products, sales, and purchases.',
+    'define_tax_rates' => 'Define Tax Rates: Create tax records such as PPN 11% or PPh 23 2%. Each record has a name, a percentage rate, and a type (Exclusive, Inclusive, or None). Use "Set as default" for the rate applied by default to new products, and enable the PPN / PPh flags so the tax is recognized in compliance calculations. Multiple tax records can be configured at the same time.',
+    'sales_application' => 'Sales Application: Enable or disable a tax record to control where it is available. Active tax records are applied to sales orders, invoices, purchases, and POS transactions. A tax only affects a transaction once it is assigned to a product or order, and PPN requires the Tax Jurisdiction to be set to Indonesia.',
+    'tax_config_vs_jurisdiction' => 'Tax Configuration vs Tax Jurisdiction: This page defines the actual tax records (name, rate, and type — Exclusive / Inclusive / None) applied to products, sales, and purchases, e.g. PPN 11% or PPh 23 2%. The Tax Jurisdiction switch on the System Settings page is different: it selects your country\'s compliance framework. Choosing "Indonesia" there turns on the PPN and e-Faktur features. A tax record here only takes effect once it is assigned to a product or order — and for PPN, the jurisdiction must be set to Indonesia. When you switch to Indonesia, standard PPN 11% and PPh 23 2% records appear here automatically.',
 
     // Settings - Currency
     'currency_settings' => 'Currency Settings',

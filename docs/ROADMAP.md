@@ -43,7 +43,8 @@ This section documents the actual architecture so all future development stays s
 - Feature check: `$tenant->hasFeature('accounting')` → checks JSON array
 - Route-level guard: `->middleware('plan.feature:accounting')` → `CheckPlanFeature` middleware
 - Blade-level guard: `@planHas('accounting') ... @endPlanHas`
-- Feature slugs currently in use (verified against `database/seeders/PlanSeeder.php` + route middleware): `accounting`, `pos`, `crm`, `sales_pipeline`, `stock_opname`, `sales_returns`, `purchase_returns`, `hr`, `cash_flow`, `quotations`, `ppn`, `financial_reports`, `multi_currency`, `sales_forecasting`, `api_access`, `audit_compliance` (+ non-gated baseline slugs: `products`, `inventory`, `sales`, `purchases`, `invoices`, `dashboard`, `basic_reports`, `customers`, `suppliers`)
+- Feature slugs currently in use (verified against `database/seeders/PlanSeeder.php` + route middleware): `accounting`, `pos`, `crm`, `sales_pipeline`, `stock_opname`, `sales_returns`, `purchase_returns`, `hr`, `cash_flow`, `quotations`, `ppn`, `financial_reports`, `multi_currency`, `sales_forecasting`, `api_access`, `audit_compliance`, `bank_reconciliation` (+ non-gated baseline slugs: `products`, `inventory`, `sales`, `purchases`, `invoices`, `dashboard`, `basic_reports`, `customers`, `suppliers`)
+- **Plan gating is enforced at the route layer** (`->middleware('plan.feature:<slug>')` on each route group) and controller layer for dashboard widgets (sales forecasting). Every Professional/Enterprise feature is verified gated by `tests/Feature/Admin/PlanFeatureGateTest.php` (15 tests — blocked/allowed per tier, JSON 403 for API clients, legacy no-plan full access). The dead `feature_routes` map was removed from `config/plans.php` in Aug 2026.
 - **New e-Faktur feature slug to add (Phase 2)**: `efaktur_api` (Enterprise only) — `ppn` (Phase 1) is already added to Professional & Enterprise plans
 - How to add a feature to a plan: migration that updates the JSON array (see `2026_04_18_071144_add_stock_opname_feature_to_plans.php` as pattern)
 
@@ -1679,7 +1680,7 @@ Tax double-submissions to DJP are a legal problem. Protection at 5 levels:
 - **Variance gate** — `complete()` throws `DomainException` when `abs(variance) > 0.005`; Complete button disabled out-of-balance with tooltip; error surfaced via flash
 - **Reconciled visibility** — `JournalEntry::withReconciledStatus()` scope (eager-loads count of items in completed reconciliations, no N+1) + `isReconciled()`; "Terekonsiliasi" badges in Journal, Ledger, manual-entry lists/details
 - **Opening-balance prefill** — `getCreateData()` returns per-account opening balances; create form prefills the statement opening balance from the account Opening Balance (swap on account change, hint text)
-- **Tutorial clarity** — new Opening Balance vs Bank Reconciliation steps in `config/tutorial.php` + EN/ID `lang/tutorial.php`
+- **Tutorial clarity** — new Opening Balance vs Bank Reconciliation steps in `config/tutorial.php` + EN/ID `lang/tutorial.php`; page-specific Import Statement context (`admin.bank-reconciliation.create`) explaining why the statement must be imported first; "Statement Start vs System Opening Balance" step on the recon page. Tax Jurisdiction vs Tax Configuration steps added on the System Settings and Tax pages (with auto-seed of PPN 11% + PPh 23 2% + PPh Final 0.5% on switching to Indonesia).
 
 **Complexity:** Medium (~3 weeks). Bank CSV parsers are the tricky part — each bank uses a different format and column layout. ✅ Completed. CSV-based scope replaces the bank-API roadmap below.
 
@@ -1747,12 +1748,15 @@ Tax double-submissions to DJP are a legal problem. Protection at 5 levels:
 
 **Why:** Monthly SPT Masa PPN filing is mandatory for PKP businesses in Indonesia. Providing templates that auto-populate from existing data saves manual work and reduces errors.
 
-**Current state (July 2026):** PPN Keluaran (output VAT) summary already exists via `EFakturService::getSptMasaSummary()` (masa/tahun, faktur counts, DPP, PPN).
+**Current state (Aug 2026):** PPN Keluaran (output VAT) summary exists via `EFakturService::getSptMasaSummary()` (masa/tahun, faktur counts, DPP, PPN). PPN Masukan (input VAT) tracking on purchases shipped (Phase 1D) — `po` carries `ppn_enabled/rate/amount` snapshots, the purchase journal debits Input VAT (1140→1160), and the SPT summary now returns `total_ppn_masukan`, `net_ppn_payable` and `ppn_credit` (Kurang/Lebih Bayar).
+
+**VAT accounting note (Phase 1E, Aug 2026):** PPN Keluaran is now recognized at **sale creation** — `SalesService::createSale()` and `PosService` post a VAT-split journal (`Dr AR gross / Cr Revenue net / Cr PPN Keluaran`) for Indonesian PPN sales, so revenue is booked net of VAT and the Faktur Pajak carries no journal (compliance-only). Sales returns reverse PPN whenever the original sale `isPpn()` (no Faktur Pajak required).
 
 **What:**
 - SPT Masa PPN form template pre-filled from sales/purchase data
 - PPN Keluaran (output VAT) summary from Faktur Pajak — ✅ done
-- PPN Masukan (input VAT) summary from purchase data — ⚠️ **missing prerequisite:** POs deliberately carry no tax (Decision 14), so input VAT tracking must be built first (a Purchase Invoice tax stage + PPN Masukan 1140 journal), or the SPT will only ever reflect output VAT
+- PPN Masukan (input VAT) summary from purchase data — ✅ done (prerequisite shipped Aug 2026: `po.ppn_enabled` snapshot + PPN Masukan 1160 journal)
+- PPN Kurang Bayar / Lebih Bayar (net payable/credit) — ✅ done (summary cards on e-Faktur index)
 - Export to DJP-compatible format (CSV or PDF)
 
 **Complexity:** Medium (~1-2 weeks). Blocked on PPN Masukan/input VAT tracking, not on tax record changes.
@@ -1772,7 +1776,7 @@ Tax double-submissions to DJP are a legal problem. Protection at 5 levels:
 
 ---
 
-### 5.8 PPh Support (21, 22, 23, 25)
+### 5.8 PPh Support (21, 23, 25, Final 0.5%)
 
 **Why:** PPh (Pajak Penghasilan / Income Tax) withholding is required alongside PPN for comprehensive Indonesian tax compliance.
 
@@ -1781,10 +1785,10 @@ Tax double-submissions to DJP are a legal problem. Protection at 5 levels:
 **What:**
 - ~~PPh 23 (service fee withholding)~~ — ✅ **Completed (July 2026).** Seeded Tax record `PPH 23` (2%, `is_pph = true`). Snapshot fields (`pph_enabled`/`pph_rate`/`pph_amount`) on Sales/PO/POS/Quotation, journal posting, and the sales-view PPh line all live.
 - PPh 21 (employee income tax) — 🔜 **Future (low effort).** Correct UMKM scope is a flat **"Payroll Tax" picker** on the payroll screen (withholding line in the payment journal), **not** a full TER/PTKP/1721-II engine. Reuses the `is_pph` mechanism. Depends on HR & Payroll feature (`hr` slug).
-- PPh 22 (goods withholding) — 🔜 **Future (trivial).** Add a seeded Tax record `PPH 22` (1.5%, `is_pph = true`) to `TaxSeeder` — it flows through every existing PPh dropdown and journal path unchanged. No new models or journal code.
+- ~~PPh Final 0.5% (UMKM final income tax)~~ — ✅ **Completed (August 2026).** Seeded Tax record `PPh Final 0.5%` (0.5%, `is_pph = true`) added to `TaxSeeder` + `TaxService::ensureIndonesianDefaults()` (idempotent per-record) with backfill migration `2026_08_05_000002` converting existing `PPH 22` rows in place — it flows through every existing PPh dropdown and journal path unchanged. No new models or journal code. `PPH 22` (1.5%) remains creatable on the Tax page but is no longer seeded.
 - PPh 25 (monthly installments) — ⏸️ **Deferred.** A manual journal entry covers the monthly installment for UMKM; a dedicated calculation engine is out of scope.
 
-**Complexity:** Low. PPh 23 is done; PPh 22 is a one-line seeder change; PPh 21 is a small payroll picker. The heavy "calculation engines" once planned for 21/22/25 are intentionally **not** built.
+**Complexity:** Low. PPh 23 and PPh Final 0.5% are done; PPh 21 is a small payroll picker. The heavy "calculation engines" once planned for 21/22/25 are intentionally **not** built.
 
 ---
 

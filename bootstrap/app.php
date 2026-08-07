@@ -58,8 +58,10 @@ return Application::configure(basePath: dirname(__DIR__))
             // Standard tenant routes
             require base_path('routes/web.php');
 
-            // API routes
-            require base_path('routes/api.php');
+            // API routes — loaded under the `api` middleware group and `/api` prefix.
+            // A custom `using` closure bypasses Laravel's automatic prefix/group wiring,
+            // so they must be applied manually here.
+            Route::middleware('api')->prefix('api')->group(base_path('routes/api.php'));
 
             // Console commands (Artisan)
             require base_path('routes/console.php');

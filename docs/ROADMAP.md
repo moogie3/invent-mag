@@ -192,7 +192,7 @@ return $dompdf->stream('FP-' . $faktur->nsfp . '.pdf', ['Attachment' => false]);
 | Unlimited users | ✅ Live | `plans.max_users = -1` |
 | Unlimited products | ✅ Live | `plans.max_products = -1` |
 | Sales forecasting — Holt-Winters | ✅ Live | Feature slug: `sales_forecasting` |
-| RESTful API (Scribe-documented) | ✅ Live | Feature slug: `api_access` |
+| RESTful API (Scribe-documented) | ✅ Live | Feature slug: `api_access` — scope: essential endpoints only (auth, CMS, payment/webhooks, plan lookup). Full CRUD API = future Enterprise expansion |
 | Audit trail & compliance logging | ✅ Live | Feature slug: `audit_compliance` |
 | Custom roles & 101 granular permissions | ✅ Live | Spatie Permission |
 | **HR & Payroll** | ✅ Live | Feature slug: `hr` |

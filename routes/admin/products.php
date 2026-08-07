@@ -49,10 +49,6 @@ Route::prefix('product')->group(function () {
         ->name('product.bulk-export')
         ->middleware('can:view-products');
 
-    Route::post('/bulk-stock-details', [ProductController::class, 'bulkStockDetails'])
-        ->name('product.bulk-stock-details')
-        ->middleware('can:view-products');
-
     Route::post('/bulk-update-stock', [ProductController::class, 'bulkUpdateStock'])
         ->name('product.bulk-update-stock')
         ->middleware('can:edit-products');

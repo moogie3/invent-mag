@@ -17,7 +17,7 @@ class MidtransWebhookTest extends TestCase
      */
     public function test_webhook_rejects_invalid_payload(): void
     {
-        $response = $this->postJson('/webhooks/midtrans', [
+        $response = $this->postJson('/api/webhooks/midtrans', [
             'order_id' => 'INV-123',
             // Missing required fields
         ]);
@@ -40,7 +40,7 @@ class MidtransWebhookTest extends TestCase
             'signature_key' => 'invalid_signature',
         ];
 
-        $response = $this->postJson('/webhooks/midtrans', $payload);
+        $response = $this->postJson('/api/webhooks/midtrans', $payload);
 
         $response->assertStatus(403);
     }
@@ -67,7 +67,7 @@ class MidtransWebhookTest extends TestCase
             'signature_key' => $signature,
         ];
 
-        $response = $this->postJson('/webhooks/midtrans', $payload);
+        $response = $this->postJson('/api/webhooks/midtrans', $payload);
 
         $response->assertStatus(404);
     }
@@ -120,7 +120,7 @@ class MidtransWebhookTest extends TestCase
         // Mock config for the test
         config(['midtrans.server_key' => $serverKey]);
 
-        $response = $this->postJson('/webhooks/midtrans', $payload);
+        $response = $this->postJson('/api/webhooks/midtrans', $payload);
 
         $response->assertStatus(200);
 
@@ -181,7 +181,7 @@ class MidtransWebhookTest extends TestCase
 
         config(['midtrans.server_key' => $serverKey]);
 
-        $response = $this->postJson('/webhooks/midtrans', $payload);
+        $response = $this->postJson('/api/webhooks/midtrans', $payload);
 
         $response->assertStatus(200);
         $response->assertJson(['message' => 'Order already processed']);
@@ -233,7 +233,7 @@ class MidtransWebhookTest extends TestCase
 
         config(['midtrans.server_key' => $serverKey]);
 
-        $response = $this->postJson('/webhooks/midtrans', $payload);
+        $response = $this->postJson('/api/webhooks/midtrans', $payload);
 
         $response->assertStatus(200);
 

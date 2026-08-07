@@ -56,6 +56,8 @@ return [
 
     'frontend_url' => env('APP_FRONTEND_URL', 'https://invent-mag.web.id'),
 
+    'contact_email' => env('CONTACT_EMAIL', 'jefrydwijaya3@gmail.com'),
+
     /*
     |--------------------------------------------------------------------------
     | Application Timezone

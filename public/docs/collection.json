@@ -10,15 +10,109 @@
     ],
     "info": {
         "name": "INVENT-MAG API Documentation",
-        "_postman_id": "1d75bf12-3f99-4f0d-a8f7-d190c41501e4",
+        "_postman_id": "3ff0b629-dcdf-4ed6-a1ed-9f2933964424",
         "description": "",
         "schema": "https:\/\/schema.getpostman.com\/json\/collection\/v2.1.0\/collection.json"
     },
     "item": [
         {
+            "name": "Contact",
+            "description": "",
+            "item": [
+                {
+                    "name": "Handle the marketing-site contact form submission.",
+                    "request": {
+                        "url": {
+                            "host": "{{baseUrl}}",
+                            "path": "api\/contact",
+                            "query": [],
+                            "raw": "{{baseUrl}}\/api\/contact"
+                        },
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application\/json"
+                            },
+                            {
+                                "key": "Accept",
+                                "value": "application\/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\"name\":\"consequatur\",\"email\":\"qkunze@example.com\",\"company\":\"consequatur\",\"topic\":\"support\",\"message\":\"consequatur\"}"
+                        },
+                        "description": ""
+                    },
+                    "response": [
+                        {
+                            "header": [],
+                            "code": 200,
+                            "body": "{\n  \"success\": true,\n  \"message\": \"Message sent successfully!\"\n}",
+                            "name": ""
+                        }
+                    ]
+                }
+            ]
+        },
+        {
             "name": "Endpoints",
             "description": "",
             "item": [
+                {
+                    "name": "GET api\/cms",
+                    "request": {
+                        "url": {
+                            "host": "{{baseUrl}}",
+                            "path": "api\/cms",
+                            "query": [],
+                            "raw": "{{baseUrl}}\/api\/cms"
+                        },
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application\/json"
+                            },
+                            {
+                                "key": "Accept",
+                                "value": "application\/json"
+                            }
+                        ],
+                        "body": null,
+                        "description": ""
+                    },
+                    "response": [
+                        {
+                            "header": [
+                                {
+                                    "key": "cache-control",
+                                    "value": "max-age=3600, public"
+                                },
+                                {
+                                    "key": "content-type",
+                                    "value": "application\/json"
+                                },
+                                {
+                                    "key": "x-ratelimit-limit",
+                                    "value": "60"
+                                },
+                                {
+                                    "key": "x-ratelimit-remaining",
+                                    "value": "59"
+                                },
+                                {
+                                    "key": "vary",
+                                    "value": "Origin"
+                                }
+                            ],
+                            "code": 200,
+                            "body": "{\"hero_title\":\"Invent-MAGs\",\"hero_subtitle\":\"From inventory and sales to a full accounting suite, Invent-MAG provides the tools you need to make smarter, data-driven decisions and accelerate your growth.\",\"hero_cta_text\":\"Start 30-Day Free Trial\",\"hero_cta_url\":\"\\\/signup\",\"hero_cta_demo_text\":\"Try Live Demo\",\"hero_cta_demo_url\":\"https:\\\/\\\/demo-pro.invent-mag.web.id\\\/admin\\\/login\",\"features_title\":\"Everything You Need\",\"features_subtitle\":\"A Better Way to Manage Your Business\",\"features_description\":\"Invent-MAG isn't just another tool, it's a complete ecosystem designed to give you a bird's-eye view of your entire operation, from inventory to accounting.\",\"features_enterprise_heading\":\"Enterprise Features\",\"feature_card_1_title\":\"Inventory & Product Management\",\"feature_card_1_desc\":\"Full product cataloging, real-time stock tracking across multiple warehouses, physical stock opname with variance tracking, warehouse-to-warehouse stock transfers, low-stock alerts, barcode support, and expiry tracking.\",\"feature_card_2_title\":\"Sales, CRM & Quotations\",\"feature_card_2_desc\":\"Complete sales order management, Point of Sale (POS), customer database with purchase history, sales pipeline for opportunity tracking, and quotation generation with full lifecycle management including approval workflows, revision history, and seamless conversion to invoices or sales orders.\",\"feature_card_3_title\":\"Purchase & SRM\",\"feature_card_3_desc\":\"Full purchase order lifecycle, supplier management with historical data, and efficient purchase return processing.\",\"feature_card_4_title\":\"Financial & Accounting Suite\",\"feature_card_4_desc\":\"Chart of Accounts, General Ledger, Manual Journal Entries, Trial Balance, Income Statement, Balance Sheet, AR\\\/AP Aging Reports, and Bank Reconciliation.\",\"feature_card_5_title\":\"HR & Payroll\",\"feature_card_5_desc\":\"Comprehensive employee attendance tracking, automated salaried proration, customizable allowances, and automated two-step accounting sync.\",\"feature_card_6_title\":\"Multi-Currency Support\",\"feature_card_6_desc\":\"Handle transactions in multiple currencies with configurable settings for symbols, decimal places, and exchange rates.\",\"feature_card_7_title\":\"Returns Management\",\"feature_card_7_desc\":\"Complete sales and purchase return workflows with automatic stock adjustments and accounting entries.\",\"feature_card_8_title\":\"User & Role Management\",\"feature_card_8_desc\":\"Secure access control with 101 granular permissions. Assign roles like Superuser, Staff, or POS operator.\",\"feature_card_9_title\":\"Sales Forecasting AI\",\"feature_card_9_desc\":\"AI-powered sales predictions using Holt-Winters algorithms and linear regression for accurate demand forecasting.\",\"feature_card_10_title\":\"RESTful API Access\",\"feature_card_10_desc\":\"Full API access with Sanctum authentication. Integrate with external systems and build custom integrations.\",\"feature_card_11_title\":\"Audit Trail & Compliance\",\"feature_card_11_desc\":\"Comprehensive audit logging for all system changes. Track user actions, modifications, and maintain compliance records.\",\"pricing_badge\":\"Simple, transparent pricing\",\"pricing_title\":\"One platform, every tool your business needs\",\"pricing_subtitle\":\"From inventory tracking to full double-entry accounting &mdash; pick the plan that matches where your business is today.\",\"pricing_no_credit_badge\":\"No credit card required\",\"pricing_trial_badge\":\"30-day free trial\",\"pricing_cancel_badge\":\"Cancel anytime\",\"pricing_most_popular_badge\":\"most popular\",\"pricing_trial_included\":\"30 days free trial included\",\"pricing_enterprise_support\":\"Enterprise support & SLA\",\"cta_title\":\"Ready to streamline your business?\",\"cta_description\":\"Join thousands of businesses using Invent-MAG to manage inventory, sales, and accounting in one place.\",\"contact_email\":\"jefrydwijaya3@gmail.com\",\"footer_text\":\"\\u00a9 2026 Invent-MAG. All rights reserved.\"}",
+                            "name": ""
+                        }
+                    ]
+                },
                 {
                     "name": "POST api\/webhooks\/midtrans",
                     "request": {
@@ -59,7 +153,7 @@
                                 },
                                 {
                                     "key": "x-ratelimit-remaining",
-                                    "value": "59"
+                                    "value": "58"
                                 },
                                 {
                                     "key": "vary",
@@ -112,7 +206,7 @@
                                 },
                                 {
                                     "key": "x-ratelimit-remaining",
-                                    "value": "58"
+                                    "value": "57"
                                 },
                                 {
                                     "key": "vary",
@@ -168,7 +262,7 @@
                                 }
                             ],
                             "code": 401,
-                            "body": "{\"message\":\"Unauthorized\"}",
+                            "body": "{\"message\":\"Unauthenticated.\"}",
                             "name": ""
                         }
                     ]
@@ -269,7 +363,7 @@
                                 },
                                 {
                                     "key": "x-ratelimit-remaining",
-                                    "value": "2"
+                                    "value": "0"
                                 },
                                 {
                                     "key": "vary",
@@ -325,7 +419,7 @@
                                 },
                                 {
                                     "key": "x-ratelimit-remaining",
-                                    "value": "8"
+                                    "value": "6"
                                 },
                                 {
                                     "key": "vary",
@@ -378,7 +472,7 @@
                                 }
                             ],
                             "code": 401,
-                            "body": "{\"message\":\"Unauthorized\"}",
+                            "body": "{\"message\":\"Unauthenticated.\"}",
                             "name": ""
                         }
                     ]
@@ -423,7 +517,7 @@
                                 }
                             ],
                             "code": 401,
-                            "body": "{\"message\":\"Unauthorized\"}",
+                            "body": "{\"message\":\"Unauthenticated.\"}",
                             "name": ""
                         }
                     ]
@@ -468,237 +562,7 @@
                                 }
                             ],
                             "code": 401,
-                            "body": "{\"message\":\"Unauthorized\"}",
-                            "name": ""
-                        }
-                    ]
-                }
-            ]
-        },
-        {
-            "name": "Products",
-            "description": "",
-            "item": [
-                {
-                    "name": "POST admin\/product\/quick-create",
-                    "request": {
-                        "url": {
-                            "host": "{{baseUrl}}",
-                            "path": "admin\/product\/quick-create",
-                            "query": [],
-                            "raw": "{{baseUrl}}\/admin\/product\/quick-create"
-                        },
-                        "method": "POST",
-                        "header": [
-                            {
-                                "key": "Content-Type",
-                                "value": "multipart\/form-data"
-                            },
-                            {
-                                "key": "Accept",
-                                "value": "application\/json"
-                            }
-                        ],
-                        "body": {
-                            "mode": "formdata",
-                            "formdata": [
-                                {
-                                    "key": "code",
-                                    "value": "\"PROD-001\"",
-                                    "type": "text",
-                                    "description": "The product code."
-                                },
-                                {
-                                    "key": "name",
-                                    "value": "\"New Product\"",
-                                    "type": "text",
-                                    "description": "The product name."
-                                },
-                                {
-                                    "key": "barcode",
-                                    "value": "consequatur",
-                                    "type": "text",
-                                    "description": ""
-                                },
-                                {
-                                    "key": "low_stock_threshold",
-                                    "value": "45",
-                                    "type": "text",
-                                    "description": "Must be at least 1."
-                                },
-                                {
-                                    "key": "price",
-                                    "value": "99.99",
-                                    "type": "text",
-                                    "description": "The purchase price of the product."
-                                },
-                                {
-                                    "key": "selling_price",
-                                    "value": "149.99",
-                                    "type": "text",
-                                    "description": "The selling price of the product."
-                                },
-                                {
-                                    "key": "category_id",
-                                    "value": "1",
-                                    "type": "text",
-                                    "description": "The ID of the product category."
-                                },
-                                {
-                                    "key": "units_id",
-                                    "value": "1",
-                                    "type": "text",
-                                    "description": "The ID of the product unit."
-                                },
-                                {
-                                    "key": "supplier_id",
-                                    "value": "1",
-                                    "type": "text",
-                                    "description": "The ID of the product supplier."
-                                },
-                                {
-                                    "key": "description",
-                                    "value": "Dolores dolorum amet iste laborum eius est dolor.",
-                                    "type": "text",
-                                    "description": ""
-                                },
-                                {
-                                    "key": "has_expiry",
-                                    "value": "",
-                                    "type": "text",
-                                    "description": ""
-                                },
-                                {
-                                    "key": "stock_quantity",
-                                    "value": "100",
-                                    "type": "text",
-                                    "description": "The initial stock quantity."
-                                },
-                                {
-                                    "key": "image",
-                                    "src": [],
-                                    "type": "file"
-                                }
-                            ]
-                        },
-                        "description": ""
-                    },
-                    "response": [
-                        {
-                            "header": [],
-                            "code": 200,
-                            "body": "{\"success\": true, \"message\": \"Product created successfully\", \"product\": {\"id\": 1, \"name\": \"New Product\"}}",
-                            "name": ""
-                        }
-                    ]
-                },
-                {
-                    "name": "POST admin\/product\/bulk-delete",
-                    "request": {
-                        "url": {
-                            "host": "{{baseUrl}}",
-                            "path": "admin\/product\/bulk-delete",
-                            "query": [],
-                            "raw": "{{baseUrl}}\/admin\/product\/bulk-delete"
-                        },
-                        "method": "POST",
-                        "header": [
-                            {
-                                "key": "Content-Type",
-                                "value": "application\/json"
-                            },
-                            {
-                                "key": "Accept",
-                                "value": "application\/json"
-                            }
-                        ],
-                        "body": {
-                            "mode": "raw",
-                            "raw": "{\"ids\":[1,2,3]}"
-                        },
-                        "description": ""
-                    },
-                    "response": [
-                        {
-                            "header": [],
-                            "code": 200,
-                            "body": "{\"success\": true, \"message\": \"Successfully deleted 2 product(s)\", \"deleted_count\": 2, \"images_deleted\": 1}",
-                            "name": ""
-                        }
-                    ]
-                }
-            ]
-        },
-        {
-            "name": "Purchase Orders",
-            "description": "",
-            "item": [
-                {
-                    "name": "POST admin\/po\/bulk-delete",
-                    "request": {
-                        "url": {
-                            "host": "{{baseUrl}}",
-                            "path": "admin\/po\/bulk-delete",
-                            "query": [],
-                            "raw": "{{baseUrl}}\/admin\/po\/bulk-delete"
-                        },
-                        "method": "POST",
-                        "header": [
-                            {
-                                "key": "Content-Type",
-                                "value": "application\/json"
-                            },
-                            {
-                                "key": "Accept",
-                                "value": "application\/json"
-                            }
-                        ],
-                        "body": {
-                            "mode": "raw",
-                            "raw": "{\"ids\":[1,2,3]}"
-                        },
-                        "description": ""
-                    },
-                    "response": [
-                        {
-                            "header": [],
-                            "code": 200,
-                            "body": "{\"success\": true, \"message\": \"Successfully deleted purchase order(s)\"}",
-                            "name": ""
-                        }
-                    ]
-                },
-                {
-                    "name": "POST admin\/po\/bulk-mark-paid",
-                    "request": {
-                        "url": {
-                            "host": "{{baseUrl}}",
-                            "path": "admin\/po\/bulk-mark-paid",
-                            "query": [],
-                            "raw": "{{baseUrl}}\/admin\/po\/bulk-mark-paid"
-                        },
-                        "method": "POST",
-                        "header": [
-                            {
-                                "key": "Content-Type",
-                                "value": "application\/json"
-                            },
-                            {
-                                "key": "Accept",
-                                "value": "application\/json"
-                            }
-                        ],
-                        "body": {
-                            "mode": "raw",
-                            "raw": "{\"ids\":[1,2,3]}"
-                        },
-                        "description": ""
-                    },
-                    "response": [
-                        {
-                            "header": [],
-                            "code": 200,
-                            "body": "{\"success\": true, \"message\": \"Successfully marked 2 purchase order(s) as paid.\", \"updated_count\": 2}",
+                            "body": "{\"message\":\"Unauthenticated.\"}",
                             "name": ""
                         }
                     ]

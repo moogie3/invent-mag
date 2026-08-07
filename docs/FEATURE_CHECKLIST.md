@@ -520,27 +520,22 @@
 - [x] API rate limiting
 - [x] Tenant-aware API endpoints
 
-**API Endpoints:**
+**API Endpoints (essential REST API under `/api` — Scribe-documented):**
 
-- [x] Authentication endpoints
-- [x] Product search
-- [x] Barcode lookup
-- [x] Product metrics
-- [x] Expiry tracking
-- [x] Supplier metrics
-- [x] Customer metrics
-- [x] System settings
-- [x] Role-permissions
-- [x] Notifications
-- [x] Historical purchases
-- [x] Product history
+- [x] Authentication: `POST /api/register`, `POST /api/login`, `POST /api/lookup-tenant`, `POST /api/v1/refresh-token`
+- [x] CMS: `GET /api/cms`
+- [x] Payments: `POST /api/payment/confirm` (Bearer), `POST /api/webhooks/midtrans`, `POST /api/webhook`
+- [x] Plans: `GET /api/v1/plans`, `GET /api/v1/plan/current`
+- [x] Contact: `POST /api/contact` (marketing-site form → founder email)
+
+> Admin CRUD (products, suppliers, customers, stock, settings, etc.) is **session-authenticated web AJAX under `/admin/*`** — not part of the REST API. Full REST CRUD is a future Enterprise expansion.
 
 ---
 
 ### 🧪 Testing
 
 - [x] PHPUnit 11+ configured
-- [x] 1182 PHP test methods / 3698 PHP assertions (Feature + Unit PHP, 169 JS Vitest files)
+- [x] 1186 PHP test methods / 3715 PHP assertions (Feature + Unit PHP, 169 JS Vitest files)
 - [x] **Plan-tier gating regression suite** — `PlanFeatureGateTest` (15 tests) verifying every Professional/Enterprise feature slug is enforced at the route layer (`plan.feature:*` middleware) or controller layer (sales forecasting), including the JSON 403 response for API clients and the legacy no-plan full-access path
 - [x] Feature tests (controllers, routes)
 - [x] Unit tests (services, helpers)
@@ -667,10 +662,10 @@
 | **Services**         | 46        |
 | **Models**           | 51        |
 | **Helpers**          | 6         |
-| **Test Methods (PHP)** | 1182     |
-| **Test Assertions (PHP)** | 3698   |
+| **Test Methods (PHP)** | 1186     |
+| **Test Assertions (PHP)** | 3715   |
 | **JS Test Files**    | 169       |
-| **API Endpoints**    | 50+       |
+| **API Endpoints**    | 11        |
 | **Database Tables**  | 55        |
 | **Migrations**       | 100+      |
 | **Seeders**          | 36        |
@@ -689,7 +684,7 @@
 2. **Complete Accounting** - Double-entry with manual journal entries
 3. **Multi-tenant SaaS** - True isolation, single codebase
 4. **Sales Pipeline** - Kanban with forecasting
-5. **1182 PHP Tests / 3698 Assertions + 169 Vitest Files** - Enterprise-grade testing (PHP + JS)
+5. **1186 PHP Tests / 3715 Assertions + 169 Vitest Files** - Enterprise-grade testing (PHP + JS)
 6. **Docker + CI/CD** - Modern DevOps ready
 7. **Comprehensive Audit Trail** - Security and accounting
 8. **Contextual Tutorial System** - 50+ page-specific help guides with drill-down navigation - users click a topic category, see all pages in that category, click one to navigate there with its contextual tutorial auto-opened

@@ -66,12 +66,25 @@
                     <a href="#authenticating-requests">Authenticating requests</a>
                 </li>
                             </ul>
+                    <ul id="tocify-header-contact" class="tocify-header">
+                <li class="tocify-item level-1" data-unique="contact">
+                    <a href="#contact">Contact</a>
+                </li>
+                                    <ul id="tocify-subheader-contact" class="tocify-subheader">
+                                                    <li class="tocify-item level-2" data-unique="contact-POSTapi-contact">
+                                <a href="#contact-POSTapi-contact">Handle the marketing-site contact form submission.</a>
+                            </li>
+                                                                        </ul>
+                            </ul>
                     <ul id="tocify-header-endpoints" class="tocify-header">
                 <li class="tocify-item level-1" data-unique="endpoints">
                     <a href="#endpoints">Endpoints</a>
                 </li>
                                     <ul id="tocify-subheader-endpoints" class="tocify-subheader">
-                                                    <li class="tocify-item level-2" data-unique="endpoints-POSTapi-webhooks-midtrans">
+                                                    <li class="tocify-item level-2" data-unique="endpoints-GETapi-cms">
+                                <a href="#endpoints-GETapi-cms">GET api/cms</a>
+                            </li>
+                                                                                <li class="tocify-item level-2" data-unique="endpoints-POSTapi-webhooks-midtrans">
                                 <a href="#endpoints-POSTapi-webhooks-midtrans">POST api/webhooks/midtrans</a>
                             </li>
                                                                                 <li class="tocify-item level-2" data-unique="endpoints-POSTapi-webhook">
@@ -100,32 +113,6 @@
                             </li>
                                                                         </ul>
                             </ul>
-                    <ul id="tocify-header-products" class="tocify-header">
-                <li class="tocify-item level-1" data-unique="products">
-                    <a href="#products">Products</a>
-                </li>
-                                    <ul id="tocify-subheader-products" class="tocify-subheader">
-                                                    <li class="tocify-item level-2" data-unique="products-POSTadmin-product-quick-create">
-                                <a href="#products-POSTadmin-product-quick-create">POST admin/product/quick-create</a>
-                            </li>
-                                                                                <li class="tocify-item level-2" data-unique="products-POSTadmin-product-bulk-delete">
-                                <a href="#products-POSTadmin-product-bulk-delete">POST admin/product/bulk-delete</a>
-                            </li>
-                                                                        </ul>
-                            </ul>
-                    <ul id="tocify-header-purchase-orders" class="tocify-header">
-                <li class="tocify-item level-1" data-unique="purchase-orders">
-                    <a href="#purchase-orders">Purchase Orders</a>
-                </li>
-                                    <ul id="tocify-subheader-purchase-orders" class="tocify-subheader">
-                                                    <li class="tocify-item level-2" data-unique="purchase-orders-POSTadmin-po-bulk-delete">
-                                <a href="#purchase-orders-POSTadmin-po-bulk-delete">POST admin/po/bulk-delete</a>
-                            </li>
-                                                                                <li class="tocify-item level-2" data-unique="purchase-orders-POSTadmin-po-bulk-mark-paid">
-                                <a href="#purchase-orders-POSTadmin-po-bulk-mark-paid">POST admin/po/bulk-mark-paid</a>
-                            </li>
-                                                                        </ul>
-                            </ul>
             </div>
 
     <ul class="toc-footer" id="toc-footer">
@@ -135,7 +122,7 @@
     </ul>
 
     <ul class="toc-footer" id="last-updated">
-        <li>Last updated: May 25, 2026</li>
+        <li>Last updated: August 7, 2026</li>
     </ul>
 </div>
 
@@ -156,11 +143,418 @@ You can switch the language used with the tabs at the top right (or from the nav
 <p>All authenticated endpoints are marked with a <code>requires authentication</code> badge in the documentation below.</p>
 <p>You can retrieve your token by visiting your dashboard and clicking <b>Generate API token</b>.</p>
 
-        <h1 id="endpoints">Endpoints</h1>
+        <h1 id="contact">Contact</h1>
 
     
 
-                                <h2 id="endpoints-POSTapi-webhooks-midtrans">POST api/webhooks/midtrans</h2>
+                                <h2 id="contact-POSTapi-contact">Handle the marketing-site contact form submission.</h2>
+
+<p>
+<small class="badge badge-darkred">requires authentication</small>
+</p>
+
+
+
+<span id="example-requests-POSTapi-contact">
+<blockquote>Example request:</blockquote>
+
+
+<div class="bash-example">
+    <pre><code class="language-bash">curl --request POST \
+    "http://127.0.0.1.nip.io/api/contact" \
+    --header "Authorization: Bearer {YOUR_API_TOKEN}" \
+    --header "Content-Type: application/json" \
+    --header "Accept: application/json" \
+    --data "{
+    \"name\": \"consequatur\",
+    \"email\": \"qkunze@example.com\",
+    \"company\": \"consequatur\",
+    \"topic\": \"support\",
+    \"message\": \"consequatur\"
+}"
+</code></pre></div>
+
+
+<div class="javascript-example">
+    <pre><code class="language-javascript">const url = new URL(
+    "http://127.0.0.1.nip.io/api/contact"
+);
+
+const headers = {
+    "Authorization": "Bearer {YOUR_API_TOKEN}",
+    "Content-Type": "application/json",
+    "Accept": "application/json",
+};
+
+let body = {
+    "name": "consequatur",
+    "email": "qkunze@example.com",
+    "company": "consequatur",
+    "topic": "support",
+    "message": "consequatur"
+};
+
+fetch(url, {
+    method: "POST",
+    headers,
+    body: JSON.stringify(body),
+}).then(response =&gt; response.json());</code></pre></div>
+
+</span>
+
+<span id="example-responses-POSTapi-contact">
+            <blockquote>
+            <p>Example response (200):</p>
+        </blockquote>
+                <pre>
+
+<code class="language-json" style="max-height: 300px;">{
+    &quot;success&quot;: true,
+    &quot;message&quot;: &quot;Message sent successfully!&quot;
+}</code>
+ </pre>
+    </span>
+<span id="execution-results-POSTapi-contact" hidden>
+    <blockquote>Received response<span
+                id="execution-response-status-POSTapi-contact"></span>:
+    </blockquote>
+    <pre class="json"><code id="execution-response-content-POSTapi-contact"
+      data-empty-response-text="<Empty response>" style="max-height: 400px;"></code></pre>
+</span>
+<span id="execution-error-POSTapi-contact" hidden>
+    <blockquote>Request failed with error:</blockquote>
+    <pre><code id="execution-error-message-POSTapi-contact">
+
+Tip: Check that you&#039;re properly connected to the network.
+If you&#039;re a maintainer of ths API, verify that your API is running and you&#039;ve enabled CORS.
+You can check the Dev Tools console for debugging information.</code></pre>
+</span>
+<form id="form-POSTapi-contact" data-method="POST"
+      data-path="api/contact"
+      data-authed="1"
+      data-hasfiles="0"
+      data-isarraybody="0"
+      autocomplete="off"
+      onsubmit="event.preventDefault(); executeTryOut('POSTapi-contact', this);">
+    <h3>
+        Request&nbsp;&nbsp;&nbsp;
+                    <button type="button"
+                    style="background-color: #8fbcd4; padding: 5px 10px; border-radius: 5px; border-width: thin;"
+                    id="btn-tryout-POSTapi-contact"
+                    onclick="tryItOut('POSTapi-contact');">Try it out ⚡
+            </button>
+            <button type="button"
+                    style="background-color: #c97a7e; padding: 5px 10px; border-radius: 5px; border-width: thin;"
+                    id="btn-canceltryout-POSTapi-contact"
+                    onclick="cancelTryOut('POSTapi-contact');" hidden>Cancel 🛑
+            </button>&nbsp;&nbsp;
+            <button type="submit"
+                    style="background-color: #6ac174; padding: 5px 10px; border-radius: 5px; border-width: thin;"
+                    id="btn-executetryout-POSTapi-contact"
+                    data-initial-text="Send Request 💥"
+                    data-loading-text="⏱ Sending..."
+                    hidden>Send Request 💥
+            </button>
+            </h3>
+            <p>
+            <small class="badge badge-black">POST</small>
+            <b><code>api/contact</code></b>
+        </p>
+                <h4 class="fancy-heading-panel"><b>Headers</b></h4>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Authorization</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Authorization" class="auth-value"               data-endpoint="POSTapi-contact"
+               value="Bearer {YOUR_API_TOKEN}"
+               data-component="header">
+    <br>
+<p>Example: <code>Bearer {YOUR_API_TOKEN}</code></p>
+            </div>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Content-Type</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Content-Type"                data-endpoint="POSTapi-contact"
+               value="application/json"
+               data-component="header">
+    <br>
+<p>Example: <code>application/json</code></p>
+            </div>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Accept</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Accept"                data-endpoint="POSTapi-contact"
+               value="application/json"
+               data-component="header">
+    <br>
+<p>Example: <code>application/json</code></p>
+            </div>
+                                <h4 class="fancy-heading-panel"><b>Body Parameters</b></h4>
+        <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>name</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="name"                data-endpoint="POSTapi-contact"
+               value="consequatur"
+               data-component="body">
+    <br>
+<p>The sender's full name. Example: <code>consequatur</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>email</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="email"                data-endpoint="POSTapi-contact"
+               value="qkunze@example.com"
+               data-component="body">
+    <br>
+<p>The sender's email address. Example: <code>qkunze@example.com</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>company</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+<i>optional</i> &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="company"                data-endpoint="POSTapi-contact"
+               value="consequatur"
+               data-component="body">
+    <br>
+<p>optional The sender's company name. Example: <code>consequatur</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>topic</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="topic"                data-endpoint="POSTapi-contact"
+               value="support"
+               data-component="body">
+    <br>
+<p>The selected topic. Example: <code>support</code></p>
+Must be one of:
+<ul style="list-style-type: square;"><li><code>sales</code></li> <li><code>support</code></li> <li><code>demo</code></li> <li><code>partnership</code></li> <li><code>other</code></li></ul>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>message</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="message"                data-endpoint="POSTapi-contact"
+               value="consequatur"
+               data-component="body">
+    <br>
+<p>The message body. Example: <code>consequatur</code></p>
+        </div>
+        </form>
+
+                <h1 id="endpoints">Endpoints</h1>
+
+    
+
+                                <h2 id="endpoints-GETapi-cms">GET api/cms</h2>
+
+<p>
+<small class="badge badge-darkred">requires authentication</small>
+</p>
+
+
+
+<span id="example-requests-GETapi-cms">
+<blockquote>Example request:</blockquote>
+
+
+<div class="bash-example">
+    <pre><code class="language-bash">curl --request GET \
+    --get "http://127.0.0.1.nip.io/api/cms" \
+    --header "Authorization: Bearer {YOUR_API_TOKEN}" \
+    --header "Content-Type: application/json" \
+    --header "Accept: application/json"</code></pre></div>
+
+
+<div class="javascript-example">
+    <pre><code class="language-javascript">const url = new URL(
+    "http://127.0.0.1.nip.io/api/cms"
+);
+
+const headers = {
+    "Authorization": "Bearer {YOUR_API_TOKEN}",
+    "Content-Type": "application/json",
+    "Accept": "application/json",
+};
+
+
+fetch(url, {
+    method: "GET",
+    headers,
+}).then(response =&gt; response.json());</code></pre></div>
+
+</span>
+
+<span id="example-responses-GETapi-cms">
+            <blockquote>
+            <p>Example response (200):</p>
+        </blockquote>
+                <details class="annotation">
+            <summary style="cursor: pointer;">
+                <small onclick="textContent = parentElement.parentElement.open ? 'Show headers' : 'Hide headers'">Show headers</small>
+            </summary>
+            <pre><code class="language-http">cache-control: max-age=3600, public
+content-type: application/json
+x-ratelimit-limit: 60
+x-ratelimit-remaining: 59
+vary: Origin
+ </code></pre></details>         <pre>
+
+<code class="language-json" style="max-height: 300px;">{
+    &quot;hero_title&quot;: &quot;Invent-MAGs&quot;,
+    &quot;hero_subtitle&quot;: &quot;From inventory and sales to a full accounting suite, Invent-MAG provides the tools you need to make smarter, data-driven decisions and accelerate your growth.&quot;,
+    &quot;hero_cta_text&quot;: &quot;Start 30-Day Free Trial&quot;,
+    &quot;hero_cta_url&quot;: &quot;/signup&quot;,
+    &quot;hero_cta_demo_text&quot;: &quot;Try Live Demo&quot;,
+    &quot;hero_cta_demo_url&quot;: &quot;https://demo-pro.invent-mag.web.id/admin/login&quot;,
+    &quot;features_title&quot;: &quot;Everything You Need&quot;,
+    &quot;features_subtitle&quot;: &quot;A Better Way to Manage Your Business&quot;,
+    &quot;features_description&quot;: &quot;Invent-MAG isn&#039;t just another tool, it&#039;s a complete ecosystem designed to give you a bird&#039;s-eye view of your entire operation, from inventory to accounting.&quot;,
+    &quot;features_enterprise_heading&quot;: &quot;Enterprise Features&quot;,
+    &quot;feature_card_1_title&quot;: &quot;Inventory &amp; Product Management&quot;,
+    &quot;feature_card_1_desc&quot;: &quot;Full product cataloging, real-time stock tracking across multiple warehouses, physical stock opname with variance tracking, warehouse-to-warehouse stock transfers, low-stock alerts, barcode support, and expiry tracking.&quot;,
+    &quot;feature_card_2_title&quot;: &quot;Sales, CRM &amp; Quotations&quot;,
+    &quot;feature_card_2_desc&quot;: &quot;Complete sales order management, Point of Sale (POS), customer database with purchase history, sales pipeline for opportunity tracking, and quotation generation with full lifecycle management including approval workflows, revision history, and seamless conversion to invoices or sales orders.&quot;,
+    &quot;feature_card_3_title&quot;: &quot;Purchase &amp; SRM&quot;,
+    &quot;feature_card_3_desc&quot;: &quot;Full purchase order lifecycle, supplier management with historical data, and efficient purchase return processing.&quot;,
+    &quot;feature_card_4_title&quot;: &quot;Financial &amp; Accounting Suite&quot;,
+    &quot;feature_card_4_desc&quot;: &quot;Chart of Accounts, General Ledger, Manual Journal Entries, Trial Balance, Income Statement, Balance Sheet, AR/AP Aging Reports, and Bank Reconciliation.&quot;,
+    &quot;feature_card_5_title&quot;: &quot;HR &amp; Payroll&quot;,
+    &quot;feature_card_5_desc&quot;: &quot;Comprehensive employee attendance tracking, automated salaried proration, customizable allowances, and automated two-step accounting sync.&quot;,
+    &quot;feature_card_6_title&quot;: &quot;Multi-Currency Support&quot;,
+    &quot;feature_card_6_desc&quot;: &quot;Handle transactions in multiple currencies with configurable settings for symbols, decimal places, and exchange rates.&quot;,
+    &quot;feature_card_7_title&quot;: &quot;Returns Management&quot;,
+    &quot;feature_card_7_desc&quot;: &quot;Complete sales and purchase return workflows with automatic stock adjustments and accounting entries.&quot;,
+    &quot;feature_card_8_title&quot;: &quot;User &amp; Role Management&quot;,
+    &quot;feature_card_8_desc&quot;: &quot;Secure access control with 101 granular permissions. Assign roles like Superuser, Staff, or POS operator.&quot;,
+    &quot;feature_card_9_title&quot;: &quot;Sales Forecasting AI&quot;,
+    &quot;feature_card_9_desc&quot;: &quot;AI-powered sales predictions using Holt-Winters algorithms and linear regression for accurate demand forecasting.&quot;,
+    &quot;feature_card_10_title&quot;: &quot;RESTful API Access&quot;,
+    &quot;feature_card_10_desc&quot;: &quot;Full API access with Sanctum authentication. Integrate with external systems and build custom integrations.&quot;,
+    &quot;feature_card_11_title&quot;: &quot;Audit Trail &amp; Compliance&quot;,
+    &quot;feature_card_11_desc&quot;: &quot;Comprehensive audit logging for all system changes. Track user actions, modifications, and maintain compliance records.&quot;,
+    &quot;pricing_badge&quot;: &quot;Simple, transparent pricing&quot;,
+    &quot;pricing_title&quot;: &quot;One platform, every tool your business needs&quot;,
+    &quot;pricing_subtitle&quot;: &quot;From inventory tracking to full double-entry accounting &amp;mdash; pick the plan that matches where your business is today.&quot;,
+    &quot;pricing_no_credit_badge&quot;: &quot;No credit card required&quot;,
+    &quot;pricing_trial_badge&quot;: &quot;30-day free trial&quot;,
+    &quot;pricing_cancel_badge&quot;: &quot;Cancel anytime&quot;,
+    &quot;pricing_most_popular_badge&quot;: &quot;most popular&quot;,
+    &quot;pricing_trial_included&quot;: &quot;30 days free trial included&quot;,
+    &quot;pricing_enterprise_support&quot;: &quot;Enterprise support &amp; SLA&quot;,
+    &quot;cta_title&quot;: &quot;Ready to streamline your business?&quot;,
+    &quot;cta_description&quot;: &quot;Join thousands of businesses using Invent-MAG to manage inventory, sales, and accounting in one place.&quot;,
+    &quot;contact_email&quot;: &quot;jefrydwijaya3@gmail.com&quot;,
+    &quot;footer_text&quot;: &quot;&copy; 2026 Invent-MAG. All rights reserved.&quot;
+}</code>
+ </pre>
+    </span>
+<span id="execution-results-GETapi-cms" hidden>
+    <blockquote>Received response<span
+                id="execution-response-status-GETapi-cms"></span>:
+    </blockquote>
+    <pre class="json"><code id="execution-response-content-GETapi-cms"
+      data-empty-response-text="<Empty response>" style="max-height: 400px;"></code></pre>
+</span>
+<span id="execution-error-GETapi-cms" hidden>
+    <blockquote>Request failed with error:</blockquote>
+    <pre><code id="execution-error-message-GETapi-cms">
+
+Tip: Check that you&#039;re properly connected to the network.
+If you&#039;re a maintainer of ths API, verify that your API is running and you&#039;ve enabled CORS.
+You can check the Dev Tools console for debugging information.</code></pre>
+</span>
+<form id="form-GETapi-cms" data-method="GET"
+      data-path="api/cms"
+      data-authed="1"
+      data-hasfiles="0"
+      data-isarraybody="0"
+      autocomplete="off"
+      onsubmit="event.preventDefault(); executeTryOut('GETapi-cms', this);">
+    <h3>
+        Request&nbsp;&nbsp;&nbsp;
+                    <button type="button"
+                    style="background-color: #8fbcd4; padding: 5px 10px; border-radius: 5px; border-width: thin;"
+                    id="btn-tryout-GETapi-cms"
+                    onclick="tryItOut('GETapi-cms');">Try it out ⚡
+            </button>
+            <button type="button"
+                    style="background-color: #c97a7e; padding: 5px 10px; border-radius: 5px; border-width: thin;"
+                    id="btn-canceltryout-GETapi-cms"
+                    onclick="cancelTryOut('GETapi-cms');" hidden>Cancel 🛑
+            </button>&nbsp;&nbsp;
+            <button type="submit"
+                    style="background-color: #6ac174; padding: 5px 10px; border-radius: 5px; border-width: thin;"
+                    id="btn-executetryout-GETapi-cms"
+                    data-initial-text="Send Request 💥"
+                    data-loading-text="⏱ Sending..."
+                    hidden>Send Request 💥
+            </button>
+            </h3>
+            <p>
+            <small class="badge badge-green">GET</small>
+            <b><code>api/cms</code></b>
+        </p>
+                <h4 class="fancy-heading-panel"><b>Headers</b></h4>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Authorization</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Authorization" class="auth-value"               data-endpoint="GETapi-cms"
+               value="Bearer {YOUR_API_TOKEN}"
+               data-component="header">
+    <br>
+<p>Example: <code>Bearer {YOUR_API_TOKEN}</code></p>
+            </div>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Content-Type</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Content-Type"                data-endpoint="GETapi-cms"
+               value="application/json"
+               data-component="header">
+    <br>
+<p>Example: <code>application/json</code></p>
+            </div>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Accept</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Accept"                data-endpoint="GETapi-cms"
+               value="application/json"
+               data-component="header">
+    <br>
+<p>Example: <code>application/json</code></p>
+            </div>
+                        </form>
+
+                    <h2 id="endpoints-POSTapi-webhooks-midtrans">POST api/webhooks/midtrans</h2>
 
 <p>
 <small class="badge badge-darkred">requires authentication</small>
@@ -210,7 +604,7 @@ fetch(url, {
             <pre><code class="language-http">cache-control: no-cache, private
 content-type: application/json
 x-ratelimit-limit: 60
-x-ratelimit-remaining: 59
+x-ratelimit-remaining: 58
 vary: Origin
  </code></pre></details>         <pre>
 
@@ -354,7 +748,7 @@ fetch(url, {
             <pre><code class="language-http">cache-control: no-cache, private
 content-type: application/json
 x-ratelimit-limit: 60
-x-ratelimit-remaining: 58
+x-ratelimit-remaining: 57
 vary: Origin
  </code></pre></details>         <pre>
 
@@ -512,7 +906,7 @@ vary: Origin
  </code></pre></details>         <pre>
 
 <code class="language-json" style="max-height: 300px;">{
-    &quot;message&quot;: &quot;Unauthorized&quot;
+    &quot;message&quot;: &quot;Unauthenticated.&quot;
 }</code>
  </pre>
     </span>
@@ -836,7 +1230,7 @@ fetch(url, {
             <pre><code class="language-http">cache-control: no-cache, private
 content-type: application/json
 x-ratelimit-limit: 3
-x-ratelimit-remaining: 2
+x-ratelimit-remaining: 0
 vary: Origin
  </code></pre></details>         <pre>
 
@@ -1056,7 +1450,7 @@ fetch(url, {
             <pre><code class="language-http">cache-control: no-cache, private
 content-type: application/json
 x-ratelimit-limit: 10
-x-ratelimit-remaining: 8
+x-ratelimit-remaining: 6
 vary: Origin
  </code></pre></details>         <pre>
 
@@ -1216,7 +1610,7 @@ vary: Origin
  </code></pre></details>         <pre>
 
 <code class="language-json" style="max-height: 300px;">{
-    &quot;message&quot;: &quot;Unauthorized&quot;
+    &quot;message&quot;: &quot;Unauthenticated.&quot;
 }</code>
  </pre>
     </span>
@@ -1358,7 +1752,7 @@ vary: Origin
  </code></pre></details>         <pre>
 
 <code class="language-json" style="max-height: 300px;">{
-    &quot;message&quot;: &quot;Unauthorized&quot;
+    &quot;message&quot;: &quot;Unauthenticated.&quot;
 }</code>
  </pre>
     </span>
@@ -1500,7 +1894,7 @@ vary: Origin
  </code></pre></details>         <pre>
 
 <code class="language-json" style="max-height: 300px;">{
-    &quot;message&quot;: &quot;Unauthorized&quot;
+    &quot;message&quot;: &quot;Unauthenticated.&quot;
 }</code>
  </pre>
     </span>
@@ -1588,853 +1982,6 @@ You can check the Dev Tools console for debugging information.</code></pre>
 <p>Example: <code>application/json</code></p>
             </div>
                         </form>
-
-                <h1 id="products">Products</h1>
-
-    
-
-                                <h2 id="products-POSTadmin-product-quick-create">POST admin/product/quick-create</h2>
-
-<p>
-<small class="badge badge-darkred">requires authentication</small>
-</p>
-
-
-
-<span id="example-requests-POSTadmin-product-quick-create">
-<blockquote>Example request:</blockquote>
-
-
-<div class="bash-example">
-    <pre><code class="language-bash">curl --request POST \
-    "http://127.0.0.1.nip.io/admin/product/quick-create" \
-    --header "Authorization: Bearer {YOUR_API_TOKEN}" \
-    --header "Content-Type: multipart/form-data" \
-    --header "Accept: application/json" \
-    --form "code="PROD-001""\
-    --form "name="New Product""\
-    --form "barcode=consequatur"\
-    --form "low_stock_threshold=45"\
-    --form "price=99.99"\
-    --form "selling_price=149.99"\
-    --form "category_id=1"\
-    --form "units_id=1"\
-    --form "supplier_id=1"\
-    --form "description=Dolores dolorum amet iste laborum eius est dolor."\
-    --form "has_expiry="\
-    --form "stock_quantity=100"\
-    --form "image=@C:\Users\123\AppData\Local\Temp\phpDE58.tmp" </code></pre></div>
-
-
-<div class="javascript-example">
-    <pre><code class="language-javascript">const url = new URL(
-    "http://127.0.0.1.nip.io/admin/product/quick-create"
-);
-
-const headers = {
-    "Authorization": "Bearer {YOUR_API_TOKEN}",
-    "Content-Type": "multipart/form-data",
-    "Accept": "application/json",
-};
-
-const body = new FormData();
-body.append('code', '"PROD-001"');
-body.append('name', '"New Product"');
-body.append('barcode', 'consequatur');
-body.append('low_stock_threshold', '45');
-body.append('price', '99.99');
-body.append('selling_price', '149.99');
-body.append('category_id', '1');
-body.append('units_id', '1');
-body.append('supplier_id', '1');
-body.append('description', 'Dolores dolorum amet iste laborum eius est dolor.');
-body.append('has_expiry', '');
-body.append('stock_quantity', '100');
-body.append('image', document.querySelector('input[name="image"]').files[0]);
-
-fetch(url, {
-    method: "POST",
-    headers,
-    body,
-}).then(response =&gt; response.json());</code></pre></div>
-
-</span>
-
-<span id="example-responses-POSTadmin-product-quick-create">
-            <blockquote>
-            <p>Example response (200):</p>
-        </blockquote>
-                <pre>
-
-<code class="language-json" style="max-height: 300px;">{
-    &quot;success&quot;: true,
-    &quot;message&quot;: &quot;Product created successfully&quot;,
-    &quot;product&quot;: {
-        &quot;id&quot;: 1,
-        &quot;name&quot;: &quot;New Product&quot;
-    }
-}</code>
- </pre>
-    </span>
-<span id="execution-results-POSTadmin-product-quick-create" hidden>
-    <blockquote>Received response<span
-                id="execution-response-status-POSTadmin-product-quick-create"></span>:
-    </blockquote>
-    <pre class="json"><code id="execution-response-content-POSTadmin-product-quick-create"
-      data-empty-response-text="<Empty response>" style="max-height: 400px;"></code></pre>
-</span>
-<span id="execution-error-POSTadmin-product-quick-create" hidden>
-    <blockquote>Request failed with error:</blockquote>
-    <pre><code id="execution-error-message-POSTadmin-product-quick-create">
-
-Tip: Check that you&#039;re properly connected to the network.
-If you&#039;re a maintainer of ths API, verify that your API is running and you&#039;ve enabled CORS.
-You can check the Dev Tools console for debugging information.</code></pre>
-</span>
-<form id="form-POSTadmin-product-quick-create" data-method="POST"
-      data-path="admin/product/quick-create"
-      data-authed="1"
-      data-hasfiles="1"
-      data-isarraybody="0"
-      autocomplete="off"
-      onsubmit="event.preventDefault(); executeTryOut('POSTadmin-product-quick-create', this);">
-    <h3>
-        Request&nbsp;&nbsp;&nbsp;
-                    <button type="button"
-                    style="background-color: #8fbcd4; padding: 5px 10px; border-radius: 5px; border-width: thin;"
-                    id="btn-tryout-POSTadmin-product-quick-create"
-                    onclick="tryItOut('POSTadmin-product-quick-create');">Try it out ⚡
-            </button>
-            <button type="button"
-                    style="background-color: #c97a7e; padding: 5px 10px; border-radius: 5px; border-width: thin;"
-                    id="btn-canceltryout-POSTadmin-product-quick-create"
-                    onclick="cancelTryOut('POSTadmin-product-quick-create');" hidden>Cancel 🛑
-            </button>&nbsp;&nbsp;
-            <button type="submit"
-                    style="background-color: #6ac174; padding: 5px 10px; border-radius: 5px; border-width: thin;"
-                    id="btn-executetryout-POSTadmin-product-quick-create"
-                    data-initial-text="Send Request 💥"
-                    data-loading-text="⏱ Sending..."
-                    hidden>Send Request 💥
-            </button>
-            </h3>
-            <p>
-            <small class="badge badge-black">POST</small>
-            <b><code>admin/product/quick-create</code></b>
-        </p>
-                <h4 class="fancy-heading-panel"><b>Headers</b></h4>
-                                <div style="padding-left: 28px; clear: unset;">
-                <b style="line-height: 2;"><code>Authorization</code></b>&nbsp;&nbsp;
-&nbsp;
- &nbsp;
- &nbsp;
-                <input type="text" style="display: none"
-                              name="Authorization" class="auth-value"               data-endpoint="POSTadmin-product-quick-create"
-               value="Bearer {YOUR_API_TOKEN}"
-               data-component="header">
-    <br>
-<p>Example: <code>Bearer {YOUR_API_TOKEN}</code></p>
-            </div>
-                                <div style="padding-left: 28px; clear: unset;">
-                <b style="line-height: 2;"><code>Content-Type</code></b>&nbsp;&nbsp;
-&nbsp;
- &nbsp;
- &nbsp;
-                <input type="text" style="display: none"
-                              name="Content-Type"                data-endpoint="POSTadmin-product-quick-create"
-               value="multipart/form-data"
-               data-component="header">
-    <br>
-<p>Example: <code>multipart/form-data</code></p>
-            </div>
-                                <div style="padding-left: 28px; clear: unset;">
-                <b style="line-height: 2;"><code>Accept</code></b>&nbsp;&nbsp;
-&nbsp;
- &nbsp;
- &nbsp;
-                <input type="text" style="display: none"
-                              name="Accept"                data-endpoint="POSTadmin-product-quick-create"
-               value="application/json"
-               data-component="header">
-    <br>
-<p>Example: <code>application/json</code></p>
-            </div>
-                                <h4 class="fancy-heading-panel"><b>Body Parameters</b></h4>
-        <div style=" padding-left: 28px;  clear: unset;">
-            <b style="line-height: 2;"><code>code</code></b>&nbsp;&nbsp;
-<small>string</small>&nbsp;
- &nbsp;
- &nbsp;
-                <input type="text" style="display: none"
-                              name="code"                data-endpoint="POSTadmin-product-quick-create"
-               value=""PROD-001""
-               data-component="body">
-    <br>
-<p>The product code. Example: <code>"PROD-001"</code></p>
-        </div>
-                <div style=" padding-left: 28px;  clear: unset;">
-            <b style="line-height: 2;"><code>name</code></b>&nbsp;&nbsp;
-<small>string</small>&nbsp;
- &nbsp;
- &nbsp;
-                <input type="text" style="display: none"
-                              name="name"                data-endpoint="POSTadmin-product-quick-create"
-               value=""New Product""
-               data-component="body">
-    <br>
-<p>The product name. Example: <code>"New Product"</code></p>
-        </div>
-                <div style=" padding-left: 28px;  clear: unset;">
-            <b style="line-height: 2;"><code>barcode</code></b>&nbsp;&nbsp;
-<small>string</small>&nbsp;
-<i>optional</i> &nbsp;
- &nbsp;
-                <input type="text" style="display: none"
-                              name="barcode"                data-endpoint="POSTadmin-product-quick-create"
-               value="consequatur"
-               data-component="body">
-    <br>
-<p>Example: <code>consequatur</code></p>
-        </div>
-                <div style=" padding-left: 28px;  clear: unset;">
-            <b style="line-height: 2;"><code>low_stock_threshold</code></b>&nbsp;&nbsp;
-<small>integer</small>&nbsp;
-<i>optional</i> &nbsp;
- &nbsp;
-                <input type="number" style="display: none"
-               step="any"               name="low_stock_threshold"                data-endpoint="POSTadmin-product-quick-create"
-               value="45"
-               data-component="body">
-    <br>
-<p>Must be at least 1. Example: <code>45</code></p>
-        </div>
-                <div style=" padding-left: 28px;  clear: unset;">
-            <b style="line-height: 2;"><code>price</code></b>&nbsp;&nbsp;
-<small>number</small>&nbsp;
- &nbsp;
- &nbsp;
-                <input type="number" style="display: none"
-               step="any"               name="price"                data-endpoint="POSTadmin-product-quick-create"
-               value="99.99"
-               data-component="body">
-    <br>
-<p>The purchase price of the product. Example: <code>99.99</code></p>
-        </div>
-                <div style=" padding-left: 28px;  clear: unset;">
-            <b style="line-height: 2;"><code>selling_price</code></b>&nbsp;&nbsp;
-<small>number</small>&nbsp;
- &nbsp;
- &nbsp;
-                <input type="number" style="display: none"
-               step="any"               name="selling_price"                data-endpoint="POSTadmin-product-quick-create"
-               value="149.99"
-               data-component="body">
-    <br>
-<p>The selling price of the product. Example: <code>149.99</code></p>
-        </div>
-                <div style=" padding-left: 28px;  clear: unset;">
-            <b style="line-height: 2;"><code>category_id</code></b>&nbsp;&nbsp;
-<small>integer</small>&nbsp;
- &nbsp;
- &nbsp;
-                <input type="number" style="display: none"
-               step="any"               name="category_id"                data-endpoint="POSTadmin-product-quick-create"
-               value="1"
-               data-component="body">
-    <br>
-<p>The ID of the product category. Example: <code>1</code></p>
-        </div>
-                <div style=" padding-left: 28px;  clear: unset;">
-            <b style="line-height: 2;"><code>units_id</code></b>&nbsp;&nbsp;
-<small>integer</small>&nbsp;
- &nbsp;
- &nbsp;
-                <input type="number" style="display: none"
-               step="any"               name="units_id"                data-endpoint="POSTadmin-product-quick-create"
-               value="1"
-               data-component="body">
-    <br>
-<p>The ID of the product unit. Example: <code>1</code></p>
-        </div>
-                <div style=" padding-left: 28px;  clear: unset;">
-            <b style="line-height: 2;"><code>supplier_id</code></b>&nbsp;&nbsp;
-<small>integer</small>&nbsp;
- &nbsp;
- &nbsp;
-                <input type="number" style="display: none"
-               step="any"               name="supplier_id"                data-endpoint="POSTadmin-product-quick-create"
-               value="1"
-               data-component="body">
-    <br>
-<p>The ID of the product supplier. Example: <code>1</code></p>
-        </div>
-                <div style=" padding-left: 28px;  clear: unset;">
-            <b style="line-height: 2;"><code>description</code></b>&nbsp;&nbsp;
-<small>string</small>&nbsp;
-<i>optional</i> &nbsp;
- &nbsp;
-                <input type="text" style="display: none"
-                              name="description"                data-endpoint="POSTadmin-product-quick-create"
-               value="Dolores dolorum amet iste laborum eius est dolor."
-               data-component="body">
-    <br>
-<p>Example: <code>Dolores dolorum amet iste laborum eius est dolor.</code></p>
-        </div>
-                <div style=" padding-left: 28px;  clear: unset;">
-            <b style="line-height: 2;"><code>image</code></b>&nbsp;&nbsp;
-<small>file</small>&nbsp;
-<i>optional</i> &nbsp;
- &nbsp;
-                <input type="file" style="display: none"
-                              name="image"                data-endpoint="POSTadmin-product-quick-create"
-               value=""
-               data-component="body">
-    <br>
-<p>Must be an image. Must not be greater than 2048 kilobytes. Example: <code>C:\Users\123\AppData\Local\Temp\phpDE58.tmp</code></p>
-        </div>
-                <div style=" padding-left: 28px;  clear: unset;">
-            <b style="line-height: 2;"><code>has_expiry</code></b>&nbsp;&nbsp;
-<small>boolean</small>&nbsp;
-<i>optional</i> &nbsp;
- &nbsp;
-                <label data-endpoint="POSTadmin-product-quick-create" style="display: none">
-            <input type="radio" name="has_expiry"
-                   value="true"
-                   data-endpoint="POSTadmin-product-quick-create"
-                   data-component="body"             >
-            <code>true</code>
-        </label>
-        <label data-endpoint="POSTadmin-product-quick-create" style="display: none">
-            <input type="radio" name="has_expiry"
-                   value="false"
-                   data-endpoint="POSTadmin-product-quick-create"
-                   data-component="body"             >
-            <code>false</code>
-        </label>
-    <br>
-<p>Example: <code>false</code></p>
-        </div>
-                <div style=" padding-left: 28px;  clear: unset;">
-            <b style="line-height: 2;"><code>stock_quantity</code></b>&nbsp;&nbsp;
-<small>integer</small>&nbsp;
- &nbsp;
- &nbsp;
-                <input type="number" style="display: none"
-               step="any"               name="stock_quantity"                data-endpoint="POSTadmin-product-quick-create"
-               value="100"
-               data-component="body">
-    <br>
-<p>The initial stock quantity. Example: <code>100</code></p>
-        </div>
-        </form>
-
-                    <h2 id="products-POSTadmin-product-bulk-delete">POST admin/product/bulk-delete</h2>
-
-<p>
-<small class="badge badge-darkred">requires authentication</small>
-</p>
-
-
-
-<span id="example-requests-POSTadmin-product-bulk-delete">
-<blockquote>Example request:</blockquote>
-
-
-<div class="bash-example">
-    <pre><code class="language-bash">curl --request POST \
-    "http://127.0.0.1.nip.io/admin/product/bulk-delete" \
-    --header "Authorization: Bearer {YOUR_API_TOKEN}" \
-    --header "Content-Type: application/json" \
-    --header "Accept: application/json" \
-    --data "{
-    \"ids\": [
-        1,
-        2,
-        3
-    ]
-}"
-</code></pre></div>
-
-
-<div class="javascript-example">
-    <pre><code class="language-javascript">const url = new URL(
-    "http://127.0.0.1.nip.io/admin/product/bulk-delete"
-);
-
-const headers = {
-    "Authorization": "Bearer {YOUR_API_TOKEN}",
-    "Content-Type": "application/json",
-    "Accept": "application/json",
-};
-
-let body = {
-    "ids": [
-        1,
-        2,
-        3
-    ]
-};
-
-fetch(url, {
-    method: "POST",
-    headers,
-    body: JSON.stringify(body),
-}).then(response =&gt; response.json());</code></pre></div>
-
-</span>
-
-<span id="example-responses-POSTadmin-product-bulk-delete">
-            <blockquote>
-            <p>Example response (200):</p>
-        </blockquote>
-                <pre>
-
-<code class="language-json" style="max-height: 300px;">{
-    &quot;success&quot;: true,
-    &quot;message&quot;: &quot;Successfully deleted 2 product(s)&quot;,
-    &quot;deleted_count&quot;: 2,
-    &quot;images_deleted&quot;: 1
-}</code>
- </pre>
-    </span>
-<span id="execution-results-POSTadmin-product-bulk-delete" hidden>
-    <blockquote>Received response<span
-                id="execution-response-status-POSTadmin-product-bulk-delete"></span>:
-    </blockquote>
-    <pre class="json"><code id="execution-response-content-POSTadmin-product-bulk-delete"
-      data-empty-response-text="<Empty response>" style="max-height: 400px;"></code></pre>
-</span>
-<span id="execution-error-POSTadmin-product-bulk-delete" hidden>
-    <blockquote>Request failed with error:</blockquote>
-    <pre><code id="execution-error-message-POSTadmin-product-bulk-delete">
-
-Tip: Check that you&#039;re properly connected to the network.
-If you&#039;re a maintainer of ths API, verify that your API is running and you&#039;ve enabled CORS.
-You can check the Dev Tools console for debugging information.</code></pre>
-</span>
-<form id="form-POSTadmin-product-bulk-delete" data-method="POST"
-      data-path="admin/product/bulk-delete"
-      data-authed="1"
-      data-hasfiles="0"
-      data-isarraybody="0"
-      autocomplete="off"
-      onsubmit="event.preventDefault(); executeTryOut('POSTadmin-product-bulk-delete', this);">
-    <h3>
-        Request&nbsp;&nbsp;&nbsp;
-                    <button type="button"
-                    style="background-color: #8fbcd4; padding: 5px 10px; border-radius: 5px; border-width: thin;"
-                    id="btn-tryout-POSTadmin-product-bulk-delete"
-                    onclick="tryItOut('POSTadmin-product-bulk-delete');">Try it out ⚡
-            </button>
-            <button type="button"
-                    style="background-color: #c97a7e; padding: 5px 10px; border-radius: 5px; border-width: thin;"
-                    id="btn-canceltryout-POSTadmin-product-bulk-delete"
-                    onclick="cancelTryOut('POSTadmin-product-bulk-delete');" hidden>Cancel 🛑
-            </button>&nbsp;&nbsp;
-            <button type="submit"
-                    style="background-color: #6ac174; padding: 5px 10px; border-radius: 5px; border-width: thin;"
-                    id="btn-executetryout-POSTadmin-product-bulk-delete"
-                    data-initial-text="Send Request 💥"
-                    data-loading-text="⏱ Sending..."
-                    hidden>Send Request 💥
-            </button>
-            </h3>
-            <p>
-            <small class="badge badge-black">POST</small>
-            <b><code>admin/product/bulk-delete</code></b>
-        </p>
-                <h4 class="fancy-heading-panel"><b>Headers</b></h4>
-                                <div style="padding-left: 28px; clear: unset;">
-                <b style="line-height: 2;"><code>Authorization</code></b>&nbsp;&nbsp;
-&nbsp;
- &nbsp;
- &nbsp;
-                <input type="text" style="display: none"
-                              name="Authorization" class="auth-value"               data-endpoint="POSTadmin-product-bulk-delete"
-               value="Bearer {YOUR_API_TOKEN}"
-               data-component="header">
-    <br>
-<p>Example: <code>Bearer {YOUR_API_TOKEN}</code></p>
-            </div>
-                                <div style="padding-left: 28px; clear: unset;">
-                <b style="line-height: 2;"><code>Content-Type</code></b>&nbsp;&nbsp;
-&nbsp;
- &nbsp;
- &nbsp;
-                <input type="text" style="display: none"
-                              name="Content-Type"                data-endpoint="POSTadmin-product-bulk-delete"
-               value="application/json"
-               data-component="header">
-    <br>
-<p>Example: <code>application/json</code></p>
-            </div>
-                                <div style="padding-left: 28px; clear: unset;">
-                <b style="line-height: 2;"><code>Accept</code></b>&nbsp;&nbsp;
-&nbsp;
- &nbsp;
- &nbsp;
-                <input type="text" style="display: none"
-                              name="Accept"                data-endpoint="POSTadmin-product-bulk-delete"
-               value="application/json"
-               data-component="header">
-    <br>
-<p>Example: <code>application/json</code></p>
-            </div>
-                                <h4 class="fancy-heading-panel"><b>Body Parameters</b></h4>
-        <div style=" padding-left: 28px;  clear: unset;">
-            <b style="line-height: 2;"><code>ids</code></b>&nbsp;&nbsp;
-<small>string[]</small>&nbsp;
- &nbsp;
- &nbsp;
-                <input type="text" style="display: none"
-                              name="ids[0]"                data-endpoint="POSTadmin-product-bulk-delete"
-               data-component="body">
-        <input type="text" style="display: none"
-               name="ids[1]"                data-endpoint="POSTadmin-product-bulk-delete"
-               data-component="body">
-    <br>
-<p>An array of product IDs to delete.</p>
-        </div>
-        </form>
-
-                <h1 id="purchase-orders">Purchase Orders</h1>
-
-    
-
-                                <h2 id="purchase-orders-POSTadmin-po-bulk-delete">POST admin/po/bulk-delete</h2>
-
-<p>
-<small class="badge badge-darkred">requires authentication</small>
-</p>
-
-
-
-<span id="example-requests-POSTadmin-po-bulk-delete">
-<blockquote>Example request:</blockquote>
-
-
-<div class="bash-example">
-    <pre><code class="language-bash">curl --request POST \
-    "http://127.0.0.1.nip.io/admin/po/bulk-delete" \
-    --header "Authorization: Bearer {YOUR_API_TOKEN}" \
-    --header "Content-Type: application/json" \
-    --header "Accept: application/json" \
-    --data "{
-    \"ids\": [
-        1,
-        2,
-        3
-    ]
-}"
-</code></pre></div>
-
-
-<div class="javascript-example">
-    <pre><code class="language-javascript">const url = new URL(
-    "http://127.0.0.1.nip.io/admin/po/bulk-delete"
-);
-
-const headers = {
-    "Authorization": "Bearer {YOUR_API_TOKEN}",
-    "Content-Type": "application/json",
-    "Accept": "application/json",
-};
-
-let body = {
-    "ids": [
-        1,
-        2,
-        3
-    ]
-};
-
-fetch(url, {
-    method: "POST",
-    headers,
-    body: JSON.stringify(body),
-}).then(response =&gt; response.json());</code></pre></div>
-
-</span>
-
-<span id="example-responses-POSTadmin-po-bulk-delete">
-            <blockquote>
-            <p>Example response (200):</p>
-        </blockquote>
-                <pre>
-
-<code class="language-json" style="max-height: 300px;">{
-    &quot;success&quot;: true,
-    &quot;message&quot;: &quot;Successfully deleted purchase order(s)&quot;
-}</code>
- </pre>
-    </span>
-<span id="execution-results-POSTadmin-po-bulk-delete" hidden>
-    <blockquote>Received response<span
-                id="execution-response-status-POSTadmin-po-bulk-delete"></span>:
-    </blockquote>
-    <pre class="json"><code id="execution-response-content-POSTadmin-po-bulk-delete"
-      data-empty-response-text="<Empty response>" style="max-height: 400px;"></code></pre>
-</span>
-<span id="execution-error-POSTadmin-po-bulk-delete" hidden>
-    <blockquote>Request failed with error:</blockquote>
-    <pre><code id="execution-error-message-POSTadmin-po-bulk-delete">
-
-Tip: Check that you&#039;re properly connected to the network.
-If you&#039;re a maintainer of ths API, verify that your API is running and you&#039;ve enabled CORS.
-You can check the Dev Tools console for debugging information.</code></pre>
-</span>
-<form id="form-POSTadmin-po-bulk-delete" data-method="POST"
-      data-path="admin/po/bulk-delete"
-      data-authed="1"
-      data-hasfiles="0"
-      data-isarraybody="0"
-      autocomplete="off"
-      onsubmit="event.preventDefault(); executeTryOut('POSTadmin-po-bulk-delete', this);">
-    <h3>
-        Request&nbsp;&nbsp;&nbsp;
-                    <button type="button"
-                    style="background-color: #8fbcd4; padding: 5px 10px; border-radius: 5px; border-width: thin;"
-                    id="btn-tryout-POSTadmin-po-bulk-delete"
-                    onclick="tryItOut('POSTadmin-po-bulk-delete');">Try it out ⚡
-            </button>
-            <button type="button"
-                    style="background-color: #c97a7e; padding: 5px 10px; border-radius: 5px; border-width: thin;"
-                    id="btn-canceltryout-POSTadmin-po-bulk-delete"
-                    onclick="cancelTryOut('POSTadmin-po-bulk-delete');" hidden>Cancel 🛑
-            </button>&nbsp;&nbsp;
-            <button type="submit"
-                    style="background-color: #6ac174; padding: 5px 10px; border-radius: 5px; border-width: thin;"
-                    id="btn-executetryout-POSTadmin-po-bulk-delete"
-                    data-initial-text="Send Request 💥"
-                    data-loading-text="⏱ Sending..."
-                    hidden>Send Request 💥
-            </button>
-            </h3>
-            <p>
-            <small class="badge badge-black">POST</small>
-            <b><code>admin/po/bulk-delete</code></b>
-        </p>
-                <h4 class="fancy-heading-panel"><b>Headers</b></h4>
-                                <div style="padding-left: 28px; clear: unset;">
-                <b style="line-height: 2;"><code>Authorization</code></b>&nbsp;&nbsp;
-&nbsp;
- &nbsp;
- &nbsp;
-                <input type="text" style="display: none"
-                              name="Authorization" class="auth-value"               data-endpoint="POSTadmin-po-bulk-delete"
-               value="Bearer {YOUR_API_TOKEN}"
-               data-component="header">
-    <br>
-<p>Example: <code>Bearer {YOUR_API_TOKEN}</code></p>
-            </div>
-                                <div style="padding-left: 28px; clear: unset;">
-                <b style="line-height: 2;"><code>Content-Type</code></b>&nbsp;&nbsp;
-&nbsp;
- &nbsp;
- &nbsp;
-                <input type="text" style="display: none"
-                              name="Content-Type"                data-endpoint="POSTadmin-po-bulk-delete"
-               value="application/json"
-               data-component="header">
-    <br>
-<p>Example: <code>application/json</code></p>
-            </div>
-                                <div style="padding-left: 28px; clear: unset;">
-                <b style="line-height: 2;"><code>Accept</code></b>&nbsp;&nbsp;
-&nbsp;
- &nbsp;
- &nbsp;
-                <input type="text" style="display: none"
-                              name="Accept"                data-endpoint="POSTadmin-po-bulk-delete"
-               value="application/json"
-               data-component="header">
-    <br>
-<p>Example: <code>application/json</code></p>
-            </div>
-                                <h4 class="fancy-heading-panel"><b>Body Parameters</b></h4>
-        <div style=" padding-left: 28px;  clear: unset;">
-            <b style="line-height: 2;"><code>ids</code></b>&nbsp;&nbsp;
-<small>string[]</small>&nbsp;
- &nbsp;
- &nbsp;
-                <input type="text" style="display: none"
-                              name="ids[0]"                data-endpoint="POSTadmin-po-bulk-delete"
-               data-component="body">
-        <input type="text" style="display: none"
-               name="ids[1]"                data-endpoint="POSTadmin-po-bulk-delete"
-               data-component="body">
-    <br>
-<p>An array of purchase order IDs to delete.</p>
-        </div>
-        </form>
-
-                    <h2 id="purchase-orders-POSTadmin-po-bulk-mark-paid">POST admin/po/bulk-mark-paid</h2>
-
-<p>
-<small class="badge badge-darkred">requires authentication</small>
-</p>
-
-
-
-<span id="example-requests-POSTadmin-po-bulk-mark-paid">
-<blockquote>Example request:</blockquote>
-
-
-<div class="bash-example">
-    <pre><code class="language-bash">curl --request POST \
-    "http://127.0.0.1.nip.io/admin/po/bulk-mark-paid" \
-    --header "Authorization: Bearer {YOUR_API_TOKEN}" \
-    --header "Content-Type: application/json" \
-    --header "Accept: application/json" \
-    --data "{
-    \"ids\": [
-        1,
-        2,
-        3
-    ]
-}"
-</code></pre></div>
-
-
-<div class="javascript-example">
-    <pre><code class="language-javascript">const url = new URL(
-    "http://127.0.0.1.nip.io/admin/po/bulk-mark-paid"
-);
-
-const headers = {
-    "Authorization": "Bearer {YOUR_API_TOKEN}",
-    "Content-Type": "application/json",
-    "Accept": "application/json",
-};
-
-let body = {
-    "ids": [
-        1,
-        2,
-        3
-    ]
-};
-
-fetch(url, {
-    method: "POST",
-    headers,
-    body: JSON.stringify(body),
-}).then(response =&gt; response.json());</code></pre></div>
-
-</span>
-
-<span id="example-responses-POSTadmin-po-bulk-mark-paid">
-            <blockquote>
-            <p>Example response (200):</p>
-        </blockquote>
-                <pre>
-
-<code class="language-json" style="max-height: 300px;">{
-    &quot;success&quot;: true,
-    &quot;message&quot;: &quot;Successfully marked 2 purchase order(s) as paid.&quot;,
-    &quot;updated_count&quot;: 2
-}</code>
- </pre>
-    </span>
-<span id="execution-results-POSTadmin-po-bulk-mark-paid" hidden>
-    <blockquote>Received response<span
-                id="execution-response-status-POSTadmin-po-bulk-mark-paid"></span>:
-    </blockquote>
-    <pre class="json"><code id="execution-response-content-POSTadmin-po-bulk-mark-paid"
-      data-empty-response-text="<Empty response>" style="max-height: 400px;"></code></pre>
-</span>
-<span id="execution-error-POSTadmin-po-bulk-mark-paid" hidden>
-    <blockquote>Request failed with error:</blockquote>
-    <pre><code id="execution-error-message-POSTadmin-po-bulk-mark-paid">
-
-Tip: Check that you&#039;re properly connected to the network.
-If you&#039;re a maintainer of ths API, verify that your API is running and you&#039;ve enabled CORS.
-You can check the Dev Tools console for debugging information.</code></pre>
-</span>
-<form id="form-POSTadmin-po-bulk-mark-paid" data-method="POST"
-      data-path="admin/po/bulk-mark-paid"
-      data-authed="1"
-      data-hasfiles="0"
-      data-isarraybody="0"
-      autocomplete="off"
-      onsubmit="event.preventDefault(); executeTryOut('POSTadmin-po-bulk-mark-paid', this);">
-    <h3>
-        Request&nbsp;&nbsp;&nbsp;
-                    <button type="button"
-                    style="background-color: #8fbcd4; padding: 5px 10px; border-radius: 5px; border-width: thin;"
-                    id="btn-tryout-POSTadmin-po-bulk-mark-paid"
-                    onclick="tryItOut('POSTadmin-po-bulk-mark-paid');">Try it out ⚡
-            </button>
-            <button type="button"
-                    style="background-color: #c97a7e; padding: 5px 10px; border-radius: 5px; border-width: thin;"
-                    id="btn-canceltryout-POSTadmin-po-bulk-mark-paid"
-                    onclick="cancelTryOut('POSTadmin-po-bulk-mark-paid');" hidden>Cancel 🛑
-            </button>&nbsp;&nbsp;
-            <button type="submit"
-                    style="background-color: #6ac174; padding: 5px 10px; border-radius: 5px; border-width: thin;"
-                    id="btn-executetryout-POSTadmin-po-bulk-mark-paid"
-                    data-initial-text="Send Request 💥"
-                    data-loading-text="⏱ Sending..."
-                    hidden>Send Request 💥
-            </button>
-            </h3>
-            <p>
-            <small class="badge badge-black">POST</small>
-            <b><code>admin/po/bulk-mark-paid</code></b>
-        </p>
-                <h4 class="fancy-heading-panel"><b>Headers</b></h4>
-                                <div style="padding-left: 28px; clear: unset;">
-                <b style="line-height: 2;"><code>Authorization</code></b>&nbsp;&nbsp;
-&nbsp;
- &nbsp;
- &nbsp;
-                <input type="text" style="display: none"
-                              name="Authorization" class="auth-value"               data-endpoint="POSTadmin-po-bulk-mark-paid"
-               value="Bearer {YOUR_API_TOKEN}"
-               data-component="header">
-    <br>
-<p>Example: <code>Bearer {YOUR_API_TOKEN}</code></p>
-            </div>
-                                <div style="padding-left: 28px; clear: unset;">
-                <b style="line-height: 2;"><code>Content-Type</code></b>&nbsp;&nbsp;
-&nbsp;
- &nbsp;
- &nbsp;
-                <input type="text" style="display: none"
-                              name="Content-Type"                data-endpoint="POSTadmin-po-bulk-mark-paid"
-               value="application/json"
-               data-component="header">
-    <br>
-<p>Example: <code>application/json</code></p>
-            </div>
-                                <div style="padding-left: 28px; clear: unset;">
-                <b style="line-height: 2;"><code>Accept</code></b>&nbsp;&nbsp;
-&nbsp;
- &nbsp;
- &nbsp;
-                <input type="text" style="display: none"
-                              name="Accept"                data-endpoint="POSTadmin-po-bulk-mark-paid"
-               value="application/json"
-               data-component="header">
-    <br>
-<p>Example: <code>application/json</code></p>
-            </div>
-                                <h4 class="fancy-heading-panel"><b>Body Parameters</b></h4>
-        <div style=" padding-left: 28px;  clear: unset;">
-            <b style="line-height: 2;"><code>ids</code></b>&nbsp;&nbsp;
-<small>string[]</small>&nbsp;
- &nbsp;
- &nbsp;
-                <input type="text" style="display: none"
-                              name="ids[0]"                data-endpoint="POSTadmin-po-bulk-mark-paid"
-               data-component="body">
-        <input type="text" style="display: none"
-               name="ids[1]"                data-endpoint="POSTadmin-po-bulk-mark-paid"
-               data-component="body">
-    <br>
-<p>An array of purchase order IDs to mark as paid.</p>
-        </div>
-        </form>
 
             
 

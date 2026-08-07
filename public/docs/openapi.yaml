@@ -8,13 +8,10 @@ servers:
     url: 'http://127.0.0.1.nip.io'
 tags:
   -
+    name: Contact
+    description: ''
+  -
     name: Endpoints
-    description: ''
-  -
-    name: Products
-    description: ''
-  -
-    name: 'Purchase Orders'
     description: ''
 components:
   securitySchemes:
@@ -26,6 +23,267 @@ security:
   -
     default: []
 paths:
+  /api/contact:
+    post:
+      summary: 'Handle the marketing-site contact form submission.'
+      operationId: handleTheMarketingSiteContactFormSubmission
+      description: ''
+      parameters: []
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  success: true
+                  message: 'Message sent successfully!'
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: 'Message sent successfully!'
+      tags:
+        - Contact
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  description: "The sender's full name."
+                  example: consequatur
+                email:
+                  type: string
+                  description: "The sender's email address."
+                  example: qkunze@example.com
+                company:
+                  type: string
+                  description: "optional The sender's company name."
+                  example: consequatur
+                  nullable: true
+                topic:
+                  type: string
+                  description: 'The selected topic.'
+                  example: support
+                  enum:
+                    - sales
+                    - support
+                    - demo
+                    - partnership
+                    - other
+                message:
+                  type: string
+                  description: 'The message body.'
+                  example: consequatur
+              required:
+                - name
+                - email
+                - topic
+                - message
+  /api/cms:
+    get:
+      summary: ''
+      operationId: getApiCms
+      description: ''
+      parameters: []
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  hero_title: Invent-MAGs
+                  hero_subtitle: 'From inventory and sales to a full accounting suite, Invent-MAG provides the tools you need to make smarter, data-driven decisions and accelerate your growth.'
+                  hero_cta_text: 'Start 30-Day Free Trial'
+                  hero_cta_url: /signup
+                  hero_cta_demo_text: 'Try Live Demo'
+                  hero_cta_demo_url: 'https://demo-pro.invent-mag.web.id/admin/login'
+                  features_title: 'Everything You Need'
+                  features_subtitle: 'A Better Way to Manage Your Business'
+                  features_description: "Invent-MAG isn't just another tool, it's a complete ecosystem designed to give you a bird's-eye view of your entire operation, from inventory to accounting."
+                  features_enterprise_heading: 'Enterprise Features'
+                  feature_card_1_title: 'Inventory & Product Management'
+                  feature_card_1_desc: 'Full product cataloging, real-time stock tracking across multiple warehouses, physical stock opname with variance tracking, warehouse-to-warehouse stock transfers, low-stock alerts, barcode support, and expiry tracking.'
+                  feature_card_2_title: 'Sales, CRM & Quotations'
+                  feature_card_2_desc: 'Complete sales order management, Point of Sale (POS), customer database with purchase history, sales pipeline for opportunity tracking, and quotation generation with full lifecycle management including approval workflows, revision history, and seamless conversion to invoices or sales orders.'
+                  feature_card_3_title: 'Purchase & SRM'
+                  feature_card_3_desc: 'Full purchase order lifecycle, supplier management with historical data, and efficient purchase return processing.'
+                  feature_card_4_title: 'Financial & Accounting Suite'
+                  feature_card_4_desc: 'Chart of Accounts, General Ledger, Manual Journal Entries, Trial Balance, Income Statement, Balance Sheet, AR/AP Aging Reports, and Bank Reconciliation.'
+                  feature_card_5_title: 'HR & Payroll'
+                  feature_card_5_desc: 'Comprehensive employee attendance tracking, automated salaried proration, customizable allowances, and automated two-step accounting sync.'
+                  feature_card_6_title: 'Multi-Currency Support'
+                  feature_card_6_desc: 'Handle transactions in multiple currencies with configurable settings for symbols, decimal places, and exchange rates.'
+                  feature_card_7_title: 'Returns Management'
+                  feature_card_7_desc: 'Complete sales and purchase return workflows with automatic stock adjustments and accounting entries.'
+                  feature_card_8_title: 'User & Role Management'
+                  feature_card_8_desc: 'Secure access control with 101 granular permissions. Assign roles like Superuser, Staff, or POS operator.'
+                  feature_card_9_title: 'Sales Forecasting AI'
+                  feature_card_9_desc: 'AI-powered sales predictions using Holt-Winters algorithms and linear regression for accurate demand forecasting.'
+                  feature_card_10_title: 'RESTful API Access'
+                  feature_card_10_desc: 'Full API access with Sanctum authentication. Integrate with external systems and build custom integrations.'
+                  feature_card_11_title: 'Audit Trail & Compliance'
+                  feature_card_11_desc: 'Comprehensive audit logging for all system changes. Track user actions, modifications, and maintain compliance records.'
+                  pricing_badge: 'Simple, transparent pricing'
+                  pricing_title: 'One platform, every tool your business needs'
+                  pricing_subtitle: 'From inventory tracking to full double-entry accounting &mdash; pick the plan that matches where your business is today.'
+                  pricing_no_credit_badge: 'No credit card required'
+                  pricing_trial_badge: '30-day free trial'
+                  pricing_cancel_badge: 'Cancel anytime'
+                  pricing_most_popular_badge: 'most popular'
+                  pricing_trial_included: '30 days free trial included'
+                  pricing_enterprise_support: 'Enterprise support & SLA'
+                  cta_title: 'Ready to streamline your business?'
+                  cta_description: 'Join thousands of businesses using Invent-MAG to manage inventory, sales, and accounting in one place.'
+                  contact_email: jefrydwijaya3@gmail.com
+                  footer_text: '© 2026 Invent-MAG. All rights reserved.'
+                properties:
+                  hero_title:
+                    type: string
+                    example: Invent-MAGs
+                  hero_subtitle:
+                    type: string
+                    example: 'From inventory and sales to a full accounting suite, Invent-MAG provides the tools you need to make smarter, data-driven decisions and accelerate your growth.'
+                  hero_cta_text:
+                    type: string
+                    example: 'Start 30-Day Free Trial'
+                  hero_cta_url:
+                    type: string
+                    example: /signup
+                  hero_cta_demo_text:
+                    type: string
+                    example: 'Try Live Demo'
+                  hero_cta_demo_url:
+                    type: string
+                    example: 'https://demo-pro.invent-mag.web.id/admin/login'
+                  features_title:
+                    type: string
+                    example: 'Everything You Need'
+                  features_subtitle:
+                    type: string
+                    example: 'A Better Way to Manage Your Business'
+                  features_description:
+                    type: string
+                    example: "Invent-MAG isn't just another tool, it's a complete ecosystem designed to give you a bird's-eye view of your entire operation, from inventory to accounting."
+                  features_enterprise_heading:
+                    type: string
+                    example: 'Enterprise Features'
+                  feature_card_1_title:
+                    type: string
+                    example: 'Inventory & Product Management'
+                  feature_card_1_desc:
+                    type: string
+                    example: 'Full product cataloging, real-time stock tracking across multiple warehouses, physical stock opname with variance tracking, warehouse-to-warehouse stock transfers, low-stock alerts, barcode support, and expiry tracking.'
+                  feature_card_2_title:
+                    type: string
+                    example: 'Sales, CRM & Quotations'
+                  feature_card_2_desc:
+                    type: string
+                    example: 'Complete sales order management, Point of Sale (POS), customer database with purchase history, sales pipeline for opportunity tracking, and quotation generation with full lifecycle management including approval workflows, revision history, and seamless conversion to invoices or sales orders.'
+                  feature_card_3_title:
+                    type: string
+                    example: 'Purchase & SRM'
+                  feature_card_3_desc:
+                    type: string
+                    example: 'Full purchase order lifecycle, supplier management with historical data, and efficient purchase return processing.'
+                  feature_card_4_title:
+                    type: string
+                    example: 'Financial & Accounting Suite'
+                  feature_card_4_desc:
+                    type: string
+                    example: 'Chart of Accounts, General Ledger, Manual Journal Entries, Trial Balance, Income Statement, Balance Sheet, AR/AP Aging Reports, and Bank Reconciliation.'
+                  feature_card_5_title:
+                    type: string
+                    example: 'HR & Payroll'
+                  feature_card_5_desc:
+                    type: string
+                    example: 'Comprehensive employee attendance tracking, automated salaried proration, customizable allowances, and automated two-step accounting sync.'
+                  feature_card_6_title:
+                    type: string
+                    example: 'Multi-Currency Support'
+                  feature_card_6_desc:
+                    type: string
+                    example: 'Handle transactions in multiple currencies with configurable settings for symbols, decimal places, and exchange rates.'
+                  feature_card_7_title:
+                    type: string
+                    example: 'Returns Management'
+                  feature_card_7_desc:
+                    type: string
+                    example: 'Complete sales and purchase return workflows with automatic stock adjustments and accounting entries.'
+                  feature_card_8_title:
+                    type: string
+                    example: 'User & Role Management'
+                  feature_card_8_desc:
+                    type: string
+                    example: 'Secure access control with 101 granular permissions. Assign roles like Superuser, Staff, or POS operator.'
+                  feature_card_9_title:
+                    type: string
+                    example: 'Sales Forecasting AI'
+                  feature_card_9_desc:
+                    type: string
+                    example: 'AI-powered sales predictions using Holt-Winters algorithms and linear regression for accurate demand forecasting.'
+                  feature_card_10_title:
+                    type: string
+                    example: 'RESTful API Access'
+                  feature_card_10_desc:
+                    type: string
+                    example: 'Full API access with Sanctum authentication. Integrate with external systems and build custom integrations.'
+                  feature_card_11_title:
+                    type: string
+                    example: 'Audit Trail & Compliance'
+                  feature_card_11_desc:
+                    type: string
+                    example: 'Comprehensive audit logging for all system changes. Track user actions, modifications, and maintain compliance records.'
+                  pricing_badge:
+                    type: string
+                    example: 'Simple, transparent pricing'
+                  pricing_title:
+                    type: string
+                    example: 'One platform, every tool your business needs'
+                  pricing_subtitle:
+                    type: string
+                    example: 'From inventory tracking to full double-entry accounting &mdash; pick the plan that matches where your business is today.'
+                  pricing_no_credit_badge:
+                    type: string
+                    example: 'No credit card required'
+                  pricing_trial_badge:
+                    type: string
+                    example: '30-day free trial'
+                  pricing_cancel_badge:
+                    type: string
+                    example: 'Cancel anytime'
+                  pricing_most_popular_badge:
+                    type: string
+                    example: 'most popular'
+                  pricing_trial_included:
+                    type: string
+                    example: '30 days free trial included'
+                  pricing_enterprise_support:
+                    type: string
+                    example: 'Enterprise support & SLA'
+                  cta_title:
+                    type: string
+                    example: 'Ready to streamline your business?'
+                  cta_description:
+                    type: string
+                    example: 'Join thousands of businesses using Invent-MAG to manage inventory, sales, and accounting in one place.'
+                  contact_email:
+                    type: string
+                    example: jefrydwijaya3@gmail.com
+                  footer_text:
+                    type: string
+                    example: '© 2026 Invent-MAG. All rights reserved.'
+      tags:
+        - Endpoints
   /api/webhooks/midtrans:
     post:
       summary: ''
@@ -82,11 +340,11 @@ paths:
               schema:
                 type: object
                 example:
-                  message: Unauthorized
+                  message: Unauthenticated.
                 properties:
                   message:
                     type: string
-                    example: Unauthorized
+                    example: Unauthenticated.
       tags:
         - Endpoints
       requestBody:
@@ -247,11 +505,11 @@ paths:
               schema:
                 type: object
                 example:
-                  message: Unauthorized
+                  message: Unauthenticated.
                 properties:
                   message:
                     type: string
-                    example: Unauthorized
+                    example: Unauthenticated.
       tags:
         - Endpoints
   /api/v1/plans:
@@ -268,11 +526,11 @@ paths:
               schema:
                 type: object
                 example:
-                  message: Unauthorized
+                  message: Unauthenticated.
                 properties:
                   message:
                     type: string
-                    example: Unauthorized
+                    example: Unauthenticated.
       tags:
         - Endpoints
   /api/v1/plan/current:
@@ -289,261 +547,10 @@ paths:
               schema:
                 type: object
                 example:
-                  message: Unauthorized
+                  message: Unauthenticated.
                 properties:
                   message:
                     type: string
-                    example: Unauthorized
+                    example: Unauthenticated.
       tags:
         - Endpoints
-  /admin/product/quick-create:
-    post:
-      summary: ''
-      operationId: postAdminProductQuickCreate
-      description: ''
-      parameters: []
-      responses:
-        200:
-          description: ''
-          content:
-            application/json:
-              schema:
-                type: object
-                example:
-                  success: true
-                  message: 'Product created successfully'
-                  product:
-                    id: 1
-                    name: 'New Product'
-                properties:
-                  success:
-                    type: boolean
-                    example: true
-                  message:
-                    type: string
-                    example: 'Product created successfully'
-                  product:
-                    type: object
-                    properties:
-                      id:
-                        type: integer
-                        example: 1
-                      name:
-                        type: string
-                        example: 'New Product'
-      tags:
-        - Products
-      requestBody:
-        required: true
-        content:
-          multipart/form-data:
-            schema:
-              type: object
-              properties:
-                code:
-                  type: string
-                  description: 'The product code.'
-                  example: '"PROD-001"'
-                name:
-                  type: string
-                  description: 'The product name.'
-                  example: '"New Product"'
-                barcode:
-                  type: string
-                  description: ''
-                  example: consequatur
-                  nullable: true
-                low_stock_threshold:
-                  type: integer
-                  description: 'Must be at least 1.'
-                  example: 45
-                  nullable: true
-                price:
-                  type: number
-                  description: 'The purchase price of the product.'
-                  example: 99.99
-                selling_price:
-                  type: number
-                  description: 'The selling price of the product.'
-                  example: 149.99
-                category_id:
-                  type: integer
-                  description: 'The ID of the product category.'
-                  example: 1
-                units_id:
-                  type: integer
-                  description: 'The ID of the product unit.'
-                  example: 1
-                supplier_id:
-                  type: integer
-                  description: 'The ID of the product supplier.'
-                  example: 1
-                description:
-                  type: string
-                  description: ''
-                  example: 'Dolores dolorum amet iste laborum eius est dolor.'
-                  nullable: true
-                image:
-                  type: string
-                  format: binary
-                  description: 'Must be an image. Must not be greater than 2048 kilobytes.'
-                  nullable: true
-                has_expiry:
-                  type: boolean
-                  description: ''
-                  example: false
-                  nullable: true
-                stock_quantity:
-                  type: integer
-                  description: 'The initial stock quantity.'
-                  example: 100
-              required:
-                - code
-                - name
-                - price
-                - selling_price
-                - category_id
-                - units_id
-                - supplier_id
-                - stock_quantity
-  /admin/product/bulk-delete:
-    post:
-      summary: ''
-      operationId: postAdminProductBulkDelete
-      description: ''
-      parameters: []
-      responses:
-        200:
-          description: ''
-          content:
-            application/json:
-              schema:
-                type: object
-                example:
-                  success: true
-                  message: 'Successfully deleted 2 product(s)'
-                  deleted_count: 2
-                  images_deleted: 1
-                properties:
-                  success:
-                    type: boolean
-                    example: true
-                  message:
-                    type: string
-                    example: 'Successfully deleted 2 product(s)'
-                  deleted_count:
-                    type: integer
-                    example: 2
-                  images_deleted:
-                    type: integer
-                    example: 1
-      tags:
-        - Products
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                ids:
-                  type: array
-                  description: 'An array of product IDs to delete.'
-                  example:
-                    - 1
-                    - 2
-                    - 3
-                  items:
-                    type: string
-              required:
-                - ids
-  /admin/po/bulk-delete:
-    post:
-      summary: ''
-      operationId: postAdminPoBulkDelete
-      description: ''
-      parameters: []
-      responses:
-        200:
-          description: ''
-          content:
-            application/json:
-              schema:
-                type: object
-                example:
-                  success: true
-                  message: 'Successfully deleted purchase order(s)'
-                properties:
-                  success:
-                    type: boolean
-                    example: true
-                  message:
-                    type: string
-                    example: 'Successfully deleted purchase order(s)'
-      tags:
-        - 'Purchase Orders'
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                ids:
-                  type: array
-                  description: 'An array of purchase order IDs to delete.'
-                  example:
-                    - 1
-                    - 2
-                    - 3
-                  items:
-                    type: string
-              required:
-                - ids
-  /admin/po/bulk-mark-paid:
-    post:
-      summary: ''
-      operationId: postAdminPoBulkMarkPaid
-      description: ''
-      parameters: []
-      responses:
-        200:
-          description: ''
-          content:
-            application/json:
-              schema:
-                type: object
-                example:
-                  success: true
-                  message: 'Successfully marked 2 purchase order(s) as paid.'
-                  updated_count: 2
-                properties:
-                  success:
-                    type: boolean
-                    example: true
-                  message:
-                    type: string
-                    example: 'Successfully marked 2 purchase order(s) as paid.'
-                  updated_count:
-                    type: integer
-                    example: 2
-      tags:
-        - 'Purchase Orders'
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                ids:
-                  type: array
-                  description: 'An array of purchase order IDs to mark as paid.'
-                  example:
-                    - 1
-                    - 2
-                    - 3
-                  items:
-                    type: string
-              required:
-                - ids

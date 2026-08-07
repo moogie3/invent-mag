@@ -3,6 +3,7 @@
 use App\Http\Controllers\Api\Auth\AuthController;
 use App\Http\Controllers\Api\Auth\RegisteredUserController;
 use App\Http\Controllers\Api\CmsController;
+use App\Http\Controllers\Api\ContactController;
 use App\Http\Controllers\Api\PaymentController;
 use App\Http\Controllers\Api\TenantLookupController;
 use App\Http\Controllers\Api\Webhook\MidtransController;
@@ -41,6 +42,11 @@ Route::middleware(['throttle:auth'])->group(function () {
 });
 
 Route::post('/lookup-tenant', [TenantLookupController::class, 'lookup'])->middleware('throttle:10,1');
+
+// Contact form - public, rate-limited (marketing site)
+Route::post('/contact', [ContactController::class, 'submit'])
+    ->middleware('throttle:5,60')
+    ->name('api.contact');
 
 // Protected routes - Token management only
 Route::middleware(['auth:sanctum', 'throttle:api'])->prefix('v1')->group(function () {

@@ -163,7 +163,7 @@ When `DomainTenantFinder` cannot match the HTTP `Host` header to any tenant reco
 
 This design is intentional: failing closed (404) is safer than accidentally serving another tenant's data or an unauthenticated dashboard.
 
-**Edge case:** The main marketing/landing page domain (non-tenant domain) must be excluded from the `NeedsTenant` middleware group. API routes for registration and tenant lookup (`/api/tenant-lookup`) are also excluded and run on the landlord application context.
+**Edge case:** The main marketing/landing page domain (non-tenant domain) must be excluded from the `NeedsTenant` middleware group. API routes for registration and tenant lookup (`/api/lookup-tenant`) are also excluded and run on the landlord application context.
 
 ---
 
@@ -922,9 +922,9 @@ Fortify is a backend authentication implementation — it provides the authentic
 
 **Laravel Sanctum** handles **API token authentication:**
 - API clients (mobile apps, third-party integrations) authenticate with Bearer tokens
-- Tokens are created via `POST /api/auth/login`
-- All `/api/` routes (except registration and webhook) require `auth:sanctum` middleware
-- Rate limited to 60 requests/minute
+- Tokens are created via `POST /api/login` (public); token refresh via `POST /api/v1/refresh-token`
+- The REST API is deliberately scoped to essential endpoints (auth, CMS, payment/webhooks, plan lookup, contact) — see `docs/TECHNICAL_SPECIFICATION.md` §5.2; only `POST /api/payment/confirm` requires `auth:sanctum`
+- Per-route rate limits are applied (e.g. `throttle:api` on the api group, `throttle:3,60` on registration, `throttle:5,60` on `/api/contact`)
 
 **Why both?** Web users use session cookies (more secure for browser-based access — no token exposure in JavaScript). API clients use tokens (stateless, cross-origin compatible). Using a single auth mechanism for both would require either exposing tokens to the browser (XSS risk) or requiring cookies for APIs (CORS complexity).
 
@@ -1123,17 +1123,17 @@ $stockRecords = ProductWarehouse::whereIn('product_id', $productIds)
 
 **Answer:**
 
-This is a nuanced question. The API routes are mounted at `/api/` on the same domain-based tenant system. When an API client sends a request to `acme.127.0.0.1.nip.io/api/products`, the same `HandleTenantFromPath` middleware resolves the tenant from the subdomain.
+This is a nuanced question. The API routes are mounted at `/api/` via `bootstrap/app.php`, wrapped in the `api` middleware group (which appends `throttle:api` + `SubstituteBindings`) with an `/api` prefix. The `api` group does **not** include the tenant-resolving middleware (`NeedsTenant`/`HandleTenantFromPath`) that the web group uses, so the public essential endpoints — auth (`/api/register`, `/api/login`, `/api/lookup-tenant`, `/api/v1/refresh-token`), CMS (`/api/cms`), plan lookup (`/api/v1/plans`, `/api/v1/plan/current`), contact (`/api/contact`), and the Midtrans webhooks — run on the API domain without tenant resolution.
 
-However, there is a `/api/tenant-lookup` endpoint (served on the main domain or from the API auth controller) that allows clients to look up a tenant's domain by a lookup key (e.g., business name or email) — this is used by mobile apps to discover the correct tenant subdomain before authenticating.
+However, there is a `/api/lookup-tenant` endpoint (public) that allows clients to discover a tenant's subdomain by shop name — this is used by the marketing-site login portal (and would be used by mobile apps) before authenticating.
 
 **Authentication flow for API:**
-1. Client POSTs to `{tenant_domain}/api/auth/login` with `email` + `password`
+1. Client POSTs to `/api/login` with `email` + `password`
 2. Server validates credentials and returns a Sanctum `personal_access_token`
 3. Client includes `Authorization: Bearer {token}` header on all subsequent requests
-4. `auth:sanctum` middleware validates the token on each request
+4. `auth:sanctum` middleware validates the token on each request (currently only `POST /api/payment/confirm` is token-protected)
 
-**Rate limiting:** `ThrottleRequests` middleware applies `60` requests per minute per authenticated user (or per IP for unauthenticated routes).
+**Rate limiting:** Per-route `throttle` middleware (e.g. `throttle:api` on the api group, `throttle:3,60` on registration, `throttle:10,1` on lookup-tenant, `throttle:5,60` on contact).
 
 **API documentation:** Scribe generates OpenAPI YAML at `/public/docs/openapi.yaml` and an interactive HTML docs page at `/public/docs/`. Developers use the `php artisan scribe:generate` command to regenerate docs when APIs change.
 

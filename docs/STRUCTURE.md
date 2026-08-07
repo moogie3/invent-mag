@@ -24,6 +24,7 @@ invent-mag/
 ├── docs/                            # All documentation (no markdown at repo root)
 │   ├── ACCOUNTING_SETUP_GUIDE.md
 │   ├── ARCHITECTURE_ASSESSMENT.md
+│   ├── DEPLOYMENT_CHECKLIST.md
 │   ├── FEATURE_CHECKLIST.md
 │   ├── INTERVIEW_QA.md
 │   ├── LANDING_PAGE_CMS.md
@@ -146,6 +147,7 @@ invent-mag/
 │   │       └── VerifyEmailResponse.php
 │   │
 │   ├── Mail/
+│   │   ├── ContactFormMail.php
 │   │   └── SubscriptionInvoiceMail.php
 │   │
 │   ├── Models/
@@ -485,9 +487,8 @@ invent-mag/
 │       │   ├── users/index.blade.php
 │       │   └── warehouse/{index,export-pdf}.blade.php
 │       │
-│       ├── emails/subscription-invoice.blade.php
+│       ├── emails/{subscription-invoice,contact-form}.blade.php
 │       ├── errors/   (200, 302, 400, 401, 403, 404, 419, 429, 500)
-│       ├── scribe/index.blade.php
 │       └── vendor/   (pagination, turbo-laravel, notifications)
 │
 ├── routes/

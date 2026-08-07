@@ -629,7 +629,7 @@
 
 ### High Priority
 
-- [ ] Bank reconciliation
+- [x] Bank reconciliation — completed (Aug 2026): CSV import (BCA/Mandiri/BNI/BRI), auto-match (±5 days, exact amount), manual match, variance gate (0.005), reconciliation lock (blocked journal reversals/voids/unposts), "Terekonsiliasi" badges, opening-balance prefill
 - [ ] Advanced multi-currency (real-time rates)
 - [ ] e-Faktur Phase 2: PJAP API (Klikpajak direct DJP submission)
 
@@ -648,6 +648,7 @@
 - [ ] PPh 21 (employee withholding) — UMKM-flat "Payroll Tax" picker on payroll screen (withholding line in payment journal); explicitly NOT a full TER/PTKP/1721-II engine
 - [x] PPh Final 0.5% (UMKM final income tax, PP 23/2018 & PP 20/2026) — completed via seeded `PPh Final 0.5%` Tax record (0.5%, `is_pph = true`, added to `TaxSeeder` + `TaxService::ensureIndonesianDefaults()` + backfill migration `2026_08_05_000002` converting existing `PPH 22` rows in place); flows through existing PPh dropdowns + shared PPh Payable (2150) unchanged. `PPH 22` (1.5%) remains creatable on the Tax page but is no longer seeded
 - [ ] PPh 25 (installment tax payments) — deferred; manual journal entry suffices for UMKM
+- [ ] Marketplace sync (Shopee/TikTok) — deferred; bulk product listing/inventory sync integration, not yet scoped into docs elsewhere
 - [ ] Mobile app (React Native/Flutter)
 - [ ] Advanced BI dashboards
 

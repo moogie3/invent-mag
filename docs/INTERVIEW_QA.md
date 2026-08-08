@@ -28,6 +28,9 @@
 20. [DevOps & Deployment](#20-devops--deployment)
 21. [Quotation Module & Billing Consistency (v1.9)](#21-quotation-module--billing-consistency-v19)
 22. [Super Admin Panel (SaaS Management)](#22-super-admin-panel-saas-management)
+23. [Recent Production Incidents & Decisions (Aug 2026)](#23-recent-production-incidents--decisions-aug-2026)
+24. [Indonesian Tax Compliance — PPN, e-Faktur & PPh (Implemented)](#24-indonesian-tax-compliance--ppn-e-faktur--pph-implemented)
+25. [Bank Reconciliation (CSV-Based)](#25-bank-reconciliation-csv-based)
 
 ---
 
@@ -96,7 +99,7 @@ A candidate should note:
 
 **Database:** MySQL (primary production), migration files are SQLite-compatible.
 
-**Infrastructure:** Docker, Railway (PaaS), GitHub Actions CI/CD.
+**Infrastructure:** Docker, **Railway (PaaS — current production deployment)**, GitHub Actions CI/CD. Domains: `invent-mag.web.id` (marketing/landing) and `api.invent-mag.web.id` (backend API).
 
 ---
 
@@ -342,13 +345,16 @@ Hides navigation items and UI elements that the current plan does not include. R
 **Layer 4 — Navigation filter (`NavigationServiceProvider`):**
 The navigation config (`config/navigation.php`) has a `plan_feature` key per menu item. `NavigationServiceProvider` filters the menu array at runtime, removing items the current plan doesn't support.
 
-**Plan features per tier:**
+**Plan features per tier** (verified against `database/seeders/PlanSeeder.php`):
 
 | Feature Slug | Starter | Professional | Enterprise |
 |---|---|---|---|
 | `products, inventory, sales, purchases, invoices, dashboard, basic_reports, customers, suppliers` | ✓ | ✓ | ✓ |
-| `pos, stock_opname, accounting, crm, sales_pipeline, financial_reports, multi_currency, sales_returns, purchase_returns` | ✗ | ✓ | ✓ |
+| `pos, sales_returns, purchase_returns` | ✓ | ✓ | ✓ |
+| `stock_opname, accounting, crm, sales_pipeline, financial_reports, multi_currency, hr, cash_flow, quotations, ppn, bank_reconciliation` | ✗ | ✓ | ✓ |
 | `sales_forecasting, api_access, audit_compliance` | ✗ | ✗ | ✓ |
+
+Note: `efaktur_api` (e-Faktur Phase 2 — PJAP direct DJP submission) is an **Enterprise-only** slug planned but not yet live; `ppn` (Phase 1 — Faktur Pajak PDF + DJP CSV) is already on Professional & Enterprise. See ROADMAP §4.
 
 **Backward compatibility:** Tenants without a plan assigned (legacy tenants) get enterprise-level access. The config key `plans.legacy_full_access = true` controls this behavior.
 
@@ -681,6 +687,16 @@ CREDIT: Inventory (Asset)             $600     [reduce inventory value]
 
 Note: The COGS amount comes from the actual batch cost calculated during FEFO processing.
 
+**Indonesian PPN (VAT) sales — VAT-split at creation (Phase 1E, Aug 2026):** For tenants in the Indonesian jurisdiction (`isIndonesian()`), a sale whose tax record is flagged `is_ppn = true` posts a **VAT-split** entry at sale creation instead of a single AR/Revenue entry:
+
+```
+DEBIT:  Accounts Receivable (Asset)   $1,110   [gross = net + VAT]
+CREDIT: Sales Revenue (Revenue)        $1,000   [net of VAT]
+CREDIT: PPN Keluaran (Liability)         $110   [VAT owed to DJP]
+```
+
+This is why revenue is booked **net of VAT** and the Faktur Pajak itself carries no journal (it is a compliance document). The PPN Keluaran account comes from `accounting_settings.ppn_keluaran_account_id` (seeded default 2110). Sales returns reverse the PPN whenever the original sale `isPpn()` — no Faktur Pajak is required for the reversal. Purchases similarly carry a PPN Masukan (input VAT) snapshot (`po.ppn_enabled/rate/amount`) that debits the input-VAT account (1160), and `EFakturService::getSptMasaSummary()` returns `total_ppn_masukan` and `net_ppn_payable` (PPN Kurang Bayar = max(0, Keluaran − Masukan)). See PPN_EVOLUTION.md Phase 1E.
+
 **POS sales** (July 2026) use the exact same journal entry pattern as regular sales. PosService injects AccountingService and posts all three entries (AR/Revenue, COGS/Inventory, Cash/AR) at creation time since POS sales are always paid in full.
 
 **On payment received:**
@@ -1011,7 +1027,7 @@ The most powerful header — defines which sources are allowed for scripts, styl
 
 **`'unsafe-inline'` (CSP Level 2 fallback):** Retained for browsers that do not support nonces. In CSP Level 3 compliant browsers, the presence of a nonce overrides `'unsafe-inline'`, so effectively inline scripts without the nonce are blocked on modern browsers.
 
-**`'unsafe-eval'` (open issue):** `eval()`, `new Function()`, `setTimeout(string)`, and `setInterval(string)` are permitted. This is almost certainly required by a charting or UI library used in the application. It is an undocumented security weakening — the library requiring it has not been explicitly identified or commented in the source. A candidate who flags this without being prompted is demonstrating genuine security depth.
+**`'unsafe-eval'` (documented residual risk):** `eval()`, `new Function()`, `setTimeout(string)`, and `setInterval(string)` are permitted. This was historically an undocumented weakening; it is **now explicitly documented** with a rationale comment in `app/Http/Middleware/SecurityHeaders.php` (see ARCHITECTURE_ASSESSMENT §3.6): it is required by jQuery (`$.globalEval`, which internally calls `eval()`) and by Chart.js / ECharts for certain dynamic renderers. The directive is retained with the note that it can only be removed by replacing those libraries with CSP-compliant alternatives. A candidate who flags this and can articulate *why* it is retained (not just that it exists) is demonstrating genuine security depth.
 
 ---
 
@@ -1550,7 +1566,7 @@ This directive reads `manifest.json` in production and injects the correct versi
 
 **`.github/workflows/deploy.yml`** runs on push to `main`:
 1. Runs CI checks first
-2. Deploys to Railway via Railway CLI or webhook
+2. Deploys to **Railway** via Railway CLI or webhook
 
 **Railway branches:**
 - `railway/code-change-_P3x3T` and `railway/code-change-DFBXMb` are Railway's automatically created branches for deployment environments (preview vs. production)
@@ -1559,6 +1575,8 @@ This directive reads `manifest.json` in production and injects the correct versi
 - `Dockerfile` builds the PHP-FPM + Nginx image
 - `docker/nginx.conf` configures the web server
 - `docker-compose.yml` orchestrates the app container + MySQL + (optionally) Redis
+
+**Release deploy specifics:** the current production release (Aug 2026 API/contact) includes a **breaking change** — the Midtrans webhook URL must move from `/webhooks/midtrans` to `/api/webhooks/midtrans`, and `MAIL_*`/`CONTACT_EMAIL` env must be verified for the contact form. See `docs/DEPLOYMENT_CHECKLIST.md`.
 
 ---
 
@@ -1636,41 +1654,6 @@ Used when a formal PDF quote is issued. The `SalesOpportunity::quotations()` has
 **The fix (applied June 2026):** `Tenant::initializeBillingPeriod()` now uses `addDays(30)` to match `BillingService`. `getNextBillingPeriod()` was also updated to use rolling 30-day periods. Both methods are now consistent with the v1.7 changelog commitment.
 
 **Why this is a senior-level finding:** The inconsistency was subtle — it didn't cause an obvious crash or error. It manifested as a discrepancy between what the UI shows ("your plan renews on [date]") and when the plan lifecycle commands actually fire.
-
----
-
-## Scoring Guide for Interviewers
-
-| Score | Description |
-|---|---|
-| **5/5** | Gives complete, accurate answer including edge cases, trade-offs, and real code references |
-| **4/5** | Correct answer with minor gaps; understands the "why" not just the "what" |
-| **3/5** | Mostly correct but misses important nuances (e.g., knows FEFO but doesn't connect it to COGS) |
-| **2/5** | Partially correct; understands the concept but cannot explain the implementation |
-| **1/5** | Incorrect or confused; cannot connect concepts to the actual codebase |
-| **0/5** | No knowledge of the topic |
-
-## Red Flags
-
-- Cannot explain why `BelongsToTenant` doesn't protect raw `DB::table()` queries
-- Does not know the difference between `void` and `reverse` for journal entries
-- Cannot explain FEFO's connection to COGS calculation
-- Does not understand why Fortify and Sanctum serve different purposes
-- Cannot articulate why the Service Layer exists
-- Does not mention the `proration_credit` mechanism for plan upgrades
-- Cannot explain why `available_amount` on `customer_credits` needs an observer to stay in sync
-- Claims "Holt-Winters parameters are hardcoded" when the `optimizeHoltWinters()` grid search has been in production since May 2026 — this is a tell that the candidate is reciting documentation rather than reading code
-- Claims "CSP has no nonces" without noting the nonce implementation or that `'unsafe-eval'` is documented with rationale in `SecurityHeaders.php`
-
-## Green Flags
-
-- Proactively identifies the `DB::table()` raw query risk AND notes that `DB::tenantTable()` macro now mitigates it, but is not a compile-time guarantee
-- Identifies `'unsafe-eval'` in the CSP `script-src` as a security concern and can articulate why it's needed (jQuery `$.globalEval`, Chart.js dynamic renderers) — or suggests alternative libraries that are CSP-compliant
-- Knows the billing period inconsistency between `Tenant::initializeBillingPeriod()` and `BillingService` was resolved in June 2026 and can describe the pre-fix impact on scheduled downgrades
-- Notes that `remaining_quantity` on `po_items` exists separately from `product_warehouse.quantity` for FEFO batch tracking
-- Can trace a complete sales transaction from HTTP request → service → FEFO → journal entries → observer
-- Identifies that the `SalesOpportunity` model supports two conversion paths (direct to `Sales` or via `Quotation`) and explains why this is the correct CRM design for a system that needs both informal and formal quoting workflows
-- Understands the distinction between the `SuperAdmin` model (platform-level, separate auth guard) and the `superuser` Spatie role (tenant-level, all permissions within a tenant) — and can explain why both are architecturally correct
 
 ---
 
@@ -1781,3 +1764,275 @@ The super admin panel (16 controllers, 28 Blade views, 39 routes) manages:
 14. **CMS** — landing page content editor (hero, features, pricing, contact)
 
 All operations are audit-logged via `activity()` (Spatie Activity Log).
+
+---
+
+## 23. Recent Production Incidents & Decisions (Aug 2026)
+
+---
+
+### Q23.1 — There was a production bug where the public API returned 404s for `/api/register` and `/api/lookup-tenant` on the deployed site, even though the routes existed locally. What was the root cause and the fix?
+
+**Answer:**
+
+The routes were registered **without the `/api/` prefix and without the `api` middleware group** in production. In `bootstrap/app.php`, Laravel 11's automatic `/api` prefixing is applied by the framework's default route registration — but this project used a custom `using:` closure:
+
+```php
+// BEFORE (buggy)
+Route::using(base_path('routes/api.php')); // custom closure bypasses the automatic
+                                           // '/api' prefix + 'api' middleware group
+```
+
+That bypassed two framework conventions at once:
+
+1. **No `/api` prefix** — every route in `routes/api.php` was registered at the domain root (e.g. `POST /register` instead of `POST /api/register`). The FE marketing site calls `POST /api/register`, so production requests 404'd.
+2. **No `api` middleware group** — `throttle:api`, `SubstituteBindings`, and `EnsureFrontendRequestsAreStateful` were missing from these routes.
+
+The diagnostic signals were Scribe generating docs with **zero routes**, and the exception handler's `$request->is('api/*')` checks never firing (because requests were not hitting `/api/*`).
+
+**The fix (Aug 2026):**
+
+```php
+// AFTER (fixed)
+Route::middleware('api')->prefix('api')->group(base_path('routes/api.php'));
+```
+
+`php artisan route:list` confirmed all routes now live under `/api/*`; Scribe regenerated docs for all 11 endpoints; tests (`MidtransWebhookTest`, `TenantLookupControllerTest`) were updated to the `/api/...` paths; full suite passed (1186 tests).
+
+**Senior lesson:** Framework conventions are easy to bypass silently. When a custom route registration deviates from the platform default, every downstream assumption (middleware, prefixes, exception-handler path checks, doc generation) must be re-verified. A candidate who recognizes that "Scribe matching zero routes" is the first clue that routing itself is broken — rather than the docs being out of date — has good diagnostic instincts.
+
+---
+
+### Q23.2 — Why was the contact form moved from Web3Forms to the backend `POST /api/contact`?
+
+**Answer:**
+
+The marketing-site contact form (`invent-mag-fe` Astro pages) originally posted to **Web3Forms** (`https://api.web3forms.com/submit`) with a client-side `access_key`. The backend `Api\ContactController` existed but was **dead code** — it referenced a non-existent `App\Mail\ContactFormMail` and was never called.
+
+**Why the change was made:**
+1. **Exposed access key** — the Web3Forms access key was hardcoded in the public JS bundle. A client-side key is public by design, but it means anyone can spam the account's submission quota.
+2. **Third-party dependency with no value** — the FE already had a backend with an email pipeline (Resend); routing contact through a paid third party was unnecessary.
+3. **Dead backend code** — the endpoint existed in the API but was unreachable/unwired.
+
+**The implementation (`app/Http/Controllers/Api/ContactController.php`, `app/Mail/ContactFormMail.php`, `resources/views/emails/contact-form.blade.php`):**
+- Validates `name`, `email`, `message`, and a `topic` enum (`sales|support|demo|partnership|other`)
+- A **honeypot** field (`botcheck`) — if submitted, the handler returns a fake success without sending mail, silently discarding bots
+- Sends a **queued** mailable (`ShouldQueue`) to `config('app.contact_email')` (`env('CONTACT_EMAIL')`) — queuing keeps the request fast and retries SMTP failures
+- Route `POST /api/contact` with `throttle:5,60` (5 attempts/minute/IP)
+- Tests use `Mail::assertQueued` (not `assertSent`) because the mailable is queued — a subtle gotcha
+
+**Why queued?** SMTP is slow and can fail; blocking the HTTP response on it turns a form submission into a 5-30s request and a hard failure mode. Queuing decouples the user-facing response from the delivery pipeline.
+
+---
+
+### Q23.3 — A secret-scanning alert flagged commit `e76c52d` (the contact-form cleanup) for a "generic high entropy secret." The commit actually *removed* the Web3Forms access key. How was this handled, and what is the correct order of operations for a leaked secret?
+
+**Answer:**
+
+Secret scanners flag **any commit whose content contains a high-entropy string — including deletion lines**. The commit that removed the key was itself flagged because the key UUID appeared in its diff.
+
+**Handling order — rotate first, then purge history:**
+1. **Revoke/rotate the credential** (the definitive fix). In this case the key was deleted in the Web3Forms dashboard. Because the key had shipped in a public client bundle for months, it was already compromised — history rewriting cannot un-leak it.
+2. **Purge history** with `git filter-repo --replace-text '<secret>==>REDACTED'`, then re-add the remote (filter-repo strips it) and `git push --force-with-lease`. After `filter-repo`, the first `--force-with-lease` push fails with "stale info" because the remote-tracking ref was removed — run `git fetch` first, then `--force-with-lease` compares against the freshly-fetched ref.
+3. **Verify** with `git log --all -S '<secret>' --oneline` (must be empty) on both the local repo and `origin/<branch>`, then dismiss the alert in the Security tab.
+
+**Why `--force-with-lease` instead of `--force`?** `--force` blindly overwrites whatever is on the remote; `--force-with-lease` aborts if the remote has moved since your last fetch — protecting against clobbering a colleague's push. It should be the default for any force-push.
+
+**Interview insight:** A strong candidate distinguishes between a *server credential* (rotation is non-negotiable) and a *public client-side key* (rotation still recommended, but the exposure is by design). They also know that rewriting a public repo's history is hygiene, not security — anyone who already cloned it retains the secret.
+
+---
+
+## 24. Indonesian Tax Compliance — PPN, e-Faktur & PPh (Implemented)
+
+---
+
+### Q24.1 — What is the universal tax model, and why was the separate PPN toggle removed?
+
+**Answer:**
+
+> "PPN is no longer a toggle. It's a property of the selected tax."
+
+There is a single `taxes` table; a tax is categorized by two booleans — `is_ppn` (VAT/compliance) and `is_pph` (withholding). The legacy v1 design had a **separate PPN on/off switch** next to the universal tax dropdown on the Sales form, which produced five correctness problems (see `docs/PPN_EVOLUTION.md` §"Problems We Found"):
+
+1. **Double-counting** — PPN was computed on the post-general-tax total instead of the taxable base (DPP)
+2. **Faktur Pajak divergence** — `EFakturService` recalculated PPN while the Sale stored a separately client-computed `ppn_amount`
+3. **Line-item DPP errors** — item DPP ignored order-level discounts
+4. **`grandTotal` ignored PPN** — the accessor returned `total` without the PPN added on top
+5. **No mutual exclusion** — a user could apply both a general tax *and* PPN on one invoice, which Indonesian law forbids on a single Faktur Pajak
+
+The v2 refactor collapsed everything into the single dropdown: selecting a tax with `is_ppn = true` activates PPN compliance (Faktur Pajak, NPWP, e-Faktur); selecting a general/none tax does not. PPN and general taxes are **mutually exclusive by construction** (one `tax_id` per document). **PPh is an independent parallel dimension** — a document can carry PPN *and* PPh snapshots simultaneously, because PPh uses its own flag and its own accounts (1170 receivable / 2150 payable) and never conflicts with the exclusivity rule.
+
+`ppn_enabled/ppn_rate/ppn_amount` and `pph_*` on `sales`/`po`/`quotations` are **denormalized snapshots** derived from the selected tax at creation time — never user input. Helpers `Sales::isPpn()`/`isPph()` read the live `Tax` when the relationship is loaded and fall back to the snapshot otherwise. Toggling a Tax record's flags or switching `tax_jurisdiction` **never retroactively changes past documents** (PPN_EVOLUTION.md Decision 15 — the snapshot is the source of truth for history).
+
+---
+
+### Q24.2 — How is Indonesian compliance gated? Walk through the layering.
+
+**Answer:**
+
+Compliance is a four-layer chain (PPN_EVOLUTION.md Decision 4); all layers must be true for a feature to fully function:
+
+```
+tax_jurisdiction = 'ID'    ← master switch (Tenant model)
+    ↓
+pkp_status = true          ← company registration status (Tenant model)
+    ↓
+hasFeature('ppn')          ← billing/plan gate (Professional+)
+    ↓
+tax.is_ppn = true          ← per-tax flag (Tax model)
+    ↓
+sale.isPpn()               ← derived helper on Sale model
+```
+
+- **UI visibility** is gated by `isIndonesian() && hasFeature('ppn')`; **Faktur Pajak generation additionally requires `pkp_status = true`** (`EFakturService` throws `DomainException` otherwise)
+- **Navigation filtering is cosmetic only:** `NavigationServiceProvider::tenantMatchesJurisdiction()` hides e-Faktur menu items for non-Indonesian tenants, but the routes remain reachable by direct URL (Decision 12 — protects deep links and bookmarks)
+- **Auto-seed on switch:** switching `tax_jurisdiction` to `'ID'` (from the Settings → Tax Region card or the e-Faktur settings page) calls `TaxService::ensureIndonesianDefaults()` — idempotent creation of `PPN 11%`, `PPH 23 (2%)`, and `PPh Final 0.5%` (Phases 1C + 1E). An existing default is never overridden.
+- **Switch-off safeguard:** `Tenant::canDisableIndonesianJurisdiction()` blocks ID→null when draft Faktur Pajak exist or PPN sales have no Faktur Pajak yet. It uses `whereDoesntHave('fakturPajak')` — a prior bug queried a non-existent `sales.faktur_pajak_id` column and 500'd. Both entry points (`SettingsController` and `EFakturController`) call the same consolidated method.
+
+---
+
+### Q24.3 — Walk through the e-Faktur lifecycle end-to-end, from sale creation to SPT Masa PPN.
+
+**Answer:**
+
+1. **Sale creation — PPN recognized at creation, not at Faktur issuance (Phase 1E).** When the tenant `isIndonesian()`, the selected tax has `is_ppn = true`, and `ppn_keluaran_account_id` is configured, `SalesService::createSale()` posts the **5-leg VAT-split journal**: `Dr AR gross / Cr Revenue net / Cr PPN Keluaran / Dr COGS / Cr Inventory`. Revenue is booked **net of VAT** (this resolved the "revenue booked gross" audit caveat). If the PPN Keluaran account is missing it falls back to the legacy 4-leg gross journal — no crash. `PosService` applies the identical split for Indonesian PPN sales.
+2. **Faktur Pajak generation is compliance-only** — since Phase 1E it posts **no journal** (`postPpnKeluaranJournalEntry()` was deleted). `EFakturService::generateFakturPajak()` validates `pkp_status`, `isPpn()`, and no existing FP; allocates an NSFP; computes `DPP = sale.total - sale.total_tax` and `PPN = sale.total_tax` (no independent recalculation → no FP/sale divergence); creates `FakturPajak` + `FakturPajakItem` records.
+3. **Draft → submit:** the admin reviews on the e-Faktur index by tax period (masa pajak), then exports the **DJP CSV** (FK header row + OF item rows, UTF-8 BOM for Excel/Indonesian locale, amounts in **integer cents** per the DJP spec) and uploads it to the DJP desktop app — or, in Phase 2, submits via the PJAP API. Status moves to `submitted`.
+4. **Cancel (draft only):** the NSFP is marked `cancelled` (returned to the pool) and any *legacy* FakturPajak-sourced PPN journal is reversed (backward compatibility only).
+5. **SPT Masa PPN:** `EFakturService::getSptMasaSummary()` rolls **PPN Keluaran** (from issued Fakturs) against **PPN Masukan** (from `po.ppn_amount` where `ppn_enabled`) and returns `total_ppn_masukan`, `net_ppn_payable` (Keluaran − Masukan, floored at 0), and `ppn_credit` (Lebih Bayar when Masukan exceeds).
+
+**PPN Masukan (input VAT) on purchases** (Phase 1D): `Dr Inventory net + Dr Input VAT (1160) / Cr AP / Cr PPh Payable`. PPN Masukan is a **debit to an asset** (1160) — it does not reduce the payable to the supplier (unlike PPh). The PO create form deliberately has **no tax fields**; input VAT is recognized at the purchase-invoice stage, following the Accurate Online / Indonesian standard (Decision 14). Sales returns reverse PPN **proportionally whenever the original sale `isPpn()`** — a Faktur Pajak is no longer required for the reversal.
+
+---
+
+### Q24.4 — How does the NSFP pool work? Why FIFO with `lockForUpdate()`?
+
+**Answer:**
+
+NSFP are DJP-allocated 17-digit serial numbers that must be used **sequentially** — reusing a number or skipping ahead is a legal violation. Under concurrent requests, two users generating Faktur Pajak simultaneously could both read the "lowest available" NSFP and produce two Fakturs with the same number. The fix is **pessimistic locking**: NSFP allocation happens inside `DB::transaction()` with `lockForUpdate()`, so only one request can hold the row at a time. A unique constraint on the `nsfp` column is belt-and-suspenders. Cancelled Fakturs return their NSFP to the pool (marked `cancelled`).
+
+The DJP CSV export converts amounts to **integer cents** (`(int) round($amount * 100)`) to match the DJP spec exactly, and prepends a **UTF-8 BOM** because the DJP e-Faktur desktop app opens files in Microsoft Excel under an Indonesian locale, which requires the BOM for correct UTF-8 detection. A candidate who knows *why* the BOM is there — not just that it is — understands the real-world pain of DJP integration.
+
+---
+
+### Q24.5 — How do the PPh types work? PPh 23, PPh Final 0.5%, PPh 21, PPh 25?
+
+**Answer:**
+
+All withholding taxes run on the **universal `is_pph` mechanism**: a `Tax` flagged `is_pph = true` appears in the PPh dropdown on Sales, PO, POS, and Quotation forms and posts through **one shared journal path** — sale side `Dr PPh Receivable (1170) / Cr PPh Payable (2150)` at invoice time; purchase side the reverse.
+
+- **PPh 23 (2%)** and **PPh Final 0.5%** (PP 23/2018, as revised by PP 20/2026) are seeded. `PPh Final 0.5%` **replaced `PPH 22` in place** via backfill migration `2026_08_05_000002` — same row, renamed, rate changed — so existing `pph_tax_id` references stay valid and per-document `pph_rate`/`pph_amount` snapshots are untouched. `PPH 22` was dropped because it is narrowly applicable (goods purchases from importers) and rarely the tax an UMKM books; it remains *creatable* from the Tax page for the minority who need it.
+- **PPh 21** is planned as a flat **"Payroll Tax" picker** on the payroll screen (reusing `is_pph`) — deliberately **not** a TER/PTKP/1721-II engine, since the UMKM target does not need a salary-tax engine.
+- **PPh 25** is **deferred** to a manual journal entry.
+
+**Why no per-type engines?** Every PPh type posts to the same PPh Payable (2150). Separate engines for 21/22/23/25 would add complexity without improving accounting accuracy — distinct types would land indistinguishably on the same liability account. A single reconcilable liability beats five engines producing identical ledger lines. The trade-off is documented as Caveat #4 in `docs/TAXATION_SYSTEM.md` (PPh types are not separately reportable in the ledger).
+
+**PPN is the exception** because it is a genuinely separate VAT obligation — the VAT-split journal at creation (Q7.2) plus the e-Faktur data model, not the `is_pph` path.
+
+---
+
+### Q24.6 — What is planned for e-Faktur Phase 2 (PJAP API), and why is it Enterprise-gated?
+
+**Answer:**
+
+Phase 2 (planned, ~3-4 weeks) adds **direct DJP submission** — a "Submit ke DJP" button on the Faktur Pajak detail page, real-time approval/rejection status, and bulk month-end submission — eliminating the manual CSV download and the DJP desktop app. Phase 1 (CSV + PDF) is **Zahir parity**; Phase 2 is the differentiator.
+
+- **PJAP choice:** **Mekari Klikpajak** (best REST docs, full sandbox, most widely used), abstracted behind an `App\Contracts\PjapInterface` contract (`submit`, `submitBatch`, `checkStatus`, `cancel`, `testConnection`) so the provider can be swapped without touching business logic. `KlikpajakService` binds per-tenant (each tenant has its own credentials).
+- **Idempotency:** submissions carry an `X-Idempotency-Key` (`FP-{id}-{nsfp}`) with `retry(3)`, so a retried request can never create a duplicate Faktur; `checkStatus()` normalizes to `pending|approved|rejected`.
+- **Queue isolation:** submission/status jobs dispatch to a dedicated **`tax-submissions`** queue so DJP jobs are never starved by other background work.
+- **Gating:** the `efaktur_api` feature slug is **Enterprise-only** (planned, not yet live); `ppn` (Phase 1) is already on Professional & Enterprise. This matches the market split: Phase 1 is the compliance baseline for every Indonesian PKP tenant, Phase 2 is premium automation for the largest tenants.
+
+---
+
+## 25. Bank Reconciliation (CSV-Based)
+
+---
+
+### Q25.1 — Why is bank reconciliation CSV-based rather than using bank APIs (BCA/Bni/Mandiri)?
+
+**Answer:**
+
+Bank Reconciliation shipped in Aug 2026 as a **CSV-import-based** feature (Professional+; `bank_reconciliation` feature slug, ROADMAP §5.1 / §5.7):
+
+- `BankStatementParser` interface + `AbstractBankStatementParser` (delimiter sniffing, Indonesian/US number normalization, date parsing) with per-bank subclasses (BCA, Mandiri, BNI, BRI) and a factory
+- `BankReconciliationService` — import, auto-match, manual match/unmatch, complete, delete, totals recalc, journal-entry candidate listing, and the `isJournalEntryReconciled()` lock check
+- Opening-balance prefill from the account's Opening Balance (adjustable to the statement), statement closing + computed closing balance + variance
+
+**Why CSV and not bank APIs:** Each Indonesian bank has a different API with its own authentication flow (OAuth, IP whitelists, per-bank SDKs) — roughly 2-3 weeks per bank. CSV import covers the UMKM workflow at **zero per-bank integration cost**, and all four banks provide CSV statement exports. The bank-API path remains an optional future automation layer (ROADMAP §5.7) *on top of* the CSV engine, not a replacement.
+
+**Senior angle:** This is a deliberate scoping decision — matching the payment-ease-of-use of a bank API against the cost of maintaining N vendor integrations for a product whose users primarily operate on exported statements. Ask whether the candidate can articulate the trade-off rather than reflexively demanding "real" API integration.
+
+---
+
+### Q25.2 — Describe the matching pipeline and the variance gate.
+
+**Answer:**
+
+After import, `BankReconciliationService` matches statement lines to journal entries:
+
+- **Auto-match** pairs statement lines with journal entries by **exact amount within a ±5-day window** — purposefully conservative to avoid false positives
+- **Manual match/unmatch** covers everything auto-match misses; unmatched statement lines and unmatched journal entries stay visible for investigation
+- **Variance gate:** `complete()` throws a `DomainException` when `abs(variance) > 0.005` — a reconciliation **cannot be completed out of balance**. The Complete button is disabled in the UI when variance ≠ 0 (the 0.005 tolerance absorbs float arithmetic). Balance = opening + matched credits − matched debits vs. the statement closing balance.
+- Status workflow: `open` → `completed`, with a reconciliation history list.
+
+**Why the gate matters:** the entire point of reconciliation is proving the books match the bank. Allowing a non-zero variance to be "completed" would legitimize a discrepancy and defeat the control.
+
+---
+
+### Q25.3 — How does the reconciliation lock protect journal entries?
+
+**Answer:**
+
+Matched journal entries become **immutable** once a reconciliation completes. `assertNotReconciled()` is wired into `AccountingService::reverseJournalEntry / voidJournalEntry / unpostJournalEntry`, so reversing, voiding, or unposting a reconciled entry throws.
+
+- "Terekonsiliasi" badges appear in Journal, Ledger, and manual-entry lists via the `withReconciledStatus()` eager-loading scope — one query, no N+1
+- This is the same immutability principle as *posted* journal entries (Q7.3): once a control point is passed, history cannot be rewritten — the statement of account stays trustworthy after the fact
+
+**Senior angle:** the lock is what makes the bank statement trustworthy post-completion. A candidate who connects it to the double-entry immutability philosophy (void vs. reverse, Q7.3) understands the accounting mindset behind the feature.
+
+---
+
+## Scoring Guide for Interviewers
+
+| Score | Description |
+|---|---|
+| **5/5** | Gives complete, accurate answer including edge cases, trade-offs, and real code references |
+| **4/5** | Correct answer with minor gaps; understands the "why" not just the "what" |
+| **3/5** | Mostly correct but misses important nuances (e.g., knows FEFO but doesn't connect it to COGS) |
+| **2/5** | Partially correct; understands the concept but cannot explain the implementation |
+| **1/5** | Incorrect or confused; cannot connect concepts to the actual codebase |
+| **0/5** | No knowledge of the topic |
+
+## Red Flags
+
+- Cannot explain why `BelongsToTenant` doesn't protect raw `DB::table()` queries
+- Does not know the difference between `void` and `reverse` for journal entries
+- Cannot explain FEFO's connection to COGS calculation
+- Does not understand why Fortify and Sanctum serve different purposes
+- Cannot articulate why the Service Layer exists
+- Does not mention the `proration_credit` mechanism for plan upgrades
+- Cannot explain why `available_amount` on `customer_credits` needs an observer to stay in sync
+- Claims "Holt-Winters parameters are hardcoded" when the `optimizeHoltWinters()` grid search has been in production since May 2026 — this is a tell that the candidate is reciting documentation rather than reading code
+- Claims "CSP has no nonces" without noting the nonce implementation or that `'unsafe-eval'` is documented with rationale in `SecurityHeaders.php`
+- Proposes "adding grid search to Holt-Winters" or "replacing Web3Forms with a backend endpoint" as *new* ideas when both are already shipped — signals stale knowledge
+- Believes PPN is still a separate toggle on the Sales form — "PPN is no longer a toggle. It's a property of the selected tax." (universal tax refactor, July 2026)
+- Cannot explain why Faktur Pajak generation no longer posts a PPN journal — since Phase 1E (Aug 2026) PPN is recognized at sale creation via the 5-leg VAT split
+- Proposes "adding per-bank PPh engines" or "integrating bank APIs" as *new* ideas — the universal `is_pph` mechanism and the CSV-based bank reconciliation already shipped
+
+## Green Flags
+
+- Proactively identifies the `DB::table()` raw query risk AND notes that `DB::tenantTable()` macro now mitigates it, but is not a compile-time guarantee
+- Identifies `'unsafe-eval'` in the CSP `script-src` as a security concern and can articulate why it's retained (jQuery `$.globalEval`, Chart.js dynamic renderers — documented in `SecurityHeaders.php`) — or suggests alternative libraries that are CSP-compliant
+- Explains the Aug 2026 `/api` prefix bug: that a custom `using:` closure in `bootstrap/app.php` bypassed Laravel's automatic `/api` prefix + `api` middleware group, and that "Scribe matching zero routes" was the diagnostic signal
+- Knows the contact form was rewired from Web3Forms to `POST /api/contact` and can explain the honeypot, the queued `ShouldQueue` mailable (hence `assertQueued`, not `assertSent`), and `throttle:5,60`
+- Can describe the correct leaked-secret playbook: rotate first, then `git filter-repo` + `--force-with-lease`, and knows history rewriting doesn't un-leak an already-public client key
+- Explains why bank reconciliation is CSV-based (per-bank API cost vs. UMKM workflow) and can name the variance gate (0.005) and the reconciliation lock wired into `AccountingService`
+- Can articulate why PPh uses one universal `is_pph` mechanism (single PPh Payable liability) instead of per-type calculation engines
+- Knows the billing period inconsistency between `Tenant::initializeBillingPeriod()` and `BillingService` was resolved in June 2026 and can describe the pre-fix impact on scheduled downgrades
+- Notes that `remaining_quantity` on `po_items` exists separately from `product_warehouse.quantity` for FEFO batch tracking
+- Can trace a complete sales transaction from HTTP request → service → FEFO → journal entries → observer
+- Identifies that the `SalesOpportunity` model supports two conversion paths (direct to `Sales` or via `Quotation`) and explains why this is the correct CRM design for a system that needs both informal and formal quoting workflows
+- Understands the distinction between the `SuperAdmin` model (platform-level, separate auth guard) and the `superuser` Spatie role (tenant-level, all permissions within a tenant) — and can explain why both are architecturally correct
+- Can walk the full e-Faktur lifecycle: 5-leg VAT split at sale creation → compliance-only Faktur Pajak generation → NSFP FIFO with `lockForUpdate()` → DJP CSV (FK/OF, UTF-8 BOM, integer cents) → SPT Masa PPN (Keluaran − Masukan, Lebih Bayar)
+- Knows why `PPh 22` was replaced by `PPh Final 0.5%` *in place* (existing `pph_tax_id` references stay valid) and can articulate the single-PPh-Payable (2150) rationale
+- Explains that e-Faktur Phase 2 (Klikpajak PJAP behind `PjapInterface`, idempotency keys, dedicated `tax-submissions` queue) is planned and Enterprise-gated via the `efaktur_api` slug

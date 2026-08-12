@@ -29,8 +29,6 @@ return [
     'trial_ends_in' => 'Masa uji coba Anda berakhir dalam :days hari',
     'trial_ended' => 'Masa uji coba Anda telah berakhir',
     'upgrade_to_unlock' => 'Tingkatkan untuk membuka lebih banyak fitur',
-    'upgrade_required' => 'Peningkatan Diperlukan',
-    'upgrade_desc' => 'Fitur ini tidak tersedia pada paket Anda saat ini.',
     'feature_requires_upgrade' => 'Fitur ":feature" memerlukan paket :plan atau yang lebih tinggi.',
     'view_plans' => 'Lihat Paket',
     'go_back' => 'Kembali',

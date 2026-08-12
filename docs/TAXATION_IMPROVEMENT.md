@@ -2,10 +2,12 @@
 
 **Author:** Senior Engineer Review  
 **Date:** June 2026  
-**Version:** 2.1  
+**Version:** 2.5  
 **Status:** Implemented
 
 > **July 2026 Update (v2.1):** All 9 remaining gaps from Section 12 (items A through I) have been fixed and verified with passing tests. Items J and K (dead imports/methods) were already fixed in v2.0.
+>
+> **August 2026 Update (v2.5):** PPh sections 13–14 reconciled against the shipped implementation. PPh base is the pre-PPN taxable amount; the sale-side journal is `Dr PPh Receivable / Cr Accounts Receivable` (account configurable via `pph_receivable_account_id`); gating is via the tenant's Indonesian jurisdiction (no `SettingService`); PPh migrations are per-table (`2026_07_28_000002` sales, `000004` po, `000005` quotations — no `sales_returns` columns); and the auto-seed creates **three** records (PPN 11%, PPH 23, PPh Final 0.5%).
 
 ---
 
@@ -68,15 +70,15 @@ ALTER TABLE taxes
 - `'inclusive'` — tax is already inside the price: `tax = subtotal - (subtotal / (1 + rate%))`
 - `'none'` — zero-rate / exempt: tax amount always = 0 regardless of rate
 
-### 2.2 `quotations` Table — Create (Missing Migration!)
+### 2.2 `quotations` Table — Already Present (No Change Needed)
 
-Migration: `2026_06_16_000002_create_quotations_table.php`
+Migration: `2025_03_20_070700_create_quotations_table.php`
 
-The `quotations` table was referenced throughout the codebase but **no migration file existed**. This is a CI-breaking bug (confirmed by the Docker build failure in the chat). This migration creates the complete table.
+The `quotations` table already existed with `tax_id`, `tax_type`, `tax_rate`, and `tax_amount` columns in its base migration. No new migration was required for the PPN tax work.
 
 ### 2.3 FK Columns on Financial Documents
 
-Migration: `2026_06_16_000003_add_tax_id_to_financial_documents.php`
+Migration: `2026_06_16_000002_add_tax_id_to_financial_documents.php`
 
 ```sql
 -- sales: add tax_id FK (retain existing tax_rate and total_tax for historical reads)
@@ -320,8 +322,7 @@ All existing `sales` records that have `tax_rate` and `total_tax` set but `tax_i
 | File                                                                          | Change Type    |
 | ----------------------------------------------------------------------------- | -------------- |
 | `database/migrations/2026_06_16_000001_add_columns_to_taxes_table.php`        | New            |
-| `database/migrations/2026_06_16_000002_create_quotations_table.php`           | New (missing!) |
-| `database/migrations/2026_06_16_000003_add_tax_id_to_financial_documents.php` | New            |
+| `database/migrations/2026_06_16_000002_add_tax_id_to_financial_documents.php` | New            |
 | `app/Models/Tax.php`                                                          | Updated        |
 | `app/Models/Sales.php`                                                        | Updated        |
 | `app/Models/Purchase.php`                                                     | Updated        |
@@ -642,19 +643,19 @@ The following issues were found during the audit and have all been resolved. Ret
 | P   | MEDIUM   | `po/view/amount-summary.blade.php`                                | Purchase show page has no tax line in amount summary — tax is calculated and stored but never displayed to the user                                                        | ✅ FIXED — Added tax line matching sales view pattern                                                                                                                                                                             |
 | Q   | MEDIUM   | `por/show/page-body.blade.php`                                    | Purchase return show page has no tax display — tax data is stored but never shown                                                                                          | ✅ FIXED — Added conditional tax line matching sales-returns pattern                                                                                                                                                              |
 
-**Test coverage:** All fixes verified with 1066 passing tests (0 new regressions).
+**Test coverage:** All fixes verified with 1186 passing tests (0 new regressions).
 
 ---
 
 ## 10. What Was NOT Changed
 
-- **`PosService` tax selector** — POS still uses the default tax via `Tax::default()->first()`. The POS flow is quick-serve; adding a tax selector to the POS would harm UX. The default tax is applied automatically and snapshotted onto the sale record.
+- **`PosService` tax selector** — POS accepts `tax_id` from the request, falling back to the tenant default tax (`Tax::default()->first() ?? Tax::active()->first()`) when omitted. The PPN tax is snapshotted onto the sale record; PPh is applied too when an Indonesian tenant passes `pph_tax_id`.
 - **`SalesHelper::calculateTotal()`** — item-level total calculation is unchanged. Tax is an order-level concept, not a line-item concept.
 - **`SalesHelper::calculateDiscount()`** — unchanged.
 - **Accounting journal entries for tax** — the current accounting model posts the gross total (inclusive of tax) to AR/Revenue. Splitting revenue vs. tax liability into separate accounts (VAT Output Tax account) is a future enhancement that depends on e-Faktur compliance work.
 - **Tax column naming inconsistency** — Sales/Purchase use `total_tax`; Returns/Quotations use `tax_amount`. This is a cosmetic inconsistency that does not affect functionality. Standardizing column names would require a migration + data backfill across 5 tables.
 - **Duplicated helper code** — `SalesHelper::calculateTaxAmount()` and `PurchaseHelper::calculateTaxAmount()` are identical implementations (same formula, same behavior). Consolidating into a shared base helper is a refactor, not a bug fix.
-- **Quotation tax handling** — Quotations handle tax directly in the controller (no `QuotationService` exists). The form uses a manual tax type + rate input rather than a Tax model dropdown. This is intentional for the quotation workflow where custom tax rates may be negotiated.
+- **Quotation tax handling** — Quotations handle tax in the controller (no `QuotationService` exists). The form uses the Tax model dropdown (`tax_id`); when the tenant is Indonesian, a second `pph_tax_id` dropdown is shown and PPh is snapshotted onto the quotation.
 
 ### Tax Implementation Consistency Matrix (July 2026)
 
@@ -683,7 +684,7 @@ PPh is **not a replacement or alternative** to PPN — both can appear on the sa
 
 ### 13.2 Database — `is_pph` Flag on `taxes` Table
 
-Migration: `2026_07_XX_000001_add_is_pph_to_taxes_table.php`
+Migration: `2026_07_28_000001_add_is_pph_to_taxes.php`
 
 ```sql
 ALTER TABLE taxes
@@ -748,33 +749,37 @@ Each dropdown is **independent** — selecting a PPN tax does not affect the PPh
 
 ### 13.4 FK Columns on Financial Documents
 
-Migration: `2026_07_XX_000002_add_pph_tax_id_to_financial_documents.php`
+PPh columns were added by **three separate per-table migrations** (plus a settings backfill), not one combined migration:
+
+| Migration | Table | Purpose |
+| --------- | ----- | ------- |
+| `2026_07_28_000002_add_pph_fields_to_sales.php` | `sales` | `pph_tax_id`, `pph_tax_rate`, `pph_tax_amount`, `pph_enabled` |
+| `2026_07_28_000003_backfill_pph_account_settings.php` | `settings` | Seeded `pph_receivable_account_id` so the sale-side PPh journal has a target account |
+| `2026_07_28_000004_add_pph_fields_to_po.php` | `po` | Same PPh columns on purchase orders |
+| `2026_07_28_000005_add_pph_fields_to_quotations.php` | `quotations` | Same PPh columns on quotations |
 
 ```sql
--- sales: add pph_tax_id, pph_tax_rate, pph_tax_amount
+-- sales (2026_07_28_000002): add pph_tax_id, pph_tax_rate, pph_tax_amount, pph_enabled
 ALTER TABLE sales ADD COLUMN pph_tax_id     BIGINT UNSIGNED NULL;
 ALTER TABLE sales ADD COLUMN pph_tax_rate   DECIMAL(5,2) NOT NULL DEFAULT 0;
 ALTER TABLE sales ADD COLUMN pph_tax_amount DECIMAL(15,2) NOT NULL DEFAULT 0;
+ALTER TABLE sales ADD COLUMN pph_enabled    BOOLEAN NOT NULL DEFAULT FALSE;
 ALTER TABLE sales ADD FOREIGN KEY (pph_tax_id) REFERENCES taxes(id) ON DELETE SET NULL;
 
--- po: same pattern
+-- po (2026_07_28_000004): same pattern
 ALTER TABLE po ADD COLUMN pph_tax_id     BIGINT UNSIGNED NULL;
 ALTER TABLE po ADD COLUMN pph_tax_rate   DECIMAL(5,2) NOT NULL DEFAULT 0;
 ALTER TABLE po ADD COLUMN pph_tax_amount DECIMAL(15,2) NOT NULL DEFAULT 0;
 ALTER TABLE po ADD FOREIGN KEY (pph_tax_id) REFERENCES taxes(id) ON DELETE SET NULL;
 
--- quotations: same pattern
+-- quotations (2026_07_28_000005): same pattern
 ALTER TABLE quotations ADD COLUMN pph_tax_id     BIGINT UNSIGNED NULL;
 ALTER TABLE quotations ADD COLUMN pph_tax_rate   DECIMAL(5,2) NOT NULL DEFAULT 0;
 ALTER TABLE quotations ADD COLUMN pph_tax_amount DECIMAL(15,2) NOT NULL DEFAULT 0;
 ALTER TABLE quotations ADD FOREIGN KEY (pph_tax_id) REFERENCES taxes(id) ON DELETE SET NULL;
-
--- sales_returns: same pattern
-ALTER TABLE sales_returns ADD COLUMN pph_tax_id     BIGINT UNSIGNED NULL;
-ALTER TABLE sales_returns ADD COLUMN pph_tax_rate   DECIMAL(5,2) NOT NULL DEFAULT 0;
-ALTER TABLE sales_returns ADD COLUMN pph_tax_amount DECIMAL(15,2) NOT NULL DEFAULT 0;
-ALTER TABLE sales_returns ADD FOREIGN KEY (pph_tax_id) REFERENCES taxes(id) ON DELETE SET NULL;
 ```
+
+> **Note:** There are **no `pph_*` columns on `sales_returns`.** Sales returns copy PPh from the parent sale's snapshot columns at return time — the return row itself stores PPN/PPh amounts via the shared `tax_id`/`tax_amount` columns, not a dedicated PPh FK. (There are also two later backfills, `2026_08_05_000001_backfill_pph_22_tax_record.php` and `2026_08_05_000002_backfill_pph_final_tax_record.php`, which converted the old `PPH 22` seed to the current PPh set.)
 
 **Column naming convention:** PPh columns use the `pph_` prefix to clearly distinguish them from PPN columns (`tax_id`, `tax_rate`, `tax_amount` / `total_tax`).
 
@@ -793,11 +798,11 @@ The `pph_tax_id` FK enables JOIN-based reporting ("show all sales where PPh tax 
 
 ### 13.6 Calculation
 
-PPh is always calculated as a **deduction from the grand total** (exclusive type). The formula is:
+PPh is always calculated as a **deduction** (exclusive type). In the shipped implementation (`SalesService::createSale()` / `updateSale()`), the base is the **taxable amount before PPN** — the subtotal after order discount — matching the UMKM PPh Final gross-base convention, where VAT is excluded from peredaran bruto:
 
 ```
-pph_tax_amount = grand_total × (pph_tax_rate / 100)
-net_total      = grand_total - pph_tax_amount  (if PPh applies)
+pph_tax_amount = taxable_amount (before PPN) × (pph_tax_rate / 100)
+grand_total    = (taxable_amount + ppn_tax_amount) - pph_tax_amount
 ```
 
 **For exclusive PPN + PPh together:**
@@ -806,30 +811,29 @@ net_total      = grand_total - pph_tax_amount  (if PPh applies)
 subtotal_after_discount = 1,000,000
 PPN rate (exclusive)    = 11%
 ppn_tax_amount          = 1,000,000 × 0.11 = 110,000
-grand_total             = 1,000,000 + 110,000 = 1,110,000
 
 PPh rate                = 2%
-pph_tax_amount          = 1,110,000 × 0.02 = 22,200
-net_total               = 1,110,000 - 22,200 = 1,087,800
+pph_tax_amount          = 1,000,000 × 0.02 = 20,000   ← base is BEFORE PPN
+grand_total             = 1,000,000 + 110,000 - 20,000 = 1,090,000
 ```
 
-**Important:** PPh is calculated on the **grand total including PPN**, not on the pre-tax subtotal. This matches standard Indonesian withholding tax practice.
+**Important:** PPh is calculated on the **pre-PPN taxable amount** (`$taxableAmount`), not on the grand total including PPN. This is deliberate — the UMKM PPh Final regime computes peredaran bruto excluding VAT.
 
 **SalesHelper update:**
 
 ```php
-public static function calculatePPhAmount(float $grandTotal, float $pphRate): float
+public static function calculatePPhAmount(float $taxableAmount, float $pphRate): float
 {
-    if ($pphRate <= 0 || $grandTotal <= 0) {
+    if ($pphRate <= 0 || $taxableAmount <= 0) {
         return 0.0;
     }
-    return round($grandTotal * ($pphRate / 100), 2);
+    return round($taxableAmount * ($pphRate / 100), 2);
 }
 ```
 
 ### 13.7 Journal Entries
 
-PPh creates an additional **withholding tax payable** journal entry. The accounting treatment:
+PPh creates an additional **withholding tax** journal entry that offsets the seller's accounts receivable. The accounting treatment:
 
 **Standard PPN-only sale (existing):**
 
@@ -839,80 +843,63 @@ Dr  Accounts Receivable     1,110,000
     Cr  PPN Output Tax Payable           110,000
 ```
 
-**Sale with PPh applied (new):**
+**Sale with PPh applied (new) — `SalesService::createSale()`:**
+
+The main journal stays the same (AR debited for the gross total). A second entry then moves the withheld amount out of AR into the PPh receivable asset:
 
 ```
-Dr  Accounts Receivable     1,110,000
-    Cr  Revenue                        1,000,000
-    Cr  PPN Output Tax Payable           110,000
-
-Dr  PPh Receivable (Tax Prepaid)  22,200
-    Cr  Revenue                          22,200
+Dr  PPh Receivable (Tax Prepaid)  20,000
+    Cr  Accounts Receivable                 20,000
 ```
 
-Alternatively, PPh can be recorded as a **reduction in revenue**:
-
-```
-Dr  Accounts Receivable     1,110,000
-Dr  PPh Withheld Payable     22,200
-    Cr  Revenue                        1,032,200
-    Cr  PPN Output Tax Payable           110,000
-```
+Net effect: AR net of withholding, with the withheld portion carried as a receivable against the tax office (it offsets the company's PPh payable when filing). The journal is only created when the tenant's jurisdiction is Indonesian **and** the selected tax has `is_pph = true`.
 
 **Account codes for PPh:**
 
-| Code   | Account Name                     | Type     |
-| ------ | -------------------------------- | -------- |
-| 1350   | PPh Receivable (Tax Prepaid)     | Asset    |
-| 2150   | PPh Withheld Payable             | Liability |
+| Code  | Account Name                 | Type      |
+| ----- | ---------------------------- | --------- |
+| 1170  | PPh Receivable (Tax Prepaid) | Asset     |
+| 2150  | PPh Payable                  | Liability |
 
-**Implementation in `AccountingService`:**
+The **PPh Receivable** account is not hardcoded — it is resolved from the tenant's accounting settings (`pph_receivable_account_id`, backfilled by `2026_07_28_000003_backfill_pph_account_settings.php`); 1170 is the seeded default. **PPh Payable (2150)** is credited on the **purchase side** where the company withholds from suppliers (`PurchaseService::createPurchase()`).
+
+**Implementation in `SalesService`: (after the standard PPN journal entry)**
 
 ```php
-// After standard PPN journal entry:
-if ($pphTaxAmount > 0) {
-    // Option A: PPh as receivable (asset)
-    AccountingService::createJournalEntry(
-        tenantId: $tenantId,
-        date: $documentDate,
-        description: "PPh withholding on sale #{$saleId}",
-        debits: [
-            ['account_code' => '1350', 'amount' => $pphTaxAmount],
-        ],
-        credits: [
-            ['account_code' => '4100', 'amount' => $pphTaxAmount], // Revenue
-        ],
-        referenceType: Sale::class,
-        referenceId: $saleId
-    );
+if ($pphAmount > 0 && app('currentTenant')->isIndonesian() && ($pphTax?->is_pph ?? false)) {
+    $pphReceivableAccountId = $accountingSettings['pph_receivable_account_id'] ?? null;
+    if ($pphReceivableAccountId) {
+        $pphReceivableAccount = Account::find($pphReceivableAccountId);
+        if ($pphReceivableAccount) {
+            $pphTransactions = [
+                ['account_name' => $pphReceivableAccount->name, 'type' => 'debit',  'amount' => $pphAmount],
+                ['account_name' => $accountsReceivableAccountName, 'type' => 'credit', 'amount' => $pphAmount],
+            ];
+            $this->accountingService->createJournalEntry(
+                "PPh Withholding on Sale #{$sale->invoice}",
+                Carbon::parse($data['order_date']),
+                $pphTransactions,
+                $sale
+            );
+        }
+    }
 }
 ```
 
 ### 13.8 Feature Gating
 
-PPh is an **opt-in feature** controlled by a tenant-level setting. Not all tenants need PPh (e.g., non-Indonesian tenants, tenants without withholding tax obligations).
+PPh is gated by the tenant's **tax jurisdiction** (Indonesia), not by a per-tenant settings flag. PPh applies only when `app('currentTenant')->isIndonesian()` is `true` **and** the selected tax has `is_pph = true`. Non-Indonesian tenants never see the PPh dropdown. (There is no `SettingService` and no `pph_enabled` setting key — the PPh columns' `pph_enabled` flag on each document is derived from the jurisdiction + selected tax at snapshot time.)
 
-**Feature flag in `settings` table:**
-
-```sql
--- Tenant settings row (per-tenant)
-INSERT INTO settings (tenant_id, key, value)
-VALUES (1, 'pph_enabled', '1');  -- '1' = enabled, '0' = disabled
-```
-
-**Accessor in `SettingService`:**
+**Jurisdiction check:**
 
 ```php
-public static function isPphEnabled(): bool
-{
-    return (bool) Setting::where('key', 'pph_enabled')->value('value');
-}
+app('currentTenant')->isIndonesian()
 ```
 
 **UI gating — tax dropdowns:**
 
 ```blade
-@if(\App\Services\SettingService::isPphEnabled())
+@if(app('currentTenant')->isIndonesian())
 <div class="form-group">
     <label>PPh Tax (Withholding)</label>
     <select name="pph_tax_id">
@@ -925,27 +912,24 @@ public static function isPphEnabled(): bool
 @endif
 ```
 
-**Service-layer gating:**
+**Service-layer gating (`SalesService::createSale()`):**
 
 ```php
-// In SalesService::createSale():
-$pphTaxId = null;
-$pphTaxRate = 0;
-$pphTaxAmount = 0;
+$pphTaxId = $data['pph_tax_id'] ?? null;
+$pphTax = $pphTaxId ? Tax::find($pphTaxId) : null;
+$pphTaxRate = $pphTax ? (float) $pphTax->rate : 0;
+$pphAmount = SalesHelper::calculatePphAmount($taxableAmount, $pphTaxRate);
+// ...
+$grandTotal = max(0, $grandTotal - $pphAmount);
 
-if (SettingService::isPphEnabled() && !empty($data['pph_tax_id'])) {
-    $pphTax = Tax::find($data['pph_tax_id']);
-    $pphTaxRate = $pphTax ? (float) $pphTax->rate : 0;
-    $pphTaxAmount = SalesHelper::calculatePPhAmount($grandTotal, $pphTaxRate);
-    $pphTaxId = $pphTax?->id;
-}
-
-$sale->pph_tax_id = $pphTaxId;
-$sale->pph_tax_rate = $pphTaxRate;
-$sale->pph_tax_amount = $pphTaxAmount;
+// stored on the sale:
+'pph_enabled' => app('currentTenant')->isIndonesian() && ($pphTax?->is_pph ?? false),
+'pph_rate'    => app('currentTenant')->isIndonesian() && ($pphTax?->is_pph ?? false) ? $pphTaxRate : null,
+'pph_amount'  => app('currentTenant')->isIndonesian() && ($pphTax?->is_pph ?? false) ? $pphAmount : 0,
+'pph_tax_id'  => app('currentTenant')->isIndonesian() && ($pphTax?->is_pph ?? false) ? $pphTax?->id : null,
 ```
 
-**Report gating:** All reports that display tax breakdowns check `SettingService::isPphEnabled()` before rendering the PPh column. When disabled, the column is hidden entirely (not shown as zero).
+**Report gating:** Reports that display tax breakdowns render the PPh column only for Indonesian tenants.
 
 ### 13.9 Tax CRUD — PPh in Settings
 
@@ -954,19 +938,15 @@ The Tax settings page now includes the `is_pph` checkbox:
 - **Create form:** checkbox labeled "This is a withholding tax (PPh)"
 - **Edit form:** same checkbox, with a warning if the tax is already referenced by documents
 - **List view:** a badge/tag on each tax row showing "PPh" or "PPN" based on `is_pph`
-- **Default tax logic:** `is_default` is scoped per category — one default PPN tax and one default PPh tax can coexist
+- **Default tax logic:** **one default per tenant** — `TaxService::setDefault()` clears `is_default` across *all* of the tenant's taxes (regardless of `is_pph`), then sets the target. There is no per-category default; `TaxService::getDefault()` returns the single tenant default (falling back to the first active tax).
 
 ```php
-// TaxService: separate defaults per category
-public static function getDefaultPpn(): ?Tax
-{
-    return Tax::where('is_pph', false)->where('is_default', true)->first();
-}
-
-public static function getDefaultPph(): ?Tax
-{
-    return Tax::where('is_pph', true)->where('is_default', true)->first();
-}
+// TaxService::setDefault() — single default per tenant, not per category
+return DB::transaction(function () use ($tax) {
+    Tax::where('tenant_id', app('currentTenant')->id)->update(['is_default' => false]);
+    $tax->update(['is_default' => true]);
+    return $tax->fresh();
+});
 ```
 
 ### 13.10 Updated Consistency Matrix
@@ -987,12 +967,13 @@ public static function getDefaultPph(): ?Tax
 
 ### 14.1 Auto-Seed PPN/PPh on Switching to Indonesia
 
-Switching the **Tax Jurisdiction** to Indonesia (either from the **System Settings → Tax Region** card or the **e-Faktur settings** page) now **automatically creates** the standard Indonesian tax records via `TaxService::ensureIndonesianDefaults()`, so users never have to configure compliance rates by hand:
+Switching the **Tax Jurisdiction** to Indonesia (either from the **System Settings → Tax Region** card or the **e-Faktur settings** page) now **automatically creates** the standard Indonesian tax records via `TaxService::ensureIndonesianDefaults()`, so users never have to configure compliance rates by hand. It creates **three records**:
 
-| Record   | Rate | Type      | Flags                     | Default?                                          |
-| -------- | ---- | --------- | ------------------------- | ------------------------------------------------- |
-| PPN 11%  | 11%  | Exclusive | `is_ppn = true`           | Yes, **only if no default tax exists yet**        |
-| PPH 23   | 2%   | Exclusive | `is_pph = true`           | No                                                |
+| Record         | Rate | Type      | Flags                     | Default?                                   |
+| -------------- | ---- | --------- | ------------------------- | ------------------------------------------ |
+| PPN 11%        | 11%  | Exclusive | `is_ppn = true`           | Yes, **only if no default tax exists yet** |
+| PPH 23         | 2%   | Exclusive | `is_pph = true`           | No                                         |
+| PPh Final 0.5% | 0.5% | Exclusive | `is_pph = true`           | No                                         |
 
 Rules:
 

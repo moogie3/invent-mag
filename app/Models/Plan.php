@@ -17,6 +17,7 @@ class Plan extends Model
         'slug',
         'name',
         'price',
+        'currency_code',
         'billing_cycle',
         'description',
         'max_users',

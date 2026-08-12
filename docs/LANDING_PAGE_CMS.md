@@ -7,7 +7,7 @@ The landing page at [invent-mag.web.id](https://invent-mag.web.id) is built with
 ### Architecture
 
 ```
-Super Admin CMS → cms.json → GET /cms API → Astro build → Static HTML (Vercel)
+Super Admin CMS → cms.json → GET /api/cms API → Astro build → Static HTML (Vercel)
 ```
 
 **Single source of truth:** `storage/app/cms.json` stores all editable content for the landing page — hero, features, pricing, CTA, and footer.
@@ -100,7 +100,7 @@ PUBLIC_DEMO_PRO_URL=https://demo-pro.invent-mag.web.id/admin/login
 The CMS content is served via a public API endpoint (no authentication required):
 
 ```
-GET /cms
+GET /api/cms
 ```
 
 **Response:** JSON object with all CMS fields (see below)
@@ -148,6 +148,8 @@ GET /cms
 10. RESTful API Access
 11. Audit Trail & Compliance
 
+> **Content accuracy note (resolved Aug 2026):** The default `feature_card_6_desc` previously read *"Handle transactions in multiple currencies with configurable settings for symbols, decimal places, and exchange rates."* The product supports per-tenant currency **formatting** (symbol, separators, decimal places) but does **not** have exchange-rate tracking or multi-currency conversion — so the "exchange rates" claim was removed from the defaults in `CmsController` (both `SuperAdmin` and `Api`) and `storage/app/cms.json`. Note that `cms.json` is the persisted runtime copy: deployments/tests that reset the CMS will fall back to the corrected defaults. (`feature_card_8_desc` previously read "112 granular permissions" — the verified count is **101** (seeded via `PermissionSeeder` + live DB), so the CMS defaults now read 101.)
+
 ### Pricing Section
 
 | Field | Description | Example |
@@ -161,6 +163,9 @@ GET /cms
 | `pricing_most_popular_badge` | Professional plan badge | `most popular` |
 | `pricing_trial_included` | Trial text on Professional plan | `30 days free trial included` |
 | `pricing_enterprise_support` | Enterprise plan badge | `Enterprise support & SLA` |
+| `billing_rate` | USD → IDR billing rate (number) | `16000` |
+
+> **`billing_rate` is computed, not editable in the CMS.** It is added to the API response at request time from `BillingSetting::getRate()` (the superadmin-managed rate at **Superadmin → Settings → Billing Rate**), falling back to `config/billing.php` (16,000). `BaseLayout.astro` uses it for IDR price display on `/id/pricing`; `PUBLIC_USD_TO_IDR` in `invent-mag-fe/.env` is a fallback override. Because the site is statically generated, pricing shows the rate baked in at build time — rebuild after changing the rate.
 
 ### CTA Section
 
@@ -185,7 +190,7 @@ GET /cms
 During `astro build`, each page calls `getCmsContent()` which fetches from the Laravel API:
 
 ```
-Frontend build → GET {PUBLIC_BACKEND_URL}/cms → CMS data → Static HTML
+Frontend build → GET {PUBLIC_BACKEND_URL}/api/cms → CMS data → Static HTML
 ```
 
 This means:
@@ -204,10 +209,11 @@ This means:
 | File | Purpose |
 |---|---|
 | `invent-mag-fe/src/lib/cms.ts` | CMS data fetcher with typed interface and defaults |
+| `invent-mag-fe/src/lib/plans.ts` | Public plan-pricing fetcher (`GET /api/plans`) with 19/59/109 offline defaults |
 | `invent-mag-fe/src/layouts/BaseLayout.astro` | Passes CMS data to i18n translations |
 | `invent-mag-fe/src/components/Hero.astro` | Hero section (accepts CMS props) |
 | `invent-mag-fe/src/components/Features.astro` | Features section (accepts CMS data) |
-| `invent-mag-fe/src/components/Pricing.astro` | Pricing section (accepts CMS data) |
+| `invent-mag-fe/src/components/Pricing.astro` | Pricing section (accepts CMS data + plan prices) |
 | `invent-mag-fe/src/components/Cta.astro` | CTA section (accepts CMS props) |
 | `invent-mag-fe/src/components/Footer.astro` | Footer (accepts CMS props) |
 | `invent-mag-fe/src/pages/index.astro` | EN homepage (fetches CMS, passes to components) |
@@ -227,3 +233,5 @@ This means:
 | **Stale content in dev** | Restart the Astro dev server: `npm run dev` |
 | **Build fails** | Check that `PUBLIC_BACKEND_URL` is set. The fetcher falls back to defaults if unreachable. |
 | **CORS errors** | Verify the frontend domain is in `config/cors.php` allowed origins. |
+
+> For the full first-run environment & domain setup (`.env`, subdomains, backend URL), see [`OWNER_SETUP_GUIDE.md`](OWNER_SETUP_GUIDE.md).

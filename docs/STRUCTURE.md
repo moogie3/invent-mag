@@ -28,10 +28,12 @@ invent-mag/
 │   ├── FEATURE_CHECKLIST.md
 │   ├── INTERVIEW_QA.md
 │   ├── LANDING_PAGE_CMS.md
+│   ├── OWNER_SETUP_GUIDE.md            # Owner first-run setup, env, domains, billing
 │   ├── PPN_EVOLUTION.md
 │   ├── ROADMAP.md
 │   ├── STRUCTURE.md
 │   ├── TAXATION_IMPROVEMENT.md
+│   ├── TAXATION_SYSTEM.md
 │   └── TECHNICAL_SPECIFICATION.md
 │
 ├── app/
@@ -44,6 +46,7 @@ invent-mag/
 │   │
 │   ├── Console/Commands/
 │   │   ├── BackupTenant.php
+│   │   ├── CheckExpiredSubscriptions.php
 │   │   ├── ProcessScheduledPlanChanges.php
 │   │   └── ResetDemoTenant.php
 │   │
@@ -51,8 +54,7 @@ invent-mag/
 │   │   └── TransactionDTO.php
 │   │
 │   ├── Exceptions/
-│   │   ├── Handler.php
-│   │   └── PlanLimitExceededException.php
+│   │   └── PlanLimitExceededException.php   # No Handler.php — Laravel 11 handles errors via bootstrap/app.php
 │   │
 │   ├── Helpers/
 │   │   ├── CurrencyHelper.php
@@ -66,13 +68,14 @@ invent-mag/
 │   │   ├── Controllers/
 │   │   │   ├── Controller.php
 │   │   │   ├── SuperAdmin/
-│   │   │   │   ├── SettingController.php   # Also handles platform-currency settings
+│   │   │   │   ├── SettingController.php   # Also handles platform-currency + billing-rate settings
 │   │   │   │   ├── PlanController.php      # Now handles currency_code on plans
 │   │   │   │   └── ... (16 super admin controllers)
 │   │   │   ├── Admin/
 │   │   │   │   ├── AccountingController.php
 │   │   │   │   ├── AuditLogController.php
 │   │   │   │   ├── BackupController.php
+│   │   │   │   ├── BankReconciliationController.php   ← NEW (Aug 2026)
 │   │   │   │   ├── CategoryController.php
 │   │   │   │   ├── CurrencyController.php
 │   │   │   │   ├── CustomerController.php
@@ -113,7 +116,9 @@ invent-mag/
 │   │   │   │   │   ├── AuthController.php
 │   │   │   │   │   └── RegisteredUserController.php
 │   │   │   │   ├── ContactController.php
+│   │   │   │   ├── CmsController.php
 │   │   │   │   ├── PaymentController.php
+│   │   │   │   ├── PlanController.php            ← NEW (Aug 2026) — public `/api/plans` marketing pricing
 │   │   │   │   ├── TenantLookupController.php
 │   │   │   │   └── Webhook/MidtransController.php
 │   │   │   └── Auth/
@@ -132,12 +137,13 @@ invent-mag/
 │   │   │   └── SetSessionCookieName.php
 │   │   │
 │   │   ├── Requests/
+│   │   │   ├── Api/
 │   │   │   ├── Auth/LoginRequest.php
 │   │   │   └── ProfileUpdateRequest.php
 │   │   │
 │   │   ├── Resources/              # API Resources
 │   │   │   ├── AccountResource.php ... WarehouseResource.php
-│   │   │   └── (30 resources total)
+│   │   │   └── (26 resources total)
 │   │   │
 │   │   └── Responses/              # Fortify customization
 │   │       ├── CustomLoginResponse.php
@@ -156,9 +162,12 @@ invent-mag/
 │   │   ├── ActivityLog.php
 │   │   ├── AttendancePeriod.php
 │   │   ├── AttendanceRecord.php
+│   │   ├── BankReconciliation.php            ← NEW (Aug 2026)
+│   │   ├── BankReconciliationItem.php        ← NEW (Aug 2026)
+│   │   ├── BillingSetting.php                ← NEW (Aug 2026) — superadmin-managed USD→IDR billing rate
 │   │   ├── Categories.php
 │   │   ├── CurrencySetting.php             # Per-tenant currency settings
-│   │   ├── PlatformCurrencySetting.php     # Super admin (platform) currency settings
+│   │   ├── PlatformCurrencySetting.php     # Super admin display preference (tenant CurrencySetting is the single system)
 │   │   ├── Customer.php
 │   │   ├── CustomerCredit.php
 │   │   ├── CustomerInteraction.php
@@ -227,6 +236,9 @@ invent-mag/
 │   │   ├── ActivityLogService.php
 │   │   ├── AgingReportService.php
 │   │   ├── AttendanceService.php
+│   │   ├── BankReconciliationService.php     ← NEW (Aug 2026)
+│   │   ├── BankStatement/                    ← NEW (Aug 2026) — BCA/BRI/BNI/Mandiri CSV/TXT parsers
+│   │   │   └── (AbstractBankStatementParser, BankStatementParser, BankStatementParserFactory, Bca/Bni/Bri/MandiriStatementParser)
 │   │   ├── BillingService.php
 │   │   ├── CashFlowService.php
 │   │   ├── CategoryService.php
@@ -277,6 +289,8 @@ invent-mag/
 │   ├── app.php
 │   ├── auth.php
 │   ├── backup.php
+│   ├── billing.php                    # USD→IDR billing rate fallback + tax rate
+│   ├── cache.php
 │   ├── cors.php
 │   ├── database.php
 │   ├── filesystems.php
@@ -288,11 +302,14 @@ invent-mag/
 │   ├── navigation.php
 │   ├── permission.php
 │   ├── plans.php
+│   ├── queue.php
 │   ├── sanctum.php
 │   ├── scribe.php
 │   ├── services.php
 │   ├── session.php
-│   └── turbo-laravel.php
+│   ├── superadmin-tutorial.php
+│   ├── turbo-laravel.php
+│   └── tutorial.php
 │
 ├── database/
 │   ├── factories/                   # 30+ model factories
@@ -317,7 +334,17 @@ invent-mag/
 │   │   ├── 2026_07_17_000004_add_ppn_fields_to_tenants_customers_sales.php ← NEW
 │   │   ├── 2026_07_17_000005_add_ppn_feature_to_plans.php               ← NEW
 │   │   ├── 2026_07_25_000001_backfill_ppn_keluaran_account_setting.php  ← NEW
-│   │   └── 2026_07_25_000002_add_tax_jurisdiction_to_tenants_and_is_ppn_to_taxes.php ← NEW
+│   │   ├── 2026_07_25_000002_add_tax_jurisdiction_to_tenants_and_is_ppn_to_taxes.php
+│   │   ├── 2026_07_28_000001_add_is_pph_to_taxes.php
+│   │   ├── 2026_07_28_000002_add_pph_fields_to_sales.php
+│   │   ├── 2026_07_28_000003_backfill_pph_account_settings.php
+│   │   ├── 2026_07_28_000004_add_pph_fields_to_po.php
+│   │   ├── 2026_07_28_000005_add_pph_fields_to_quotations.php
+│   │   ├── 2026_08_01_000001_create_bank_reconciliation_tables.php
+│   │   ├── 2026_08_03_000001_add_ppn_fields_to_po.php
+│   │   ├── 2026_08_03_000002_backfill_ppn_masukan_account_setting.php
+│   │   ├── 2026_08_05_000001_backfill_pph_22_tax_record.php
+│   │   └── 2026_08_05_000002_backfill_pph_final_tax_record.php
 │   │
 │   └── seeders/
 │       ├── DatabaseSeeder.php
@@ -367,7 +394,7 @@ invent-mag/
 │   ├── css/                        # Page-specific CSS files
 │   │   ├── app.css, auth.css, pos.css, print-a4.css
 │   │   ├── dashboard/, hr/, settings/ styles
-│   │   └── (20+ CSS files)
+│   │   └── (18 CSS files)
 │   │
 │   ├── images/background.jpeg
 │   │
@@ -470,7 +497,7 @@ invent-mag/
 │       │   │   ├── trial-banner.blade.php
 │       │   │   └── (14 partial subdirectories, 120+ total partials)
 │       │   │
-│       │   ├── plan/{index,upgrade,checkout,upgrade-required}.blade.php
+│       │   ├── plan/{index,upgrade,checkout}.blade.php
 │       │   ├── po/{index,show,purchase-create,purchase-edit}.blade.php
 │       │   ├── por/{index,show,create,edit}.blade.php  # Purchase Returns
 │       │   ├── pos/{index,receipt,print}.blade.php
@@ -493,9 +520,10 @@ invent-mag/
 │
 ├── routes/
 │   ├── api.php
-│   ├── admin/                          # Modular admin route groups (15 files)
+│   ├── admin/                          # Modular admin route groups (16 files)
 │   │   ├── accounting.php
 │   │   ├── auth.php
+│   │   ├── bank-reconciliation.php     ← NEW (Aug 2026)
 │   │   ├── contacts.php
 │   │   ├── crm.php
 │   │   ├── dashboard.php
@@ -510,6 +538,7 @@ invent-mag/
 │   │   ├── sales.php
 │   │   └── settings.php
 │   ├── console.php
+│   ├── superadmin.php                  # Super admin panel routes
 │   ├── turbo.php
 │   └── web.php                     # Main route file (admin + auth)
 │

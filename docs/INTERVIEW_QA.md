@@ -64,8 +64,7 @@ The Service Layer is critical: controllers are intentionally thin — they valid
 
 A candidate should note:
 - The single database becomes a bottleneck under heavy multi-tenant load
-- ~~The `file` cache driver does not scale horizontally~~ — **Redis is now the default cache and queue driver (May 2026)**; this is no longer an open issue
-- A candidate who still says "file cache doesn't scale" without knowing it's been fixed is demonstrating they haven't read the current code
+- **Cache/queue drivers:** the *config defaults* are `database` (`config/cache.php` `CACHE_STORE`, `config/queue.php` `QUEUE_CONNECTION`), while `.env.example` sets **Redis**. Production runs on Redis (Redis Cloud on Railway). A candidate who says "the file cache driver is the default and doesn't scale" without checking `config/` is demonstrating they haven't read the current code — the defaults are `database`, and production uses Redis.
 
 ---
 
@@ -77,7 +76,7 @@ A candidate should note:
 - PHP 8.2 with Laravel 11.31
 - `spatie/laravel-multitenancy` ^4.0 — domain-based multi-tenancy
 - `spatie/laravel-permission` ^6.20 — RBAC (roles + permissions)
-- `spatie/laravel-backup` ^9.3 — encrypted per-tenant backups
+- `spatie/laravel-backup` ^9.3 — installed as a dependency but **not** used for tenant backups; the `backup:tenant` Artisan command is a custom implementation (see Q20.2)
 - `laravel/fortify` ^1.25 — authentication pipeline
 - `laravel/sanctum` ^4.0 — API token authentication
 - `hotwired-laravel/turbo-laravel` ^2.0 — Hotwire Turbo Drive (SPA-like navigation)
@@ -99,7 +98,7 @@ A candidate should note:
 
 **Database:** MySQL (primary production), migration files are SQLite-compatible.
 
-**Infrastructure:** Docker, **Railway (PaaS — current production deployment)**, GitHub Actions CI/CD. Domains: `invent-mag.web.id` (marketing/landing) and `api.invent-mag.web.id` (backend API).
+**Infrastructure:** Docker, **Railway (PaaS — current production deployment)**, GitHub Actions CI/CD (CI on every push/PR; release automation builds a GHCR image and deploys it to a VPS via `appleboy/ssh-action` on version tags — see Q20.1). Domains: `invent-mag.web.id` (marketing/landing) and `api.invent-mag.web.id` (backend API).
 
 ---
 
@@ -150,7 +149,7 @@ SESSION_DOMAIN=.127.0.0.1.nip.io
 - Everything else is tenant-scoped
 
 **Middleware:**
-- `NeedsTenant` — enforces that a valid tenant context exists; aborts 404 if tenant not found
+- `NeedsTenant` — enforces that a valid tenant context exists; throws `NoCurrentTenant` if tenant not found (rendered by the exception handler — 404 JSON for `/api/*`, redirect to super-admin dashboard on the super domain, redirect to frontend login otherwise; see Q2.2)
 - `HandleTenantFromPath` — custom middleware that resolves tenant on each request
 
 **Critical weakness a senior engineer should identify:**
@@ -162,11 +161,13 @@ Raw `DB::table()` queries bypass the global scope and do NOT automatically filte
 
 **Answer:**
 
-When `DomainTenantFinder` cannot match the HTTP `Host` header to any tenant record in the `tenants` table, `NeedsTenant` middleware aborts the request with a **404 HTTP response**. There is no fallback to a "default" tenant.
+When `DomainTenantFinder` cannot match the HTTP `Host` header to any tenant record in the `tenants` table, `NeedsTenant` middleware throws `Spatie\Multitenancy\Exceptions\NoCurrentTenant`. The behavior is centralized in `bootstrap/app.php` (`withExceptions`):
 
-This design is intentional: failing closed (404) is safer than accidentally serving another tenant's data or an unauthenticated dashboard.
+- **API routes (`/api/*`)** → returns a **404 JSON** response (`Workspace not found or no tenant specified.`)
+- **Super admin domain** (`super.invent-mag.web.id`) → redirects to the **super admin dashboard** (super admin routes deliberately exclude `NeedsTenant`/`HandleTenantFromPath`)
+- **Any other web request** → redirects to the **frontend login page** (`config('app.frontend_url') . '/login'`)
 
-**Edge case:** The main marketing/landing page domain (non-tenant domain) must be excluded from the `NeedsTenant` middleware group. API routes for registration and tenant lookup (`/api/lookup-tenant`) are also excluded and run on the landlord application context.
+This is deliberate: failing closed (404 for API) is safer than accidentally serving another tenant's data or an unauthenticated dashboard. The main marketing/landing page domain and the public API endpoints (registration, tenant lookup, contact) are excluded from the tenant-resolving middleware entirely.
 
 ---
 
@@ -181,8 +182,16 @@ The `tenants` table (landlord migration) contains:
 | `id` | Primary key |
 | `name` | Tenant/company name |
 | `domain` | Subdomain (e.g., `acme.127.0.0.1.nip.io`) |
+| `npwp` | NPWP tax registration number (DJP) |
+| `pkp_status` | Whether the tenant is a PKP (VAT-registered) business |
+| `pkp_date` | Date of PKP registration |
+| `ppn_rate` | Default PPN rate (%) — defaults to `11.00` |
+| `klikpajak_api_key` | KlikPajak PJAP API key (Phase 2 — stored for future e-invoice submission) |
+| `klikpajak_secret` | KlikPajak PJAP API secret (Phase 2) |
+| `klikpajak_use_sandbox` | Whether KlikPajak calls use the sandbox environment (Phase 2) |
+| `tax_jurisdiction` | `ID` or null — set to `ID` enables Indonesian tax enforcement (PPN/PPh) |
 | `plan_id` | Current active plan FK |
-| `plan_status` | `active`, `trial`, `expired` |
+| `plan_status` | `active`, `trialing`, `expired`, `terminated` |
 | `trial_ends_at` | Trial expiry timestamp |
 | `plan_expires_at` | Subscription expiry timestamp |
 | `plan_changed_at` | When the plan was last changed |
@@ -288,7 +297,7 @@ This is a **real inventory accounting mechanism** — it ensures that:
 This is a classic **header-line double-entry ledger design**:
 
 **`journal_entries`** (header):
-- `id, description, date, status (draft/posted/void), entry_type (standard/opening/reversal)`
+- `id, description, date, status (draft/posted/void), entry_type (standard/opening/reversal/adjusting/closing)`
 - `sourceable_type + sourceable_id` — polymorphic link to the business event that triggered this entry (e.g., a `Sales` record)
 - `reversed_entry_id` — FK to the entry being reversed (for reversal entries)
 
@@ -310,8 +319,8 @@ Journal Entry: "Sale INV-0001"
 **Lifecycle states:**
 - `draft` → entry is created but not yet in effect; can be edited
 - `posted` → entry is finalized and affects financial reports; cannot be directly edited
-- `void` → entry is cancelled; a voiding entry is created with reversed amounts
-- `reversal` — a correcting entry that negates a previously posted entry
+- `void` → the entry is cancelled in place by setting `status = void` and appending the void reason to `notes` (`AccountingService::voidJournalEntry()`). **No reversal entry is created** — the original lines remain but the entry no longer counts as `posted`. Voiding requires the entry to be `posted` and blocks entries tied to a completed bank reconciliation (`assertNotReconciled()`).
+- `reversal` → a correcting entry created by `AccountingService::reverseJournalEntry()`: it builds a new entry with the debits/credits swapped, `entry_type = reversal`, posts it immediately, and points its `reversed_entry_id` at the original entry. The original must have `status = posted` (`canBeReversed()`); reversal is also blocked on reconciled entries.
 
 ---
 
@@ -621,7 +630,7 @@ payments WHERE paymentable_type = 'App\Models\Sales' AND paymentable_id = {sales
 outstanding = sales.total - SUM(payments.amount) - sales.customer_credit_used
 ```
 
-**Payment status is not stored** as a permanent column — it is **computed dynamically** based on `total`, payments, and credit used. This prevents inconsistency between the stored status and actual payment data.
+**Payment status IS stored** as the `status` enum column on `sales` — `['Unpaid', 'Paid', 'Partial', 'Returned']` (migration `2025_02_03_065737`, default `Unpaid`, indexed). It is determined at write time from `total`, payments, and credit used, and is kept in sync by `SalesService` when payments/returns/credit applications change. (This column also powers the aging queries in `DashboardService`, which filter `WHERE status IN ('Unpaid', 'Partial')`.)
 
 **POS special case:** POS sales (`type = 'pos'`) are always marked as **Paid** at creation time. The POS flow does not support partial payment — the customer must pay in full before completing the transaction. Note: the underlying column is now a `type` string (`'regular'` or `'pos'`); the old boolean `is_pos` column was dropped in migration `2026_05_18_075029`. A backward-compat accessor `getIsPosAttribute()` exists so legacy view code using `$sale->is_pos` still works. **POS sales now create accounting journal entries through AccountingService (July 2026): Dr AR/Cr Revenue, Dr COGS/Cr Inventory, Dr Cash/Cr AR — identical to regular sales.**
 
@@ -646,26 +655,32 @@ Double-entry bookkeeping is the foundation of accurate financial reporting. You 
 **`AccountingService` enforces these rules:**
 
 ```php
-public function validateTransactions(array $transactions): void
+protected function validateTransactions(array $transactions): void
 {
-    $totalDebits = collect($transactions)
-        ->where('type', 'debit')
-        ->sum('amount');
-    $totalCredits = collect($transactions)
-        ->where('type', 'credit')
-        ->sum('amount');
+    $debits = 0;
+    $credits = 0;
 
-    if (abs($totalDebits - $totalCredits) > 0.001) {
-        throw new UnbalancedJournalEntryException(
-            "Debits ($totalDebits) do not equal credits ($totalCredits)"
-        );
+    foreach ($transactions as $tx) {
+        // each line must carry an account reference, a 'debit'/'credit' type, and an amount
+        if ((! isset($tx['account_name']) && ! isset($tx['account_code']) && ! isset($tx['account_id'])) || ! isset($tx['type'], $tx['amount'])) {
+            throw new \Exception('Each transaction must have an account_id, account_name, or account_code, type, and amount.');
+        }
+        if (! in_array($tx['type'], ['debit', 'credit'])) {
+            throw new \Exception("Invalid transaction type: {$tx['type']}. Must be 'debit' or 'credit'.");
+        }
+        $tx['type'] === 'debit' ? $debits += $tx['amount'] : $credits += $tx['amount'];
     }
 
     if (count($transactions) < 2) {
-        throw new InvalidJournalEntryException("Minimum 2 transaction lines required");
+        throw new \Exception('At least two transactions (debit and credit) are required.');
+    }
+    if (round($debits, 2) !== round($credits, 2)) {
+        throw new \Exception("Debits ({$debits}) do not equal credits ({$credits}).");
     }
 }
 ```
+
+Note: this method throws the generic `\Exception` — there are **no** dedicated `UnbalancedJournalEntryException`/`InvalidJournalEntryException` classes in the codebase. `validateTransactions()` is `protected` and called from `createJournalEntry()` / `postJournalEntry()`; the balanced-state and minimum-line-count checks are the same in either entry point.
 
 **`SalesService` uses `AccountingService`** to automatically create journal entries when a sale is created, paid, or returned — the developer creating a sale does not need to think about accounting; it happens automatically.
 
@@ -695,7 +710,7 @@ CREDIT: Sales Revenue (Revenue)        $1,000   [net of VAT]
 CREDIT: PPN Keluaran (Liability)         $110   [VAT owed to DJP]
 ```
 
-This is why revenue is booked **net of VAT** and the Faktur Pajak itself carries no journal (it is a compliance document). The PPN Keluaran account comes from `accounting_settings.ppn_keluaran_account_id` (seeded default 2110). Sales returns reverse the PPN whenever the original sale `isPpn()` — no Faktur Pajak is required for the reversal. Purchases similarly carry a PPN Masukan (input VAT) snapshot (`po.ppn_enabled/rate/amount`) that debits the input-VAT account (1160), and `EFakturService::getSptMasaSummary()` returns `total_ppn_masukan` and `net_ppn_payable` (PPN Kurang Bayar = max(0, Keluaran − Masukan)). See PPN_EVOLUTION.md Phase 1E.
+This is why revenue is booked **net of VAT** and the Faktur Pajak itself carries no journal (it is a compliance document). The PPN Keluaran account comes from `accounting_settings.ppn_keluaran_account_id` (seeded default **2130** — Output VAT). Sales returns reverse the PPN whenever the original sale `isPpn()` — no Faktur Pajak is required for the reversal. Purchases similarly carry a PPN Masukan (input VAT) snapshot (`po.ppn_enabled/rate/amount`) that debits the input-VAT account (1160), and `EFakturService::getSptMasaSummary()` returns `total_ppn_masukan` and `net_ppn_payable` (PPN Kurang Bayar = max(0, Keluaran − Masukan)). See PPN_EVOLUTION.md Phase 1E.
 
 **POS sales** (July 2026) use the exact same journal entry pattern as regular sales. PosService injects AccountingService and posts all three entries (AR/Revenue, COGS/Inventory, Cash/AR) at creation time since POS sales are always paid in full.
 
@@ -766,7 +781,7 @@ Purchase returns use the Purchase Returns account (code 5120) for the credit sid
 
 **Answer:**
 
-The `PayrollService::calculatePayrollItem()` uses this formula:
+The `PayrollService::createPayrollItem()` uses this formula:
 
 **Given:**
 - `base_salary` = $5,000/month
@@ -847,7 +862,7 @@ The `AttendanceService` enforces this: any attempt to create/update/delete an `A
 
 **Answer:**
 
-**Holt-Winters Triple Exponential Smoothing** (also called "Triple Exponential Smoothing") decomposes a time series into three components:
+**Holt-Winters Triple Exponential Smoothing** (also called "Triple Exponential Smoothing") decomposes a time series into three components. This implementation uses the **additive** form (components are summed, not multiplied — verified in `SalesForecastService` lines ~179-194):
 
 1. **Level (α = 0.3)** — the current baseline value of the series, analogous to a smoothed average
 2. **Trend (β = 0.1)** — the direction and magnitude of change over time (upward/downward slope)
@@ -860,14 +875,16 @@ The `AttendanceService` enforces this: any attempt to create/update/delete an `A
 - Season length (`m`) = 12 months
 - **Optimization:** `optimizeHoltWinters()` performs a 125-combination grid search across α, β, γ ∈ `[0.1, 0.3, 0.5, 0.7, 0.9]` minimizing RMSE on in-sample data. The optimized parameters are used per-forecast call, not the hardcoded seeds above.
 
-**Update equations:**
+**Update equations (additive):**
 ```
-L_t = α × (Y_t / S_{t-m}) + (1-α) × (L_{t-1} + b_{t-1})   [Level]
-b_t = β × (L_t - L_{t-1}) + (1-β) × b_{t-1}                 [Trend]
-S_t = γ × (Y_t / L_t) + (1-γ) × S_{t-m}                    [Seasonal index]
+L_t = α × (Y_t − S_{t-m}) + (1−α) × (L_{t-1} + b_{t-1})   [Level]
+b_t = β × (L_t − L_{t-1}) + (1−β) × b_{t-1}                 [Trend]
+S_t = γ × (Y_t − L_t) + (1−γ) × S_{t-m}                    [Seasonal index]
 
-Forecast(t+h) = (L_t + h × b_t) × S_{t-m+h_mod_m}          [Prediction]
+Prediction(t+h) = max(0, L_t + h × b_t + S_{t-m+h_mod_m})   [Additive]
 ```
+
+Note the seasonal adjustment uses **subtraction** in the level/season update equations and **addition** in the prediction — this is the hallmark of the additive Holt-Winters variant, not the multiplicative one (`Y_t / S_{t-m}`).
 
 **Data requirements:**
 - Requires **at least 12 months** of historical sales data to calculate initial seasonal indices
@@ -939,7 +956,7 @@ Fortify is a backend authentication implementation — it provides the authentic
 **Laravel Sanctum** handles **API token authentication:**
 - API clients (mobile apps, third-party integrations) authenticate with Bearer tokens
 - Tokens are created via `POST /api/login` (public); token refresh via `POST /api/v1/refresh-token`
-- The REST API is deliberately scoped to essential endpoints (auth, CMS, payment/webhooks, plan lookup, contact) — see `docs/TECHNICAL_SPECIFICATION.md` §5.2; only `POST /api/payment/confirm` requires `auth:sanctum`
+- The REST API is deliberately scoped to essential endpoints (auth, CMS, payment/webhooks, plan lookup, contact) — see `docs/TECHNICAL_SPECIFICATION.md` §5.2; four endpoints require `auth:sanctum` (`POST /api/payment/confirm`, `POST /api/v1/refresh-token`, `GET /api/v1/plans`, `GET /api/v1/plan/current`). Public plan lookup for the marketing site is served by `GET /api/plans` (`Api/PlanController`, no auth)
 - Per-route rate limits are applied (e.g. `throttle:api` on the api group, `throttle:3,60` on registration, `throttle:5,60` on `/api/contact`)
 
 **Why both?** Web users use session cookies (more secure for browser-based access — no token exposure in JavaScript). API clients use tokens (stateless, cross-origin compatible). Using a single auth mechanism for both would require either exposing tokens to the browser (XSS risk) or requiring cookies for APIs (CORS complexity).
@@ -953,19 +970,17 @@ Fortify is a backend authentication implementation — it provides the authentic
 The system uses **`spatie/laravel-permission`** with a custom `Role` model that extends Spatie's.
 
 **Structure:**
-- There are **101 permissions** defined (the exact list is seeded via `PermissionSeeder`)
+- There are **101 permissions** defined (the exact list is seeded via `PermissionSeeder`) — verified against both the seeder array and the live `permissions` table (DB count = 101; earlier docs citing 112 or 79 were stale)
 - Permissions follow the pattern: `{action}-{resource}` (e.g., `create-products`, `view-accounting`, `delete-users`, `manage-roles`)
 - Roles are created per-tenant and assigned permissions
 - Users are assigned roles
 
 **Default roles (seeded on tenant creation):**
-- `Superuser` — all permissions within the tenant scope (note: this is a tenant-level Spatie role, NOT the same as the `SuperAdmin` model which is a separate platform-level entity)
-- `Manager` — most permissions except user/role management
-- `Staff` — limited permissions (view + basic CRUD)
-- `Accountant` — accounting-focused permissions
-- `HR` — HR module permissions
+- `superuser` — all 101 permissions within the tenant scope (note: this is a tenant-level Spatie role, NOT the same as the `SuperAdmin` model which is a separate platform-level entity)
+- `staff` — limited permissions (view + basic CRUD, including `view-hr`)
+- `pos` — POS-focused permissions (including `access-pos`)
 
-Custom role management (creating new roles with custom permission sets) is available to Enterprise plan tenants via permission-based access control.
+There is **no** Manager, Accountant, or HR role seeded — `RoleSeeder`/`RolePermissionSeeder` create exactly `superuser`, `staff`, and `pos`. Permission sets are assigned per-role; any further granularity is created via custom role management (available to Enterprise plan tenants via permission-based access control).
 
 **Permission checking:**
 ```php
@@ -1115,7 +1130,7 @@ $stockRecords = ProductWarehouse::whereIn('product_id', $productIds)
 
 **Answer:**
 
-**Current configuration (as of May 2026):** Redis is now the default cache and queue driver. The documentation and `config/cache.php` / `config/queue.php` reflect this.
+**Current configuration (as of May 2026):** The config **defaults** are `database` (`config/cache.php` `CACHE_STORE`, `config/queue.php` `QUEUE_CONNECTION`). `.env.example` sets **Redis**, and production runs on Redis — so `config/` defaults alone do not tell the whole story. A candidate should distinguish the config fallback from the deployed environment.
 
 **Why Redis matters for cache:**
 - File cache works on a single server only. In a multi-node deployment, each server has its own file cache — cache invalidation on one server does NOT propagate to others, leading to stale cache bugs.
@@ -1139,7 +1154,7 @@ $stockRecords = ProductWarehouse::whereIn('product_id', $productIds)
 
 **Answer:**
 
-This is a nuanced question. The API routes are mounted at `/api/` via `bootstrap/app.php`, wrapped in the `api` middleware group (which appends `throttle:api` + `SubstituteBindings`) with an `/api` prefix. The `api` group does **not** include the tenant-resolving middleware (`NeedsTenant`/`HandleTenantFromPath`) that the web group uses, so the public essential endpoints — auth (`/api/register`, `/api/login`, `/api/lookup-tenant`, `/api/v1/refresh-token`), CMS (`/api/cms`), plan lookup (`/api/v1/plans`, `/api/v1/plan/current`), contact (`/api/contact`), and the Midtrans webhooks — run on the API domain without tenant resolution.
+This is a nuanced question. The API routes are mounted at `/api/` via `bootstrap/app.php`, wrapped in the `api` middleware group (which appends `throttle:api` + `SubstituteBindings`) with an `/api` prefix. The `api` group does **not** include the tenant-resolving middleware (`NeedsTenant`/`HandleTenantFromPath`) that the web group uses, so the public essential endpoints — auth (`/api/register`, `/api/login`, `/api/lookup-tenant`; `/api/v1/refresh-token` is Bearer-protected), CMS (`/api/cms`), plan lookup (`/api/plans` public marketing pricing; `/api/v1/plans` + `/api/v1/plan/current` Bearer-authenticated), contact (`/api/contact`), and the Midtrans webhooks — run on the API domain without tenant resolution.
 
 However, there is a `/api/lookup-tenant` endpoint (public) that allows clients to discover a tenant's subdomain by shop name — this is used by the marketing-site login portal (and would be used by mobile apps) before authenticating.
 
@@ -1147,7 +1162,7 @@ However, there is a `/api/lookup-tenant` endpoint (public) that allows clients t
 1. Client POSTs to `/api/login` with `email` + `password`
 2. Server validates credentials and returns a Sanctum `personal_access_token`
 3. Client includes `Authorization: Bearer {token}` header on all subsequent requests
-4. `auth:sanctum` middleware validates the token on each request (currently only `POST /api/payment/confirm` is token-protected)
+4. `auth:sanctum` middleware validates the token on each request. **Four routes are token-protected** (two middleware groups in `routes/api.php`): `POST /api/payment/confirm`, `POST /api/v1/refresh-token`, `GET /api/v1/plans`, and `GET /api/v1/plan/current`. The rest of the API is deliberately public (auth, CMS, marketing plan lookup via `GET /api/plans`, contact, webhooks).
 
 **Rate limiting:** Per-route `throttle` middleware (e.g. `throttle:api` on the api group, `throttle:3,60` on registration, `throttle:10,1` on lookup-tenant, `throttle:5,60` on contact).
 
@@ -1155,15 +1170,14 @@ However, there is a `/api/lookup-tenant` endpoint (public) that allows clients t
 
 ---
 
-### Q13.2 — What does the `HandlesApiErrors` trait do and why is it used on API controllers?
+### Q13.2 — What does the `HandlesApiErrors` trait do and where is it used?
 
 **Answer:**
 
-`HandlesApiErrors` is a reusable trait applied to API controllers that standardizes error response formatting.
+`HandlesApiErrors` (in `app/Traits/HandlesApiErrors.php`) is a reusable trait that standardizes API error response formatting.
 
-**Why:** Laravel's default exception handler returns HTML error pages for validation errors, model not found exceptions, etc. API clients expect **JSON error responses** in a consistent format.
+**What it does:** It exposes a `handleApiException(\Throwable $e): JsonResponse` helper that maps exceptions to consistent JSON responses via a `match(true)`:
 
-**What it does:**
 ```php
 trait HandlesApiErrors
 {
@@ -1192,7 +1206,7 @@ trait HandlesApiErrors
 }
 ```
 
-**Why a trait instead of global exception handler?** The global exception handler in `bootstrap/app.php` could do this, but using a trait allows per-controller customization and makes the error handling behavior explicit and visible to developers reading the controller code. It also allows some controllers to handle errors differently from others.
+**Honest caveat (verified against the code):** `HandlesApiErrors` is currently **not used by any controller** — a grep for the trait finds only the trait file itself. API error handling in this codebase is centralized in the **global exception handler** in `bootstrap/app.php` (`shouldRenderJsonWhen` forces JSON for `/api/*` requests, plus explicit `render` callbacks for `ValidationException`, `ModelNotFoundException`, `NoCurrentTenant`, `ThrottleRequestsException`, etc.). The trait is available as a per-controller customization tool but was superseded by the global handler. A strong candidate will note the discrepancy rather than claim the trait is "applied to API controllers."
 
 ---
 
@@ -1212,54 +1226,43 @@ If `SalesController` contained all the logic:
 3. **Testing** — testing a controller requires an HTTP request context (kernel, middleware, session). Testing a service is just `new SalesService()` with mocked dependencies
 4. **API controllers** — the `Api/SalesController` (if it exists) can reuse `SalesService` without duplicating logic
 
-**Concrete example:** When a sale is created, `SalesService::createSale()`:
-1. Validates stock availability across warehouses
-2. Applies FEFO batch deduction
-3. Updates `product_warehouse.quantity`
-4. Calculates totals (with discounts and taxes)
-5. Creates `sales` and `sales_items` records
-6. Creates payment records if `amount_received > 0`
-7. Creates accounting journal entries via `AccountingService`
-8. Dispatches notification if customer has outstanding balance
-9. Logs the activity via `ActivityObserver`
+**Concrete example:** When a sale is created, `SalesService::createSale()` runs entirely inside a `DB::transaction()`:
+1. Decodes and validates the product JSON payload (throws on empty/invalid data)
+2. Validates stock availability across warehouses — on a shortage it deletes the just-created `sales` record and throws with the affected product names
+3. Applies FEFO batch deduction (`po_items` ordered by `expiry_date ASC`) and computes COGS from the actual price of each consumed batch
+4. Updates `product_warehouse.quantity` (decrement per line item)
+5. Calculates totals (line discounts, order discount, tax/PPh, grand total)
+6. Creates the `sales` header and `sales_items` line records
+7. Applies customer credit if `customer_credit_amount > 0` (`applyCustomerCredit()` + status refresh)
+8. Creates accounting journal entries via `AccountingService` — the sale entry, a separate PPh withholding entry, and a customer-credit-applied entry when applicable
 
-This 9-step process would be in the controller if no service layer existed — untestable, unreusable, unmaintainable.
+Note: `createSale()` does **not** create payment records — payments are recorded separately via `SalesService::addPayment()` (and the POS flow in `PosService`), which is what keeps a single service method focused on one responsibility. There is also **no** notification dispatch in the sale pipeline.
+
+This multi-step process would be in the controller if no service layer existed — untestable, unreusable, unmaintainable.
 
 ---
 
-### Q14.2 — What is `TransactionDTO` and why use a DTO here instead of a plain array?
+### Q14.2 — What is `TransactionDTO` and how is it used?
 
 **Answer:**
 
-`TransactionDTO` (in `app/DTOs/`) is a typed data container for passing transaction line data between the service layer and the accounting system.
+`TransactionDTO` (in `app/DTOs/TransactionDTO.php`) is a **read-model DTO used to shape transaction-list rows for views**, not a write-side accounting structure.
 
-**Without DTO:**
+It is a simple class with public, dynamically-assigned properties:
+- `id`, `type`, `invoice`, `customer_supplier`, `contact_info`, `date`, `amount`, `paid_amount`, `due_amount`, `status`, `view_url`, `edit_url`
+
 ```php
-// Plain array — no type safety, easy to make key typos, no IDE autocomplete
-AccountingService::postEntry([
-    ['account_id' => 5, 'type' => 'debit', 'ammount' => 1000],  // typo: 'ammount'
-]);
+public function __construct(array $data)
+{
+    foreach ($data as $key => $value) {
+        $this->$key = $value;
+    }
+}
 ```
 
-**With DTO:**
-```php
-// Type-safe, IDE-autocomplete, constructor validation
-$transaction = new TransactionDTO(
-    accountId: 5,
-    type: TransactionType::DEBIT,  // enum, not string — can't pass wrong value
-    amount: 1000.00,               // float type enforced
-);
-AccountingService::postEntry([$transaction]);
-```
+**How it's used:** The financial transaction lists (sales + purchases combined views) build an array of these DTOs so Blade templates render a uniform row layout — invoice number, customer/supplier, amounts, outstanding balance, and pre-computed view/edit URLs — without re-deriving display data in the view layer.
 
-**Benefits:**
-1. **Type safety** — PHP 8.2 property types catch errors at construction
-2. **IDE autocomplete** — developers see available properties without reading documentation
-3. **Refactoring** — renaming a property is caught by IDE; renaming an array key is not
-4. **Validation** — constructor can enforce business rules (e.g., amount must be positive)
-5. **Self-documenting** — the DTO class is the specification of what data is needed
-
-**In accounting specifically:** The debit/credit balance check is critical. Using a typed `TransactionType` enum (instead of `'debit'` strings) prevents the silent bug where someone passes `'Debit'` or `'DEBIT'` and the equality check fails.
+**Important correction:** There is **no** `TransactionType` enum in the codebase, and `TransactionDTO` is **not** passed into `AccountingService::postEntry()` — journal lines are plain arrays with `account_name`/`account_code`/`account_id`, `type` (`'debit'`/`'credit'`), and `amount` keys (see Q7.1). A candidate who claims `TransactionDTO` is a typed accounting transaction container is describing a different system.
 
 ---
 
@@ -1271,7 +1274,7 @@ AccountingService::postEntry([$transaction]);
 
 **Answer:**
 
-`ActivityObserver` is registered for **16 models** in `AppServiceProvider::registerActivityObservers()`. For each model, it listens to:
+`ActivityObserver` is registered for **28 models** in `AppServiceProvider::registerActivityObservers()`. For each model, it listens to:
 - `created` event → logs "created" with the new attributes
 - `updated` event → logs "updated" with changed attributes (before/after values)
 - `deleted` event → logs "deleted" with the model's data
@@ -1294,7 +1297,7 @@ public function created(Model $model): void
 ```
 
 **Performance impact:**
-Every write operation on any of the 16 observed models incurs an **additional INSERT** into `activity_logs`. For a sale with 10 line items:
+Every write operation on any of the 28 observed models incurs an **additional INSERT** into `activity_logs`. For a sale with 10 line items:
 - 1 INSERT for `sales` → triggers 1 observer INSERT → total 2 INSERTs
 - 10 INSERTs for `sales_items` → each triggers 1 observer INSERT → 10 more INSERTs
 - Payments, stock updates → more observer inserts
@@ -1324,19 +1327,26 @@ SELECT * FROM customer_credits WHERE available_amount > 0 AND status = 'active'
 ```
 Without the `available_amount` column, this query requires a subquery or computed column.
 
-**The observer ensures consistency:** Whenever `used_amount` changes (because a credit was applied to a sale), the observer recalculates and updates `available_amount`:
+**The observer ensures consistency:** On `creating` it seeds `available_amount` for a new credit; on `updating` it recomputes `available_amount` whenever `amount` or `used_amount` changes (the `updated()`/`created()` hooks are intentionally empty):
+
 ```php
-public function updated(CustomerCredit $credit): void
+public function creating(CustomerCredit $customerCredit): void
 {
-    if ($credit->wasChanged('used_amount')) {
-        $credit->updateQuietly([
-            'available_amount' => $credit->amount - $credit->used_amount,
-        ]);
+    if (! isset($customerCredit->available_amount)) {
+        $customerCredit->available_amount = $customerCredit->amount - ($customerCredit->used_amount ?? 0);
+    }
+}
+
+public function updating(CustomerCredit $customerCredit): void
+{
+    // Only update available_amount if amount or used_amount changed
+    if ($customerCredit->isDirty(['amount', 'used_amount'])) {
+        $customerCredit->available_amount = $customerCredit->amount - $customerCredit->used_amount;
     }
 }
 ```
 
-Note: `updateQuietly()` prevents re-triggering the observer in a loop.
+Because `available_amount` is set during the `updating` lifecycle hook, the change is written in the **same UPDATE** as the `used_amount` change — no separate write, no recursion risk (unlike an `updated()` + `updateQuietly()` approach).
 
 ---
 
@@ -1349,8 +1359,9 @@ Note: `updateQuietly()` prevents re-triggering the observer in a loop.
 **Answer:**
 
 **Creation triggers:**
-1. **Sales return** — when a customer returns goods, a `customer_credit` is created for the refund amount instead of (or in addition to) a cash refund
-2. **Manual credit** — staff can manually issue a credit (e.g., as compensation for a service failure)
+1. **Sales return** — in `SalesReturnService`, a `customer_credit` is created for the refund amount when the return is marked `Completed` and the original sale was actually paid (`$wasPaid`, derived from the real payment state, not the stored status). The credit links back via `sales_return_id`, and the return stores the resulting `customer_credit_id`.
+
+There is currently **no** manual/standalone credit-issuing endpoint or UI — sales returns are the only source of `CustomerCredit` records (`CustomerCredit::create` appears only in `SalesReturnService`).
 
 **`customer_credits` columns:**
 - `customer_id` — the credited customer
@@ -1358,38 +1369,43 @@ Note: `updateQuietly()` prevents re-triggering the observer in a loop.
 - `used_amount` — amount applied to sales (starts at 0)
 - `available_amount` — `amount - used_amount` (maintained by observer)
 - `reason` — free text explanation
-- `status` — `active`, `used`, `expired`
+- `status` — `active`, `used` (`expired` is a conceptual value; see the transition note below — code never writes it)
 - `expires_at` — optional expiry date
 
-**Consumption (FIFO):** When a new sale is being created and the customer has credit:
+**Consumption (FIFO):** When a new sale is being created and the customer has credit, `SalesService::applyCustomerCredit()` (and `useCustomerCredit()` when a payment is received — same loop, so no separate `CustomerCreditService` class) applies credits oldest-first:
 
 ```php
-// CustomerCreditService uses FIFO — oldest credits first
-$credits = CustomerCredit::where('customer_id', $customerId)
-    ->where('status', 'active')
-    ->where('available_amount', '>', 0)
-    ->where(function($q) {
-        $q->whereNull('expires_at')->orWhere('expires_at', '>', now());
-    })
-    ->orderBy('created_at', 'asc')  // FIFO: oldest first
-    ->get();
+// SalesService::useCustomerCredit() uses FIFO — oldest credits first
+$credits = CustomerCredit::forCustomer($customerId)->active()->orderBy('created_at', 'asc')->get();
 
-$creditApplied = 0;
+$remainingAmount = $amount;
+
 foreach ($credits as $credit) {
-    $apply = min($credit->available_amount, $remainingBalance);
-    $credit->increment('used_amount', $apply);
-    $creditApplied += $apply;
-    $remainingBalance -= $apply;
-    if ($remainingBalance <= 0) break;
-}
+    if ($remainingAmount <= 0) {
+        break;
+    }
 
-// Store on the sale record
-$sale->customer_credit_used = $creditApplied;
+    $availableOnThisCredit = $credit->available_amount;
+    $creditToUse = min($availableOnThisCredit, $remainingAmount);
+
+    if ($creditToUse > 0) {
+        $credit->increment('used_amount', $creditToUse);
+        $credit->decrement('available_amount', $creditToUse);
+        $remainingAmount -= $creditToUse;
+
+        // Check if credit is fully used
+        if ($credit->used_amount >= $credit->amount) {
+            $credit->update(['status' => 'used']);
+        }
+    }
+}
 ```
 
+The `active()` scope is what enforces expiry at query time: `status = 'active'`, `expires_at IS NULL OR expires_at >= today`, and `amount > used_amount`.
+
 **Status transitions:**
-- `active` → `used` (when `available_amount = 0`)
-- `active` → `expired` (when `expires_at` passes — handled by scheduled command or check at consumption time)
+- `active` → `used` — set by the consumption loop when `used_amount >= amount` (i.e., fully consumed)
+- expiry is **not** a stored transition — no code writes `status = 'expired'` and there is **no scheduled command** for it. Expired credits are simply excluded at consumption/aggregation time by the `active()` scope (`expires_at >= today`).
 
 **Accounting impact:** When credit is applied to a sale:
 ```
@@ -1409,31 +1425,34 @@ CREDIT: Accounts Receivable         $300  [reduce what customer owes]
 
 Accounts Receivable (AR) aging shows how long outstanding invoices have been unpaid, categorized into time buckets relative to their `due_date`.
 
-**Aging buckets:**
+**Aging buckets** (verified in `DashboardService::getAgingData()` / the shared aging query — `$diff` = days overdue = `DATEDIFF(NOW(), due_date)`):
 | Bucket | Definition |
 |---|---|
-| Current | `due_date >= today` (not yet due) |
-| 1-30 days | `today - due_date` between 1 and 30 days |
-| 31-60 days | `today - due_date` between 31 and 60 days |
-| 61-90 days | `today - due_date` between 61 and 90 days |
-| 90+ days | `today - due_date > 90 days` |
+| Current (`current_amount`) | `diff < 0` (not yet due) |
+| 1-30 days (`overdue_1_30`) | `diff >= 0 AND diff <= 30` |
+| 31-60 days (`overdue_31_60`) | `diff > 30 AND diff <= 60` |
+| 61-90 days (`overdue_61_90`) | `diff > 60 AND diff <= 90` |
+| 90+ days (`overdue_90_plus`) | `diff > 90` |
+| Total overdue | `diff >= 0` |
 
 **Query approach:**
 ```php
-$today = now()->toDateString();
-
+// $diffSql is 'julianday('now') - julianday(due_date)' on SQLite,
+// 'DATEDIFF(NOW(), due_date)' on MySQL
 $agingData = DB::table('sales')
     ->where('tenant_id', $tenantId)
     ->whereIn('status', ['Unpaid', 'Partial'])  // only outstanding
-    ->select([
-        DB::raw("SUM(CASE WHEN due_date >= '$today' THEN (total - COALESCE(paid, 0)) ELSE 0 END) as current"),
-        DB::raw("SUM(CASE WHEN DATEDIFF('$today', due_date) BETWEEN 1 AND 30 THEN (total - COALESCE(paid, 0)) ELSE 0 END) as days_1_30"),
-        // ... similar for other buckets
-    ])
+    ->whereNotNull('due_date')
+    ->selectRaw("SUM(CASE WHEN $diffSql < 0 THEN total ELSE 0 END) as current_amount")
+    ->selectRaw("SUM(CASE WHEN $diffSql >= 0 AND $diffSql <= 30 THEN total ELSE 0 END) as overdue_1_30")
+    ->selectRaw("SUM(CASE WHEN $diffSql > 30 AND $diffSql <= 60 THEN total ELSE 0 END) as overdue_31_60")
+    ->selectRaw("SUM(CASE WHEN $diffSql > 60 AND $diffSql <= 90 THEN total ELSE 0 END) as overdue_61_90")
+    ->selectRaw("SUM(CASE WHEN $diffSql > 90 THEN total ELSE 0 END) as overdue_90_plus")
+    ->selectRaw("SUM(CASE WHEN $diffSql >= 0 THEN total ELSE 0 END) as total_overdue")
     ->first();
 ```
 
-**Paid amount subquery:** The outstanding amount per invoice is `total - SUM(payments.amount) - customer_credit_used`. A correlated subquery or join to `payments` table is used to get this accurately.
+**Important implementation detail:** the aging buckets sum `sales.total` directly — there is **no** subtraction of `payments.amount` or `customer_credit_used` in the aging query. An invoice appears in a bucket by its full `total` for as long as its `status` is `Unpaid`/`Partial` (i.e., until a payment flips the stored `status` to `Paid`). The `(status, due_date)` indexes on `sales` and `po` are specifically for making these queries fast.
 
 **AP aging** is identical but queries the `po` (purchase orders) table instead of `sales`.
 
@@ -1467,21 +1486,23 @@ For a request to `GET /accounting/journal-entries` (an authenticated, plan-gated
 11. `VerifyCsrfToken` — validates CSRF token on POST/PUT/PATCH/DELETE
 12. `SubstituteBindings` — resolves route model bindings
 
-**Custom appended middleware:**
-13. `NeedsTenant` — verifies tenant context exists (404 if not)
-14. `HandleTenantFromPath` — resolves and sets current tenant
-15. `SetLocale` — sets application locale from user/session preferences
-16. `DebugModeMiddleware` — enables/disables Laravel Telescope or debug bar
-17. `SecurityHeaders` — sets all security HTTP headers on the response
-18. `SetSessionCookieName` — sets session cookie name per-tenant
-19. `TurboMiddleware` — handles Hotwire Turbo request headers
+**Custom web middleware (wired in `bootstrap/app.php`):**
+- **Prepended first:** `SetSessionCookieName` — sets the session cookie name per-tenant (runs before the session starts so the right cookie is used)
+- **Appended (in order):**
+  - `NeedsTenant` — verifies tenant context exists (throws `NoCurrentTenant` if not)
+  - `HandleTenantFromPath` — resolves and sets current tenant
+  - `SetLocale` — sets application locale from user/session preferences
+  - `DebugModeMiddleware` — enables/disables Laravel Telescope or debug bar
+  - `SecurityHeaders` — sets all security HTTP headers on the response
+  - `TurboMiddleware` — handles Hotwire Turbo request headers
+  - `CaptureImpersonation` — captures the impersonated admin identity from session
 
 **Route-specific middleware:**
-20. `auth` (Fortify) — redirects to login if not authenticated
-21. `verified` — redirects to email verification if not verified
-22. `subscription.active` — redirects to plan upgrade if subscription expired
-23. `plan.feature:accounting` — redirects to upgrade if plan lacks `accounting` feature
-24. `permission:view-journal-entries` — 403 if user lacks permission
+- `auth` (Fortify) — redirects to login if not authenticated
+- `verified` — redirects to email verification if not verified
+- `subscription.active` — redirects to plan upgrade if subscription expired
+- `plan.feature:accounting` — redirects to upgrade if plan lacks `accounting` feature
+- `permission:view-journal` — 403 if user lacks the permission (note: the actual permission slug is `view-journal`, not `view-journal-entries`)
 
 **Controller executes.**
 
@@ -1526,9 +1547,7 @@ The page update is partial — only the `<body>` is replaced. The browser does n
 
 Vite (`vite.config.js`) is configured with the `laravel-vite-plugin`:
 
-**Input files compiled:**
-- `resources/css/app.css` — Tailwind CSS entry point (purges unused classes based on Blade template scan)
-- `resources/js/app.js` — main JavaScript entry (imports Alpine.js, Axios, Turbo)
+**Input files compiled:** the `laravel` plugin's `input` array lists **65 entries** — `resources/css/app.css` plus one JS entry per admin area (`resources/js/app.js`, `resources/js/admin/*.js` for accounting, POS, products, customers, payroll, journal entries, backup, and so on). Each admin page references only the entry it needs via `@vite([...])`, so unused page bundles are not loaded.
 
 **Output:** Versioned files in `public/build/` with a `manifest.json` for cache-busting.
 
@@ -1554,22 +1573,24 @@ This directive reads `manifest.json` in production and injects the correct versi
 
 **Answer:**
 
-**`.github/workflows/ci.yml`** runs on every push/PR:
+**`.github/workflows/ci.yml`** runs on every push/PR to `main` and `develop`:
 
-1. **PHP lint** — checks for syntax errors
-2. **PHPStan/Pint** — static analysis and code style enforcement
-3. **Composer install** — installs PHP dependencies
-4. **npm install + build** — installs Node dependencies and builds assets
-5. **Run migrations** — against an in-memory SQLite database
-6. **Run PHP tests** — `php artisan test` (PHPUnit/Pest)
-7. **Run JS tests** — `npx vitest run`
+1. **Setup PHP 8.2** (`shivammathur/setup-php` with bcmath, ctype, fileinfo, mbstring, openssl, pdo, tokenizer, xml)
+2. **Copy `.env`** from `.env.example`
+3. **Composer install** (`ramsey/composer-install`, locked versions, `--ignore-platform-reqs`)
+4. **Generate app key** (`php artisan key:generate`)
+5. **Setup Node 20 + `npm install`**
+6. **Build frontend assets** (`npm run build`)
+7. **Run PHP tests** — `php artisan test`
+8. **Prepare + upload artifact** — rsyncs the project (excluding `.git`, `.github`, `node_modules`, `.env`, storage runtime dirs) into a `build-artifact` uploaded as a CI artifact
 
-**`.github/workflows/deploy.yml`** runs on push to `main`:
-1. Runs CI checks first
-2. Deploys to **Railway** via Railway CLI or webhook
+Note: `ci.yml` does **not** run PHPStan/lint or `npx vitest run` — those are not steps in the current workflow; it runs the PHP test suite and builds assets.
 
-**Railway branches:**
-- `railway/code-change-_P3x3T` and `railway/code-change-DFBXMb` are Railway's automatically created branches for deployment environments (preview vs. production)
+**`.github/workflows/deploy.yml`** runs on **version tags (`v*`)** and via `workflow_dispatch`, with two jobs:
+1. **Build & push image** — checks out, logs into **GHCR** (`ghcr.io`, `GITHUB_TOKEN`), extracts semver/latest tags, builds the Docker image and pushes it to the container registry
+2. **Deploy to server** — `appleboy/ssh-action` connects to the VPS (`SERVER_HOST`/`SERVER_USER`/`SSH_PRIVATE_KEY` secrets) and runs `docker-compose pull`, `docker-compose up -d`, `php artisan migrate --force`, and `optimize:clear` + `config:cache`/`route:cache`/`view:cache`
+
+**Current production is Railway (PaaS).** The GHCR + VPS pipeline is the repository's release/deployment automation path (self-hosted deployment target), and Railway remains the live production host. See `docs/DEPLOYMENT_CHECKLIST.md` for the current release notes.
 
 **Docker support:**
 - `Dockerfile` builds the PHP-FPM + Nginx image
@@ -1584,22 +1605,23 @@ This directive reads `manifest.json` in production and injects the correct versi
 
 **Answer:**
 
-`BackupTenant` uses `spatie/laravel-backup` to create an encrypted backup of tenant data.
+`BackupTenant` (`app/Console/Commands/BackupTenant.php`, signature `backup:tenant {tenant_id} {type} {filename}`) is a **custom backup implementation** — it does **not** use `spatie/laravel-backup` (that package is installed but unused; there is no spatie backup config for this command).
 
 **Process:**
-1. Resolves the specific tenant to back up
-2. Scopes the backup to only that tenant's data (using `tenant_id` filtering)
-3. Creates a mysqldump of the relevant tables filtered by `tenant_id`
-4. Compresses the dump into a ZIP archive
-5. Encrypts the archive using the tenant's `backup_password` (stored on the `tenants` table)
-6. Stores the backup in configured storage (local disk or S3-compatible)
-7. Sends notification to the tenant admin on completion
+1. Reads the MySQL connection config and the `mysqldump` binary path (`database.connections.mysql.dump.dump_binary_path`, defaulting to `C:/xampp/mysql/bin`)
+2. Builds a temp directory and calls `mysqldump` per-table via Symfony `Process`, with:
+   - `--where "tenant_id={id}"` on every tenant-scoped table (35 tables listed in `$tablesWithTenantId`)
+   - A `--where "child_fk IN (SELECT id FROM parent WHERE tenant_id={id})"` strategy for child tables without a `tenant_id` (e.g. `stock_opname_items` via `stock_opnames`)
+   - `--single-transaction --skip-lock-tables --quick` for a consistent, non-blocking dump
+3. Concatenates all table dumps into one `backup.sql` wrapped in `SET FOREIGN_KEY_CHECKS = 0/1`
+4. Zips it into `storage/app/backups/{filename}` with `ZipArchive`
 
-**Tenant columns used:**
-- `backup_password` — the encryption key for this tenant's backup, stored with Laravel's `encrypted` cast (encrypted via APP_KEY using AES-256-CBC before writing to the database)
-- `backup_encrypted` — boolean flag indicating whether the backup is encrypted
+**What it does NOT do (correcting the older doc):**
+- No encryption — the zip is **not** password-protected, and the `backup_password` / `backup_encrypted` columns on `tenants` are **not** used by this command
+- No notification sent to the tenant admin on completion
+- No use of `spatie/laravel-backup`
 
-**Security note:** `backup_password` is stored encrypted in the database via Laravel's `encrypted` cast (migration `2026_05_19_000002` widened the column to `TEXT` and re-encrypted all existing values). This means an attacker who obtains a database dump cannot directly read backup passwords without also having `APP_KEY`. However, if `APP_KEY` is also compromised (e.g., via a leaked `.env` file), both the password and the data it protects are exposed. The fundamental trade-off — convenience vs. requiring tenants to supply their own password at backup/restore time — is acknowledged. For most SMB tenants, the current approach is the right balance.
+The signature still takes a `type` argument (`db_only` or `full`) but the current `handle()` implementation dumps the same tenant-scoped table set regardless of `type`. A candidate who claims this uses spatie/laravel-backup or encrypts per-tenant backups is describing the docs rather than the code.
 
 ---
 
@@ -1621,9 +1643,9 @@ Used when a deal is won without a formal quote — the opportunity is converted 
 
 **Path B — Formal quoting:**
 ```
-SalesOpportunity → Quotation → Sales (via quotation.sales_id on conversion)
+SalesOpportunity → Quotation → Sales (via quotation.converted_to_sales_id on conversion)
 ```
-Used when a formal PDF quote is issued. The `SalesOpportunity::quotations()` hasMany relationship links opportunities to multiple quotations (e.g., a revised quote after negotiation). When a quotation status transitions to `Accepted` and is "Converted", a `Sales` record is created.
+Used when a formal PDF quote is issued. The `SalesOpportunity::quotations()` hasMany relationship links opportunities to multiple quotations (e.g., a revised quote after negotiation). When a quotation status transitions to `Accepted` and is "Converted" (`QuotationController::convert()` — only `accepted` quotations qualify), a `Sales` record is created and the quotation is set to `status = converted` with `converted_to_sales_id` pointing at the new sales order (`Quotation::convertedToSales()` relationship).
 
 **Why both paths are needed:** Some deals are won verbally and then billed directly (no document trail needed). Others require a formal written quote for procurement approval on the customer's side. Forcing all deals through the quotation path would add unnecessary friction to fast-moving sales. Both paths eventually produce a `Sales` record, which is the canonical financial document.
 
@@ -1631,29 +1653,24 @@ Used when a formal PDF quote is issued. The `SalesOpportunity::quotations()` has
 
 ---
 
-### Q21.2 — There was an inconsistency between `Tenant::initializeBillingPeriod()` and `BillingService::getCurrentBillingPeriod()`. Describe it and explain the potential impact. Is it still open?
+### Q21.2 — There was an inconsistency between how the billing period was initialized and how `BillingService` computed it. Describe it and explain the potential impact. Is it still open?
 
 **Answer:**
 
-**The inconsistency (now resolved in June 2026):**
+**The inconsistency (resolved June 2026):**
 
-`BillingService::getCurrentBillingPeriod()` — implements rolling 30-day billing as described in the v1.7 changelog:
+`BillingService::getCurrentBillingPeriod(?Plan $plan)` computes a **rolling window from today** using the plan's billing cycle length (default **30 days** when no plan/`getBillingPeriodDays()` falls back):
 ```php
-'end' => now()->copy()->addDays(30)->toDateString()
+'start' => now()->toDateString(),
+'end'   => now()->copy()->addDays($days)->toDateString(),
 ```
+`getNextBillingPeriod()` does the same relative to the next cycle start.
 
-`Tenant::initializeBillingPeriod()` — originally used calendar month:
-```php
-'billing_period_start' => now()->startOfMonth()->toDateString(),
-'billing_period_end'   => now()->endOfMonth()->toDateString(),
-```
+Historically, the plan-assignment flow that initialized a tenant's `billing_period_start`/`billing_period_end` used **calendar-month** dates (`startOfMonth`/`endOfMonth`). Since the initialization logic now lives in `BillingService::initializeBillingPeriodIfEmpty()` — which simply calls `getCurrentBillingPeriod($plan)` — both paths are **consistent rolling-30-day** computation, matching the v1.7 changelog commitment. `Tenant::getCurrentBillingPeriod()` reads the stored start/end and derives `days_remaining`.
 
-**When this mattered:**
-`Tenant::initializeBillingPeriod()` is called on plan assignment (upgrade flow) if the billing period has not yet been set. If a tenant upgrades on June 12, `initializeBillingPeriod()` would set `billing_period_end = June 30` (calendar month). But `BillingService` would have computed `billing_period_end = July 12` (rolling 30 days). The `ProcessScheduledPlanChanges` command uses `pending_plan_effective_at` which is set from `BillingService::getNextBillingPeriod()` — so the scheduled downgrade fires on the BillingService-computed date. But the `billing_period_end` stored on the tenant reflects the Tenant model's calendar month — creating a mismatch between when the period ends and when the next period starts.
+**When this mattered:** on a mid-cycle plan assignment (upgrade/downgrade), a calendar-month `billing_period_end` (e.g. June 30 for a June 12 upgrade) diverged from the rolling computation (`July 12`). The `ProcessScheduledPlanChanges` command schedules downgrades via `pending_plan_effective_at` derived from `getNextBillingPeriod()`, so the effective date and the stored `billing_period_end` could disagree — the UI "renews on [date]" could differ from when plan-lifecycle commands actually fire.
 
-**The fix (applied June 2026):** `Tenant::initializeBillingPeriod()` now uses `addDays(30)` to match `BillingService`. `getNextBillingPeriod()` was also updated to use rolling 30-day periods. Both methods are now consistent with the v1.7 changelog commitment.
-
-**Why this is a senior-level finding:** The inconsistency was subtle — it didn't cause an obvious crash or error. It manifested as a discrepancy between what the UI shows ("your plan renews on [date]") and when the plan lifecycle commands actually fire.
+**Why this is a senior-level finding:** the inconsistency was subtle — no crash or obvious error, just a discrepancy between displayed renewal date and the actual period lifecycle.
 
 ---
 
@@ -1673,7 +1690,7 @@ This is a critical architectural distinction that candidates often confuse.
 - Runs on the **root domain** (`invent-mag.web.id`) — not on tenant subdomains
 - Has **no tenant context** — it manages tenants, plans, subscriptions, and billing across the entire platform
 - Has no Spatie roles — full access by design (there is only one or very few super admin users)
-- Uses `PlatformCurrencySetting` for monetary formatting (independent from tenant currencies)
+- Uses `PlatformCurrencySetting` only as a display preference for its own overview screens (via `CurrencyHelper::formatPlatform()`) — it is not a separate currency system and never affects tenant formatting
 - Routes in `routes/superadmin.php`, protected by `auth:super_admin` middleware
 
 **Tenant-level "superuser" role (`spatie/laravel-permission`):**
@@ -1718,27 +1735,22 @@ The `auth:super_admin` middleware tells Laravel to resolve the user from the `su
 
 ---
 
-### Q22.3 — Explain the Platform Currency System. How does it differ from tenant currency?
+### Q22.3 — How does the currency setting system work?
 
 **Answer:**
 
-There are two completely independent currency systems:
+There is **one currency setting system**: the tenant `CurrencySetting`.
 
-**`PlatformCurrencySetting` (super admin):**
-- Model: `App\Models\PlatformCurrencySetting` — no `BelongsToTenant` trait, no `tenant_id`
-- Table: `platform_currency_settings` (single global row)
-- Used by: `CurrencyHelper::formatPlatform($amount)`
-- Affects: Plan prices, subscription order amounts, billing totals — anything displayed in the super admin panel
-- Configurable at: Super admin → Settings → Platform Currency
-
-**`CurrencySetting` (tenant):**
+**`CurrencySetting` (tenant — the single system):**
 - Model: `App\Models\CurrencySetting` — uses `BelongsToTenant` trait
-- Table: `currency_settings` (one row per tenant)
-- Used by: `CurrencyHelper::format($amount)`
-- Affects: Invoice totals, POS receipts, sales amounts — anything displayed in the tenant admin panel
+- Table: `currency_settings` — **one row per tenant**
+- Used by: `CurrencyHelper::format($amount)` — drives every monetary display in the tenant admin panel (invoice totals, POS receipts, sales amounts, accounting reports)
 - Configurable at: Tenant admin → Settings → Currency
 
-**Key property:** Changing the platform currency (e.g., from USD to IDR) has **zero impact** on tenant currency settings. The `currency_code` column on `plans` and `subscription_orders` records the currency at time of creation, preserving historical accuracy even if the platform currency changes later.
+**Super admin display preference (not a second system):**
+The super admin panel has a `PlatformCurrencySetting` model (`platform_currency_settings`, one global row, seeded USD) used only by `CurrencyHelper::formatPlatform($amount)` on super-admin overview screens (e.g., the payment-overview dashboard). It is a **display preference for the platform's own screens** — not a currency system that affects tenants.
+
+**Key property:** Tenant transactions are always displayed in the tenant's own currency via `CurrencySetting`; the super-admin display preference has **zero impact** on tenant formatting. The `currency_code` column on `plans` and `subscription_orders` records the currency at time of creation, preserving historical accuracy.
 
 ---
 
@@ -1746,9 +1758,9 @@ There are two completely independent currency systems:
 
 **Answer:**
 
-The super admin panel (16 controllers, 28 Blade views, 39 routes) manages:
+The super admin panel (16 controllers, 30 Blade views, ~55 routes) manages:
 
-1. **Tenants** — list, view, toggle active/inactive, edit domain, impersonate (planned)
+1. **Tenants** — list, view, toggle active/inactive, edit domain, impersonate (implemented: `POST /tenants/{tenant}/impersonate` + `CaptureImpersonation` middleware)
 2. **Plans** — full CRUD with feature toggles, pricing, usage limits, trial days
 3. **Subscriptions** — terminate, reactivate, view stats (active/trialing/expired/terminated)
 4. **Features** — assign feature slugs per plan tier via matrix view
@@ -1763,7 +1775,7 @@ The super admin panel (16 controllers, 28 Blade views, 39 routes) manages:
 13. **Settings** — .env editor, user preferences, platform currency config
 14. **CMS** — landing page content editor (hero, features, pricing, contact)
 
-All operations are audit-logged via `activity()` (Spatie Activity Log).
+All operations are audit-logged via the **custom** `ActivityLog`/`AccountingAuditLog` system (see Q15.1) — note this is NOT Spatie Activity Log: `spatie/laravel-activitylog` is not installed, there is no `activity()` helper, and `activity_logs` is written by `ActivityLogService`.
 
 ---
 
@@ -1797,7 +1809,7 @@ The diagnostic signals were Scribe generating docs with **zero routes**, and the
 Route::middleware('api')->prefix('api')->group(base_path('routes/api.php'));
 ```
 
-`php artisan route:list` confirmed all routes now live under `/api/*`; Scribe regenerated docs for all 11 endpoints; tests (`MidtransWebhookTest`, `TenantLookupControllerTest`) were updated to the `/api/...` paths; full suite passed (1186 tests).
+`php artisan route:list` confirmed all routes now live under `/api/*`; Scribe regenerated docs for all 12 endpoints; tests (`MidtransWebhookTest`, `TenantLookupControllerTest`) were updated to the `/api/...` paths; full suite passed (1186 tests).
 
 **Senior lesson:** Framework conventions are easy to bypass silently. When a custom route registration deviates from the platform default, every downstream assumption (middleware, prefixes, exception-handler path checks, doc generation) must be re-verified. A candidate who recognizes that "Scribe matching zero routes" is the first clue that routing itself is broken — rather than the docs being out of date — has good diagnostic instincts.
 
@@ -1862,7 +1874,7 @@ There is a single `taxes` table; a tax is categorized by two booleans — `is_pp
 
 The v2 refactor collapsed everything into the single dropdown: selecting a tax with `is_ppn = true` activates PPN compliance (Faktur Pajak, NPWP, e-Faktur); selecting a general/none tax does not. PPN and general taxes are **mutually exclusive by construction** (one `tax_id` per document). **PPh is an independent parallel dimension** — a document can carry PPN *and* PPh snapshots simultaneously, because PPh uses its own flag and its own accounts (1170 receivable / 2150 payable) and never conflicts with the exclusivity rule.
 
-`ppn_enabled/ppn_rate/ppn_amount` and `pph_*` on `sales`/`po`/`quotations` are **denormalized snapshots** derived from the selected tax at creation time — never user input. Helpers `Sales::isPpn()`/`isPph()` read the live `Tax` when the relationship is loaded and fall back to the snapshot otherwise. Toggling a Tax record's flags or switching `tax_jurisdiction` **never retroactively changes past documents** (PPN_EVOLUTION.md Decision 15 — the snapshot is the source of truth for history).
+`ppn_enabled/ppn_rate/ppn_amount` and `pph_*` on `sales`/`po`/`quotations` are **denormalized snapshots** derived from the selected tax at creation time — never user input. Helpers `Sales::isPpn()`/`isPph()` **always read the stored snapshot** (`return (bool) $this->ppn_enabled;` / `$this->pph_enabled`) — they never consult the live `Tax` relationship, by design. Toggling a Tax record's flags or switching `tax_jurisdiction` **never retroactively changes past documents** (PPN_EVOLUTION.md Decision 15 — the snapshot is the source of truth for history).
 
 ---
 
@@ -1919,7 +1931,10 @@ The DJP CSV export converts amounts to **integer cents** (`(int) round($amount *
 
 **Answer:**
 
-All withholding taxes run on the **universal `is_pph` mechanism**: a `Tax` flagged `is_pph = true` appears in the PPh dropdown on Sales, PO, POS, and Quotation forms and posts through **one shared journal path** — sale side `Dr PPh Receivable (1170) / Cr PPh Payable (2150)` at invoice time; purchase side the reverse.
+All withholding taxes run on the **universal `is_pph` mechanism**: a `Tax` flagged `is_pph = true` appears in the PPh dropdown on Sales, PO, POS, and Quotation forms and posts through **one shared journal path** with **different legs per side**:
+
+- **Sale side** (`SalesService`, PPh withholding on sale): `Dr PPh Receivable (1170) / Cr Accounts Receivable` — the seller records the tax it will claim back from DJP, reducing the amount the customer owes.
+- **Purchase side** (`PurchaseService`): `Cr PPh Payable (2150)` added alongside `Dr Inventory (net) + Dr Input VAT (1160) / Cr Accounts Payable` — the buyer records the withholding it must remit to DJP.
 
 - **PPh 23 (2%)** and **PPh Final 0.5%** (PP 23/2018, as revised by PP 20/2026) are seeded. `PPh Final 0.5%` **replaced `PPH 22` in place** via backfill migration `2026_08_05_000002` — same row, renamed, rate changed — so existing `pph_tax_id` references stay valid and per-document `pph_rate`/`pph_amount` snapshots are untouched. `PPH 22` was dropped because it is narrowly applicable (goods purchases from importers) and rarely the tax an UMKM books; it remains *creatable* from the Tax page for the minority who need it.
 - **PPh 21** is planned as a flat **"Payroll Tax" picker** on the payroll screen (reusing `is_pph`) — deliberately **not** a TER/PTKP/1721-II engine, since the UMKM target does not need a salary-tax engine.

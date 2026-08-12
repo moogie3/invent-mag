@@ -12,9 +12,56 @@ use Illuminate\Validation\Rules\Password;
 class RegisteredUserController extends Controller
 {
     /**
-     * Handle an incoming registration request.
+     * Register a new user and tenant.
      *
-     * @return JsonResponse
+     * Creates a user account and its tenant (workspace) in one call, then
+     * returns an access token for immediate use. Rate-limited to 3 per hour
+     * per IP.
+     *
+     * @group Authentication
+     * Public registration, login, and tenant lookup, plus token refresh for authenticated clients.
+     *
+     * @unauthenticated
+     *
+     * @bodyParam name string required The user's full name.
+     * @bodyParam shopname string required The desired workspace name. Must be unique.
+     * @bodyParam email string required The user's email address. Must be unique.
+     * @bodyParam password string required The user's password (confirmed). Must meet the app's password rules.
+     * @bodyParam password_confirmation string required Confirmation of the password.
+     * @bodyParam plan string optional The plan slug to assign (defaults to the platform default plan when omitted). Enum: starter, professional, enterprise.
+     *
+     * @response status=201 scenario=success {
+     *   "message": "Registration successful",
+     *   "user": {
+     *     "name": "Jane Doe",
+     *     "email": "jane@example.com",
+     *     "updated_at": "2026-08-12T09:00:00.000000Z",
+     *     "created_at": "2026-08-12T09:00:00.000000Z",
+     *     "id": 1
+     *   },
+     *   "access_token": "1|abcdefghijklmnopqrstuvwxyz",
+     *   "token_type": "Bearer",
+     *   "tenant_domain": "mycompany.invent-mag.web.id",
+     *   "workspace_slug": "mycompany",
+     *   "plan": {
+     *     "name": "Starter",
+     *     "slug": "starter",
+     *     "status": "trial",
+     *     "on_trial": true,
+     *     "trial_ends_at": "2026-09-11T09:00:00.000000Z"
+     *   }
+     * }
+     * @response status=422 scenario="validation error" {
+     *   "message": "The shopname has already been taken. (and 2 more errors)",
+     *   "errors": {
+     *     "shopname": [
+     *       "The shopname has already been taken."
+     *     ],
+     *     "email": [
+     *       "The email has already been taken."
+     *     ]
+     *   }
+     * }
      */
     public function store(Request $request, CreateNewUser $creator)
     {

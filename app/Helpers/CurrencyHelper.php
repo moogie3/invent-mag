@@ -179,6 +179,19 @@ class CurrencyHelper
     }
 
     /**
+     * Format an IDR amount with Indonesian conventions (super admin context).
+     * Subscription orders and revenue are stored in IDR, so they must never be
+     * formatted with the (typically USD) platform display currency.
+     */
+    public static function formatPlatformIdr($amount)
+    {
+        $isNegative = $amount < 0;
+        $formatted = number_format((float) abs($amount), 0, ',', '.');
+
+        return ($isNegative ? '-' : '').'Rp '.$formatted;
+    }
+
+    /**
      * Format discount amount per unit with proper decimal places (not rounded)
      * Used for displaying percentage discount converted to fixed amount
      */

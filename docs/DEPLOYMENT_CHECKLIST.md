@@ -20,6 +20,7 @@ Applies to the changeset that: (1) restored the `/api` prefix + `api` middleware
    MAIL_FROM_ADDRESS=no-reply@invent-mag.com
    MAIL_FROM_NAME=INVENT-MAG
    ```
+   > **Note on defaults:** `config/mail.php` falls back to `noreply@invent-mag.web.id` if `MAIL_FROM_ADDRESS` is unset; the current `.env` overrides it with `no-reply@invent-mag.com`. Set it explicitly in production to avoid the fallback being used for outbound mail.
 5. **Update the Midtrans Payment Notification URL** in the Midtrans dashboard (Settings → Configuration → Payment Notification URL):
    - **Old (root path — now 404s):** `https://api.invent-mag.web.id/webhooks/midtrans`
    - **New:** `https://api.invent-mag.web.id/api/webhooks/midtrans`
@@ -41,10 +42,10 @@ Applies to the changeset that: (1) restored the `/api` prefix + `api` middleware
 | Tenant lookup | `curl -X POST https://api.invent-mag.web.id/api/lookup-tenant -H "Content-Type: application/json" -d '{"shopname":"demo"}'` | `200` or `404 {"message":"Shop not found."}` (not a 404 route error / 500) |
 | Register endpoint | `curl -X POST https://api.invent-mag.web.id/api/register ...` | JSON response (not route-not-found) |
 | CMS | `curl https://api.invent-mag.web.id/api/cms` | `200` JSON |
-| Plans | `curl https://api.invent-mag.web.id/api/v1/plans` | `200` JSON |
+| Plans | `curl https://api.invent-mag.web.id/api/plans` | `200` JSON |
 | Contact form | Submit `/contact` form | "Message Sent!" + email received at `CONTACT_EMAIL` |
 | Midtrans webhook | Trigger a test transaction in Midtrans sandbox | Notification hits `POST /api/webhooks/midtrans` with `200` |
-| API docs | `https://api.invent-mag.web.id/docs/` | 11 endpoints listed, including `POST /api/contact` |
+| API docs | `https://api.invent-mag.web.id/docs/` | 12 endpoints listed, including `POST /api/contact` |
 | FE login/register | Attempt login + signup on marketing site | No `/api/register` / `/api/lookup-tenant` 404s |
 
 ## 4. Rollback Notes

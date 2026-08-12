@@ -71,13 +71,13 @@
                                     <br><small class="text-muted text-capitalize">{{ $order->change_type }}</small>
                                     @endif
                                 </td>
-                                <td class="text-end fw-bold">{{ App\Helpers\CurrencyHelper::formatPlatform($order->amount) }}</td>
+                                <td class="text-end fw-bold">{{ App\Helpers\CurrencyHelper::formatPlatformIdr($order->amount) }}</td>
                             </tr>
                         </tbody>
                         <tfoot>
                             <tr>
                                 <th class="text-end">Total</th>
-                                <th class="text-end fs-4">{{ App\Helpers\CurrencyHelper::formatPlatform($order->amount) }}</th>
+                                <th class="text-end fs-4">{{ App\Helpers\CurrencyHelper::formatPlatformIdr($order->amount) }}</th>
                             </tr>
                         </tfoot>
                     </table>

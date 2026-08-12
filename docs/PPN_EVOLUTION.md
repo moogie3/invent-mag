@@ -1,7 +1,7 @@
 # PPN & e-Faktur Feature Evolution
 
 > **Last updated:** 2026-08-05
-> **Status:** PPh 23 + PPh Final 0.5% Implemented — 1167 PHP tests / 3586 assertions + 169 JS Vitest files (2026-08-05). PPh 21/25 scoped to UMKM-appropriate form (2026-07-31).
+> **Status:** PPh 23 + PPh Final 0.5% Implemented — 1186 PHP tests / 3715 assertions + 169 JS Vitest files (2026-08-05). PPh 21/25 scoped to UMKM-appropriate form (2026-07-31).
 
 ---
 
@@ -41,7 +41,7 @@
 - **NSFP (Nomor Seri Faktur Pajak)** — unique serial numbers allocated by DJP for each Faktur Pajak
 - Company NPWP, PKP status, and seller/buyer data snapshot at issuance time
 
-Indonesia's current PPN rate is **11%** (effective April 1, 2022).
+Indonesia's current PPN rate is **11%** (effective April 1, 2022, per UU HPP No. 7/2021).
 
 ---
 
@@ -203,6 +203,8 @@ The Quotation create/edit form previously used **manual `tax_type` / `tax_rate` 
 
 The Purchase Order create page **no longer shows tax fields**. This follows the Accurate Online / Indonesian standard approach: PPN (input VAT / PPN Masukan) is only tracked at the **invoice stage**, not at the purchase order stage. Tax is applied when a Purchase Invoice is created from the PO.
 
+> **Superseded by Phase 1D (2026-08-03):** Purchase Orders now **do** capture PPN Masukan — `ppn_enabled` / `ppn_rate` / `ppn_amount` snapshot fields on `po`, and `PurchaseService` splits the journal `Dr Inventory (net) + Dr Input VAT (1160)` when a PPN tax is selected. The PO create/edit form auto-shows/hides the PPN Masukan block from the selected tax's `data-is-ppn` flag. The original "no tax on PO" phase is historical only.
+
 ### Index Tax Columns
 
 The following index pages now display a **Tax column** showing the applied tax name/type:
@@ -235,6 +237,7 @@ Phase 1C removes the last confusing onboarding step for Indonesian users: when a
 
 - **PPN 11%** — `rate = 11`, `type = exclusive`, `is_ppn = true`. Becomes the default tax **only if no default already exists** (an existing default is never overridden).
 - **PPH 23** — `rate = 2`, `type = exclusive`, `is_pph = true`. Never default.
+- **PPh Final 0.5%** — `rate = 0.5`, `type = exclusive`, `is_pph = true` (PP 23/2018 UMKM final income tax; added in Phase 1E, 2026-08-05). Never default.
 
 The method is **idempotent**: it checks for an existing `is_ppn = true` / `is_pph = true` record per tenant and skips creation if one already exists, so re-toggling jurisdiction (or switching away and back) never duplicates records. Created record names are returned and logged.
 
@@ -244,7 +247,7 @@ This matters because the sales/POS/quotation/Purchase-service layers only apply 
 
 Two new tutorial steps (EN/ID) explain the difference that users keep confusing:
 
-- **`tax_jurisdiction_vs_config`** (System Settings page) — the Tax Jurisdiction switch (`None / Indonesia`) selects the country's *compliance framework* (turns on PPN, e-Faktur, NSFP, NPWP features); it does **not** by itself add a rate to transactions. Actual rates live on the Tax page. Mentions that switching to Indonesia auto-creates PPN 11% + PPh 23 2%.
+- **`tax_jurisdiction_vs_config`** (System Settings page) — the Tax Jurisdiction switch (`None / Indonesia`) selects the country's *compliance framework* (turns on PPN, e-Faktur, NSFP, NPWP features); it does **not** by itself add a rate to transactions. Actual rates live on the Tax page. Mentions that switching to Indonesia auto-creates PPN 11% + PPh 23 2% + PPh Final 0.5%.
 - **`tax_config_vs_jurisdiction`** (Tax page) — the reverse perspective: Tax records (name/rate/type) only take effect once assigned to a product or order, and PPN additionally requires the jurisdiction to be Indonesia.
 
 The stale tax tutorial steps were also refreshed to match current behavior:
@@ -274,7 +277,7 @@ Fixed by adding `'pkp_date' => 'date'` to `Tenant::$casts` (and to `Customer::$c
 - `tests/Unit/Services/TaxServiceEnsureIndonesianDefaultsTest.php` — creates both records, idempotency, skips existing PPN/PPh, preserves existing default.
 - `tests/Feature/Admin/SettingsTaxJurisdictionTest.php` — switch-on creates records (web + AJAX), idempotent via endpoint, switch-away leaves records intact.
 - `tests/Feature/Admin/EfakturSettingsTest.php` — settings page renders with a PKP date set / null, save-then-render, and `pkp_date` date-cast on both Tenant and Customer.
-- Full suite: **1151 passing (3480 assertions)**.
+- Full suite: **1186 passing (3715 assertions)**.
 
 ---
 
@@ -395,7 +398,7 @@ These are the key architectural decisions made during the refactor. **Do not vio
 
 This replaces `hasFeature('ppn')` as the **primary UI gate**. `hasFeature('ppn')` remains as a **billing gate** (plan tier check).
 
-**Auto-seed on switch:** Because the master switch alone does not create any tax rate, switching to `'ID'` now also calls `TaxService::ensureIndonesianDefaults()` (see Phase 1C) to auto-create PPN 11% and PPh 23 2% records — so the toggle and the available tax rates stay consistent for the user.
+**Auto-seed on switch:** Because the master switch alone does not create any tax rate, switching to `'ID'` now also calls `TaxService::ensureIndonesianDefaults()` (see Phase 1C) to auto-create PPN 11%, PPh 23 2%, and PPh Final 0.5% records — so the toggle and the available tax rates stay consistent for the user.
 
 ### 4. Layering: jurisdiction → PKP → plan → tax
 
@@ -440,17 +443,13 @@ The toggle controls **future behavior**, not past records. Reversing journal ent
 ```php
 public function isPpn(): bool
 {
-    if ($this->relationLoaded('tax') && $this->tax) {
-        return (bool) $this->tax->is_ppn;
-    }
-    // Fallback to snapshot
     return (bool) $this->ppn_enabled;
 }
 ```
 
-Always use `$sale->isPpn()` instead of `$sale->ppn_enabled` directly. This ensures the latest tax data is used when available, with snapshot fallback for historical records.
+Always use `$sale->isPpn()` instead of `$sale->ppn_enabled` directly. It reads the stored **snapshot only** — never the live `Tax.is_ppn` relationship — so toggling a Tax record's flag or switching `tax_jurisdiction` never retroactively changes past sales (see Decision 15).
 
-`$sale->isPph()` follows the same pattern — reads from the live `Tax.is_pph` with `pph_enabled` snapshot fallback.
+`$sale->isPph()` follows the same pattern — reads the `pph_enabled` snapshot only.
 
 ### 9. Safeguards on Tax Jurisdiction Toggle
 
@@ -494,11 +493,11 @@ The ID→null safeguard (blocking the switch when draft Faktur Pajak or unissued
 | `tenants`             | `tax_jurisdiction`, `pkp_status`, `npwp`, `pkp_date`, `ppn_rate`                                        | Tenant-level Indonesian tax config                                  |
 | `taxes`               | `is_ppn`, `is_pph`, `rate`, `type`, `name`                                                              | Tax definitions. `is_ppn` flags PPN taxes, `is_pph` flags PPh taxes |
 | `sales`               | `tax_id`, `ppn_enabled`, `ppn_rate`, `ppn_amount`, `pph_enabled`, `pph_rate`, `pph_amount`, `total_tax` | PPN + PPh snapshot fields on sales                                  |
-| `purchase_orders`     | `tax_id`, `pph_enabled`, `pph_rate`, `pph_amount`                                                       | PPh snapshot fields on POs                                          |
+| `po`                  | `tax_id`, `ppn_enabled`, `ppn_rate`, `ppn_amount`, `pph_enabled`, `pph_rate`, `pph_amount`              | PPN Masukan + PPh snapshot fields on POs                            |
 | `quotations`          | `tax_id`, `pph_enabled`, `pph_rate`, `pph_amount`                                                       | PPh snapshot fields on quotations                                   |
-| `faktur_pajaks`       | `sales_id`, `nsfp`, `dpp`, `ppn`, `status`, `npwp_penjual`, `npwp_pembeli`                              | Generated Faktur Pajak                                              |
+| `faktur_pajak`        | `sales_id`, `nsfp`, `dpp`, `ppn`, `status`, `npwp_penjual`, `npwp_pembeli`                              | Generated Faktur Pajak                                              |
 | `faktur_pajak_items`  | `faktur_pajak_id`, `nama_barang`, `dpp`, `ppn`                                                          | Line items on Faktur Pajak                                          |
-| `nsfp_pools`          | `nsfp`, `status`, `used_at`, `faktur_pajak_id`                                                          | NSFP serial number pool                                             |
+| `nsfp_pool`           | `nsfp`, `status`, `used_at`, `faktur_pajak_id`                                                          | NSFP serial number pool                                             |
 | `journal_entries`     | `sourceable_type`, `sourceable_id`                                                                      | PPN + PPh journal entries                                           |
 | `accounting_settings` | `ppn_keluaran_account_id`, `pph_receivable_account_id`, `pph_payable_account_id`                     | PPN liability + PPh account references                              |
 
@@ -594,8 +593,8 @@ Since Phase 1E this reversal triggers whenever the original sale `isPpn() && ppn
 ### Sale with PPh 23 (Withholding Tax)
 
 ```
-Dr. PPh Receivable (1170-{tid})     pph_amount    (company receives withheld tax from customer)
-Cr. PPh 23 Payable  (2150-{tid})   pph_amount    (company remits withheld tax to DJP)
+Dr. PPh Receivable (1170-{tid})     pph_amount    (withholding tax receivable from the customer)
+Cr. Accounts Receivable (1130)      pph_amount    (reduces the net amount the customer owes)
 ```
 
 Source document: `Sales` model (`sourceable_type = Sales`) — posted at invoice time (Mekari pattern).
@@ -605,8 +604,9 @@ PPh is **independent of PPN**. An invoice can have both PPN and PPh journal entr
 ### Purchase Invoice with PPh 23
 
 ```
-Dr. PPh 23 Payable  (2150-{tid})   pph_amount    (reduce withholding liability)
-Cr. PPh Receivable  (1170-{tid})   pph_amount    (reduce receivable from vendor)
+Dr. Inventory (1140)               inventory_amount   (cost of goods; net when PPN Masukan is split out)
+Cr. Accounts Payable (2110)        final_total        (net of withholding)
+Cr. PPh Payable (2150-{tid})       pph_amount         (withheld from the supplier, remitted to DJP)
 ```
 
 ### Sale Deleted
@@ -704,7 +704,7 @@ Order-level discounts are reflected in the parent DPP; line-item discounts are r
 | `app/Services/SalesReturnService.php`                                          | Uses `$sale->isPpn()` instead of `$sale->ppn_enabled` for PPN reversal                                                                        |
 | `app/Services/EFakturService.php`                                              | Uses `$sale->isPpn()`. Fixed DPP = `total - total_tax`. Fixed `cancelFakturPajak()` to reverse journal entries.                               |
 | `app/Services/ChartOfAccountsService.php`                                      | Added `ppn_keluaran_account_id` validation rule                                                                                               |
-| `app/Services/TaxService.php`                                                 | Added `ensureIndonesianDefaults()` — auto-creates PPN 11% + PPh 23 2% on switch to Indonesia (idempotent)                                      |
+| `app/Services/TaxService.php`                                                 | Added `ensureIndonesianDefaults()` — auto-creates PPN 11% + PPh 23 2% + PPh Final 0.5% on switch to Indonesia (idempotent)                                      |
 | `app/Services/CustomerService.php`                                             | Added npwp/pkp validation and CSV export columns                                                                                              |
 | `app/Http/Controllers/Admin/SalesController.php`                               | Added PPN validation to store/update                                                                                                          |
 | `app/Http/Controllers/Admin/CustomerController.php`                            | Added npwp/pkp validation                                                                                                                     |
@@ -766,7 +766,7 @@ Quick-reference for files most relevant to PPN/e-Faktur implementation and the P
 | `app/Http/Controllers/Admin/SettingsController.php::updateTaxJurisdiction()` | AJAX endpoint for updating `tax_jurisdiction` from the Settings page                                  |
 | `app/Services/EFakturService.php`                                            | Core e-Faktur service — Faktur Pajak generation, cancellation, CSV export, journal entries            |
 | `app/Services/SalesService.php`                                              | Sales creation/update — derives PPN from `tax->is_ppn`, handles `fakturPajak` eager loads             |
-| `app/Services/TaxService.php::ensureIndonesianDefaults()`                     | Auto-creates PPN 11% + PPh 23 2% when jurisdiction switches to Indonesia (idempotent)                 |
+| `app/Services/TaxService.php::ensureIndonesianDefaults()`                     | Auto-creates PPN 11% + PPh 23 2% + PPh Final 0.5% when jurisdiction switches to Indonesia (idempotent)                 |
 | `app/Services/SalesReturnService.php`                                        | Sales return creation — uses `$sale->isPpn()` for PPN reversal, `tax_id` payloads                     |
 | `app/Services/PosService.php`                                                | POS service — tax model integration via `tax_id`                                                      |
 | `app/Models/Tenant.php`                                                      | `isIndonesian()` helper, `canDisableIndonesianJurisdiction()` safeguard, `tax_jurisdiction` attribute |
@@ -845,8 +845,8 @@ PPh journal entries are posted **at invoice time** (not at payment time), follow
 **Sale with PPh 23:**
 
 ```
-Dr. PPh Receivable (1170-{tid})     pph_amount    (company receives the withheld tax)
-Cr. PPh 23 Payable  (2150-{tid})   pph_amount    (company owes withheld tax to DJP)
+Dr. PPh Receivable (1170-{tid})     pph_amount    (withholding tax receivable from the customer)
+Cr. Accounts Receivable (1130)      pph_amount    (reduces the net amount the customer owes)
 ```
 
 This is a **standalone journal entry** — it does not interact with PPN journal entries. If an invoice has both PPN and PPh, both sets of journal entries are created independently.
@@ -854,8 +854,9 @@ This is a **standalone journal entry** — it does not interact with PPN journal
 **PPh on Purchase Invoices (PPh 23 input):**
 
 ```
-Dr. PPh 23 Payable  (2150-{tid})   pph_amount    (reduce withholding liability)
-Cr. PPh Receivable  (1170-{tid})   pph_amount    (reduce receivable)
+Dr. Inventory (1140)               inventory_amount   (cost of goods; net when PPN Masukan is split out)
+Cr. Accounts Payable (2110)        final_total        (net of withholding)
+Cr. PPh Payable (2150-{tid})       pph_amount         (withheld from the supplier, remitted to DJP)
 ```
 
 ### PPh Scope
@@ -863,7 +864,7 @@ Cr. PPh Receivable  (1170-{tid})   pph_amount    (reduce receivable)
 Currently implemented:
 
 - **PPh 23** — withholding on services, royalties, interest (implemented 2026-07-28)
-- **PPh Final 0.5%** — UMKM final income tax (PP 23/2018, PP 20/2026). Seeded `Tax` record (`PPh Final 0.5%`, rate `0.5`, `is_pph = true`) in `TaxSeeder` + `TaxService::ensureIndonesianDefaults()` + backfill migration `2026_08_05_000002_backfill_pph_final_tax_record.php` for existing tenants (implemented 2026-08-05). Replaces the previous `PPH 22` seed (1.5%): existing `PPH 22` rows are converted **in place** (same row, new name/rate) so `pph_tax_id` references stay valid and historical `pph_rate`/`pph_amount` snapshots are untouched. No new models or journal code — it flows through every existing PPh dropdown and the shared PPh Payable (2150) path unchanged. `PPH 22` remains creatable from the Tax page for the minority who need it, but is no longer seeded.
+- **PPh Final 0.5%** — UMKM final income tax (PP 23/2018, PP 20/2026). Seeded `Tax` record (`PPh Final 0.5%`, rate `0.5`, `is_pph = true`) in `TaxSeeder` + `TaxService::ensureIndonesianDefaults()` + backfill migration `2026_08_05_000002_backfill_pph_final_tax_record.php` for existing tenants (implemented 2026-08-05). Replaces the previous `PPH 22` seed (1.5%): existing `PPH 22` rows are converted **in place** (same row, new name/rate) so `pph_tax_id` references stay valid and historical `pph_rate`/`pph_amount` snapshots are untouched. No new models or journal code — it flows through every existing PPh dropdown and the shared PPh journal path (sale side `Dr PPh Receivable 1170 / Cr Accounts Receivable`, purchase side `Cr PPh Payable 2150`) unchanged. `PPH 22` remains creatable from the Tax page for the minority who need it, but is no longer seeded.
 
 Future (planned, UMKM-appropriate scope — decided 2026-07-31):
 

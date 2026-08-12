@@ -1,8 +1,8 @@
 # Invent-MAG: Technical Specification Document
 
-**Document Version:** 2.4
+**Document Version:** 2.5
 **Last Updated:** Aug 2026
-**System Version:** 2.4
+**System Version:** 2.5
 
 ---
 
@@ -13,7 +13,7 @@ Invent-MAG is a production-ready, enterprise-grade ERP system built on Laravel 1
 ### Key Technical Highlights
 
 - **Multi-tenant SaaS architecture** with row-level database isolation
-- **1066 test files** ensuring code reliability
+- **1186 test methods** (3715 assertions) ensuring code reliability
 - **527+ commits** demonstrating sustained development
 - **Docker + CI/CD** for modern DevOps practices
 - **Service-oriented architecture** with clean separation of concerns
@@ -91,7 +91,7 @@ class Product extends Model
 
 **Payment Gateway:** Midtrans (Indonesian market)  
 **Pricing Model:** Three-tier SaaS subscription  
-**Currency:** USD displayed, IDR charged (16,000 exchange rate)
+**Currency:** USD displayed, IDR charged at a superadmin-managed exchange rate — stored in the `billing_settings` table (fallback: `config/billing.php` = 16,000), read by `Admin/PlanController` via `BillingSetting::getRate()` and exposed to the marketing site as `billing_rate` on `GET /api/cms`. The Astro `BaseLayout` price formatter uses that rate, with `PUBLIC_USD_TO_IDR` as a fallback override. Rate is managed at Superadmin → Settings → Billing Rate. Plan USD prices are exposed to the marketing site via public `GET /api/plans` (`Api/PlanController`); `invent-mag-fe` `src/lib/plans.ts` fetches it at build time with 19/59/109 as offline defaults.
 
 #### Subscription Tiers
 
@@ -102,6 +102,8 @@ class Product extends Model
 | Enterprise   | Unlimited | Unlimited  | Unlimited | $109/mo| + Forecasting, API, Audit Trail, Custom Roles, **e-Faktur PPN** |
 
 *(Updated: July 2026 - e-Faktur PPN added to Professional & Enterprise tiers)*
+
+> **Note:** "Stock Transfer" is available on **all** plans — it is not a gated feature slug. "Custom Roles" is not an implemented feature — tenant roles are fixed (`superuser`, `staff`, `pos`) with 101 granular permissions.
 
 #### Payment Flow
 
@@ -172,6 +174,8 @@ Internet → [DNS: invent-mag.web.id]
 2. **Production Stage:** PHP environment set up, Nginx installed, assets copied.
 3. **Execution:** `start.sh` runs migrations, caches config, starts both PHP-FPM and Nginx.
 
+**Current production:** Railway (PaaS). **Release automation:** `.github/workflows/deploy.yml` — on a `v*` tag or `workflow_dispatch`, GitHub Actions builds a Docker image to GHCR and SSHes into a VPS (`appleboy/ssh-action`) to `docker-compose pull` + `up -d` with `migrate --force`. Tests run on every push via `.github/workflows/ci.yml`.
+
 ### 1.5 Super Admin Panel (SaaS Management)
 
 **Purpose:** A fully separate admin panel for platform operators to manage tenants, plans, subscriptions, billing, and system configuration.
@@ -184,8 +188,8 @@ Internet → [DNS: invent-mag.web.id]
 | **Guard** | `super_admin` (session-based, defined in `config/auth.php`) |
 | **Provider** | `super_admins` Eloquent provider |
 | **Domain** | Root domain (`invent-mag.web.id`) — not on tenant subdomains |
-| **Routes** | `routes/superadmin.php` — 39 routes, all behind `auth:super_admin` middleware |
-| **Currency** | `PlatformCurrencySetting` — global, no `tenant_id`, independent from `CurrencySetting` |
+| **Routes** | `routes/superadmin.php` — 55 route definitions (guest login group + `auth:super_admin` group) |
+| **Currency** | `PlatformCurrencySetting` — global display preference for super-admin screens only; tenant display uses the single per-tenant `CurrencySetting` system |
 
 **Default credentials:** `superadmin@invent-mag.com` / `password` (seeded via `SuperAdminSeeder`)
 
@@ -225,27 +229,28 @@ Route::middleware('auth:super_admin')->group(function () {
 | `SettingController` | .env editor, user preferences, platform currency config |
 | `CmsController` | Landing page content editor (hero, features, pricing, contact) |
 
-#### Platform Currency System
+#### Platform Currency Display Preference
 
-`PlatformCurrencySetting` is a standalone model (no `BelongsToTenant`) stored in `platform_currency_settings`. It controls how monetary amounts are formatted across all super admin pages — plan prices, subscription orders, billing totals.
+`PlatformCurrencySetting` is a standalone model (no `BelongsToTenant`) stored in `platform_currency_settings` (one global row, seeded USD). It is a **display preference for the super admin's own overview screens** (e.g. payment-overview) — not a second currency system. The currency system that matters is the single per-tenant `CurrencySetting` (one row per tenant, Settings → Currency), which drives `CurrencyHelper::format()` everywhere in the tenant admin panel.
 
 ```php
 // Super admin panel
-CurrencyHelper::formatPlatform($amount);  // Uses PlatformCurrencySetting
+CurrencyHelper::formatPlatform($amount);     // USD, uses PlatformCurrencySetting
+CurrencyHelper::formatPlatformIdr($amount);  // IDR (Rp, id-ID separators) — used for billing/subscription amounts
 
 // Tenant admin panel
 CurrencyHelper::format($amount);           // Uses CurrencySetting (per-tenant)
 ```
 
-Changing the platform currency has zero impact on tenant currencies. The `currency_code` column on `plans` and `subscription_orders` records the currency at time of creation for historical accuracy.
+Changing the super-admin display preference has zero impact on tenant currencies — tenant transactions are always formatted with the tenant's own `CurrencySetting`. The `currency_code` column on `plans` and `subscription_orders` records the currency at time of creation for historical accuracy.
 
-#### Views (28 Blade files in `resources/views/superadmin/`)
+#### Views (30 Blade files in `resources/views/superadmin/`)
 
 Layout: `base.blade.php` → `menu-sidebar.blade.php` + `navbar.blade.php` + content area
 
-Sections: auth, dashboard, tenants, plans, subscriptions, billing, payment-overview, transactions, pending-payments, invoices, backups, audit-log, permissions, settings, features, cms
+Sections: auth, dashboard, tenants, plans, subscriptions, billing, payment-overview, transactions, pending-payments, invoices, backups, audit-log, permissions, settings (incl. billing-rate), features, cms
 
-Tutorial: `config/superadmin-tutorial.php` — 258 lines of route-specific tutorial content displayed via the "How It Works" modal in the super admin base layout.
+Tutorial: `config/superadmin-tutorial.php` — 304 lines of route-specific tutorial content displayed via the "How It Works" modal in the super admin base layout.
 
 #### Migrations
 
@@ -256,6 +261,8 @@ Tutorial: `config/superadmin-tutorial.php` — 258 lines of route-specific tutor
 | `2026_07_06_000001_create_platform_currency_settings_table` | Platform currency config (symbol, separators, position, code) |
 | `2026_07_06_000002_add_currency_code_to_plans_table` | `currency_code` on plans for historical currency tracking |
 | `2026_07_06_000003_add_currency_code_to_subscription_orders_table` | `currency_code` on subscription orders |
+| `2026_08_11_000001_create_billing_settings_table` | Singleton `billing_settings` row: superadmin-managed USD→IDR billing rate (seeded default 16,000) |
+| `2026_08_11_000002_update_subscription_orders_status_enum` | Add `voided` to `subscription_orders.status` enum (void order / terminate subscription flows) |
 
 ---
 
@@ -265,9 +272,9 @@ Tutorial: `config/superadmin-tutorial.php` — 258 lines of route-specific tutor
 
 | Category          | Count | Coverage                        |
 | ----------------- | ----- | ------------------------------- |
-| **Feature Tests** | 42+   | Controllers, Routes, End-to-end |
-| **Unit Tests**    | 48+   | Services, Helpers, DTOs         |
-| **Total Tests**   | 1066  | test files                      |
+| **Feature Tests** | 48+   | Controllers, Routes, End-to-end |
+| **Unit Tests**    | 61+   | Services, Helpers, DTOs         |
+| **Total Tests**   | 1186  | test methods (3715 assertions)  |
 
 ### 2.2 Test Structure
 
@@ -291,8 +298,9 @@ tests/
 │   │   ├── EmailVerificationTest.php
 │   │   └── PasswordUpdateTest.php
 │   ├── Api/
-│   │   ├── TenantLookupControllerTest.php
-│   │   └── MultiTenancyTest.php
+│   │   ├── ContactControllerTest.php
+│   │   └── TenantLookupControllerTest.php
+│   ├── MultiTenancyTest.php
 │   └── MidtransWebhookTest.php
 └── Unit/
     ├── Services/
@@ -402,6 +410,7 @@ routes/
 └── admin/                  # Domain-specific route files
     ├── accounting.php      # Chart of accounts, journal entries, ledger
     ├── auth.php            # Login, password reset, verification
+    ├── bank-reconciliation.php # Bank reconciliation import, matching, reports
     ├── contacts.php        # Customers, suppliers, CRM/SRM details
     ├── crm.php             # Sales pipeline and opportunities
     ├── dashboard.php       # Dashboard and tutorial context
@@ -411,6 +420,7 @@ routes/
     ├── notifications.php   # System notifications, users, audit log
     ├── products.php        # Product CRUD and stock API
     ├── purchases.php       # POs and purchase returns
+    ├── quotations.php      # Quotation lifecycle
     ├── reports.php         # Financial and transaction reports
     ├── sales.php           # Sales orders and sales returns
     └── settings.php        # System, profile, and backup settings
@@ -441,7 +451,7 @@ routes/
 'view-accounting'
 'edit-chart-of-accounts'
 'post-manual-journal'
-// ... 79 total permissions
+// ... 101 total permissions
 
 // Usage in controller
 public function store(Request $request)
@@ -542,11 +552,16 @@ Tenant (1)
 | **product_warehouse** | Stock levels      | 1000s per tenant   |
 | **sales**             | Sales orders      | 10000s per tenant  |
 | **quotations**        | Quotation management (Draft/Sent/Accepted/Rejected/Expired/Converted) | Per tenant  |
-| **purchase_orders**   | POs               | 10000s per tenant  |
+| **po**               | Purchase orders   | 10000s per tenant  |
 | **accounts**          | Chart of accounts | 35+ per tenant     |
 | **journal_entries**   | Accounting        | 10000s per tenant  |
 | **transactions**      | Accounting lines  | 100000s per tenant |
 | **taxes**             | Tax rate/label definitions with `is_ppn` and `is_pph` flags | Per tenant |
+| **faktur_pajak**      | e-Faktur PPN headers (NSFP, snapshotted seller/buyer data, DPP/PPN/PPnBM, DJP submission status) | Per tenant |
+| **faktur_pajak_items**| e-Faktur line items from `sales_items` with BKP/JKP classification | Per tenant |
+| **nsfp_pool**         | Available NSFP numbers imported from DJP, allocated FIFO | Per tenant |
+| **bank_reconciliations** | Bank reconciliation headers (statement period, opening/closing balance, variance) | Per tenant |
+| **bank_reconciliation_items** | Matched/unmatched statement lines with transaction linkage | Per tenant |
 
 ### 4.3 Performance Optimizations
 
@@ -565,11 +580,11 @@ Tenant (1)
 ### 5.1 API Implementation
 
 **Framework:** Laravel Sanctum  
-**Authentication:** Bearer tokens (`api/payment/confirm`); the remaining endpoints are public (auth, CMS, payment webhooks, plan lookup)  
+**Authentication:** Bearer tokens (`api/payment/confirm`, `api/v1/refresh-token`, `api/v1/plans`, `api/v1/plan/current`); the remaining endpoints are public (auth, CMS, marketing pricing via `api/plans`, contact, payment webhooks)  
 **Documentation:** Scribe (auto-generated)  
 **Base URL:** `{app_url}/api` (all routes are registered under the `api` middleware group with the `/api` prefix — see `bootstrap/app.php`)
 
-> **Scope note:** The public REST API is intentionally limited to the **essential endpoints** below (authentication, CMS content, payment confirmations/webhooks, and plan lookups). There is no product/customer/sales CRUD API — all CRUD operations happen in the session-authenticated web admin (`/admin/*`). A broader REST API is an Enterprise roadmap item (`api_access` feature slug).
+> **Scope note:** The public REST API is intentionally limited to the **essential endpoints** below (authentication, CMS content, marketing plan pricing, payment confirmations/webhooks, and authenticated plan lookups). There is no product/customer/sales CRUD API — all CRUD operations happen in the session-authenticated web admin (`/admin/*`). A broader REST API is an Enterprise roadmap item (`api_access` feature slug).
 
 ### 5.2 API Endpoints
 
@@ -581,7 +596,7 @@ The complete, always-current endpoint list is generated by Scribe (`php artisan 
 POST /api/register             # User registration (public)
 POST /api/login                # User login (public)
 POST /api/lookup-tenant        # Tenant discovery by shop name (public)
-POST /api/v1/refresh-token     # Token refresh (public)
+POST /api/v1/refresh-token     # Token refresh (Bearer token, auth:sanctum)
 ```
 
 #### CMS Content
@@ -601,8 +616,9 @@ POST /api/webhook              # Midtrans webhook fallback alias (misconfigured 
 #### Plans
 
 ```http
-GET /api/v1/plans              # List active plans (public)
-GET /api/v1/plan/current       # Current plan for a tenant (public)
+GET /api/plans                # Public marketing pricing data (no auth) — used by the Astro pricing cards
+GET /api/v1/plans             # List active plans (Bearer token, auth:sanctum)
+GET /api/v1/plan/current      # Current plan for a tenant (Bearer token, auth:sanctum)
 ```
 
 #### Contact
@@ -952,6 +968,7 @@ PPh (Pajak Penghasilan) is implemented as a second independent dropdown on sales
 | 2.3     | Aug 2026     | Tax Jurisdiction auto-seed & tutorial clarity: `TaxService::ensureIndonesianDefaults()` auto-creates PPN 11% + PPh 23 2% (idempotent, preserves existing default) whenever a tenant switches to Indonesia (Settings page + e-Faktur settings). 2 new tutorial steps (`tax_jurisdiction_vs_config` on System Settings, `tax_config_vs_jurisdiction` on Tax page) explaining jurisdiction vs tax-configuration; refreshed stale tax steps (`define_tax_rates`, `sales_application`, `tax_configuration_desc`). Bank Recon Import page tutorial context (`admin.bank-reconciliation.create`) + reworded "Statement Start vs System Opening Balance" step. Bug fixes: `bootstrap/app.php` ValidationException renderer preserves Fortify named error bag; `Tenant::canDisableIndonesianJurisdiction()` rewritten to `whereDoesntHave('fakturPajak')` (was querying nonexistent `sales.faktur_pajak_id`); Settings page JS hardened (419/401 reload + real error message); `pkp_date` now date-cast on `Tenant` and `Customer` models (fixes "Call to a member function format() on string" 500 on the e-Faktur Settings page and the identical latent bug in the Customers list when a PKP date is set). Tests: 1151 passing (3480 assertions). |
 | 2.2     | Aug 2026     | Bank Reconciliation module: `BankReconciliationService` + `BankStatementParserFactory` with BCA/Mandiri/BNI/BRI CSV/TXT parsers (auto format detection), auto + manual matching, opening-balance prefill from account Opening Balance, variance gate (completion blocked when variance ≠ 0), entry locking from reverse/void/unpost, and reconciled status badges in Journal/Ledger via `JournalEntry::withReconciledStatus()` (no N+1). Plan feature `bank_reconciliation` gated to Professional+. Migration: `bank_reconciliations` & `bank_reconciliation_items` tables. Tutorial: Opening Balance vs Bank Reconciliation steps (EN/ID). Tests: 23 bank-recon/parser + 46 accounting/journal passing. |
 | 2.1     | Jul 2026     | Tax UX improvements: per-item discount type selector (% vs Fixed) on quotations, tax auto-sync on sales create/edit page load, tax breakdown row on sales-returns show page, pipeline opportunity amount now tax-inclusive grand total. Migration: `notes` & `terms_conditions` columns on `sales` and `sales_opportunities`. Tutorial: 4 new step keys (`tax_auto_sync`, `tax_breakdown_ret`, `opportunity_amount_tax`, `item_discount_type_qt`) with EN/ID translations. Test suite: fixed 17 failing unit tests (528 passed, 0 failed). |
+| 2.0     | Jul 2026     | Platform Currency Display Preference: added `PlatformCurrencySetting` model for super admin overview screens, `CurrencyHelper::formatPlatform()` method, `currency_code` columns on `plans` and `subscription_orders`. Display preference only — the single per-tenant `CurrencySetting` system remains the one currency system. |
 | 1.9     | June 2026    | Sales Pipeline enhancements: Kanban/List view toggle, currency-formatted list view amounts, notes & terms conditions on opportunities, `onPageLoad` deduplication fix preventing double card rendering. Tutorial expansion: Added pipeline and quotation lifecycle tutorial contexts (50+ total contexts), orphaned lang key cleanup, missing Indonesian translations. |
 | 1.8     | June 2026    | System Notifications: Added product expiry alerts (30/7-day windows), subscription plan expiry warnings (14-day), and backup status notifications. POS, Sales Returns & Purchase Returns now available on Starter plan. Architecture fixes: Split `web.php` into domain route files. Migrated `accounting_settings` to `tenants` table. Set Redis as default cache/queue. Implemented CSP nonces. Encrypted backup passwords. |
 | 1.7     | May 2026     | Tutorial HR Expansion: Added HR & Payroll as step 4 in welcome setup workflow (now 6 steps). Added Employees, Attendance, Payroll to Master Data sub-topics. Master Data topic card description updated. |
@@ -966,9 +983,9 @@ PPh (Pajak Penghasilan) is implemented as a second independent dropdown on sales
 
 ---
 
-## 11. Development Team Requirements
+## 12. Development Team Requirements
 
-### 11.1 To Maintain
+### 12.1 To Maintain
 
 | Role                   | Time Required  | Skills              |
 | ---------------------- | -------------- | ------------------- |
@@ -976,7 +993,7 @@ PPh (Pajak Penghasilan) is implemented as a second independent dropdown on sales
 | **Frontend Developer** | 10-20 hrs/week | Tailwind, Alpine.js |
 | **DevOps**             | 5-10 hrs/week  | Docker, CI/CD       |
 
-### 11.2 To Extend
+### 12.2 To Extend
 
 Common extension points:
 
@@ -987,7 +1004,7 @@ Common extension points:
 
 ---
 
-## 12. Deployment Checklist
+## 13. Deployment Checklist
 
 ### Pre-deployment
 
@@ -1016,7 +1033,7 @@ Common extension points:
 
 ---
 
-## 13. Contact & Support
+## 14. Contact & Support
 
 **Developer:** moogie3  
 **Repository:** https://github.com/moogie3/invent-mag  
@@ -1033,6 +1050,8 @@ Common extension points:
 
 | Version | Date     | Changes                                                                                                                                                                       |
 | ------- | -------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 2.5     | Aug 2026 | VAT accounting fix (Phase 1E): PPN Keluaran recognized at sale creation (`SalesService::createSale()` + `PosService` post 5-leg VAT-split journal), e-Faktur issuance compliance-only, `SalesReturnService` PPN reversals trigger on `isPpn()` without a Faktur Pajak, seeded `PPH 22` replaced by `PPh Final 0.5%` (PP 23/2018) with in-place backfill migration. |
+| 2.4     | Aug 2026 | PPN Masukan (Input VAT on Purchases): `po` snapshot fields, PurchaseService journal splits `Dr Inventory (net)` + `Dr Input VAT (1160)`, `ppn_masukan_account_id` on Accounting Settings, SPT Masa PPN summary includes Masukan/Kurang/Lebih Bayar. |
 | 1.0     | Feb 2026 | Initial technical specification                                                                                                                                               |
 | 1.0     | Feb 2026 | Added comprehensive test coverage stats and documented returns fixes                                                                                                          |
 | 1.0     | Mar 2026 | Full Production Architecture: Subdomain isolation (`*.invent-mag.web.id`), Resend API Email Integration, Advanced Rate Limiting, Midtrans Tenant-Aware Webhooks, CI/CD fixes. |
@@ -1043,7 +1062,7 @@ Common extension points:
 | 1.9     | June 2026    | Sales Pipeline enhancements, tutorial contexts expansion, lang cleanup, onPageLoad deduplication fix. |
 | 1.8     | May 2026     | Architecture Assessment Fixes: Migrated accounting settings to tenants, implemented CSP nonces, split route files, encrypted backup keys, made Redis the default. |
 | 1.7     | May 2026     | Tutorial HR Expansion: Added HR & Payroll to welcome setup workflow. Added Employees, Attendance, Payroll to Master Data sub-topics. Tech spec category count updated (6→7), context count updated (30+→40+). |
-| 2.0     | Jul 2026     | Platform Currency System: Added `PlatformCurrencySetting` model for super admin panel, `CurrencyHelper::formatPlatform()` method, `currency_code` columns on `plans` and `subscription_orders` tables. Super admin currency is now fully independent from tenant `CurrencySetting`. All hardcoded `$` displays replaced with dynamic `formatPlatform()`. |
+| 2.0     | Jul 2026     | Platform Currency Display Preference: Added `PlatformCurrencySetting` model for super admin overview screens, `CurrencyHelper::formatPlatform()` method, `currency_code` columns on `plans` and `subscription_orders` tables. This is a display preference only — the single tenant `CurrencySetting` system remains the one currency system. All hardcoded `$` displays replaced with dynamic `formatPlatform()`. |
 | 2.1     | Jul 2026     | Tax UX improvements and tutorial expansion (per-item discount type on quotations, tax auto-sync on sales, sales return tax breakdown, pipeline opportunity amount tax-inclusive, notes/terms columns migration, 4 new tutorial step keys, 17 failing unit tests fixed — 528 passing, 0 failed). |
 | 2.3     | Aug 2026     | Tax Jurisdiction auto-seed (PPN 11% + PPh 23 2% auto-created on switch to Indonesia), 2 new Tax Jurisdiction vs Tax Configuration tutorial steps + refreshed stale tax steps, Bank Recon Import page tutorial, bug fixes (Fortify error bag, `canDisableIndonesianJurisdiction()` whereDoesntHave, Settings JS hardening, `pkp_date` date cast on Tenant/Customer fixing the e-Faktur Settings page crash). 1151 tests passing. |
 | 2.2     | Aug 2026     | Bank Reconciliation module: BCA/Mandiri/BNI/BRI CSV/TXT import with auto format detection, auto + manual matching, opening-balance prefill, variance gate, entry locking, reconciled status badges in Journal/Ledger. New tables `bank_reconciliations` & `bank_reconciliation_items`. Feature gated to Professional+. Opening Balance vs Bank Reconciliation tutorial steps added. |

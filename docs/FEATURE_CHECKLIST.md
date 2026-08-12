@@ -1,8 +1,8 @@
 # Invent-MAG: Complete Feature Checklist
 
 **Last Updated:** August 2026  
-**Version:** 2.6  
-**System Version:** 2.1
+**Document Version:** 2.8  
+**System Version:** 2.5
 
 ---
 
@@ -105,7 +105,7 @@
 - [x] Adjustment log integration
 - [x] Activity log tracking (MODULE_STOCK_TRANSFER)
 - [x] Demo data seeder (`StockTransferSeeder`)
-- [x] Full test suite (`StockTransferControllerTest` — 7 tests)
+- [x] Full test suite (`StockTransferControllerTest` — 8 tests)
 - [x] Linked from product edit page and adjustment log page
 
 ---
@@ -306,13 +306,15 @@
 
 #### Advanced Accounting
 
-- [x] Multi-currency support
-- [x] Currency configuration
+- [x] Currency formatting configuration (per-tenant `CurrencySetting` — symbol, separators, decimal places, position, code, locale; **no exchange-rate tracking**, see note below)
+- [x] Currency configuration (one row per tenant)
 - [x] Opening balance setup wizard (New Fiscal Year)
 - [x] General Ledger accurately factors in Sales/Purchase Returns
 - [x] Recurring journal entry infrastructure
 - [x] Journal entry approval workflow
 - [x] Comprehensive accounting audit log
+
+> **Note:** The `multi_currency` plan feature gates the per-tenant currency **formatting** page (`routes/admin/settings.php` → `plan.feature:multi_currency`). The `currency_settings` table stores display formatting only — there is **no** exchange-rate column and no multi-currency conversion engine. "Multi-currency with real-time exchange rates" is still a planned item (see PLANNED FEATURES → High Priority).
 
 #### Bank Reconciliation (Professional + Enterprise)
 - [x] CSV/TXT statement import (BCA, Mandiri, BNI, BRI) with per-bank parser + auto delimiter/number/date detection
@@ -398,9 +400,9 @@
 
 ### ⚙️ System Settings
 
-- [x] Currency settings
-- [x] Multi-currency configuration
-- [x] Platform currency setting (Super Admin) — independent from tenant currencies
+- [x] Currency settings (per-tenant display formatting — single currency system)
+- [x] Currency configuration (one row per tenant; formatting only, no FX rates)
+- [x] Platform currency display preference (Super Admin overview screens only — tenant `CurrencySetting` is the single currency system)
 - [x] Tax configuration
 - [x] Dynamic tax rates
 - [x] **Auto-seeded Indonesian defaults** — PPN 11% + PPh 23 2% + PPh Final 0.5% created automatically when Tax Jurisdiction is switched to Indonesia (no manual setup needed); full six-record catalog via `TaxSeeder` (adds PPN 12%, Non-PKP, PPN Inclusive)
@@ -460,8 +462,8 @@
 - [x] CMS editor for hero section, features, pricing, and contact content
 
 #### Views & Tutorial
-- [x] 28 Blade views in `resources/views/superadmin/`
-- [x] Dedicated tutorial system (`config/superadmin-tutorial.php` — 258 lines)
+- [x] 29 Blade views in `resources/views/superadmin/`
+- [x] Dedicated tutorial system (`config/superadmin-tutorial.php` — 304 lines)
 - [x] Sidebar navigation with grouped sections (Management, Payments, System, Configuration)
 
 ---
@@ -478,7 +480,7 @@
 - [x] `Sales::fakturPajak()` HasOne relationship
 - [x] `EFakturService` — generate, cancel, NSFP import, DJP CSV export, SPT Masa summary
 - [x] Atomic NSFP allocation with `lockForUpdate()` (race condition safe)
-- [x] PPN Keluaran journal entry via `AccountingService` on faktur generation
+- [x] PPN Keluaran journal entry via `AccountingService` on faktur generation — **superseded by Phase 1E (Aug 2026):** Faktur Pajak generation no longer posts a journal (compliance-only); PPN Keluaran is recognized at sale creation via the VAT-split journal in `SalesService::createSale()`/`PosService`
 - [x] `EFakturController` — index, show, generate, cancel, print (Dompdf PDF), exportCsv, settings, saveSettings, importNsfp
 - [x] Routes in `routes/admin/efaktur.php` under `plan.feature:ppn` middleware
 - [x] Blade views: `efaktur/index.blade.php`, `show.blade.php`, `settings.blade.php`, `faktur-pdf.blade.php`
@@ -525,7 +527,7 @@
 - [x] Authentication: `POST /api/register`, `POST /api/login`, `POST /api/lookup-tenant`, `POST /api/v1/refresh-token`
 - [x] CMS: `GET /api/cms`
 - [x] Payments: `POST /api/payment/confirm` (Bearer), `POST /api/webhooks/midtrans`, `POST /api/webhook`
-- [x] Plans: `GET /api/v1/plans`, `GET /api/v1/plan/current`
+- [x] Plans: `GET /api/plans` (public marketing pricing), `GET /api/v1/plans`, `GET /api/v1/plan/current`
 - [x] Contact: `POST /api/contact` (marketing-site form → founder email)
 
 > Admin CRUD (products, suppliers, customers, stock, settings, etc.) is **session-authenticated web AJAX under `/admin/*`** — not part of the REST API. Full REST CRUD is a future Enterprise expansion.
@@ -557,7 +559,7 @@
 - [x] GitHub Actions CI/CD
 - [x] Automated testing pipeline
 - [x] Deployment workflow
-- [x] Backup system (Spatie)
+- [x] Backup system (custom `backup:tenant` command — per-table mysqldump with `tenant_id` filter, zipped; not Spatie)
 
 ---
 
@@ -660,18 +662,18 @@
 | -------------------- | --------- |
 | **Total Features**   | 220+      |
 | **Controllers**      | 62        |
-| **Services**         | 46        |
-| **Models**           | 51        |
+| **Services**         | 54        |
+| **Models**           | 53        |
 | **Helpers**          | 6         |
 | **Test Methods (PHP)** | 1186     |
 | **Test Assertions (PHP)** | 3715   |
 | **JS Test Files**    | 169       |
 | **API Endpoints**    | 11        |
-| **Database Tables**  | 55        |
-| **Migrations**       | 100+      |
+| **Database Tables**  | 57        |
+| **Migrations**       | 106       |
 | **Seeders**          | 36        |
 | **Permissions**      | 101       |
-| **Routes**           | 220+      |
+| **Routes**           | 437       |
 | **JavaScript Files** | 189       |
 | **Languages**        | 2 (EN/ID) |
 | **Development Time** | 1.5 years |
@@ -692,5 +694,5 @@
 
 ---
 
-**Document Version:** 2.7  
+**Document Version:** 2.8  
 **Last Updated:** August 2026

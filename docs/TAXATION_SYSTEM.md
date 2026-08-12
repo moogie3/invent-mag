@@ -137,7 +137,7 @@ The same `tax_id` selection drives calculation and accounting on:
 
 ### 4.3 Snapshots
 
-`ppn_enabled/ppn_rate/ppn_amount` and `pph_enabled/pph_rate/pph_amount` are **denormalized snapshots** copied from the selected Tax at creation time. They exist for historical accuracy (a Tax record edited later must not rewrite history) and performance. Helpers `Sales::isPpn()` / `Sales::isPph()` read the snapshot with a live-tax fallback when the relationship is already loaded.
+`ppn_enabled/ppn_rate/ppn_amount` and `pph_enabled/pph_rate/pph_amount` are **denormalized snapshots** copied from the selected Tax at creation time. They exist for historical accuracy (a Tax record edited later must not rewrite history) and performance. Helpers `Sales::isPpn()` / `Sales::isPph()` read the snapshot **only** — never the live `Tax` relationship.
 
 **Critical:** toggling a Tax record's flags or switching `tax_jurisdiction` **never retroactively changes existing documents** — the snapshot is the source of truth for history.
 
@@ -168,9 +168,9 @@ The same `tax_id` selection drives calculation and accounting on:
 
 - `is_pph = true` tax selected → `pph_*` snapshot stored on the document.
 - PPh **subtracts** from the total (the payer owes less because tax is withheld at source).
-- **Sale side:** `Dr PPh Receivable (1170) / Cr PPh Payable (2150)` posted at invoice time (Mekari pattern).
-- **Purchase side:** the reverse (`Dr PPh Payable / Cr PPh Receivable`).
-- Both types share the same two accounts (1170/2150) — they are distinguished only by the seeded name/rate; see §9 Caveat #4.
+- **Sale side:** `Dr PPh Receivable (1170) / Cr Accounts Receivable` posted at invoice time (Mekari pattern) — the customer owes the net-of-withholding amount.
+- **Purchase side:** `Cr PPh Payable (2150)` alongside `Dr Inventory / Cr AP` — the company withholds from the supplier and remits to DJP.
+- PPh types share two accounts (1170 receivable / 2150 payable) — distinguished only by the seeded name/rate; see §9 Caveat #4.
 
 ### 5.4 Non-PKP / general / no tax
 
@@ -204,10 +204,10 @@ Identical VAT split in the POS journal (also 5 legs). `sourceable = Sales` (type
 
 ```
 Dr. PPh Receivable (1170-{tid})   pph_amount
-Cr. PPh Payable   (2150-{tid})   pph_amount
+Cr. Accounts Receivable           pph_amount
 ```
 
-Standalone entry, independent of PPN. Posted at invoice time.
+Standalone entry, independent of PPN. Posted at invoice time; the credit reduces the net amount the customer owes.
 
 ### 6.4 Purchase with PPN Masukan + PPh
 
@@ -270,7 +270,7 @@ Revenue was credited at the tax-inclusive total. **Fixed** by the 5-leg split (�
 
 ### Caveat #4 (KNOWN LIMITATION) — Shared PPh accounts
 
-All PPh types post to the same PPh Payable (2150). Distinct seeded types (PPh 23 vs PPh Final 0.5%) are therefore not separately reportable in the ledger. This is deliberate (fewer records = more accurate single liability); a PPh sub-ledger is future work.
+PPh Payable (2150) is the shared withholding liability **credited on the purchase side**; on the sale side the receivable is booked as `PPh Receivable (1170)` offset against AR. All PPh types post to these same two accounts. Distinct seeded types (PPh 23 vs PPh Final 0.5%) are therefore not separately reportable in the ledger. This is deliberate (fewer records = more accurate single liability); a PPh sub-ledger is future work.
 
 ### Caveat #5 (KNOWN LIMITATION) — POS lacks PPN snapshot fields
 
@@ -284,9 +284,9 @@ POS `Sales::create` does not persist `ppn_enabled/ppn_rate/ppn_amount`, so histo
 | --- | --- | --- |
 | `taxes` | `name`, `rate`, `type`, `is_ppn`, `is_pph`, `is_default` | Tax definitions (seed set in §3) |
 | `sales` | `tax_id`, `ppn_*`, `pph_*`, `total_tax` | Document snapshots |
-| `purchase_orders` | `tax_id`, `ppn_*`, `pph_*` | Document snapshots |
+| `po` | `tax_id`, `ppn_*`, `pph_*` | Document snapshots |
 | `quotations` | `tax_id`, `pph_*` | Document snapshots |
-| `faktur_pajaks` | `sales_id`, `nsfp`, `dpp`, `ppn`, `status` | DJP tax invoice |
+| `faktur_pajak` | `sales_id`, `nsfp`, `dpp`, `ppn`, `status` | DJP tax invoice |
 | `accounting_settings` | `ppn_keluaran_account_id`, `ppn_masukan_account_id`, `pph_receivable_account_id`, `pph_payable_account_id` | GL account wiring |
 
-Seed account codes (per-tenant suffix): PPN Keluaran `2110-{tid}`, PPN Masukan `1160-{tid}`, PPh Receivable `1170-{tid}`, PPh Payable `2150-{tid}`, Inventory `1140-{tid}`, AR `1100-{tid}`, AP `2110-{tid}`.
+Seed account codes (per-tenant suffix): PPN Keluaran `2130-{tid}`, PPN Masukan `1160-{tid}`, PPh Receivable `1170-{tid}`, PPh Payable `2150-{tid}`, Inventory `1140-{tid}`, AR `1130-{tid}`, AP `2110-{tid}`.

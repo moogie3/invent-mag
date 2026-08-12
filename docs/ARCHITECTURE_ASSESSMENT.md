@@ -1,10 +1,10 @@
 # Invent-MAG: Senior Engineer Architecture Assessment
 
 **Assessor:** Senior Software Engineer (AI-assisted deep codebase review)
-**Codebase Version:** 2.1
+**Codebase Version:** 2.5
 **Review Date:** June 2026
 **Development Context:** Solo developer, 1.5 years, 527+ commits, production SaaS
-**Last Updated:** August 2026 (rev 14) — VAT accounting fixed and the seeded withholding tax corrected. PPN Keluaran is now recognized at **sale creation** (5-leg VAT split `Dr AR gross / Cr Revenue net / Cr PPN Keluaran`) instead of Faktur Pajak issuance — resolving the double-posted AR audit finding; Faktur issuance is compliance-only. Seed `PPH 22` (1.5%) replaced by **`PPh Final 0.5%`** (PP 23/2018 UMKM final income tax) with an in-place backfill migration. Full suite: 1167 passing (3586 assertions). Rating: 9.5/10.
+**Last Updated:** August 2026 (rev 14) — VAT accounting fixed and the seeded withholding tax corrected. PPN Keluaran is now recognized at **sale creation** (5-leg VAT split `Dr AR gross / Cr Revenue net / Cr PPN Keluaran`) instead of Faktur Pajak issuance — resolving the double-posted AR audit finding; Faktur issuance is compliance-only. Seed `PPH 22` (1.5%) replaced by **`PPh Final 0.5%`** (PP 23/2018 UMKM final income tax) with an in-place backfill migration. Full suite: 1186 passing (3715 assertions). Rating: 9.5/10.
 
 ---
 
@@ -12,11 +12,11 @@
 
 > **August 2026 Update (rev 14):** VAT accounting correctness + seeded tax correction. An accounting audit found PPN Keluaran was recognized at Faktur Pajak issuance (via `EFakturService::postPpnKeluaranJournalEntry()`) on top of the gross-revenue entry posted at sale creation — double-posting AR for PPN sales and booking revenue gross of VAT. Fix (Phase 1E): `SalesService::createSale()` and `PosService` now post a single 5-leg VAT-split journal (`Dr AR gross / Cr Revenue net / Cr PPN Keluaran`) when an Indonesian PPN tax is selected and `ppn_keluaran_account_id` is configured, with a graceful 4-leg gross-revenue fallback otherwise; the e-Faktur journal post was deleted so Faktur issuance is compliance-only; `SalesReturnService` reverses PPN whenever the sale `isPpn()` (no Faktur Pajak required); `cancelFakturPajak()` still reverses legacy FP-sourced PPN journals. Separately, the seeded `PPH 22` (1.5%) — rarely applicable to SME *sales* — was replaced by **`PPh Final 0.5%`** (PP 23/2018 UMKM final income tax); migration `2026_08_05_000002` converts existing rows in place so `pph_tax_id` references and historical snapshots are preserved. New coverage: +3 tax tests (VAT split, fallback, POS split). See `docs/TAXATION_SYSTEM.md`.
 
-> **August 2026 Update (rev 13):** Tax onboarding clarity + correctness fixes. `TaxService::ensureIndonesianDefaults()` auto-creates the standard PPN 11% (`is_ppn`) and PPh 23 2% (`is_pph`) records when a tenant switches its Tax Jurisdiction to Indonesia (Settings page or e-Faktur settings) — idempotent and never overriding an existing default, so users aren't forced through a confusing extra configuration step. Tutorial system gains 2 new steps (`tax_jurisdiction_vs_config` on System Settings, `tax_config_vs_jurisdiction` on the Tax page) and the stale `define_tax_rates` / `sales_application` / `tax_configuration_desc` steps were corrected; the Bank Reconciliation Import page gets a dedicated context. Two bug fixes: `Tenant::canDisableIndonesianJurisdiction()` previously queried a nonexistent `sales.faktur_pajak_id` column (SQL error → generic alert) and now uses `whereDoesntHave('fakturPajak')`; the `bootstrap/app.php` ValidationException renderer drops Fortify's named `updatePassword` bag (now `->withErrors($e->errors(), $e->errorBag)`), fixing `PasswordUpdateTest`. Settings page JS hardened to reload on 419/401 and show the real message. Full suite: 1146 passing (3470 assertions).
+> **August 2026 Update (rev 13):** Tax onboarding clarity + correctness fixes. `TaxService::ensureIndonesianDefaults()` auto-creates the standard PPN 11% (`is_ppn`) and PPh 23 2% (`is_pph`) records when a tenant switches its Tax Jurisdiction to Indonesia (Settings page or e-Faktur settings) — idempotent and never overriding an existing default, so users aren't forced through a confusing extra configuration step. Tutorial system gains 2 new steps (`tax_jurisdiction_vs_config` on System Settings, `tax_config_vs_jurisdiction` on the Tax page) and the stale `define_tax_rates` / `sales_application` / `tax_configuration_desc` steps were corrected; the Bank Reconciliation Import page gets a dedicated context. Two bug fixes: `Tenant::canDisableIndonesianJurisdiction()` previously queried a nonexistent `sales.faktur_pajak_id` column (SQL error → generic alert) and now uses `whereDoesntHave('fakturPajak')`; the `bootstrap/app.php` ValidationException renderer drops Fortify's named `updatePassword` bag (now `->withErrors($e->errors(), $e->errorBag)`), fixing `PasswordUpdateTest`. Settings page JS hardened to reload on 419/401 and show the real message. Full suite: 1186 passing (3715 assertions).
 
 > **August 2026 Update (rev 12):** Bank Reconciliation module is fully implemented, closing the last significant feature gap. `BankReconciliationService`, `BankStatementParserFactory` with BCA/Mandiri/BNI/BRI parsers (CSV/TXT, auto format detection), opening-balance prefill from the account's Opening Balance, variance gate (completion blocked when variance ≠ 0, within 0.005 tolerance), locking of matched entries from reverse/void/unpost, and reconciled-status badges surfaced in Journal/Ledger via `JournalEntry::withReconciledStatus()`. Tutorial steps added clarifying Opening Balance vs Bank Reconciliation. 69 related tests passing (23 bank-recon/parser + 46 accounting/journal). Rating raised from 9.0 to 9.5.
 
-> **July 2026 Update (rev 11):** e-Faktur Phase 1 complete. Tax jurisdiction toggling, navigation filtering, POS/Quotation tax model integration, PPN backward compatibility enforced via snapshot pattern, PPh (Withholding Tax) implemented. Test suite: 552 PHP tests / 2541 PHP assertions + 169 JS Vitest files.
+> **July 2026 Update (rev 11):** e-Faktur Phase 1 complete. Tax jurisdiction toggling, navigation filtering, POS/Quotation tax model integration, PPN backward compatibility enforced via snapshot pattern, PPh (Withholding Tax) implemented. Test suite: 1186 PHP tests / 3715 PHP assertions + 169 JS Vitest files.
 
 > **June 2026 Update (rev 7):** Full re-scan of the v1.9 codebase plus the Tax system improvement completed. All previously open items from rev 6 are now resolved: (1) `'unsafe-eval'` in CSP is documented with an explicit comment in `SecurityHeaders.php` identifying the libraries that require it (jQuery `$.globalEval`, Chart.js dynamic renderers); (2) `Tenant::initializeBillingPeriod()` now uses rolling 30 days matching `BillingService`. Additionally, the Tax system has been fully rewritten: full CRUD with TaxController + TaxService, CRUD list Blade view replacing the old single-record form, three tax types (exclusive/inclusive/none), `tax_id` FK + snapshot columns on financial documents, POS automatically uses default tax, SalesReturnService copies tax data from sale, and 16 new feature tests pass.
 
@@ -83,11 +83,11 @@ The backward compatibility for legacy tenants (`plans.legacy_full_access = true`
 
 ### 1.4 The Test Coverage Is Honest
 
-552 PHP test methods (2541 PHP assertions) across 267 test files (42 Feature + 56 Unit PHP + 169 JS Vitest) is real coverage for an ERP domain. The `CreatesTenant` trait in `tests/Traits/` makes tenant-scoped tests composable without boilerplate. `MultiTenancyTest.php` is a direct test of the most dangerous failure mode in the entire system.
+1186 PHP test methods (3715 PHP assertions) across 278 test files (48 Feature + 61 Unit PHP + 169 JS Vitest) is real coverage for an ERP domain. The `CreatesTenant` trait in `tests/Traits/` makes tenant-scoped tests composable without boilerplate. `MultiTenancyTest.php` is a direct test of the most dangerous failure mode in the entire system.
 
 The existence of `MidtransWebhookTest.php` is particularly good — it tests the payment callback path including signature verification, which is easy to skip in testing and catastrophic to get wrong in production.
 
-The JS tests via Vitest covering 171 files suggest that the frontend calculation logic (currency formatting, sales totals, discount application) is tested independently of the server, which is the right approach for financial calculation code that runs in the browser.
+The JS tests via Vitest covering 169 files suggest that the frontend calculation logic (currency formatting, sales totals, discount application) is tested independently of the server, which is the right approach for financial calculation code that runs in the browser.
 
 ---
 
@@ -123,8 +123,8 @@ The Super Admin panel is architecturally distinct from the tenant admin panel �
 | Auth Guard | `super_admin` (session-based) | `web` (session-based) |
 | Provider | `super_admins` Eloquent provider | `users` Eloquent provider |
 | Domain | Root domain (`invent-mag.web.id`) | Subdomain (`tenant.invent-mag.web.id`) |
-| Routes | `routes/superadmin.php` (single file, 39 routes) | `routes/admin/*.php` (14 domain files) |
-| Currency | `PlatformCurrencySetting` (global, not tenant-scoped) | `CurrencySetting` (per-tenant via `BelongsToTenant`) |
+| Routes | `routes/superadmin.php` (single file, 55 routes) | `routes/admin/*.php` (16 domain files) |
+| Currency | `PlatformCurrencySetting` (global display preference for super-admin screens only) | `CurrencySetting` (the single currency system, per-tenant via `BelongsToTenant`) |
 | Roles | No RBAC — full access by design | Spatie Permission (superuser, staff, pos) |
 | Session | Separate session namespace | Tenant-scoped session |
 
@@ -134,7 +134,7 @@ The Super Admin panel is architecturally distinct from the tenant admin panel �
 
 2. **Domain isolation.** The super admin panel runs on the root domain. Tenant admin runs on subdomains. The `SESSION_DOMAIN=.invent-mag.web.id` cookie scoping means a super admin session is never sent to tenant subdomains and vice versa. This is a correct implementation of the single-tenancy boundary.
 
-3. **Currency separation.** `PlatformCurrencySetting` is a standalone model (no `BelongsToTenant` trait, no `tenant_id` column). `CurrencyHelper::formatPlatform()` is a distinct method from `CurrencyHelper::format()`. The super admin panel formats subscription prices, billing amounts, and plan pricing using `formatPlatform()`; tenant-facing pages use `format()`. Changing the platform currency (e.g., from USD to IDR) has zero impact on tenant currency settings.
+3. **Currency is a single tenant system.** The currency setting system is the per-tenant `CurrencySetting` (one row per tenant, `BelongsToTenant`, drives `CurrencyHelper::format()` for every tenant-facing display). The super admin `PlatformCurrencySetting` (`formatPlatform()`) is only a display preference for the super admin's own overview screens — not a separate currency system. Tenant transactions are always formatted in the tenant's own currency, regardless of the super-admin display preference.
 
 4. **No role explosion.** The super admin has no need for granular RBAC — there is only one (or very few) super admin users. Adding Spatie roles to the super admin panel would be over-engineering. The `auth:super_admin` guard is sufficient.
 
@@ -290,7 +290,7 @@ The encrypted backup and the key to decrypt it are stored in the same MySQL data
 
 > **Resolution:** Scribe config cleaned: the 4 admin AJAX routes (`po.bulk-delete`, `po.bulk-mark-paid`, `admin.product.quickCreate`, `product.bulk-delete`) were moved from `include` to `exclude` in `config/scribe.php`. The `prefixes` filter (`api/*`) already excluded `/admin/*` routes. Web AJAX endpoints under `/admin/` remain session-authenticated and are explicitly excluded from API docs.
 >
-> **Follow-up fix (Aug 2026):** The API routes in `bootstrap/app.php` were being registered at the domain root (no `/api` prefix, no `api` middleware group) because the custom `using:` closure bypassed Laravel's automatic prefix wiring — while the FE (`/api/register`, `/api/lookup-tenant`), the Scribe `api/*` filter, and the exception handler (`$request->is('api/*')`) all expected `/api/*`. The routes are now explicitly wrapped with `Route::middleware('api')->prefix('api')->group(...)` in `bootstrap/app.php`. Scribe now documents exactly the 11 essential `/api/*` endpoints: `register`, `login`, `lookup-tenant`, `v1/refresh-token` (public auth), `cms` (public CMS), `contact` (public contact form), `payment/confirm` (Bearer, `auth:sanctum`), `webhooks/midtrans` + `webhook` (HMAC-signed webhooks), and `v1/plans` + `v1/plan/current` (public plan lookup). The stale artifacts (`resources/views/scribe/index.blade.php`, `storage/app/scribe/`, dead `product.bulk-stock-details` route) were removed. `Api\ContactController` was initially flagged as dead but was wired up instead: it is now served by the public `POST /api/contact` endpoint, uses the new `App\Mail\ContactFormMail` mailable + `emails.contact-form` template, and the marketing site's contact forms (`invent-mag-fe/src/pages/contact.astro` and `id/contact.astro`) were switched from the Web3Forms third-party service to this backend endpoint.
+> **Follow-up fix (Aug 2026):** The API routes in `bootstrap/app.php` were being registered at the domain root (no `/api` prefix, no `api` middleware group) because the custom `using:` closure bypassed Laravel's automatic prefix wiring — while the FE (`/api/register`, `/api/lookup-tenant`), the Scribe `api/*` filter, and the exception handler (`$request->is('api/*')`) all expected `/api/*`. The routes are now explicitly wrapped with `Route::middleware('api')->prefix('api')->group(...)` in `bootstrap/app.php`. Scribe now documents exactly the 12 essential `/api/*` endpoints: `register`, `login`, `lookup-tenant` (public auth), `cms` (public CMS), `plans` (public marketing pricing — added Aug 2026 for the data-driven pricing cards), `contact` (public contact form), `webhooks/midtrans` + `webhook` (HMAC-signed webhooks), and `payment/confirm`, `v1/refresh-token`, `v1/plans` + `v1/plan/current` (Bearer, `auth:sanctum`). The stale artifacts (`resources/views/scribe/index.blade.php`, `storage/app/scribe/`, dead `product.bulk-stock-details` route) were removed. `Api\ContactController` was initially flagged as dead but was wired up instead: it is now served by the public `POST /api/contact` endpoint, uses the new `App\Mail\ContactFormMail` mailable + `emails.contact-form` template, and the marketing site's contact forms (`invent-mag-fe/src/pages/contact.astro` and `id/contact.astro`) were switched from the Web3Forms third-party service to this backend endpoint.
 
 The documented API endpoints include:
 
@@ -443,7 +443,7 @@ The following are gaps relative to what the system claims to be (a production ER
 | ~~Forecast accuracy metrics (MAPE/RMSE)~~      | ~~Medium~~   | ~~The feature is listed as implemented in the feature checklist but does not exist in the codebase.~~ **✅ Resolved May 2026**                                                                                                                          |
 | ~~Redis as default for cache and queue~~       | ~~Medium~~   | ~~Required before the horizontal scaling claim is accurate.~~ **✅ Resolved May 2026**                                                                                                                                                                  |
 | ~~Route file splitting~~                       | ~~Low~~      | ~~Maintainability improvement, not a functional gap.~~ **✅ Resolved May 2026**                                                                                                                                                                         |
-| API boundary cleanup (web vs. REST separation) | **✅ DONE**  | Scribe scope cleaned May 2026 (admin AJAX excluded) + `/api` prefix restored Aug 2026 (routes were being registered at root). Scribe documents the 11 essential `/api/*` endpoints; only `api/payment/confirm` is Bearer-authenticated.                              |
+| API boundary cleanup (web vs. REST separation) | **✅ DONE**  | Scribe scope cleaned May 2026 (admin AJAX excluded) + `/api` prefix restored Aug 2026 (routes were being registered at root). Scribe documents the 12 essential `/api/*` endpoints; the token-protected ones (`auth:sanctum`) are `api/payment/confirm`, `api/v1/refresh-token`, `api/v1/plans`, and `api/v1/plan/current`.                              |
 | ~~Backup password encryption~~                 | ~~Medium~~   | ~~Backup password stored plaintext in same DB as the data it protects.~~ **✅ Resolved May 2026**                                                                                                                                                       |
 
 ---
@@ -470,7 +470,7 @@ If this codebase were presented to me in a technical due diligence for acquisiti
 
 5. **Billing period inconsistency** — ✅ **RESOLVED**. `Tenant::initializeBillingPeriod()` now uses `addDays(30)` instead of calendar month, matching `BillingService`. `getNextBillingPeriod()` similarly updated to rolling 30-day periods. The v1.7 changelog commitment to rolling 30 days is now consistently applied across the codebase.
 
-**The softer issues are fully resolved.** The `is_pos` flag replaced with `type`. Tutorial system is data-driven via `config/tutorial.php` + `TutorialService`. Route file split into 14 domain-specific files. The inaccurate "Repository Pattern" claim corrected. These are closed.
+**The softer issues are fully resolved.** The `is_pos` flag replaced with `type`. Tutorial system is data-driven via `config/tutorial.php` + `TutorialService`. Route file split into 16 domain-specific files. The inaccurate "Repository Pattern" claim corrected. These are closed.
 
 **The feature gaps are known and roadmapped.** Bank Reconciliation — the most significant missing accounting control — was fully implemented in August 2026 (import, matching, variance gate, locking, reconciled badges). e-Faktur compliance Phase 1 (in-system PPN + e-Faktur preparation) is DONE; Phase 2 (PJAP API direct DJP submission) is the remaining market-fit item and is roadmapped.
 
@@ -505,7 +505,7 @@ The following items remain open as of June 2026. All previously closed items are
 | 5 | **High** | ✅ **DONE** | **Add Bank Reconciliation module** — implemented August 2026: BankReconciliationService, BankStatementParserFactory (BCA/Mandiri/BNI/BRI), auto format detection, auto/manual matching, opening-balance prefill, variance gate, entry locking, reconciled badges in Journal/Ledger |
 | 6 | Medium | ✅ DONE | Split `routes/web.php` into per-domain route files |
 | 7 | Medium | ✅ DONE | Implement Holt-Winters `optimizeHoltWinters()` grid search; MAPE surfaced in dashboard |
-| 8 | Medium | ✅ DONE | Clean Scribe scope — admin AJAX excluded; `/api` prefix restored Aug 2026; docs cover the 11 essential `/api/*` endpoints |
+| 8 | Medium | ✅ DONE | Clean Scribe scope — admin AJAX excluded; `/api` prefix restored Aug 2026; docs cover the 12 essential `/api/*` endpoints |
 | 9 | Medium | ✅ DONE | Encrypt `backup_password` via Laravel `encrypted` cast |
 | 10 | Low | ✅ DONE | Refactor tutorial system — `config/tutorial.php` + `TutorialService`; no conditional ladder |
 | 11 | Low | ✅ DONE | Replace `is_pos` boolean with `type` string column on `sales` |
@@ -546,13 +546,13 @@ The following items remain open as of June 2026. All previously closed items are
 - Feature-gated `bank_reconciliation` slug on Professional + Enterprise plans; legacy tenants get full access
 - Plan feature summary added under the Import title; Opening Balance vs Bank Reconciliation tutorial steps added
 
-**Post-assessment addition (Jul 2026): Platform Currency System**
-- Added `PlatformCurrencySetting` model (super admin currency) fully independent from tenant `CurrencySetting`
-- `CurrencyHelper::formatPlatform()` provides dynamic platform currency formatting
+**Post-assessment addition (Jul 2026): Platform Currency Display Preference**
+- Added `PlatformCurrencySetting` model for super admin overview screens (display preference only — the single tenant `CurrencySetting` system remains the one currency system)
+- `CurrencyHelper::formatPlatform()` provides dynamic platform display formatting
 - `currency_code` columns added to `plans` and `subscription_orders` tables
 - All super admin monetary displays now use `formatPlatform()` instead of hardcoded `$`
-- Changing platform currency has zero impact on tenant currency settings
+- The super-admin display preference has zero impact on tenant currencies
 
 ---
 
-_This assessment is based on full static analysis of the v2.1 codebase: all source files, migrations, services, controllers, middleware, config, tests, and documentation. Covers all models (51), services (46), route files (15 admin + api + web + console + turbo), migration files (100+), and 552 test methods (2541 assertions) across 267 test files (42 Feature + 56 Unit PHP + 169 JS Vitest). No runtime profiling performed._
+_This assessment is based on full static analysis of the v2.5 codebase: all source files, migrations, services, controllers, middleware, config, tests, and documentation. Covers all models (53), services (47 top-level + 7 `BankStatement/` parsers), route files (16 admin + api + superadmin + web + console + turbo), migration files (106), and 1186 test methods (3715 assertions) across 278 test files (48 Feature + 61 Unit PHP + 169 JS Vitest). No runtime profiling performed._

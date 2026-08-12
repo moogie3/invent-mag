@@ -10,14 +10,513 @@
     ],
     "info": {
         "name": "INVENT-MAG API Documentation",
-        "_postman_id": "3ff0b629-dcdf-4ed6-a1ed-9f2933964424",
-        "description": "",
+        "_postman_id": "fc42be41-b205-45f1-9cb4-8ba70b2e32dc",
+        "description": "Invent-MAG exposes a deliberately small REST API covering authentication, tenant discovery, CMS content, marketing plan pricing, payment confirmations, and Midtrans webhooks. All other functionality is served by the session-authenticated web admin panel (`\/admin\/*`) and is intentionally not part of the API.",
         "schema": "https:\/\/schema.getpostman.com\/json\/collection\/v2.1.0\/collection.json"
     },
     "item": [
         {
+            "name": "Authentication",
+            "description": "Public registration, login, and tenant lookup, plus token refresh for authenticated clients.",
+            "item": [
+                {
+                    "name": "Log in and receive an API token.",
+                    "request": {
+                        "url": {
+                            "host": "{{baseUrl}}",
+                            "path": "api\/login",
+                            "query": [],
+                            "raw": "{{baseUrl}}\/api\/login"
+                        },
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application\/json"
+                            },
+                            {
+                                "key": "Accept",
+                                "value": "application\/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\"email\":\"qkunze@example.com\",\"password\":\"O[2UZ5ij-e\\\/dl4m{o,\"}"
+                        },
+                        "description": "Authenticates the user with email and password and returns a Sanctum\nbearer token for authenticated API calls. Rate-limited to 5 requests\nper minute per IP.",
+                        "auth": {
+                            "type": "noauth"
+                        }
+                    },
+                    "response": [
+                        {
+                            "header": [],
+                            "code": 200,
+                            "body": "{\n  \"token\": \"1|abcdefghijklmnopqrstuvwxyz\",\n  \"token_type\": \"Bearer\"\n}",
+                            "name": "success"
+                        },
+                        {
+                            "header": [],
+                            "code": 401,
+                            "body": "{\n  \"message\": \"Invalid login details\"\n}",
+                            "name": "invalid credentials"
+                        }
+                    ]
+                },
+                {
+                    "name": "Register a new user and tenant.",
+                    "request": {
+                        "url": {
+                            "host": "{{baseUrl}}",
+                            "path": "api\/register",
+                            "query": [],
+                            "raw": "{{baseUrl}}\/api\/register"
+                        },
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application\/json"
+                            },
+                            {
+                                "key": "Accept",
+                                "value": "application\/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\"name\":\"consequatur\",\"shopname\":\"consequatur\",\"email\":\"qkunze@example.com\",\"password\":\"O[2UZ5ij-e\\\/dl4m{o,\",\"plan\":\"professional\",\"password_confirmation\":\"consequatur\"}"
+                        },
+                        "description": "Creates a user account and its tenant (workspace) in one call, then\nreturns an access token for immediate use. Rate-limited to 3 per hour\nper IP.",
+                        "auth": {
+                            "type": "noauth"
+                        }
+                    },
+                    "response": [
+                        {
+                            "header": [],
+                            "code": 201,
+                            "body": "{\n  \"message\": \"Registration successful\",\n  \"user\": {\n    \"name\": \"Jane Doe\",\n    \"email\": \"jane@example.com\",\n    \"updated_at\": \"2026-08-12T09:00:00.000000Z\",\n    \"created_at\": \"2026-08-12T09:00:00.000000Z\",\n    \"id\": 1\n  },\n  \"access_token\": \"1|abcdefghijklmnopqrstuvwxyz\",\n  \"token_type\": \"Bearer\",\n  \"tenant_domain\": \"mycompany.invent-mag.web.id\",\n  \"workspace_slug\": \"mycompany\",\n  \"plan\": {\n    \"name\": \"Starter\",\n    \"slug\": \"starter\",\n    \"status\": \"trial\",\n    \"on_trial\": true,\n    \"trial_ends_at\": \"2026-09-11T09:00:00.000000Z\"\n  }\n}",
+                            "name": "success"
+                        },
+                        {
+                            "header": [],
+                            "code": 422,
+                            "body": "{\n  \"message\": \"The shopname has already been taken. (and 2 more errors)\",\n  \"errors\": {\n    \"shopname\": [\n      \"The shopname has already been taken.\"\n    ],\n    \"email\": [\n      \"The email has already been taken.\"\n    ]\n  }\n}",
+                            "name": "validation error"
+                        }
+                    ]
+                },
+                {
+                    "name": "Find a tenant's workspace by shop name.",
+                    "request": {
+                        "url": {
+                            "host": "{{baseUrl}}",
+                            "path": "api\/lookup-tenant",
+                            "query": [],
+                            "raw": "{{baseUrl}}\/api\/lookup-tenant"
+                        },
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application\/json"
+                            },
+                            {
+                                "key": "Accept",
+                                "value": "application\/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\"shopname\":\"consequatur\"}"
+                        },
+                        "description": "Resolves a shop name to its workspace slug, used by the marketing-site\nlogin portal before authenticating. Matches by domain prefix first, then\nby tenant name.",
+                        "auth": {
+                            "type": "noauth"
+                        }
+                    },
+                    "response": [
+                        {
+                            "header": [],
+                            "code": 200,
+                            "body": "{\n  \"tenant_domain\": \"mycompany.invent-mag.web.id\",\n  \"workspace_slug\": \"mycompany\"\n}",
+                            "name": "success"
+                        },
+                        {
+                            "header": [],
+                            "code": 404,
+                            "body": "{\n  \"message\": \"Shop not found.\"\n}",
+                            "name": "not found"
+                        },
+                        {
+                            "header": [],
+                            "code": 422,
+                            "body": "{\n  \"message\": \"The shopname field is required.\",\n  \"errors\": {\n    \"shopname\": [\n      \"The shopname field is required.\"\n    ]\n  }\n}",
+                            "name": "validation error"
+                        }
+                    ]
+                },
+                {
+                    "name": "Refresh the current API token.",
+                    "request": {
+                        "url": {
+                            "host": "{{baseUrl}}",
+                            "path": "api\/v1\/refresh-token",
+                            "query": [],
+                            "raw": "{{baseUrl}}\/api\/v1\/refresh-token"
+                        },
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application\/json"
+                            },
+                            {
+                                "key": "Accept",
+                                "value": "application\/json"
+                            }
+                        ],
+                        "body": null,
+                        "description": "Revokes the current token and issues a new one with a one-day expiry.\nCall this with the token you want to replace."
+                    },
+                    "response": [
+                        {
+                            "header": [],
+                            "code": 200,
+                            "body": "{\n  \"token\": \"2|abcdefghijklmnopqrstuvwxyz\",\n  \"expires_at\": \"2026-08-13T09:00:00.000000Z\"\n}",
+                            "name": "success"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "CMS Content",
+            "description": "Public landing-page content and billing rate served to the Astro marketing site at build time.",
+            "item": [
+                {
+                    "name": "Get marketing-site CMS content.",
+                    "request": {
+                        "url": {
+                            "host": "{{baseUrl}}",
+                            "path": "api\/cms",
+                            "query": [],
+                            "raw": "{{baseUrl}}\/api\/cms"
+                        },
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application\/json"
+                            },
+                            {
+                                "key": "Accept",
+                                "value": "application\/json"
+                            }
+                        ],
+                        "body": null,
+                        "description": "Returns the landing-page copy (hero, features, pricing, CTA, footer)\nserved to the Astro marketing site at build time. Also includes the\ncurrent USD\u2192IDR billing rate, computed live from `BillingSetting::getRate()`\n(superadmin-managed at Superadmin \u2192 Settings \u2192 Billing Rate), falling back\nto `config\/billing.php`. Responses are cached for 1 hour.",
+                        "auth": {
+                            "type": "noauth"
+                        }
+                    },
+                    "response": [
+                        {
+                            "header": [],
+                            "code": 200,
+                            "body": "{\n  \"hero_title\": \"The All-In-One ERP to Streamline Your Business\",\n  \"hero_subtitle\": \"From inventory and sales to a full accounting suite, Invent-MAG provides the tools you need to make smarter, data-driven decisions and accelerate your growth.\",\n  \"pricing_badge\": \"Simple, transparent pricing\",\n  \"pricing_title\": \"One platform, every tool your business needs\",\n  \"pricing_most_popular_badge\": \"most popular\",\n  \"billing_rate\": 16000,\n  \"cta_title\": \"Ready to streamline your business?\",\n  \"contact_email\": \"jefrydwijaya3@gmail.com\",\n  \"footer_text\": \"\u00a9 2026 Invent-MAG. All rights reserved.\"\n}",
+                            "name": "success"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "Plans",
+            "description": "Subscription plan pricing (public) and authenticated plan\/usage data.",
+            "item": [
+                {
+                    "name": "Get active subscription plans (public pricing data).",
+                    "request": {
+                        "url": {
+                            "host": "{{baseUrl}}",
+                            "path": "api\/plans",
+                            "query": [],
+                            "raw": "{{baseUrl}}\/api\/plans"
+                        },
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application\/json"
+                            },
+                            {
+                                "key": "Accept",
+                                "value": "application\/json"
+                            }
+                        ],
+                        "body": null,
+                        "description": "Returns the active plans used by the marketing-site pricing cards\n(`invent-mag-fe\/src\/lib\/plans.ts` fetches this at build time). Only\ndisplay-oriented fields are exposed \u2014 no relations or internals.",
+                        "auth": {
+                            "type": "noauth"
+                        }
+                    },
+                    "response": [
+                        {
+                            "header": [],
+                            "code": 200,
+                            "body": "{\n  \"data\": [\n    {\n      \"slug\": \"starter\",\n      \"name\": \"Starter\",\n      \"description\": \"Everything you need to manage inventory and orders.\",\n      \"price\": 19,\n      \"currency_code\": \"USD\",\n      \"billing_cycle\": \"monthly\",\n      \"trial_days\": 30,\n      \"max_users\": 3,\n      \"max_warehouses\": 1,\n      \"max_products\": 100,\n      \"features\": []\n    }\n  ],\n  \"meta\": {\n    \"currency_code\": \"USD\"\n  }\n}",
+                            "name": "success"
+                        }
+                    ]
+                },
+                {
+                    "name": "List active plans (authenticated).",
+                    "request": {
+                        "url": {
+                            "host": "{{baseUrl}}",
+                            "path": "api\/v1\/plans",
+                            "query": [],
+                            "raw": "{{baseUrl}}\/api\/v1\/plans"
+                        },
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application\/json"
+                            },
+                            {
+                                "key": "Accept",
+                                "value": "application\/json"
+                            }
+                        ],
+                        "body": null,
+                        "description": "Returns the full active plan records for an authenticated client."
+                    },
+                    "response": [
+                        {
+                            "header": [],
+                            "code": 200,
+                            "body": "[\n  {\n    \"slug\": \"starter\",\n    \"name\": \"Starter\",\n    \"price\": \"19.00\",\n    \"currency_code\": \"USD\",\n    \"billing_cycle\": \"monthly\",\n    \"trial_days\": 30,\n    \"max_users\": 3,\n    \"max_warehouses\": 1,\n    \"max_products\": 100,\n    \"features\": [],\n    \"is_active\": true,\n    \"sort_order\": 1\n  }\n]",
+                            "name": "success"
+                        }
+                    ]
+                },
+                {
+                    "name": "Get the current tenant's plan usage statistics.",
+                    "request": {
+                        "url": {
+                            "host": "{{baseUrl}}",
+                            "path": "api\/v1\/plan\/current",
+                            "query": [],
+                            "raw": "{{baseUrl}}\/api\/v1\/plan\/current"
+                        },
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application\/json"
+                            },
+                            {
+                                "key": "Accept",
+                                "value": "application\/json"
+                            }
+                        ],
+                        "body": null,
+                        "description": "Returns the authenticated tenant's effective plan along with current\nusage against plan limits (users, warehouses, products) and trial status."
+                    },
+                    "response": [
+                        {
+                            "header": [],
+                            "code": 200,
+                            "body": "{\n  \"plan\": {\n    \"slug\": \"professional\",\n    \"name\": \"Professional\",\n    \"price\": \"59.00\",\n    \"max_users\": 10,\n    \"max_warehouses\": -1,\n    \"max_products\": 500\n  },\n  \"tenant\": {\n    \"name\": \"My Company\",\n    \"domain\": \"mycompany.invent-mag.web.id\"\n  },\n  \"users\": {\n    \"current\": 3,\n    \"limit\": 10,\n    \"unlimited\": false,\n    \"percentage\": 30\n  },\n  \"warehouses\": {\n    \"current\": 2,\n    \"limit\": -1,\n    \"unlimited\": true,\n    \"percentage\": 0\n  },\n  \"products\": {\n    \"current\": 150,\n    \"limit\": 500,\n    \"unlimited\": false,\n    \"percentage\": 30\n  },\n  \"trial\": {\n    \"on_trial\": true,\n    \"days_remaining\": 18\n  }\n}",
+                            "name": "success"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "Payments",
+            "description": "Payment confirmation for Midtrans Snap transactions.",
+            "item": [
+                {
+                    "name": "Confirm payment after a successful Midtrans Snap transaction.",
+                    "request": {
+                        "url": {
+                            "host": "{{baseUrl}}",
+                            "path": "api\/payment\/confirm",
+                            "query": [],
+                            "raw": "{{baseUrl}}\/api\/payment\/confirm"
+                        },
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application\/json"
+                            },
+                            {
+                                "key": "Accept",
+                                "value": "application\/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\"order_id\":\"consequatur\",\"transaction_result\":[]}"
+                        },
+                        "description": "Verifies the order belongs to the current tenant, checks the Midtrans\ntransaction status, and marks the order paid. Use this after the\nfrontend completes a Snap transaction so the plan updates immediately\nwithout waiting for the webhook."
+                    },
+                    "response": [
+                        {
+                            "header": [],
+                            "code": 200,
+                            "body": "{\n  \"message\": \"Payment confirmed successfully\",\n  \"plan\": \"Professional\"\n}",
+                            "name": "success"
+                        },
+                        {
+                            "header": [],
+                            "code": 400,
+                            "body": "{\n  \"message\": \"Payment not completed\",\n  \"status\": \"pending\"\n}",
+                            "name": "payment not completed"
+                        },
+                        {
+                            "header": [],
+                            "code": 404,
+                            "body": "{\n  \"message\": \"Order not found\"\n}",
+                            "name": "order not found"
+                        },
+                        {
+                            "header": [],
+                            "code": 500,
+                            "body": "{\n  \"message\": \"Payment verification failed. Please try again later.\"\n}",
+                            "name": "verification failure"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "Webhooks",
+            "description": "Midtrans payment notification endpoints.",
+            "item": [
+                {
+                    "name": "Handle a Midtrans payment notification webhook.",
+                    "request": {
+                        "url": {
+                            "host": "{{baseUrl}}",
+                            "path": "api\/webhooks\/midtrans",
+                            "query": [],
+                            "raw": "{{baseUrl}}\/api\/webhooks\/midtrans"
+                        },
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application\/json"
+                            },
+                            {
+                                "key": "Accept",
+                                "value": "application\/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\"order_id\":\"consequatur\",\"status_code\":\"consequatur\",\"gross_amount\":\"consequatur\",\"signature_key\":\"consequatur\",\"transaction_status\":\"consequatur\"}"
+                        },
+                        "description": "Receives Midtrans transaction notifications, verifies the SHA-512\nsignature, and updates the matching subscription order (paid on\n`capture`\/`settlement`, failed on `cancel`\/`deny`\/`expire`). Configure\nthis URL in the Midtrans dashboard; `POST \/api\/webhook` is a fallback\nalias for misconfigured dashboards.",
+                        "auth": {
+                            "type": "noauth"
+                        }
+                    },
+                    "response": [
+                        {
+                            "header": [],
+                            "code": 200,
+                            "body": "{\n  \"message\": \"Webhook handled successfully\"\n}",
+                            "name": "success"
+                        },
+                        {
+                            "header": [],
+                            "code": 400,
+                            "body": "{\n  \"message\": \"Invalid payload\"\n}",
+                            "name": "invalid payload"
+                        },
+                        {
+                            "header": [],
+                            "code": 403,
+                            "body": "{\n  \"message\": \"Invalid signature\"\n}",
+                            "name": "bad signature"
+                        },
+                        {
+                            "header": [],
+                            "code": 404,
+                            "body": "{\n  \"message\": \"Order not found\"\n}",
+                            "name": "order not found"
+                        }
+                    ]
+                },
+                {
+                    "name": "Handle a Midtrans payment notification webhook (fallback alias).",
+                    "request": {
+                        "url": {
+                            "host": "{{baseUrl}}",
+                            "path": "api\/webhook",
+                            "query": [],
+                            "raw": "{{baseUrl}}\/api\/webhook"
+                        },
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application\/json"
+                            },
+                            {
+                                "key": "Accept",
+                                "value": "application\/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\"order_id\":\"consequatur\",\"status_code\":\"consequatur\",\"gross_amount\":\"consequatur\",\"signature_key\":\"consequatur\",\"transaction_status\":\"consequatur\"}"
+                        },
+                        "description": "Identical to `POST \/api\/webhooks\/midtrans`, exposed as a fallback alias\nfor Midtrans dashboards that were configured with the bare `\/webhook` URL.",
+                        "auth": {
+                            "type": "noauth"
+                        }
+                    },
+                    "response": [
+                        {
+                            "header": [],
+                            "code": 200,
+                            "body": "{\n  \"message\": \"Webhook handled successfully\"\n}",
+                            "name": "success"
+                        },
+                        {
+                            "header": [],
+                            "code": 400,
+                            "body": "{\n  \"message\": \"Invalid payload\"\n}",
+                            "name": "invalid payload"
+                        },
+                        {
+                            "header": [],
+                            "code": 403,
+                            "body": "{\n  \"message\": \"Invalid signature\"\n}",
+                            "name": "bad signature"
+                        },
+                        {
+                            "header": [],
+                            "code": 404,
+                            "body": "{\n  \"message\": \"Order not found\"\n}",
+                            "name": "order not found"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
             "name": "Contact",
-            "description": "",
+            "description": "Marketing-site contact form submission.",
             "item": [
                 {
                     "name": "Handle the marketing-site contact form submission.",
@@ -41,529 +540,31 @@
                         ],
                         "body": {
                             "mode": "raw",
-                            "raw": "{\"name\":\"consequatur\",\"email\":\"qkunze@example.com\",\"company\":\"consequatur\",\"topic\":\"support\",\"message\":\"consequatur\"}"
+                            "raw": "{\"name\":\"consequatur\",\"email\":\"qkunze@example.com\",\"company\":\"consequatur\",\"topic\":\"support\",\"message\":\"consequatur\",\"botcheck\":\"consequatur\"}"
                         },
-                        "description": ""
+                        "description": "Validates the form, passes the built-in honeypot (`botcheck` must stay\nempty), and emails the platform contact address.",
+                        "auth": {
+                            "type": "noauth"
+                        }
                     },
                     "response": [
                         {
                             "header": [],
                             "code": 200,
                             "body": "{\n  \"success\": true,\n  \"message\": \"Message sent successfully!\"\n}",
-                            "name": ""
-                        }
-                    ]
-                }
-            ]
-        },
-        {
-            "name": "Endpoints",
-            "description": "",
-            "item": [
-                {
-                    "name": "GET api\/cms",
-                    "request": {
-                        "url": {
-                            "host": "{{baseUrl}}",
-                            "path": "api\/cms",
-                            "query": [],
-                            "raw": "{{baseUrl}}\/api\/cms"
+                            "name": "success"
                         },
-                        "method": "GET",
-                        "header": [
-                            {
-                                "key": "Content-Type",
-                                "value": "application\/json"
-                            },
-                            {
-                                "key": "Accept",
-                                "value": "application\/json"
-                            }
-                        ],
-                        "body": null,
-                        "description": ""
-                    },
-                    "response": [
                         {
-                            "header": [
-                                {
-                                    "key": "cache-control",
-                                    "value": "max-age=3600, public"
-                                },
-                                {
-                                    "key": "content-type",
-                                    "value": "application\/json"
-                                },
-                                {
-                                    "key": "x-ratelimit-limit",
-                                    "value": "60"
-                                },
-                                {
-                                    "key": "x-ratelimit-remaining",
-                                    "value": "59"
-                                },
-                                {
-                                    "key": "vary",
-                                    "value": "Origin"
-                                }
-                            ],
-                            "code": 200,
-                            "body": "{\"hero_title\":\"Invent-MAGs\",\"hero_subtitle\":\"From inventory and sales to a full accounting suite, Invent-MAG provides the tools you need to make smarter, data-driven decisions and accelerate your growth.\",\"hero_cta_text\":\"Start 30-Day Free Trial\",\"hero_cta_url\":\"\\\/signup\",\"hero_cta_demo_text\":\"Try Live Demo\",\"hero_cta_demo_url\":\"https:\\\/\\\/demo-pro.invent-mag.web.id\\\/admin\\\/login\",\"features_title\":\"Everything You Need\",\"features_subtitle\":\"A Better Way to Manage Your Business\",\"features_description\":\"Invent-MAG isn't just another tool, it's a complete ecosystem designed to give you a bird's-eye view of your entire operation, from inventory to accounting.\",\"features_enterprise_heading\":\"Enterprise Features\",\"feature_card_1_title\":\"Inventory & Product Management\",\"feature_card_1_desc\":\"Full product cataloging, real-time stock tracking across multiple warehouses, physical stock opname with variance tracking, warehouse-to-warehouse stock transfers, low-stock alerts, barcode support, and expiry tracking.\",\"feature_card_2_title\":\"Sales, CRM & Quotations\",\"feature_card_2_desc\":\"Complete sales order management, Point of Sale (POS), customer database with purchase history, sales pipeline for opportunity tracking, and quotation generation with full lifecycle management including approval workflows, revision history, and seamless conversion to invoices or sales orders.\",\"feature_card_3_title\":\"Purchase & SRM\",\"feature_card_3_desc\":\"Full purchase order lifecycle, supplier management with historical data, and efficient purchase return processing.\",\"feature_card_4_title\":\"Financial & Accounting Suite\",\"feature_card_4_desc\":\"Chart of Accounts, General Ledger, Manual Journal Entries, Trial Balance, Income Statement, Balance Sheet, AR\\\/AP Aging Reports, and Bank Reconciliation.\",\"feature_card_5_title\":\"HR & Payroll\",\"feature_card_5_desc\":\"Comprehensive employee attendance tracking, automated salaried proration, customizable allowances, and automated two-step accounting sync.\",\"feature_card_6_title\":\"Multi-Currency Support\",\"feature_card_6_desc\":\"Handle transactions in multiple currencies with configurable settings for symbols, decimal places, and exchange rates.\",\"feature_card_7_title\":\"Returns Management\",\"feature_card_7_desc\":\"Complete sales and purchase return workflows with automatic stock adjustments and accounting entries.\",\"feature_card_8_title\":\"User & Role Management\",\"feature_card_8_desc\":\"Secure access control with 101 granular permissions. Assign roles like Superuser, Staff, or POS operator.\",\"feature_card_9_title\":\"Sales Forecasting AI\",\"feature_card_9_desc\":\"AI-powered sales predictions using Holt-Winters algorithms and linear regression for accurate demand forecasting.\",\"feature_card_10_title\":\"RESTful API Access\",\"feature_card_10_desc\":\"Full API access with Sanctum authentication. Integrate with external systems and build custom integrations.\",\"feature_card_11_title\":\"Audit Trail & Compliance\",\"feature_card_11_desc\":\"Comprehensive audit logging for all system changes. Track user actions, modifications, and maintain compliance records.\",\"pricing_badge\":\"Simple, transparent pricing\",\"pricing_title\":\"One platform, every tool your business needs\",\"pricing_subtitle\":\"From inventory tracking to full double-entry accounting &mdash; pick the plan that matches where your business is today.\",\"pricing_no_credit_badge\":\"No credit card required\",\"pricing_trial_badge\":\"30-day free trial\",\"pricing_cancel_badge\":\"Cancel anytime\",\"pricing_most_popular_badge\":\"most popular\",\"pricing_trial_included\":\"30 days free trial included\",\"pricing_enterprise_support\":\"Enterprise support & SLA\",\"cta_title\":\"Ready to streamline your business?\",\"cta_description\":\"Join thousands of businesses using Invent-MAG to manage inventory, sales, and accounting in one place.\",\"contact_email\":\"jefrydwijaya3@gmail.com\",\"footer_text\":\"\\u00a9 2026 Invent-MAG. All rights reserved.\"}",
-                            "name": ""
-                        }
-                    ]
-                },
-                {
-                    "name": "POST api\/webhooks\/midtrans",
-                    "request": {
-                        "url": {
-                            "host": "{{baseUrl}}",
-                            "path": "api\/webhooks\/midtrans",
-                            "query": [],
-                            "raw": "{{baseUrl}}\/api\/webhooks\/midtrans"
-                        },
-                        "method": "POST",
-                        "header": [
-                            {
-                                "key": "Content-Type",
-                                "value": "application\/json"
-                            },
-                            {
-                                "key": "Accept",
-                                "value": "application\/json"
-                            }
-                        ],
-                        "body": null,
-                        "description": ""
-                    },
-                    "response": [
-                        {
-                            "header": [
-                                {
-                                    "key": "cache-control",
-                                    "value": "no-cache, private"
-                                },
-                                {
-                                    "key": "content-type",
-                                    "value": "application\/json"
-                                },
-                                {
-                                    "key": "x-ratelimit-limit",
-                                    "value": "60"
-                                },
-                                {
-                                    "key": "x-ratelimit-remaining",
-                                    "value": "58"
-                                },
-                                {
-                                    "key": "vary",
-                                    "value": "Origin"
-                                }
-                            ],
-                            "code": 400,
-                            "body": "{\"message\":\"Invalid payload\"}",
-                            "name": ""
-                        }
-                    ]
-                },
-                {
-                    "name": "POST api\/webhook",
-                    "request": {
-                        "url": {
-                            "host": "{{baseUrl}}",
-                            "path": "api\/webhook",
-                            "query": [],
-                            "raw": "{{baseUrl}}\/api\/webhook"
-                        },
-                        "method": "POST",
-                        "header": [
-                            {
-                                "key": "Content-Type",
-                                "value": "application\/json"
-                            },
-                            {
-                                "key": "Accept",
-                                "value": "application\/json"
-                            }
-                        ],
-                        "body": null,
-                        "description": ""
-                    },
-                    "response": [
-                        {
-                            "header": [
-                                {
-                                    "key": "cache-control",
-                                    "value": "no-cache, private"
-                                },
-                                {
-                                    "key": "content-type",
-                                    "value": "application\/json"
-                                },
-                                {
-                                    "key": "x-ratelimit-limit",
-                                    "value": "60"
-                                },
-                                {
-                                    "key": "x-ratelimit-remaining",
-                                    "value": "57"
-                                },
-                                {
-                                    "key": "vary",
-                                    "value": "Origin"
-                                }
-                            ],
-                            "code": 400,
-                            "body": "{\"message\":\"Invalid payload\"}",
-                            "name": ""
-                        }
-                    ]
-                },
-                {
-                    "name": "Confirm payment directly from frontend after successful Snap transaction.",
-                    "request": {
-                        "url": {
-                            "host": "{{baseUrl}}",
-                            "path": "api\/payment\/confirm",
-                            "query": [],
-                            "raw": "{{baseUrl}}\/api\/payment\/confirm"
-                        },
-                        "method": "POST",
-                        "header": [
-                            {
-                                "key": "Content-Type",
-                                "value": "application\/json"
-                            },
-                            {
-                                "key": "Accept",
-                                "value": "application\/json"
-                            }
-                        ],
-                        "body": {
-                            "mode": "raw",
-                            "raw": "{\"order_id\":\"consequatur\",\"transaction_result\":[]}"
-                        },
-                        "description": "This ensures the plan is updated immediately without waiting for webhook.\n\nSecurity: Verifies the order belongs to the current tenant."
-                    },
-                    "response": [
-                        {
-                            "header": [
-                                {
-                                    "key": "cache-control",
-                                    "value": "no-cache, private"
-                                },
-                                {
-                                    "key": "content-type",
-                                    "value": "application\/json"
-                                },
-                                {
-                                    "key": "vary",
-                                    "value": "Origin"
-                                }
-                            ],
-                            "code": 401,
-                            "body": "{\"message\":\"Unauthenticated.\"}",
-                            "name": ""
-                        }
-                    ]
-                },
-                {
-                    "name": "POST api\/login",
-                    "request": {
-                        "url": {
-                            "host": "{{baseUrl}}",
-                            "path": "api\/login",
-                            "query": [],
-                            "raw": "{{baseUrl}}\/api\/login"
-                        },
-                        "method": "POST",
-                        "header": [
-                            {
-                                "key": "Content-Type",
-                                "value": "application\/json"
-                            },
-                            {
-                                "key": "Accept",
-                                "value": "application\/json"
-                            }
-                        ],
-                        "body": null,
-                        "description": ""
-                    },
-                    "response": [
-                        {
-                            "header": [
-                                {
-                                    "key": "cache-control",
-                                    "value": "no-cache, private"
-                                },
-                                {
-                                    "key": "content-type",
-                                    "value": "application\/json"
-                                },
-                                {
-                                    "key": "x-ratelimit-limit",
-                                    "value": "5"
-                                },
-                                {
-                                    "key": "x-ratelimit-remaining",
-                                    "value": "4"
-                                },
-                                {
-                                    "key": "vary",
-                                    "value": "Origin"
-                                }
-                            ],
-                            "code": 401,
-                            "body": "{\"message\":\"Invalid login details\"}",
-                            "name": ""
-                        }
-                    ]
-                },
-                {
-                    "name": "Handle an incoming registration request.",
-                    "request": {
-                        "url": {
-                            "host": "{{baseUrl}}",
-                            "path": "api\/register",
-                            "query": [],
-                            "raw": "{{baseUrl}}\/api\/register"
-                        },
-                        "method": "POST",
-                        "header": [
-                            {
-                                "key": "Content-Type",
-                                "value": "application\/json"
-                            },
-                            {
-                                "key": "Accept",
-                                "value": "application\/json"
-                            }
-                        ],
-                        "body": {
-                            "mode": "raw",
-                            "raw": "{\"name\":\"vmqeopfuudtdsufvyvddq\",\"shopname\":\"amniihfqcoynlazghdtqt\",\"email\":\"andreanne00@example.org\",\"password\":\"O[2UZ5ij-e\\\/dl4m{o,\",\"plan\":\"professional\"}"
-                        },
-                        "description": ""
-                    },
-                    "response": [
-                        {
-                            "header": [
-                                {
-                                    "key": "cache-control",
-                                    "value": "no-cache, private"
-                                },
-                                {
-                                    "key": "content-type",
-                                    "value": "application\/json"
-                                },
-                                {
-                                    "key": "x-ratelimit-limit",
-                                    "value": "3"
-                                },
-                                {
-                                    "key": "x-ratelimit-remaining",
-                                    "value": "0"
-                                },
-                                {
-                                    "key": "vary",
-                                    "value": "Origin"
-                                }
-                            ],
+                            "header": [],
                             "code": 422,
-                            "body": "{\"message\":\"The password field confirmation does not match.\",\"errors\":{\"password\":[\"The password field confirmation does not match.\"]}}",
-                            "name": ""
-                        }
-                    ]
-                },
-                {
-                    "name": "Find a tenant's domain by their shop name.",
-                    "request": {
-                        "url": {
-                            "host": "{{baseUrl}}",
-                            "path": "api\/lookup-tenant",
-                            "query": [],
-                            "raw": "{{baseUrl}}\/api\/lookup-tenant"
+                            "body": "{\n  \"success\": false,\n  \"message\": \"Validation failed\",\n  \"errors\": {\n    \"email\": [\n      \"The email field must be a valid email address.\"\n    ]\n  }\n}",
+                            "name": "validation error"
                         },
-                        "method": "POST",
-                        "header": [
-                            {
-                                "key": "Content-Type",
-                                "value": "application\/json"
-                            },
-                            {
-                                "key": "Accept",
-                                "value": "application\/json"
-                            }
-                        ],
-                        "body": {
-                            "mode": "raw",
-                            "raw": "{\"shopname\":\"vmqeopfuudtdsufvyvddq\"}"
-                        },
-                        "description": ""
-                    },
-                    "response": [
                         {
-                            "header": [
-                                {
-                                    "key": "cache-control",
-                                    "value": "no-cache, private"
-                                },
-                                {
-                                    "key": "content-type",
-                                    "value": "application\/json"
-                                },
-                                {
-                                    "key": "x-ratelimit-limit",
-                                    "value": "10"
-                                },
-                                {
-                                    "key": "x-ratelimit-remaining",
-                                    "value": "6"
-                                },
-                                {
-                                    "key": "vary",
-                                    "value": "Origin"
-                                }
-                            ],
-                            "code": 404,
-                            "body": "{\"message\":\"Shop not found.\"}",
-                            "name": ""
-                        }
-                    ]
-                },
-                {
-                    "name": "POST api\/v1\/refresh-token",
-                    "request": {
-                        "url": {
-                            "host": "{{baseUrl}}",
-                            "path": "api\/v1\/refresh-token",
-                            "query": [],
-                            "raw": "{{baseUrl}}\/api\/v1\/refresh-token"
-                        },
-                        "method": "POST",
-                        "header": [
-                            {
-                                "key": "Content-Type",
-                                "value": "application\/json"
-                            },
-                            {
-                                "key": "Accept",
-                                "value": "application\/json"
-                            }
-                        ],
-                        "body": null,
-                        "description": ""
-                    },
-                    "response": [
-                        {
-                            "header": [
-                                {
-                                    "key": "cache-control",
-                                    "value": "no-cache, private"
-                                },
-                                {
-                                    "key": "content-type",
-                                    "value": "application\/json"
-                                },
-                                {
-                                    "key": "vary",
-                                    "value": "Origin"
-                                }
-                            ],
-                            "code": 401,
-                            "body": "{\"message\":\"Unauthenticated.\"}",
-                            "name": ""
-                        }
-                    ]
-                },
-                {
-                    "name": "GET api\/v1\/plans",
-                    "request": {
-                        "url": {
-                            "host": "{{baseUrl}}",
-                            "path": "api\/v1\/plans",
-                            "query": [],
-                            "raw": "{{baseUrl}}\/api\/v1\/plans"
-                        },
-                        "method": "GET",
-                        "header": [
-                            {
-                                "key": "Content-Type",
-                                "value": "application\/json"
-                            },
-                            {
-                                "key": "Accept",
-                                "value": "application\/json"
-                            }
-                        ],
-                        "body": null,
-                        "description": ""
-                    },
-                    "response": [
-                        {
-                            "header": [
-                                {
-                                    "key": "cache-control",
-                                    "value": "no-cache, private"
-                                },
-                                {
-                                    "key": "content-type",
-                                    "value": "application\/json"
-                                },
-                                {
-                                    "key": "vary",
-                                    "value": "Origin"
-                                }
-                            ],
-                            "code": 401,
-                            "body": "{\"message\":\"Unauthenticated.\"}",
-                            "name": ""
-                        }
-                    ]
-                },
-                {
-                    "name": "GET api\/v1\/plan\/current",
-                    "request": {
-                        "url": {
-                            "host": "{{baseUrl}}",
-                            "path": "api\/v1\/plan\/current",
-                            "query": [],
-                            "raw": "{{baseUrl}}\/api\/v1\/plan\/current"
-                        },
-                        "method": "GET",
-                        "header": [
-                            {
-                                "key": "Content-Type",
-                                "value": "application\/json"
-                            },
-                            {
-                                "key": "Accept",
-                                "value": "application\/json"
-                            }
-                        ],
-                        "body": null,
-                        "description": ""
-                    },
-                    "response": [
-                        {
-                            "header": [
-                                {
-                                    "key": "cache-control",
-                                    "value": "no-cache, private"
-                                },
-                                {
-                                    "key": "content-type",
-                                    "value": "application\/json"
-                                },
-                                {
-                                    "key": "vary",
-                                    "value": "Origin"
-                                }
-                            ],
-                            "code": 401,
-                            "body": "{\"message\":\"Unauthenticated.\"}",
-                            "name": ""
+                            "header": [],
+                            "code": 500,
+                            "body": "{\n  \"success\": false,\n  \"message\": \"Failed to send message. Please try again.\"\n}",
+                            "name": "mail failure"
                         }
                     ]
                 }

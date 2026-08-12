@@ -3,7 +3,7 @@
 > **Last updated:** August 2026  
 > **Version:** 2.5  
 > **Stack:** Laravel 11 · Blade/Alpine.js · MySQL · Redis · Dompdf · Spatie Multitenancy · Spatie Permission  
-> **Deployment:** Docker · DigitalOcean (backend) · Vercel (frontend/marketing)  
+> **Deployment:** Railway (backend — current production) · Docker image published to GHCR and deployed to a VPS via GitHub Actions on release tags · Vercel (frontend/marketing)  
 > **Domain:** https://invent-mag.web.id
 
 ---
@@ -141,7 +141,7 @@ return $dompdf->stream('FP-' . $faktur->nsfp . '.pdf', ['Attachment' => false]);
 
 ## 2. Current Feature State & Plan Tiers
 
-### Starter — $19/month (Rp 313,500/bulan)
+### Starter — $19/month (Rp 304.000/bulan)
 
 | Feature | Status | Notes |
 |---|---|---|
@@ -164,7 +164,7 @@ return $dompdf->stream('FP-' . $faktur->nsfp . '.pdf', ['Attachment' => false]);
 
 ---
 
-### Professional — $59/month (Rp 973,500/bulan)
+### Professional — $59/month (Rp 944.000/bulan)
 
 | Feature | Status | Notes |
 |---|---|---|
@@ -184,7 +184,7 @@ return $dompdf->stream('FP-' . $faktur->nsfp . '.pdf', ['Attachment' => false]);
 
 ---
 
-### Enterprise — $109/month (Rp 1,798,500/bulan)
+### Enterprise — $109/month (Rp 1.744.000/bulan)
 
 | Feature | Status | Notes |
 |---|---|---|
@@ -204,9 +204,11 @@ return $dompdf->stream('FP-' . $faktur->nsfp . '.pdf', ['Attachment' => false]);
 
 ### 3.1 IDR Pricing Display
 
-**Status:** ✅ Already implemented on `/id/pricing` (Rp 313.500 / Rp 973.500 / Rp 1.798.500)
+**Status:** ✅ Already implemented on `/id/pricing` (Rp 304.000 / Rp 944.000 / Rp 1.744.000 at a 16,000 rate — USD prices now from public `GET /api/plans`, IDR from CMS `billing_rate`)
 
-**Rate:** 1 USD = 16,500 IDR (rounded to nearest 500). Review quarterly.
+**Rate:** Billing is charged in IDR at a **superadmin-managed exchange rate**, stored in the `billing_settings` table (fallback: `config/billing.php` = 16,000). The backend (`Admin/PlanController.php`) reads it via `BillingSetting::getRate()`, and `GET /api/cms` exposes it as `billing_rate`. The marketing site (`invent-mag-fe`) uses that CMS `billing_rate` for IDR prices, with `PUBLIC_USD_TO_IDR` as a fallback override. Update it at **Superadmin → Settings → Billing Rate** (`superadmin.settings.billing-rate`). ⚠️ The Astro site is statically generated — rebuild it after changing the rate so the marketing prices reflect it (same workflow as CMS content).
+
+**Data-driven USD prices (Aug 2026):** The card prices themselves (`$19 / $59 / $109`) are no longer hardcoded in `Pricing.astro`. Public `GET /api/plans` (`Api/PlanController`) serves active plan prices from the `plans` table; `invent-mag-fe/src/lib/plans.ts` fetches it at build time (falling back to 19/59/109 when the API is unreachable) and `Pricing.astro` renders the `$` price from it, while `BaseLayout` converts to IDR client-side using `billing_rate`. Edit plan prices at **Superadmin → Plans**, then rebuild the marketing site.
 
 ---
 
@@ -761,6 +763,13 @@ class EFakturService
     // -----------------------------------------------------------------------
     // Journal Entry for PPN Keluaran
     // -----------------------------------------------------------------------
+    //
+    // NOTE (Phase 1E, Aug 2026): this journal-at-generation method was REMOVED
+    // in Phase 1E. PPN Keluaran is now recognized at SALE CREATION via the
+    // 5-leg VAT-split journal in SalesService::createSale()/PosService
+    // (Dr AR gross / Cr Revenue net / Cr PPN Keluaran), and Faktur Pajak
+    // generation posts NO journal — it is a compliance-only document.
+    // The snippet below is retained as historical context for the original plan.
 
     /**
      * Post PPN Keluaran (output VAT) journal entry.
@@ -1780,7 +1789,7 @@ Tax double-submissions to DJP are a legal problem. Protection at 5 levels:
 
 **Why:** PPh (Pajak Penghasilan / Income Tax) withholding is required alongside PPN for comprehensive Indonesian tax compliance.
 
-**Approach (July 2026):** All PPh types run on the **universal tax system** — a Tax record flagged `is_pph = true` automatically appears in the PPh dropdown on Sales, PO, POS, and Quotation forms and posts through the existing shared PPh journal path (Dr PPh Receivable 1170 / Cr PPh Payable 2150). No per-type engines are planned; for the UMKM target they would add complexity without accounting accuracy (every PPh type already posts to the same PPh Payable).
+**Approach (July 2026):** All PPh types run on the **universal tax system** — a Tax record flagged `is_pph = true` automatically appears in the PPh dropdown on Sales, PO, POS, and Quotation forms and posts through the existing shared PPh journal path (sale side: `Dr PPh Receivable 1170 / Cr Accounts Receivable`; purchase side: `Cr PPh Payable 2150` alongside Dr Inventory / Cr AP). No per-type engines are planned; for the UMKM target they would add complexity without accounting accuracy (every PPh type posts to the same two accounts — receivable on sales, payable on purchases).
 
 **What:**
 - ~~PPh 23 (service fee withholding)~~ — ✅ **Completed (July 2026).** Seeded Tax record `PPH 23` (2%, `is_pph = true`). Snapshot fields (`pph_enabled`/`pph_rate`/`pph_amount`) on Sales/PO/POS/Quotation, journal posting, and the sales-view PPh line all live.

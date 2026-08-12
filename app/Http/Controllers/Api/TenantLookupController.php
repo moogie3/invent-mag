@@ -10,9 +10,34 @@ use Illuminate\Http\Request;
 class TenantLookupController extends Controller
 {
     /**
-     * Find a tenant's domain by their shop name.
+     * Find a tenant's workspace by shop name.
      *
-     * @return JsonResponse
+     * Resolves a shop name to its workspace slug, used by the marketing-site
+     * login portal before authenticating. Matches by domain prefix first, then
+     * by tenant name.
+     *
+     * @group Authentication
+     * Public registration, login, and tenant lookup, plus token refresh for authenticated clients.
+     *
+     * @unauthenticated
+     *
+     * @bodyParam shopname string required The shop/workspace name to look up.
+     *
+     * @response scenario=success {
+     *   "tenant_domain": "mycompany.invent-mag.web.id",
+     *   "workspace_slug": "mycompany"
+     * }
+     * @response status=404 scenario="not found" {
+     *   "message": "Shop not found."
+     * }
+     * @response status=422 scenario="validation error" {
+     *   "message": "The shopname field is required.",
+     *   "errors": {
+     *     "shopname": [
+     *       "The shopname field is required."
+     *     ]
+     *   }
+     * }
      */
     public function lookup(Request $request)
     {

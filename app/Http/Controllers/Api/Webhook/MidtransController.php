@@ -26,6 +26,39 @@ class MidtransController extends Controller
         Config::$serverKey = config('midtrans.server_key');
     }
 
+    /**
+     * Handle a Midtrans payment notification webhook.
+     *
+     * Receives Midtrans transaction notifications, verifies the SHA-512
+     * signature, and updates the matching subscription order (paid on
+     * `capture`/`settlement`, failed on `cancel`/`deny`/`expire`). Configure
+     * this URL in the Midtrans dashboard; `POST /api/webhook` is a fallback
+     * alias for misconfigured dashboards.
+     *
+     * @group Webhooks
+     * Midtrans payment notification endpoints.
+     *
+     * @unauthenticated
+     *
+     * @bodyParam order_id string required The subscription order number.
+     * @bodyParam status_code string required The Midtrans HTTP status code.
+     * @bodyParam gross_amount string required The transaction amount.
+     * @bodyParam signature_key string required The HMAC-SHA512 signature over `order_id + status_code + gross_amount + server_key`.
+     * @bodyParam transaction_status string optional The Midtrans transaction status: capture, settlement, cancel, deny, or expire.
+     *
+     * @response scenario=success {
+     *   "message": "Webhook handled successfully"
+     * }
+     * @response status=400 scenario="invalid payload" {
+     *   "message": "Invalid payload"
+     * }
+     * @response status=403 scenario="bad signature" {
+     *   "message": "Invalid signature"
+     * }
+     * @response status=404 scenario="order not found" {
+     *   "message": "Order not found"
+     * }
+     */
     public function handle(Request $request)
     {
         $payload = $request->all();
@@ -99,5 +132,40 @@ class MidtransController extends Controller
         }
 
         return response()->json(['message' => 'Webhook handled successfully']);
+    }
+
+    /**
+     * Handle a Midtrans payment notification webhook (fallback alias).
+     *
+     * Identical to `POST /api/webhooks/midtrans`, exposed as a fallback alias
+     * for Midtrans dashboards that were configured with the bare `/webhook` URL.
+     *
+     * @group Webhooks
+     * Midtrans payment notification endpoints.
+     *
+     * @unauthenticated
+     *
+     * @bodyParam order_id string required The subscription order number.
+     * @bodyParam status_code string required The Midtrans HTTP status code.
+     * @bodyParam gross_amount string required The transaction amount.
+     * @bodyParam signature_key string required The HMAC-SHA512 signature over `order_id + status_code + gross_amount + server_key`.
+     * @bodyParam transaction_status string optional The Midtrans transaction status: capture, settlement, cancel, deny, or expire.
+     *
+     * @response scenario=success {
+     *   "message": "Webhook handled successfully"
+     * }
+     * @response status=400 scenario="invalid payload" {
+     *   "message": "Invalid payload"
+     * }
+     * @response status=403 scenario="bad signature" {
+     *   "message": "Invalid signature"
+     * }
+     * @response status=404 scenario="order not found" {
+     *   "message": "Order not found"
+     * }
+     */
+    public function handleFallback(Request $request)
+    {
+        return $this->handle($request);
     }
 }

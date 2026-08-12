@@ -142,6 +142,7 @@ The system creates the following account structure:
 | 1140 | Inventory | Goods available for sale |
 | 1150 | Prepaid Expenses | Expenses paid in advance |
 | 1160 | Input VAT | VAT paid on purchases |
+| 1170 | PPh Receivable | Income tax withheld from our sales, reclaimable from the tax office |
 | 1200 | Fixed Assets | Parent for long-term assets |
 | 1210 | Land | Company land |
 | 1220 | Buildings | Company buildings |
@@ -157,6 +158,7 @@ The system creates the following account structure:
 | 2120 | Accrued Expenses | Expenses incurred but not yet paid |
 | 2130 | Output VAT | VAT collected from customers |
 | 2140 | Salary Payable | Wages owed to employees |
+| 2150 | PPh Payable | Income tax withheld from suppliers, to be remitted |
 | 2200 | Long-Term Liabilities | Parent for long-term debts |
 | 2210 | Bank Loans | Loans with maturity > 1 year |
 
@@ -194,6 +196,7 @@ The system creates the following account structure:
 | 6220 | Rent Expense | Office/store rent |
 | 6230 | Utility Expenses | Electricity, water, internet |
 | 6240 | Depreciation Expense | Asset depreciation |
+| 6300 | Salary Expense | Total payroll cost for the period |
 
 ---
 
@@ -540,11 +543,15 @@ Journal Entry:
 ┌─────────────────────────────────────┬──────────┬──────────┐
 │ Account                             │ Debit    │ Credit   │
 ├─────────────────────────────────────┼──────────┼──────────┤
-│ Purchases (5100)                    │  500,000 │          │
+│ Inventory (1140)                    │  500,000 │          │
 │ Input VAT (1160)                    │   50,000 │          │
 │   Accounts Payable (2110)           │          │  550,000 │
 └─────────────────────────────────────┴──────────┴──────────┘
 ```
+
+- Inventory is debited at cost (the system does **not** post to a "Purchases" account for stock purchases).
+- When PPN Masukan applies, the VAT is split out to **Input VAT (1160)** instead of being capitalized into inventory.
+- When the tenant is Indonesian and a PPh tax is applied, an additional credit to **PPh Payable (2150)** records the withholding the company will remit on the supplier's behalf.
 
 ### 4. Payment to Supplier
 
@@ -573,13 +580,16 @@ Journal Entry:
 ┌─────────────────────────────────────┬──────────┬──────────┐
 │ Account                             │ Debit    │ Credit   │
 ├─────────────────────────────────────┼──────────┼──────────┤
-│ Sales Returns (4110)               │  200,000 │          │
+│ Sales Revenue (4100)                │  200,000 │          │
 │   Accounts Receivable (1130)        │          │  200,000 │
 └─────────────────────────────────────┴──────────┴──────────┘
 ```
 
+The return reverses the original sale entry, so it debits **Sales Revenue (4100)** (not a "Sales Returns" contra account) and credits **Accounts Receivable (1130)**.
+
 Additionally:
-- Inventory is restocked (COGS reversed)
+- Inventory is restocked and COGS reversed (Dr Inventory / Cr Cost of Goods Sold) proportionally to the returned amount
+- If the original sale carried PPN, the PPN Keluaran portion is reversed proportionally
 - If the original invoice was **Paid**, a **Customer Credit Note** is automatically created for future purchases
 
 ### 6. Purchase Return (Completed)
@@ -743,5 +753,5 @@ If you encounter issues:
 
 ---
 
-*Document Version: 1.2*  
+*Document Version: 1.3*  
 *Last Updated: June 2026*

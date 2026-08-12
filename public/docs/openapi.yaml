@@ -1,18 +1,30 @@
 openapi: 3.0.3
 info:
   title: 'INVENT-MAG API Documentation'
-  description: ''
+  description: 'Invent-MAG exposes a deliberately small REST API covering authentication, tenant discovery, CMS content, marketing plan pricing, payment confirmations, and Midtrans webhooks. All other functionality is served by the session-authenticated web admin panel (`/admin/*`) and is intentionally not part of the API.'
   version: 1.0.0
 servers:
   -
     url: 'http://127.0.0.1.nip.io'
 tags:
   -
-    name: Contact
-    description: ''
+    name: Authentication
+    description: 'Public registration, login, and tenant lookup, plus token refresh for authenticated clients.'
   -
-    name: Endpoints
-    description: ''
+    name: 'CMS Content'
+    description: 'Public landing-page content and billing rate served to the Astro marketing site at build time.'
+  -
+    name: Plans
+    description: 'Subscription plan pricing (public) and authenticated plan/usage data.'
+  -
+    name: Payments
+    description: 'Payment confirmation for Midtrans Snap transactions.'
+  -
+    name: Webhooks
+    description: 'Midtrans payment notification endpoints.'
+  -
+    name: Contact
+    description: 'Marketing-site contact form submission.'
 components:
   securitySchemes:
     default:
@@ -23,15 +35,936 @@ security:
   -
     default: []
 paths:
+  /api/login:
+    post:
+      summary: 'Log in and receive an API token.'
+      operationId: logInAndReceiveAnAPIToken
+      description: "Authenticates the user with email and password and returns a Sanctum\nbearer token for authenticated API calls. Rate-limited to 5 requests\nper minute per IP."
+      parameters: []
+      responses:
+        200:
+          description: success
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  token: 1|abcdefghijklmnopqrstuvwxyz
+                  token_type: Bearer
+                properties:
+                  token:
+                    type: string
+                    example: 1|abcdefghijklmnopqrstuvwxyz
+                  token_type:
+                    type: string
+                    example: Bearer
+        401:
+          description: 'invalid credentials'
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Invalid login details'
+                properties:
+                  message:
+                    type: string
+                    example: 'Invalid login details'
+      tags:
+        - Authentication
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  description: "The user's email address."
+                  example: qkunze@example.com
+                password:
+                  type: string
+                  description: "The user's password."
+                  example: 'O[2UZ5ij-e/dl4m{o,'
+              required:
+                - email
+                - password
+      security: []
+  /api/register:
+    post:
+      summary: 'Register a new user and tenant.'
+      operationId: registerANewUserAndTenant
+      description: "Creates a user account and its tenant (workspace) in one call, then\nreturns an access token for immediate use. Rate-limited to 3 per hour\nper IP."
+      parameters: []
+      responses:
+        201:
+          description: success
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Registration successful'
+                  user:
+                    name: 'Jane Doe'
+                    email: jane@example.com
+                    updated_at: '2026-08-12T09:00:00.000000Z'
+                    created_at: '2026-08-12T09:00:00.000000Z'
+                    id: 1
+                  access_token: 1|abcdefghijklmnopqrstuvwxyz
+                  token_type: Bearer
+                  tenant_domain: mycompany.invent-mag.web.id
+                  workspace_slug: mycompany
+                  plan:
+                    name: Starter
+                    slug: starter
+                    status: trial
+                    on_trial: true
+                    trial_ends_at: '2026-09-11T09:00:00.000000Z'
+                properties:
+                  message:
+                    type: string
+                    example: 'Registration successful'
+                  user:
+                    type: object
+                    properties:
+                      name:
+                        type: string
+                        example: 'Jane Doe'
+                      email:
+                        type: string
+                        example: jane@example.com
+                      updated_at:
+                        type: string
+                        example: '2026-08-12T09:00:00.000000Z'
+                      created_at:
+                        type: string
+                        example: '2026-08-12T09:00:00.000000Z'
+                      id:
+                        type: integer
+                        example: 1
+                  access_token:
+                    type: string
+                    example: 1|abcdefghijklmnopqrstuvwxyz
+                  token_type:
+                    type: string
+                    example: Bearer
+                  tenant_domain:
+                    type: string
+                    example: mycompany.invent-mag.web.id
+                  workspace_slug:
+                    type: string
+                    example: mycompany
+                  plan:
+                    type: object
+                    properties:
+                      name:
+                        type: string
+                        example: Starter
+                      slug:
+                        type: string
+                        example: starter
+                      status:
+                        type: string
+                        example: trial
+                      on_trial:
+                        type: boolean
+                        example: true
+                      trial_ends_at:
+                        type: string
+                        example: '2026-09-11T09:00:00.000000Z'
+        422:
+          description: 'validation error'
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'The shopname has already been taken. (and 2 more errors)'
+                  errors:
+                    shopname:
+                      - 'The shopname has already been taken.'
+                    email:
+                      - 'The email has already been taken.'
+                properties:
+                  message:
+                    type: string
+                    example: 'The shopname has already been taken. (and 2 more errors)'
+                  errors:
+                    type: object
+                    properties:
+                      shopname:
+                        type: array
+                        example:
+                          - 'The shopname has already been taken.'
+                        items:
+                          type: string
+                      email:
+                        type: array
+                        example:
+                          - 'The email has already been taken.'
+                        items:
+                          type: string
+      tags:
+        - Authentication
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  description: "The user's full name."
+                  example: consequatur
+                shopname:
+                  type: string
+                  description: 'The desired workspace name. Must be unique.'
+                  example: consequatur
+                email:
+                  type: string
+                  description: "The user's email address. Must be unique."
+                  example: qkunze@example.com
+                password:
+                  type: string
+                  description: "The user's password (confirmed). Must meet the app's password rules."
+                  example: 'O[2UZ5ij-e/dl4m{o,'
+                plan:
+                  type: string
+                  description: 'optional The plan slug to assign (defaults to the platform default plan when omitted).'
+                  example: professional
+                  enum:
+                    - starter
+                    - professional
+                    - enterprise
+                  nullable: true
+                password_confirmation:
+                  type: string
+                  description: 'Confirmation of the password.'
+                  example: consequatur
+              required:
+                - name
+                - shopname
+                - email
+                - password
+                - password_confirmation
+      security: []
+  /api/lookup-tenant:
+    post:
+      summary: "Find a tenant's workspace by shop name."
+      operationId: findATenantsWorkspaceByShopName
+      description: "Resolves a shop name to its workspace slug, used by the marketing-site\nlogin portal before authenticating. Matches by domain prefix first, then\nby tenant name."
+      parameters: []
+      responses:
+        200:
+          description: success
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  tenant_domain: mycompany.invent-mag.web.id
+                  workspace_slug: mycompany
+                properties:
+                  tenant_domain:
+                    type: string
+                    example: mycompany.invent-mag.web.id
+                  workspace_slug:
+                    type: string
+                    example: mycompany
+        404:
+          description: 'not found'
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Shop not found.'
+                properties:
+                  message:
+                    type: string
+                    example: 'Shop not found.'
+        422:
+          description: 'validation error'
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'The shopname field is required.'
+                  errors:
+                    shopname:
+                      - 'The shopname field is required.'
+                properties:
+                  message:
+                    type: string
+                    example: 'The shopname field is required.'
+                  errors:
+                    type: object
+                    properties:
+                      shopname:
+                        type: array
+                        example:
+                          - 'The shopname field is required.'
+                        items:
+                          type: string
+      tags:
+        - Authentication
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                shopname:
+                  type: string
+                  description: 'The shop/workspace name to look up.'
+                  example: consequatur
+              required:
+                - shopname
+      security: []
+  /api/v1/refresh-token:
+    post:
+      summary: 'Refresh the current API token.'
+      operationId: refreshTheCurrentAPIToken
+      description: "Revokes the current token and issues a new one with a one-day expiry.\nCall this with the token you want to replace."
+      parameters: []
+      responses:
+        200:
+          description: success
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  token: 2|abcdefghijklmnopqrstuvwxyz
+                  expires_at: '2026-08-13T09:00:00.000000Z'
+                properties:
+                  token:
+                    type: string
+                    example: 2|abcdefghijklmnopqrstuvwxyz
+                  expires_at:
+                    type: string
+                    example: '2026-08-13T09:00:00.000000Z'
+      tags:
+        - Authentication
+  /api/cms:
+    get:
+      summary: 'Get marketing-site CMS content.'
+      operationId: getMarketingSiteCMSContent
+      description: "Returns the landing-page copy (hero, features, pricing, CTA, footer)\nserved to the Astro marketing site at build time. Also includes the\ncurrent USD→IDR billing rate, computed live from `BillingSetting::getRate()`\n(superadmin-managed at Superadmin → Settings → Billing Rate), falling back\nto `config/billing.php`. Responses are cached for 1 hour."
+      parameters: []
+      responses:
+        200:
+          description: success
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  hero_title: 'The All-In-One ERP to Streamline Your Business'
+                  hero_subtitle: 'From inventory and sales to a full accounting suite, Invent-MAG provides the tools you need to make smarter, data-driven decisions and accelerate your growth.'
+                  pricing_badge: 'Simple, transparent pricing'
+                  pricing_title: 'One platform, every tool your business needs'
+                  pricing_most_popular_badge: 'most popular'
+                  billing_rate: 16000
+                  cta_title: 'Ready to streamline your business?'
+                  contact_email: jefrydwijaya3@gmail.com
+                  footer_text: '© 2026 Invent-MAG. All rights reserved.'
+                properties:
+                  hero_title:
+                    type: string
+                    example: 'The All-In-One ERP to Streamline Your Business'
+                  hero_subtitle:
+                    type: string
+                    example: 'From inventory and sales to a full accounting suite, Invent-MAG provides the tools you need to make smarter, data-driven decisions and accelerate your growth.'
+                  pricing_badge:
+                    type: string
+                    example: 'Simple, transparent pricing'
+                  pricing_title:
+                    type: string
+                    example: 'One platform, every tool your business needs'
+                  pricing_most_popular_badge:
+                    type: string
+                    example: 'most popular'
+                  billing_rate:
+                    type: integer
+                    example: 16000
+                  cta_title:
+                    type: string
+                    example: 'Ready to streamline your business?'
+                  contact_email:
+                    type: string
+                    example: jefrydwijaya3@gmail.com
+                  footer_text:
+                    type: string
+                    example: '© 2026 Invent-MAG. All rights reserved.'
+      tags:
+        - 'CMS Content'
+      security: []
+  /api/plans:
+    get:
+      summary: 'Get active subscription plans (public pricing data).'
+      operationId: getActiveSubscriptionPlanspublicPricingData
+      description: "Returns the active plans used by the marketing-site pricing cards\n(`invent-mag-fe/src/lib/plans.ts` fetches this at build time). Only\ndisplay-oriented fields are exposed — no relations or internals."
+      parameters: []
+      responses:
+        200:
+          description: success
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  data:
+                    -
+                      slug: starter
+                      name: Starter
+                      description: 'Everything you need to manage inventory and orders.'
+                      price: 19
+                      currency_code: USD
+                      billing_cycle: monthly
+                      trial_days: 30
+                      max_users: 3
+                      max_warehouses: 1
+                      max_products: 100
+                      features: []
+                  meta:
+                    currency_code: USD
+                properties:
+                  data:
+                    type: array
+                    example:
+                      -
+                        slug: starter
+                        name: Starter
+                        description: 'Everything you need to manage inventory and orders.'
+                        price: 19
+                        currency_code: USD
+                        billing_cycle: monthly
+                        trial_days: 30
+                        max_users: 3
+                        max_warehouses: 1
+                        max_products: 100
+                        features: []
+                    items:
+                      type: object
+                      properties:
+                        slug:
+                          type: string
+                          example: starter
+                        name:
+                          type: string
+                          example: Starter
+                        description:
+                          type: string
+                          example: 'Everything you need to manage inventory and orders.'
+                        price:
+                          type: integer
+                          example: 19
+                        currency_code:
+                          type: string
+                          example: USD
+                        billing_cycle:
+                          type: string
+                          example: monthly
+                        trial_days:
+                          type: integer
+                          example: 30
+                        max_users:
+                          type: integer
+                          example: 3
+                        max_warehouses:
+                          type: integer
+                          example: 1
+                        max_products:
+                          type: integer
+                          example: 100
+                        features:
+                          type: array
+                          example: []
+                  meta:
+                    type: object
+                    properties:
+                      currency_code:
+                        type: string
+                        example: USD
+      tags:
+        - Plans
+      security: []
+  /api/v1/plans:
+    get:
+      summary: 'List active plans (authenticated).'
+      operationId: listActivePlansauthenticated
+      description: 'Returns the full active plan records for an authenticated client.'
+      parameters: []
+      responses:
+        200:
+          description: success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    slug:
+                      type: string
+                      example: starter
+                    name:
+                      type: string
+                      example: Starter
+                    price:
+                      type: string
+                      example: '19.00'
+                    currency_code:
+                      type: string
+                      example: USD
+                    billing_cycle:
+                      type: string
+                      example: monthly
+                    trial_days:
+                      type: integer
+                      example: 30
+                    max_users:
+                      type: integer
+                      example: 3
+                    max_warehouses:
+                      type: integer
+                      example: 1
+                    max_products:
+                      type: integer
+                      example: 100
+                    features:
+                      type: array
+                      example: []
+                    is_active:
+                      type: boolean
+                      example: true
+                    sort_order:
+                      type: integer
+                      example: 1
+                example:
+                  -
+                    slug: starter
+                    name: Starter
+                    price: '19.00'
+                    currency_code: USD
+                    billing_cycle: monthly
+                    trial_days: 30
+                    max_users: 3
+                    max_warehouses: 1
+                    max_products: 100
+                    features: []
+                    is_active: true
+                    sort_order: 1
+      tags:
+        - Plans
+  /api/v1/plan/current:
+    get:
+      summary: "Get the current tenant's plan usage statistics."
+      operationId: getTheCurrentTenantsPlanUsageStatistics
+      description: "Returns the authenticated tenant's effective plan along with current\nusage against plan limits (users, warehouses, products) and trial status."
+      parameters: []
+      responses:
+        200:
+          description: success
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  plan:
+                    slug: professional
+                    name: Professional
+                    price: '59.00'
+                    max_users: 10
+                    max_warehouses: -1
+                    max_products: 500
+                  tenant:
+                    name: 'My Company'
+                    domain: mycompany.invent-mag.web.id
+                  users:
+                    current: 3
+                    limit: 10
+                    unlimited: false
+                    percentage: 30
+                  warehouses:
+                    current: 2
+                    limit: -1
+                    unlimited: true
+                    percentage: 0
+                  products:
+                    current: 150
+                    limit: 500
+                    unlimited: false
+                    percentage: 30
+                  trial:
+                    on_trial: true
+                    days_remaining: 18
+                properties:
+                  plan:
+                    type: object
+                    properties:
+                      slug:
+                        type: string
+                        example: professional
+                      name:
+                        type: string
+                        example: Professional
+                      price:
+                        type: string
+                        example: '59.00'
+                      max_users:
+                        type: integer
+                        example: 10
+                      max_warehouses:
+                        type: integer
+                        example: -1
+                      max_products:
+                        type: integer
+                        example: 500
+                  tenant:
+                    type: object
+                    properties:
+                      name:
+                        type: string
+                        example: 'My Company'
+                      domain:
+                        type: string
+                        example: mycompany.invent-mag.web.id
+                  users:
+                    type: object
+                    properties:
+                      current:
+                        type: integer
+                        example: 3
+                      limit:
+                        type: integer
+                        example: 10
+                      unlimited:
+                        type: boolean
+                        example: false
+                      percentage:
+                        type: integer
+                        example: 30
+                  warehouses:
+                    type: object
+                    properties:
+                      current:
+                        type: integer
+                        example: 2
+                      limit:
+                        type: integer
+                        example: -1
+                      unlimited:
+                        type: boolean
+                        example: true
+                      percentage:
+                        type: integer
+                        example: 0
+                  products:
+                    type: object
+                    properties:
+                      current:
+                        type: integer
+                        example: 150
+                      limit:
+                        type: integer
+                        example: 500
+                      unlimited:
+                        type: boolean
+                        example: false
+                      percentage:
+                        type: integer
+                        example: 30
+                  trial:
+                    type: object
+                    properties:
+                      on_trial:
+                        type: boolean
+                        example: true
+                      days_remaining:
+                        type: integer
+                        example: 18
+      tags:
+        - Plans
+  /api/payment/confirm:
+    post:
+      summary: 'Confirm payment after a successful Midtrans Snap transaction.'
+      operationId: confirmPaymentAfterASuccessfulMidtransSnapTransaction
+      description: "Verifies the order belongs to the current tenant, checks the Midtrans\ntransaction status, and marks the order paid. Use this after the\nfrontend completes a Snap transaction so the plan updates immediately\nwithout waiting for the webhook."
+      parameters: []
+      responses:
+        200:
+          description: success
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Payment confirmed successfully'
+                  plan: Professional
+                properties:
+                  message:
+                    type: string
+                    example: 'Payment confirmed successfully'
+                  plan:
+                    type: string
+                    example: Professional
+        400:
+          description: 'payment not completed'
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Payment not completed'
+                  status: pending
+                properties:
+                  message:
+                    type: string
+                    example: 'Payment not completed'
+                  status:
+                    type: string
+                    example: pending
+        404:
+          description: 'order not found'
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Order not found'
+                properties:
+                  message:
+                    type: string
+                    example: 'Order not found'
+        500:
+          description: 'verification failure'
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Payment verification failed. Please try again later.'
+                properties:
+                  message:
+                    type: string
+                    example: 'Payment verification failed. Please try again later.'
+      tags:
+        - Payments
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                order_id:
+                  type: string
+                  description: 'The subscription order number (matches `subscription_orders.order_number`).'
+                  example: consequatur
+                transaction_result:
+                  type: object
+                  description: 'The raw result object returned by the Midtrans Snap API.'
+                  example: []
+                  properties: {  }
+              required:
+                - order_id
+                - transaction_result
+  /api/webhooks/midtrans:
+    post:
+      summary: 'Handle a Midtrans payment notification webhook.'
+      operationId: handleAMidtransPaymentNotificationWebhook
+      description: "Receives Midtrans transaction notifications, verifies the SHA-512\nsignature, and updates the matching subscription order (paid on\n`capture`/`settlement`, failed on `cancel`/`deny`/`expire`). Configure\nthis URL in the Midtrans dashboard; `POST /api/webhook` is a fallback\nalias for misconfigured dashboards."
+      parameters: []
+      responses:
+        200:
+          description: success
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Webhook handled successfully'
+                properties:
+                  message:
+                    type: string
+                    example: 'Webhook handled successfully'
+        400:
+          description: 'invalid payload'
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Invalid payload'
+                properties:
+                  message:
+                    type: string
+                    example: 'Invalid payload'
+        403:
+          description: 'bad signature'
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Invalid signature'
+                properties:
+                  message:
+                    type: string
+                    example: 'Invalid signature'
+        404:
+          description: 'order not found'
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Order not found'
+                properties:
+                  message:
+                    type: string
+                    example: 'Order not found'
+      tags:
+        - Webhooks
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                order_id:
+                  type: string
+                  description: 'The subscription order number.'
+                  example: consequatur
+                status_code:
+                  type: string
+                  description: 'The Midtrans HTTP status code.'
+                  example: consequatur
+                gross_amount:
+                  type: string
+                  description: 'The transaction amount.'
+                  example: consequatur
+                signature_key:
+                  type: string
+                  description: 'The HMAC-SHA512 signature over `order_id + status_code + gross_amount + server_key`.'
+                  example: consequatur
+                transaction_status:
+                  type: string
+                  description: 'optional The Midtrans transaction status: capture, settlement, cancel, deny, or expire.'
+                  example: consequatur
+              required:
+                - order_id
+                - status_code
+                - gross_amount
+                - signature_key
+      security: []
+  /api/webhook:
+    post:
+      summary: 'Handle a Midtrans payment notification webhook (fallback alias).'
+      operationId: handleAMidtransPaymentNotificationWebhookfallbackAlias
+      description: "Identical to `POST /api/webhooks/midtrans`, exposed as a fallback alias\nfor Midtrans dashboards that were configured with the bare `/webhook` URL."
+      parameters: []
+      responses:
+        200:
+          description: success
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Webhook handled successfully'
+                properties:
+                  message:
+                    type: string
+                    example: 'Webhook handled successfully'
+        400:
+          description: 'invalid payload'
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Invalid payload'
+                properties:
+                  message:
+                    type: string
+                    example: 'Invalid payload'
+        403:
+          description: 'bad signature'
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Invalid signature'
+                properties:
+                  message:
+                    type: string
+                    example: 'Invalid signature'
+        404:
+          description: 'order not found'
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Order not found'
+                properties:
+                  message:
+                    type: string
+                    example: 'Order not found'
+      tags:
+        - Webhooks
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                order_id:
+                  type: string
+                  description: 'The subscription order number.'
+                  example: consequatur
+                status_code:
+                  type: string
+                  description: 'The Midtrans HTTP status code.'
+                  example: consequatur
+                gross_amount:
+                  type: string
+                  description: 'The transaction amount.'
+                  example: consequatur
+                signature_key:
+                  type: string
+                  description: 'The HMAC-SHA512 signature over `order_id + status_code + gross_amount + server_key`.'
+                  example: consequatur
+                transaction_status:
+                  type: string
+                  description: 'optional The Midtrans transaction status: capture, settlement, cancel, deny, or expire.'
+                  example: consequatur
+              required:
+                - order_id
+                - status_code
+                - gross_amount
+                - signature_key
+      security: []
   /api/contact:
     post:
       summary: 'Handle the marketing-site contact form submission.'
       operationId: handleTheMarketingSiteContactFormSubmission
-      description: ''
+      description: "Validates the form, passes the built-in honeypot (`botcheck` must stay\nempty), and emails the platform contact address."
       parameters: []
       responses:
         200:
-          description: ''
+          description: success
           content:
             application/json:
               schema:
@@ -46,6 +979,50 @@ paths:
                   message:
                     type: string
                     example: 'Message sent successfully!'
+        422:
+          description: 'validation error'
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  success: false
+                  message: 'Validation failed'
+                  errors:
+                    email:
+                      - 'The email field must be a valid email address.'
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: 'Validation failed'
+                  errors:
+                    type: object
+                    properties:
+                      email:
+                        type: array
+                        example:
+                          - 'The email field must be a valid email address.'
+                        items:
+                          type: string
+        500:
+          description: 'mail failure'
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  success: false
+                  message: 'Failed to send message. Please try again.'
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: 'Failed to send message. Please try again.'
       tags:
         - Contact
       requestBody:
@@ -82,475 +1059,13 @@ paths:
                   type: string
                   description: 'The message body.'
                   example: consequatur
+                botcheck:
+                  type: string
+                  description: 'optional Honeypot field — leave empty to pass spam protection.'
+                  example: consequatur
               required:
                 - name
                 - email
                 - topic
                 - message
-  /api/cms:
-    get:
-      summary: ''
-      operationId: getApiCms
-      description: ''
-      parameters: []
-      responses:
-        200:
-          description: ''
-          content:
-            application/json:
-              schema:
-                type: object
-                example:
-                  hero_title: Invent-MAGs
-                  hero_subtitle: 'From inventory and sales to a full accounting suite, Invent-MAG provides the tools you need to make smarter, data-driven decisions and accelerate your growth.'
-                  hero_cta_text: 'Start 30-Day Free Trial'
-                  hero_cta_url: /signup
-                  hero_cta_demo_text: 'Try Live Demo'
-                  hero_cta_demo_url: 'https://demo-pro.invent-mag.web.id/admin/login'
-                  features_title: 'Everything You Need'
-                  features_subtitle: 'A Better Way to Manage Your Business'
-                  features_description: "Invent-MAG isn't just another tool, it's a complete ecosystem designed to give you a bird's-eye view of your entire operation, from inventory to accounting."
-                  features_enterprise_heading: 'Enterprise Features'
-                  feature_card_1_title: 'Inventory & Product Management'
-                  feature_card_1_desc: 'Full product cataloging, real-time stock tracking across multiple warehouses, physical stock opname with variance tracking, warehouse-to-warehouse stock transfers, low-stock alerts, barcode support, and expiry tracking.'
-                  feature_card_2_title: 'Sales, CRM & Quotations'
-                  feature_card_2_desc: 'Complete sales order management, Point of Sale (POS), customer database with purchase history, sales pipeline for opportunity tracking, and quotation generation with full lifecycle management including approval workflows, revision history, and seamless conversion to invoices or sales orders.'
-                  feature_card_3_title: 'Purchase & SRM'
-                  feature_card_3_desc: 'Full purchase order lifecycle, supplier management with historical data, and efficient purchase return processing.'
-                  feature_card_4_title: 'Financial & Accounting Suite'
-                  feature_card_4_desc: 'Chart of Accounts, General Ledger, Manual Journal Entries, Trial Balance, Income Statement, Balance Sheet, AR/AP Aging Reports, and Bank Reconciliation.'
-                  feature_card_5_title: 'HR & Payroll'
-                  feature_card_5_desc: 'Comprehensive employee attendance tracking, automated salaried proration, customizable allowances, and automated two-step accounting sync.'
-                  feature_card_6_title: 'Multi-Currency Support'
-                  feature_card_6_desc: 'Handle transactions in multiple currencies with configurable settings for symbols, decimal places, and exchange rates.'
-                  feature_card_7_title: 'Returns Management'
-                  feature_card_7_desc: 'Complete sales and purchase return workflows with automatic stock adjustments and accounting entries.'
-                  feature_card_8_title: 'User & Role Management'
-                  feature_card_8_desc: 'Secure access control with 101 granular permissions. Assign roles like Superuser, Staff, or POS operator.'
-                  feature_card_9_title: 'Sales Forecasting AI'
-                  feature_card_9_desc: 'AI-powered sales predictions using Holt-Winters algorithms and linear regression for accurate demand forecasting.'
-                  feature_card_10_title: 'RESTful API Access'
-                  feature_card_10_desc: 'Full API access with Sanctum authentication. Integrate with external systems and build custom integrations.'
-                  feature_card_11_title: 'Audit Trail & Compliance'
-                  feature_card_11_desc: 'Comprehensive audit logging for all system changes. Track user actions, modifications, and maintain compliance records.'
-                  pricing_badge: 'Simple, transparent pricing'
-                  pricing_title: 'One platform, every tool your business needs'
-                  pricing_subtitle: 'From inventory tracking to full double-entry accounting &mdash; pick the plan that matches where your business is today.'
-                  pricing_no_credit_badge: 'No credit card required'
-                  pricing_trial_badge: '30-day free trial'
-                  pricing_cancel_badge: 'Cancel anytime'
-                  pricing_most_popular_badge: 'most popular'
-                  pricing_trial_included: '30 days free trial included'
-                  pricing_enterprise_support: 'Enterprise support & SLA'
-                  cta_title: 'Ready to streamline your business?'
-                  cta_description: 'Join thousands of businesses using Invent-MAG to manage inventory, sales, and accounting in one place.'
-                  contact_email: jefrydwijaya3@gmail.com
-                  footer_text: '© 2026 Invent-MAG. All rights reserved.'
-                properties:
-                  hero_title:
-                    type: string
-                    example: Invent-MAGs
-                  hero_subtitle:
-                    type: string
-                    example: 'From inventory and sales to a full accounting suite, Invent-MAG provides the tools you need to make smarter, data-driven decisions and accelerate your growth.'
-                  hero_cta_text:
-                    type: string
-                    example: 'Start 30-Day Free Trial'
-                  hero_cta_url:
-                    type: string
-                    example: /signup
-                  hero_cta_demo_text:
-                    type: string
-                    example: 'Try Live Demo'
-                  hero_cta_demo_url:
-                    type: string
-                    example: 'https://demo-pro.invent-mag.web.id/admin/login'
-                  features_title:
-                    type: string
-                    example: 'Everything You Need'
-                  features_subtitle:
-                    type: string
-                    example: 'A Better Way to Manage Your Business'
-                  features_description:
-                    type: string
-                    example: "Invent-MAG isn't just another tool, it's a complete ecosystem designed to give you a bird's-eye view of your entire operation, from inventory to accounting."
-                  features_enterprise_heading:
-                    type: string
-                    example: 'Enterprise Features'
-                  feature_card_1_title:
-                    type: string
-                    example: 'Inventory & Product Management'
-                  feature_card_1_desc:
-                    type: string
-                    example: 'Full product cataloging, real-time stock tracking across multiple warehouses, physical stock opname with variance tracking, warehouse-to-warehouse stock transfers, low-stock alerts, barcode support, and expiry tracking.'
-                  feature_card_2_title:
-                    type: string
-                    example: 'Sales, CRM & Quotations'
-                  feature_card_2_desc:
-                    type: string
-                    example: 'Complete sales order management, Point of Sale (POS), customer database with purchase history, sales pipeline for opportunity tracking, and quotation generation with full lifecycle management including approval workflows, revision history, and seamless conversion to invoices or sales orders.'
-                  feature_card_3_title:
-                    type: string
-                    example: 'Purchase & SRM'
-                  feature_card_3_desc:
-                    type: string
-                    example: 'Full purchase order lifecycle, supplier management with historical data, and efficient purchase return processing.'
-                  feature_card_4_title:
-                    type: string
-                    example: 'Financial & Accounting Suite'
-                  feature_card_4_desc:
-                    type: string
-                    example: 'Chart of Accounts, General Ledger, Manual Journal Entries, Trial Balance, Income Statement, Balance Sheet, AR/AP Aging Reports, and Bank Reconciliation.'
-                  feature_card_5_title:
-                    type: string
-                    example: 'HR & Payroll'
-                  feature_card_5_desc:
-                    type: string
-                    example: 'Comprehensive employee attendance tracking, automated salaried proration, customizable allowances, and automated two-step accounting sync.'
-                  feature_card_6_title:
-                    type: string
-                    example: 'Multi-Currency Support'
-                  feature_card_6_desc:
-                    type: string
-                    example: 'Handle transactions in multiple currencies with configurable settings for symbols, decimal places, and exchange rates.'
-                  feature_card_7_title:
-                    type: string
-                    example: 'Returns Management'
-                  feature_card_7_desc:
-                    type: string
-                    example: 'Complete sales and purchase return workflows with automatic stock adjustments and accounting entries.'
-                  feature_card_8_title:
-                    type: string
-                    example: 'User & Role Management'
-                  feature_card_8_desc:
-                    type: string
-                    example: 'Secure access control with 101 granular permissions. Assign roles like Superuser, Staff, or POS operator.'
-                  feature_card_9_title:
-                    type: string
-                    example: 'Sales Forecasting AI'
-                  feature_card_9_desc:
-                    type: string
-                    example: 'AI-powered sales predictions using Holt-Winters algorithms and linear regression for accurate demand forecasting.'
-                  feature_card_10_title:
-                    type: string
-                    example: 'RESTful API Access'
-                  feature_card_10_desc:
-                    type: string
-                    example: 'Full API access with Sanctum authentication. Integrate with external systems and build custom integrations.'
-                  feature_card_11_title:
-                    type: string
-                    example: 'Audit Trail & Compliance'
-                  feature_card_11_desc:
-                    type: string
-                    example: 'Comprehensive audit logging for all system changes. Track user actions, modifications, and maintain compliance records.'
-                  pricing_badge:
-                    type: string
-                    example: 'Simple, transparent pricing'
-                  pricing_title:
-                    type: string
-                    example: 'One platform, every tool your business needs'
-                  pricing_subtitle:
-                    type: string
-                    example: 'From inventory tracking to full double-entry accounting &mdash; pick the plan that matches where your business is today.'
-                  pricing_no_credit_badge:
-                    type: string
-                    example: 'No credit card required'
-                  pricing_trial_badge:
-                    type: string
-                    example: '30-day free trial'
-                  pricing_cancel_badge:
-                    type: string
-                    example: 'Cancel anytime'
-                  pricing_most_popular_badge:
-                    type: string
-                    example: 'most popular'
-                  pricing_trial_included:
-                    type: string
-                    example: '30 days free trial included'
-                  pricing_enterprise_support:
-                    type: string
-                    example: 'Enterprise support & SLA'
-                  cta_title:
-                    type: string
-                    example: 'Ready to streamline your business?'
-                  cta_description:
-                    type: string
-                    example: 'Join thousands of businesses using Invent-MAG to manage inventory, sales, and accounting in one place.'
-                  contact_email:
-                    type: string
-                    example: jefrydwijaya3@gmail.com
-                  footer_text:
-                    type: string
-                    example: '© 2026 Invent-MAG. All rights reserved.'
-      tags:
-        - Endpoints
-  /api/webhooks/midtrans:
-    post:
-      summary: ''
-      operationId: postApiWebhooksMidtrans
-      description: ''
-      parameters: []
-      responses:
-        400:
-          description: ''
-          content:
-            application/json:
-              schema:
-                type: object
-                example:
-                  message: 'Invalid payload'
-                properties:
-                  message:
-                    type: string
-                    example: 'Invalid payload'
-      tags:
-        - Endpoints
-  /api/webhook:
-    post:
-      summary: ''
-      operationId: postApiWebhook
-      description: ''
-      parameters: []
-      responses:
-        400:
-          description: ''
-          content:
-            application/json:
-              schema:
-                type: object
-                example:
-                  message: 'Invalid payload'
-                properties:
-                  message:
-                    type: string
-                    example: 'Invalid payload'
-      tags:
-        - Endpoints
-  /api/payment/confirm:
-    post:
-      summary: 'Confirm payment directly from frontend after successful Snap transaction.'
-      operationId: confirmPaymentDirectlyFromFrontendAfterSuccessfulSnapTransaction
-      description: "This ensures the plan is updated immediately without waiting for webhook.\n\nSecurity: Verifies the order belongs to the current tenant."
-      parameters: []
-      responses:
-        401:
-          description: ''
-          content:
-            application/json:
-              schema:
-                type: object
-                example:
-                  message: Unauthenticated.
-                properties:
-                  message:
-                    type: string
-                    example: Unauthenticated.
-      tags:
-        - Endpoints
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                order_id:
-                  type: string
-                  description: ''
-                  example: consequatur
-                transaction_result:
-                  type: object
-                  description: ''
-                  example: []
-                  properties: {  }
-              required:
-                - order_id
-                - transaction_result
-  /api/login:
-    post:
-      summary: ''
-      operationId: postApiLogin
-      description: ''
-      parameters: []
-      responses:
-        401:
-          description: ''
-          content:
-            application/json:
-              schema:
-                type: object
-                example:
-                  message: 'Invalid login details'
-                properties:
-                  message:
-                    type: string
-                    example: 'Invalid login details'
-      tags:
-        - Endpoints
-  /api/register:
-    post:
-      summary: 'Handle an incoming registration request.'
-      operationId: handleAnIncomingRegistrationRequest
-      description: ''
-      parameters: []
-      responses:
-        422:
-          description: ''
-          content:
-            application/json:
-              schema:
-                type: object
-                example:
-                  message: 'The password field confirmation does not match.'
-                  errors:
-                    password:
-                      - 'The password field confirmation does not match.'
-                properties:
-                  message:
-                    type: string
-                    example: 'The password field confirmation does not match.'
-                  errors:
-                    type: object
-                    properties:
-                      password:
-                        type: array
-                        example:
-                          - 'The password field confirmation does not match.'
-                        items:
-                          type: string
-      tags:
-        - Endpoints
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                name:
-                  type: string
-                  description: 'Must not be greater than 255 characters.'
-                  example: vmqeopfuudtdsufvyvddq
-                shopname:
-                  type: string
-                  description: 'Must not be greater than 255 characters.'
-                  example: amniihfqcoynlazghdtqt
-                email:
-                  type: string
-                  description: 'Must be a valid email address. Must not be greater than 255 characters.'
-                  example: andreanne00@example.org
-                password:
-                  type: string
-                  description: ''
-                  example: 'O[2UZ5ij-e/dl4m{o,'
-                plan:
-                  type: string
-                  description: ''
-                  example: professional
-                  enum:
-                    - starter
-                    - professional
-                    - enterprise
-                  nullable: true
-              required:
-                - name
-                - shopname
-                - email
-                - password
-  /api/lookup-tenant:
-    post:
-      summary: "Find a tenant's domain by their shop name."
-      operationId: findATenantsDomainByTheirShopName
-      description: ''
-      parameters: []
-      responses:
-        404:
-          description: ''
-          content:
-            application/json:
-              schema:
-                type: object
-                example:
-                  message: 'Shop not found.'
-                properties:
-                  message:
-                    type: string
-                    example: 'Shop not found.'
-      tags:
-        - Endpoints
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                shopname:
-                  type: string
-                  description: 'Must not be greater than 255 characters.'
-                  example: vmqeopfuudtdsufvyvddq
-              required:
-                - shopname
-  /api/v1/refresh-token:
-    post:
-      summary: ''
-      operationId: postApiV1RefreshToken
-      description: ''
-      parameters: []
-      responses:
-        401:
-          description: ''
-          content:
-            application/json:
-              schema:
-                type: object
-                example:
-                  message: Unauthenticated.
-                properties:
-                  message:
-                    type: string
-                    example: Unauthenticated.
-      tags:
-        - Endpoints
-  /api/v1/plans:
-    get:
-      summary: ''
-      operationId: getApiV1Plans
-      description: ''
-      parameters: []
-      responses:
-        401:
-          description: ''
-          content:
-            application/json:
-              schema:
-                type: object
-                example:
-                  message: Unauthenticated.
-                properties:
-                  message:
-                    type: string
-                    example: Unauthenticated.
-      tags:
-        - Endpoints
-  /api/v1/plan/current:
-    get:
-      summary: ''
-      operationId: getApiV1PlanCurrent
-      description: ''
-      parameters: []
-      responses:
-        401:
-          description: ''
-          content:
-            application/json:
-              schema:
-                type: object
-                example:
-                  message: Unauthenticated.
-                properties:
-                  message:
-                    type: string
-                    example: Unauthenticated.
-      tags:
-        - Endpoints
+      security: []

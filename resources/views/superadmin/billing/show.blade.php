@@ -57,7 +57,7 @@
                                 <dd class="col-7"><code>{{ $order->order_number }}</code></dd>
 
                                 <dt class="col-5">Amount</dt>
-                                <dd class="col-7 fw-bold fs-4">{{ App\Helpers\CurrencyHelper::formatPlatform($order->amount) }}</dd>
+                                <dd class="col-7 fw-bold fs-4">{{ App\Helpers\CurrencyHelper::formatPlatformIdr($order->amount) }}</dd>
 
                                 <dt class="col-5">Status</dt>
                                 <dd class="col-7">
@@ -143,7 +143,7 @@
                 </span>
                 <h4 class="fw-bold mb-2">Void Order #{{ $order->order_number }}?</h4>
                 <p class="text-muted mb-0">
-                    Void order for <strong>{{ App\Helpers\CurrencyHelper::formatPlatform($order->amount) }}</strong>.
+                    Void order for <strong>{{ App\Helpers\CurrencyHelper::formatPlatformIdr($order->amount) }}</strong>.
                     This action cannot be undone.
                 </p>
             </div>

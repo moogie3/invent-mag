@@ -40,9 +40,9 @@ class SubscriptionController extends Controller
         }
 
         \DB::transaction(function () use ($tenant) {
-            // Void all pending/waiting orders for this tenant
+            // Void all pending orders for this tenant
             SubscriptionOrder::where('tenant_id', $tenant->id)
-                ->whereIn('status', ['pending', 'waiting'])
+                ->where('status', 'pending')
                 ->update(['status' => 'voided']);
 
             // Cancel any scheduled downgrade and clear proration

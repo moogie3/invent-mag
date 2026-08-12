@@ -4,6 +4,7 @@ namespace App\Http\Controllers\SuperAdmin;
 
 use App\Helpers\CurrencyHelper;
 use App\Http\Controllers\Controller;
+use App\Models\BillingSetting;
 use App\Models\PlatformCurrencySetting;
 use App\Models\SuperAdmin;
 use App\Services\CurrencyService;
@@ -188,5 +189,25 @@ class SettingController extends Controller
 
         return redirect()->route('superadmin.settings.platform-currency')
             ->with('success', 'Platform currency settings updated successfully.');
+    }
+
+    public function billingRate()
+    {
+        $rate = BillingSetting::getRate();
+        $rateUpdatedAt = BillingSetting::first()?->rate_updated_at;
+
+        return view('superadmin.settings.billing-rate', compact('rate', 'rateUpdatedAt'));
+    }
+
+    public function updateBillingRate(Request $request)
+    {
+        $validated = $request->validate([
+            'usd_idr_rate' => 'required|numeric|min:1|max:100000',
+        ]);
+
+        BillingSetting::setRate((float) $validated['usd_idr_rate']);
+
+        return redirect()->route('superadmin.settings.billing-rate')
+            ->with('success', 'Billing exchange rate updated successfully.');
     }
 }

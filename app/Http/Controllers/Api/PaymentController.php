@@ -27,10 +27,33 @@ class PaymentController extends Controller
     }
 
     /**
-     * Confirm payment directly from frontend after successful Snap transaction.
-     * This ensures the plan is updated immediately without waiting for webhook.
+     * Confirm payment after a successful Midtrans Snap transaction.
      *
-     * Security: Verifies the order belongs to the current tenant.
+     * Verifies the order belongs to the current tenant, checks the Midtrans
+     * transaction status, and marks the order paid. Use this after the
+     * frontend completes a Snap transaction so the plan updates immediately
+     * without waiting for the webhook.
+     *
+     * @group Payments
+     * Payment confirmation for Midtrans Snap transactions.
+     *
+     * @bodyParam order_id string required The subscription order number (matches `subscription_orders.order_number`).
+     * @bodyParam transaction_result object required The raw result object returned by the Midtrans Snap API.
+     *
+     * @response scenario=success {
+     *   "message": "Payment confirmed successfully",
+     *   "plan": "Professional"
+     * }
+     * @response status=400 scenario="payment not completed" {
+     *   "message": "Payment not completed",
+     *   "status": "pending"
+     * }
+     * @response status=404 scenario="order not found" {
+     *   "message": "Order not found"
+     * }
+     * @response status=500 scenario="verification failure" {
+     *   "message": "Payment verification failed. Please try again later."
+     * }
      */
     public function confirm(Request $request)
     {

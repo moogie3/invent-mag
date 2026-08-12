@@ -40,6 +40,10 @@
                                     class="list-group-item list-group-item-action d-flex align-items-center {{ request()->routeIs('superadmin.settings.platform-currency') ? 'active' : '' }}">
                                     <i class="ti ti-currency-dollar fs-2 me-2"></i> Platform Currency
                                 </a>
+                                <a href="{{ route('superadmin.settings.billing-rate') }}"
+                                    class="list-group-item list-group-item-action d-flex align-items-center {{ request()->routeIs('superadmin.settings.billing-rate') ? 'active' : '' }}">
+                                    <i class="ti ti-cash fs-2 me-2"></i> Billing Rate
+                                </a>
                                 <a href="{{ route('superadmin.settings.preferences') }}"
                                     class="list-group-item list-group-item-action d-flex align-items-center {{ request()->routeIs('superadmin.settings.preferences') ? 'active' : '' }}">
                                     <i class="ti ti-adjustments fs-2 me-2"></i> Preferences

@@ -79,6 +79,9 @@
                                 ${{ number_format($plan->price, 0) }}
                                 <span class="fs-5 fw-normal text-secondary">{{ __('plan.billing_monthly') }}</span>
                             </div>
+                            <div class="text-secondary small mb-3">
+                                ≈ Rp {{ number_format($plan->price * $billingRate, 0, ',', '.') }}
+                            </div>
                             @if($plan->description)
                                 <p class="text-muted mb-4">{{ $plan->description }}</p>
                             @endif

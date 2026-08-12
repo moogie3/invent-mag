@@ -5,11 +5,9 @@ use App\Http\Controllers\Api\Auth\RegisteredUserController;
 use App\Http\Controllers\Api\CmsController;
 use App\Http\Controllers\Api\ContactController;
 use App\Http\Controllers\Api\PaymentController;
+use App\Http\Controllers\Api\PlanController;
 use App\Http\Controllers\Api\TenantLookupController;
 use App\Http\Controllers\Api\Webhook\MidtransController;
-use App\Models\Plan;
-use App\Services\PlanService;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -25,9 +23,12 @@ use Illuminate\Support\Facades\Route;
 // CMS content (public, no auth required)
 Route::get('/cms', [CmsController::class, 'show'])->name('api.cms.show');
 
+// Public pricing data for the marketing site (no auth required)
+Route::get('/plans', [PlanController::class, 'index'])->name('api.plans.public');
+
 // Webhooks (Must be outside of CSRF and auth middleware)
 Route::post('/webhooks/midtrans', [MidtransController::class, 'handle'])->name('api.webhooks.midtrans');
-Route::post('/webhook', [MidtransController::class, 'handle']); // Fallback for misconfigured Midtrans dashboard
+Route::post('/webhook', [MidtransController::class, 'handleFallback']); // Fallback for misconfigured Midtrans dashboard
 
 // Payment confirmation - requires authentication
 Route::middleware('auth:sanctum')->group(function () {
@@ -50,29 +51,9 @@ Route::post('/contact', [ContactController::class, 'submit'])
 
 // Protected routes - Token management only
 Route::middleware(['auth:sanctum', 'throttle:api'])->prefix('v1')->group(function () {
-    Route::post('/refresh-token', function (Request $request) {
-        $user = $request->user();
+    Route::post('/refresh-token', [AuthController::class, 'refresh'])->name('api.refresh-token');
 
-        // Revoke old tokens
-        $user->tokens()->delete();
+    Route::get('/plans', [PlanController::class, 'authenticatedIndex'])->name('api.plans.index');
 
-        // Create new token
-        $token = $user->createToken('auth_token', ['*'], now()->addDay())->plainTextToken;
-
-        return response()->json([
-            'token' => $token,
-            'expires_at' => now()->addDay()->toISOString(),
-        ]);
-    })->name('api.refresh-token');
-
-    // Plan endpoints
-    Route::get('/plans', function () {
-        return response()->json(Plan::active()->ordered()->get());
-    })->name('api.plans.index');
-
-    Route::get('/plan/current', function (Request $request) {
-        $planService = app(PlanService::class);
-
-        return response()->json($planService->getUsageStats());
-    })->name('api.plan.current');
+    Route::get('/plan/current', [PlanController::class, 'current'])->name('api.plan.current');
 });

@@ -1,5 +1,5 @@
 {
-    "hero_title": "Invent-MAGs",
+    "hero_title": "The All-In-One ERP to Streamline Your Business",
     "hero_subtitle": "From inventory and sales to a full accounting suite, Invent-MAG provides the tools you need to make smarter, data-driven decisions and accelerate your growth.",
     "hero_cta_text": "Start 30-Day Free Trial",
     "hero_cta_url": "\/signup",
@@ -20,7 +20,7 @@
     "feature_card_5_title": "HR & Payroll",
     "feature_card_5_desc": "Comprehensive employee attendance tracking, automated salaried proration, customizable allowances, and automated two-step accounting sync.",
     "feature_card_6_title": "Multi-Currency Support",
-    "feature_card_6_desc": "Handle transactions in multiple currencies with configurable settings for symbols, decimal places, and exchange rates.",
+    "feature_card_6_desc": "Configure your currency display with custom symbols, thousands and decimal separators, and decimal places for a consistent, localized experience.",
     "feature_card_7_title": "Returns Management",
     "feature_card_7_desc": "Complete sales and purchase return workflows with automatic stock adjustments and accounting entries.",
     "feature_card_8_title": "User & Role Management",

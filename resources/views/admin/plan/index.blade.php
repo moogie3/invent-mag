@@ -157,6 +157,7 @@
                                                     </div>
                                                     <div class="text-secondary mb-2 fw-medium">
                                                         ${{ number_format($currentPlan->price, 2) }} <span class="text-muted fw-normal">{{ __('plan.billing_monthly') }}</span>
+                                                        <span class="text-muted fw-normal">· ≈ Rp {{ number_format($currentPlan->price * $billingRate, 0, ',', '.') }}</span>
                                                     </div>
                                                     @if($currentPlan->description)
                                                         <p class="text-muted small mb-0">{{ $currentPlan->description }}</p>

@@ -83,7 +83,7 @@ class CmsController extends Controller
             'feature_card_5_title' => 'HR & Payroll',
             'feature_card_5_desc' => 'Comprehensive employee attendance tracking, automated salaried proration, customizable allowances, and automated two-step accounting sync.',
             'feature_card_6_title' => 'Multi-Currency Support',
-            'feature_card_6_desc' => 'Handle transactions in multiple currencies with configurable settings for symbols, decimal places, and exchange rates.',
+            'feature_card_6_desc' => 'Configure your currency display with custom symbols, thousands and decimal separators, and decimal places for a consistent, localized experience.',
             'feature_card_7_title' => 'Returns Management',
             'feature_card_7_desc' => 'Complete sales and purchase return workflows with automatic stock adjustments and accounting entries.',
             'feature_card_8_title' => 'User & Role Management',

@@ -3,21 +3,51 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Models\BillingSetting;
 use Illuminate\Http\JsonResponse;
 
 class CmsController extends Controller
 {
+    /**
+     * Get marketing-site CMS content.
+     *
+     * Returns the landing-page copy (hero, features, pricing, CTA, footer)
+     * served to the Astro marketing site at build time. Also includes the
+     * current USD→IDR billing rate, computed live from `BillingSetting::getRate()`
+     * (superadmin-managed at Superadmin → Settings → Billing Rate), falling back
+     * to `config/billing.php`. Responses are cached for 1 hour.
+     *
+     * @group CMS Content
+     * Public landing-page content and billing rate served to the Astro marketing site at build time.
+     *
+     * @unauthenticated
+     *
+     * @response scenario=success {
+     *   "hero_title": "The All-In-One ERP to Streamline Your Business",
+     *   "hero_subtitle": "From inventory and sales to a full accounting suite, Invent-MAG provides the tools you need to make smarter, data-driven decisions and accelerate your growth.",
+     *   "pricing_badge": "Simple, transparent pricing",
+     *   "pricing_title": "One platform, every tool your business needs",
+     *   "pricing_most_popular_badge": "most popular",
+     *   "billing_rate": 16000,
+     *   "cta_title": "Ready to streamline your business?",
+     *   "contact_email": "jefrydwijaya3@gmail.com",
+     *   "footer_text": "© 2026 Invent-MAG. All rights reserved."
+     * }
+     */
     public function show(): JsonResponse
     {
         $defaults = $this->getDefaults();
 
         $path = storage_path('app/cms.json');
         if (! file_exists($path)) {
+            $defaults['billing_rate'] = BillingSetting::getRate();
+
             return response()->json($defaults);
         }
 
         $stored = json_decode(file_get_contents($path), true) ?? [];
         $content = array_merge($defaults, $stored);
+        $content['billing_rate'] = BillingSetting::getRate();
 
         return response()->json($content)->header('Cache-Control', 'public, max-age=3600');
     }
@@ -46,7 +76,7 @@ class CmsController extends Controller
             'feature_card_5_title' => 'HR & Payroll',
             'feature_card_5_desc' => 'Comprehensive employee attendance tracking, automated salaried proration, customizable allowances, and automated two-step accounting sync.',
             'feature_card_6_title' => 'Multi-Currency Support',
-            'feature_card_6_desc' => 'Handle transactions in multiple currencies with configurable settings for symbols, decimal places, and exchange rates.',
+            'feature_card_6_desc' => 'Configure your currency display with custom symbols, thousands and decimal separators, and decimal places for a consistent, localized experience.',
             'feature_card_7_title' => 'Returns Management',
             'feature_card_7_desc' => 'Complete sales and purchase return workflows with automatic stock adjustments and accounting entries.',
             'feature_card_8_title' => 'User & Role Management',
@@ -66,6 +96,7 @@ class CmsController extends Controller
             'pricing_most_popular_badge' => 'most popular',
             'pricing_trial_included' => '30 days free trial included',
             'pricing_enterprise_support' => 'Enterprise support & SLA',
+            'billing_rate' => (float) config('billing.fallback_rate', 16000),
             'cta_title' => 'Ready to streamline your business?',
             'cta_description' => 'Join thousands of businesses using Invent-MAG to manage inventory, sales, and accounting in one place.',
             'contact_email' => 'jefrydwijaya3@gmail.com',

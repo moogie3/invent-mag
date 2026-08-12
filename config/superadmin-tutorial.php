@@ -207,7 +207,7 @@ return [
         'icon' => 'ti ti-settings',
         'description' => 'Global application configuration written to the .env file.',
         'steps' => [
-            'Use the <strong>left sidebar</strong> to switch between Application, Platform Currency, and Preferences settings.',
+            'Use the <strong>left sidebar</strong> to switch between Application, Platform Currency, Billing Rate, and Preferences settings.',
             'Edit the <strong>Application Name</strong>, <strong>Application URL</strong>, and <strong>Debug Mode</strong> toggle.',
             'Some fields are <strong>read-only</strong> (Environment, Mail Driver, Mail From Address, Mail From Name) — these must be changed directly in the .env file.',
             'Click <strong>Save Application Settings</strong> to persist changes to the .env file.',
@@ -219,7 +219,7 @@ return [
         'icon' => 'ti ti-currency-dollar',
         'description' => 'Configure the currency symbol and formatting for the super admin panel. This does not affect tenant currency settings.',
         'steps' => [
-            'Use the <strong>left sidebar</strong> to switch between Application, Platform Currency, and Preferences settings.',
+            'Use the <strong>left sidebar</strong> to switch between Application, Platform Currency, Billing Rate, and Preferences settings.',
             'Select a <strong>Currency Code</strong> from the dropdown — the symbol and name auto-fill when a preset is selected.',
             'Set the <strong>Currency Symbol</strong> and choose <strong>position</strong> (prefix like $100 or suffix like 100$).',
             'Configure number formatting: <strong>decimal separator</strong>, <strong>thousand separator</strong>, and <strong>decimal places</strong>.',
@@ -228,12 +228,25 @@ return [
         ],
     ],
 
+    'superadmin.settings.billing-rate' => [
+        'title' => 'Billing Exchange Rate',
+        'icon' => 'ti ti-cash',
+        'description' => 'Set the USD → IDR rate used to convert plan prices to the IDR gross amount charged via the payment gateway at checkout.',
+        'steps' => [
+            'Use the <strong>left sidebar</strong> to switch between Application, Platform Currency, Billing Rate, and Preferences settings.',
+            'Enter the <strong>exchange rate</strong> (1 USD = Rp ...). Plan prices are stored in USD.',
+            'Review the <strong>price preview</strong> for Starter, Professional, and Enterprise plans at the current rate (before 12% PPN).',
+            'Click <strong>Save Rate</strong> to apply — the new rate is used for all future checkout charges.',
+            '<strong>Note:</strong> Keep the marketing site (<code>invent-mag-fe</code> <code>PUBLIC_USD_TO_IDR</code>) in sync with this rate.',
+        ],
+    ],
+
     'superadmin.settings.preferences' => [
         'title' => 'System Preferences',
         'icon' => 'ti ti-adjustments',
         'description' => 'Customize your interface, theme, notifications and more.',
         'steps' => [
-            'Use the <strong>left sidebar</strong> to switch between Application, Platform Currency, and Preferences settings.',
+            'Use the <strong>left sidebar</strong> to switch between Application, Platform Currency, Billing Rate, and Preferences settings.',
             '<strong>Interface Layout:</strong> Enable sidebar lock and sticky navbar for your preferred navigation behavior.',
             '<strong>Theme Configuration:</strong> Switch between Light and Dark themes, and toggle the theme switch button visibility.',
             '<strong>Notifications & Alerts:</strong> Configure sound and browser notifications, success message display, and notification duration.',

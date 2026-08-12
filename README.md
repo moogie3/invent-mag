@@ -15,7 +15,7 @@
 | **🏗️ Architecture**  | Multi-tenant SaaS                            |
 | **🧪 Test Coverage** | 1099 tests / 3317 assertions                |
 | **💻 Codebase**      | 451+ commits, 1.5 years development          |
-| **🔐 Security**      | RBAC with 79 permissions, audit logging      |
+| **🔐 Security**      | RBAC with 101 permissions, audit logging      |
 | **🐳 DevOps**        | Docker + GitHub Actions CI/CD                |
 | **📡 API**           | RESTful API with Sanctum authentication      |
 | **🌍 Multi-tenancy** | Subdomain-based SaaS (`*.invent-mag.web.id`) |
@@ -294,6 +294,8 @@ Experience Invent-MAG firsthand:
 - **Category Management:** Product categorization
 - **Unit Management:** Units of measure
 
+> 📘 **New to the project?** See [`docs/OWNER_SETUP_GUIDE.md`](docs/OWNER_SETUP_GUIDE.md) — a step-by-step walkthrough for first-time setup (environment, domains, superadmin panel, CMS, billing & payments).
+
 ### **🏢 Super Admin Panel (SaaS Management)**
 
 A fully separate admin panel for platform operators, running on the root domain with its own authentication guard and model.
@@ -422,7 +424,7 @@ Data:
 | --------------------- | ----------------------------------------------------- |
 | **Authentication**    | Laravel Fortify + Email Verification                  |
 | **API Security**      | Laravel Sanctum (Token-based)                         |
-| **Authorization**     | Spatie Permission (79 permissions)                    |
+| **Authorization**     | Spatie Permission (101 permissions)                    |
 | **Tenant Isolation**  | Spatie Multitenancy (Row-level isolation)             |
 | **Password Security** | Bcrypt hashing                                        |
 | **CSRF Protection**   | Built-in token validation                             |

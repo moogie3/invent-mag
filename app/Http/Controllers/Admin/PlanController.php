@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\BillingSetting;
 use App\Models\Plan;
 use App\Models\SubscriptionOrder;
 use App\Services\BillingService;
@@ -45,6 +46,7 @@ class PlanController extends Controller
         $currentPlan = $this->planService->getCurrentPlan();
         $plans = $this->planService->getAvailablePlans();
         $features = config('plans.features');
+        $billingRate = BillingSetting::getRate();
 
         if ($request->query('success') == 1 && $tenant) {
             $recentOrder = SubscriptionOrder::where('tenant_id', $tenant->id)
@@ -77,7 +79,7 @@ class PlanController extends Controller
             }
         }
 
-        return view('admin.plan.index', compact('usageStats', 'currentPlan', 'plans', 'features', 'tenant'));
+        return view('admin.plan.index', compact('usageStats', 'currentPlan', 'plans', 'features', 'tenant', 'billingRate'));
     }
 
     /**
@@ -99,6 +101,7 @@ class PlanController extends Controller
         // Detect active trial — used to suppress renewal buttons and expiring-soon banners
         // because a trial countdown should not be conflated with a paid subscription expiry
         $isOnActiveTrial = $tenant ? $tenant->isOnActiveTrial() : false;
+        $billingRate = BillingSetting::getRate();
 
         // Check if plan is expiring soon (within 7 days) — only for paid subscriptions.
         // Active trials are excluded because their trial window should not
@@ -128,7 +131,8 @@ class PlanController extends Controller
             'isOnActiveTrial',
             'expiringSoon',
             'expiryDays',
-            'currentExpiryDate'
+            'currentExpiryDate',
+            'billingRate'
         ));
     }
 
@@ -149,8 +153,8 @@ class PlanController extends Controller
 
         $orderNumber = 'INV-'.strtoupper(uniqid()).'-'.time();
 
-        $exchangeRate = 16000;
-        $taxRate = 0.12;
+        $exchangeRate = BillingSetting::getRate();
+        $taxRate = config('billing.tax_rate', 0.12);
 
         if ($changeType === 'upgrade') {
             $daysRemaining = $this->billingService->getDaysRemainingInPeriod($tenant);
@@ -233,13 +237,14 @@ class PlanController extends Controller
         $priceIdr = $order->amount;
         $changeType = $order->change_type;
 
-        $exchangeRate = 16000;
+        $exchangeRate = BillingSetting::getRate();
         $priceUsd = $priceIdr / $exchangeRate;
-        $taxRate = 0.12;
+        $taxRate = config('billing.tax_rate', 0.12);
         $taxAmount = $priceUsd * $taxRate;
         $totalUsd = $priceUsd + $taxAmount;
+        $billingRate = $exchangeRate;
 
-        return view('admin.plan.checkout', compact('order', 'snapToken', 'newPlan', 'currentPlan', 'priceIdr', 'priceUsd', 'taxAmount', 'totalUsd', 'changeType'));
+        return view('admin.plan.checkout', compact('order', 'snapToken', 'newPlan', 'currentPlan', 'priceIdr', 'priceUsd', 'taxAmount', 'totalUsd', 'changeType', 'billingRate'));
     }
 
     /**

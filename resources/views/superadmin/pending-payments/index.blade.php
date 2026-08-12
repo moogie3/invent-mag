@@ -34,7 +34,7 @@
                     <div class="card shadow border-0 rounded-4 stat-card card-hover">
                         <div class="card-body text-center">
                             <div class="subheader">Total Pending Amount</div>
-                            <div class="h1 mb-0 text-warning">{{ App\Helpers\CurrencyHelper::formatPlatform($stats['total_amount']) }}</div>
+                            <div class="h1 mb-0 text-warning">{{ App\Helpers\CurrencyHelper::formatPlatformIdr($stats['total_amount']) }}</div>
                         </div>
                         <i class="ti ti-currency-dollar stat-icon text-warning"></i>
                     </div>
@@ -62,7 +62,7 @@
                                     <a href="{{ route('superadmin.tenants.show', $order->tenant) }}" class="text-reset">{{ $order->tenant?->name ?? 'Deleted' }}</a>
                                 </td>
                                 <td>{{ $order->plan?->name ?? 'N/A' }}</td>
-                                <td class="fw-semibold">{{ App\Helpers\CurrencyHelper::formatPlatform($order->amount) }}</td>
+                                <td class="fw-semibold">{{ App\Helpers\CurrencyHelper::formatPlatformIdr($order->amount) }}</td>
                                 <td class="text-muted">{{ $order->created_at->format('M d, Y H:i') }}</td>
                                 <td>
                                     <div class="d-flex gap-1">

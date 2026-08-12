@@ -13,7 +13,7 @@ return [
     'title' => config('app.name').' API Documentation',
 
     // A short description of your API. Will be included in the docs webpage, Postman collection and OpenAPI spec.
-    'description' => '',
+    'description' => 'Invent-MAG exposes a deliberately small REST API covering authentication, tenant discovery, CMS content, marketing plan pricing, payment confirmations, and Midtrans webhooks. All other functionality is served by the session-authenticated web admin panel (`/admin/*`) and is intentionally not part of the API.',
 
     // Text to place in the "Introduction" section, right after the `description`. Markdown and HTML are supported.
     'intro_text' => <<<'INTRO'
@@ -176,7 +176,14 @@ return [
         // You can override this by listing the groups, subgroups and endpoints here in the order you want them.
         // See https://scribe.knuckles.wtf/blog/laravel-v4#easier-sorting and https://scribe.knuckles.wtf/laravel/reference/config#order for details
         // Note: does not work for `external` docs types
-        'order' => [],
+        'order' => [
+            'Authentication',
+            'CMS Content',
+            'Plans',
+            'Payments',
+            'Webhooks',
+            'Contact',
+        ],
     ],
 
     // Custom logo path. This will be used as the value of the src attribute for the <img> tag,

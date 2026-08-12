@@ -29,8 +29,6 @@ return [
     'trial_ends_in' => 'Your trial ends in :days days',
     'trial_ended' => 'Your trial has ended',
     'upgrade_to_unlock' => 'Upgrade to unlock more features',
-    'upgrade_required' => 'Upgrade Required',
-    'upgrade_desc' => 'This feature is not available on your current plan.',
     'feature_requires_upgrade' => 'The ":feature" feature requires the :plan plan or higher.',
     'view_plans' => 'View Plans',
     'go_back' => 'Go Back',

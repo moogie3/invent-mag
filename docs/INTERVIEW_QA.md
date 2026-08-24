@@ -2018,6 +2018,390 @@ Matched journal entries become **immutable** once a reconciliation completes. `a
 | **1/5** | Incorrect or confused; cannot connect concepts to the actual codebase |
 | **0/5** | No knowledge of the topic |
 
+---
+
+## 26. Purchasing & Accounts Payable (AP)
+
+### Q26.1 — Walk through the Purchase Order lifecycle from creation to payment, including stock and accounting effects.
+
+**`PurchaseService::createPurchase()`** runs entirely inside a `DB::transaction()`:
+
+1. Decodes `products` JSON; throws on empty/invalid data
+2. For each line item: creates a `POItem` record (stores `expiry_date` per batch, sets `remaining_quantity = quantity`), increments `ProductWarehouse.quantity` via `firstOrCreate` + `increment` (creates the pivot row if the product has never been stocked in that warehouse)
+3. Calculates totals: `PurchaseHelper::calculateDiscount()` (order discount) → `afterDiscount` → `PurchaseHelper::calculateTaxAmount()` → `finalTotal`; for inclusive tax `finalTotal = afterDiscount`; for exclusive `finalTotal = afterDiscount + taxAmount`
+4. Subtracts PPh from `finalTotal` (`max(0, finalTotal - pphAmount)`)
+5. Updates the Purchase header with `total`, `total_tax`, `pph_enabled/rate/amount/tax_id`, `ppn_enabled/rate/amount`
+6. Creates accounting journal entry — **throws if `inventory_account_id` or `accounts_payable_account_id` is not configured** (unlike sales which silently skips). Standard entry:
+   - `Dr Inventory` (gross or net-of-PPN amount)
+   - `Cr Accounts Payable` (`finalTotal` — net of PPh)
+   - `Dr PPN Masukan` (input VAT asset, code `1160`) — only if Indonesian + `is_ppn` tax + `ppn_masukan_account_id` configured; when present, Inventory is debited at the pre-tax (`afterDiscount`) amount instead of gross
+   - `Cr PPh Payable` (code `2150`) — only if Indonesian + `is_pph` + `pph_payable_account_id` configured
+
+**Payment status machine** (`updatePurchaseStatus()`):
+- `Unpaid` → `Partial` (some payments, total < grand total)
+- `Partial` → `Paid` (total payments ≥ grand total, within `round(..., 2)`)
+
+**`addPayment()`** — separate from creation; creates a `Payment` morph record and journals `Dr AP / Cr Cash`. **Throws** if `accounts_payable_account_id` or `cash_account_id` is missing (no silent skip).
+
+**`deletePurchase()`** — reverses all sourced `posted` journal entries via `AccountingService::reverseJournalEntry()`, decrements stock per line item, then deletes.
+
+**Dashboard aggregates** — `getPurchaseIndexData()` uses a single raw SQL aggregate join instead of hydrating all records, tracking domestic (`IN`) vs. foreign (`OUT`) supplier split and monthly totals.
+
+---
+
+### Q26.2 — How do Purchase Returns work and what is the accounting treatment?
+
+**`PurchaseReturnService::createPurchaseReturn()`**:
+
+1. Decodes `items` JSON, filters for `returned_quantity > 0`
+2. Calculates `totalReturnAmount` server-side (return_price × returned_qty per line)
+3. Inherits tax from the original Purchase (`tax_rate`, `tax_type`, `tax_id`)
+4. Creates `PurchaseReturn` + `PurchaseReturnItem` records
+5. Decrements `ProductWarehouse.quantity` (from the PO's warehouse, falls back to main warehouse)
+6. Decrements `POItem.remaining_quantity` (FIFO across batch lines via `decrementPOItemRemaining()`)
+7. Updates original PO status: total returned qty ≥ total purchased qty → `Returned`; partial → `Partial`
+8. Creates a 4-leg journal entry:
+   - `Dr AP` (reduce what is owed) by `totalReturnAmount`
+   - `Cr Purchase Returns` (contra-COGS, account code `5120-{tenantId}`) by `totalReturnAmount`
+   - `Dr COGS/Purchases` by `proportionalPurchase` (= `originalInventoryDebit × returnRatio`, derived by reading the original PO journal entry's inventory debit line)
+   - `Cr Inventory` by `proportionalPurchase`
+
+**Status values:** `Pending`, `Completed`, `Canceled`
+
+**Cancel** (`cancelPurchaseReturn()`) — if cancelling a `Completed` return: restores stock, restores `remaining_quantity` via `incrementPOItemRemaining()`, reverses the return journal entry via `AccountingService::reverseJournalEntry()`, then sets status `Canceled`.
+
+**No "SupplierCredit" model exists** — purchase returns directly reduce AP via the journal entry (no credit note record analogous to `CustomerCredit`).
+
+---
+
+## 27. Point of Sale (POS)
+
+### Q27.1 — How does the POS module differ from a regular sale, and what does `PosService::createSale()` do?
+
+POS is a **walk-up, always-paid, single-warehouse** sale path distinct from the regular `SalesService::createSale()`.
+
+**Key differences:**
+
+| Aspect | Regular Sale (`SalesService`) | POS (`PosService`) |
+|---|---|---|
+| Payment at creation | No — `addPayment()` called separately | Yes — `Payment` record created immediately |
+| Warehouse | Any warehouse on the order | Main warehouse only (`is_main = true`) |
+| Invoice format | User-supplied | Auto-generated `POS-0001` (sequential) |
+| Status at creation | `Pending` or `Unpaid` | Always `Paid` |
+| COGS source | FEFO batch (`po_items` cost) | `product.cost_price` × qty (no FEFO) |
+| Stock decrement | Via FEFO deduction loop | Direct `ProductWarehouse.decrement()` |
+| Sale type | `Sales::TYPE_SALE` | `Sales::TYPE_POS` |
+
+**`PosService::createSale()` steps:**
+
+1. Decodes `products` JSON; throws on empty/invalid
+2. Resolves tax: `data['tax_id']` → falls back to `Tax::default()` → `Tax::active()->first()`
+3. Calculates: `taxable = subtotal − orderDiscount`; `taxAmount = SalesHelper::calculateTaxAmount(...)`; `grandTotal = inclusive ? taxable : taxable + taxAmount`; then **subtracts PPh**: `grandTotal = max(0, grandTotal − pphAmount)`
+4. Cash payment guard: if `payment_method === 'CASH'` and `amount_received < grandTotal` → throws
+5. Resolves invoice number from last `POS-%` invoice (`str_pad` to 4 digits)
+6. Verifies main warehouse exists; throws if not
+7. Validates stock per product in main warehouse — throws `'Insufficient stock for: ...'` if any line is short
+8. Inside `DB::transaction()`:
+   - Creates `Sales` record (`status='Paid'`, `type=TYPE_POS`, `change_amount = max(0, received − grandTotal)`, stores `pph_*` fields only if Indonesian + `is_pph`)
+   - Creates one `Payment` record (`amount = grandTotal`, `payment_date = now()`)
+   - Creates `SalesItem` lines; decrements `ProductWarehouse` per line
+   - Computes `totalCostOfGoods` using `product.cost_price` × qty (not FEFO)
+   - **Accounting** (only if all 4 required `accounting_settings` keys present):
+     - Sale entry: `Dr AR / Cr Revenue / Dr COGS / Cr Inventory`
+     - VAT split (Indonesian + `is_ppn` + `ppn_keluaran_account_id`): adds `Cr PPN Keluaran`; reduces revenue credit to `grandTotal − taxAmount`
+     - Payment entry (if `cash_account_id` set): `Dr Cash / Cr AR`
+     - PPh entry (if Indonesian + `is_pph` + `pph_receivable_account_id`): `Dr PPh Receivable / Cr AR`
+   - Returns the created `Sales` model
+
+**`getReceiptData(Sales $sale)`** recomputes all totals from the sale record for the receipt view (line discounts, order discount, tax, PPh, change).
+
+---
+
+## 28. Financial Reporting Suite
+
+### Q28.1 — What financial reports does the system produce and how are they generated?
+
+**Reports available** (`ReportController`, `routes/admin/reports.php`):
+
+| Report | Service | Route | Plan gate |
+|---|---|---|---|
+| Income Statement (P&L) | `FinancialReportingService::generateIncomeStatement()` | `admin.reports.income-statement` | `plan.feature:financial_reports` |
+| Balance Sheet | `FinancialReportingService::generateBalanceSheet()` | `admin.reports.balance-sheet` | `plan.feature:financial_reports` |
+| Cash Flow Statement | `CashFlowService::generateCashFlowStatement()` | `admin.reports.cash-flow` | `plan.feature:financial_reports` |
+| Aged Receivables | `ReportController::agedReceivables()` | `admin.reports.aged-receivables` | `plan.feature:financial_reports` |
+| Aged Payables | `ReportController::agedPayables()` | `admin.reports.aged-payables` | `plan.feature:financial_reports` |
+| Adjustment Log | `ReportController::adjustmentLog()` | `admin.reports.adjustment-log` | All plans |
+| Recent Transactions | `ReportController::recentTransactions()` | `admin.reports.recent-transactions` | All plans |
+| General Ledger | `GeneralLedgerService::getGeneralLedger()` | (via AccountingController) | `plan.feature:accounting` |
+| Journal Register | `GeneralLedgerService::getJournalEntries()` | (via AccountingController) | `plan.feature:accounting` |
+
+All financial reports require `can:view-financial-reports` permission AND the `plan.feature:financial_reports` middleware.
+
+---
+
+### Q28.2 — Explain the Income Statement and Balance Sheet calculation logic in detail.
+
+**`FinancialReportingService::generateIncomeStatement(startDate, endDate)`:**
+
+- Revenue accounts: for each `type = 'revenue'` account, `balance = credits − debits` within the date range (only `status = posted` entries, tenant-scoped)
+- Expense accounts: for each `type = 'expense'` account, `balance = debits − credits`
+- Uses `withSum()` on the `transactions` relationship with nested `whereHas('journalEntry', ...)` constraints — two `withSum` calls per account type
+- `net_income = total_revenue − total_expenses`
+
+**`FinancialReportingService::generateBalanceSheet(endDate)`:**
+
+- Loads ALL account types with cumulative transaction sums up to `endDate` (all posted entries `date <= endDate`)
+- Normal balance rule: `asset` + `expense` → `debits − credits`; `liability` + `equity` + `revenue` → `credits − debits`
+- Accounts with `abs(balance) <= 0.001` are excluded
+- Revenue and expense balances roll into equity: revenue adds, expense subtracts from `totalEquity`
+- Returns `equation_balanced` boolean: `abs(totalAssets − (totalLiabilities + totalEquity)) < 0.001`
+
+**`GeneralLedgerService::calculateOpeningBalance(accountId, startDate)`:**
+
+- Opening balance = `account.opening_balance` (stored field) + net of all transactions **before** `startDate`
+- Uses raw SQL aggregate (`SUM(CASE WHEN type='debit' THEN amount ELSE 0 END)`) — **does not hydrate historical `Transaction` models into RAM** for performance
+- `period_change = sum(debit − credit)` for transactions in range; `closing = opening + period_change`
+
+---
+
+### Q28.3 — How is the Cash Flow Statement built?
+
+**`CashFlowService::generateCashFlowStatement(startDate, endDate)`** uses the **indirect method**:
+
+1. **Net income** — from `FinancialReportingService::generateIncomeStatement()`
+2. **Non-cash items** — depreciation/amortisation: expense accounts in code range `6200–6299` with period activity > 0.001 (Admin & General Expenses group; `Depreciation Expense` is `6240`)
+3. **Working capital changes** — current asset changes (code `1100–1199` excluding cash `1110–1120`) have a **negative** cash impact when they increase; current liability changes (`2100–2199`) have a **positive** impact. Delta = end balance − start balance.
+4. **Operating cash flow** = net income + non-cash total + working capital total
+5. **Investing activities** — fixed asset accounts (`1200–1299`), excluding contra accounts and level < 2, `cfImpact = −delta`
+6. **Financing activities** — long-term liabilities (`2200–2299`) + equity (`3000–3999`), excluding retained earnings (`3200–3299`) and level < 1, `cfImpact = +delta`
+7. **Cash balance** — accounts with code `1110–1120` (Cash + Bank)
+8. Returns `opening_cash_balance`, `closing_cash_balance`, `net_change_in_cash`
+
+**Note:** Account code ranges are compared by the integer prefix before the first `-` (e.g., `1110-{tenantId}` → prefix `1110`).
+
+---
+
+## 29. Chart of Accounts
+
+### Q29.1 — Describe the Chart of Accounts structure, the account model, and how it is managed.
+
+**`Account` model** fields: `parent_id`, `name`, `code` (e.g. `1130-{tenantId}`), `type`, `level`, `is_active`, `is_contra`, `normal_balance` (`debit`/`credit`), `opening_balance`, `opening_balance_date`, `currency`, `allow_manual_entry`, `tax_type`.
+
+**Default COA seeded by `AccountSeeder`** (runs at tenant creation via `TenantSetupService`):
+
+| Range | Type | Level | Examples |
+|---|---|---|---|
+| `1000` | asset | 0 | Assets (root) |
+| `1100–1170` | asset | 1–2 | Current assets: Cash (1110), Bank (1120), AR (1130), Allowance for Doubtful (1135, contra), Inventory (1140), Prepaid (1150), PPN Masukan/Input VAT (1160), PPh Receivable (1170) |
+| `1200–1235` | asset | 1–2 | Fixed assets: Land (1210), Buildings (1220), Accum. Deprec. Buildings (1225, contra), Equipment (1230), Accum. Deprec. Equipment (1235, contra) |
+| `2100–2150` | liability | 1–2 | Current liabilities: AP (2110), Accrued Expenses (2120), PPN Keluaran/Output VAT (2130), Salary Payable (2140), PPh Payable (2150) |
+| `2200–2210` | liability | 1–2 | Long-term: Bank Loans (2210) |
+| `3000–3200` | equity | 0–1 | Opening Balance Equity (3010), Owner's Equity (3100), Retained Earnings (3200) |
+| `4000–4120` | revenue | 0–1 | Sales Revenue (4100), Sales Returns (4110, contra), Sales Discounts (4120, contra) |
+| `5000–5200` | expense | 0–1 | COGS group: Purchases (5100), Freight-in (5110), Purchase Returns (5120, contra), Purchase Discounts (5130, contra), COGS (5200) |
+| `6000–6300` | expense | 0–2 | Operating expenses: Selling (6100–6120), Admin/General (6200–6240 incl. Depreciation 6240), Salary Expense (6300) |
+
+Account codes are tenant-scoped: `{base}-{tenantId}` (e.g., `1130-5`).
+
+**`ChartOfAccountsService::resetToDefault()`** — destructive reset: disables FK checks, deletes all `Transaction` + `JournalEntry` + `Account` records for the tenant, re-enables FK checks, then calls `Artisan::call('db:seed', ['--class' => 'AccountSeeder'])`. Also auto-configures `accounting_settings` (maps canonical codes to account IDs).
+
+**Accounting settings** stored as JSON in `tenants.accounting_settings`. Required keys (6 mandatory, 4 optional):
+- Required: `sales_revenue_account_id` (4100), `accounts_receivable_account_id` (1130), `cost_of_goods_sold_account_id` (5200), `inventory_account_id` (1140), `accounts_payable_account_id` (2110), `cash_account_id` (1110)
+- Optional: `ppn_keluaran_account_id` (2130), `ppn_masukan_account_id` (1160), `pph_receivable_account_id` (1170), `pph_payable_account_id` (2150)
+
+**`canBeDeleted()`** — account can only be deleted if it has no transactions, no child accounts, and `opening_balance == 0`.
+
+---
+
+## 30. Stock Transfers, Opname & Adjustments
+
+### Q30.1 — How does stock transfer between warehouses work, and what audit trail does it leave?
+
+**`StockTransferController::store()`** — validates `from_warehouse_id != to_warehouse_id`, qty ≥ 1, then:
+
+1. Checks source `ProductWarehouse.quantity` — redirects back with error if insufficient (no exception thrown; it's a web controller)
+2. Inside `DB::transaction()`:
+   - Decrements source `ProductWarehouse.quantity`
+   - `firstOrCreate` destination pivot (with `tenant_id`), increments quantity
+   - Creates **two `StockAdjustment` records** (`adjustment_type = 'transfer'`):
+     - Source: `quantity_before` → `quantity_after = before − transferred`, `reason = "Transfer to {toWarehouse.name}"`
+     - Destination: `quantity_before` → `quantity_after = before + transferred`, `reason = "Transfer from {fromWarehouse.name}"`
+3. Logs via `ActivityLogService::logCreate(ActivityLog::MODULE_STOCK_TRANSFER, "...")` inside a `try/catch` — logging failure never blocks the transfer
+
+`StockAdjustment` types: `increase`, `decrease`, `transfer` (set by the calling code).
+
+---
+
+### Q30.2 — Explain the Stock Opname (physical count) lifecycle.
+
+**`StockOpnameService`** manages a 3-status lifecycle: `Draft` → `In Progress` → `Completed`
+
+**`createOpname(warehouseId, scheduledDate, notes)`:**
+- Reference number: `SO-YYMMDD-0001` (tenant-scoped sequential, 4-digit)
+- Snapshots ALL `ProductWarehouse` rows for the warehouse (expected_qty = current quantity)
+- Includes products with **no stock record** (expected_qty = 0) so new products aren't missed
+- Bulk-inserts `StockOpnameItem` rows in chunks of 500
+
+**`updateCounts(opname, counts)`:**
+- For each product with a non-null `counted_qty`: sets `variance = counted − expected`, `variance_value = abs(variance) × product.cost`
+- Transitions `Draft` → `In Progress` on first count save
+
+**`completeOpname(opname)`:**
+- Throws if already `Completed`
+- For each item with `variance != 0`:
+  1. Sets `ProductWarehouse.quantity = counted_qty`
+  2. Creates a `StockAdjustment` (`increase` or `decrease`, references opname number)
+  3. Accumulates `totalShrinkageValue` and `totalExcessValue` (abs variance × `product.price`)
+- **Accounting** (if `tenant.hasFeature('accounting')` and settings have `inventory_account_id` + `cost_of_goods_sold_account_id`):
+  - Shrinkage: `Dr COGS/Expense / Cr Inventory`
+  - Excess: `Dr Inventory / Cr COGS/Expense`
+  - Single consolidated journal entry per opname; silently skips if accounts not configured
+- Sets `status = Completed`, `completed_at = now()`
+
+---
+
+## 31. Opening Balances & Recurring Journal Entries
+
+### Q31.1 — How are opening balances entered and stored?
+
+**`OpeningBalanceService::saveOpeningBalances(balances, balanceDate, notes)`:**
+
+1. Validates: no negative amounts; `totalDebit − totalCredit < 0.01` (must balance within 1 cent)
+2. Accepts both `'debit'/'credit'` keys (form) and `'amount'/'type'` keys (API) — same method handles both callers
+3. Inside `DB::transaction()`:
+   - Deletes any existing `OpeningBalance` records for `balanceDate`
+   - Deletes any `JournalEntry` with `entry_type = ENTRY_TYPE_OPENING` and `date = balanceDate` (idempotent re-save)
+   - For each non-zero account balance:
+     - Creates an `OpeningBalance` record (`debit_amount`, `credit_amount`, `balance`, `balance_date`)
+     - Updates `accounts.opening_balance` + `accounts.opening_balance_date` directly
+   - Adds an automatic balancing line to the **Opening Balance Equity** account (3010, found by name `%Opening Balance Equity%` OR `%Ekuitas Saldo Awal%`) — `balancingType = debit if totalCredit > totalDebit`
+   - Calls `AccountingService::createOpeningBalanceEntry()` which posts a single `ENTRY_TYPE_OPENING` journal entry
+
+**`getAccountsForSetup()`** — returns `asset/liability/equity` accounts, level ≥ 1, active, excluding the Opening Balance Equity account itself (to prevent a circular entry).
+
+**`deleteOpeningBalances(date)`** — reverses all three side effects: deletes journal entry, deletes `OpeningBalance` records, resets `accounts.opening_balance = 0` and `opening_balance_date = null`.
+
+---
+
+### Q31.2 — How do recurring journal entries work and are they triggered automatically?
+
+**`RecurringJournalEntry` model** — stored as a template with:
+- `name`, `description`, `frequency` (`daily`/`weekly`/`monthly`/`quarterly`/`yearly`), `interval` (multiplier)
+- `start_date`, `end_date` (optional), `next_generation_date`, `last_generated_at`, `is_active`
+- `transactions` — JSON array of `{account_code, type, amount}` line items
+- `template_account_code` — optional; used to append the account name to the description
+
+**`isDueForGeneration()`** — `is_active` AND `end_date` not past AND `now() >= next_generation_date`
+
+**`generateJournalEntry()`** — calls `AccountingService::createJournalEntry()` with the template transactions; updates `last_generated_at` and `next_generation_date` via `calculateNextGenerationDate()` (quarterly = `addMonths(interval × 3)`)
+
+**`ManualJournalEntryService::processRecurringEntries()`** — loops `RecurringJournalEntry::dueForGeneration()->get()`, runs each in a `DB::transaction()`, increments a counter, logs errors without re-throwing.
+
+**⚠ Not wired to the scheduler.** `routes/console.php` only schedules `billing:check-expired` (01:30), `billing:process-scheduled-changes` (01:00), and `tenant:reset-demo` (00:00). `app/Console/Commands` contains only `BackupTenant`, `CheckExpiredSubscriptions`, `ProcessScheduledPlanChanges`, `ResetDemoTenant`. The recurring-entry infrastructure is complete and tested, but automatic triggering requires a future artisan command + schedule entry.
+
+---
+
+## 32. Notification System
+
+### Q32.1 — What is the difference between `NotificationService` and `SystemNotificationService`?
+
+The system has **two complementary notification services** with different scopes, combined by `NotificationController`:
+
+**`NotificationService`** — operational/transactional notifications:
+- Due purchase orders (due ≤ 7 days, limit 20, `type = 'purchase'`)
+- Due sales invoices (due ≤ 7 days, limit 20, `type = 'sales'`)
+- Low stock alerts (`ProductWarehouse.quantity <= product.low_stock_threshold`, `type = 'product'`)
+- Expiring product batches via `POItem::getExpiringSoonItems()` (`type = 'product'`)
+- Show/hide logic: unpaid/partial OR payment made today; sorted by `days_remaining` asc
+- Urgency: ≤ 2 days → `high`; ≤ 5 days → `medium`; else → `low`
+
+**`SystemNotificationService`** — platform/billing/setup notifications:
+- **Trial status** — days remaining (critical ≤ 3, high ≤ 7); trial expired (always critical)
+- **Plan expiry** — 14-day warning window only; skips if on trial; expired = separate message
+- **Usage limits** — fires only when **at or over** the limit (users ≥ `max_users`, warehouses ≥ `max_warehouses`, products ≥ `max_products`)
+- **Accounting setup incomplete** — checks 6 required `accounting_settings` keys; count missing → description
+- **Profile incomplete** — `shopname`, `address`, or `avatar` not set
+- **Scheduled downgrade** — shows `pending_plan_effective_at` and `proration_credit`
+- **Recent upgrade** — within 24 hours of `plan_changed_at`
+- **Product expiry (30-day)** — total count within 30 days; critical if any expire within 7 days
+- **Backup status** — no backups → warning; last backup within 24h → success confirmation; >7 days → overdue (>30 days = high urgency). Checks per-tenant zip files in `storage/app/backups/` by `{domain}-` prefix.
+
+**Dismissal** — both services respect `user.system_settings['dismissed_notifications']` (JSON array of IDs). `markAsRead()` / `clearAll()` in `NotificationController` write to this user JSON column — **not** to Laravel's `notifications` table. Dismissed IDs persist until manually cleared.
+
+**`NotificationController::count()`** — returns `{count: operational + system}` as JSON; returns `{count: 0}` on any exception (never errors the UI).
+
+---
+
+## 33. Tenant Onboarding & Superadmin Tutorial System
+
+### Q33.1 — What happens when a new tenant is created, and what data is seeded automatically?
+
+**`TenantSetupService::setup(Tenant $tenant, ?string $planSlug)`** is called on tenant creation:
+
+1. `$tenant->makeCurrent()` — establishes the tenant context for all subsequent operations
+2. `assignPlan()` — resolves slug (uses `$planSlug` arg, falls back to `config('plans.default_plan', 'starter')`); gracefully skips if no plans exist yet. Calls `PlanService::assignPlanToTenant()`; starts trial if `$plan->hasTrial()`
+3. `runEssentialSeeders()` — runs 5 seeders in order, each in try/catch (failure of one doesn't stop others):
+   - `AccountSeeder` — full Chart of Accounts + auto-configures `accounting_settings`
+   - `CategorySeeder` — default product categories
+   - `UnitSeeder` — units of measurement
+   - `CurrencySeeder` — currency settings
+   - `TaxSeeder` — tax configurations
+4. `createDefaultWarehouse()` — `Warehouse::create(['name' => 'Main Warehouse', 'is_main' => true, 'address' => '{tenant.name} Main Location'])`
+5. `createDefaultCustomer()` — `Customer::create(['name' => 'Walk-in Customer', 'email' => 'cash@{tenant.domain}', ...])`
+6. `Tenant::forgetCurrent()` — clears tenant context
+
+**Result after onboarding:** tenant has a full COA, default categories/units/currency/taxes, one main warehouse, one Walk-in Customer for cash/POS sales, and a plan (with or without trial).
+
+---
+
+### Q33.2 — What is the Superadmin Tutorial System?
+
+The superadmin panel has a context-sensitive help system backed by `config/superadmin-tutorial.php` and `TutorialService`.
+
+**`TutorialService::getContextForRoute(?string $routeName)`:**
+- Looks up `config('tutorial.contexts')` (loaded from the config file) using `Str::is($pattern, $routeName)` for wildcard matching
+- Falls back to a generic "Help & Tutorial" context with 3 general steps
+
+**`config/superadmin-tutorial.php`** — maps 18 superadmin route names to structured help context arrays, each with:
+- `title`, `icon`, `description`
+- `steps` — array of HTML strings (rendered in the help sidebar)
+- Optional `alert`, `env_table`, `env_key`, `docs_file`, `env_note` (CMS page only)
+
+**Routes covered:** `superadmin.dashboard`, `superadmin.tenants.{index,show}`, `superadmin.plans.{index,create,edit}`, `superadmin.subscriptions.index`, `superadmin.features.index`, `superadmin.billing.{index,show}`, `superadmin.transactions.index`, `superadmin.pending-payments.index`, `superadmin.payment-overview.index`, `superadmin.invoices.{index,show}`, `superadmin.permissions.index`, `superadmin.settings.{index,platform-currency,billing-rate,preferences}`, `superadmin.audit-log.{index,show}`, `superadmin.backups.index`, `superadmin.cms.index`
+
+**Note:** The tenant-facing admin panel has a separate `config/tutorial.php` (not `superadmin-tutorial.php`) that powers the same route-aware help sidebar for tenant users.
+
+---
+
+## 34. Audit Logging
+
+### Q34.1 — How does the custom audit logging system work?
+
+The system uses a **custom `ActivityLogService`** + `ActivityLog` model (no `spatie/laravel-activitylog` — not in `composer.lock`).
+
+**`ActivityLogService::log()`** writes to the `activity_logs` table with:
+- `tenant_id`, `user_id`, `user_name`, `user_role` (first Spatie role name)
+- `module` — one of the `MODULE_*` constants
+- `action` — one of the `ACTION_*` constants
+- `entity_type` (FQCN), `entity_id`, `entity_label` (human name)
+- `description` (free text), `old_values`, `new_values` (JSON columns)
+- `ip_address`, `user_agent`
+
+**Convenience shortcuts on `ActivityLogService`:**
+- `logCreate(module, description, $model, $newValues)` — `ACTION_CREATE`, captures `$model->toArray()` as new values
+- `logUpdate(module, description, $model, $oldValues, $newValues)` — `ACTION_UPDATE`
+- `logDelete(module, description, $model, $oldValues)` — `ACTION_DELETE`
+
+**`ActivityLog::MODULE_*` constants (30 modules):**
+`Dashboard`, `Product`, `Sales`, `Sales Return`, `Purchase Order`, `Purchase Return`, `POS`, `Customer`, `Supplier`, `Warehouse`, `Stock Adjustment`, `Stock Transfer`, `Stock Opname`, `Category`, `Unit`, `Tax`, `Currency`, `User`, `Settings`, `Accounting`, `Bank Reconciliation`, `Journal Entry`, `Sales Pipeline`, `CRM`, `Supplier Management` (SRM), `Employee`, `Attendance`, `Payroll`, `Report`, `Payment`
+
+**`ActivityLog::ACTION_*` constants (15 actions):**
+`create`, `update`, `delete`, `login`, `logout`, `export`, `import`, `approve`, `reject`, `transfer`, `adjust`, `payment`, `post`, `void`, `reverse`
+
+**Observer pattern** — 28 models registered in `AppServiceProvider::registerActivityObservers()` (verified in prior session). Observers call `ActivityLogService::logCreate/logUpdate/logDelete` in `created`/`updated`/`deleted` hooks. Logging calls are always wrapped in `try/catch` so a log failure never breaks a business transaction.
+
+**Retention** — no pruning command; logs accumulate. Each log links back to the entity via `entity_type` + `entity_id` (not a morph relationship — plain string columns).
+
 ## Red Flags
 
 - Cannot explain why `BelongsToTenant` doesn't protect raw `DB::table()` queries
@@ -2051,3 +2435,807 @@ Matched journal entries become **immutable** once a reconciliation completes. `a
 - Can walk the full e-Faktur lifecycle: 5-leg VAT split at sale creation → compliance-only Faktur Pajak generation → NSFP FIFO with `lockForUpdate()` → DJP CSV (FK/OF, UTF-8 BOM, integer cents) → SPT Masa PPN (Keluaran − Masukan, Lebih Bayar)
 - Knows why `PPh 22` was replaced by `PPh Final 0.5%` *in place* (existing `pph_tax_id` references stay valid) and can articulate the single-PPh-Payable (2150) rationale
 - Explains that e-Faktur Phase 2 (Klikpajak PJAP behind `PjapInterface`, idempotency keys, dedicated `tax-submissions` queue) is planned and Enterprise-gated via the `efaktur_api` slug
+
+---
+
+## §35 — HR & Payroll Module
+
+### Q35.1 Walk through the full HR & Payroll lifecycle from an employee record through to a paid payslip.
+
+**Scope:** Professional + Enterprise only (feature slug: `hr`). Four controllers in `app/Http/Controllers/Admin/Hr/`: `EmployeeController`, `AttendanceController`, `PayrollController`, `PayslipController`. Two services: `EmployeeService`, `PayrollService`. Routes in `routes/admin/hr.php`.
+
+#### Employee Management (`Employee` model)
+
+Key fields on the `employees` table (verified from migrations and model):
+- `tenant_id`, `name`, `employee_code`, `department`, `position`, `employment_type`
+- `base_salary` (decimal)
+- `bank_account`, `bank_name`, `bank_number` — for payslip
+- `status` (`active` / `resigned` / etc.)
+- `default_allowances` (JSON array — `[{label, amount}, …]`) — auto-populated on each payroll run
+- `default_deductions` (JSON array — same shape) — added on each payroll run (absence deduction appended dynamically)
+- Migration `2026_05_12_035444_add_allowances_deductions_to_employees_table` added the allowances/deductions columns
+
+#### Attendance Period (`AttendancePeriod` model)
+
+- One row per month/year per tenant: `year`, `month`, `status` (`open` / `closed`), `working_days` (configurable — migration `2026_05_12_045741_add_working_days_to_attendance_periods_table`)
+- `working_days` defaults to 21 if null; the period manager can set 22–26 to accommodate Mon–Sat work weeks
+
+#### Attendance Record (`AttendanceRecord` model)
+
+- `period_id`, `employee_id`, `date`, `status` (`present` / `absent` / `sick` / `leave` / `holiday` / `half_day`), `overtime_hours`
+- Entered via the daily grid in `AttendanceController` — supports individual entry, bulk fill, and custom skip-day selection
+
+#### Payroll Run — `PayrollService::runPayroll(AttendancePeriod $period)`
+
+1. **Guard:** checks no existing `PayrollRun` for the period+tenant. Throws `InvalidArgumentException` if one already exists.
+2. **Fetches** all `active` employees for the tenant.
+3. **Creates** a `PayrollRun` record (`status = 'draft'`, `run_date = now()`).
+4. **For each employee:** calls `createPayrollItem()`:
+   - Fetches `AttendanceRecord`s for the period+employee
+   - `presentDays` = count of `present`, `sick`, `leave`, `holiday` (all treated as paid)
+   - `halfDays` = count of `half_day`
+   - `overtimeHours` = sum of `overtime_hours`
+   - `workingDays` = `period->working_days ?? 21`
+   - `overtimePay` = `overtimeHours × (base_salary / 176)` — 176-hour divisor (monthly standard)
+   - `unpaidDays` = `workingDays − (presentDays + halfDays×0.5)` — unrecorded days count as absent
+   - `absenceDeductionAmount` = `(base_salary / workingDays) × unpaidDays` (added as a deduction item)
+   - Creates `PayrollItem` with `allowances = employee.default_allowances`, `deductions = employee.default_deductions + [absence deduction if any]`, `gross_pay = calculateGross()`, `net_pay = calculateNet()`
+5. Returns the `PayrollRun` in `draft` status for review and manual editing.
+
+#### PayrollItem calculations
+
+- `calculateGross()` = `base_salary + sum(allowances.amount) + overtime_pay`
+- `calculateNet()` = `gross_pay − sum(deductions.amount)`
+- Draft items can be edited via `PayrollService::updateItem()` — adjusts allowances/deductions arrays and recalculates gross/net in place
+
+#### Two-step accounting flow
+
+**Step 1 — Approve (`PayrollService::approve()`):**
+- Transitions `PayrollRun` status: `draft` → `processed`
+- Calls `postApprovalJournalEntry()`:
+  - **Dr** `6300-{tenant_id}` (Salary Expense) — `total net_pay` of all items
+  - **Cr** `2140-{tenant_id}` (Salary Payable) — same amount
+  - Source document: `PayrollRun`
+
+**Step 2 — Mark Paid (`PayrollService::markPaid(PayrollRun, accountId)`):**
+- Transitions `PayrollRun` status: `processed` → `paid`, sets `paid_date = now()`
+- Calls `postPaymentJournalEntry()`:
+  - **Dr** `2140-{tenant_id}` (Salary Payable) — clears the liability
+  - **Cr** selected bank account (`account_id` chosen at runtime) — actual cash outflow
+  - Source document: `PayrollRun`
+
+Both journal entries go through `AccountingService::createJournalEntry()` — never directly.
+
+#### Export
+
+`PayrollService::exportRunItems()` supports **PDF** (landscape A4 via Dompdf → `admin.hr.payroll.export-run-pdf`) and **CSV** (headers: Employee, Code, Base Salary, Allowances, Deductions, Overtime, Gross Pay, Net Pay, Present/Working).
+
+`PayrollService::exportRuns()` exports a list of runs (PDF or CSV) — used for multi-period reporting.
+
+#### Payslip
+
+`PayrollService::generatePayslip(PayrollItem)` sets `pdf_path` and `pdf_generated_at` on the item. The payslip blade is at `resources/views/admin/hr/payslip/print.blade.php`. `PayslipController` handles the print/download flow.
+
+#### Blade views
+
+`resources/views/admin/hr/`:
+- `employee/{form,index}.blade.php`
+- `attendance/{index,show,export-pdf,export-period-pdf}.blade.php`
+- `payroll/{index,show,export-pdf,export-run-pdf}.blade.php`
+- `payslip/print.blade.php`
+
+---
+
+### Q35.2 What does `AccountingAuditService` do and how does it differ from `ActivityLogService`?
+
+**Two parallel audit systems coexist:**
+
+| | `AccountingAuditService` | `ActivityLogService` |
+|---|---|---|
+| **Table** | `accounting_audit_logs` | `activity_logs` |
+| **Scope** | Journal entries only | All business entities (30 modules) |
+| **Trigger** | Called explicitly in `ManualJournalEntryService` | Observer pattern on 28 models |
+| **Data** | Full transaction array (account code, name, type, amount per line) + old/new JE state | Module, action, entity reference, old/new values |
+| **Actions tracked** | `create`, `update`, `post`, `unpost`, `void`, `reverse`, `delete`, `approve`, `reject` | `create`, `update`, `delete`, `login`, `logout`, `export`, `import`, `approve`, `reject`, `transfer`, `adjust`, `payment`, `post`, `void`, `reverse` |
+| **Why separate** | Accounting audit needs the full T-account detail (debit/credit per line) which the generic system doesn't capture | Business operation audit needs module/action semantics across all entities |
+
+**`AccountingAuditService` public methods:**
+- `logCreate(JournalEntry, transactions[], description?)` — logs ACTION_CREATE
+- `logUpdate(JournalEntry, oldValues[], newTransactions[])` — logs ACTION_UPDATE
+- `logAction(JournalEntry, action, oldValues?, additionalData[])` — generic action logger (post/unpost/void/reverse/delete/approve/reject)
+- `getEntryAuditLogs(JournalEntry)` — retrieves logs for a single JE (used on the JE show page sidebar — the "Audit Log" badge)
+- `getTenantAuditLogs(filters[])` — paginated tenant-scoped log query (filterable by action, entity_type, user_id, date range)
+- `getAuditSummary(days=30)` — action count breakdown + 10 most recent logs (used by `AuditLogController` for the dashboard cards)
+
+**`AccountingAuditLog` model fields:** `tenant_id`, `action`, `entity_type` (FQCN), `entity_id`, `old_values` (JSON), `new_values` (JSON), `description`, `user_id`, `user_name`, `ip_address`, `user_agent`
+
+---
+
+## §36 — Dashboard Service
+
+### Q36.1 What data does `DashboardService::getDashboardData()` return and how is it computed?
+
+`DashboardService` is a large service (~955 lines) that powers the main dashboard. `getDashboardData()` accepts `dates` (start/end Carbon objects, defaults to current year), `reportType` (`all`/`sales`/`purchases`), and an optional `categoryId` filter.
+
+**Return array keys and their sources:**
+
+| Key | Source |
+|---|---|
+| `topCategories` | Top 5 categories by revenue in the date range (JOIN sales_items → products → categories, SUM) |
+| `monthlyData` | Per-month revenue/expenses/profit/margin breakdown for the date range |
+| `chartLabels` / `chartData` | Monthly sales totals for current year (by order_date) |
+| `purchaseChartLabels` / `purchaseChartData` | Monthly purchase totals for current year |
+| `customerAnalytics` | Total/active customers, retention rate, avg order value, customer LTV (total sales ÷ total customers), top 5 customers |
+| `supplierAnalytics` | Total/active suppliers, payment performance %, avg purchase value, outstanding AP, top 5 suppliers |
+| `recentTransactions` | Up to 20 most recent sales/purchases in the date range (merged and sorted by date) |
+| `topSellingProducts` | Top 5 products by units_sold in the date range |
+| `recentSales` / `recentPurchases` | Latest 3 sales/purchases (for the summary widget) |
+| `lowStockCount` / `lowStockProducts` | Per-warehouse items where `quantity >= low_stock_threshold` (ProductWarehouse JOIN Product) |
+| `expiringSoonItems` | `POItem::getExpiringSoonItems()` |
+| `totalliability` | `Purchase::sum('total')` (all time) |
+| `countliability` | `Purchase::where('status','Unpaid')->sum('total')` |
+| `countRevenue` | `Sales::where('status','Unpaid')->sum('total')` |
+| `countSales` | Current-month Paid sales sum |
+| `paidDebtMonthly` | Current-month Paid sales updated_at sum |
+| `liabilitypaymentMonthly` | Current-month Paid purchases updated_at sum |
+| `avgDueDays` | Average days between due_date and last payment_date for Paid sales (JOIN payments) |
+| `collectionRate` | `paidInvoices / totalInvoices × 100` (count-based, not amount-based) |
+| `keyMetrics` | 4 cards: Remaining Liability, Accounts Receivable, Monthly Earnings, Payment Overdue count |
+| `financialItems` | 8 cards: Total Liabilities, This Month Paid Liabilities, Total AR, This Month AR Paid, Operating Expenses, Net Profit, Gross Profit, Operating Income — each with MoM change % |
+| `invoiceStatusData` | Total invoices, collection rate, out/in counts, AR/AP aging amounts |
+| `customerInsights` | Avg due days, collection rate, payment terms breakdown |
+| `arAging` / `apAging` | 5-bucket aging: current (DATEDIFF < 0), 1-30, 31-60, 61-90, 90+ — raw SQL CASE/SUM on sales/po |
+
+**Additional methods:**
+- `getChartData(period, type)` — AJAX chart refresh (7days/30days/3months/year)
+- `getChartDataByDateRange(dateRange, type, start?, end?)` — same but with named ranges (today/this_week/this_month/this_year/custom)
+- `calculateDateRange(dateRange, start?, end?)` — converts range name to `{start, end}` Carbon pair
+
+**Note on aging:** Buckets use `DATEDIFF(NOW(), due_date)` (MySQL) / `julianday('now') - julianday(due_date)` (SQLite). "current" = DATEDIFF < 0 (not yet due). Queries filter `status IN ('Unpaid', 'Partial')` + `due_date IS NOT NULL`.
+
+---
+
+## §37 — Bank Reconciliation Deep Dive
+
+### Q37.1 Walk through the full bank reconciliation workflow — import, auto-match, manual match, and completion.
+
+**Overview:** Bank reconciliation is in `BankReconciliationService` + `BankStatementParserFactory` + four bank parsers. Feature slug: `bank_reconciliation` (Professional+). Routes: `routes/admin/bank-reconciliation.php`.
+
+#### Step 1 — Statement Import (`BankReconciliationService::importStatement()`)
+
+Parameters: `accountId`, `bank` (e.g. `'bca'`), `content` (raw file string), `openingBalance`, `closingBalance`, `periodStart?`, `periodEnd?`
+
+1. `BankStatementParserFactory::make($bank)` returns the appropriate parser (`BcaStatementParser`, `BniStatementParser`, `BriStatementParser`, or `MandiriStatementParser`).
+2. Parser calls `parse($content)` → returns array of `[date, description, reference, type (debit/credit), amount]` lines. Each parser handles its own delimiter, date format, and number format detection.
+3. If the parsed lines array is empty, throws `InvalidArgumentException('The statement file contains no recognized transaction lines.')`.
+4. Wraps in `DB::transaction`:
+   - Creates `BankReconciliation` record: `account_id`, `period_start`/`period_end` (from parsed dates if not provided), `opening_balance`, `closing_balance`, `status = STATUS_OPEN`, `created_by = auth()->id()`
+   - Creates one `BankReconciliationItem` per line: `line_date`, `description`, `reference`, `type`, `amount`, `status = STATUS_UNMATCHED`
+5. Calls `recalculateTotals($reconciliation)` → updates `matched_amount`, `variance`
+6. Calls `autoMatch($reconciliation)` → attempts automatic matching
+
+#### Step 2 — Auto-match (`BankReconciliationService::autoMatch()`)
+
+For each unmatched item:
+- Looks for posted, non-reversal `JournalEntry` records where:
+  - Date is within `±MATCH_DATE_WINDOW_DAYS` (= 5 days) of the statement line date
+  - Has a transaction on the reconciliation's `account_id` with `amount BETWEEN (item_amount − 0.005) AND (item_amount + 0.005)` (the ±0.005 tolerance covers floating-point mismatches)
+  - Not already matched to another reconciliation item (`whereDoesntHave('bankReconciliationItems')`)
+- If a match is found: updates the item to `STATUS_MATCHED`, sets `journal_entry_id`, `matched_at = now()`
+- Returns count of matched items
+
+#### Step 3 — Manual match (`BankReconciliationService::manualMatch()`)
+
+- Guard: throws if reconciliation is completed
+- Validates the requested JE is: posted, not a reversal, has a transaction on the account_id with amount within 0.005, and is not already matched
+- Updates item to `STATUS_MANUALLY_MATCHED` + sets `journal_entry_id` + `matched_at`
+
+#### Unmatch (`BankReconciliationService::unmatch()`)
+
+- Guard: throws if reconciliation is completed
+- Resets item to `STATUS_UNMATCHED`, clears `journal_entry_id` and `matched_at`
+
+#### Step 4 — Complete (`BankReconciliationService::complete()`)
+
+1. Calls `recalculateTotals()` one final time
+2. **Variance gate:** if `abs(reconciliation->variance) > 0.005`, throws `DomainException` — cannot complete while out of balance
+3. Updates status to `STATUS_COMPLETED`
+
+Once completed:
+- `isJournalEntryReconciled(JournalEntry)` returns `true` for matched entries → `AccountingService` blocks void/reverse/unpost operations
+- Reconciled entries show a "Terekonsiliasi" badge via `JournalEntry::withReconciledStatus()` scope (no N+1 — eager-loads the badge in the query)
+
+#### Opening balance prefill
+
+`getCreateData()` returns `accountOpeningBalances` — a map of `account_id → {amount, date}` from `account.opening_balance` and `account.opening_balance_date`. The import form pre-fills the `opening_balance` field from the selected account's system Opening Balance. Users can override it to match the actual statement opening balance before importing.
+
+#### Journal entry candidates for manual match
+
+`getJournalEntryCandidates($reconciliation)` returns posted, non-reversal JEs with a transaction on the account, dated within `±30 days` of the period, and not yet matched — up to 200 results, ordered by date.
+
+#### Bank Statement Parsers
+
+Located in `app/Services/BankStatement/`. The factory `BankStatementParserFactory::make($bank)` instantiates the right parser. Each parser extends `AbstractBankStatementParser` and implements `parse(string $content): array`. The abstract class provides helpers for number parsing (Indonesian thousands separator `.`, decimal separator `,`) and date normalization.
+
+Supported banks: `BcaStatementParser`, `BniStatementParser`, `BriStatementParser`, `MandiriStatementParser`
+
+`BankStatementParserFactory::supportedBanks()` returns the list of supported bank slugs — used to populate the import form's bank dropdown.
+
+---
+
+## §38 — Billing & Plan Service
+
+### Q38.1 How does `BillingService` handle subscription billing cycles, and what is the proration credit mechanism?
+
+`BillingService` manages the SaaS subscription lifecycle. Key behaviors (verified from the FEATURE_CHECKLIST and version history; for complete detail see `BillingServiceTest`):
+
+**Rolling 30-day billing cycle:**
+- Each subscription period is exactly 30 days from the payment date (not calendar month)
+- `Tenant::initializeBillingPeriod()` sets `billing_starts_at` and `billing_ends_at`
+- 7-day renewal grace period: `CheckExpiredSubscriptions` command extends tenants 7 days beyond `billing_ends_at` before marking them as expired
+
+**Plan upgrade — proration credit:**
+- When a tenant upgrades mid-cycle, unused days on the current plan are credited as `proration_credit` on the `SubscriptionOrder` model
+- The next invoice deducts the proration credit: `new_plan_price − proration_credit`
+- This prevents double-charging for unused time
+
+**Scheduled downgrade:**
+- A downgrade is not applied immediately — it is stored and applied at the end of the current billing period by `ProcessScheduledPlanChanges` command
+- This prevents feature access loss in the middle of a paid period
+
+**`CheckExpiredSubscriptions` command:**
+- Runs on schedule; finds tenants where `billing_ends_at` has passed the 7-day grace window
+- Updates `plan_status` → `expired` and revokes plan features
+
+**`SubscriptionOrder` model:**
+- Tracks each payment: `tenant_id`, `plan_id`, `amount_usd`, `amount_idr`, `currency_code`, `status` (`pending`/`paid`/`voided`), `proration_credit`, `billing_period_start`, `billing_period_end`
+- `status` enum extended with `voided` (migration `2026_08_11_000002`) — supports superadmin void-order / terminate-subscription flows
+
+**`BillingSetting` model:**
+- Singleton table `billing_settings` (one row, seeded with default 16,000)
+- `BillingSetting::getRate()` returns the current superadmin-managed USD→IDR rate
+- Fallback: `config('billing.fallback_rate')` = 16,000 if no row exists
+- `config('billing.tax_rate')` = 0.12 (12% — added to IDR price at checkout)
+
+---
+
+## §39 — Accounting Audit Log vs Activity Log vs General Accounting
+
+### Q39.1 How many parallel logging systems exist and what does each one cover?
+
+Three separate logging systems coexist, each serving a distinct purpose:
+
+| System | Model | Table | Purpose | Scope |
+|---|---|---|---|---|
+| **`ActivityLogService`** | `ActivityLog` | `activity_logs` | Business operation audit trail | 30 modules, 15 action types, 28 model observers |
+| **`AccountingAuditService`** | `AccountingAuditLog` | `accounting_audit_logs` | Accounting-specific change trail with full T-account detail | Journal entries only (create/update/post/unpost/void/reverse/delete/approve/reject) |
+| **`SecurityLogger`** | (writes to Laravel log channel) | Log files | Security events | Auth events: login success/failure, password change, permission denial, suspicious activity |
+
+**Why three systems?**
+
+- `ActivityLogService` answers "who did what to which business object" — it records module/action/entity tuples for operational compliance. Insufficient for accounting because it doesn't capture the debit/credit line detail of a journal entry.
+- `AccountingAuditService` answers "what was the exact financial state before and after" — it stores the full transaction array (account code, name, debit/credit, amount) in `old_values`/`new_values` JSON. Used on the JE show page sidebar to display an audit trail with T-account changes.
+- `SecurityLogger` answers "what authentication and authorization events occurred" — logged separately for security incident response, independent of the business data trail.
+
+**`AccountingAuditLog` fields:** `tenant_id`, `action`, `entity_type` (FQCN, e.g. `App\Models\JournalEntry`), `entity_id`, `old_values` (JSON — full JE + transactions), `new_values` (JSON — same), `description`, `user_id`, `user_name`, `ip_address`, `user_agent`
+
+Both `ActivityLog` and `AccountingAuditLog` use plain string `entity_type` / `entity_id` columns — **not** Eloquent morph relationships (no `morphTo()`, no `morphable` polymorphism). This means you can query them with raw SQL without needing Eloquent morph maps.
+
+---
+
+## §40 — Statistics Reference (Verified Counts)
+
+### Q40.1 What are the verified codebase statistics as of August 2026?
+
+All counts verified by directory listing:
+
+| Metric | Count | How verified |
+|---|---|---|
+| **Controllers** | 64 | `find app/Http/Controllers -name "*.php"` (Admin×38 + SuperAdmin×16 + Api×8 + Auth/LoginController + Controller.php) |
+| **Services** | 54 | `find app/Services -name "*.php"` (47 top-level + 7 BankStatement/ parsers) |
+| **Models** | 54 | `ls app/Models/*.php` (top-level only, excluding Concerns/BelongsToTenant.php) |
+| **API Resources** | 26 | `ls app/Http/Resources/` |
+| **Admin route files** | 16 | `ls routes/admin/` |
+| **Superadmin blade views** | 30 | `find resources/views/superadmin -name "*.blade.php"` |
+| **Migrations** | 108 | `find database/migrations -name "*.php"` |
+| **Seeders** | 36 | `find database/seeders -name "*.php"` |
+| **ActivityLog MODULE_* constants** | 30 | `grep MODULE_ app/Models/ActivityLog.php` |
+| **ActivityLog ACTION_* constants** | 15 | `grep ACTION_ app/Models/ActivityLog.php` |
+| **AccountingAuditLog actions** | 9 | create/update/post/unpost/void/reverse/delete/approve/reject |
+| **PHP test methods** | 1186 | PHPUnit output (3715 assertions) |
+| **JS test files** | 169 | `tests/js/` |
+| **Permissions** | 101 | `PermissionSeeder` (verified in prior session) |
+| **Languages** | 2 | `lang/en/`, `lang/id/` |
+
+---
+
+## §41 — CRM Service Deep Dive
+
+### Q41.1 What does `CrmService` cover and how is Customer Lifetime Value calculated?
+
+`CrmService` powers the CRM modal panels for both customers (`CustomerCrmController`) and suppliers (`SupplierCrmController`). It does **not** handle pipeline management — that is `SalesPipelineService`.
+
+#### Customer CRM (`getCustomerCrmData($id, $page)`)
+
+Returns a comprehensive profile for one customer:
+
+| Key | Calculation |
+|---|---|
+| `lifetimeValue` | Sum of `sale->getAdjustedTotal()` for ALL historical sales (returns-adjusted grand totals) |
+| `totalSalesCount` | Count of all sales records for this customer |
+| `averageOrderValue` | `lifetimeValue / totalSalesCount` (0 if no sales) |
+| `favoriteCategory` | Category with highest total adjusted quantity across all sales items (arsort on categoryCounts array) |
+| `mostPurchasedProduct` | Product with highest total adjusted quantity (arsort on productQuantities array) |
+| `totalProductsPurchased` | Sum of all adjusted quantities across all sales items |
+| `lastPurchaseDate` | `allSales->max('created_at')` |
+| `lastInteractionDate` | Max `interaction_date` from `CustomerInteraction` records |
+| `customerCredits` | Latest 20 `CustomerCredit` records: id, amount, used_amount, available_amount, reason, status, expires_at |
+| `totalAvailableCredits` | Sum of `available_amount` for active (non-expired, not fully-used) credits |
+| `sales` | Paginated (10/page) sales with: returned_amount, summary totals, paid amounts, balance per invoice |
+
+**Return quantity adjustment:** For each `SalesItem`, `returnedQty = sale->getReturnedQuantityForProduct(product_id)`. Items with `adjustedQty <= 0` are excluded from category/product counting — this prevents fully-returned items from inflating metrics.
+
+**LTV note:** `getAdjustedTotal()` accounts for returns — it subtracts the total returned amount from the sale total. So LTV truly reflects net revenue, not gross billed.
+
+#### Supplier CRM (`getSupplierCrmData($id, $page)`)
+
+Mirror structure to customer CRM but for suppliers/purchases:
+- `lifetimeValue` = sum of `purchase->getAdjustedTotal()` (net of purchase returns)
+- `averagePurchaseValue` = `lifetimeValue / totalPurchasesCount`
+- Same favoriteCategory and mostPurchasedProduct logic using purchase items
+
+#### Interaction Logging
+
+`storeCustomerInteraction(data, customerId)` and `storeSupplierInteraction(data, supplierId)` create `CustomerInteraction` / `SupplierInteraction` records with fields: `customer_id`/`supplier_id`, `user_id` (Auth::id()), `type`, `notes`, `interaction_date`. Returns the interaction loaded with its `user` relationship.
+
+Interaction `type` values come from the frontend — no enum constraint in the model (flexible).
+
+#### Historical Purchase Views
+
+`getHistoricalPurchases(Customer)` — flat list of all sales items for a customer, adjusted for returns, with `customer_latest_price` appended (the most recent price paid for each product, looked up by `order_date` comparison). Used by the CRM modal's "Price History" tab.
+
+`getCustomerProductHistory($id)` — groups the same data by `product_name`, showing a per-product timeline of purchases with returned/adjusted quantities. Used by the "Product History" tab.
+
+`getSupplierHistoricalPurchases($id)` and `getSupplierProductHistory($id)` — equivalent methods for suppliers, using purchase data.
+
+---
+
+## §42 — Accounting Reports: Three-Service Architecture
+
+### Q42.1 What does each accounting report service cover and how do they differ?
+
+Three services handle accounting reports. They operate on distinct report types and data scopes:
+
+| Service | Reports Covered | Data Source | Scope |
+|---|---|---|---|
+| `AccountingReportService` | Trial Balance, Chart of Accounts | `Account` model + `Transaction` model | Balance-to-date (cumulative from inception to `endDate`) |
+| `FinancialReportingService` | Income Statement (P&L), Balance Sheet | `Account` model + `Transaction` model | Period-based (startDate–endDate for P&L; inception-to-endDate for Balance Sheet) |
+| `GeneralLedgerService` | General Ledger, Journal Entries list | `Transaction` model + `JournalEntry` model | Per-account, paginated, opening balance calculated |
+
+#### `AccountingReportService`
+
+**`generateTrialBalance(endDate)`:**
+- For each `Account`, computes `total_debits` and `total_credits` from posted journal entries up to `endDate` using `withSum()`
+- Normalizes to debit/credit balance column: asset/expense accounts → positive balance goes to debit column; liability/equity/revenue accounts → positive balance goes to credit column
+- Skips zero-balance accounts
+- Returns `report_data[]`, `total_debits`, `total_credits`, `is_balanced` (bool), `end_date`
+
+**`getChartOfAccounts()`:** Returns parent accounts (`whereNull('parent_id')`) with `children` eager-loaded, ordered by `code`. Used by the Chart of Accounts view.
+
+**`flattenAccountHierarchy(accounts, level)`:** Recursive flattener for CSV/PDF export — prepends `str_repeat('-', level)` to names to show hierarchy depth.
+
+#### `FinancialReportingService`
+
+**`generateIncomeStatement(startDate, endDate)`:**
+- Revenue accounts: credits − debits in period (posted JEs only)
+- Expense accounts: debits − credits in period (posted JEs only)
+- `net_income = total_revenue − total_expenses`
+- Both use `JournalEntry::STATUS_POSTED` filter — draft/unposted entries excluded
+
+**`generateBalanceSheet(endDate)`:**
+- Gets all accounts with cumulative balances up to `endDate` (all time, not period-limited)
+- Assets: `calculateAccountBalance()` = debits − credits
+- Liabilities/Equity: credits − debits
+- Revenue and Expense type accounts: their net balances are added to `totalEquity` (retained earnings rolled in)
+- `equation_balanced = abs(totalAssets − (totalLiabilities + totalEquity)) < 0.001`
+
+#### `GeneralLedgerService`
+
+**`getGeneralLedger(accountId, startDate, endDate, perPage=50)`:**
+1. `calculateOpeningBalance(accountId, startDate)` — raw `DB::table()` aggregate (no Eloquent hydration) summing all debit/credit transactions with posted JEs **before** `startDate`. Adds `account->opening_balance` (seeded initial balance on the Account model)
+2. Fetches paginated transactions in the period, eager-loading `journalEntry` with `withReconciledStatus()` scope
+3. `calculatePeriodChange(transactions)` = sum of (debit amounts − credit amounts) for in-period transactions
+4. `closingBalance = openingBalance + periodChange`
+
+**Opening balance raw SQL pattern:** Uses `DB::table('transactions')->join('journal_entries', ...)` with `selectRaw("SUM(CASE WHEN type='debit' THEN amount ELSE 0 END) as total_debit, ...")` — avoids hydrating potentially thousands of historical Transaction models into RAM. This is a deliberate N+1 prevention optimization.
+
+**`getJournalEntries(startDate, endDate, perPage=20)`:** Paginated JE list with `transactions.account` eager-loaded and `withReconciledStatus()` scope applied. Used by the Journal view (`admin.accounting.journal`).
+
+---
+
+## §43 — Recurring Journal Entries
+
+### Q43.1 How do recurring journal entries work and are they scheduler-wired?
+
+**Model:** `RecurringJournalEntry` — fields: `name`, `description`, `frequency`, `interval`, `start_date`, `end_date` (nullable), `last_generated_at`, `next_generation_date`, `transactions` (JSON array of `{account_code, type, amount}`), `template_account_code` (nullable), `is_active` (bool), `created_by`.
+
+#### Frequencies (5 constants)
+`FREQUENCY_DAILY`, `FREQUENCY_WEEKLY`, `FREQUENCY_MONTHLY`, `FREQUENCY_QUARTERLY`, `FREQUENCY_YEARLY`
+
+#### `isDueForGeneration()` — three conditions, ALL must pass:
+1. `is_active` must be true
+2. If `end_date` is set, `now()` must not be after `end_date`
+3. `now()` must be on or after `next_generation_date` (same day counts via `isSameDay()`)
+
+#### `calculateNextGenerationDate()` — uses `interval` multiplier:
+- Daily: `+$interval days`
+- Weekly: `+$interval weeks`
+- Monthly: `+$interval months`
+- Quarterly: `+($interval × 3) months`
+- Yearly: `+$interval years`
+
+#### generateJournalEntry() -- called on the model itself:
+1. Calls isDueForGeneration() -- returns null if not due
+2. Calls AccountingService::createJournalEntry(description, now(), transactions[], model) -- passes the RecurringJournalEntry as the sourceable polymorphic model
+3. Updates last_generated_at = now() and next_generation_date = calculateNextGenerationDate()
+
+#### ManualJournalEntryService::processRecurringEntries(): int
+- Fetches RecurringJournalEntry::dueForGeneration()->get() (scope: active + next_generation_date <= today + end_date not passed)
+- Wraps each generateJournalEntry() in DB::transaction()
+- Logs errors and continues -- partial failures do not abort the batch
+- Returns count of successfully processed entries
+
+#### SCHEDULER NOT WIRED -- CRITICAL FACT
+processRecurringEntries() exists in the service but is **not called by any scheduled command** in routes/console.php. The three scheduled commands are:
+1. tenant:reset-demo -- daily at 00:00
+2. billing:process-scheduled-changes -- daily at 01:00
+3. billing:check-expired -- daily at 01:30
+
+**Recurring journal entries must be triggered manually** -- they do NOT auto-process on a schedule. This is a known gap for a future roadmap item.
+
+#### scopeDueForGeneration scope:
+Active entries where next_generation_date <= today AND (end_date IS NULL OR end_date >= today).
+
+---
+
+## §44 — SecurityLogger
+
+### Q44.1 What does SecurityLogger log and where does it write?
+
+SecurityLogger is a pure static utility class (no constructor, no DI). It writes exclusively to the `security` log channel via `Log::channel('security')`.
+
+**5 static methods:**
+
+| Method | Log Level | Fields Logged |
+|---|---|---|
+| `logPasswordChange($user)` | `info` | user_id, email, ip, user_agent, timestamp |
+| `logFailedLogin($email, $reason)` | `warning` | email, reason, ip, user_agent, timestamp |
+| `logSuccessfulLogin($user)` | `info` | user_id, email, ip, user_agent, timestamp |
+| `logPermissionDenied($user, $permission)` | `warning` | user_id, email, permission, route, ip, timestamp |
+| `logSuspiciousActivity($description, $data=[])` | `alert` | description, user_id, ip, user_agent, timestamp + merged extra data |
+
+**Key distinctions from ActivityLogService:**
+- SecurityLogger writes to log **files** only (security channel) — no DB table
+- ActivityLogService writes to the `activity_logs` **database table**
+- Log files are append-only and tamper-resistant; DB records are queryable but mutable
+- `logSuspiciousActivity` accepts arbitrary extra context via `array_merge` — the only method that does
+- Security events are NOT queryable via Eloquent
+
+---
+
+## §45 — TransactionService
+
+### Q45.1 What does TransactionService actually do?
+
+TransactionService is the full implementation of the "Recent Transactions" unified view — merging Sales and Purchases into one paginated list. Injected with SalesService and PurchaseService via constructor.
+
+**getTransactions(filters, perPage=25): LengthAwarePaginator**
+- Named date ranges: today / this_week / this_month / last_month / custom
+- Builds separate Sales and Purchase Eloquent queries
+- Maps each to TransactionDTO (id, type, invoice, customer_supplier, contact_info, date, amount, paid_amount, due_amount, status, view_url, edit_url)
+- Merges and sorts in-memory, paginates with LengthAwarePaginator manual slice
+
+**getTransactionsSummary(filters): array**
+- Two `selectRaw()` aggregate queries
+- Returns: total/sales/purchases count+amounts, paid/unpaid breakdowns
+
+**bulkMarkAsPaid(transactions[]): int**
+- Composite ID format: `sale_123` / `purchase_456` (split on underscore)
+- Delegates to SalesService::bulkMarkPaid() and PurchaseService::bulkMarkPaid()
+
+**markTransactionAsPaid(id, type): array**
+- Balance > 0: calls addPayment with [amount=balance, payment_method='Unknown']
+- Balance = 0: directly sets status='Paid', payment_date=now()
+
+**bulkExportTransactions(filters, ids, exportOption)**
+- PDF: renders `admin.reports.recent-transactions-bulk-export-pdf` via Dompdf, landscape A4
+- CSV: Type, Invoice, Customer/Supplier, Date, Amount, Status
+
+**calculatePaidAmount logic:**
+- status='Paid' returns total
+- Sales with status='Partial' returns amount_received
+- Otherwise returns 0
+
+---
+
+## §46 — TenantSetupService
+
+### Q46.1 Walk through TenantSetupService::setup() step by step.
+
+Called whenever a new tenant is provisioned. Steps in order:
+
+1. `set_time_limit(0)` — prevents PHP timeout
+2. `$tenant->makeCurrent()` — sets tenant DB context
+3. **assignPlan($tenant, $planSlug)**:
+   - Gracefully skips if `Plan::count() === 0` (no plans seeded yet)
+   - Resolves slug: `$planSlug ?? config('plans.default_plan', 'starter')`
+   - Checks `$plan->hasTrial()` — Professional and Enterprise offer trials; Starter does not
+   - Calls `PlanService::assignPlanToTenant($tenant, $slug, $startTrial)`
+4. **runEssentialSeeders()** — 5 seeders in order (each individually try/caught):
+   - AccountSeeder — Chart of Accounts
+   - CategorySeeder — default product categories
+   - UnitSeeder — units of measurement
+   - CurrencySeeder — default currency settings (IDR)
+   - TaxSeeder — default tax configurations
+   - Seeder failures are logged and skipped; setup continues
+5. **createDefaultWarehouse($tenant)** — name='Main Warehouse', is_main=true
+6. **createDefaultCustomer($tenant)** — name='Walk-in Customer', email='cash@{tenant->domain}', phone='-', address='-' (POS default)
+7. `Tenant::forgetCurrent()` — clears tenant context
+
+**Called from:** FortifyServiceProvider (Fortify registration) and Artisan commands for manual provisioning.
+
+---
+
+## §47 — AccountingExportService vs ReportExporter
+
+### Q47.1 What is the difference between the two export services?
+
+Both have identical base `exportToPdf()` and `exportToCsv()` methods. The distinction is domain scope and default PDF orientation:
+
+| | AccountingExportService | ReportExporter |
+|---|---|---|
+| Default PDF orientation | landscape | portrait |
+| Domain | Accounting module only (JE, CoA, Trial Balance, GL) | All other reports (P&L, Balance Sheet, Aging, Adj Log, Recent Transactions, Cash Flow) |
+| Used by | AccountingController, JournalEntryController | ReportController, TransactionService |
+
+**AccountingExportService specific methods:**
+- exportChartOfAccountsToPdf/ToCsv — CoA with hierarchy, CSV headers: Code, Name, Type, Level
+- exportJournalToPdf/ToCsv — date/description only on first transaction row per JE
+- exportTrialBalanceToPdf/ToCsv — Code, Account, Debit, Credit + totals row
+- exportGeneralLedgerToPdf/ToCsv — running balance per row, opening/closing balance rows
+
+**ReportExporter specific methods:**
+- exportIncomeStatementToCsv — Revenue + Expense sections + Net Income
+- exportBalanceSheetToCsv — Assets + Liabilities + Equity + Total L&E
+- exportAgingToCsv(aging, filename, reportType) — 'receivables'/'payables'; per-bucket with contact, invoice, due_date, days_overdue, amount
+- exportAdjustmentLogToCsv — Date, Product, Type, Qty Before/After, Change, Reason, Adjusted By
+- exportRecentTransactionsToCsv — Type, Invoice, Customer/Supplier, Date, Amount, Status
+- exportCashFlowToCsv — Operating/Investing/Financing sections + Net Change + Opening/Closing Cash
+
+---
+
+## §48 — Sales Pipeline Service Deep Dive
+
+### Q48.1 Walk through the full pipeline lifecycle from opportunity creation to sales order conversion.
+
+SalesPipelineService manages the full CRM pipeline. Methods verified from actual source code.
+
+#### Stage Reordering — Double-Write Pattern
+
+`reorderStages(pipeline, stages[])` inside DB::transaction():
+1. Pass 1: Set each stage position to `stageId + 1,000,000` (avoids UNIQUE constraint conflicts)
+2. Pass 2: Set final target positions
+
+Prevents duplicate key violations when swapping adjacent stages.
+
+#### createOpportunity(data) inside DB::transaction():
+1. Creates SalesOpportunity with amount=0
+2. Creates all SalesOpportunityItem records (price rounded to 2dp)
+3. Fetches default tax: `Tax::default()->first() ?? Tax::active()->first()`
+4. Tax exclusive: grandTotal = subtotal + taxAmount; inclusive: grandTotal = subtotal
+5. Updates opportunity amount = round(grandTotal, 2)
+
+#### deleteOpportunity — preserves financial records
+Does NOT delete linked Sales Order. FK is ON DELETE SET NULL — `sales_opportunity_id` on Sales becomes null.
+
+#### generateQuotation(opportunityId) — Opportunity to Draft Quotation:
+- Number: `QTN-{Ymd}-{zero-padded (tenant count+1)}`
+- Copies opportunity items (discount=0, tax_type='none' per item)
+- Applies default tax at header level
+- valid_until = now() + 14 days, status = 'draft'
+- Links via `sales_opportunity_id` on Quotation
+- Does NOT mark opportunity as 'converted'
+
+#### convertToSalesOrder(opportunity) — Won Opportunity to Sales Order:
+
+Guards (throws on violation):
+- status !== 'won' — "must be in a won status"
+- Already converted or has sales_id — "already been converted"
+- No items — "No products associated"
+- No warehouse — "No warehouse available"
+- Insufficient stock — "Insufficient stock for product: {name}. Available: {n}, Requested: {m}"
+
+Execution inside DB::transaction():
+1. Invoice: `PL-{zero-padded sequential}` (scans all `PL-%` invoices for max number)
+2. Warehouse: `Warehouse::where('is_main', true)->first()` fallback to `Warehouse::first()`
+3. Creates Sales (type=TYPE_REGULAR, status='Unpaid', copies notes/terms_conditions)
+4. Creates SalesItem per item (discount=0, discount_type='fixed')
+5. Decrements ProductWarehouse.quantity at main warehouse (throws if insufficient)
+6. Sets opportunity: status='converted', sales_id=salesOrder->id
+
+**Invoice prefix PL-** (Pipeline) distinguishes pipeline-converted orders from regular sales.
+**moveOpportunity:** Simple update(['pipeline_stage_id' => $stageId]). Cross-pipeline moves allowed.
+
+---
+
+## §49 — invent-mag-fe Frontend Architecture Audit
+
+### Q49.1 What does the Astro marketing site do and how does it connect to the backend?
+
+**Framework:** Astro static site generator + Tailwind CSS + TypeScript. Deployed on Vercel. Build-time API calls pre-render content; fallback defaults ensure the build succeeds even when backend is offline.
+
+#### Pages
+
+| URL | File | Build-time API Calls |
+|---|---|---|
+| / | pages/index.astro | getCmsContent() + getPlans() |
+| /pricing | pages/pricing.astro | getCmsContent() + getPlans() |
+| /contact | pages/contact.astro | getCmsContent() |
+| /login | pages/login.astro | None (fully static) |
+| /signup | pages/signup.astro | None (fully static) |
+| /id/* | Indonesian locale | Same as English counterparts |
+
+#### API Integration (src/lib/)
+
+**getPlans() — GET /api/plans:**
+- 5-second timeout via AbortSignal.timeout(5000)
+- Fallback PLAN_DEFAULTS: Starter $19, Professional $59, Enterprise $109 (all USD, monthly, 30-day trial)
+- Limits (PlanSummary interface): Starter (3 users, 1 warehouse, 100 products), Professional (10/-1/500), Enterprise (-1/-1/-1)
+- -1 means unlimited
+
+**getCmsContent() — GET /api/cms:**
+- 5-second timeout, merges: { ...CMS_DEFAULTS, ...data }
+- 50+ content fields: hero, 11 feature cards (title+desc each), pricing badges, CTA, contact_email, footer_text
+- billing_rate: 16000 — IDR/USD rate from superadmin BillingSetting; used for IDR price display on pricing page
+
+#### Login Page (/login)
+- noindex=true, nofollow=true — not crawled by search engines
+- Single field: shop name (tenant subdomain)
+- /js/login.js calls POST /api/lookup-tenant with JSON body { shopname } (throttle:10,1) — returns { tenant_domain }
+- Redirects browser to https://{tenant_domain}/admin/login
+
+#### Signup Page (/signup)
+- noindex=true, nofollow=true
+- Hidden input name="plan" value="professional" — all signups default to Professional trial regardless of pricing tier viewed
+- Fields: name, shopname, email, password, password_confirmation, terms checkbox
+- Two-step UX: submit form -> confirmation modal (shows name/shopname/email) -> confirmRegistration() -> POST /api/register via /js/register.js -> success modal with window.tempTenantLoginUrl -> "Go to Login" button
+- Key finding: plan='professional' is hardcoded; the pricing page selection does not carry over
+
+#### i18n
+- Two locales: en and id (Indonesian)
+- data-i18n="key" attributes on HTML elements
+- Client-side JS swaps text based on localStorage or browser navigator.language
+- Indonesian pages at /id/* are separate Astro files (not dynamic locale routing)
+
+#### Environment Variable
+- PUBLIC_BACKEND_URL — defaults to https://api.invent-mag.web.id in both plans.ts and cms.ts
+- Set in Vercel environment for production
+
+## §50 — invent-mag-fe Frontend Architecture Audit (Components & i18n)
+
+### Component Architecture
+The Astro frontend (static site) uses modular components that accept `cms` props to inject superadmin-controlled text.
+
+#### Core Components
+- **Hero.astro**: Uses glowing background effects (`bg-hero-glow`, `blur-[120px]`). CTA defaults to `/signup`, Demo defaults to `demo-pro.invent-mag.web.id`.
+- **Pricing.astro**: 
+  - Dynamic prices calculated via `priceFor(slug, fallback)`. 
+  - The Enterprise tier explicitly does NOT link to `/signup`; its CTA links to `/contact?subject=sales` with text "Contact Sales". The Professional CTA also links to Contact Sales, not signup! (A likely UX bug vs starter tier).
+- **Features.astro**: Displays 8 standard features and 3 enterprise features (Sales Forecasting AI, RESTful API, Audit Trail).
+- **Testimonials.astro**: Uses Alpine.js (`x-data="{ currentTestimonial: 0 }"`) for an auto-rotating carousel every 5 seconds. Uses Holt-Winters and FIFO in the fake quotes.
+  - **Bug**: Contains a stray duplicate `</figure>` closing tag at line 67.
+- **LogoCloud.astro**: Inverts client logos using CSS (`brightness-0 invert`) and animates them sequentially using `/js/logo-animation.js` (IntersectionObserver).
+- **Stats.astro**: 5 animated counters (Accounts, Permissions, Roles, Double-Entry %, Forecasting x). Animated via `/js/stats-animation.js` (IntersectionObserver + requestAnimationFrame with easeOutExpo).
+
+#### Layout & SEO (BaseLayout.astro)
+- Uses **astro-seo** package for comprehensive meta tags, OpenGraph, and Twitter Cards.
+- Injects three JSON-LD Schema objects:
+  - `SoftwareApplication`: Declares ERP Software category, lists all pricing tiers (19, 59, 109).
+  - `Organization`: Links to GitHub and LinkedIn.
+  - `WebSite`: Declares Sitelinks Search Box support.
+- Hardcodes the IDR exchange rate via `PUBLIC_USD_TO_IDR` fallback if `cms.billing_rate` is missing (default 16000).
+- Implements `hreflang` correctly (EN at root `/`, ID at `/id/`).
+
+#### Client-Side i18n implementation
+- **Static Translation**: Astro pages at `/id/*` for Indonesian route resolution.
+- **Dynamic Translation**: `/src/components/i18n.astro` and `i18n.ts` inject a global `translations` object (en and id) containing ~100 keys.
+- **DOM Updates**: `translatePage()` runs on load and `locale-changed` event. It finds all elements with `data-i18n="key"` and replaces `textContent`.
+- **Price Formatting**: Elements with `data-i18n-price` are dynamically calculated to Rupiah if `locale === 'id'` using the backend `billing_rate`.
+
+## §51 — invent-mag-fe Frontend Architecture Audit (Client JavaScript)
+
+The site avoids heavy frameworks, relying exclusively on Alpine.js (`<script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.9/dist/cdn.min.js"></script>`) and vanilla JS for interactivity.
+
+#### Navigation & Mobile Menu (Navigation.astro)
+- Alpine state `x-data="{ mobileMenuOpen: false }"`.
+- Custom `LanguageSwitcher` inside Nav uses Alpine `x-show` for the dropdown, writes to `localStorage`, and dispatches a `locale-changed` CustomEvent.
+- Live Demos dropdown links to both `demo-starter` and `demo-pro` subdomains.
+
+#### Login Flow (/js/login.js)
+- Vanilla JS event listener on `#lookupForm`.
+- Prevents default, shows "Finding...".
+- Calls **POST `/api/lookup-tenant`** with `{ shopname }`.
+- On success (200), redirects directly to the tenant's admin panel: `https://${result.tenant_domain}/admin/login`.
+
+#### Registration Flow (/js/register.js & /js/modal.js)
+- **Modal System**: Custom `Modal` object handles `show()`, `hide()`, `showSuccess()`, `showError()`, and `showConfirmation()`. Esc key and click-outside listeners supported.
+- **Step 1 (Intercept)**: Submit intercepts the form, populates the confirmation modal via `[data-confirm="..."]` elements, and calls `Modal.showConfirmation(data)`.
+- **Step 2 (Submit)**: The "Confirm & Register" button triggers `confirmRegistration()`.
+- Calls **POST `/api/register`**.
+- **Error Handling**: Handles 422 (Validation, specifically checking for "taken" email to show custom modal), 429 (Too many attempts), and 500.
+- **Success**: Shows success modal and sets `window.tempTenantLoginUrl = https://${result.tenant_domain}/admin/login` for the final redirect button.
+## §52 — Inventory & POS Architecture (Product, Warehouse, POS Services)
+
+### Inventory (ProductService)
+The `ProductService` handles core catalog and stock management.
+- **Stock Optimization**: When fetching product lists, it eager-loads `productWarehouses` and filters them. It manually injects `total_stock` and `main_warehouse_stock` into the collection mapping to avoid hitting heavy N+1 accessors during rendering.
+- **Stock Adjustments**: `adjustProductStock()` and `bulkUpdateStock()` wrap stock changes in a DB transaction. They increment/decrement the pivot table `ProductWarehouse` and log an explicit `StockAdjustment` (adjustment_type: increase, decrease, or correction).
+- **Exports**: Bulk export directly streams CSV/PDF payloads using Dompdf or native PHP `fputcsv`.
+
+### Warehouse Service (Multi-Location)
+- **Plan Limits**: Validates warehouse creation against the tenant's current SaaS plan via `PlanService->canAddWarehouse()`. (Backward compatibility: If PlanService fails because the table doesn't exist during early seeding, it catches the exception and allows creation).
+- **Main Warehouse**: Ensures exactly one warehouse has `is_main = true`. Changing it uses a transaction to unset all others before setting the new one.
+- **Stock Validation**: Most transactional systems (POS) default to the `main` warehouse if not specified.
+
+### POS Service (Sales Flow)
+The POS is tightly integrated with the `AccountingService` and localized tax logic.
+- **Stock Validation**: `validateStockBeforeSale` verifies the requested quantities against the specific warehouse (usually main). Throws exceptions listing the specific products short on stock.
+- **Accounting Integration**: A completed POS sale creates real-time Journal Entries using the tenant's mapped accounts:
+  1. `Dr Accounts Receivable` / `Cr Sales Revenue`
+  2. `Dr Cost of Goods Sold` / `Cr Inventory`
+  3. `Dr Cash` / `Cr Accounts Receivable` (if paid immediately)
+- **Indonesian Tax Localization**:
+  - **PPN Keluaran (Output VAT)**: If PPN is enabled, it credits the PPN Keluaran liability account *at sale creation*, subtracting the tax amount from Sales Revenue. This prevents Accounts Receivable and Revenue overstatement.
+  - **PPh (Withholding Tax)**: If PPh is enabled (e.g., PPh 23), it deducts the withheld amount from the grand total (reducing cash collected) and posts `Dr PPh Receivable` / `Cr Accounts Receivable`.
+
+## §53 — Purchasing & e-Faktur (Localization)
+
+### Purchase Service
+Handles procurement, receiving, and accounts payable.
+- **Index Optimization**: Instead of fetching all POs to calculate dashboard summaries, it runs a raw DB aggregate query using `SUM(CASE WHEN suppliers.location = 'IN' THEN ...)` to group unpaid local (IN) vs international (OUT) payables in one hit.
+- **Stock & Accounting Integration**: When a PO is marked "Received", it increments the `ProductWarehouse` stock and posts journal entries (`Dr Inventory`, `Cr Accounts Payable`).
+
+### EFakturService (Indonesian DJP Tax Integration)
+Handles the highly specific regulatory requirements for Indonesian VAT (PPN) reporting.
+- **NSFP Pool (Nomor Seri Faktur Pajak)**: Taxes require serial numbers issued by the government. The service imports these blocks (via `importNsfpPool`).
+- **Pessimistic Locking**: `generateFakturPajak()` uses `NsfpPool::available()->lockForUpdate()->first()` inside a DB transaction to guarantee that two concurrent checkout requests never get assigned the exact same DJP serial number.
+- **CSV Export (`exportCsvForDjp`)**: Generates the `FK` (Faktur Keluaran) and `OF` (Object Faktur) CSV lines required by the DJP desktop app. 
+  - **BOM Injection**: Injects the UTF-8 Byte Order Mark (`\xEF\xBB\xBF`) to ensure Indonesian Windows/Excel environments open the CSV correctly without mangling characters.
+  - DJP requires amounts formatted as integers (cents), avoiding floating-point rounding errors during import.
+- **PKP Check**: Verifies the tenant's `pkp_status` (Pengusaha Kena Pajak / VAT-registered Entity) before allowing any tax invoice generation.## §54 — Controller & Routing Architecture
+
+### Routing Strategy
+The application eschews a monolithic `web.php` file in favor of heavily segmented routing:
+- **`routes/api.php`**: Exclusively handles "central" API logic for the static frontend marketing site (Astro). Contains endpoints for CMS data, tenant lookup (`POST /api/lookup-tenant`), public marketing registration, and Midtrans webhooks.
+- **`routes/superadmin.php`**: Handles the SaaS management layer (Billing, Tenant management, global CMS settings).
+- **`routes/admin/*.php`**: The core ERP tenant routes are deeply modularized into 16 separate files (`accounting.php`, `hr.php`, `inventory.php`, `sales.php`, etc.), making the route definitions highly maintainable.
+
+### Controller Hierarchy
+Controllers live in three distinct namespaces corresponding to the routes:
+- **`App\Http\Controllers\Api`**: Minimal, unauthenticated endpoints supporting the Astro frontend.
+- **`App\Http\Controllers\SuperAdmin`**: SaaS backend. Includes `TenantController` for instance lifecycle and impersonation.
+- **`App\Http\Controllers\Admin`**: The main tenant ERP logic (60+ controllers).
+
+### Hybrid Request/Response Pattern (Admin Controllers)
+Instead of building a separate `V1` API namespace for SPA or external consumption, the `Admin` controllers use a hybrid pattern. Inside controller methods (e.g., `store`, `update`, `destroy`), the code checks for `$request->header('X-Laravel-JSON')`:
+- **If Present**: Returns a `JsonResponse` (useful for AJAX modals, headless API consumption, or Turbo drive).
+- **If Absent**: Returns traditional Laravel `redirect()->route(...)` with flashed session data (`with('success', ...)`).
+- **Delegation**: The controllers themselves are extremely thin, heavily relying on injection of `App\Services\*` to perform the actual business logic (e.g., `ProductController` delegates to `ProductService`).
+
+### Cross-Domain Impersonation Flow
+Because tenants reside on isolated subdomains (e.g., `acme.invent-mag.web.id`) while the superadmin panel is on the root or a different subdomain, session cookies cannot be natively shared. 
+The system implements a clever token-based impersonation handoff in `SuperAdmin\TenantController::impersonate()`:
+1. Generates an encrypted payload containing the `impersonating_tenant_id`, `superadmin_return_url`, and the target tenant user ID.
+2. Redirects the superadmin to `https://{tenant.domain}/admin/dashboard?impersonation_token={encrypted_payload}`.
+3. A middleware (`CaptureImpersonation`) intercepting the tenant domain decrypts this token, forcefully logs the superadmin into the `web` guard as that tenant's user, sets session variables, and drops the token from the URL.
+4. To exit, a `POST /admin/stop-impersonating` route (defined in `web.php`) clears the session and redirects the user back across domains to the stored `superadmin_return_url`.

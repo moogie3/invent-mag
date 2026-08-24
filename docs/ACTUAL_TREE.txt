@@ -1,0 +1,1765 @@
+invent-mag/
+├── .github
+│   └── workflows
+│       ├── ci.yml
+│       └── deploy.yml
+├── .scribe
+│   ├── endpoints
+│   │   ├── 00.yaml
+│   │   ├── 01.yaml
+│   │   ├── 02.yaml
+│   │   ├── 03.yaml
+│   │   ├── 04.yaml
+│   │   ├── 05.yaml
+│   │   └── custom.0.yaml
+│   ├── endpoints.cache
+│   │   ├── 00.yaml
+│   │   ├── 01.yaml
+│   │   ├── 02.yaml
+│   │   ├── 03.yaml
+│   │   ├── 04.yaml
+│   │   └── 05.yaml
+│   ├── .filehashes
+│   ├── auth.md
+│   └── intro.md
+├── .vscode
+│   └── settings.json
+├── app
+│   ├── Actions
+│   │   └── Fortify
+│   │       ├── CreateNewUser.php
+│   │       ├── PasswordValidationRules.php
+│   │       ├── ResetUserPassword.php
+│   │       ├── UpdateUserPassword.php
+│   │       └── UpdateUserProfileInformation.php
+│   ├── Console
+│   │   └── Commands
+│   │       ├── BackupTenant.php
+│   │       ├── CheckExpiredSubscriptions.php
+│   │       ├── ProcessScheduledPlanChanges.php
+│   │       └── ResetDemoTenant.php
+│   ├── DTOs
+│   │   └── TransactionDTO.php
+│   ├── Exceptions
+│   │   └── PlanLimitExceededException.php
+│   ├── Helpers
+│   │   ├── CurrencyHelper.php
+│   │   ├── ProductHelper.php
+│   │   ├── PurchaseHelper.php
+│   │   ├── PurchaseReturnHelper.php
+│   │   ├── SalesHelper.php
+│   │   └── SalesReturnHelper.php
+│   ├── Http
+│   │   ├── Controllers
+│   │   │   ├── Admin
+│   │   │   │   ├── Hr
+│   │   │   │   │   ├── AttendanceController.php
+│   │   │   │   │   ├── EmployeeController.php
+│   │   │   │   │   ├── PayrollController.php
+│   │   │   │   │   └── PayslipController.php
+│   │   │   │   ├── AccountingController.php
+│   │   │   │   ├── AuditLogController.php
+│   │   │   │   ├── BackupController.php
+│   │   │   │   ├── BankReconciliationController.php
+│   │   │   │   ├── CategoryController.php
+│   │   │   │   ├── CurrencyController.php
+│   │   │   │   ├── CustomerController.php
+│   │   │   │   ├── CustomerCrmController.php
+│   │   │   │   ├── DashboardController.php
+│   │   │   │   ├── EFakturController.php
+│   │   │   │   ├── JournalEntryController.php
+│   │   │   │   ├── NotificationController.php
+│   │   │   │   ├── OpeningBalanceController.php
+│   │   │   │   ├── PlanController.php
+│   │   │   │   ├── POSController.php
+│   │   │   │   ├── ProductController.php
+│   │   │   │   ├── ProductStockController.php
+│   │   │   │   ├── ProfileController.php
+│   │   │   │   ├── PurchaseController.php
+│   │   │   │   ├── PurchaseReturnController.php
+│   │   │   │   ├── QuotationController.php
+│   │   │   │   ├── ReportController.php
+│   │   │   │   ├── SalesController.php
+│   │   │   │   ├── SalesPipelineController.php
+│   │   │   │   ├── SalesReturnController.php
+│   │   │   │   ├── SettingsController.php
+│   │   │   │   ├── StockOpnameController.php
+│   │   │   │   ├── StockTransferController.php
+│   │   │   │   ├── SupplierController.php
+│   │   │   │   ├── SupplierCrmController.php
+│   │   │   │   ├── TaxController.php
+│   │   │   │   ├── UnitController.php
+│   │   │   │   ├── UserController.php
+│   │   │   │   └── WarehouseController.php
+│   │   │   ├── Api
+│   │   │   │   ├── Auth
+│   │   │   │   │   ├── AuthController.php
+│   │   │   │   │   └── RegisteredUserController.php
+│   │   │   │   ├── V1
+│   │   │   │   ├── Webhook
+│   │   │   │   │   └── MidtransController.php
+│   │   │   │   ├── CmsController.php
+│   │   │   │   ├── ContactController.php
+│   │   │   │   ├── PaymentController.php
+│   │   │   │   ├── PlanController.php
+│   │   │   │   └── TenantLookupController.php
+│   │   │   ├── Auth
+│   │   │   │   └── LoginController.php
+│   │   │   ├── SuperAdmin
+│   │   │   │   ├── Auth
+│   │   │   │   │   └── LoginController.php
+│   │   │   │   ├── AuditLogController.php
+│   │   │   │   ├── BackupController.php
+│   │   │   │   ├── BillingController.php
+│   │   │   │   ├── CmsController.php
+│   │   │   │   ├── DashboardController.php
+│   │   │   │   ├── FeatureController.php
+│   │   │   │   ├── InvoiceController.php
+│   │   │   │   ├── PaymentOverviewController.php
+│   │   │   │   ├── PendingPaymentController.php
+│   │   │   │   ├── PermissionController.php
+│   │   │   │   ├── PlanController.php
+│   │   │   │   ├── SettingController.php
+│   │   │   │   ├── SubscriptionController.php
+│   │   │   │   ├── TenantController.php
+│   │   │   │   └── TransactionController.php
+│   │   │   └── Controller.php
+│   │   ├── Middleware
+│   │   │   ├── CaptureImpersonation.php
+│   │   │   ├── CheckPlanFeature.php
+│   │   │   ├── CheckPlanLimit.php
+│   │   │   ├── CheckSubscriptionStatus.php
+│   │   │   ├── DebugModeMiddleware.php
+│   │   │   ├── HandleTenantFromPath.php
+│   │   │   ├── RedirectIfAuthenticated.php
+│   │   │   ├── SecurityHeaders.php
+│   │   │   ├── SetLocale.php
+│   │   │   └── SetSessionCookieName.php
+│   │   ├── Requests
+│   │   │   ├── Api
+│   │   │   │   └── V1
+│   │   │   ├── Auth
+│   │   │   │   └── LoginRequest.php
+│   │   │   └── ProfileUpdateRequest.php
+│   │   ├── Resources
+│   │   │   ├── AccountResource.php
+│   │   │   ├── CategoryResource.php
+│   │   │   ├── CurrencySettingResource.php
+│   │   │   ├── CustomerInteractionResource.php
+│   │   │   ├── CustomerResource.php
+│   │   │   ├── JournalEntryResource.php
+│   │   │   ├── PaymentResource.php
+│   │   │   ├── PipelineStageResource.php
+│   │   │   ├── POItemResource.php
+│   │   │   ├── POSResource.php
+│   │   │   ├── ProductResource.php
+│   │   │   ├── PurchaseResource.php
+│   │   │   ├── RoleResource.php
+│   │   │   ├── SalesItemResource.php
+│   │   │   ├── SalesOpportunityItemResource.php
+│   │   │   ├── SalesOpportunityResource.php
+│   │   │   ├── SalesPipelineResource.php
+│   │   │   ├── SalesResource.php
+│   │   │   ├── StockAdjustmentResource.php
+│   │   │   ├── SupplierInteractionResource.php
+│   │   │   ├── SupplierResource.php
+│   │   │   ├── TaxResource.php
+│   │   │   ├── TransactionResource.php
+│   │   │   ├── UnitResource.php
+│   │   │   ├── UserResource.php
+│   │   │   └── WarehouseResource.php
+│   │   └── Responses
+│   │       ├── CustomLoginResponse.php
+│   │       ├── CustomRegisterResponse.php
+│   │       ├── LogoutResponse.php
+│   │       ├── PasswordResetResponse.php
+│   │       └── VerifyEmailResponse.php
+│   ├── Mail
+│   │   ├── ContactFormMail.php
+│   │   └── SubscriptionInvoiceMail.php
+│   ├── Models
+│   │   ├── Concerns
+│   │   │   └── BelongsToTenant.php
+│   │   ├── Models
+│   │   ├── Account.php
+│   │   ├── AccountingAuditLog.php
+│   │   ├── ActivityLog.php
+│   │   ├── AttendancePeriod.php
+│   │   ├── AttendanceRecord.php
+│   │   ├── BankReconciliation.php
+│   │   ├── BankReconciliationItem.php
+│   │   ├── BillingSetting.php
+│   │   ├── Categories.php
+│   │   ├── CurrencySetting.php
+│   │   ├── Customer.php
+│   │   ├── CustomerCredit.php
+│   │   ├── CustomerInteraction.php
+│   │   ├── Employee.php
+│   │   ├── FakturPajak.php
+│   │   ├── FakturPajakItem.php
+│   │   ├── JournalEntry.php
+│   │   ├── NsfpPool.php
+│   │   ├── OpeningBalance.php
+│   │   ├── Payment.php
+│   │   ├── PayrollItem.php
+│   │   ├── PayrollRun.php
+│   │   ├── PipelineStage.php
+│   │   ├── Plan.php
+│   │   ├── PlatformCurrencySetting.php
+│   │   ├── POItem.php
+│   │   ├── Product.php
+│   │   ├── ProductWarehouse.php
+│   │   ├── Purchase.php
+│   │   ├── PurchaseReturn.php
+│   │   ├── PurchaseReturnItem.php
+│   │   ├── Quotation.php
+│   │   ├── RecurringJournalEntry.php
+│   │   ├── Role.php
+│   │   ├── Sales.php
+│   │   ├── SalesItem.php
+│   │   ├── SalesOpportunity.php
+│   │   ├── SalesOpportunityItem.php
+│   │   ├── SalesPipeline.php
+│   │   ├── SalesReturn.php
+│   │   ├── SalesReturnItem.php
+│   │   ├── StockAdjustment.php
+│   │   ├── StockOpname.php
+│   │   ├── StockOpnameItem.php
+│   │   ├── SubscriptionOrder.php
+│   │   ├── SuperAdmin.php
+│   │   ├── Supplier.php
+│   │   ├── SupplierInteraction.php
+│   │   ├── Tax.php
+│   │   ├── Tenant.php
+│   │   ├── Transaction.php
+│   │   ├── Unit.php
+│   │   ├── User.php
+│   │   └── Warehouse.php
+│   ├── Multitenancy
+│   ├── Observers
+│   │   ├── ActivityObserver.php
+│   │   └── CustomerCreditObserver.php
+│   ├── Providers
+│   │   ├── AppServiceProvider.php
+│   │   ├── AuthServiceProvider.php
+│   │   ├── FortifyServiceProvider.php
+│   │   ├── NavigationServiceProvider.php
+│   │   └── TestingServiceProvider.php
+│   ├── Scopes
+│   │   └── TenantScope.php
+│   ├── Services
+│   │   ├── BankStatement
+│   │   │   ├── AbstractBankStatementParser.php
+│   │   │   ├── BankStatementParser.php
+│   │   │   ├── BankStatementParserFactory.php
+│   │   │   ├── BcaStatementParser.php
+│   │   │   ├── BniStatementParser.php
+│   │   │   ├── BriStatementParser.php
+│   │   │   └── MandiriStatementParser.php
+│   │   ├── AccountingAuditService.php
+│   │   ├── AccountingExportService.php
+│   │   ├── AccountingReportService.php
+│   │   ├── AccountingService.php
+│   │   ├── AccountService.php
+│   │   ├── ActivityLogService.php
+│   │   ├── AgingReportService.php
+│   │   ├── AttendanceService.php
+│   │   ├── BankReconciliationService.php
+│   │   ├── BillingService.php
+│   │   ├── CashFlowService.php
+│   │   ├── CategoryService.php
+│   │   ├── ChartOfAccountsService.php
+│   │   ├── CrmService.php
+│   │   ├── CurrencyService.php
+│   │   ├── CustomerService.php
+│   │   ├── DashboardService.php
+│   │   ├── EFakturService.php
+│   │   ├── EmployeeService.php
+│   │   ├── FinancialReportingService.php
+│   │   ├── GeneralLedgerService.php
+│   │   ├── ManualJournalEntryService.php
+│   │   ├── NotificationService.php
+│   │   ├── OpeningBalanceService.php
+│   │   ├── PayrollService.php
+│   │   ├── PlanService.php
+│   │   ├── PosService.php
+│   │   ├── ProductService.php
+│   │   ├── ProfileService.php
+│   │   ├── PurchaseReturnService.php
+│   │   ├── PurchaseService.php
+│   │   ├── ReportExporter.php
+│   │   ├── SalesForecastService.php
+│   │   ├── SalesPipelineService.php
+│   │   ├── SalesReturnService.php
+│   │   ├── SalesService.php
+│   │   ├── SecurityLogger.php
+│   │   ├── StockOpnameService.php
+│   │   ├── SupplierService.php
+│   │   ├── SystemNotificationService.php
+│   │   ├── TaxService.php
+│   │   ├── TenantSetupService.php
+│   │   ├── TransactionService.php
+│   │   ├── TutorialService.php
+│   │   ├── UnitService.php
+│   │   ├── UserService.php
+│   │   └── WarehouseService.php
+│   └── Traits
+│       └── HandlesApiErrors.php
+├── config
+│   ├── app.php
+│   ├── auth.php
+│   ├── backup.php
+│   ├── billing.php
+│   ├── cache.php
+│   ├── cors.php
+│   ├── database.php
+│   ├── filesystems.php
+│   ├── fortify.php
+│   ├── logging.php
+│   ├── mail.php
+│   ├── midtrans.php
+│   ├── multitenancy.php
+│   ├── navigation.php
+│   ├── permission.php
+│   ├── plans.php
+│   ├── queue.php
+│   ├── sanctum.php
+│   ├── scribe.php
+│   ├── services.php
+│   ├── session.php
+│   ├── superadmin-tutorial.php
+│   ├── turbo-laravel.php
+│   └── tutorial.php
+├── database
+│   ├── data
+│   ├── factories
+│   │   ├── AccountFactory.php
+│   │   ├── ActivityLogFactory.php
+│   │   ├── CategoriesFactory.php
+│   │   ├── CurrencySettingFactory.php
+│   │   ├── CustomerFactory.php
+│   │   ├── CustomerInteractionFactory.php
+│   │   ├── EmployeeFactory.php
+│   │   ├── JournalEntryFactory.php
+│   │   ├── PaymentFactory.php
+│   │   ├── PipelineStageFactory.php
+│   │   ├── POItemFactory.php
+│   │   ├── ProductFactory.php
+│   │   ├── PurchaseFactory.php
+│   │   ├── PurchaseReturnFactory.php
+│   │   ├── PurchaseReturnItemFactory.php
+│   │   ├── RoleFactory.php
+│   │   ├── SalesFactory.php
+│   │   ├── SalesItemFactory.php
+│   │   ├── SalesOpportunityFactory.php
+│   │   ├── SalesOpportunityItemFactory.php
+│   │   ├── SalesPipelineFactory.php
+│   │   ├── SalesReturnFactory.php
+│   │   ├── SalesReturnItemFactory.php
+│   │   ├── StockAdjustmentFactory.php
+│   │   ├── StockOpnameFactory.php
+│   │   ├── StockOpnameItemFactory.php
+│   │   ├── SupplierFactory.php
+│   │   ├── SupplierInteractionFactory.php
+│   │   ├── TaxFactory.php
+│   │   ├── TransactionFactory.php
+│   │   ├── UnitFactory.php
+│   │   ├── UserFactory.php
+│   │   └── WarehouseFactory.php
+│   ├── migrations
+│   │   ├── landlord
+│   │   │   └── 2026_01_08_070136_create_landlord_tenants_table.php
+│   │   ├── 0000_01_01_000000_create_tenants_table.php
+│   │   ├── 0001_01_01_000001_create_users_table.php
+│   │   ├── 2025_02_03_063900_create_warehouse.php
+│   │   ├── 2025_02_03_063933_create_product.php
+│   │   ├── 2025_02_03_064331_create_categories.php
+│   │   ├── 2025_02_03_064401_create_units.php
+│   │   ├── 2025_02_03_064405_create_customer.php
+│   │   ├── 2025_02_03_064410_create_supplier.php
+│   │   ├── 2025_02_03_064436_create_po.php
+│   │   ├── 2025_02_03_065737_create_sales.php
+│   │   ├── 2025_02_09_031551_create_po_items_table.php
+│   │   ├── 2025_02_14_052312_create_currency.php
+│   │   ├── 2025_02_22_074425_create_cache_table.php
+│   │   ├── 2025_02_23_061749_add_two_factor_columns_to_users_table.php
+│   │   ├── 2025_02_25_041714_create_password_reset_tokens_table.php
+│   │   ├── 2025_02_26_065932_create_sales_item.php
+│   │   ├── 2025_03_20_070633_create_taxes_table.php
+│   │   ├── 2025_03_20_070700_create_quotations_table.php
+│   │   ├── 2025_06_30_042733_create_permission_tables.php
+│   │   ├── 2025_07_04_052335_create_customer_interactions_table.php
+│   │   ├── 2025_07_11_055056_create_sales_pipelines_table.php
+│   │   ├── 2025_07_11_055100_create_pipeline_stages_table.php
+│   │   ├── 2025_07_11_055104_create_sales_opportunities_table.php
+│   │   ├── 2025_07_11_084924_add_sales_opportunity_id_to_sales_table.php
+│   │   ├── 2025_07_12_032205_create_sales_opportunity_items_table.php
+│   │   ├── 2025_07_14_090100_create_supplier_interactions_table.php
+│   │   ├── 2025_09_21_015953_create_stock_adjustments_table.php
+│   │   ├── 2025_10_11_024714_create_payments_table.php
+│   │   ├── 2025_11_15_162853_create_accounts_table.php
+│   │   ├── 2025_11_15_162853_create_journal_entries_table.php
+│   │   ├── 2025_11_15_162853_create_transactions_table.php
+│   │   ├── 2025_11_20_062031_create_personal_access_tokens_table.php
+│   │   ├── 2025_12_06_053640_create_purchase_returns_table.php
+│   │   ├── 2025_12_06_053641_create_purchase_return_items_table.php
+│   │   ├── 2025_12_06_053642_add_tax_columns_to_purchase_returns_table.php
+│   │   ├── 2025_12_07_082022_create_sales_returns_table.php
+│   │   ├── 2025_12_07_082023_create_sales_return_items_table.php
+│   │   ├── 2026_01_31_050645_fix_accounts_name_unique_constraint.php
+│   │   ├── 2026_02_05_043852_create_product_warehouse_table.php
+│   │   ├── 2026_02_11_000001_add_status_to_journal_entries.php
+│   │   ├── 2026_02_11_000002_create_accounting_audit_logs_table.php
+│   │   ├── 2026_02_11_000003_create_recurring_journal_entries_table.php
+│   │   ├── 2026_02_11_000004_add_enhanced_fields_to_accounts_table.php
+│   │   ├── 2026_02_11_000004_make_sourceable_nullable.php
+│   │   ├── 2026_02_11_000005_create_opening_balances_table.php
+│   │   ├── 2026_02_24_000001_create_plans_table.php
+│   │   ├── 2026_02_24_000002_add_plan_fields_to_tenants_table.php
+│   │   ├── 2026_02_27_000001_assign_enterprise_plan_to_existing_tenants.php
+│   │   ├── 2026_03_02_064022_create_subscription_orders_table.php
+│   │   ├── 2026_03_11_000000_add_dashboard_performance_indexes.php
+│   │   ├── 2026_03_11_000001_add_additional_performance_indexes.php
+│   │   ├── 2026_04_01_000001_create_activity_logs_table.php
+│   │   ├── 2026_04_02_000001_add_billing_fields_to_tenants_table.php
+│   │   ├── 2026_04_02_000002_add_change_type_to_subscription_orders_table.php
+│   │   ├── 2026_04_04_062323_add_tutorial_completed_to_users_table.php
+│   │   ├── 2026_04_05_000001_add_max_products_to_plans_table.php
+│   │   ├── 2026_04_06_091332_create_customer_credits_table.php
+│   │   ├── 2026_04_06_091414_add_customer_credit_used_to_sales_table.php
+│   │   ├── 2026_04_06_092917_add_customer_credit_id_to_sales_returns_table.php
+│   │   ├── 2026_04_07_000001_add_name_to_sales_items_table.php
+│   │   ├── 2026_04_07_000002_add_available_amount_to_customer_credits_table.php
+│   │   ├── 2026_04_08_000001_add_sales_item_id_to_sales_return_items_table.php
+│   │   ├── 2026_04_18_070915_create_stock_opnames_table.php
+│   │   ├── 2026_04_18_070917_create_stock_opname_items_table.php
+│   │   ├── 2026_04_18_071144_add_stock_opname_feature_to_plans.php
+│   │   ├── 2026_04_20_000001_add_variance_value_to_stock_opname_items_table.php
+│   │   ├── 2026_04_20_000002_add_total_variance_value_to_stock_opnames_table.php
+│   │   ├── 2026_05_02_000001_add_backup_fields_to_tenants_table.php
+│   │   ├── 2026_05_07_081248_create_employees_table.php
+│   │   ├── 2026_05_07_081249_create_attendance_periods_table.php
+│   │   ├── 2026_05_07_081249_create_attendance_records_table.php
+│   │   ├── 2026_05_07_081250_000001_create_payroll_runs_table.php
+│   │   ├── 2026_05_07_081250_000002_create_payroll_items_table.php
+│   │   ├── 2026_05_07_081251_add_hr_feature_to_plans_table.php
+│   │   ├── 2026_05_12_035444_add_allowances_deductions_to_employees_table.php
+│   │   ├── 2026_05_12_045741_add_working_days_to_attendance_periods_table.php
+│   │   ├── 2026_05_18_075029_replace_is_pos_with_type_on_sales_table.php
+│   │   ├── 2026_05_19_000001_migrate_accounting_settings_to_tenants_table.php
+│   │   ├── 2026_05_19_000002_encrypt_backup_password_on_tenants_table.php
+│   │   ├── 2026_05_25_000001_add_cash_flow_feature_to_plans_table.php
+│   │   ├── 2026_06_04_000001_create_super_admins_table.php
+│   │   ├── 2026_06_09_000002_add_system_settings_to_super_admins_table.php
+│   │   ├── 2026_06_16_000001_add_columns_to_taxes_table.php
+│   │   ├── 2026_06_16_000002_add_tax_id_to_financial_documents.php
+│   │   ├── 2026_07_06_000001_create_platform_currency_settings_table.php
+│   │   ├── 2026_07_06_000002_add_currency_code_to_plans_table.php
+│   │   ├── 2026_07_06_000003_add_currency_code_to_subscription_orders_table.php
+│   │   ├── 2026_07_09_000001_add_notes_terms_to_sales_and_opportunities.php
+│   │   ├── 2026_07_17_000001_create_faktur_pajak_table.php
+│   │   ├── 2026_07_17_000002_create_faktur_pajak_items_table.php
+│   │   ├── 2026_07_17_000003_create_nsfp_pool_table.php
+│   │   ├── 2026_07_17_000004_add_ppn_fields_to_tenants_customers_sales.php
+│   │   ├── 2026_07_17_000005_add_ppn_feature_to_plans.php
+│   │   ├── 2026_07_25_000001_backfill_ppn_keluaran_account_setting.php
+│   │   ├── 2026_07_25_000002_add_tax_jurisdiction_to_tenants_and_is_ppn_to_taxes.php
+│   │   ├── 2026_07_28_000001_add_is_pph_to_taxes.php
+│   │   ├── 2026_07_28_000002_add_pph_fields_to_sales.php
+│   │   ├── 2026_07_28_000003_backfill_pph_account_settings.php
+│   │   ├── 2026_07_28_000004_add_pph_fields_to_po.php
+│   │   ├── 2026_07_28_000005_add_pph_fields_to_quotations.php
+│   │   ├── 2026_08_01_000001_create_bank_reconciliation_tables.php
+│   │   ├── 2026_08_03_000001_add_ppn_fields_to_po.php
+│   │   ├── 2026_08_03_000002_backfill_ppn_masukan_account_setting.php
+│   │   ├── 2026_08_05_000001_backfill_pph_22_tax_record.php
+│   │   ├── 2026_08_05_000002_backfill_pph_final_tax_record.php
+│   │   ├── 2026_08_11_000001_create_billing_settings_table.php
+│   │   └── 2026_08_11_000002_update_subscription_orders_status_enum.php
+│   ├── schema
+│   ├── seeders
+│   │   ├── AccountSeeder.php
+│   │   ├── ActivityLogSeeder.php
+│   │   ├── AttendanceSeeder.php
+│   │   ├── CategorySeeder.php
+│   │   ├── CreditFeatureSeeder.php
+│   │   ├── CurrencySeeder.php
+│   │   ├── CustomerInteractionSeeder.php
+│   │   ├── CustomerSeeder.php
+│   │   ├── DatabaseSeeder.php
+│   │   ├── EmployeeSeeder.php
+│   │   ├── ManualJournalEntrySeeder.php
+│   │   ├── PayrollSeeder.php
+│   │   ├── PermissionSeeder.php
+│   │   ├── PipelineStageSeeder.php
+│   │   ├── PlanSeeder.php
+│   │   ├── ProductSeeder.php
+│   │   ├── PurchaseReturnSeeder.php
+│   │   ├── PurchaseSeeder.php
+│   │   ├── QuotationSeeder.php
+│   │   ├── RolePermissionSeeder.php
+│   │   ├── RoleSeeder.php
+│   │   ├── SalesOpportunitySeeder.php
+│   │   ├── SalesPipelineSeeder.php
+│   │   ├── SalesReturnSeeder.php
+│   │   ├── SalesSeeder.php
+│   │   ├── StockAdjustmentSeeder.php
+│   │   ├── StockOpnamePermissionSeeder.php
+│   │   ├── StockOpnameSeeder.php
+│   │   ├── StockTransferSeeder.php
+│   │   ├── SuperAdminSeeder.php
+│   │   ├── SupplierInteractionSeeder.php
+│   │   ├── SupplierSeeder.php
+│   │   ├── TaxSeeder.php
+│   │   ├── UnitSeeder.php
+│   │   ├── UserSeeder.php
+│   │   └── WarehouseSeeder.php
+│   └── .gitignore
+├── docker
+│   ├── nginx.conf
+│   └── start.sh
+├── docs
+│   ├── ACCOUNTING_SETUP_GUIDE.md
+│   ├── ARCHITECTURE_ASSESSMENT.md
+│   ├── DEPLOYMENT_CHECKLIST.md
+│   ├── FEATURE_CHECKLIST.md
+│   ├── INTERVIEW_QA.md
+│   ├── LANDING_PAGE_CMS.md
+│   ├── OWNER_SETUP_GUIDE.md
+│   ├── PPN_EVOLUTION.md
+│   ├── ROADMAP.md
+│   ├── STRUCTURE.md
+│   ├── TAXATION_IMPROVEMENT.md
+│   ├── TAXATION_SYSTEM.md
+│   └── TECHNICAL_SPECIFICATION.md
+├── lang
+│   ├── en
+│   │   ├── accounting.php
+│   │   ├── messages.php
+│   │   ├── plan.php
+│   │   └── tutorial.php
+│   └── id
+│       ├── accounting.php
+│       ├── messages.php
+│       ├── plan.php
+│       └── tutorial.php
+├── resources
+│   ├── css
+│   │   ├── alerts.css
+│   │   ├── app.css
+│   │   ├── auth.css
+│   │   ├── crm.css
+│   │   ├── dark.css
+│   │   ├── error.css
+│   │   ├── menu-sidebar.css
+│   │   ├── navbar.css
+│   │   ├── pos-receipt.css
+│   │   ├── pos.css
+│   │   ├── print-a4.css
+│   │   ├── print-receipt.css
+│   │   ├── product.css
+│   │   ├── purchase-order.css
+│   │   ├── settings.css
+│   │   ├── srm.css
+│   │   ├── superadmin.css
+│   │   └── tutorial-modal.css
+│   ├── images
+│   │   └── background.jpeg
+│   ├── js
+│   │   ├── admin
+│   │   │   ├── helpers
+│   │   │   │   └── notification.js
+│   │   │   ├── layouts
+│   │   │   │   ├── advanced-settings.js
+│   │   │   │   ├── global-keyboard-shortcuts.js
+│   │   │   │   ├── legacy-inline-scripts.js
+│   │   │   │   ├── menu-sidebar.js
+│   │   │   │   ├── navbar.js
+│   │   │   │   ├── page-loader.js
+│   │   │   │   ├── receipt-page.js
+│   │   │   │   ├── selectable-table.js
+│   │   │   │   ├── settings.js
+│   │   │   │   ├── theme-initializer.js
+│   │   │   │   ├── theme-toggle.js
+│   │   │   │   ├── theme-visibility.js
+│   │   │   │   └── tutorial-modal.js
+│   │   │   ├── partials
+│   │   │   │   ├── auth
+│   │   │   │   │   ├── showContentAfterLoading.js
+│   │   │   │   │   └── togglePasswordVisibility.js
+│   │   │   │   ├── category
+│   │   │   │   │   └── handleEditCategoryModal.js
+│   │   │   │   ├── currency
+│   │   │   │   │   ├── api.js
+│   │   │   │   │   ├── elements.js
+│   │   │   │   │   ├── form.js
+│   │   │   │   │   ├── modal.js
+│   │   │   │   │   ├── preview.js
+│   │   │   │   │   └── state.js
+│   │   │   │   ├── customer
+│   │   │   │   │   ├── crmModal
+│   │   │   │   │   │   ├── api.js
+│   │   │   │   │   │   ├── main.js
+│   │   │   │   │   │   ├── state.js
+│   │   │   │   │   │   └── ui.js
+│   │   │   │   │   ├── editModal
+│   │   │   │   │   │   ├── form.js
+│   │   │   │   │   │   ├── image.js
+│   │   │   │   │   │   └── main.js
+│   │   │   │   │   └── utils
+│   │   │   │   │       ├── currency.js
+│   │   │   │   │       ├── date.js
+│   │   │   │   │       ├── dom.js
+│   │   │   │   │       └── status.js
+│   │   │   │   ├── pos
+│   │   │   │   │   ├── cart
+│   │   │   │   │   │   ├── actions.js
+│   │   │   │   │   │   ├── dom.js
+│   │   │   │   │   │   ├── state.js
+│   │   │   │   │   │   └── totals.js
+│   │   │   │   │   ├── payment
+│   │   │   │   │   │   ├── api.js
+│   │   │   │   │   │   ├── form.js
+│   │   │   │   │   │   └── modal.js
+│   │   │   │   │   ├── quickCreate
+│   │   │   │   │   │   ├── customer.js
+│   │   │   │   │   │   └── product.js
+│   │   │   │   │   └── utils
+│   │   │   │   │       ├── currency.js
+│   │   │   │   │       └── ui.js
+│   │   │   │   ├── product
+│   │   │   │   │   ├── bulkActions
+│   │   │   │   │   │   ├── delete.js
+│   │   │   │   │   │   ├── export.js
+│   │   │   │   │   │   ├── selection.js
+│   │   │   │   │   │   └── stock.js
+│   │   │   │   │   ├── modals
+│   │   │   │   │   │   ├── delete.js
+│   │   │   │   │   │   ├── init.js
+│   │   │   │   │   │   └── product.js
+│   │   │   │   │   ├── search
+│   │   │   │   │   │   ├── state.js
+│   │   │   │   │   │   ├── table.js
+│   │   │   │   │   │   └── ui.js
+│   │   │   │   │   ├── utils
+│   │   │   │   │   │   ├── helpers.js
+│   │   │   │   │   │   └── ui.js
+│   │   │   │   │   ├── events.js
+│   │   │   │   │   ├── main.js
+│   │   │   │   │   └── stats.js
+│   │   │   │   ├── profile
+│   │   │   │   │   ├── form.js
+│   │   │   │   │   └── modal.js
+│   │   │   │   ├── purchase-order
+│   │   │   │   │   ├── bulkActions
+│   │   │   │   │   │   ├── actions.js
+│   │   │   │   │   │   └── PurchaseOrderBulkSelection.js
+│   │   │   │   │   ├── common
+│   │   │   │   │   │   └── PurchaseOrderModule.js
+│   │   │   │   │   ├── create
+│   │   │   │   │   │   └── PurchaseOrderCreate.js
+│   │   │   │   │   ├── edit
+│   │   │   │   │   │   └── PurchaseOrderEdit.js
+│   │   │   │   │   └── view
+│   │   │   │   │       └── PurchaseOrderView.js
+│   │   │   │   ├── purchase-returns
+│   │   │   │   │   ├── bulkActions
+│   │   │   │   │   │   └── selection.js
+│   │   │   │   │   ├── create
+│   │   │   │   │   │   └── PurchaseReturnCreate.js
+│   │   │   │   │   └── edit
+│   │   │   │   │       └── PurchaseReturnEdit.js
+│   │   │   │   ├── recentts
+│   │   │   │   │   ├── bulkActions
+│   │   │   │   │   │   ├── api.js
+│   │   │   │   │   │   └── selection.js
+│   │   │   │   │   ├── modals
+│   │   │   │   │   │   └── markAsPaid.js
+│   │   │   │   │   └── utils
+│   │   │   │   │       ├── dom.js
+│   │   │   │   │       ├── export.js
+│   │   │   │   │       ├── resetButton.js
+│   │   │   │   │       ├── search.js
+│   │   │   │   │       └── selection.js
+│   │   │   │   ├── sales-order
+│   │   │   │   │   ├── bulkActions
+│   │   │   │   │   │   ├── actions.js
+│   │   │   │   │   │   └── SalesOrderBulkSelection.js
+│   │   │   │   │   ├── common
+│   │   │   │   │   │   └── SalesOrderModule.js
+│   │   │   │   │   ├── create
+│   │   │   │   │   │   └── SalesOrderCreate.js
+│   │   │   │   │   ├── edit
+│   │   │   │   │   │   └── SalesOrderEdit.js
+│   │   │   │   │   └── view
+│   │   │   │   │       └── SalesOrderView.js
+│   │   │   │   ├── sales-pipeline
+│   │   │   │   │   ├── common
+│   │   │   │   │   │   ├── constants.js
+│   │   │   │   │   │   ├── state.js
+│   │   │   │   │   │   └── utils.js
+│   │   │   │   │   ├── data
+│   │   │   │   │   │   └── init.js
+│   │   │   │   │   ├── forms
+│   │   │   │   │   │   ├── convertOpportunity.js
+│   │   │   │   │   │   ├── editOpportunity.js
+│   │   │   │   │   │   ├── editPipeline.js
+│   │   │   │   │   │   ├── newOpportunity.js
+│   │   │   │   │   │   ├── newPipeline.js
+│   │   │   │   │   │   └── newStage.js
+│   │   │   │   │   ├── modals
+│   │   │   │   │   │   └── opportunityItems.js
+│   │   │   │   │   ├── opportunities
+│   │   │   │   │   │   ├── card.js
+│   │   │   │   │   │   └── dragAndDrop.js
+│   │   │   │   │   └── ui
+│   │   │   │   │       ├── customerSelect.js
+│   │   │   │   │       ├── pipelineBoard.js
+│   │   │   │   │       ├── pipelineSelect.js
+│   │   │   │   │       ├── pipelinesList.js
+│   │   │   │   │       └── stagesList.js
+│   │   │   │   ├── sales-returns
+│   │   │   │   │   ├── bulkActions
+│   │   │   │   │   │   └── selection.js
+│   │   │   │   │   ├── create
+│   │   │   │   │   │   └── SalesReturnCreate.js
+│   │   │   │   │   └── edit
+│   │   │   │   │       └── SalesReturnEdit.js
+│   │   │   │   ├── sorting
+│   │   │   │   │   ├── listjs.js
+│   │   │   │   │   └── search.js
+│   │   │   │   ├── supplier
+│   │   │   │   │   ├── editModal
+│   │   │   │   │   │   ├── form.js
+│   │   │   │   │   │   ├── image.js
+│   │   │   │   │   │   └── main.js
+│   │   │   │   │   ├── search
+│   │   │   │   │   │   ├── state.js
+│   │   │   │   │   │   ├── table.js
+│   │   │   │   │   │   └── ui.js
+│   │   │   │   │   ├── srmModal
+│   │   │   │   │   │   ├── api.js
+│   │   │   │   │   │   ├── main.js
+│   │   │   │   │   │   ├── state.js
+│   │   │   │   │   │   └── ui.js
+│   │   │   │   │   └── utils
+│   │   │   │   │       ├── currency.js
+│   │   │   │   │       ├── date.js
+│   │   │   │   │       ├── dom.js
+│   │   │   │   │       └── status.js
+│   │   │   │   ├── tax
+│   │   │   │   │   ├── handleEditTaxModal.js
+│   │   │   │   │   └── handleTaxActions.js
+│   │   │   │   ├── unit
+│   │   │   │   │   └── handleEditUnitModal.js
+│   │   │   │   ├── user
+│   │   │   │   │   ├── common
+│   │   │   │   │   │   ├── elements.js
+│   │   │   │   │   │   └── state.js
+│   │   │   │   │   ├── create
+│   │   │   │   │   │   └── main.js
+│   │   │   │   │   ├── delete
+│   │   │   │   │   │   ├── api.js
+│   │   │   │   │   │   └── main.js
+│   │   │   │   │   ├── edit
+│   │   │   │   │   │   ├── api.js
+│   │   │   │   │   │   └── main.js
+│   │   │   │   │   └── rolesPermissions
+│   │   │   │   │       ├── api.js
+│   │   │   │   │       └── sync.js
+│   │   │   │   └── warehouse
+│   │   │   │       ├── common
+│   │   │   │       │   └── formSubmission.js
+│   │   │   │       ├── create
+│   │   │   │       │   └── main.js
+│   │   │   │       ├── edit
+│   │   │   │       │   └── main.js
+│   │   │   │       └── search
+│   │   │   │           ├── state.js
+│   │   │   │           ├── table.js
+│   │   │   │           └── ui.js
+│   │   │   ├── plan
+│   │   │   │   ├── checkout.js
+│   │   │   │   └── upgrade.js
+│   │   │   ├── reports
+│   │   │   │   └── stock-transfer.js
+│   │   │   ├── utils
+│   │   │   │   ├── formValidator.js
+│   │   │   │   ├── midtrans.js
+│   │   │   │   ├── onPageLoad.js
+│   │   │   │   └── sound.js
+│   │   │   ├── accounting.js
+│   │   │   ├── adjustment-log.js
+│   │   │   ├── audit-log.js
+│   │   │   ├── auth.js
+│   │   │   ├── backup.js
+│   │   │   ├── bootstrap-init.js
+│   │   │   ├── category.js
+│   │   │   ├── currency.js
+│   │   │   ├── customer-credit.js
+│   │   │   ├── customer.js
+│   │   │   ├── dashboard.js
+│   │   │   ├── global-event-delegator.js
+│   │   │   ├── hr.js
+│   │   │   ├── journal-entry.js
+│   │   │   ├── notifications.js
+│   │   │   ├── opening-balance.js
+│   │   │   ├── paid-invoice-modal.js
+│   │   │   ├── pos.js
+│   │   │   ├── product.js
+│   │   │   ├── profile.js
+│   │   │   ├── purchase-order.js
+│   │   │   ├── purchase-return.js
+│   │   │   ├── quotation.js
+│   │   │   ├── recentts.js
+│   │   │   ├── reset-password.js
+│   │   │   ├── sales-order.js
+│   │   │   ├── sales-pipeline.js
+│   │   │   ├── sales-return.js
+│   │   │   ├── sorting.js
+│   │   │   ├── stock-opname.js
+│   │   │   ├── supplier.js
+│   │   │   ├── tax.js
+│   │   │   ├── unit.js
+│   │   │   ├── user.js
+│   │   │   └── warehouse.js
+│   │   ├── superadmin
+│   │   │   ├── layouts
+│   │   │   │   └── notifications.js
+│   │   │   ├── settings
+│   │   │   │   └── platform-currency.js
+│   │   │   └── payment-overview.js
+│   │   ├── utils
+│   │   │   ├── currencyFormatter.js
+│   │   │   └── sanitize.js
+│   │   ├── app.js
+│   │   └── bootstrap.js
+│   └── views
+│       ├── admin
+│       │   ├── accounting
+│       │   │   ├── accounts
+│       │   │   │   ├── create.blade.php
+│       │   │   │   ├── edit.blade.php
+│       │   │   │   ├── export-pdf.blade.php
+│       │   │   │   └── index.blade.php
+│       │   │   ├── journal-entries
+│       │   │   │   ├── create.blade.php
+│       │   │   │   ├── edit.blade.php
+│       │   │   │   ├── index.blade.php
+│       │   │   │   └── show.blade.php
+│       │   │   ├── opening-balance
+│       │   │   │   └── index.blade.php
+│       │   │   ├── accounting-setting.blade.php
+│       │   │   ├── chart-of-accounts.blade.php
+│       │   │   ├── general-ledger-export-pdf.blade.php
+│       │   │   ├── general-ledger.blade.php
+│       │   │   ├── journal-export-pdf.blade.php
+│       │   │   ├── journal.blade.php
+│       │   │   ├── trial-balance-export-pdf.blade.php
+│       │   │   └── trial-balance.blade.php
+│       │   ├── audit-log
+│       │   │   └── index.blade.php
+│       │   ├── auth
+│       │   │   ├── confirm-password.blade.php
+│       │   │   ├── forgot-password.blade.php
+│       │   │   ├── login.blade.php
+│       │   │   ├── reset-password.blade.php
+│       │   │   ├── verify-email-success.blade.php
+│       │   │   └── verify-email.blade.php
+│       │   ├── category
+│       │   │   └── index.blade.php
+│       │   ├── currency
+│       │   │   └── currency-edit.blade.php
+│       │   ├── customer
+│       │   │   ├── export-pdf.blade.php
+│       │   │   └── index.blade.php
+│       │   ├── efaktur
+│       │   │   ├── faktur-pdf.blade.php
+│       │   │   ├── index.blade.php
+│       │   │   ├── settings.blade.php
+│       │   │   └── show.blade.php
+│       │   ├── hr
+│       │   │   ├── attendance
+│       │   │   │   ├── export-pdf.blade.php
+│       │   │   │   ├── export-period-pdf.blade.php
+│       │   │   │   ├── index.blade.php
+│       │   │   │   └── show.blade.php
+│       │   │   ├── employee
+│       │   │   │   ├── export-pdf.blade.php
+│       │   │   │   ├── form.blade.php
+│       │   │   │   └── index.blade.php
+│       │   │   ├── payroll
+│       │   │   │   ├── export-pdf.blade.php
+│       │   │   │   ├── export-run-pdf.blade.php
+│       │   │   │   ├── index.blade.php
+│       │   │   │   └── show.blade.php
+│       │   │   └── payslip
+│       │   │       └── print.blade.php
+│       │   ├── layouts
+│       │   │   ├── modals
+│       │   │   │   ├── audit-log
+│       │   │   │   │   └── auditlogmodals.blade.php
+│       │   │   │   ├── category
+│       │   │   │   │   └── catmodals.blade.php
+│       │   │   │   ├── crm
+│       │   │   │   ├── currency
+│       │   │   │   │   └── currmodals.blade.php
+│       │   │   │   ├── customer
+│       │   │   │   │   ├── crm-modal.blade.php
+│       │   │   │   │   └── custmodals.blade.php
+│       │   │   │   ├── general
+│       │   │   │   │   ├── clear-notifications-modal.blade.php
+│       │   │   │   │   ├── keyboard-shortcuts-modal.blade.php
+│       │   │   │   │   ├── tutorial-context.blade.php
+│       │   │   │   │   └── tutorial-modal.blade.php
+│       │   │   │   ├── journal-entries
+│       │   │   │   │   └── jemodals.blade.php
+│       │   │   │   ├── po
+│       │   │   │   │   ├── pomodals-view.blade.php
+│       │   │   │   │   ├── pomodals.blade.php
+│       │   │   │   │   ├── pormodals-view.blade.php
+│       │   │   │   │   └── pormodals.blade.php
+│       │   │   │   ├── pos
+│       │   │   │   │   └── posmodals.blade.php
+│       │   │   │   ├── product
+│       │   │   │   │   └── productmodals.blade.php
+│       │   │   │   ├── profile
+│       │   │   │   │   └── profilemodals.blade.php
+│       │   │   │   ├── quotations
+│       │   │   │   │   ├── quotationsmodals-view.blade.php
+│       │   │   │   │   └── quotationsmodals.blade.php
+│       │   │   │   ├── recentts
+│       │   │   │   │   └── recentmodals.blade.php
+│       │   │   │   ├── sales
+│       │   │   │   │   ├── sales-pipeline-modals.blade.php
+│       │   │   │   │   ├── sales-return-modals.blade.php
+│       │   │   │   │   ├── salesmodals-view.blade.php
+│       │   │   │   │   ├── salesmodals.blade.php
+│       │   │   │   │   └── srmodals-view.blade.php
+│       │   │   │   ├── stock-opname
+│       │   │   │   │   └── stockopnamemodals.blade.php
+│       │   │   │   ├── supplier
+│       │   │   │   │   ├── srm-modal.blade.php
+│       │   │   │   │   └── suppmodals.blade.php
+│       │   │   │   ├── tax
+│       │   │   │   │   └── taxmodals.blade.php
+│       │   │   │   ├── unit
+│       │   │   │   │   └── unitmodals.blade.php
+│       │   │   │   ├── users
+│       │   │   │   │   └── usersmodals.blade.php
+│       │   │   │   └── warehouse
+│       │   │   │       └── waremodals.blade.php
+│       │   │   ├── partials
+│       │   │   │   ├── accounts
+│       │   │   │   │   └── account_row.blade.php
+│       │   │   │   ├── audit-log
+│       │   │   │   │   └── index
+│       │   │   │   │       ├── header.blade.php
+│       │   │   │   │       └── page-body.blade.php
+│       │   │   │   ├── dashboard
+│       │   │   │   │   ├── accounting-summary.blade.php
+│       │   │   │   │   ├── analytics-card.blade.php
+│       │   │   │   │   ├── analytics-metrics.blade.php
+│       │   │   │   │   ├── analytics-stats.blade.php
+│       │   │   │   │   ├── analytics-table.blade.php
+│       │   │   │   │   ├── customer-insights.blade.php
+│       │   │   │   │   ├── dashboard-header.blade.php
+│       │   │   │   │   ├── dashboard-scripts.blade.php
+│       │   │   │   │   ├── financial-summary.blade.php
+│       │   │   │   │   ├── invoice-status.blade.php
+│       │   │   │   │   ├── key-metrics.blade.php
+│       │   │   │   │   ├── main-content.blade.php
+│       │   │   │   │   ├── metric-card.blade.php
+│       │   │   │   │   ├── metric-progress-bar.blade.php
+│       │   │   │   │   ├── metric-trend-badge.blade.php
+│       │   │   │   │   ├── metric-view-details.blade.php
+│       │   │   │   │   ├── performance-chart.blade.php
+│       │   │   │   │   ├── quick-actions.blade.php
+│       │   │   │   │   ├── recent-transactions.blade.php
+│       │   │   │   │   ├── revenue-expenses-table.blade.php
+│       │   │   │   │   ├── sales-forecast.blade.php
+│       │   │   │   │   ├── sidebar.blade.php
+│       │   │   │   │   ├── system-alerts.blade.php
+│       │   │   │   │   ├── tabbed-content.blade.php
+│       │   │   │   │   ├── top-categories-card.blade.php
+│       │   │   │   │   ├── top-products-table.blade.php
+│       │   │   │   │   └── trend-badge.blade.php
+│       │   │   │   ├── journal-entries
+│       │   │   │   │   ├── create
+│       │   │   │   │   │   ├── basic-info.blade.php
+│       │   │   │   │   │   ├── header.blade.php
+│       │   │   │   │   │   ├── page-body.blade.php
+│       │   │   │   │   │   ├── summary-section.blade.php
+│       │   │   │   │   │   ├── transaction-row.blade.php
+│       │   │   │   │   │   └── transactions-card.blade.php
+│       │   │   │   │   ├── edit
+│       │   │   │   │   │   ├── basic-info.blade.php
+│       │   │   │   │   │   ├── header.blade.php
+│       │   │   │   │   │   ├── page-body.blade.php
+│       │   │   │   │   │   ├── summary-section.blade.php
+│       │   │   │   │   │   ├── transaction-row.blade.php
+│       │   │   │   │   │   └── transactions-card.blade.php
+│       │   │   │   │   ├── index
+│       │   │   │   │   │   ├── entry-list.blade.php
+│       │   │   │   │   │   ├── header.blade.php
+│       │   │   │   │   │   └── page-body.blade.php
+│       │   │   │   │   └── show
+│       │   │   │   │       ├── header.blade.php
+│       │   │   │   │       ├── main-content.blade.php
+│       │   │   │   │       ├── page-body.blade.php
+│       │   │   │   │       └── sidebar.blade.php
+│       │   │   │   ├── notification
+│       │   │   │   │   ├── content.blade.php
+│       │   │   │   │   ├── expiring-tab.blade.php
+│       │   │   │   │   ├── financial-tab.blade.php
+│       │   │   │   │   ├── lowstock-tab.blade.php
+│       │   │   │   │   ├── page-body.blade.php
+│       │   │   │   │   ├── system-tab.blade.php
+│       │   │   │   │   └── tabs.blade.php
+│       │   │   │   ├── po
+│       │   │   │   │   ├── create
+│       │   │   │   │   │   ├── add-product-actions.blade.php
+│       │   │   │   │   │   ├── basic-info.blade.php
+│       │   │   │   │   │   ├── form-actions.blade.php
+│       │   │   │   │   │   ├── header.blade.php
+│       │   │   │   │   │   ├── order-discount.blade.php
+│       │   │   │   │   │   ├── order-information.blade.php
+│       │   │   │   │   │   ├── order-items.blade.php
+│       │   │   │   │   │   ├── order-summary.blade.php
+│       │   │   │   │   │   ├── page-body.blade.php
+│       │   │   │   │   │   ├── product-selection.blade.php
+│       │   │   │   │   │   └── summary-totals.blade.php
+│       │   │   │   │   ├── edit
+│       │   │   │   │   │   ├── amount-summary.blade.php
+│       │   │   │   │   │   ├── card-header.blade.php
+│       │   │   │   │   │   ├── form-content.blade.php
+│       │   │   │   │   │   ├── header.blade.php
+│       │   │   │   │   │   ├── item-row.blade.php
+│       │   │   │   │   │   ├── items-table.blade.php
+│       │   │   │   │   │   ├── order-info.blade.php
+│       │   │   │   │   │   ├── order-summary.blade.php
+│       │   │   │   │   │   ├── page-body.blade.php
+│       │   │   │   │   │   ├── po-info-section.blade.php
+│       │   │   │   │   │   ├── summary-section.blade.php
+│       │   │   │   │   │   └── supplier-info.blade.php
+│       │   │   │   │   ├── index
+│       │   │   │   │   │   ├── bulk-action-buttons.blade.php
+│       │   │   │   │   │   ├── bulk-actions.blade.php
+│       │   │   │   │   │   ├── date-filter.blade.php
+│       │   │   │   │   │   ├── entries-selector.blade.php
+│       │   │   │   │   │   ├── filters.blade.php
+│       │   │   │   │   │   ├── header.blade.php
+│       │   │   │   │   │   ├── page-body.blade.php
+│       │   │   │   │   │   ├── pagination.blade.php
+│       │   │   │   │   │   ├── search-input.blade.php
+│       │   │   │   │   │   ├── store-info.blade.php
+│       │   │   │   │   │   ├── table-actions.blade.php
+│       │   │   │   │   │   ├── table-body.blade.php
+│       │   │   │   │   │   ├── table-header.blade.php
+│       │   │   │   │   │   ├── table-row.blade.php
+│       │   │   │   │   │   └── table.blade.php
+│       │   │   │   │   └── view
+│       │   │   │   │       ├── amount-summary.blade.php
+│       │   │   │   │       ├── card-body.blade.php
+│       │   │   │   │       ├── card-header.blade.php
+│       │   │   │   │       ├── header.blade.php
+│       │   │   │   │       ├── invoice-card.blade.php
+│       │   │   │   │       ├── items-table.blade.php
+│       │   │   │   │       ├── order-info.blade.php
+│       │   │   │   │       ├── order-summary.blade.php
+│       │   │   │   │       ├── page-body.blade.php
+│       │   │   │   │       ├── payment-history.blade.php
+│       │   │   │   │       ├── po-info-section.blade.php
+│       │   │   │   │       ├── summary-section.blade.php
+│       │   │   │   │       └── supplier-info.blade.php
+│       │   │   │   ├── por
+│       │   │   │   │   ├── create
+│       │   │   │   │   │   ├── header.blade.php
+│       │   │   │   │   │   └── page-body.blade.php
+│       │   │   │   │   ├── edit
+│       │   │   │   │   │   ├── header.blade.php
+│       │   │   │   │   │   └── page-body.blade.php
+│       │   │   │   │   ├── index
+│       │   │   │   │   │   ├── bulk-actions.blade.php
+│       │   │   │   │   │   ├── date-filter.blade.php
+│       │   │   │   │   │   ├── entries-selector.blade.php
+│       │   │   │   │   │   ├── filters.blade.php
+│       │   │   │   │   │   ├── header.blade.php
+│       │   │   │   │   │   ├── page-body.blade.php
+│       │   │   │   │   │   ├── search-input.blade.php
+│       │   │   │   │   │   └── store-info.blade.php
+│       │   │   │   │   └── show
+│       │   │   │   │       ├── header.blade.php
+│       │   │   │   │       └── page-body.blade.php
+│       │   │   │   ├── pos
+│       │   │   │   │   └── index
+│       │   │   │   │       ├── form.blade.php
+│       │   │   │   │       ├── header.blade.php
+│       │   │   │   │       ├── page-body.blade.php
+│       │   │   │   │       ├── product-catalog.blade.php
+│       │   │   │   │       ├── shopping-cart.blade.php
+│       │   │   │   │       └── transaction-info.blade.php
+│       │   │   │   ├── product
+│       │   │   │   │   ├── create
+│       │   │   │   │   │   ├── additional-details.blade.php
+│       │   │   │   │   │   ├── basic-info.blade.php
+│       │   │   │   │   │   ├── category-supplier.blade.php
+│       │   │   │   │   │   ├── form-footer.blade.php
+│       │   │   │   │   │   ├── form.blade.php
+│       │   │   │   │   │   ├── header.blade.php
+│       │   │   │   │   │   ├── page-body.blade.php
+│       │   │   │   │   │   ├── pricing.blade.php
+│       │   │   │   │   │   └── stock-info.blade.php
+│       │   │   │   │   ├── edit
+│       │   │   │   │   │   ├── basic-info.blade.php
+│       │   │   │   │   │   ├── card-body.blade.php
+│       │   │   │   │   │   ├── card-footer.blade.php
+│       │   │   │   │   │   ├── card-header.blade.php
+│       │   │   │   │   │   ├── description.blade.php
+│       │   │   │   │   │   ├── expiry-settings.blade.php
+│       │   │   │   │   │   ├── form.blade.php
+│       │   │   │   │   │   ├── header.blade.php
+│       │   │   │   │   │   ├── image-upload.blade.php
+│       │   │   │   │   │   ├── inventory-details.blade.php
+│       │   │   │   │   │   ├── page-body.blade.php
+│       │   │   │   │   │   ├── pricing.blade.php
+│       │   │   │   │   │   ├── warehouse-selection.blade.php
+│       │   │   │   │   │   └── warehouse-stock.blade.php
+│       │   │   │   │   └── index
+│       │   │   │   │       ├── action-dropdown.blade.php
+│       │   │   │   │       ├── bulk-actions.blade.php
+│       │   │   │   │       ├── header.blade.php
+│       │   │   │   │       ├── info-header.blade.php
+│       │   │   │   │       ├── page-body.blade.php
+│       │   │   │   │       ├── pagination.blade.php
+│       │   │   │   │       ├── search.blade.php
+│       │   │   │   │       ├── table-body.blade.php
+│       │   │   │   │       ├── table-header.blade.php
+│       │   │   │   │       └── table.blade.php
+│       │   │   │   ├── profile
+│       │   │   │   │   └── _profile_settings.blade.php
+│       │   │   │   ├── sales
+│       │   │   │   │   ├── create
+│       │   │   │   │   │   ├── add-product-actions.blade.php
+│       │   │   │   │   │   ├── basic-info.blade.php
+│       │   │   │   │   │   ├── customer-credit.blade.php
+│       │   │   │   │   │   ├── form-actions.blade.php
+│       │   │   │   │   │   ├── header.blade.php
+│       │   │   │   │   │   ├── order-discount.blade.php
+│       │   │   │   │   │   ├── order-items.blade.php
+│       │   │   │   │   │   ├── order-summary.blade.php
+│       │   │   │   │   │   ├── page-body.blade.php
+│       │   │   │   │   │   ├── product-selection.blade.php
+│       │   │   │   │   │   ├── sales-information.blade.php
+│       │   │   │   │   │   └── summary-totals.blade.php
+│       │   │   │   │   ├── edit
+│       │   │   │   │   │   ├── amount-summary.blade.php
+│       │   │   │   │   │   ├── card-header.blade.php
+│       │   │   │   │   │   ├── customer-info.blade.php
+│       │   │   │   │   │   ├── form-content.blade.php
+│       │   │   │   │   │   ├── header.blade.php
+│       │   │   │   │   │   ├── item-row.blade.php
+│       │   │   │   │   │   ├── items-table.blade.php
+│       │   │   │   │   │   ├── order-info.blade.php
+│       │   │   │   │   │   ├── order-summary.blade.php
+│       │   │   │   │   │   ├── page-body.blade.php
+│       │   │   │   │   │   ├── sales-info-section.blade.php
+│       │   │   │   │   │   └── summary-section.blade.php
+│       │   │   │   │   ├── index
+│       │   │   │   │   │   ├── bulk-action-buttons.blade.php
+│       │   │   │   │   │   ├── bulk-actions.blade.php
+│       │   │   │   │   │   ├── date-filter.blade.php
+│       │   │   │   │   │   ├── entries-selector.blade.php
+│       │   │   │   │   │   ├── filters.blade.php
+│       │   │   │   │   │   ├── header.blade.php
+│       │   │   │   │   │   ├── page-body.blade.php
+│       │   │   │   │   │   ├── pagination.blade.php
+│       │   │   │   │   │   ├── sales-table.blade.php
+│       │   │   │   │   │   ├── search-input.blade.php
+│       │   │   │   │   │   ├── store-info.blade.php
+│       │   │   │   │   │   ├── table-actions.blade.php
+│       │   │   │   │   │   ├── table-body.blade.php
+│       │   │   │   │   │   ├── table-header.blade.php
+│       │   │   │   │   │   └── table-row.blade.php
+│       │   │   │   │   └── view
+│       │   │   │   │       ├── amount-summary.blade.php
+│       │   │   │   │       ├── card-body.blade.php
+│       │   │   │   │       ├── card-header.blade.php
+│       │   │   │   │       ├── customer-info.blade.php
+│       │   │   │   │       ├── header.blade.php
+│       │   │   │   │       ├── invoice-card.blade.php
+│       │   │   │   │       ├── items-table.blade.php
+│       │   │   │   │       ├── order-info.blade.php
+│       │   │   │   │       ├── order-summary.blade.php
+│       │   │   │   │       ├── page-body.blade.php
+│       │   │   │   │       ├── payment-history.blade.php
+│       │   │   │   │       ├── sales-info-section.blade.php
+│       │   │   │   │       └── summary-section.blade.php
+│       │   │   │   ├── sales-returns
+│       │   │   │   │   ├── create
+│       │   │   │   │   │   ├── header.blade.php
+│       │   │   │   │   │   └── page-body.blade.php
+│       │   │   │   │   ├── edit
+│       │   │   │   │   │   ├── header.blade.php
+│       │   │   │   │   │   └── page-body.blade.php
+│       │   │   │   │   ├── index
+│       │   │   │   │   │   ├── bulk-actions.blade.php
+│       │   │   │   │   │   ├── date-filter.blade.php
+│       │   │   │   │   │   ├── entries-selector.blade.php
+│       │   │   │   │   │   ├── filters.blade.php
+│       │   │   │   │   │   ├── header.blade.php
+│       │   │   │   │   │   ├── page-body.blade.php
+│       │   │   │   │   │   ├── search-input.blade.php
+│       │   │   │   │   │   └── store-info.blade.php
+│       │   │   │   │   └── show
+│       │   │   │   │       ├── header.blade.php
+│       │   │   │   │       └── page-body.blade.php
+│       │   │   │   ├── warehouse
+│       │   │   │   │   └── index
+│       │   │   │   │       ├── header.blade.php
+│       │   │   │   │       ├── info-section.blade.php
+│       │   │   │   │       ├── page-body.blade.php
+│       │   │   │   │       ├── pagination.blade.php
+│       │   │   │   │       ├── search.blade.php
+│       │   │   │   │       ├── table-actions.blade.php
+│       │   │   │   │       ├── table-row.blade.php
+│       │   │   │   │       └── table.blade.php
+│       │   │   │   ├── error-actions.blade.php
+│       │   │   │   ├── global-loader.blade.php
+│       │   │   │   ├── impersonation-banner.blade.php
+│       │   │   │   ├── session-notifications.blade.php
+│       │   │   │   └── trial-banner.blade.php
+│       │   │   ├── authbase.blade.php
+│       │   │   ├── base.blade.php
+│       │   │   ├── errorbase.blade.php
+│       │   │   ├── footer.blade.php
+│       │   │   ├── menu-sidebar.blade.php
+│       │   │   ├── menu.blade.php
+│       │   │   ├── navbar.blade.php
+│       │   │   ├── receiptbase.blade.php
+│       │   │   └── script.blade.php
+│       │   ├── plan
+│       │   │   ├── checkout.blade.php
+│       │   │   ├── index.blade.php
+│       │   │   └── upgrade.blade.php
+│       │   ├── po
+│       │   │   ├── bulk-export-pdf.blade.php
+│       │   │   ├── index.blade.php
+│       │   │   ├── print-pdf.blade.php
+│       │   │   ├── purchase-create.blade.php
+│       │   │   ├── purchase-edit.blade.php
+│       │   │   └── show.blade.php
+│       │   ├── por
+│       │   │   ├── bulk-export-pdf.blade.php
+│       │   │   ├── create.blade.php
+│       │   │   ├── edit.blade.php
+│       │   │   ├── index.blade.php
+│       │   │   ├── print-pdf.blade.php
+│       │   │   └── show.blade.php
+│       │   ├── pos
+│       │   │   ├── index.blade.php
+│       │   │   ├── print.blade.php
+│       │   │   └── receipt.blade.php
+│       │   ├── product
+│       │   │   ├── bulk-export-pdf.blade.php
+│       │   │   ├── index.blade.php
+│       │   │   ├── product-create.blade.php
+│       │   │   └── product-edit.blade.php
+│       │   ├── profile
+│       │   │   └── profile-edit.blade.php
+│       │   ├── quotations
+│       │   │   ├── partials
+│       │   │   │   ├── create
+│       │   │   │   │   ├── header.blade.php
+│       │   │   │   │   └── page-body.blade.php
+│       │   │   │   ├── edit
+│       │   │   │   │   ├── header.blade.php
+│       │   │   │   │   └── page-body.blade.php
+│       │   │   │   ├── form
+│       │   │   │   │   ├── form-actions.blade.php
+│       │   │   │   │   ├── quotation-info.blade.php
+│       │   │   │   │   ├── quotation-item-row.blade.php
+│       │   │   │   │   ├── quotation-items.blade.php
+│       │   │   │   │   └── quotation-summary.blade.php
+│       │   │   │   ├── index
+│       │   │   │   │   ├── header.blade.php
+│       │   │   │   │   ├── page-body.blade.php
+│       │   │   │   │   ├── pagination.blade.php
+│       │   │   │   │   ├── quotation-table.blade.php
+│       │   │   │   │   └── store-info.blade.php
+│       │   │   │   └── view
+│       │   │   │       ├── header.blade.php
+│       │   │   │       └── page-body.blade.php
+│       │   │   ├── index.blade.php
+│       │   │   ├── quotation-create.blade.php
+│       │   │   ├── quotation-edit.blade.php
+│       │   │   ├── quotation-print-pdf.blade.php
+│       │   │   └── show.blade.php
+│       │   ├── reports
+│       │   │   ├── bank-reconciliation
+│       │   │   │   ├── create.blade.php
+│       │   │   │   ├── index.blade.php
+│       │   │   │   └── show.blade.php
+│       │   │   ├── adjustment-log-export-pdf.blade.php
+│       │   │   ├── adjustment-log.blade.php
+│       │   │   ├── aged-payables-export-pdf.blade.php
+│       │   │   ├── aged-payables.blade.php
+│       │   │   ├── aged-receivables-export-pdf.blade.php
+│       │   │   ├── aged-receivables.blade.php
+│       │   │   ├── balance-sheet-export-pdf.blade.php
+│       │   │   ├── balance-sheet.blade.php
+│       │   │   ├── cash-flow-export-pdf.blade.php
+│       │   │   ├── cash-flow.blade.php
+│       │   │   ├── income-statement-export-pdf.blade.php
+│       │   │   ├── income-statement.blade.php
+│       │   │   ├── recent-transactions-bulk-export-pdf.blade.php
+│       │   │   ├── recent-transactions-export-pdf.blade.php
+│       │   │   ├── recentts.blade.php
+│       │   │   └── stock-transfer.blade.php
+│       │   ├── sales
+│       │   │   ├── bulk-export-pdf.blade.php
+│       │   │   ├── index.blade.php
+│       │   │   ├── opportunity-print-pdf.blade.php
+│       │   │   ├── pipeline.blade.php
+│       │   │   ├── print-pdf.blade.php
+│       │   │   ├── sales-create.blade.php
+│       │   │   ├── sales-edit.blade.php
+│       │   │   └── show.blade.php
+│       │   ├── sales-returns
+│       │   │   ├── bulk-export-pdf.blade.php
+│       │   │   ├── create.blade.php
+│       │   │   ├── edit.blade.php
+│       │   │   ├── index.blade.php
+│       │   │   ├── print-pdf.blade.php
+│       │   │   └── show.blade.php
+│       │   ├── settings
+│       │   │   ├── backup.blade.php
+│       │   │   └── settings.blade.php
+│       │   ├── stock-opname
+│       │   │   ├── create.blade.php
+│       │   │   ├── index.blade.php
+│       │   │   └── show.blade.php
+│       │   ├── supplier
+│       │   │   ├── export-pdf.blade.php
+│       │   │   └── index.blade.php
+│       │   ├── tax
+│       │   │   └── tax.blade.php
+│       │   ├── unit
+│       │   │   └── index.blade.php
+│       │   ├── users
+│       │   │   └── index.blade.php
+│       │   ├── warehouse
+│       │   │   ├── export-pdf.blade.php
+│       │   │   └── index.blade.php
+│       │   ├── dashboard.blade.php
+│       │   └── notifications.blade.php
+│       ├── emails
+│       │   ├── contact-form.blade.php
+│       │   └── subscription-invoice.blade.php
+│       ├── errors
+│       │   ├── 200.blade.php
+│       │   ├── 302.blade.php
+│       │   ├── 400.blade.php
+│       │   ├── 401.blade.php
+│       │   ├── 403.blade.php
+│       │   ├── 404.blade.php
+│       │   ├── 419.blade.php
+│       │   ├── 429.blade.php
+│       │   ├── 500.blade.php
+│       │   └── 503.blade.php
+│       ├── landing
+│       ├── superadmin
+│       │   ├── audit-log
+│       │   │   ├── index.blade.php
+│       │   │   └── show.blade.php
+│       │   ├── auth
+│       │   │   └── login.blade.php
+│       │   ├── backups
+│       │   │   └── index.blade.php
+│       │   ├── billing
+│       │   │   ├── index.blade.php
+│       │   │   └── show.blade.php
+│       │   ├── cms
+│       │   │   └── index.blade.php
+│       │   ├── dashboard
+│       │   │   └── index.blade.php
+│       │   ├── features
+│       │   │   └── index.blade.php
+│       │   ├── invoices
+│       │   │   ├── index.blade.php
+│       │   │   └── show.blade.php
+│       │   ├── layouts
+│       │   │   ├── modals
+│       │   │   │   └── how-it-works-modal.blade.php
+│       │   │   ├── partials
+│       │   │   ├── base.blade.php
+│       │   │   ├── menu-sidebar.blade.php
+│       │   │   ├── navbar.blade.php
+│       │   │   └── script.blade.php
+│       │   ├── payment-overview
+│       │   │   └── index.blade.php
+│       │   ├── pending-payments
+│       │   │   └── index.blade.php
+│       │   ├── permissions
+│       │   │   └── index.blade.php
+│       │   ├── plans
+│       │   │   ├── create.blade.php
+│       │   │   ├── edit.blade.php
+│       │   │   └── index.blade.php
+│       │   ├── settings
+│       │   │   ├── billing-rate.blade.php
+│       │   │   ├── index.blade.php
+│       │   │   ├── platform-currency.blade.php
+│       │   │   └── preferences.blade.php
+│       │   ├── subscriptions
+│       │   │   └── index.blade.php
+│       │   ├── tenants
+│       │   │   ├── index.blade.php
+│       │   │   └── show.blade.php
+│       │   └── transactions
+│       │       └── index.blade.php
+│       └── index.blade.php
+├── routes
+│   ├── admin
+│   │   ├── accounting.php
+│   │   ├── auth.php
+│   │   ├── bank-reconciliation.php
+│   │   ├── contacts.php
+│   │   ├── crm.php
+│   │   ├── dashboard.php
+│   │   ├── efaktur.php
+│   │   ├── hr.php
+│   │   ├── inventory.php
+│   │   ├── notifications.php
+│   │   ├── products.php
+│   │   ├── purchases.php
+│   │   ├── quotations.php
+│   │   ├── reports.php
+│   │   ├── sales.php
+│   │   └── settings.php
+│   ├── api.php
+│   ├── console.php
+│   ├── superadmin.php
+│   ├── turbo.php
+│   └── web.php
+├── tests
+│   ├── Feature
+│   │   ├── Admin
+│   │   │   ├── AccountingControllerTest.php
+│   │   │   ├── AuditLogControllerTest.php
+│   │   │   ├── BackupControllerTest.php
+│   │   │   ├── BankReconciliationControllerTest.php
+│   │   │   ├── CategoryControllerTest.php
+│   │   │   ├── CurrencyControllerTest.php
+│   │   │   ├── CustomerControllerTest.php
+│   │   │   ├── CustomerCrmControllerTest.php
+│   │   │   ├── DashboardControllerTest.php
+│   │   │   ├── EfakturSettingsTest.php
+│   │   │   ├── JournalEntryControllerTest.php
+│   │   │   ├── NotificationControllerTest.php
+│   │   │   ├── OpeningBalanceControllerTest.php
+│   │   │   ├── PlanControllerTest.php
+│   │   │   ├── PlanFeatureGateTest.php
+│   │   │   ├── POSControllerTest.php
+│   │   │   ├── PrintTest.php
+│   │   │   ├── ProductControllerTest.php
+│   │   │   ├── ProductStockControllerTest.php
+│   │   │   ├── ProfileControllerTest.php
+│   │   │   ├── PurchaseControllerTest.php
+│   │   │   ├── PurchasePpnMasukanViewTest.php
+│   │   │   ├── PurchaseReturnControllerTest.php
+│   │   │   ├── QuotationControllerTest.php
+│   │   │   ├── ReportControllerTest.php
+│   │   │   ├── SalesControllerTest.php
+│   │   │   ├── SalesPipelineControllerTest.php
+│   │   │   ├── SalesReturnControllerTest.php
+│   │   │   ├── SettingsControllerTest.php
+│   │   │   ├── SettingsTaxJurisdictionTest.php
+│   │   │   ├── StockOpnameControllerTest.php
+│   │   │   ├── StockTransferControllerTest.php
+│   │   │   ├── SupplierControllerTest.php
+│   │   │   ├── SupplierCrmControllerTest.php
+│   │   │   ├── TaxControllerTest.php
+│   │   │   ├── UnitControllerTest.php
+│   │   │   ├── UserControllerTest.php
+│   │   │   └── WarehouseControllerTest.php
+│   │   ├── Api
+│   │   │   ├── Auth
+│   │   │   ├── ContactControllerTest.php
+│   │   │   └── TenantLookupControllerTest.php
+│   │   ├── Auth
+│   │   │   ├── AuthenticationTest.php
+│   │   │   ├── EmailVerificationTest.php
+│   │   │   ├── PasswordConfirmationTest.php
+│   │   │   ├── PasswordResetTest.php
+│   │   │   └── PasswordUpdateTest.php
+│   │   ├── HrFeatureTest.php
+│   │   ├── MidtransWebhookTest.php
+│   │   └── MultiTenancyTest.php
+│   ├── js
+│   │   ├── app.test.js
+│   │   ├── auth.test.js
+│   │   ├── category.test.js
+│   │   ├── currency.test.js
+│   │   ├── customer-crm-api.test.js
+│   │   ├── customer-crm-main.test.js
+│   │   ├── customer-crm-state.test.js
+│   │   ├── customer-crm-ui.test.js
+│   │   ├── customer-edit-form.test.js
+│   │   ├── customer-edit-image.test.js
+│   │   ├── customer-edit-main.test.js
+│   │   ├── customer.test.js
+│   │   ├── helpers-notification.test.js
+│   │   ├── layouts-advanced-settings.test.js
+│   │   ├── layouts-global-keyboard-shortcuts.test.js
+│   │   ├── layouts-menu-sidebar.test.js
+│   │   ├── layouts-navbar.test.js
+│   │   ├── layouts-page-loader.test.js
+│   │   ├── layouts-selectable-table.test.js
+│   │   ├── layouts-settings.test.js
+│   │   ├── layouts-theme-initializer.test.js
+│   │   ├── layouts-theme-toggle.test.js
+│   │   ├── layouts-theme-visibility.test.js
+│   │   ├── partials-auth-showContentAfterLoading.test.js
+│   │   ├── partials-auth-togglePasswordVisibility.test.js
+│   │   ├── partials-category-handleEditCategoryModal.test.js
+│   │   ├── partials-currency-api.test.js
+│   │   ├── partials-currency-elements.test.js
+│   │   ├── partials-currency-form.test.js
+│   │   ├── partials-currency-modal.test.js
+│   │   ├── partials-currency-preview.test.js
+│   │   ├── partials-currency-state.test.js
+│   │   ├── partials-customer-crmModal-api.test.js
+│   │   ├── partials-customer-crmModal-main.test.js
+│   │   ├── partials-customer-crmModal-state.test.js
+│   │   ├── partials-customer-crmModal-ui.test.js
+│   │   ├── partials-customer-editModal-form.test.js
+│   │   ├── partials-customer-editModal-image.test.js
+│   │   ├── partials-customer-editModal-main.test.js
+│   │   ├── partials-customer-utils-currency.test.js
+│   │   ├── partials-customer-utils-date.test.js
+│   │   ├── partials-customer-utils-dom.test.js
+│   │   ├── partials-customer-utils-status.test.js
+│   │   ├── partials-pos-cart-actions.test.js
+│   │   ├── partials-pos-cart-dom.test.js
+│   │   ├── partials-pos-cart-state.test.js
+│   │   ├── partials-pos-cart-totals.test.js
+│   │   ├── partials-pos-payment-api.test.js
+│   │   ├── partials-pos-payment-form.test.js
+│   │   ├── partials-pos-payment-modal.test.js
+│   │   ├── partials-pos-quickCreate-customer.test.js
+│   │   ├── partials-pos-quickCreate-product.test.js
+│   │   ├── partials-pos-utils-currency.test.js
+│   │   ├── partials-pos-utils-sound.test.js
+│   │   ├── partials-pos-utils-ui.test.js
+│   │   ├── partials-product-bulkActions-delete.test.js
+│   │   ├── partials-product-bulkActions-export.test.js
+│   │   ├── partials-product-bulkActions-selection.test.js
+│   │   ├── partials-product-bulkActions-stock.test.js
+│   │   ├── partials-product-events.test.js
+│   │   ├── partials-product-main.test.js
+│   │   ├── partials-product-modals-delete.test.js
+│   │   ├── partials-product-modals-init.test.js
+│   │   ├── partials-product-modals-product.test.js
+│   │   ├── partials-product-search-state.test.js
+│   │   ├── partials-product-search-table.test.js
+│   │   ├── partials-product-search-ui.test.js
+│   │   ├── partials-product-stats.test.js
+│   │   ├── partials-product-utils-helpers.test.js
+│   │   ├── partials-product-utils-ui.test.js
+│   │   ├── partials-profile-form.test.js
+│   │   ├── partials-profile-modal.test.js
+│   │   ├── partials-purchase-order-bulkActions-actions.test.js
+│   │   ├── partials-purchase-order-bulkActions-PurchaseOrderBulkSelection.test.js
+│   │   ├── partials-purchase-order-common-PurchaseOrderModule.test.js
+│   │   ├── partials-purchase-order-create-PurchaseOrderCreate.test.js
+│   │   ├── partials-purchase-order-edit-PurchaseOrderEdit.test.js
+│   │   ├── partials-purchase-order-view-PurchaseOrderView.test.js
+│   │   ├── partials-recentts-bulkActions-api.test.js
+│   │   ├── partials-recentts-bulkActions-selection.test.js
+│   │   ├── partials-recentts-modals-markAsPaid.test.js
+│   │   ├── partials-recentts-utils-dom.test.js
+│   │   ├── partials-recentts-utils-export.test.js
+│   │   ├── partials-recentts-utils-resetButton.test.js
+│   │   ├── partials-recentts-utils-search.test.js
+│   │   ├── partials-recentts-utils-selection.test.js
+│   │   ├── partials-sales-order-bulkActions-actions.test.js
+│   │   ├── partials-sales-order-bulkActions-SalesOrderBulkSelection.test.js
+│   │   ├── partials-sales-order-common-SalesOrderModule.test.js
+│   │   ├── partials-sales-order-create-SalesOrderCreate.test.js
+│   │   ├── partials-sales-order-edit-SalesOrderEdit.test.js
+│   │   ├── partials-sales-order-view-SalesOrderView.test.js
+│   │   ├── partials-sales-pipeline-common-constants.test.js
+│   │   ├── partials-sales-pipeline-common-state.test.js
+│   │   ├── partials-sales-pipeline-common-utils.test.js
+│   │   ├── partials-sales-pipeline-data-init.test.js
+│   │   ├── partials-sales-pipeline-forms-convertOpportunity.test.js
+│   │   ├── partials-sales-pipeline-forms-editOpportunity.test.js
+│   │   ├── partials-sales-pipeline-forms-editPipeline.test.js
+│   │   ├── partials-sales-pipeline-forms-newOpportunity.test.js
+│   │   ├── partials-sales-pipeline-forms-newPipeline.test.js
+│   │   ├── partials-sales-pipeline-forms-newStage.test.js
+│   │   ├── partials-sales-pipeline-modals-opportunityItems.test.js
+│   │   ├── partials-sales-pipeline-opportunities-card.test.js
+│   │   ├── partials-sales-pipeline-opportunities-dragAndDrop.test.js
+│   │   ├── partials-sales-pipeline-ui-customerSelect.test.js
+│   │   ├── partials-sales-pipeline-ui-pipelineBoard.test.js
+│   │   ├── partials-sales-pipeline-ui-pipelineSelect.test.js
+│   │   ├── partials-sales-pipeline-ui-pipelinesList.test.js
+│   │   ├── partials-sales-pipeline-ui-stagesList.test.js
+│   │   ├── partials-sorting-lis.test.js.js
+│   │   ├── partials-sorting-search.test.js
+│   │   ├── partials-supplier-editModal-form.test.js
+│   │   ├── partials-supplier-editModal-image.test.js
+│   │   ├── partials-supplier-editModal-main.test.js
+│   │   ├── partials-supplier-search-state.test.js
+│   │   ├── partials-supplier-search-table.test.js
+│   │   ├── partials-supplier-search-ui.test.js
+│   │   ├── partials-supplier-srmModal-api.test.js
+│   │   ├── partials-supplier-srmModal-main.test.js
+│   │   ├── partials-supplier-srmModal-state.test.js
+│   │   ├── partials-supplier-srmModal-ui.test.js
+│   │   ├── partials-supplier-utils-currency.test.js
+│   │   ├── partials-supplier-utils-date.test.js
+│   │   ├── partials-supplier-utils-dom.test.js
+│   │   ├── partials-supplier-utils-status.test.js
+│   │   ├── partials-unit-handleEditUnitModal.test.js
+│   │   ├── partials-user-common-elements.test.js
+│   │   ├── partials-user-common-state.test.js
+│   │   ├── partials-user-create-main.test.js
+│   │   ├── partials-user-delete-api.test.js
+│   │   ├── partials-user-delete-main.test.js
+│   │   ├── partials-user-edit-api.test.js
+│   │   ├── partials-user-edit-main.test.js
+│   │   ├── partials-user-rolesPermissions-api.test.js
+│   │   ├── partials-user-rolesPermissions-sync.test.js
+│   │   ├── partials-warehouse-common-formSubmission.test.js
+│   │   ├── partials-warehouse-create-main.test.js
+│   │   ├── partials-warehouse-edit-main.test.js
+│   │   ├── partials-warehouse-search-state.test.js
+│   │   ├── partials-warehouse-search-table.test.js
+│   │   ├── partials-warehouse-search-ui.test.js
+│   │   ├── pos-actions.test.js
+│   │   ├── pos-state.test.js
+│   │   ├── pos-totals.test.js
+│   │   ├── pos.test.js
+│   │   ├── product.test.js
+│   │   ├── profile.test.js
+│   │   ├── purchase-order-bulk-actions.test.js
+│   │   ├── purchase-order-bulk-selection.test.js
+│   │   ├── purchase-order-common.test.js
+│   │   ├── purchase-order-create.test.js
+│   │   ├── purchase-order-edit.test.js
+│   │   ├── purchase-order-view.test.js
+│   │   ├── purchase-order.test.js
+│   │   ├── recentts.test.js
+│   │   ├── sales-order-bulk-actions.test.js
+│   │   ├── sales-order-bulk-selection.test.js
+│   │   ├── sales-order-common.test.js
+│   │   ├── sales-order-create.test.js
+│   │   ├── sales-order-edit.test.js
+│   │   ├── sales-order-view.test.js
+│   │   ├── sales-order.test.js
+│   │   ├── sales-pipeline.test.js
+│   │   ├── setup.js
+│   │   ├── sorting.test.js
+│   │   ├── supplier.test.js
+│   │   ├── tax.test.js
+│   │   ├── unit.test.js
+│   │   ├── user.test.js
+│   │   └── warehouse.test.js
+│   ├── Traits
+│   │   └── CreatesTenant.php
+│   ├── Unit
+│   │   ├── DTOs
+│   │   │   └── TransactionDTOTest.php
+│   │   ├── Helpers
+│   │   │   ├── CurrencyHelperPlatformTest.php
+│   │   │   ├── CurrencyHelperTest.php
+│   │   │   ├── PphHelperTest.php
+│   │   │   ├── ProductHelperTest.php
+│   │   │   ├── PurchaseHelperTest.php
+│   │   │   ├── PurchaseReturnHelperTest.php
+│   │   │   ├── SalesHelperTest.php
+│   │   │   └── SalesReturnHelperTest.php
+│   │   ├── Http
+│   │   │   ├── Middleware
+│   │   │   │   └── SetLocaleTest.php
+│   │   │   └── Requests
+│   │   │       └── ProfileUpdateRequestTest.php
+│   │   ├── Models
+│   │   │   ├── ProductStockTest.php
+│   │   │   ├── SalesIsPphTest.php
+│   │   │   ├── TaxIsPphTest.php
+│   │   │   └── TenantCanDisableIndonesianJurisdictionTest.php
+│   │   ├── Observers
+│   │   └── Services
+│   │       ├── AccountingAuditServiceTest.php
+│   │       ├── AccountingExportServiceTest.php
+│   │       ├── AccountingReportServiceTest.php
+│   │       ├── AccountingServiceTest.php
+│   │       ├── AccountServiceTest.php
+│   │       ├── ActivityLogServiceTest.php
+│   │       ├── AgingReportServiceTest.php
+│   │       ├── BankStatementParserTest.php
+│   │       ├── BillingServiceTest.php
+│   │       ├── CashFlowServiceTest.php
+│   │       ├── CategoryServiceTest.php
+│   │       ├── ChartOfAccountsServiceTest.php
+│   │       ├── CrmServiceTest.php
+│   │       ├── CurrencyServiceTest.php
+│   │       ├── CustomerServiceTest.php
+│   │       ├── DashboardServiceTest.php
+│   │       ├── EFakturServiceSptMasukanTest.php
+│   │       ├── FinancialReportingServiceTest.php
+│   │       ├── GeneralLedgerServiceTest.php
+│   │       ├── ManualJournalEntryServiceTest.php
+│   │       ├── NotificationServiceTest.php
+│   │       ├── OpeningBalanceServiceTest.php
+│   │       ├── PlanServiceTest.php
+│   │       ├── PosServiceTest.php
+│   │       ├── ProductServiceTest.php
+│   │       ├── ProfileServiceTest.php
+│   │       ├── PurchaseReturnServiceTest.php
+│   │       ├── PurchaseServicePpnMasukanTest.php
+│   │       ├── PurchaseServiceTest.php
+│   │       ├── ReportExporterTest.php
+│   │       ├── SalesForecastServiceTest.php
+│   │       ├── SalesPipelineServiceTest.php
+│   │       ├── SalesReturnServiceTest.php
+│   │       ├── SalesServiceTest.php
+│   │       ├── SecurityLoggerTest.php
+│   │       ├── StockOpnameServiceTest.php
+│   │       ├── SupplierServiceTest.php
+│   │       ├── SystemNotificationServiceTest.php
+│   │       ├── TaxServiceEnsureIndonesianDefaultsTest.php
+│   │       ├── TaxServiceTest.php
+│   │       ├── TenantSetupServiceTest.php
+│   │       ├── TransactionServiceTest.php
+│   │       ├── TutorialServiceTest.php
+│   │       ├── UnitServiceTest.php
+│   │       ├── UserServiceTest.php
+│   │       └── WarehouseServiceTest.php
+│   └── TestCase.php
+├── .dockerignore
+├── .editorconfig
+├── .env
+├── .env.example
+├── .gitattributes
+├── .gitignore
+├── .phpunit.result.cache
+├── artisan
+├── composer.json
+├── composer.lock
+├── docker-compose.yml
+├── Dockerfile
+├── graph.png
+├── LICENSE
+├── package-lock.json
+├── package.json
+├── phpunit.xml
+├── postcss.config.js
+├── README.md
+├── screenshot.png
+├── tailwind.config.js
+└── vite.config.js

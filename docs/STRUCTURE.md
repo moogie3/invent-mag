@@ -4,84 +4,85 @@
 invent-mag/
 ├── .dockerignore
 ├── .editorconfig
+├── .env
 ├── .env.example
 ├── .gitattributes
 ├── .gitignore
+├── .phpunit.result.cache
+├── Dockerfile
+├── LICENSE
+├── README.md
 ├── artisan
 ├── composer.json
+├── composer.lock
 ├── docker-compose.yml
-├── Dockerfile
-├── graph.png                        # ERD diagram
-├── LICENSE
+├── generate_tree.cjs
+├── graph.png
+├── package-lock.json
 ├── package.json
 ├── phpunit.xml
 ├── postcss.config.js
-├── README.md
 ├── screenshot.png
 ├── tailwind.config.js
 ├── vite.config.js
-│
-├── docs/                            # All documentation (no markdown at repo root)
+├── docs/
 │   ├── ACCOUNTING_SETUP_GUIDE.md
+│   ├── ACTUAL_TREE.txt
 │   ├── ARCHITECTURE_ASSESSMENT.md
 │   ├── DEPLOYMENT_CHECKLIST.md
 │   ├── FEATURE_CHECKLIST.md
 │   ├── INTERVIEW_QA.md
 │   ├── LANDING_PAGE_CMS.md
-│   ├── OWNER_SETUP_GUIDE.md            # Owner first-run setup, env, domains, billing
+│   ├── OWNER_SETUP_GUIDE.md
 │   ├── PPN_EVOLUTION.md
 │   ├── ROADMAP.md
 │   ├── STRUCTURE.md
 │   ├── TAXATION_IMPROVEMENT.md
 │   ├── TAXATION_SYSTEM.md
 │   └── TECHNICAL_SPECIFICATION.md
-│
 ├── app/
-│   ├── Actions/Fortify/
-│   │   ├── CreateNewUser.php
-│   │   ├── PasswordValidationRules.php
-│   │   ├── ResetUserPassword.php
-│   │   ├── UpdateUserPassword.php
-│   │   └── UpdateUserProfileInformation.php
-│   │
-│   ├── Console/Commands/
-│   │   ├── BackupTenant.php
-│   │   ├── CheckExpiredSubscriptions.php
-│   │   ├── ProcessScheduledPlanChanges.php
-│   │   └── ResetDemoTenant.php
-│   │
-│   ├── DTOs/
+│   ├── Actions
+│   │   └── Fortify
+│   │       ├── CreateNewUser.php
+│   │       ├── PasswordValidationRules.php
+│   │       ├── ResetUserPassword.php
+│   │       ├── UpdateUserPassword.php
+│   │       └── UpdateUserProfileInformation.php
+│   ├── Console
+│   │   └── Commands
+│   │       ├── BackupTenant.php
+│   │       ├── CheckExpiredSubscriptions.php
+│   │       ├── ProcessScheduledPlanChanges.php
+│   │       └── ResetDemoTenant.php
+│   ├── DTOs
 │   │   └── TransactionDTO.php
-│   │
-│   ├── Exceptions/
-│   │   └── PlanLimitExceededException.php   # No Handler.php — Laravel 11 handles errors via bootstrap/app.php
-│   │
-│   ├── Helpers/
+│   ├── Exceptions
+│   │   └── PlanLimitExceededException.php
+│   ├── Helpers
 │   │   ├── CurrencyHelper.php
 │   │   ├── ProductHelper.php
 │   │   ├── PurchaseHelper.php
 │   │   ├── PurchaseReturnHelper.php
 │   │   ├── SalesHelper.php
 │   │   └── SalesReturnHelper.php
-│   │
-│   ├── Http/
-│   │   ├── Controllers/
-│   │   │   ├── Controller.php
-│   │   │   ├── SuperAdmin/
-│   │   │   │   ├── SettingController.php   # Also handles platform-currency + billing-rate settings
-│   │   │   │   ├── PlanController.php      # Now handles currency_code on plans
-│   │   │   │   └── ... (16 super admin controllers)
-│   │   │   ├── Admin/
+│   ├── Http
+│   │   ├── Controllers
+│   │   │   ├── Admin
+│   │   │   │   ├── Hr
+│   │   │   │   │   ├── AttendanceController.php
+│   │   │   │   │   ├── EmployeeController.php
+│   │   │   │   │   ├── PayrollController.php
+│   │   │   │   │   └── PayslipController.php
 │   │   │   │   ├── AccountingController.php
 │   │   │   │   ├── AuditLogController.php
 │   │   │   │   ├── BackupController.php
-│   │   │   │   ├── BankReconciliationController.php   ← NEW (Aug 2026)
+│   │   │   │   ├── BankReconciliationController.php
 │   │   │   │   ├── CategoryController.php
 │   │   │   │   ├── CurrencyController.php
 │   │   │   │   ├── CustomerController.php
 │   │   │   │   ├── CustomerCrmController.php
 │   │   │   │   ├── DashboardController.php
-│   │   │   │   ├── EFakturController.php       ← NEW (July 2026)
+│   │   │   │   ├── EFakturController.php
 │   │   │   │   ├── JournalEntryController.php
 │   │   │   │   ├── NotificationController.php
 │   │   │   │   ├── OpeningBalanceController.php
@@ -105,27 +106,42 @@ invent-mag/
 │   │   │   │   ├── TaxController.php
 │   │   │   │   ├── UnitController.php
 │   │   │   │   ├── UserController.php
-│   │   │   │   ├── WarehouseController.php
-│   │   │   │   └── Hr/
-│   │   │   │       ├── AttendanceController.php
-│   │   │   │       ├── EmployeeController.php
-│   │   │   │       ├── PayrollController.php
-│   │   │   │       └── PayslipController.php
-│   │   │   ├── Api/
-│   │   │   │   ├── Auth/
+│   │   │   │   └── WarehouseController.php
+│   │   │   ├── Api
+│   │   │   │   ├── Auth
 │   │   │   │   │   ├── AuthController.php
 │   │   │   │   │   └── RegisteredUserController.php
-│   │   │   │   ├── ContactController.php
+│   │   │   │   ├── V1
+│   │   │   │   ├── Webhook
+│   │   │   │   │   └── MidtransController.php
 │   │   │   │   ├── CmsController.php
+│   │   │   │   ├── ContactController.php
 │   │   │   │   ├── PaymentController.php
-│   │   │   │   ├── PlanController.php            ← NEW (Aug 2026) — public `/api/plans` marketing pricing
-│   │   │   │   ├── TenantLookupController.php
-│   │   │   │   └── Webhook/MidtransController.php
-│   │   │   └── Auth/
-│   │   │       └── LoginController.php
-│   │   │
-│   │   ├── Middleware/
-│   │   │   ├── CaptureImpersonation.php        ← Decrypts impersonation token, logs in tenant user
+│   │   │   │   ├── PlanController.php
+│   │   │   │   └── TenantLookupController.php
+│   │   │   ├── Auth
+│   │   │   │   └── LoginController.php
+│   │   │   ├── SuperAdmin
+│   │   │   │   ├── Auth
+│   │   │   │   │   └── LoginController.php
+│   │   │   │   ├── AuditLogController.php
+│   │   │   │   ├── BackupController.php
+│   │   │   │   ├── BillingController.php
+│   │   │   │   ├── CmsController.php
+│   │   │   │   ├── DashboardController.php
+│   │   │   │   ├── FeatureController.php
+│   │   │   │   ├── InvoiceController.php
+│   │   │   │   ├── PaymentOverviewController.php
+│   │   │   │   ├── PendingPaymentController.php
+│   │   │   │   ├── PermissionController.php
+│   │   │   │   ├── PlanController.php
+│   │   │   │   ├── SettingController.php
+│   │   │   │   ├── SubscriptionController.php
+│   │   │   │   ├── TenantController.php
+│   │   │   │   └── TransactionController.php
+│   │   │   └── Controller.php
+│   │   ├── Middleware
+│   │   │   ├── CaptureImpersonation.php
 │   │   │   ├── CheckPlanFeature.php
 │   │   │   ├── CheckPlanLimit.php
 │   │   │   ├── CheckSubscriptionStatus.php
@@ -135,59 +151,84 @@ invent-mag/
 │   │   │   ├── SecurityHeaders.php
 │   │   │   ├── SetLocale.php
 │   │   │   └── SetSessionCookieName.php
-│   │   │
-│   │   ├── Requests/
-│   │   │   ├── Api/
-│   │   │   ├── Auth/LoginRequest.php
+│   │   ├── Requests
+│   │   │   ├── Api
+│   │   │   │   └── V1
+│   │   │   ├── Auth
+│   │   │   │   └── LoginRequest.php
 │   │   │   └── ProfileUpdateRequest.php
-│   │   │
-│   │   ├── Resources/              # API Resources
-│   │   │   ├── AccountResource.php ... WarehouseResource.php
-│   │   │   └── (26 resources total)
-│   │   │
-│   │   └── Responses/              # Fortify customization
+│   │   ├── Resources
+│   │   │   ├── AccountResource.php
+│   │   │   ├── CategoryResource.php
+│   │   │   ├── CurrencySettingResource.php
+│   │   │   ├── CustomerInteractionResource.php
+│   │   │   ├── CustomerResource.php
+│   │   │   ├── JournalEntryResource.php
+│   │   │   ├── PaymentResource.php
+│   │   │   ├── PipelineStageResource.php
+│   │   │   ├── POItemResource.php
+│   │   │   ├── POSResource.php
+│   │   │   ├── ProductResource.php
+│   │   │   ├── PurchaseResource.php
+│   │   │   ├── RoleResource.php
+│   │   │   ├── SalesItemResource.php
+│   │   │   ├── SalesOpportunityItemResource.php
+│   │   │   ├── SalesOpportunityResource.php
+│   │   │   ├── SalesPipelineResource.php
+│   │   │   ├── SalesResource.php
+│   │   │   ├── StockAdjustmentResource.php
+│   │   │   ├── SupplierInteractionResource.php
+│   │   │   ├── SupplierResource.php
+│   │   │   ├── TaxResource.php
+│   │   │   ├── TransactionResource.php
+│   │   │   ├── UnitResource.php
+│   │   │   ├── UserResource.php
+│   │   │   └── WarehouseResource.php
+│   │   └── Responses
 │   │       ├── CustomLoginResponse.php
 │   │       ├── CustomRegisterResponse.php
 │   │       ├── LogoutResponse.php
 │   │       ├── PasswordResetResponse.php
 │   │       └── VerifyEmailResponse.php
-│   │
-│   ├── Mail/
+│   ├── Mail
 │   │   ├── ContactFormMail.php
 │   │   └── SubscriptionInvoiceMail.php
-│   │
-│   ├── Models/
+│   ├── Models
+│   │   ├── Concerns
+│   │   │   └── BelongsToTenant.php
+│   │   ├── Models
 │   │   ├── Account.php
 │   │   ├── AccountingAuditLog.php
 │   │   ├── ActivityLog.php
 │   │   ├── AttendancePeriod.php
 │   │   ├── AttendanceRecord.php
-│   │   ├── BankReconciliation.php            ← NEW (Aug 2026)
-│   │   ├── BankReconciliationItem.php        ← NEW (Aug 2026)
-│   │   ├── BillingSetting.php                ← NEW (Aug 2026) — superadmin-managed USD→IDR billing rate
+│   │   ├── BankReconciliation.php
+│   │   ├── BankReconciliationItem.php
+│   │   ├── BillingSetting.php
 │   │   ├── Categories.php
-│   │   ├── CurrencySetting.php             # Per-tenant currency settings
-│   │   ├── PlatformCurrencySetting.php     # Super admin display preference (tenant CurrencySetting is the single system)
+│   │   ├── CurrencySetting.php
 │   │   ├── Customer.php
 │   │   ├── CustomerCredit.php
 │   │   ├── CustomerInteraction.php
 │   │   ├── Employee.php
-│   │   ├── FakturPajak.php                 ← NEW (July 2026)
-│   │   ├── FakturPajakItem.php             ← NEW (July 2026)
+│   │   ├── FakturPajak.php
+│   │   ├── FakturPajakItem.php
 │   │   ├── JournalEntry.php
-│   │   ├── NsfpPool.php                    ← NEW (July 2026)
+│   │   ├── NsfpPool.php
 │   │   ├── OpeningBalance.php
 │   │   ├── Payment.php
 │   │   ├── PayrollItem.php
 │   │   ├── PayrollRun.php
 │   │   ├── PipelineStage.php
 │   │   ├── Plan.php
+│   │   ├── PlatformCurrencySetting.php
 │   │   ├── POItem.php
 │   │   ├── Product.php
 │   │   ├── ProductWarehouse.php
 │   │   ├── Purchase.php
 │   │   ├── PurchaseReturn.php
 │   │   ├── PurchaseReturnItem.php
+│   │   ├── Quotation.php
 │   │   ├── RecurringJournalEntry.php
 │   │   ├── Role.php
 │   │   ├── Sales.php
@@ -197,7 +238,6 @@ invent-mag/
 │   │   ├── SalesPipeline.php
 │   │   ├── SalesReturn.php
 │   │   ├── SalesReturnItem.php
-│   │   ├── Quotation.php
 │   │   ├── StockAdjustment.php
 │   │   ├── StockOpname.php
 │   │   ├── StockOpnameItem.php
@@ -210,24 +250,28 @@ invent-mag/
 │   │   ├── Transaction.php
 │   │   ├── Unit.php
 │   │   ├── User.php
-│   │   ├── Warehouse.php
-│   │   └── Concerns/BelongsToTenant.php
-│   │
-│   ├── Observers/
+│   │   └── Warehouse.php
+│   ├── Multitenancy
+│   ├── Observers
 │   │   ├── ActivityObserver.php
 │   │   └── CustomerCreditObserver.php
-│   │
-│   ├── Providers/
+│   ├── Providers
 │   │   ├── AppServiceProvider.php
 │   │   ├── AuthServiceProvider.php
 │   │   ├── FortifyServiceProvider.php
 │   │   ├── NavigationServiceProvider.php
 │   │   └── TestingServiceProvider.php
-│   │
-│   ├── Scopes/
+│   ├── Scopes
 │   │   └── TenantScope.php
-│   │
-│   ├── Services/
+│   ├── Services
+│   │   ├── BankStatement
+│   │   │   ├── AbstractBankStatementParser.php
+│   │   │   ├── BankStatementParser.php
+│   │   │   ├── BankStatementParserFactory.php
+│   │   │   ├── BcaStatementParser.php
+│   │   │   ├── BniStatementParser.php
+│   │   │   ├── BriStatementParser.php
+│   │   │   └── MandiriStatementParser.php
 │   │   ├── AccountingAuditService.php
 │   │   ├── AccountingExportService.php
 │   │   ├── AccountingReportService.php
@@ -236,9 +280,7 @@ invent-mag/
 │   │   ├── ActivityLogService.php
 │   │   ├── AgingReportService.php
 │   │   ├── AttendanceService.php
-│   │   ├── BankReconciliationService.php     ← NEW (Aug 2026)
-│   │   ├── BankStatement/                    ← NEW (Aug 2026) — BCA/BRI/BNI/Mandiri CSV/TXT parsers
-│   │   │   └── (AbstractBankStatementParser, BankStatementParser, BankStatementParserFactory, Bca/Bni/Bri/MandiriStatementParser)
+│   │   ├── BankReconciliationService.php
 │   │   ├── BillingService.php
 │   │   ├── CashFlowService.php
 │   │   ├── CategoryService.php
@@ -247,7 +289,7 @@ invent-mag/
 │   │   ├── CurrencyService.php
 │   │   ├── CustomerService.php
 │   │   ├── DashboardService.php
-│   │   ├── EFakturService.php              ← NEW (July 2026)
+│   │   ├── EFakturService.php
 │   │   ├── EmployeeService.php
 │   │   ├── FinancialReportingService.php
 │   │   ├── GeneralLedgerService.php
@@ -277,19 +319,13 @@ invent-mag/
 │   │   ├── UnitService.php
 │   │   ├── UserService.php
 │   │   └── WarehouseService.php
-│   │
-│   └── Traits/
+│   └── Traits
 │       └── HandlesApiErrors.php
-│
-├── bootstrap/
-│   ├── app.php
-│   └── providers.php
-│
 ├── config/
 │   ├── app.php
 │   ├── auth.php
 │   ├── backup.php
-│   ├── billing.php                    # USD→IDR billing rate fallback + tax rate
+│   ├── billing.php
 │   ├── cache.php
 │   ├── cors.php
 │   ├── database.php
@@ -310,224 +346,15 @@ invent-mag/
 │   ├── superadmin-tutorial.php
 │   ├── turbo-laravel.php
 │   └── tutorial.php
-│
-├── database/
-│   ├── factories/                   # 30+ model factories
-│   │
-│   ├── migrations/
-│   │   ├── landlord/
-│   │   │   └── 2026_01_08_070136_create_landlord_tenants_table.php
-│   │   │
-│   │   ├── 0000_01_01_000000_create_tenants_table.php
-│   │   ├── 0001_01_01_000001_create_users_table.php
-│   │   ├── ... (100+ tenant migrations)
-│   │   ├── 2026_05_07_081251_add_hr_feature_to_plans_table.php
-│   │   ├── 2026_05_12_035444_add_allowances_deductions_to_employees_table.php
-│   │   ├── 2026_05_12_045741_add_working_days_to_attendance_periods_table.php
-│   │   ├── 2026_05_25_000001_add_cash_flow_feature_to_plans_table.php
-│   │   ├── 2026_07_06_000001_create_platform_currency_settings_table.php
-│   │   ├── 2026_07_06_000002_add_currency_code_to_plans_table.php
-│   │   ├── 2026_07_06_000003_add_currency_code_to_subscription_orders_table.php
-│   │   ├── 2026_07_17_000001_create_faktur_pajak_table.php              ← NEW
-│   │   ├── 2026_07_17_000002_create_faktur_pajak_items_table.php        ← NEW
-│   │   ├── 2026_07_17_000003_create_nsfp_pool_table.php                 ← NEW
-│   │   ├── 2026_07_17_000004_add_ppn_fields_to_tenants_customers_sales.php ← NEW
-│   │   ├── 2026_07_17_000005_add_ppn_feature_to_plans.php               ← NEW
-│   │   ├── 2026_07_25_000001_backfill_ppn_keluaran_account_setting.php  ← NEW
-│   │   ├── 2026_07_25_000002_add_tax_jurisdiction_to_tenants_and_is_ppn_to_taxes.php
-│   │   ├── 2026_07_28_000001_add_is_pph_to_taxes.php
-│   │   ├── 2026_07_28_000002_add_pph_fields_to_sales.php
-│   │   ├── 2026_07_28_000003_backfill_pph_account_settings.php
-│   │   ├── 2026_07_28_000004_add_pph_fields_to_po.php
-│   │   ├── 2026_07_28_000005_add_pph_fields_to_quotations.php
-│   │   ├── 2026_08_01_000001_create_bank_reconciliation_tables.php
-│   │   ├── 2026_08_03_000001_add_ppn_fields_to_po.php
-│   │   ├── 2026_08_03_000002_backfill_ppn_masukan_account_setting.php
-│   │   ├── 2026_08_05_000001_backfill_pph_22_tax_record.php
-│   │   └── 2026_08_05_000002_backfill_pph_final_tax_record.php
-│   │
-│   └── seeders/
-│       ├── DatabaseSeeder.php
-│       ├── PlanSeeder.php
-│       ├── PermissionSeeder.php
-│       ├── RoleSeeder.php / RolePermissionSeeder.php
-│       ├── AccountSeeder.php
-│       ├── UserSeeder.php / CustomerSeeder.php / SupplierSeeder.php
-│       ├── ProductSeeder.php / CategorySeeder.php / UnitSeeder.php
-│       ├── SalesSeeder.php / PurchaseSeeder.php
-│       ├── EmployeeSeeder.php / AttendanceSeeder.php / PayrollSeeder.php
-│       ├── StockOpnameSeeder.php / StockTransferSeeder.php
-│       ├── SalesReturnSeeder.php / PurchaseReturnSeeder.php
-│       └── (36 seeders total)
-│
-├── docker/
-│   ├── nginx.conf
-│   └── start.sh
-│
-├── lang/
-│   ├── en/
-│   │   ├── accounting.php
-│   │   ├── messages.php
-│   │   ├── plan.php
-│   │   └── tutorial.php
-│   ├── id/
-│   │   ├── accounting.php
-│   │   ├── messages.php
-│   │   ├── plan.php
-│   │   └── tutorial.php
-│   └── vendor/backup/
-│       ├── en/notifications.php
-│       ├── id/notifications.php
-│       └── ko/notifications.php
-│
-├── public/
-│   ├── .htaccess
-│   ├── index.php
-│   ├── audio/                      # POS sound effects (8 files)
-│   ├── build/assets/               # Vite build output (JS/CSS)
-│   ├── docs/                       # Scribe API docs
-│   ├── images/
-│   ├── img/default_placeholder.png
-│   └── tabler/dist/                # Tabler CSS framework
-│
-├── resources/
-│   ├── css/                        # Page-specific CSS files
-│   │   ├── app.css, auth.css, pos.css, print-a4.css
-│   │   ├── dashboard/, hr/, settings/ styles
-│   │   └── (18 CSS files)
-│   │
-│   ├── images/background.jpeg
-│   │
-│   ├── js/
-│   │   ├── app.js, bootstrap.js
-│   │   ├── admin/
-│   │   │   ├── sales-order.js, purchase-order.js, pos.js
-│   │   │   ├── accounting.js, customer.js, supplier.js, product.js
-│   │   │   ├── hr.js, stock-opname.js, sales-pipeline.js
-│   │   │   ├── (20+ module JS files)
-│   │   │   ├── helpers/
-│   │   │   │   └── notification.js
-│   │   │   ├── layouts/
-│   │   │   │   └── (navbar, sidebar, theme-toggle, tutorial-modal, etc.)
-│   │   │   ├── partials/           # Per-feature JS modules
-│   │   │   │   ├── sales-order/{bulkActions,common,create,edit,view}/
-│   │   │   │   ├── purchase-order/{bulkActions,common,create,edit,view}/
-│   │   │   │   ├── sales-pipeline/{common,data,forms,modals,opportunities,ui}/
-│   │   │   │   ├── product/{bulkActions,modals,search}/
-│   │   │   │   ├── customer/{crmModal,editModal,utils}/
-│   │   │   │   ├── supplier/{editModal,search,srmModal,utils}/
-│   │   │   │   ├── pos/{cart,payment,quickCreate,utils}/
-│   │   │   │   ├── user/{common,create,delete,edit,rolesPermissions}/
-│   │   │   │   ├── warehouse/{common,create,edit,search}/
-│   │   │   │   ├── recentts/{bulkActions,modals,utils}/
-│   │   │   │   └── (50+ partial JS files)
-│   │   │   └── utils/
-│   │   │       ├── formValidator.js       # Global form validation (novalidate + data-validate-form)
-│   │   │       ├── midtrans.js
-│   │   │       ├── onPageLoad.js
-│   │   │       └── sound.js
-│   │   └── utils/
-│   │       ├── currencyFormatter.js
-│   │       └── sanitize.js
-│   │
-│   └── views/
-│       ├── admin/
-│       │   ├── dashboard.blade.php
-│       │   ├── notifications.blade.php
-│       │   │
-│       │   ├── efaktur/                        ← NEW (July 2026)
-│       │   │   ├── index.blade.php             # Period filter, summary cards, faktur table
-│       │   │   ├── show.blade.php              # Faktur Pajak detail view
-│       │   │   ├── settings.blade.php          # PKP/NPWP settings, NSFP import
-│       │   │   └── faktur-pdf.blade.php        # DJP-compliant A4 PDF
-│       │   │
-│       │   ├── accounting/
-│       │   │   ├── chart-of-accounts.blade.php
-│       │   │   ├── journal.blade.php
-│       │   │   ├── general-ledger.blade.php
-│       │   │   ├── trial-balance.blade.php
-│       │   │   ├── accounting-setting.blade.php
-│       │   │   ├── accounts/{create,edit,index}.blade.php
-│       │   │   ├── journal-entries/{create,edit,index,show}.blade.php
-│       │   │   └── opening-balance/index.blade.php
-│       │   │
-│       │   ├── audit-log/                     # Audit Log UI (superuser-only)
-│       │   │   └── index.blade.php
-│       │   │
-│       │   ├── auth/   (login, register, forgot-password, etc.)
-│       │   ├── category/index.blade.php
-│       │   ├── currency/currency-edit.blade.php
-│       │   ├── customer/index.blade.php
-│       │   ├── supplier/index.blade.php
-│       │   │
-│       │   ├── hr/
-│       │   │   ├── employee/{form,index}.blade.php
-│       │   │   ├── attendance/{index,show,export-pdf,export-period-pdf}.blade.php
-│       │   │   ├── payroll/{index,show,export-pdf,export-run-pdf}.blade.php
-│       │   │   └── payslip/print.blade.php
-│       │   │
-│       │   ├── layouts/
-│       │   │   ├── base.blade.php, authbase.blade.php, errorbase.blade.php
-│       │   │   ├── navbar.blade.php, menu.blade.php, menu-sidebar.blade.php
-│       │   │   ├── footer.blade.php, script.blade.php
-│       │   │   └── modals/          # All modal dialogs
-│       │   │       ├── sales/salesmodals.blade.php
-│       │   │       ├── po/pomodals.blade.php
-│       │   │       ├── product/productmodals.blade.php
-│       │   │       ├── customer/custmodals.blade.php
-│       │   │       ├── supplier/suppmodals.blade.php
-│       │   │       ├── users/usersmodals.blade.php
-│       │   │       ├── warehouse/waremodals.blade.php
-│       │   │       ├── audit-log/  category/  crm/  currency/
-│       │   │       ├── journal-entries/  quotations/  recentts/
-│       │   │       ├── stock-opname/  tax/  unit/  profile/
-│       │   │       ├── general/ (tutorial, keyboard-shortcuts, notifications)
-│       │   │       └── (21 modal subdirectories, 30+ modal files)
-│       │   │
-│       │   ├── layouts/partials/    # Reusable blade partials
-│       │   │   ├── sales/{create,edit,index,view}/   (50+ partials)
-│       │   │   ├── po/{create,edit,index,view}/      (55+ partials)
-│       │   │   ├── product/{create,edit,index}/       (30+ partials)
-│       │   │   ├── dashboard/                         (20+ partials)
-│       │   │   ├── warehouse/index/                   (8 partials)
-│       │   │   ├── accounts/  audit-log/  journal-entries/  notification/
-│       │   │   ├── por/  pos/  profile/  sales-returns/
-│       │   │   ├── error-actions.blade.php  global-loader.blade.php
-│       │   │   ├── impersonation-banner.blade.php  session-notifications.blade.php
-│       │   │   ├── trial-banner.blade.php
-│       │   │   └── (14 partial subdirectories, 120+ total partials)
-│       │   │
-│       │   ├── plan/{index,upgrade,checkout}.blade.php
-│       │   ├── po/{index,show,purchase-create,purchase-edit}.blade.php
-│       │   ├── por/{index,show,create,edit}.blade.php  # Purchase Returns
-│       │   ├── pos/{index,receipt,print}.blade.php
-│       │   ├── product/{index,product-create,product-edit}.blade.php
-│       │   ├── profile/profile-edit.blade.php
-│       │   ├── reports/  (income-statement, balance-sheet, cash-flow, aged-*, etc.)
-│       │   ├── sales/{index,show,sales-create,sales-edit,pipeline}.blade.php
-│       │   ├── sales-returns/{index,show,create,edit}.blade.php
-│       │   ├── quotations/{index,show,create,edit}.blade.php
-│       │   ├── settings/{settings,backup}.blade.php  # Tax Region card on settings
-│       │   ├── stock-opname/{index,create,show}.blade.php
-│       │   ├── tax/tax.blade.php
-│       │   ├── unit/index.blade.php
-│       │   ├── users/index.blade.php
-│       │   └── warehouse/{index,export-pdf}.blade.php
-│       │
-│       ├── emails/{subscription-invoice,contact-form}.blade.php
-│       ├── errors/   (200, 302, 400, 401, 403, 404, 419, 429, 500)
-│       └── vendor/   (pagination, turbo-laravel, notifications)
-│
 ├── routes/
-│   ├── api.php
-│   ├── admin/                          # Modular admin route groups (16 files)
+│   ├── admin
 │   │   ├── accounting.php
 │   │   ├── auth.php
-│   │   ├── bank-reconciliation.php     ← NEW (Aug 2026)
+│   │   ├── bank-reconciliation.php
 │   │   ├── contacts.php
 │   │   ├── crm.php
 │   │   ├── dashboard.php
-│   │   ├── efaktur.php                 ← NEW (July 2026) — e-Faktur routes
+│   │   ├── efaktur.php
 │   │   ├── hr.php
 │   │   ├── inventory.php
 │   │   ├── notifications.php
@@ -537,59 +364,314 @@ invent-mag/
 │   │   ├── reports.php
 │   │   ├── sales.php
 │   │   └── settings.php
+│   ├── api.php
 │   ├── console.php
-│   ├── superadmin.php                  # Super admin panel routes
+│   ├── superadmin.php
 │   ├── turbo.php
-│   └── web.php                     # Main route file (admin + auth)
-│
+│   └── web.php
+├── database/
+│   ├── data
+│   ├── migrations
+│   │   └── [Migrations omitted for brevity...]
+│   ├── schema
+│   └── .gitignore
 └── tests/
-    ├── TestCase.php
-    ├── Traits/CreatesTenant.php
-    │
-    ├── Feature/
+    ├── Feature
+    │   ├── Admin
+    │   │   ├── AccountingControllerTest.php
+    │   │   ├── AuditLogControllerTest.php
+    │   │   ├── BackupControllerTest.php
+    │   │   ├── BankReconciliationControllerTest.php
+    │   │   ├── CategoryControllerTest.php
+    │   │   ├── CurrencyControllerTest.php
+    │   │   ├── CustomerControllerTest.php
+    │   │   ├── CustomerCrmControllerTest.php
+    │   │   ├── DashboardControllerTest.php
+    │   │   ├── EfakturSettingsTest.php
+    │   │   ├── JournalEntryControllerTest.php
+    │   │   ├── NotificationControllerTest.php
+    │   │   ├── OpeningBalanceControllerTest.php
+    │   │   ├── PlanControllerTest.php
+    │   │   ├── PlanFeatureGateTest.php
+    │   │   ├── POSControllerTest.php
+    │   │   ├── PrintTest.php
+    │   │   ├── ProductControllerTest.php
+    │   │   ├── ProductStockControllerTest.php
+    │   │   ├── ProfileControllerTest.php
+    │   │   ├── PurchaseControllerTest.php
+    │   │   ├── PurchasePpnMasukanViewTest.php
+    │   │   ├── PurchaseReturnControllerTest.php
+    │   │   ├── QuotationControllerTest.php
+    │   │   ├── ReportControllerTest.php
+    │   │   ├── SalesControllerTest.php
+    │   │   ├── SalesPipelineControllerTest.php
+    │   │   ├── SalesReturnControllerTest.php
+    │   │   ├── SettingsControllerTest.php
+    │   │   ├── SettingsTaxJurisdictionTest.php
+    │   │   ├── StockOpnameControllerTest.php
+    │   │   ├── StockTransferControllerTest.php
+    │   │   ├── SupplierControllerTest.php
+    │   │   ├── SupplierCrmControllerTest.php
+    │   │   ├── TaxControllerTest.php
+    │   │   ├── UnitControllerTest.php
+    │   │   ├── UserControllerTest.php
+    │   │   └── WarehouseControllerTest.php
+    │   ├── Api
+    │   │   ├── Auth
+    │   │   ├── ContactControllerTest.php
+    │   │   └── TenantLookupControllerTest.php
+    │   ├── Auth
+    │   │   ├── AuthenticationTest.php
+    │   │   ├── EmailVerificationTest.php
+    │   │   ├── PasswordConfirmationTest.php
+    │   │   ├── PasswordResetTest.php
+    │   │   └── PasswordUpdateTest.php
     │   ├── HrFeatureTest.php
     │   ├── MidtransWebhookTest.php
-    │   ├── MultiTenancyTest.php
-    │   └── Admin/
-    │       ├── SalesControllerTest.php
-    │       ├── PurchaseControllerTest.php
-    │       ├── POSControllerTest.php
-    │       ├── ProductControllerTest.php
-    │       ├── CustomerControllerTest.php
-    │       ├── SupplierControllerTest.php
-    │       ├── AccountingControllerTest.php
-    │       ├── NotificationControllerTest.php
-    │       ├── PrintTest.php
-    │       ├── SalesReturnControllerTest.php
-    │       ├── PurchaseReturnControllerTest.php
-│       ├── SalesPipelineControllerTest.php
-│       ├── StockOpnameControllerTest.php
-│       ├── ReportControllerTest.php
-│       ├── BackupControllerTest.php
-│       ├── AuditLogControllerTest.php
-│       ├── (25+ controller test files)
-│   ├── Api/TenantLookupControllerTest.php
-│   └── Auth/
-│       ├── AuthenticationTest.php
-│       ├── EmailVerificationTest.php
-│       ├── PasswordConfirmationTest.php
-│       ├── PasswordResetTest.php
-│       └── PasswordUpdateTest.php
-│
-│   └── Unit/
-│       ├── DTOs/TransactionDTOTest.php
-│       ├── Helpers/   (Currency, Product, Purchase, Sales helpers)
-│       ├── Http/Middleware/SetLocaleTest.php
-│       ├── Http/Requests/ProfileUpdateRequestTest.php
-│       ├── Models/ProductStockTest.php
-│       └── Services/   (CashFlowServiceTest + 20+ service tests)
-│
-    └── js/                       # Vitest frontend tests (169 files)
-        ├── app.test.js, auth.test.js, category.test.js, currency.test.js
-        ├── customer*.test.js     # customer, customer-crm-{api,main,state,ui}, customer-edit-*
-        ├── helpers-notification.test.js
-        ├── layouts-*.test.js     # navbar, sidebar, theme-*, settings, tutorial-modal, etc.
-        ├── partials-*.test.js    # per-module partial specs (50+)
-        ├── pos-*.test.js         # cart, payment, quickCreate
-        └── (169 Vitest test files total)
+    │   └── MultiTenancyTest.php
+    ├── js
+    │   ├── app.test.js
+    │   ├── auth.test.js
+    │   ├── category.test.js
+    │   ├── currency.test.js
+    │   ├── customer-crm-api.test.js
+    │   ├── customer-crm-main.test.js
+    │   ├── customer-crm-state.test.js
+    │   ├── customer-crm-ui.test.js
+    │   ├── customer-edit-form.test.js
+    │   ├── customer-edit-image.test.js
+    │   ├── customer-edit-main.test.js
+    │   ├── customer.test.js
+    │   ├── helpers-notification.test.js
+    │   ├── layouts-advanced-settings.test.js
+    │   ├── layouts-global-keyboard-shortcuts.test.js
+    │   ├── layouts-menu-sidebar.test.js
+    │   ├── layouts-navbar.test.js
+    │   ├── layouts-page-loader.test.js
+    │   ├── layouts-selectable-table.test.js
+    │   ├── layouts-settings.test.js
+    │   ├── layouts-theme-initializer.test.js
+    │   ├── layouts-theme-toggle.test.js
+    │   ├── layouts-theme-visibility.test.js
+    │   ├── partials-auth-showContentAfterLoading.test.js
+    │   ├── partials-auth-togglePasswordVisibility.test.js
+    │   ├── partials-category-handleEditCategoryModal.test.js
+    │   ├── partials-currency-api.test.js
+    │   ├── partials-currency-elements.test.js
+    │   ├── partials-currency-form.test.js
+    │   ├── partials-currency-modal.test.js
+    │   ├── partials-currency-preview.test.js
+    │   ├── partials-currency-state.test.js
+    │   ├── partials-customer-crmModal-api.test.js
+    │   ├── partials-customer-crmModal-main.test.js
+    │   ├── partials-customer-crmModal-state.test.js
+    │   ├── partials-customer-crmModal-ui.test.js
+    │   ├── partials-customer-editModal-form.test.js
+    │   ├── partials-customer-editModal-image.test.js
+    │   ├── partials-customer-editModal-main.test.js
+    │   ├── partials-customer-utils-currency.test.js
+    │   ├── partials-customer-utils-date.test.js
+    │   ├── partials-customer-utils-dom.test.js
+    │   ├── partials-customer-utils-status.test.js
+    │   ├── partials-pos-cart-actions.test.js
+    │   ├── partials-pos-cart-dom.test.js
+    │   ├── partials-pos-cart-state.test.js
+    │   ├── partials-pos-cart-totals.test.js
+    │   ├── partials-pos-payment-api.test.js
+    │   ├── partials-pos-payment-form.test.js
+    │   ├── partials-pos-payment-modal.test.js
+    │   ├── partials-pos-quickCreate-customer.test.js
+    │   ├── partials-pos-quickCreate-product.test.js
+    │   ├── partials-pos-utils-currency.test.js
+    │   ├── partials-pos-utils-sound.test.js
+    │   ├── partials-pos-utils-ui.test.js
+    │   ├── partials-product-bulkActions-delete.test.js
+    │   ├── partials-product-bulkActions-export.test.js
+    │   ├── partials-product-bulkActions-selection.test.js
+    │   ├── partials-product-bulkActions-stock.test.js
+    │   ├── partials-product-events.test.js
+    │   ├── partials-product-main.test.js
+    │   ├── partials-product-modals-delete.test.js
+    │   ├── partials-product-modals-init.test.js
+    │   ├── partials-product-modals-product.test.js
+    │   ├── partials-product-search-state.test.js
+    │   ├── partials-product-search-table.test.js
+    │   ├── partials-product-search-ui.test.js
+    │   ├── partials-product-stats.test.js
+    │   ├── partials-product-utils-helpers.test.js
+    │   ├── partials-product-utils-ui.test.js
+    │   ├── partials-profile-form.test.js
+    │   ├── partials-profile-modal.test.js
+    │   ├── partials-purchase-order-bulkActions-actions.test.js
+    │   ├── partials-purchase-order-bulkActions-PurchaseOrderBulkSelection.test.js
+    │   ├── partials-purchase-order-common-PurchaseOrderModule.test.js
+    │   ├── partials-purchase-order-create-PurchaseOrderCreate.test.js
+    │   ├── partials-purchase-order-edit-PurchaseOrderEdit.test.js
+    │   ├── partials-purchase-order-view-PurchaseOrderView.test.js
+    │   ├── partials-recentts-bulkActions-api.test.js
+    │   ├── partials-recentts-bulkActions-selection.test.js
+    │   ├── partials-recentts-modals-markAsPaid.test.js
+    │   ├── partials-recentts-utils-dom.test.js
+    │   ├── partials-recentts-utils-export.test.js
+    │   ├── partials-recentts-utils-resetButton.test.js
+    │   ├── partials-recentts-utils-search.test.js
+    │   ├── partials-recentts-utils-selection.test.js
+    │   ├── partials-sales-order-bulkActions-actions.test.js
+    │   ├── partials-sales-order-bulkActions-SalesOrderBulkSelection.test.js
+    │   ├── partials-sales-order-common-SalesOrderModule.test.js
+    │   ├── partials-sales-order-create-SalesOrderCreate.test.js
+    │   ├── partials-sales-order-edit-SalesOrderEdit.test.js
+    │   ├── partials-sales-order-view-SalesOrderView.test.js
+    │   ├── partials-sales-pipeline-common-constants.test.js
+    │   ├── partials-sales-pipeline-common-state.test.js
+    │   ├── partials-sales-pipeline-common-utils.test.js
+    │   ├── partials-sales-pipeline-data-init.test.js
+    │   ├── partials-sales-pipeline-forms-convertOpportunity.test.js
+    │   ├── partials-sales-pipeline-forms-editOpportunity.test.js
+    │   ├── partials-sales-pipeline-forms-editPipeline.test.js
+    │   ├── partials-sales-pipeline-forms-newOpportunity.test.js
+    │   ├── partials-sales-pipeline-forms-newPipeline.test.js
+    │   ├── partials-sales-pipeline-forms-newStage.test.js
+    │   ├── partials-sales-pipeline-modals-opportunityItems.test.js
+    │   ├── partials-sales-pipeline-opportunities-card.test.js
+    │   ├── partials-sales-pipeline-opportunities-dragAndDrop.test.js
+    │   ├── partials-sales-pipeline-ui-customerSelect.test.js
+    │   ├── partials-sales-pipeline-ui-pipelineBoard.test.js
+    │   ├── partials-sales-pipeline-ui-pipelineSelect.test.js
+    │   ├── partials-sales-pipeline-ui-pipelinesList.test.js
+    │   ├── partials-sales-pipeline-ui-stagesList.test.js
+    │   ├── partials-sorting-lis.test.js.js
+    │   ├── partials-sorting-search.test.js
+    │   ├── partials-supplier-editModal-form.test.js
+    │   ├── partials-supplier-editModal-image.test.js
+    │   ├── partials-supplier-editModal-main.test.js
+    │   ├── partials-supplier-search-state.test.js
+    │   ├── partials-supplier-search-table.test.js
+    │   ├── partials-supplier-search-ui.test.js
+    │   ├── partials-supplier-srmModal-api.test.js
+    │   ├── partials-supplier-srmModal-main.test.js
+    │   ├── partials-supplier-srmModal-state.test.js
+    │   ├── partials-supplier-srmModal-ui.test.js
+    │   ├── partials-supplier-utils-currency.test.js
+    │   ├── partials-supplier-utils-date.test.js
+    │   ├── partials-supplier-utils-dom.test.js
+    │   ├── partials-supplier-utils-status.test.js
+    │   ├── partials-unit-handleEditUnitModal.test.js
+    │   ├── partials-user-common-elements.test.js
+    │   ├── partials-user-common-state.test.js
+    │   ├── partials-user-create-main.test.js
+    │   ├── partials-user-delete-api.test.js
+    │   ├── partials-user-delete-main.test.js
+    │   ├── partials-user-edit-api.test.js
+    │   ├── partials-user-edit-main.test.js
+    │   ├── partials-user-rolesPermissions-api.test.js
+    │   ├── partials-user-rolesPermissions-sync.test.js
+    │   ├── partials-warehouse-common-formSubmission.test.js
+    │   ├── partials-warehouse-create-main.test.js
+    │   ├── partials-warehouse-edit-main.test.js
+    │   ├── partials-warehouse-search-state.test.js
+    │   ├── partials-warehouse-search-table.test.js
+    │   ├── partials-warehouse-search-ui.test.js
+    │   ├── pos-actions.test.js
+    │   ├── pos-state.test.js
+    │   ├── pos-totals.test.js
+    │   ├── pos.test.js
+    │   ├── product.test.js
+    │   ├── profile.test.js
+    │   ├── purchase-order-bulk-actions.test.js
+    │   ├── purchase-order-bulk-selection.test.js
+    │   ├── purchase-order-common.test.js
+    │   ├── purchase-order-create.test.js
+    │   ├── purchase-order-edit.test.js
+    │   ├── purchase-order-view.test.js
+    │   ├── purchase-order.test.js
+    │   ├── recentts.test.js
+    │   ├── sales-order-bulk-actions.test.js
+    │   ├── sales-order-bulk-selection.test.js
+    │   ├── sales-order-common.test.js
+    │   ├── sales-order-create.test.js
+    │   ├── sales-order-edit.test.js
+    │   ├── sales-order-view.test.js
+    │   ├── sales-order.test.js
+    │   ├── sales-pipeline.test.js
+    │   ├── setup.js
+    │   ├── sorting.test.js
+    │   ├── supplier.test.js
+    │   ├── tax.test.js
+    │   ├── unit.test.js
+    │   ├── user.test.js
+    │   └── warehouse.test.js
+    ├── Traits
+    │   └── CreatesTenant.php
+    ├── Unit
+    │   ├── DTOs
+    │   │   └── TransactionDTOTest.php
+    │   ├── Helpers
+    │   │   ├── CurrencyHelperPlatformTest.php
+    │   │   ├── CurrencyHelperTest.php
+    │   │   ├── PphHelperTest.php
+    │   │   ├── ProductHelperTest.php
+    │   │   ├── PurchaseHelperTest.php
+    │   │   ├── PurchaseReturnHelperTest.php
+    │   │   ├── SalesHelperTest.php
+    │   │   └── SalesReturnHelperTest.php
+    │   ├── Http
+    │   │   ├── Middleware
+    │   │   │   └── SetLocaleTest.php
+    │   │   └── Requests
+    │   │       └── ProfileUpdateRequestTest.php
+    │   ├── Models
+    │   │   ├── ProductStockTest.php
+    │   │   ├── SalesIsPphTest.php
+    │   │   ├── TaxIsPphTest.php
+    │   │   └── TenantCanDisableIndonesianJurisdictionTest.php
+    │   ├── Observers
+    │   └── Services
+    │       ├── AccountingAuditServiceTest.php
+    │       ├── AccountingExportServiceTest.php
+    │       ├── AccountingReportServiceTest.php
+    │       ├── AccountingServiceTest.php
+    │       ├── AccountServiceTest.php
+    │       ├── ActivityLogServiceTest.php
+    │       ├── AgingReportServiceTest.php
+    │       ├── BankStatementParserTest.php
+    │       ├── BillingServiceTest.php
+    │       ├── CashFlowServiceTest.php
+    │       ├── CategoryServiceTest.php
+    │       ├── ChartOfAccountsServiceTest.php
+    │       ├── CrmServiceTest.php
+    │       ├── CurrencyServiceTest.php
+    │       ├── CustomerServiceTest.php
+    │       ├── DashboardServiceTest.php
+    │       ├── EFakturServiceSptMasukanTest.php
+    │       ├── FinancialReportingServiceTest.php
+    │       ├── GeneralLedgerServiceTest.php
+    │       ├── ManualJournalEntryServiceTest.php
+    │       ├── NotificationServiceTest.php
+    │       ├── OpeningBalanceServiceTest.php
+    │       ├── PlanServiceTest.php
+    │       ├── PosServiceTest.php
+    │       ├── ProductServiceTest.php
+    │       ├── ProfileServiceTest.php
+    │       ├── PurchaseReturnServiceTest.php
+    │       ├── PurchaseServicePpnMasukanTest.php
+    │       ├── PurchaseServiceTest.php
+    │       ├── ReportExporterTest.php
+    │       ├── SalesForecastServiceTest.php
+    │       ├── SalesPipelineServiceTest.php
+    │       ├── SalesReturnServiceTest.php
+    │       ├── SalesServiceTest.php
+    │       ├── SecurityLoggerTest.php
+    │       ├── StockOpnameServiceTest.php
+    │       ├── SupplierServiceTest.php
+    │       ├── SystemNotificationServiceTest.php
+    │       ├── TaxServiceEnsureIndonesianDefaultsTest.php
+    │       ├── TaxServiceTest.php
+    │       ├── TenantSetupServiceTest.php
+    │       ├── TransactionServiceTest.php
+    │       ├── TutorialServiceTest.php
+    │       ├── UnitServiceTest.php
+    │       ├── UserServiceTest.php
+    │       └── WarehouseServiceTest.php
+    └── TestCase.php
 ```

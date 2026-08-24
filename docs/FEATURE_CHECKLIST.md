@@ -462,7 +462,7 @@
 - [x] CMS editor for hero section, features, pricing, and contact content
 
 #### Views & Tutorial
-- [x] 29 Blade views in `resources/views/superadmin/`
+- [x] 30 Blade views in `resources/views/superadmin/`
 - [x] Dedicated tutorial system (`config/superadmin-tutorial.php` — 304 lines)
 - [x] Sidebar navigation with grouped sections (Management, Payments, System, Configuration)
 
@@ -661,16 +661,16 @@
 | Metric               | Value     |
 | -------------------- | --------- |
 | **Total Features**   | 220+      |
-| **Controllers**      | 62        |
+| **Controllers**      | 64        |
 | **Services**         | 54        |
-| **Models**           | 53        |
+| **Models**           | 54        |
 | **Helpers**          | 6         |
 | **Test Methods (PHP)** | 1186     |
 | **Test Assertions (PHP)** | 3715   |
 | **JS Test Files**    | 169       |
 | **API Endpoints**    | 11        |
 | **Database Tables**  | 57        |
-| **Migrations**       | 106       |
+| **Migrations**       | 108       |
 | **Seeders**          | 36        |
 | **Permissions**      | 101       |
 | **Routes**           | 437       |

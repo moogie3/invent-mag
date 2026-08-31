@@ -11,8 +11,8 @@ onPageLoad(function () {
     initSelectableTable();
     initDeleteModal();
     initWarehouseSearch();
-    initSetMainLinks();
-    initUnsetMainLinks();
+    // initSetMainLinks(); removed in favor of modal POST
+    // initUnsetMainLinks(); removed in favor of modal POST
     initViewWarehouseButtons();
 
     if (window.shortcutManager) {
@@ -145,7 +145,69 @@ function initDeleteModal() {
                 }
             }
         });
+
+        const deleteForm = document.getElementById('deleteForm');
+        if (deleteForm && !deleteForm.dataset.handlerAttached) {
+            deleteForm.dataset.handlerAttached = 'true';
+            deleteForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                handleWarehouseDeleteSubmit(this);
+            });
+        }
     }
+}
+
+function handleWarehouseDeleteSubmit(form) {
+    if (form.dataset.submitting === 'true') return;
+    form.dataset.submitting = 'true';
+
+    const submitBtn = form.querySelector('button[type="submit"]');
+    const originalText = submitBtn?.textContent;
+    if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span> Deleting...';
+    }
+
+    fetch(form.action, {
+        method: 'POST',
+        body: new FormData(form),
+        headers: {
+            'X-Requested-With': 'XMLHttpRequest',
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '',
+        },
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            InventMagApp.showToast('Success', data.message || 'Deleted successfully', 'success');
+            const deleteModal = bootstrap.Modal.getInstance(document.getElementById('deleteModal'));
+            if (deleteModal) {
+                deleteModal._element.addEventListener('hidden.bs.modal', function handler() {
+                    deleteModal._element.removeEventListener('hidden.bs.modal', handler);
+                    document.querySelectorAll('.modal-backdrop').forEach(b => b.remove());
+                    document.body.classList.remove('modal-open');
+                    document.body.style.overflow = '';
+                    location.reload();
+                }, { once: true });
+                deleteModal.hide();
+            } else {
+                location.reload();
+            }
+        } else {
+            InventMagApp.showToast('Error', data.message || 'Failed to delete', 'error');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        InventMagApp.showToast('Error', 'An error occurred', 'error');
+    })
+    .finally(() => {
+        form.dataset.submitting = 'false';
+        if (submitBtn) {
+            submitBtn.disabled = false;
+            submitBtn.textContent = originalText;
+        }
+    });
 }
 
 function initWarehouseSearch() {
@@ -307,3 +369,17 @@ export function exportWarehouses(exportOption = 'csv') {
 }
 
 window.exportWarehouses = exportWarehouses;
+
+window.setSetMainWarehouseFormAction = function (action, name) {
+    var form = document.getElementById("setMainWarehouseFormModal");
+    if (form) form.action = action;
+    var nameEl = document.getElementById("newMainWarehouseName");
+    if (nameEl) nameEl.textContent = name;
+};
+
+window.setUnsetMainWarehouseFormAction = function (action, name) {
+    var form = document.getElementById("unsetMainWarehouseFormModal");
+    if (form) form.action = action;
+    var nameEl = document.getElementById("unsetMainWarehouseName");
+    if (nameEl) nameEl.textContent = name;
+};

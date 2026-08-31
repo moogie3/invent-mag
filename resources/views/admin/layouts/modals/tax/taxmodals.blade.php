@@ -1,3 +1,45 @@
+{{-- SET DEFAULT MODAL --}}
+<div class="modal modal-blur fade" id="defaultTaxModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-sm modal-dialog-centered" role="document">
+        <div class="modal-content border-0 shadow-lg rounded-3">
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            <div class="modal-status bg-primary"></div>
+            <div class="modal-body text-center py-4">
+                <i class="ti ti-star text-primary mb-3" style="font-size: 3rem;"></i>
+                <h3>{{ __('messages.tax_set_as_default') }}</h3>
+                <div class="text-muted mb-3">{{ __('messages.tax_confirm_set_default') }}</div>
+                <div class="d-flex flex-column gap-2 text-start bg-light p-3 rounded">
+                    <div>
+                        <small class="text-muted d-block">Current Default:</small>
+                        <strong class="text-danger">{{ $defaultTax ? $defaultTax->name . ' (' . $defaultTax->rate . '%)' : 'None' }}</strong>
+                    </div>
+                    <div>
+                        <small class="text-muted d-block">New Default:</small>
+                        <strong class="text-success" id="newDefaultTaxName"></strong>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <div class="w-100">
+                    <div class="row">
+                        <div class="col">
+                            <button type="button" class="btn w-100" data-bs-dismiss="modal">
+                                {{ __('messages.cancel') }}
+                            </button>
+                        </div>
+                        <div class="col">
+                            <form id="setDefaultTaxFormModal" method="POST">
+                                @csrf
+                                <button type="submit" class="btn btn-primary w-100">{{ __('messages.save') }}</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
 {{-- DELETE MODAL --}}
 <div class="modal modal-blur fade" id="deleteTaxModal" tabindex="-1" role="dialog" aria-hidden="true">
     <div class="modal-dialog modal-sm modal-dialog-centered" role="document">

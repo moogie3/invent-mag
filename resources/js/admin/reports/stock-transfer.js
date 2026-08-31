@@ -6,6 +6,8 @@ onPageLoad(function() {
     const toWarehouseSelect = document.querySelector('select[name="to_warehouse_id"]');
     const productSelect = document.getElementById('productSelect');
     const availableQtyInput = document.getElementById('availableQuantity');
+    const quantityInput = document.getElementById('quantityToTransfer');
+    const quantityWarning = document.getElementById('quantity_warning');
     const form = document.getElementById('stockTransferForm');
 
     if (!fromWarehouseSelect || !productSelect) {
@@ -39,6 +41,12 @@ onPageLoad(function() {
         const defaultText = productSelect.dataset.placeholder || 'Select Product';
         productSelect.innerHTML = '<option value="">' + defaultText + '</option>';
         availableQtyInput.value = '';
+        quantityInput.value = '';
+        quantityInput.removeAttribute('max');
+        if (quantityWarning) {
+            quantityWarning.classList.add('d-none');
+        }
+        quantityInput.classList.remove('is-invalid');
 
         if (!warehouseId) {
             return;
@@ -95,8 +103,66 @@ onPageLoad(function() {
     // Event listener for Product selection
     productSelect.addEventListener('change', function() {
         const selectedOption = this.options[this.selectedIndex];
-        availableQtyInput.value = selectedOption ? (selectedOption.dataset.quantity || '0') : '0';
+        const availableQty = selectedOption ? (parseInt(selectedOption.dataset.quantity) || 0) : 0;
+        availableQtyInput.value = availableQty;
+        
+        if (quantityInput) {
+            quantityInput.value = '';
+            if (availableQty > 0) {
+                quantityInput.setAttribute('max', availableQty);
+            } else {
+                quantityInput.removeAttribute('max');
+            }
+        }
+        if (quantityWarning) {
+            quantityWarning.classList.add('d-none');
+        }
+        quantityInput.classList.remove('is-invalid');
     });
+
+    // Event listener for Quantity input validation (matches sales order pattern)
+    if (quantityInput) {
+        quantityInput.addEventListener('input', function() {
+            const max = parseInt(this.getAttribute('max')) || 0;
+            let value = parseInt(this.value) || 0;
+            const originalValue = value;
+
+            if (max > 0 && value > max) {
+                this.value = max;
+                value = max;
+            }
+
+            // Show warning if user tried to exceed max
+            if (max > 0 && originalValue > max) {
+                this.classList.add('is-invalid');
+                if (quantityWarning) {
+                    quantityWarning.classList.remove('d-none');
+                }
+            } else {
+                this.classList.remove('is-invalid');
+                if (quantityWarning) {
+                    quantityWarning.classList.add('d-none');
+                }
+            }
+        });
+
+        quantityInput.addEventListener('blur', function() {
+            const max = parseInt(this.getAttribute('max')) || 0;
+            let value = parseInt(this.value) || 0;
+            if (max > 0 && value > max) {
+                this.value = max;
+                this.classList.add('is-invalid');
+                if (quantityWarning) {
+                    quantityWarning.classList.remove('d-none');
+                }
+            } else if (value > 0) {
+                this.classList.remove('is-invalid');
+                if (quantityWarning) {
+                    quantityWarning.classList.add('d-none');
+                }
+            }
+        });
+    }
 
     // Form submission validation
     if (form) {
@@ -112,6 +178,16 @@ onPageLoad(function() {
                     window.InventMagApp.showToast('Warning', errorMsg, 'warning');
                 } else {
                     alert(errorMsg);
+                }
+            }
+
+            // Validate quantity before submit
+            const max = parseInt(quantityInput.getAttribute('max')) || 0;
+            const value = parseInt(quantityInput.value) || 0;
+            if (max > 0 && value > max) {
+                e.preventDefault();
+                if (typeof window.InventMagApp !== 'undefined' && window.InventMagApp.showToast) {
+                    window.InventMagApp.showToast('Warning', 'Quantity exceeds available stock', 'warning');
                 }
             }
         });

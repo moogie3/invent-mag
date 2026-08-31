@@ -26,10 +26,13 @@ class ProductService
         $query->with('productWarehouses');
 
         // Constrain the eager loaded warehouses if a filter is applied
+        // Must explicitly include withPivot('quantity') when constraining the relationship
         $query->with(['warehouses' => function ($q) use ($filters) {
             if (isset($filters['warehouse_id']) && $filters['warehouse_id']) {
                 $q->where('warehouses.id', $filters['warehouse_id']);
             }
+            // Ensure pivot quantity is loaded even when constraining the relationship
+            $q->withPivot('quantity');
         }]);
 
         if (isset($filters['warehouse_id']) && $filters['warehouse_id']) {
@@ -416,6 +419,9 @@ class ProductService
     {
         $productsQuery = Product::query();
 
+        $mainWarehouse = Warehouse::where('is_main', true)->first();
+        $mainWarehouseId = $mainWarehouse ? $mainWarehouse->id : null;
+
         $productsQuery->with([
             'category' => function ($q) {
                 $q->select('id', 'name');
@@ -425,6 +431,11 @@ class ProductService
             },
             'supplier' => function ($q) {
                 $q->select('id', 'name');
+            },
+            'productWarehouses' => function ($q) use ($mainWarehouseId) {
+                if ($mainWarehouseId) {
+                    $q->where('warehouse_id', $mainWarehouseId);
+                }
             },
         ]);
 
@@ -442,10 +453,22 @@ class ProductService
             });
         });
 
-        return $productsQuery
+        $products = $productsQuery
             ->orderBy('name', 'asc')
             ->limit(50)
             ->get();
+
+        $products->each(function ($product) use ($mainWarehouseId) {
+            $product->setAppends(['main_warehouse_stock']);
+            if ($mainWarehouseId) {
+                $mainStock = $product->productWarehouses->first();
+                $product->main_warehouse_stock = $mainStock ? (float) $mainStock->quantity : 0;
+            } else {
+                $product->main_warehouse_stock = 0;
+            }
+        });
+
+        return $products;
     }
 
     public function searchByBarcode(string $barcode)

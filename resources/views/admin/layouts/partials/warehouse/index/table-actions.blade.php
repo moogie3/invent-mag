@@ -8,14 +8,18 @@
     </button>
 
     @if (!$wo->is_main)
-        <button type="button" class="btn btn-icon btn-ghost-warning set-main-btn"
-            data-url="{{ route('admin.warehouse.set-main', $wo->id) }}"
+        <button type="button" class="btn btn-icon btn-ghost-warning"
+            data-bs-toggle="modal"
+            data-bs-target="#setMainWarehouseModal"
+            data-onclick="setSetMainWarehouseFormAction('{{ route('admin.warehouse.set-main', $wo->id) }}', '{{ $wo->name }}')"
             title="{{ __('messages.warehouse_action_set_as_main') }}">
             <i class="ti ti-star"></i>
         </button>
     @else
-        <button type="button" class="btn btn-icon btn-ghost-secondary unset-main-btn"
-            data-url="{{ route('admin.warehouse.unset-main', $wo->id) }}"
+        <button type="button" class="btn btn-icon btn-ghost-secondary"
+            data-bs-toggle="modal"
+            data-bs-target="#unsetMainWarehouseModal"
+            data-onclick="setUnsetMainWarehouseFormAction('{{ route('admin.warehouse.unset-main', $wo->id) }}', '{{ $wo->name }}')"
             title="{{ __('messages.warehouse_action_unset_main') }}">
             <i class="ti ti-star-off"></i>
         </button>

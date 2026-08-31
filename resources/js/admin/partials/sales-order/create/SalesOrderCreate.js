@@ -847,12 +847,68 @@ export class SalesOrderCreate extends SalesOrderModule {
                 return false;
             }
 
-            this.sessionJustSubmitted = true;
+            // Submit via AJAX
+            e.preventDefault();
+            e.stopPropagation();
+            this.submitFormViaAjax();
         } catch (error) {
             e.preventDefault();
             e.stopPropagation();
             return false;
         }
+    }
+
+    submitFormViaAjax() {
+        if (this.isSubmitting) return;
+        this.isSubmitting = true;
+
+        const form = this.elements.form;
+        if (!form) return;
+
+        const submitBtn = form.querySelector('button[type="submit"]');
+        const originalText = submitBtn?.innerHTML;
+        if (submitBtn) {
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span> Saving...';
+        }
+
+        const formData = new FormData(form);
+        const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
+
+        fetch(form.action, {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+                'X-CSRF-TOKEN': csrfToken,
+            },
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                InventMagApp.showToast('Success', data.message || 'Sale created successfully.', 'success');
+                if (data.redirect) {
+                    setTimeout(() => {
+                        window.location.href = data.redirect;
+                    }, 500);
+                } else {
+                    location.reload();
+                }
+            } else {
+                InventMagApp.showToast('Error', data.message || 'Failed to create sale.', 'error');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            InventMagApp.showToast('Error', 'An error occurred', 'error');
+        })
+        .finally(() => {
+            this.isSubmitting = false;
+            if (submitBtn) {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = originalText;
+            }
+        });
     }
 
     renderTable() {

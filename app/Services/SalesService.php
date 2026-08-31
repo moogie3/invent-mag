@@ -137,7 +137,23 @@ class SalesService
     public function getSalesCreateData()
     {
         $customers = Customer::select('id', 'name', 'email', 'phone_number', 'payment_terms')->get();
-        $products = Product::select('id', 'name', 'code', 'selling_price')->get()->each->setAppends(['main_warehouse_stock']);
+        $mainWarehouse = \App\Models\Warehouse::where('is_main', true)->first();
+        $products = Product::select('id', 'name', 'code', 'selling_price')
+            ->with(['productWarehouses' => function ($query) use ($mainWarehouse) {
+                if ($mainWarehouse) {
+                    $query->where('warehouse_id', $mainWarehouse->id);
+                }
+            }])
+            ->get()
+            ->each(function ($product) use ($mainWarehouse) {
+                $product->setAppends(['main_warehouse_stock']);
+                if ($mainWarehouse) {
+                    $mainStock = $product->productWarehouses->first();
+                    $product->main_warehouse_stock = $mainStock ? (float) $mainStock->quantity : 0;
+                } else {
+                    $product->main_warehouse_stock = 0;
+                }
+            });
         $taxes = Tax::active()->orderBy('name')->get();
         $defaultTax = Tax::default()->first() ?? $taxes->first();
         $sales = [];

@@ -6,7 +6,7 @@
             <option value="">{{ __('messages.select_product') }}</option>
             @foreach ($products as $product)
                 <option value="{{ $product->id }}" data-price="{{ $product->price }}"
-                    data-selling-price="{{ $product->selling_price }}" data-stock="{{ $product->stock_quantity ?? 0 }}">
+                    data-selling-price="{{ $product->selling_price }}" data-stock="{{ $product->main_warehouse_stock ?? 0 }}">
                     {{ $product->name }}
                 </option>
             @endforeach

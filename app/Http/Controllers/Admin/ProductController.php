@@ -30,28 +30,45 @@ class ProductController extends Controller
     {
         try {
             $entries = $request->input('entries', 10);
-            $filters = $request->only(['warehouse_id']); // Add other filters if needed
+            
+            $filters = $request->only(['warehouse_id']);
+            
+            // Check if warehouse_id was explicitly provided in request
+            $warehouseIdProvided = $request->has('warehouse_id');
+            
+            // Only apply warehouse filter if explicitly provided and not empty
+            // Default is "All Warehouses" (no filter)
+            if ($warehouseIdProvided && $filters['warehouse_id']) {
+                // Filter is already set from request
+            } else {
+                // No warehouse filter - show all warehouses
+                unset($filters['warehouse_id']);
+            }
 
             // Pass filters to service
             $products = $this->productService->getPaginatedProducts($entries, $filters);
 
             $totalproduct = Product::count();
-            $lowStockCount = Product::lowStockCount();
             $expiringSoonCount = $this->productService->getExpiringSoonPOItemsCount();
             $totalcategory = Categories::count();
 
             $formData = $this->productService->getProductFormData();
 
             $lowStockProducts = Product::getLowStockProducts();
+            $lowStockProductsPerWarehouse = Product::getLowStockProductsPerWarehouse();
             $expiringSoonProducts = $this->productService->getExpiringSoonPOItems();
 
-            // Get selected warehouse if warehouse_id is provided
+            // Get selected warehouse if warehouse_id is provided AND not empty
             $selectedWarehouse = null;
             if (isset($filters['warehouse_id']) && $filters['warehouse_id']) {
                 $selectedWarehouse = Warehouse::find($filters['warehouse_id']);
             }
 
-            return view('admin.product.index', compact('totalcategory', 'products', 'entries', 'totalproduct', 'lowStockCount', 'lowStockProducts', 'expiringSoonCount', 'expiringSoonProducts', 'selectedWarehouse') + $formData);
+            // Calculate TOTAL low stock count across ALL warehouses (for header)
+            // This shows overall low stock status regardless of filter
+            $lowStockCount = Product::lowStockCountAllWarehouses();
+
+            return view('admin.product.index', compact('totalcategory', 'products', 'entries', 'totalproduct', 'lowStockCount', 'lowStockProducts', 'lowStockProductsPerWarehouse', 'expiringSoonCount', 'expiringSoonProducts', 'selectedWarehouse') + $formData);
         } catch (\Exception $e) {
             Log::error('Failed to load products index: '.$e->getMessage(), ['exception' => $e]);
 
@@ -76,11 +93,17 @@ class ProductController extends Controller
     {
         try {
             $thirtyDaysFromNow = now()->addDays(30);
+            $mainWarehouse = Warehouse::where('is_main', true)->first();
             $product = Product::with([
                 'category',
                 'supplier',
                 'unit',
                 'warehouses',
+                'productWarehouses' => function ($query) use ($mainWarehouse) {
+                    if ($mainWarehouse) {
+                        $query->where('warehouse_id', $mainWarehouse->id);
+                    }
+                },
                 'poItems' => function ($query) use ($thirtyDaysFromNow) {
                     $query->whereNotNull('expiry_date')
                         ->where('expiry_date', '>=', now())
@@ -90,6 +113,15 @@ class ProductController extends Controller
                         ->orderBy('expiry_date', 'asc');
                 },
             ])->findOrFail($id);
+
+            $product->setAppends(['main_warehouse_stock']);
+            if ($mainWarehouse) {
+                $mainStock = $product->productWarehouses->first();
+                $product->main_warehouse_stock = $mainStock ? (float) $mainStock->quantity : 0;
+            } else {
+                $product->main_warehouse_stock = 0;
+            }
+
             $product->formatted_price = CurrencyHelper::formatWithPosition($product->price);
             $product->formatted_selling_price = CurrencyHelper::formatWithPosition($product->selling_price);
 

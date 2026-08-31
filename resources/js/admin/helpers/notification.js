@@ -339,3 +339,12 @@ window.handleSessionNotifications = function () {
 };
 
 // The call to handleSessionNotifications is now triggered from settings.js after user settings are loaded.
+
+// Reset the processed flag before Turbo caches the page so that when a redirect
+// lands on this page with a fresh session flash (e.g. after delete), the toast fires correctly.
+document.addEventListener('turbo:before-cache', () => {
+    const el = document.getElementById('session-notification-data');
+    if (el) {
+        delete el.dataset.processed;
+    }
+});

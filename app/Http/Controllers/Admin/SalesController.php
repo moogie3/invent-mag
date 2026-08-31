@@ -105,9 +105,24 @@ class SalesController extends Controller
         try {
             $this->salesService->createSale($request->all());
 
+            if ($request->ajax()) {
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Sale created successfully.',
+                    'redirect' => route('admin.sales'),
+                ]);
+            }
+
             return redirect()->route('admin.sales')->with('success', 'Sale created successfully.');
         } catch (\Exception $e) {
             Log::error('Sale creation failed: '.$e->getMessage(), ['exception' => $e, 'input' => $request->all()]);
+
+            if ($request->ajax()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Something went wrong: '.$e->getMessage(),
+                ], 500);
+            }
 
             return back()
                 ->withErrors(['error' => 'Something went wrong: '.$e->getMessage()])
@@ -137,9 +152,24 @@ class SalesController extends Controller
         try {
             $this->salesService->updateSale($sale, $request->all());
 
+            if ($request->ajax()) {
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Sale updated successfully.',
+                    'redirect' => route('admin.sales.show', $id),
+                ]);
+            }
+
             return redirect()->route('admin.sales.show', $id)->with('success', 'Sale updated successfully.');
         } catch (\Exception $e) {
             Log::error('Sale update failed for ID '.$id.': '.$e->getMessage(), ['exception' => $e, 'input' => $request->all()]);
+
+            if ($request->ajax()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Something went wrong: '.$e->getMessage(),
+                ], 500);
+            }
 
             return back()
                 ->withErrors(['error' => 'Something went wrong: '.$e->getMessage()])

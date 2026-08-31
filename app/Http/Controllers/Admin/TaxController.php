@@ -22,8 +22,9 @@ class TaxController extends Controller
         $entries = $request->input('entries', 10);
         $taxes = Tax::orderBy('name')->paginate($entries);
         $totalTaxes = Tax::count();
+        $defaultTax = Tax::where('is_default', true)->first();
 
-        return view('admin.tax.tax', compact('taxes', 'totalTaxes'));
+        return view('admin.tax.tax', compact('taxes', 'totalTaxes', 'defaultTax'));
     }
 
     public function store(Request $request)

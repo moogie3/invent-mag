@@ -118,7 +118,9 @@
 
                                                                             @if (!$tax->is_default)
                                                                              <button type="button" class="btn btn-icon btn-ghost-success"
-                                                                                data-onclick="setDefaultTax('{{ $tax->id }}')"
+                                                                                data-bs-toggle="modal"
+                                                                                data-bs-target="#defaultTaxModal"
+                                                                                data-onclick="setSetDefaultTaxFormAction('{{ route('admin.setting.tax.default', $tax->id) }}', '{{ $tax->name }} ({{ $tax->rate }}%)')"
                                                                                 title="{{ __('messages.tax_set_default') }}">
                                                                                 <i class="ti ti-star"></i>
                                                                             </button>
@@ -176,10 +178,4 @@
         </div>
     </div>
     @include('admin.layouts.modals.tax.taxmodals')
-
-    <form id="setDefaultTaxForm" method="POST" style="display:none;"
-        data-base="{{ url('admin/settings/tax') }}"
-        data-confirm-msg="{{ __('messages.tax_confirm_set_default') }}">
-        @csrf
-    </form>
 @endsection

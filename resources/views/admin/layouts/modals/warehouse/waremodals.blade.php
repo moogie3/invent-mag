@@ -1,3 +1,83 @@
+{{-- SET MAIN MODAL --}}
+<div class="modal modal-blur fade" id="setMainWarehouseModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-sm modal-dialog-centered" role="document">
+        <div class="modal-content border-0 shadow-lg rounded-3">
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            <div class="modal-status bg-primary"></div>
+            <div class="modal-body text-center py-4">
+                <i class="ti ti-star text-primary mb-3" style="font-size: 3rem;"></i>
+                <h3>{{ __('messages.warehouse_action_set_as_main') }}</h3>
+                <div class="text-muted mb-3">{{ __('messages.warehouse_confirm_set_main') }}</div>
+                <div class="d-flex flex-column gap-2 text-start bg-light p-3 rounded">
+                    <div>
+                        <small class="text-muted d-block">Current Main:</small>
+                        <strong class="text-danger">{{ $mainWarehouse ? $mainWarehouse->name : 'None' }}</strong>
+                    </div>
+                    <div>
+                        <small class="text-muted d-block">New Main:</small>
+                        <strong class="text-success" id="newMainWarehouseName"></strong>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <div class="w-100">
+                    <div class="row">
+                        <div class="col">
+                            <button type="button" class="btn w-100" data-bs-dismiss="modal">
+                                {{ __('messages.cancel') }}
+                            </button>
+                        </div>
+                        <div class="col">
+                            <form id="setMainWarehouseFormModal" method="POST" data-turbo-frame="_top">
+                                @csrf
+                                <button type="submit" class="btn btn-primary w-100">{{ __('messages.save') }}</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{{-- UNSET MAIN MODAL --}}
+<div class="modal modal-blur fade" id="unsetMainWarehouseModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-sm modal-dialog-centered" role="document">
+        <div class="modal-content border-0 shadow-lg rounded-3">
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            <div class="modal-status bg-secondary"></div>
+            <div class="modal-body text-center py-4">
+                <i class="ti ti-star-off text-secondary mb-3" style="font-size: 3rem;"></i>
+                <h3>{{ __('messages.warehouse_action_unset_main') }}</h3>
+                <div class="text-muted mb-3">{{ __('messages.warehouse_confirm_unset_main') }}</div>
+                <div class="d-flex flex-column gap-2 text-start bg-light p-3 rounded">
+                    <div>
+                        <small class="text-muted d-block">Unsetting:</small>
+                        <strong class="text-danger" id="unsetMainWarehouseName"></strong>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <div class="w-100">
+                    <div class="row">
+                        <div class="col">
+                            <button type="button" class="btn w-100" data-bs-dismiss="modal">
+                                {{ __('messages.cancel') }}
+                            </button>
+                        </div>
+                        <div class="col">
+                            <form id="unsetMainWarehouseFormModal" method="POST" data-turbo-frame="_top">
+                                @csrf
+                                <button type="submit" class="btn btn-secondary w-100">{{ __('messages.save') }}</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
 {{-- MODAL --}}
 <div class="modal modal-blur fade" id="deleteModal" tabindex="-1" role="dialog" aria-hidden="true">
     <div class="modal-dialog modal-sm modal-dialog-centered" role="document">
@@ -24,9 +104,8 @@
                             </button>
                         </div>
                         <div class="col">
-                            <form id="deleteForm" method="POST">
+                            <form id="deleteForm" method="POST" data-turbo-frame="_top">
                                 @csrf
-                                @method('DELETE')
                                 <button type="submit" class="btn btn-danger w-100">{{ __('messages.delete') }}</button>
                             </form>
                         </div>

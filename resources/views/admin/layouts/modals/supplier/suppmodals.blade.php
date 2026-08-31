@@ -8,7 +8,7 @@
             </div>
             <div class="modal-status bg-danger"></div>
             <div class="modal-body text-center py-4">
-                <i class="ti ti-alert-triangle" style="font-size: 3rem;"></i>
+                <i class="ti ti-alert-triangle text-danger" style="font-size: 3rem;"></i>
                 <h3>{{ __('messages.are_you_sure') }}</h3>
                 <div class="text-muted">{{ __('messages.supplier_modal_delete_warning') }}</div>
             </div>

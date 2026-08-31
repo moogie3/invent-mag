@@ -90,10 +90,13 @@
                                         </div>
                                         <div class="col-md-6">
                                             <label class="form-label">{{ __('messages.quantity_to_transfer') }}</label>
-                                            <input type="number" class="form-control @error('quantity') is-invalid @enderror" name="quantity" min="1" required>
+                                            <input type="number" class="form-control @error('quantity') is-invalid @enderror" name="quantity" id="quantityToTransfer" min="1" required>
                                             @error('quantity')
                                                 <div class="invalid-feedback">{{ $message }}</div>
                                             @enderror
+                                            <small id="quantity_warning" class="text-danger d-none mt-1">
+                                                <i class="ti ti-alert-triangle"></i> {{ __('messages.exceeds_available_stock') }}
+                                            </small>
                                         </div>
                                         <div class="col-md-12">
                                             <label class="form-label">{{ __('messages.reason') }}</label>

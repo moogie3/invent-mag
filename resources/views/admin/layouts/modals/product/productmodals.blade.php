@@ -132,15 +132,23 @@
                         <thead>
                             <tr>
                                 <th class="fs-4 fw-bold">{{ __('messages.product_name') }}</th>
+                                <th class="text-center fs-4 fw-bold">{{ __('messages.warehouse') }}</th>
                                 <th class="text-center fs-4 fw-bold">{{ __('messages.product_current_stock') }}</th>
                                 <th class="text-center fs-4 fw-bold">{{ __('messages.threshold') }}</th>
                                 <th class="text-end fs-4 fw-bold">{{ __('messages.action') }}</th>
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach ($lowStockProducts as $pw)
+                            @foreach ($lowStockProductsPerWarehouse as $pw)
                                 <tr>
                                     <td>{{ $pw->product->name }}</td>
+                                    <td class="text-center">
+                                        @if($pw->warehouse)
+                                            <span class="badge bg-primary-lt text-primary">{{ $pw->warehouse->name }}</span>
+                                        @else
+                                            <span class="text-muted">N/A</span>
+                                        @endif
+                                    </td>
                                     @php
                                         [
                                             $stockBadgeClass,
@@ -154,9 +162,6 @@
                                                 <small>({{ $stockBadgeText }})</small>
                                             @endif
                                         </span>
-                                        @if($pw->warehouse)
-                                            <small class="text-muted d-block">{{ $pw->warehouse->name }}</small>
-                                        @endif
                                     </td>
                                     <td class="text-center">{{ $pw->product->low_stock_threshold ?? 10 }}</td>
                                     <td class="text-end">

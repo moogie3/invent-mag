@@ -15,11 +15,13 @@ export function createProductItemRow(item = {}, index, containerId) {
     let productOptions = '<option value="">Select Product</option>';
     allProducts.forEach((product) => {
         const selected = product.id == productId ? "selected" : "";
+        // Use main_warehouse_stock for consistent stock display (matches POS and Sales Order)
+        const mainWarehouseStock = product.main_warehouse_stock ?? 0;
         productOptions += `<option value="${product.id}" data-price="${
             product.selling_price || 0
-        }" data-stock="${product.stock_quantity || 0}" ${selected}>${
+        }" data-stock="${mainWarehouseStock}" ${selected}>${
             product.name
-        } (Stock: ${product.stock_quantity || 0})</option>`;
+        } (Stock: ${mainWarehouseStock})</option>`;
     });
 
     itemDiv.innerHTML = `
@@ -34,7 +36,7 @@ export function createProductItemRow(item = {}, index, containerId) {
         <div class="col-md-3">
             <label for="${containerId}-quantity-${index}" class="form-label">Quantity</label>
             <input type="number" class="form-control quantity-input" id="${containerId}-quantity-${index}" name="items[${index}][quantity]" value="${quantity}" min="1" max="${
-        item.product ? item.product.stock_quantity : ""
+        item.product ? (item.product.main_warehouse_stock ?? 0) : ""
     }" required>
         </div>
         <div class="col-md-3">

@@ -17,6 +17,9 @@
     {{-- Prevent search engines from indexing the admin panel --}}
     <meta name="robots" content="noindex, nofollow, noarchive">
 
+    {{-- Page-specific head content (e.g. turbo-cache-control meta) --}}
+    @yield('header')
+
     @vite('resources/js/admin/layouts/theme-initializer.js')
 
     @php

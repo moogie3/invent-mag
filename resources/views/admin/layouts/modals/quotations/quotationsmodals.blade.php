@@ -8,23 +8,27 @@
             </div>
             <div class="modal-status bg-danger"></div>
             <div class="modal-body text-center py-4">
-                <i class="ti ti-alert-triangle icon text-danger mb-2" style="font-size: 3rem;"></i>
+                <i class="ti ti-alert-triangle text-danger" style="font-size: 3rem;"></i>
                 <h3>{{ __('messages.are_you_sure') }}</h3>
                 <p class="text-muted">{{ __('messages.delete_quotation_confirmation') }}</p>
             </div>
             <div class="modal-footer">
-                <form id="deleteForm" method="POST">
-                    @csrf
-                    @method('DELETE')
-                    <div class="w-100 d-flex gap-2 justify-content-center">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-                            {{ __('messages.cancel') }}
-                        </button>
-                        <button type="submit" class="btn btn-danger">
-                            <i class="ti ti-trash me-1"></i> {{ __('messages.delete') }}
-                        </button>
+                <div class="w-100">
+                    <div class="row">
+                        <div class="col">
+                            <button type="button" class="btn w-100" data-bs-dismiss="modal">
+                                {{ __('messages.cancel') }}
+                            </button>
+                        </div>
+                        <div class="col">
+                            <form id="deleteForm" method="POST">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" class="btn btn-danger w-100">{{ __('messages.delete') }}</button>
+                            </form>
+                        </div>
                     </div>
-                </form>
+                </div>
             </div>
         </div>
     </div>

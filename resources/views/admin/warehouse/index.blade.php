@@ -2,8 +2,11 @@
 
 @section('title', __('messages.warehouse_page_title'))
 
+@section('header')
+<meta name="turbo-cache-control" content="no-cache">
+@endsection
+
 @section('content')
-    <meta name="turbo-cache-control" content="no-cache">
     <div class="page-wrapper">
         @include('admin.layouts.partials.warehouse.index.header')
         @include('admin.layouts.partials.warehouse.index.page-body')

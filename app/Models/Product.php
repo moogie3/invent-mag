@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Facades\DB;
 
 class Product extends Model
 {
@@ -228,21 +229,28 @@ class Product extends Model
     }
 
     /**
-     * Get all products with low stock (per warehouse)
+     * Get all products with low stock (in main warehouse)
      *
      * @return Collection
      */
     public static function getLowStockProducts()
     {
         $tenantId = app('currentTenant')->id ?? null;
+        $mainWarehouseId = self::getMainWarehouseId();
+
+        if (! $mainWarehouseId) {
+            return collect();
+        }
 
         $items = ProductWarehouse::with(['product', 'warehouse'])
+            ->join('products', 'product_warehouse.product_id', '=', 'products.id')
             ->where('product_warehouse.tenant_id', $tenantId)
-            ->where('product_warehouse.quantity', '>', 0)
-            ->whereHas('product', function ($query) use ($tenantId) {
-                $query->where('tenant_id', $tenantId)
-                    ->whereRaw('products.low_stock_threshold >= product_warehouse.quantity');
-            })
+            ->where('products.tenant_id', $tenantId)
+            ->where('product_warehouse.warehouse_id', $mainWarehouseId)
+            ->where('product_warehouse.quantity', '>=', 0)
+            ->whereNotNull('products.low_stock_threshold')
+            ->whereRaw('products.low_stock_threshold >= product_warehouse.quantity')
+            ->select('product_warehouse.*')
             ->get();
 
         $items->each(function ($item) {
@@ -255,19 +263,117 @@ class Product extends Model
     }
 
     /**
-     * Count how many products have low stock (per warehouse)
+     * Get all products with low stock per warehouse (for modal display)
+     *
+     * @return Collection
+     */
+    public static function getLowStockProductsPerWarehouse()
+    {
+        $tenantId = app('currentTenant')->id ?? null;
+
+        $items = ProductWarehouse::with(['product', 'warehouse'])
+            ->join('products', 'product_warehouse.product_id', '=', 'products.id')
+            ->where('product_warehouse.tenant_id', $tenantId)
+            ->where('products.tenant_id', $tenantId)
+            ->where('product_warehouse.quantity', '>=', 0)
+            ->whereNotNull('products.low_stock_threshold')
+            ->whereRaw('products.low_stock_threshold >= product_warehouse.quantity')
+            ->select('product_warehouse.*')
+            ->get();
+
+        $items->each(function ($item) {
+            if ($item->product) {
+                $item->product->setAppends([]);
+            }
+        });
+
+        return $items;
+    }
+
+    /**
+     * Count how many products have low stock (in main warehouse)
      */
     public static function lowStockCount(): int
     {
         $tenantId = app('currentTenant')->id ?? null;
+        $mainWarehouseId = self::getMainWarehouseId();
 
-        return ProductWarehouse::where('product_warehouse.tenant_id', $tenantId)
-            ->where('product_warehouse.quantity', '>', 0)
-            ->whereHas('product', function ($query) use ($tenantId) {
-                $query->where('tenant_id', $tenantId)
-                    ->whereRaw('products.low_stock_threshold >= product_warehouse.quantity');
-            })
+        if (! $mainWarehouseId) {
+            return 0;
+        }
+
+        return ProductWarehouse::join('products', 'product_warehouse.product_id', '=', 'products.id')
+            ->where('product_warehouse.tenant_id', $tenantId)
+            ->where('products.tenant_id', $tenantId)
+            ->where('product_warehouse.warehouse_id', $mainWarehouseId)
+            ->where('product_warehouse.quantity', '>=', 0)
+            ->whereNotNull('products.low_stock_threshold')
+            ->whereRaw('products.low_stock_threshold >= product_warehouse.quantity')
             ->count();
+    }
+
+    /**
+     * Count how many products have low stock for a specific warehouse
+     */
+    public static function lowStockCountForWarehouse(?int $warehouseId): int
+    {
+        $tenantId = app('currentTenant')->id ?? null;
+
+        if (! $warehouseId) {
+            return 0;
+        }
+
+        return ProductWarehouse::join('products', 'product_warehouse.product_id', '=', 'products.id')
+            ->where('product_warehouse.tenant_id', $tenantId)
+            ->where('products.tenant_id', $tenantId)
+            ->where('product_warehouse.warehouse_id', $warehouseId)
+            ->where('product_warehouse.quantity', '>=', 0)
+            ->whereNotNull('products.low_stock_threshold')
+            ->whereRaw('products.low_stock_threshold >= product_warehouse.quantity')
+            ->count();
+    }
+
+    /**
+     * Count how many distinct products have low stock across ALL warehouses
+     * Used for header stock status - shows total products with low stock in any warehouse
+     */
+    public static function lowStockCountAllWarehouses(): int
+    {
+        $tenantId = app('currentTenant')->id ?? null;
+
+        return ProductWarehouse::join('products', 'product_warehouse.product_id', '=', 'products.id')
+            ->where('product_warehouse.tenant_id', $tenantId)
+            ->where('products.tenant_id', $tenantId)
+            ->where('product_warehouse.quantity', '>=', 0)
+            ->whereNotNull('products.low_stock_threshold')
+            ->whereRaw('products.low_stock_threshold >= product_warehouse.quantity')
+            ->distinct('product_warehouse.product_id')
+            ->count('product_warehouse.product_id');
+    }
+
+    /**
+     * Get low stock count per warehouse
+     *
+     * @return array
+     */
+    public static function lowStockCountPerWarehouse(): array
+    {
+        $tenantId = app('currentTenant')->id ?? null;
+
+        return ProductWarehouse::join('products', 'product_warehouse.product_id', '=', 'products.id')
+            ->join('warehouses', 'product_warehouse.warehouse_id', '=', 'warehouses.id')
+            ->where('product_warehouse.tenant_id', $tenantId)
+            ->where('products.tenant_id', $tenantId)
+            ->where('product_warehouse.quantity', '>=', 0)
+            ->whereNotNull('products.low_stock_threshold')
+            ->whereRaw('products.low_stock_threshold >= product_warehouse.quantity')
+            ->select('warehouses.id', 'warehouses.name', DB::raw('count(*) as low_stock_count'))
+            ->groupBy('warehouses.id', 'warehouses.name')
+            ->get()
+            ->mapWithKeys(function ($item) {
+                return [$item->name => $item->low_stock_count];
+            })
+            ->toArray();
     }
 
     /**

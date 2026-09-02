@@ -80,8 +80,9 @@ class ProductController extends Controller
     {
         try {
             $formData = $this->productService->getProductFormData();
+            $lowStockProductsPerWarehouse = Product::getLowStockProductsPerWarehouse();
 
-            return view('admin.product.product-create', $formData);
+            return view('admin.product.product-create', $formData + compact('lowStockProductsPerWarehouse'));
         } catch (\Exception $e) {
             Log::error('Failed to load product create form: '.$e->getMessage(), ['exception' => $e]);
 

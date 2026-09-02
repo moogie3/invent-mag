@@ -1,7 +1,7 @@
 # Invent-MAG: Complete Feature Checklist
 
-**Last Updated:** August 2026  
-**Document Version:** 2.8  
+**Last Updated:** September 2026  
+**Document Version:** 2.9  
 **System Version:** 2.5
 
 ---
@@ -70,7 +70,8 @@
 - [x] Real-time stock tracking
 - [x] Per-warehouse stock levels
 - [x] Stock adjustments with audit trail
-- [x] Low stock alerts (per warehouse)
+- [x] **Low stock alerts (per warehouse)** — detects low stock per warehouse using each product's custom `low_stock_threshold`
+- [x] **Product index defaults to "All Warehouses"** — shows total stock across all warehouses; filtering to a specific warehouse shows that warehouse's stock
 - [x] Unit of measure management
 - [x] Barcode support
 - [x] Barcode search
@@ -99,6 +100,7 @@
 - [x] Source/destination warehouse selection
 - [x] Real-time available stock display per warehouse
 - [x] Quantity and reason entry
+- [x] **Quantity validation with warning** — caps input at available stock, shows `is-invalid` + warning message matching Sales Order create page behavior
 - [x] Automatic stock decrement from source warehouse
 - [x] Automatic stock increment to destination warehouse
 - [x] Dual StockAdjustment records with `adjustment_type = 'transfer'`
@@ -209,6 +211,9 @@
 - [x] Plan-gated feature (available on Professional & Enterprise)
 - [x] 4 granular permissions (view/create/edit/delete)
 - [x] Quotation uses Tax model dropdown instead of manual tax_type/tax_rate inputs
+- [x] **Consistent add-item UI** — labeled Product, Quantity, Price inputs matching Sales Order create page
+- [x] **Currency-aware amount summary** — subtotal, discount, tax, total formatted with tenant's currency settings (symbol, separators, decimal places, position)
+- [x] **Compact amount summary card** — consistent spacing, no separator lines, total visually distinct
 
 ---
 
@@ -694,5 +699,5 @@
 
 ---
 
-**Document Version:** 2.8  
-**Last Updated:** August 2026
+**Document Version:** 2.9  
+**Last Updated:** September 2026

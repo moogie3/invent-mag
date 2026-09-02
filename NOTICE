@@ -1,0 +1,127 @@
+Invent-MAG - Third Party Notices
+=================================
+
+This product includes software developed by third parties. Below are the required
+attributions and license notices for included components.
+
+---
+
+Tabler UI Framework
+-------------------
+Version: 1.0.0-beta20
+Source: https://tabler.io
+Repository: https://github.com/tabler/tabler
+Copyright: 2018-2023 The Tabler Authors, 2018-2023 codecalm.net Paweł Kuna
+License: MIT License
+
+MIT License Terms:
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE.
+
+---
+
+fslightbox
+----------
+Used by Tabler for image lightbox functionality
+Copyright: Piotr Zdziarski
+License: MIT License
+Source: https://github.com/fslightbox/fslightbox
+
+---
+
+TinyMCE (included in Tabler distribution)
+-----------------------------------------
+Used by Tabler for rich text editing
+Copyright: Tiny Technologies, Inc.
+License: MIT License (with additional terms)
+Source: https://www.tiny.cloud/
+
+---
+
+Alpine.js
+---------
+Version: 3.4.2
+Repository: https://github.com/alpinejs/alpine
+Copyright: Caleb Porzio
+License: MIT License
+
+---
+
+Tailwind CSS
+------------
+Version: 3.x
+Repository: https://github.com/tailwindlabs/tailwindcss
+Copyright: Tailwind Labs Inc.
+License: MIT License
+
+---
+
+Chart.js
+--------
+Version: 4.5.1
+Repository: https://github.com/chartjs/Chart.js
+Copyright: Chart.js Contributors
+License: MIT License
+
+---
+
+Hotwired Turbo
+--------------
+Version: 8.x
+Repository: https://github.com/hotwired/turbo
+Copyright: Basecamp, LLC
+License: MIT License
+
+---
+
+Axios
+-----
+Version: 1.x
+Repository: https://github.com/axios/axios
+Copyright: Matt Zabriskie
+License: MIT License
+
+---
+
+Laravel Framework & Packages
+----------------------------
+All Laravel framework components and first-party packages
+Copyright: Taylor Otwell
+License: MIT License
+
+Spatie Packages (multitenancy, permission, backup, etc.)
+Copyright: Spatie
+License: MIT License
+
+---
+
+PHP Dependencies (via Composer)
+-------------------------------
+All PHP dependencies listed in composer.json are licensed under their respective
+licenses (mostly MIT, BSD, Apache 2.0). See vendor/ directory for individual
+license files.
+
+---
+
+Apache 2.0 License (Project License)
+------------------------------------
+Invent-MAG is licensed under the Apache License, Version 2.0.
+See LICENSE file for full terms.
+
+Apache License requires preservation of NOTICE file if present in dependencies.
+This NOTICE file serves as the aggregated attribution for all included works.

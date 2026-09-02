@@ -2,7 +2,7 @@
 
 **Version:** 2.1  
 **Author:** moogie3  
-**License:** MIT  
+**License:** Apache-2.0  
 **Development Time:** 1.5+ years (451+ commits)  
 **Status:** Production-Ready
 

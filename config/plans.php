@@ -35,6 +35,7 @@ return [
         'api_access' => 'RESTful API Access',
         'audit_compliance' => 'Audit Trail & Compliance Logging',
         'bank_reconciliation' => 'Bank Reconciliation',
+        'shopee_import' => 'Shopee Product Import (XLSX)',
     ],
 
     // NOTE: Feature gating is enforced at the ROUTE layer via the
@@ -62,6 +63,7 @@ return [
         'quotations' => 'Quotations are available on the Professional plan and above.',
         'ppn' => 'e-Faktur PPN compliance is available on the Professional plan and above.',
         'bank_reconciliation' => 'Bank Reconciliation is available on the Professional plan and above.',
+        'shopee_import' => 'Shopee Product Import is available on the Enterprise plan.',
     ],
 
 ];

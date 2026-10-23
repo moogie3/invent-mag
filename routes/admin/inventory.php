@@ -61,6 +61,10 @@ Route::prefix('pos')->middleware('plan.feature:pos')->group(function () {
         ->name('admin.pos')
         ->middleware('can:access-pos');
 
+    Route::get('/products', [POSController::class, 'searchProducts'])
+        ->name('admin.pos.products')
+        ->middleware('can:access-pos');
+
     Route::get('/create', [POSController::class, 'create'])
         ->name('admin.pos.create')
         ->middleware('can:access-pos');

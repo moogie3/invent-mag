@@ -30,12 +30,12 @@ class ProductController extends Controller
     {
         try {
             $entries = $request->input('entries', 10);
-            
+
             $filters = $request->only(['warehouse_id']);
-            
+
             // Check if warehouse_id was explicitly provided in request
             $warehouseIdProvided = $request->has('warehouse_id');
-            
+
             // Only apply warehouse filter if explicitly provided and not empty
             // Default is "All Warehouses" (no filter)
             if ($warehouseIdProvided && $filters['warehouse_id']) {
@@ -144,8 +144,9 @@ class ProductController extends Controller
         $warehouses = Warehouse::all();
         $mainWarehouse = Warehouse::where('is_main', true)->first();
         $lowStockProducts = Product::getLowStockProducts();
+        $lowStockProductsPerWarehouse = Product::getLowStockProductsPerWarehouse();
 
-        return view('admin.product.product-edit', compact('lowStockProducts', 'products', 'categories', 'units', 'suppliers', 'warehouses', 'mainWarehouse'));
+        return view('admin.product.product-edit', compact('lowStockProducts', 'lowStockProductsPerWarehouse', 'products', 'categories', 'units', 'suppliers', 'warehouses', 'mainWarehouse'));
     }
 
     public function store(Request $request)

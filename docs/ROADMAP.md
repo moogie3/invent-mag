@@ -194,8 +194,9 @@ return $dompdf->stream('FP-' . $faktur->nsfp . '.pdf', ['Attachment' => false]);
 | Sales forecasting — Holt-Winters | ✅ Live | Feature slug: `sales_forecasting` |
 | RESTful API (Scribe-documented) | ✅ Live | Feature slug: `api_access` — scope: essential endpoints only (auth, CMS, payment/webhooks, plan lookup). Full CRUD API = future Enterprise expansion |
 | Audit trail & compliance logging | ✅ Live | Feature slug: `audit_compliance` |
-| Custom roles & 101 granular permissions | ✅ Live | Spatie Permission |
+| Custom roles & 102 granular permissions | ✅ Live | Spatie Permission |
 | **HR & Payroll** | ✅ Live | Feature slug: `hr` |
+| **Shopee XLSX product import** | ✅ Live | Feature slug: `shopee_import` — bulk update via Seller Centre mass-update files, matched by SKU Induk; splits Shopee variations into sellable products; stock posts to the main warehouse only |
 | Dedicated support & SLA | ✅ Live | |
 
 ---
@@ -1825,6 +1826,19 @@ Tax double-submissions to DJP are a legal problem. Protection at 5 levels:
 - Export to PDF/presentation format
 
 **Complexity:** Medium (~2 weeks). Depends on charting library choice and data aggregation layer.
+
+---
+
+### 5.11 Shopee XLSX Import ✅ DONE (Oct 2026)
+
+**What shipped:** Enterprise-gated "Import Shopee" modal (`shopee_import` feature slug, `import-products` permission) that bulk-updates the catalog from Shopee Seller Centre mass-update XLSX exports (Basic required; Sales required only when creating products; Media/Shipping optional).
+
+- Rows match `products.code` = *SKU Induk*; multi-variation families split into one sellable product per variation (`products.parent_id` + "Variant of" badge) with per-variation price/stock
+- **Stock posts to the MAIN warehouse only** (absolute quantity; other warehouses untouched; skipped when no main warehouse exists)
+- Cover images download via queued `DownloadShopeeCoverImages` jobs (unchanged covers skipped, failed batches retried) with a live progress bar in the modal
+- Shipped with its own guide in the tutorial (`shopee_import` step)
+
+**Still deferred:** listing sync (create/update Shopee listings from Invent-MAG) and TikTok integration — the current feature is catalog *import* only.
 
 ---
 

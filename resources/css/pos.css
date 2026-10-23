@@ -19,9 +19,27 @@
     overflow-y: auto;
 }
 
-#productGrid {
-    max-height: 600px;
+/* Bounded scroll area for the POS catalog: search inputs stay pinned above
+   while the grid (60 cards per page, auto-loaded on scroll) scrolls
+   internally, so a 1000+ item catalog never grows the page itself.
+   overflow-x kills the horizontal scrollbar Bootstrap's row negative
+   margins would otherwise add inside this wrapper. */
+.pos-catalog-scroll {
+    max-height: 62vh;
     overflow-y: auto;
+    overflow-x: hidden;
+    overscroll-behavior: contain;
+}
+
+/* 3-line clamp with ellipsis + stable height so long Shopee names don't get
+   hard-cut mid-letter and card rows stay aligned. */
+.product-card-title {
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    min-height: 3.6em;
 }
 
 #totalPriceContainer {

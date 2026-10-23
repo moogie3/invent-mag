@@ -1,4 +1,5 @@
 <div class="col-md-6">
+    @vite('resources/css/pos.css')
     <div class="card border-0 shadow-sm rounded-3 card-product-catalog mb-4">
         <div class="card-header d-flex justify-content-between align-items-center">
             <h4 class="card-title mb-0">
@@ -24,19 +25,16 @@
                     </div>
                 </div>
             </div>
-            <div class="row g-2" id="productGrid">
-                @if ($products->isEmpty())
-                    <div class="empty">
-                        <div class="empty-img">
-                            <i class="ti ti-mood-sad" style="font-size: 5rem; color: #ccc;"></i>
-                        </div>
-                        <p class="empty-title">{{ __('messages.no_products_found') }}</p>
-                        <p class="empty-subtitle text-muted">
-                            {{ __('messages.it_looks_like_you_havent_added_any_products_yet') }}
-                        </p>
-                    </div>
-                @else
-                    @foreach ($products as $product)
+            <div class="pos-catalog-scroll mb-2">
+                <div class="row g-2" id="productGrid"
+                    data-search-url="{{ route('admin.pos.products') }}"
+                    data-limit="{{ \App\Services\PosService::CATALOG_PAGE_SIZE }}"
+                    data-has-more="{{ $has_more ? '1' : '0' }}"
+                    data-load-more-label="{{ __('messages.load_more') }}"
+                    data-empty-title="{{ __('messages.no_products_found') }}"
+                    data-empty-subtitle="{{ __('messages.it_looks_like_you_havent_added_any_products_yet') }}"
+                    data-in-stock-label="{{ __('messages.in_stock') }}">
+                    @forelse ($products as $product)
                         <div class="col-md-4 mb-2">
                             <div class="card product-card border-0 shadow-sm rounded-3 hover-shadow" style="cursor: pointer;"
                                 data-product-id="{{ $product->id }}" data-product-name="{{ $product->name }}"
@@ -50,11 +48,11 @@
                                             style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; border: 1px solid #ccc; border-radius: 5px; margin: 0 auto;"></i>
                                     @else
                                         <img src="{{ $product->image }}" class="img-fluid" alt="{{ $product->name }}"
-                                            style="width: 100%; height: 100%; object-fit: cover; border-radius: 4px 4px 0 0;">
+                                            loading="lazy" style="width: 100%; height: 100%; object-fit: cover; border-radius: 4px 4px 0 0;">
                                     @endif
                                 </div>
                                 <div class="card-body p-2 text-center">
-                                    <h5 class="card-title fs-4 mb-1" style="max-height: 4em; overflow: hidden;">
+                                    <h5 class="card-title fs-4 mb-1 product-card-title">
                                         {{ $product->name }}</h5>
                                     <p class="card-text fs-4 mb-1">
                                         {{ \App\Helpers\CurrencyHelper::formatWithPosition($product->selling_price) }}
@@ -66,8 +64,18 @@
                                 </div>
                             </div>
                         </div>
-                    @endforeach
-                @endif
+                    @empty
+                        <div class="empty">
+                            <div class="empty-img">
+                                <i class="ti ti-mood-sad" style="font-size: 5rem; color: #ccc;"></i>
+                            </div>
+                            <p class="empty-title">{{ __('messages.no_products_found') }}</p>
+                            <p class="empty-subtitle text-muted">
+                                {{ __('messages.it_looks_like_you_havent_added_any_products_yet') }}
+                            </p>
+                        </div>
+                    @endforelse
+                </div>
             </div>
         </div>
     </div>

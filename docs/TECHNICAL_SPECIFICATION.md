@@ -448,10 +448,11 @@ routes/
 'create-products'
 'edit-products'
 'delete-products'
+'import-products'
 'view-accounting'
 'edit-chart-of-accounts'
 'post-manual-journal'
-// ... 101 total permissions
+// ... 102 total permissions
 
 // Usage in controller
 public function store(Request $request)

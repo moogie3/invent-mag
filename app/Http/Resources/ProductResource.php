@@ -20,8 +20,9 @@ class ProductResource extends JsonResource
             'barcode' => $this->barcode,
             'name' => $this->name,
             'description' => $this->description,
-            // Handle image URL generation carefully
-            'image' => $this->image ? url("storage/image/{$this->image}") : url('img/default_placeholder.png'),
+            // Accessor already returns a full URL (local file, remote Shopee
+            // cover, or placeholder) — never prefix it again.
+            'image' => $this->image,
             'price' => $this->price,
             'selling_price' => $this->selling_price,
             'stock_quantity' => $this->stock_quantity,

@@ -73,6 +73,7 @@ export default defineConfig({
                 "resources/css/navbar.css",
                 "resources/css/menu-sidebar.css",
                 "resources/css/pos-receipt.css",
+                "resources/css/pos.css",
                 "resources/css/error.css",
                 "resources/css/settings.css",
                 "resources/css/tutorial-modal.css",

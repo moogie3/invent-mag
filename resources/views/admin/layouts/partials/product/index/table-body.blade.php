@@ -16,7 +16,16 @@
                 @endif
             </td>
             <td class="sort-code no-print">{{ $product->code }}</td>
-            <td class="sort-name">{{ $product->name }}</td>
+            <td class="sort-name">
+                {{ $product->name }}
+                @if ($product->parent_id)
+                    <span class="badge bg-purple-lt ms-1" title="{{ __('messages.variant_of', ['code' => $product->parent?->code]) }}">
+                        {{ __('messages.variant_of', ['code' => $product->parent?->code]) }}
+                    </span>
+                @elseif (($product->variants_count ?? 0) > 0)
+                    <span class="badge bg-secondary-lt ms-1">{{ __('messages.variants_badge', ['count' => $product->variants_count]) }}</span>
+                @endif
+            </td>
             <td class="sort-quantity no-print text-center">
                 @php
                     $displayStock = $product->total_stock;

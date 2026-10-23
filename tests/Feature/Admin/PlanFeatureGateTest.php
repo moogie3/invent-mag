@@ -31,6 +31,7 @@ class PlanFeatureGateTest extends TestCase
         'sales_forecasting',
         'api_access',
         'audit_compliance',
+        'shopee_import',
     ];
 
     protected function setUp(): void
@@ -188,6 +189,21 @@ class PlanFeatureGateTest extends TestCase
             ->assertJsonPath('error', 'plan_feature_required')
             ->assertJsonPath('required_feature', 'quotations')
             ->assertJsonPath('suggested_plan', 'professional');
+    }
+
+    public function test_shopee_import_is_gated_to_enterprise(): void
+    {
+        $this->actingAs($this->user);
+        $this->user->assignRole('superuser');
+
+        $this->assignPlan('professional');
+        $response = $this->post(route('product.shopee-import'));
+        $response->assertStatus(302);
+        $this->assertStringContainsString('admin/settings/plan/upgrade', $response->headers->get('Location'));
+
+        // Enterprise passes the feature gate; fails only on validation (no files uploaded)
+        $this->assignPlan('enterprise');
+        $this->postJson(route('product.shopee-import'))->assertStatus(422);
     }
 
     public function test_tenant_without_plan_has_full_access(): void

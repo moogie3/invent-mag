@@ -655,7 +655,7 @@
 - [ ] PPh 21 (employee withholding) — UMKM-flat "Payroll Tax" picker on payroll screen (withholding line in payment journal); explicitly NOT a full TER/PTKP/1721-II engine
 - [x] PPh Final 0.5% (UMKM final income tax, PP 23/2018 & PP 20/2026) — completed via seeded `PPh Final 0.5%` Tax record (0.5%, `is_pph = true`, added to `TaxSeeder` + `TaxService::ensureIndonesianDefaults()` + backfill migration `2026_08_05_000002` converting existing `PPH 22` rows in place); flows through existing PPh dropdowns + shared PPh Payable (2150) unchanged. `PPH 22` (1.5%) remains creatable on the Tax page but is no longer seeded
 - [ ] PPh 25 (installment tax payments) — deferred; manual journal entry suffices for UMKM
-- [ ] Marketplace sync (Shopee/TikTok) — deferred; bulk product listing/inventory sync integration, not yet scoped into docs elsewhere
+- [x] **Shopee XLSX product import** — completed (Oct 2026): Enterprise feature slug `shopee_import`, permission `import-products`. The "Import Shopee" modal accepts Seller Centre mass-update files (Basic required; Sales required only to create products; Media/Shipping optional), matched by `products.code` = SKU Induk. Multi-variation products split into one sellable product per variation (`products.parent_id` family anchor + "Variant of" badge) with per-variation price/stock; **stock posts to the MAIN warehouse only** (absolute quantity per product; other warehouses untouched; skipped when no main warehouse). Cover images download via queued `DownloadShopeeCoverImages` jobs (already-stored covers skipped, failed batches retried into `failed_jobs`) behind a live modal progress bar. Listing sync (create/update listings from Invent-MAG) and TikTok remain deferred
 - [ ] Mobile app (React Native/Flutter)
 - [ ] Advanced BI dashboards
 
@@ -670,12 +670,12 @@
 | **Services**         | 54        |
 | **Models**           | 54        |
 | **Helpers**          | 6         |
-| **Test Methods (PHP)** | 1186     |
-| **Test Assertions (PHP)** | 3715   |
-| **JS Test Files**    | 169       |
+| **Test Methods (PHP)** | 1208     |
+| **Test Assertions (PHP)** | 3827   |
+| **JS Test Files**    | 170       |
 | **API Endpoints**    | 11        |
 | **Database Tables**  | 57        |
-| **Migrations**       | 108       |
+| **Migrations**       | 110       |
 | **Seeders**          | 36        |
 | **Permissions**      | 101       |
 | **Routes**           | 437       |

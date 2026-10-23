@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Product;
 use App\Models\Sales;
 use App\Models\Tax;
 use App\Services\PosService;
@@ -25,6 +26,41 @@ class POSController extends Controller
         $data['taxes'] = Tax::active()->orderBy('name')->get();
 
         return view('admin.pos.index', $data);
+    }
+
+    /**
+     * Paginated product search for the POS catalog grid (used by the search
+     * box and the Load more button; the initial page is server-rendered).
+     */
+    public function searchProducts(Request $request)
+    {
+        $validated = $request->validate([
+            'q' => 'nullable|string|max:100',
+            'offset' => 'nullable|integer|min:0',
+        ]);
+
+        $result = $this->posService->searchProducts(
+            $validated['q'] ?? '',
+            (int) ($validated['offset'] ?? 0),
+            PosService::CATALOG_PAGE_SIZE,
+        );
+
+        $placeholder = asset('img/default_placeholder.png');
+
+        return response()->json([
+            'success' => true,
+            'has_more' => $result['has_more'],
+            'products' => $result['products']->map(fn (Product $product) => [
+                'id' => $product->id,
+                'code' => $product->code,
+                'name' => $product->name,
+                'selling_price' => (float) $product->selling_price,
+                'unit_symbol' => $product->unit?->symbol,
+                'main_warehouse_stock' => (int) $product->main_warehouse_stock,
+                'image' => $product->image,
+                'is_placeholder' => $product->image === $placeholder,
+            ])->values(),
+        ]);
     }
 
     public function store(Request $request)

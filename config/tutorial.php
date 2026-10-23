@@ -141,7 +141,7 @@ return [
             'title' => 'tutorial.products_master',
             'icon' => 'ti-packages',
             'desc' => 'tutorial.products_master_desc',
-            'steps' => ['tutorial.create_product_btn', 'tutorial.warehouse_filter', 'tutorial.stock_status', 'tutorial.expiry_status', 'tutorial.bulk_actions', 'tutorial.table_actions', 'tutorial.multi_warehouse_flow'],
+            'steps' => ['tutorial.create_product_btn', 'tutorial.warehouse_filter', 'tutorial.stock_status', 'tutorial.expiry_status', 'tutorial.bulk_actions', 'tutorial.table_actions', 'tutorial.multi_warehouse_flow', 'tutorial.shopee_import'],
         ],
         'admin.reports.stock-transfer*' => [
             'title' => 'tutorial.stock_transfer',

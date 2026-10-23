@@ -114,7 +114,7 @@ class AppServiceProvider extends ServiceProvider
         // ---------------------------------------------------------------
 
         /**
-         * @planHas('feature_slug') ... @endPlanHas
+         * @planHas('feature_slug') ... @endplanHas
          * Conditionally renders content if the current tenant's plan includes the feature.
          * Returns true (show content) if: no tenant context, legacy tenant, or plan has feature.
          */

@@ -675,3 +675,92 @@
         </div>
     </div>
 </div>
+
+<!-- Shopee Import Modal -->
+<div class="modal modal-blur fade" id="shopeeImportModal" tabindex="-1" aria-labelledby="shopeeImportModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg rounded-3">
+            <div class="modal-header">
+                <h5 class="modal-title" id="shopeeImportModalLabel">
+                    <i class="ti ti-file-import me-2"></i>
+                    {{ __('messages.import_shopee_title') }}
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="alert alert-info d-flex align-items-center mb-3">
+                    <i class="ti ti-info-circle me-2 fs-4"></i>
+                    <div>{{ __('messages.import_shopee_desc') }}</div>
+                </div>
+
+                <form id="shopeeImportForm" action="{{ route('product.shopee-import') }}" method="POST"
+                    enctype="multipart/form-data"
+                    data-label-updated="{{ __('messages.import_shopee_updated') }}"
+                    data-label-created="{{ __('messages.import_shopee_created') }}"
+                    data-label-skipped="{{ __('messages.import_shopee_skipped') }}"
+                    data-label-errors="{{ __('messages.import_shopee_errors') }}"
+                    data-label-images="{{ __('messages.import_shopee_images') }}"
+                    data-label-split-families="{{ __('messages.import_shopee_split_families') }}"
+                    data-label-more="{{ __('messages.import_shopee_more') }}"
+                    data-msg-running="{{ __('messages.import_shopee_running') }}"
+                    data-msg-done="{{ __('messages.import_shopee_done') }}"
+                    data-msg-failed="{{ __('messages.import_shopee_failed') }}"
+                    data-msg-generic-error="{{ __('messages.import_shopee_generic_error') }}"
+                    data-msg-session-expired="{{ __('messages.import_shopee_session_expired') }}"
+                    data-progress-url="{{ route('product.shopee-import.progress') }}"
+                    data-label-progress-preparing="{{ __('messages.import_shopee_progress_preparing') }}"
+                    data-label-progress-products="{{ __('messages.import_shopee_progress_products') }}"
+                    data-label-progress-queueing="{{ __('messages.import_shopee_progress_queueing') }}"
+                    data-label-progress-images="{{ __('messages.import_shopee_progress_images') }}"
+                    data-label-progress-complete="{{ __('messages.import_shopee_progress_complete') }}">
+                    @csrf
+                    <input type="hidden" name="progress_token" id="shopeeImportProgressToken" value="">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label">{{ __('messages.import_shopee_basic_file') }}
+                                <span class="text-danger">*</span></label>
+                            <input type="file" class="form-control" name="basic_file" accept=".xlsx" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">{{ __('messages.import_shopee_media_file') }}</label>
+                            <input type="file" class="form-control" name="media_file" accept=".xlsx">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">{{ __('messages.import_shopee_sales_file') }}</label>
+                            <input type="file" class="form-control" name="sales_file" accept=".xlsx">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">{{ __('messages.import_shopee_shipping_file') }}</label>
+                            <input type="file" class="form-control" name="shipping_file" accept=".xlsx">
+                        </div>
+                    </div>
+                    <small class="text-muted d-block mt-2">{{ __('messages.import_shopee_hint') }}</small>
+
+                    <div id="shopeeImportProgress" class="mt-3" style="display: none;" aria-live="polite">
+                        <div class="d-flex justify-content-between align-items-center mb-1">
+                            <small class="text-muted"
+                                id="shopeeImportProgressLabel">{{ __('messages.import_shopee_progress_preparing') }}</small>
+                            <small class="text-muted" id="shopeeImportProgressPct">0%</small>
+                        </div>
+                        <div class="progress" style="height: 10px;">
+                            <div id="shopeeImportProgressBar" class="progress-bar progress-bar-striped progress-bar-animated"
+                                role="progressbar" style="width: 0%" aria-valuemin="0" aria-valuemax="100"
+                                aria-valuenow="0"></div>
+                        </div>
+                    </div>
+
+                    <div id="shopeeImportResult" class="mt-3" style="display: none;"></div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    {{ __('messages.cancel') }}
+                </button>
+                <button type="submit" form="shopeeImportForm" class="btn btn-shopee" id="shopeeImportSubmitBtn">
+                    <i class="ti ti-upload me-1"></i> {{ __('messages.import_shopee_run') }}
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

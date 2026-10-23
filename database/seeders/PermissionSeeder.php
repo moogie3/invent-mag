@@ -17,6 +17,7 @@ class PermissionSeeder extends Seeder
             'create-products',
             'edit-products',
             'delete-products',
+            'import-products',
 
             // Purchase Orders
             'view-purchase-orders',
@@ -209,7 +210,7 @@ class PermissionSeeder extends Seeder
     {
         $role = Role::findOrCreate('staff');
         $permissions = [
-            'view-products', 'create-products', 'edit-products', 'delete-products',
+            'view-products', 'create-products', 'edit-products', 'delete-products', 'import-products',
             'view-purchase-orders', 'create-purchase-orders', 'edit-purchase-orders', 'delete-purchase-orders',
             'view-sales', 'create-sales', 'edit-sales', 'delete-sales',
             'view-warehouses', 'create-warehouses', 'edit-warehouses', 'delete-warehouses',

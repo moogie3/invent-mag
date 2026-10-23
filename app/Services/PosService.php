@@ -15,11 +15,18 @@ use App\Models\Tax;
 use App\Models\Unit;
 use App\Models\Warehouse;
 use Carbon\Carbon;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
 class PosService
 {
+    /**
+     * Products per catalog page. With 1000+ items the POS grid renders this
+     * page up front and loads the rest via admin.pos.products (search/paging).
+     */
+    public const CATALOG_PAGE_SIZE = 60;
+
     protected AccountingService $accountingService;
 
     public function __construct(AccountingService $accountingService)
@@ -29,25 +36,7 @@ class PosService
 
     public function getPosIndexData()
     {
-        $products = Product::with(['unit', 'productWarehouses'])->get();
-
-        $mainWarehouse = Warehouse::where('is_main', true)->first();
-        $mainWarehouseId = $mainWarehouse ? $mainWarehouse->id : null;
-
-        $products->each(function ($product) use ($mainWarehouseId) {
-            $product->setAppends([]); // Prevent heavy default accessors
-
-            if ($mainWarehouseId) {
-                $mainStock = $product->productWarehouses->where('warehouse_id', $mainWarehouseId)->first();
-                $stockQty = $mainStock ? max(0, (float) $mainStock->quantity) : 0;
-            } else {
-                $stockQty = 0;
-            }
-
-            $product->main_warehouse_stock = $stockQty;
-            $product->stock_quantity = $stockQty;
-            $product->total_stock = $product->productWarehouses->sum('quantity');
-        });
+        ['products' => $products, 'has_more' => $has_more] = $this->searchProducts(null, 0, self::CATALOG_PAGE_SIZE);
 
         $customers = Customer::all();
         $walkInCustomerId = $customers->where('name', 'Walk In Customer')->first()->id ?? null;
@@ -55,8 +44,55 @@ class PosService
         $units = Unit::all();
         $suppliers = Supplier::all();
         $warehouses = Warehouse::all();
+        $mainWarehouse = Warehouse::where('is_main', true)->first();
 
-        return compact('products', 'customers', 'walkInCustomerId', 'categories', 'units', 'suppliers', 'warehouses', 'mainWarehouse');
+        return compact('products', 'has_more', 'customers', 'walkInCustomerId', 'categories', 'units', 'suppliers', 'warehouses', 'mainWarehouse');
+    }
+
+    /**
+     * Paginated catalog search (name/code match) with main-warehouse stock
+     * decorated onto each product. Fetches limit + 1 rows to know if a next
+     * page exists.
+     *
+     * @return array{products: Collection<int, Product>, has_more: bool}
+     */
+    public function searchProducts(?string $query, int $offset, int $limit): array
+    {
+        $term = trim((string) $query);
+
+        $products = Product::with(['unit', 'productWarehouses'])
+            ->when($term !== '', function ($builder) use ($term) {
+                // Strip LIKE wildcards — they are metacharacters, not search text.
+                $safe = str_replace(['%', '_'], '', $term);
+                $builder->where(fn ($w) => $w
+                    ->where('name', 'like', "%{$safe}%")
+                    ->orWhere('code', 'like', "%{$safe}%"));
+            })
+            ->orderBy('name')
+            ->orderBy('id')
+            ->skip(max(0, $offset))
+            ->take($limit + 1)
+            ->get();
+
+        $hasMore = $products->count() > $limit;
+        $products = $products->take($limit)->values();
+
+        $mainWarehouseId = Warehouse::where('is_main', true)->value('id');
+
+        $products->each(function ($product) use ($mainWarehouseId) {
+            $product->setAppends([]); // Prevent heavy default accessors
+
+            $mainStock = $mainWarehouseId
+                ? $product->productWarehouses->firstWhere('warehouse_id', $mainWarehouseId)
+                : null;
+            $stockQty = $mainStock ? max(0, (float) $mainStock->quantity) : 0;
+
+            $product->main_warehouse_stock = $stockQty;
+            $product->stock_quantity = $stockQty;
+            $product->total_stock = $product->productWarehouses->sum('quantity');
+        });
+
+        return ['products' => $products, 'has_more' => $hasMore];
     }
 
     public function validateStockBeforeSale(array $products, $warehouseId = null)

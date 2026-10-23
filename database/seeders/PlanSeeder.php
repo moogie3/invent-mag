@@ -130,6 +130,7 @@ class PlanSeeder extends Seeder
                     'api_access',
                     'audit_compliance',
                     'hr',
+                    'shopee_import',
                 ],
             ],
         ];

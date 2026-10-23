@@ -22,3 +22,4 @@ yarn-error.log
 /.vscode
 /.zed
 /.scribe
+/storage/app/public/image/

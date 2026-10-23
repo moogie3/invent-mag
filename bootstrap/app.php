@@ -35,6 +35,7 @@ use Spatie\Multitenancy\MultitenancyServiceProvider;
 use Spatie\Permission\Middleware\PermissionMiddleware;
 use Spatie\Permission\Middleware\RoleMiddleware;
 use Spatie\Permission\Middleware\RoleOrPermissionMiddleware;
+use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -156,6 +157,13 @@ return Application::configure(basePath: dirname(__DIR__))
         // 401 - Unauthorized (handled by redirectGuestsTo in middleware config above)
 
         // 403 - Forbidden
+        // NOTE: Laravel's prepareException() converts AuthorizationException into
+        // AccessDeniedHttpException before render callbacks run, so we must match
+        // AccessDeniedHttpException (and AuthorizationException as a fallback).
+        $exceptions->render(function (AccessDeniedHttpException $e, Request $request) use ($handleError) {
+            return $handleError($request, 403, 'Forbidden');
+        });
+
         $exceptions->render(function (AuthorizationException $e, Request $request) use ($handleError) {
             return $handleError($request, 403, 'Forbidden');
         });

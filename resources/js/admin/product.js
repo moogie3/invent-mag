@@ -1,4 +1,5 @@
 import { initProductPage } from "./partials/product/main.js";
+import { initShopeeImport } from "./partials/product/shopeeImport.js";
 import { validateForm } from "./utils/formValidator.js";
 
 import {
@@ -20,6 +21,7 @@ onPageLoad(function () {
     initProductPage();
     initDeleteModal();
     initProductForms();
+    initShopeeImport();
 
     setTimeout(() => {
         window.shortcutManager.unregister("ctrl+s");

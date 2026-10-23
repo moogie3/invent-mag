@@ -193,3 +193,19 @@ body.no-animations #global-loader {
 
 /* Remove overriding text color so it stays white */
 /* .toast-content .text-dark and .text-muted were forcing text color */
+
+/* Shopee import action — brand orange #EE4D2D (distinct from blue/gray toolbar buttons) */
+.btn-shopee {
+    --tblr-btn-bg: #ee4d2d;
+    --tblr-btn-border-color: #ee4d2d;
+    --tblr-btn-color: #fff;
+    --tblr-btn-hover-bg: #d94626;
+    --tblr-btn-hover-border-color: #d94626;
+    --tblr-btn-hover-color: #fff;
+    --tblr-btn-active-bg: #c93e20;
+    --tblr-btn-active-border-color: #c93e20;
+    --tblr-btn-active-color: #fff;
+    --tblr-btn-disabled-bg: #ee4d2d;
+    --tblr-btn-disabled-border-color: #ee4d2d;
+    --tblr-btn-disabled-color: rgba(255, 255, 255, 0.75);
+}

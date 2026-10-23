@@ -348,4 +348,67 @@ class POSControllerTest extends TestCase
         $response->assertStatus(200);
         $response->assertJson(['success' => true]);
     }
+
+    public function test_pos_index_renders_only_one_page_of_products_with_scroll_loading()
+    {
+        // setUp already creates 1 product; 60 more = 61 total (page size 60).
+        Product::factory()->count(60)->create();
+
+        $response = $this->get(route('admin.pos'));
+
+        $response->assertStatus(200);
+        $this->assertSame(60, substr_count($response->getContent(), 'data-product-id='));
+        $response->assertDontSee('id="loadMoreProducts"', false); // no button: scrolling loads more
+        $response->assertSee('data-has-more="1"', false);
+        $response->assertViewHas('has_more', true);
+    }
+
+    public function test_pos_index_marks_grid_as_fully_loaded_when_everything_fits_on_one_page()
+    {
+        $response = $this->get(route('admin.pos'));
+
+        $response->assertStatus(200);
+        $response->assertViewHas('has_more', false);
+        $response->assertDontSee('id="loadMoreProducts"', false);
+        $response->assertSee('data-has-more="0"', false);
+    }
+
+    public function test_pos_products_endpoint_filters_by_name_and_code()
+    {
+        Product::factory()->create(['name' => 'Kapasitor Filter Special']);
+
+        $response = $this->getJson(route('admin.pos.products', ['q' => 'Kapasitor']));
+
+        $response->assertStatus(200)->assertJsonPath('success', true);
+        $products = $response->json('products');
+        $this->assertNotEmpty($products);
+        foreach ($products as $product) {
+            $haystack = strtolower($product['name'].' '.($product['code'] ?? ''));
+            $this->assertStringContainsString('kapasitor', $haystack);
+        }
+        $this->assertArrayHasKey('is_placeholder', $products[0]);
+        $this->assertArrayHasKey('image', $products[0]);
+        $this->assertArrayHasKey('main_warehouse_stock', $products[0]);
+    }
+
+    public function test_pos_products_endpoint_paginates_with_has_more()
+    {
+        Product::factory()->count(65)->create(); // + 1 from setUp = 66
+
+        $first = $this->getJson(route('admin.pos.products'));
+        $first->assertStatus(200);
+        $this->assertCount(60, $first->json('products'));
+        $this->assertTrue($first->json('has_more'));
+
+        $second = $this->getJson(route('admin.pos.products', ['offset' => 60]));
+        $second->assertStatus(200);
+        $this->assertCount(6, $second->json('products'));
+        $this->assertFalse($second->json('has_more'));
+    }
+
+    public function test_pos_products_endpoint_rejects_negative_offsets()
+    {
+        $this->getJson(route('admin.pos.products', ['offset' => -1]))
+            ->assertStatus(422);
+    }
 }

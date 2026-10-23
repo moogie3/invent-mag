@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Facades\DB;
 
 class Product extends Model
@@ -22,6 +23,7 @@ class Product extends Model
         'name',
         'description',
         'image',
+        'cover_url',
         'price',
         'selling_price',
         'category_id',
@@ -29,6 +31,7 @@ class Product extends Model
         'units_id',
         'has_expiry',
         'low_stock_threshold',
+        'parent_id',
     ];
 
     protected $guarded = [
@@ -55,6 +58,22 @@ class Product extends Model
     public function productWarehouses()
     {
         return $this->hasMany(ProductWarehouse::class);
+    }
+
+    /**
+     * Family anchor (variant #1 keeps the parent Shopee SKU as its code).
+     */
+    public function parent(): BelongsTo
+    {
+        return $this->belongsTo(Product::class, 'parent_id');
+    }
+
+    /**
+     * Sibling variants created by a Shopee split (excludes the anchor itself).
+     */
+    public function variants(): HasMany
+    {
+        return $this->hasMany(Product::class, 'parent_id');
     }
 
     public function getTotalStockAttribute()
@@ -213,9 +232,11 @@ class Product extends Model
     protected function image(): Attribute
     {
         return Attribute::make(
+            // Local cache wins; remote-first Shopee cover shows while the
+            // background download has not cached the file yet.
             get: fn ($value) => $value
-                ? asset("storage/image/{$value}") // Convert filename to full URL
-                : asset('img/default_placeholder.png'), // Default image if no image exists
+                ? asset("storage/image/{$value}")
+                : ($this->cover_url ?: asset('img/default_placeholder.png')),
         );
     }
 
@@ -353,8 +374,6 @@ class Product extends Model
 
     /**
      * Get low stock count per warehouse
-     *
-     * @return array
      */
     public static function lowStockCountPerWarehouse(): array
     {

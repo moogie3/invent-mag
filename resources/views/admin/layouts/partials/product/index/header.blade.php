@@ -44,6 +44,14 @@
                         </li>
                     </ul>
                 </div>
+                @can('import-products')
+                    @planHas('shopee_import')
+                        <button class="btn btn-shopee d-none d-sm-inline-block" type="button"
+                            data-bs-toggle="modal" data-bs-target="#shopeeImportModal">
+                            <i class="ti ti-file-import me-2"></i> {{ __('messages.import_shopee') }}
+                        </button>
+                    @endplanHas
+                @endcan
                 <a href="{{ route('admin.product.create') }}" class="btn btn-primary d-none d-sm-inline-block">
                     <i class="ti ti-plus fs-4"></i>
                     {{ __('messages.create_new_product') }}

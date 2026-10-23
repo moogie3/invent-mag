@@ -10,6 +10,7 @@ import { initPaymentApi } from "./partials/pos/payment/api.js";
 import { populatePaymentModal } from "./partials/pos/payment/modal.js";
 import { initQuickCreateCustomer } from "./partials/pos/quickCreate/customer.js";
 import { initQuickCreateProduct } from "./partials/pos/quickCreate/product.js";
+import { initCatalogSearch } from "./partials/pos/catalog/search.js";
 import { onPageLoad } from "./utils/onPageLoad.js";
 
 onPageLoad(function () {
@@ -21,11 +22,13 @@ onPageLoad(function () {
             const processPaymentBtn = document.getElementById("processPaymentBtn");
             const barcodeInput = document.getElementById("barcodeScannerInput");
             const searchInput = document.getElementById("searchProduct");
+            const catalogScroller = document.querySelector(".pos-catalog-scroll");
             const hasExpiryCheckbox = document.getElementById("has_expiry");
             
             if (processPaymentBtn) delete processPaymentBtn.dataset.handlerAttached;
             if (barcodeInput) delete barcodeInput.dataset.handlerAttached;
             if (searchInput) delete searchInput.dataset.handlerAttached;
+            if (catalogScroller) delete catalogScroller.dataset.handlerAttached;
             if (hasExpiryCheckbox) delete hasExpiryCheckbox.dataset.handlerAttached;
         });
     }
@@ -57,6 +60,7 @@ onPageLoad(function () {
     initPaymentApi();
     initQuickCreateCustomer();
     initQuickCreateProduct();
+    initCatalogSearch();
 
     const processPaymentBtn = document.getElementById("processPaymentBtn");
     if (processPaymentBtn && !processPaymentBtn.dataset.handlerAttached) {
@@ -109,29 +113,6 @@ onPageLoad(function () {
                         });
                 }
             }
-        });
-    }
-
-    const searchInput = document.getElementById("searchProduct");
-    const productGrid = document.getElementById("productGrid");
-
-    if (searchInput && productGrid && !searchInput.dataset.handlerAttached) {
-        searchInput.dataset.handlerAttached = 'true';
-        searchInput.addEventListener("input", function () {
-            const searchText = this.value.toLowerCase().trim();
-            const productCards = productGrid.querySelectorAll(".col-md-4");
-
-            productCards.forEach((card) => {
-                const productNameElement = card.querySelector(".card-title");
-                if (productNameElement) {
-                    const productName = productNameElement.textContent
-                        .toLowerCase()
-                        .trim();
-                    card.style.display = productName.includes(searchText)
-                        ? ""
-                        : "none";
-                }
-            });
         });
     }
 

@@ -20,7 +20,7 @@ class ProductService
 {
     public function getPaginatedProducts(int $entries, array $filters = [])
     {
-        $query = Product::with(['category', 'supplier', 'unit']);
+        $query = Product::with(['category', 'supplier', 'unit', 'parent:id,code'])->withCount('variants');
 
         // Eager load product_warehouses to prevent N+1 in stock calculations
         $query->with('productWarehouses');

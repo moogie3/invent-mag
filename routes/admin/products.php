@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Admin\ProductController;
+use App\Http\Controllers\Admin\ProductShopeeImportController;
 use App\Http\Controllers\Admin\ProductStockController;
 
 // Product Routes
@@ -48,6 +49,14 @@ Route::prefix('product')->group(function () {
     Route::post('/bulk-export', [ProductController::class, 'bulkExport'])
         ->name('product.bulk-export')
         ->middleware('can:view-products');
+
+    Route::get('/shopee-import/progress', [ProductShopeeImportController::class, 'progress'])
+        ->name('product.shopee-import.progress')
+        ->middleware('can:import-products', 'plan.feature:shopee_import');
+
+    Route::post('/shopee-import', [ProductShopeeImportController::class, 'store'])
+        ->name('product.shopee-import')
+        ->middleware('can:import-products', 'plan.feature:shopee_import');
 
     Route::post('/bulk-update-stock', [ProductController::class, 'bulkUpdateStock'])
         ->name('product.bulk-update-stock')

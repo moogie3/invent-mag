@@ -3187,6 +3187,13 @@ The `ProductService` handles core catalog and stock management.
 - **Main Warehouse**: Ensures exactly one warehouse has `is_main = true`. Changing it uses a transaction to unset all others before setting the new one.
 - **Stock Validation**: Most transactional systems (POS) default to the `main` warehouse if not specified.
 
+### Shopee Import (XLSX)
+Enterprise-gated bulk catalog sync (`ShopeeImportService`, permission `import-products`).
+- **Matching**: Rows match on `products.code` = Shopee *SKU Induk*. Files validate with `extensions:xlsx` (filename-based — xlsx is a ZIP container, so MIME sniffing falsely rejects genuine exports).
+- **Variation splitting**: Families with multiple Shopee variations are split into one sellable product per variation — variant 1 keeps the parent code as the family anchor, the rest link via `products.parent_id` and show a "Variant of" badge — preserving each variation's exact price and stock (no more summed stock).
+- **Stock**: Written as an absolute quantity to the **main warehouse only** (`Warehouse.is_main`); other warehouses are never touched, and the stock update is skipped (summary `stock_skipped`) when no main warehouse exists.
+- **Cover images**: Queued `DownloadShopeeCoverImages` jobs (15 covers per batch) download Shopee CDN covers. Already-stored covers fast-path without any HTTP request; failed batches fail the job so the queue retries (`$tries = 3`, backoff 10s/30s) and finally land in `failed_jobs`. The import modal shows a live progress bar for both the row-import phase and the image-download phase.
+
 ### POS Service (Sales Flow)
 The POS is tightly integrated with the `AccountingService` and localized tax logic.
 - **Stock Validation**: `validateStockBeforeSale` verifies the requested quantities against the specific warehouse (usually main). Throws exceptions listing the specific products short on stock.

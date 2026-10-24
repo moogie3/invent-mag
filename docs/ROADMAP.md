@@ -1836,6 +1836,8 @@ Tax double-submissions to DJP are a legal problem. Protection at 5 levels:
 - Rows match `products.code` = *SKU Induk*; multi-variation families split into one sellable product per variation (`products.parent_id` + "Variant of" badge) with per-variation price/stock
 - **Stock posts to the MAIN warehouse only** (absolute quantity; other warehouses untouched; skipped when no main warehouse exists)
 - Cover images download via queued `DownloadShopeeCoverImages` jobs (unchanged covers skipped, failed batches retried) with a live progress bar in the modal
+- **Auto-categorized**: `ShopeeCategoryResolver` files each product into the 35-category SKU taxonomy (tier 1 SKU prefix/alias → tier 2 EN/ID name keywords → tier 3 Shopee leaf → tier 4 MISC) from `config/shopee_categories.php`; legacy "Shopee Import" rows re-filed via `php artisan categories:backfill-shopee` (`--dry-run` / `--tenant=`), which the deploy workflow runs after migrations
+- Imported products get `low_stock_threshold = 10` so they don't need a manual threshold
 - Shipped with its own guide in the tutorial (`shopee_import` step)
 
 **Still deferred:** listing sync (create/update Shopee listings from Invent-MAG) and TikTok integration — the current feature is catalog *import* only.

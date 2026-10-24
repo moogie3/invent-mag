@@ -72,7 +72,7 @@ function buildProductCol(product, grid) {
     title.textContent = product.name;
 
     const price = document.createElement("p");
-    price.className = "card-text fs-4 mb-1";
+    price.className = "card-text fs-4 mb-1 text-nowrap";
     price.textContent = formatCurrency(product.selling_price);
 
     const stock = product.main_warehouse_stock ?? 0;

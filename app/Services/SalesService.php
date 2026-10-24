@@ -137,7 +137,7 @@ class SalesService
     public function getSalesCreateData()
     {
         $customers = Customer::select('id', 'name', 'email', 'phone_number', 'payment_terms')->get();
-        $mainWarehouse = \App\Models\Warehouse::where('is_main', true)->first();
+        $mainWarehouse = Warehouse::where('is_main', true)->first();
         $products = Product::select('id', 'name', 'code', 'selling_price')
             ->with(['productWarehouses' => function ($query) use ($mainWarehouse) {
                 if ($mainWarehouse) {

@@ -47,6 +47,33 @@ class ProductControllerTest extends TestCase
     }
 
     #[Test]
+    public function the_product_actions_dropdown_shows_datasheet_links_only_for_semiconductors()
+    {
+        $trsCategory = Categories::create(['name' => 'TRS', 'description' => 'Transistor']);
+        $capCategory = Categories::create(['name' => 'CAP', 'description' => 'Capacitor']);
+
+        Product::factory()->create([
+            'name' => 'Transistor TIP122 Darlington',
+            'category_id' => $trsCategory->id,
+        ]);
+        Product::factory()->create([
+            'name' => 'Kapasitor Elco 470uf TIP122',
+            'category_id' => $capCategory->id,
+        ]);
+
+        $response = $this->actingAs($this->user)->get(route('admin.product'));
+        $response->assertStatus(200);
+
+        // The semiconductor row links to alldatasheet; the capacitor row — even
+        // though its name contains the same part number — must not.
+        $this->assertSame(
+            1,
+            substr_count($response->getContent(), 'alldatasheet.com/view.jsp?Searchword=TIP122')
+        );
+        $response->assertSee('Datasheet');
+    }
+
+    #[Test]
     public function a_user_can_view_the_product_create_page()
     {
         $this->actingAs($this->user)

@@ -3,6 +3,7 @@
 return [
     // MAIN MENU
     'dashboard' => 'Dasbor',
+    'datasheet' => 'Datasheet',
     'pos' => 'POS',
     'sales' => 'Penjualan',
     'sales_returns' => 'Retur Penjualan',

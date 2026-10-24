@@ -97,6 +97,10 @@ jobs:
             # Run database migrations
             # --force is needed in production to bypass confirmation prompt
             docker-compose exec -T app php artisan migrate --force
+
+            # Re-file legacy "Shopee Import" products into the SKU taxonomy
+            # (idempotent: prints "Nothing to do" once no legacy rows remain)
+            docker-compose exec -T app php artisan categories:backfill-shopee
             
             # Clear and recache configuration, routes, and views for performance
             docker-compose exec -T app php artisan optimize:clear

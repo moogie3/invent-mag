@@ -116,4 +116,50 @@ class ProductHelperTest extends TestCase
         $this->assertEquals(['badge bg-red text-white', 'Low Stock'], ProductHelper::getStockClassAndText(20, 25));
         $this->assertEquals(['badge bg-green text-white', 'In Stock'], ProductHelper::getStockClassAndText(30, 25));
     }
+
+    #[Test]
+    #[Group('helpers')]
+    #[Group('product-helper')]
+    public function it_builds_a_datasheet_url_from_the_part_number_in_the_name()
+    {
+        $this->assertSame(
+            'https://www.alldatasheet.com/view.jsp?Searchword=TIP122',
+            ProductHelper::datasheetUrl('Transistor TIP122 Darlington', 'TRS')
+        );
+        $this->assertSame(
+            'https://www.alldatasheet.com/view.jsp?Searchword=TDA4510',
+            ProductHelper::datasheetUrl('IC TDA4510 TV Jungle', 'Integrated Circuit (IC)')
+        );
+        $this->assertSame(
+            'https://www.alldatasheet.com/view.jsp?Searchword=2N3055',
+            ProductHelper::datasheetUrl('Transistor 2N3055 Power', 'TR')
+        );
+        $this->assertSame(
+            'https://www.alldatasheet.com/view.jsp?Searchword=1N4007',
+            ProductHelper::datasheetUrl('Dioda Rectifier 1N4007', 'DIO')
+        );
+        $this->assertSame(
+            'https://www.alldatasheet.com/view.jsp?Searchword=IRF540N',
+            ProductHelper::datasheetUrl('MOSFET IRF540N N-Channel', 'MOS')
+        );
+    }
+
+    #[Test]
+    #[Group('helpers')]
+    #[Group('product-helper')]
+    public function it_returns_no_datasheet_url_outside_semiconductor_categories()
+    {
+        $this->assertNull(ProductHelper::datasheetUrl('Kapasitor Elco 470uf TIP122', 'CAP'));
+        $this->assertNull(ProductHelper::datasheetUrl('Flyback Samsung FBT', 'FLY'));
+        $this->assertNull(ProductHelper::datasheetUrl('Transistor TIP122', null));
+    }
+
+    #[Test]
+    #[Group('helpers')]
+    #[Group('product-helper')]
+    public function it_returns_no_datasheet_url_when_the_name_has_no_part_number()
+    {
+        $this->assertNull(ProductHelper::datasheetUrl('Transistor NPN Power Analog', 'TRS'));
+        $this->assertNull(ProductHelper::datasheetUrl('', 'IC'));
+    }
 }

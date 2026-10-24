@@ -269,8 +269,7 @@ class Product extends Model
             ->where('products.tenant_id', $tenantId)
             ->where('product_warehouse.warehouse_id', $mainWarehouseId)
             ->where('product_warehouse.quantity', '>=', 0)
-            ->whereNotNull('products.low_stock_threshold')
-            ->whereRaw('products.low_stock_threshold >= product_warehouse.quantity')
+            ->whereRaw('COALESCE(products.low_stock_threshold, ?) >= product_warehouse.quantity', [self::DEFAULT_LOW_STOCK_THRESHOLD])
             ->select('product_warehouse.*')
             ->get();
 
@@ -297,8 +296,7 @@ class Product extends Model
             ->where('product_warehouse.tenant_id', $tenantId)
             ->where('products.tenant_id', $tenantId)
             ->where('product_warehouse.quantity', '>=', 0)
-            ->whereNotNull('products.low_stock_threshold')
-            ->whereRaw('products.low_stock_threshold >= product_warehouse.quantity')
+            ->whereRaw('COALESCE(products.low_stock_threshold, ?) >= product_warehouse.quantity', [self::DEFAULT_LOW_STOCK_THRESHOLD])
             ->select('product_warehouse.*')
             ->get();
 
@@ -328,8 +326,7 @@ class Product extends Model
             ->where('products.tenant_id', $tenantId)
             ->where('product_warehouse.warehouse_id', $mainWarehouseId)
             ->where('product_warehouse.quantity', '>=', 0)
-            ->whereNotNull('products.low_stock_threshold')
-            ->whereRaw('products.low_stock_threshold >= product_warehouse.quantity')
+            ->whereRaw('COALESCE(products.low_stock_threshold, ?) >= product_warehouse.quantity', [self::DEFAULT_LOW_STOCK_THRESHOLD])
             ->count();
     }
 
@@ -349,8 +346,7 @@ class Product extends Model
             ->where('products.tenant_id', $tenantId)
             ->where('product_warehouse.warehouse_id', $warehouseId)
             ->where('product_warehouse.quantity', '>=', 0)
-            ->whereNotNull('products.low_stock_threshold')
-            ->whereRaw('products.low_stock_threshold >= product_warehouse.quantity')
+            ->whereRaw('COALESCE(products.low_stock_threshold, ?) >= product_warehouse.quantity', [self::DEFAULT_LOW_STOCK_THRESHOLD])
             ->count();
     }
 
@@ -366,8 +362,7 @@ class Product extends Model
             ->where('product_warehouse.tenant_id', $tenantId)
             ->where('products.tenant_id', $tenantId)
             ->where('product_warehouse.quantity', '>=', 0)
-            ->whereNotNull('products.low_stock_threshold')
-            ->whereRaw('products.low_stock_threshold >= product_warehouse.quantity')
+            ->whereRaw('COALESCE(products.low_stock_threshold, ?) >= product_warehouse.quantity', [self::DEFAULT_LOW_STOCK_THRESHOLD])
             ->distinct('product_warehouse.product_id')
             ->count('product_warehouse.product_id');
     }
@@ -384,8 +379,7 @@ class Product extends Model
             ->where('product_warehouse.tenant_id', $tenantId)
             ->where('products.tenant_id', $tenantId)
             ->where('product_warehouse.quantity', '>=', 0)
-            ->whereNotNull('products.low_stock_threshold')
-            ->whereRaw('products.low_stock_threshold >= product_warehouse.quantity')
+            ->whereRaw('COALESCE(products.low_stock_threshold, ?) >= product_warehouse.quantity', [self::DEFAULT_LOW_STOCK_THRESHOLD])
             ->select('warehouses.id', 'warehouses.name', DB::raw('count(*) as low_stock_count'))
             ->groupBy('warehouses.id', 'warehouses.name')
             ->get()

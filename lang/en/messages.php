@@ -3,6 +3,7 @@
 return [
     // MAIN MENU
     'dashboard' => 'Dashboard',
+    'datasheet' => 'Datasheet',
     'pos' => 'POS',
     'sales' => 'Sales',
     'sales_returns' => 'Sales Returns',

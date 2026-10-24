@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Tenant;
-use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 class TenantLookupController extends Controller

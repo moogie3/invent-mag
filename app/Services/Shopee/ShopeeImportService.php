@@ -4,7 +4,6 @@ namespace App\Services\Shopee;
 
 use App\Jobs\DownloadShopeeCoverImages;
 use App\Models\ActivityLog;
-use App\Models\Categories;
 use App\Models\Product;
 use App\Models\ProductWarehouse;
 use App\Models\Supplier;
@@ -39,6 +38,7 @@ class ShopeeImportService
         private readonly ShopeeXlsxParser $parser,
         private readonly PlanService $planService,
         private readonly ActivityLogService $activityLogService,
+        private readonly ShopeeCategoryResolver $categoryResolver,
     ) {}
 
     /**
@@ -359,6 +359,10 @@ class ShopeeImportService
             $data['name'] = $name;
         }
 
+        if ($product->low_stock_threshold === null) {
+            $data['low_stock_threshold'] = Product::DEFAULT_LOW_STOCK_THRESHOLD;
+        }
+
         if ($family['description'] !== '' && $family['description'] !== $product->description) {
             $data['description'] = $family['description'];
         }
@@ -428,11 +432,14 @@ class ShopeeImportService
             'description' => $family['description'],
             'price' => 0,
             'selling_price' => round($price, 2),
-            'category_id' => $this->resolveCategoryId($family['category_path']),
+            'category_id' => $this->categoryResolver->resolve($code, $name, (string) $family['category_path'])->id,
             'units_id' => $unit->id,
             'supplier_id' => $supplier->id,
             'parent_id' => $parentId,
             'cover_url' => trim((string) ($family['cover_url'] ?? '')) ?: null,
+            // Never NULL: imported products must count as low stock at the
+            // default threshold (same 10 as everywhere else in the UI).
+            'low_stock_threshold' => Product::DEFAULT_LOW_STOCK_THRESHOLD,
         ];
 
         $gtin = trim((string) ($variant['gtin'] ?? ''));
@@ -477,37 +484,6 @@ class ShopeeImportService
         if ((float) $stockRecord->quantity !== (float) $quantity) {
             $stockRecord->update(['quantity' => $quantity]);
         }
-    }
-
-    /**
-     * Resolve a local category from the Shopee category path ("101798 - Home & Living/.../Pliers").
-     * Falls back to a reusable "Shopee Import" category. Never overwrites existing mappings.
-     */
-    private function resolveCategoryId(string $categoryPath): int
-    {
-        $leaf = $categoryPath;
-        if (str_contains($leaf, '/')) {
-            $parts = explode('/', $leaf);
-            $leaf = trim((string) end($parts));
-        }
-        // Strip "12345 - " prefix when present
-        if (preg_match('/^\d+\s*-\s*(.+)$/', $leaf, $m)) {
-            $leaf = trim($m[1]);
-        }
-
-        if ($leaf !== '') {
-            $match = Categories::where('name', $leaf)->first();
-            if ($match) {
-                return $match->id;
-            }
-        }
-
-        $fallback = Categories::firstOrCreate(
-            ['name' => 'Shopee Import'],
-            ['description' => 'Auto-created for products imported from Shopee XLSX files']
-        );
-
-        return $fallback->id;
     }
 
     /**

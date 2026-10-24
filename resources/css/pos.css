@@ -31,14 +31,11 @@
     overscroll-behavior: contain;
 }
 
-/* 3-line clamp with ellipsis + stable height so long Shopee names don't get
-   hard-cut mid-letter and card rows stay aligned. */
+/* Full product names on POS cards: variant info lives at the END of long
+   Shopee names ("... Ohm - 150 Ohm"), so clamping would hide exactly what a
+   cashier needs to tell variants apart. min-height keeps short-name cards
+   aligned with their row. */
 .product-card-title {
-    display: -webkit-box;
-    -webkit-line-clamp: 3;
-    line-clamp: 3;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
     min-height: 3.6em;
 }
 

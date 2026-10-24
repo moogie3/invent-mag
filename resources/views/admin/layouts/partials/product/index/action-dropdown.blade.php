@@ -7,6 +7,12 @@
             data-bs-target="#viewProductModal" class="dropdown-item">
             <i class="ti ti-zoom-scan me-2"></i> {{ __('messages.view') }}
         </a>
+        @php($datasheetUrl = \App\Helpers\ProductHelper::datasheetUrl($product->name, $product->category?->name))
+        @if ($datasheetUrl)
+            <a href="{{ $datasheetUrl }}" target="_blank" rel="noopener noreferrer" class="dropdown-item">
+                <i class="ti ti-file-analytics me-2"></i> {{ __('messages.datasheet') }}
+            </a>
+        @endif
         <a href="{{ route('admin.product.edit', $product->id) }}" class="dropdown-item">
             <i class="ti ti-edit me-2"></i> {{ __('messages.edit') }}
         </a>

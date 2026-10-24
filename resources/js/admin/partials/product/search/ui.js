@@ -2,6 +2,7 @@ import { originalProductData } from './state.js';
 import { initBulkSelection, restoreCheckboxStates, updateBulkActionsBarVisibility, getSelectedProductIds } from '../bulkActions/selection.js';
 import { formatCurrency } from '../../../../utils/currencyFormatter.js';
 import { escapeHtml } from '../../../../utils/sanitize.js';
+import { datasheetUrl } from '../utils/datasheet.js';
 
 export function renderSearchResults(products) {
     const tableBody = document.querySelector("table tbody");
@@ -22,6 +23,7 @@ export function renderSearchResults(products) {
             const isLowStock =
                 product.stock_quantity <= (product.low_stock_threshold || 10);
             const isSelected = selectedProductIds.has(product.id.toString());
+            const datasheet = datasheetUrl(product.name, product.category?.name);
 
             return `
             <tr data-id="${product.id}">
@@ -67,6 +69,13 @@ export function renderSearchResults(products) {
                                data-bs-toggle="modal" data-bs-target="#viewProductModal" class="dropdown-item">
                                 <i class="ti ti-zoom-scan me-2"></i> View
                             </a>
+                            ${
+                                datasheet
+                                    ? `<a href="${datasheet}" target="_blank" rel="noopener noreferrer" class="dropdown-item">
+                                <i class="ti ti-file-analytics me-2"></i> Datasheet
+                            </a>`
+                                    : ""
+                            }
                             <a href="/admin/product/edit/${
                                 product.id
                             }" class="dropdown-item">

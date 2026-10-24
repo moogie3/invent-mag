@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Helpers\ProductHelper;
 use App\Models\POItem;
+use App\Models\Product;
 use App\Models\ProductWarehouse;
 use App\Models\Purchase;
 use App\Models\Sales;
@@ -122,7 +123,7 @@ class NotificationService
             ->where('product_warehouse.quantity', '>', 0)
             ->whereHas('product', function ($query) use ($tenantId) {
                 $query->where('tenant_id', $tenantId)
-                    ->whereRaw('products.low_stock_threshold >= product_warehouse.quantity');
+                    ->whereRaw('COALESCE(products.low_stock_threshold, ?) >= product_warehouse.quantity', [Product::DEFAULT_LOW_STOCK_THRESHOLD]);
             })
             ->get()
             ->map(function ($pw) {

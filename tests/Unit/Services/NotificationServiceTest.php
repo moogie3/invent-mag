@@ -109,4 +109,18 @@ class NotificationServiceTest extends TestCase
         $this->assertEquals(4, $counts['lowStockCount']);
         $this->assertEquals(9, $counts['total']);
     }
+
+    #[Test]
+    public function it_includes_null_threshold_products_in_low_stock_notifications()
+    {
+        $product = Product::factory()->withStock(5)->create(['low_stock_threshold' => null]);
+
+        $notifications = $this->notificationService->getDueNotifications();
+
+        $this->assertCount(1, $notifications);
+        $this->assertSame('Low Stock Alert: '.$product->name, $notifications->first()['title']);
+
+        $counts = $this->notificationService->getNotificationCounts();
+        $this->assertSame(1, $counts['lowStockCount']);
+    }
 }

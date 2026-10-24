@@ -147,6 +147,73 @@ class ProductShopeeImportTest extends TestCase
     }
 
     #[Test]
+    public function it_stores_the_default_low_stock_threshold_on_create()
+    {
+        $basic = $this->makeXlsx('basic_info', self::BASIC_HEADERS, [
+            ['57907016203', 'IC-0001', 'IC Tester Baru', 'Deskripsi', ''],
+        ]);
+        $sales = $this->makeXlsx('sales_info', self::SALES_HEADERS, [
+            ['57907016203', 'IC Tester Baru', '3', '', 'IC-0001', '', '15000', '', '20'],
+        ]);
+
+        $summary = $this->runImport(['basic' => $basic, 'sales' => $sales]);
+
+        $this->assertSame(1, $summary['created']);
+
+        $product = Product::where('code', 'IC-0001')->firstOrFail();
+        $this->assertSame(Product::DEFAULT_LOW_STOCK_THRESHOLD, (int) $product->low_stock_threshold);
+    }
+
+    #[Test]
+    public function it_fills_a_null_threshold_on_update_but_keeps_a_custom_value()
+    {
+        $withNull = Product::factory()->create(['code' => 'TL-0001', 'low_stock_threshold' => null]);
+        $withCustom = Product::factory()->create(['code' => 'TL-0002', 'low_stock_threshold' => 7]);
+
+        $basic = $this->makeXlsx('basic_info', self::BASIC_HEADERS, [
+            ['57907016201', 'TL-0001', 'Produk Satu', 'Deskripsi', ''],
+            ['57907016202', 'TL-0002', 'Produk Dua', 'Deskripsi', ''],
+        ]);
+        $sales = $this->makeXlsx('sales_info', self::SALES_HEADERS, [
+            ['57907016201', 'Produk Satu', '1', '', 'TL-0001', '', '10000', '', '5'],
+            ['57907016202', 'Produk Dua', '2', '', 'TL-0002', '', '10000', '', '5'],
+        ]);
+
+        $summary = $this->runImport(['basic' => $basic, 'sales' => $sales]);
+
+        $this->assertSame(2, $summary['updated']);
+        $this->assertSame(0, $summary['created']);
+        $this->assertSame(Product::DEFAULT_LOW_STOCK_THRESHOLD, (int) $withNull->fresh()->low_stock_threshold);
+        $this->assertSame(7, (int) $withCustom->fresh()->low_stock_threshold);
+    }
+
+    #[Test]
+    public function it_files_imported_products_into_the_sku_guide_categories()
+    {
+        $basic = $this->makeXlsx('basic_info', self::BASIC_HEADERS, [
+            ['57907016210', 'TRS-0001', 'Transistor 2N3055', 'Deskripsi', ''],
+            ['57907016211', '57907016211', 'Kapasitor Elco 470uf 25v', 'Deskripsi', ''],
+        ]);
+        $sales = $this->makeXlsx('sales_info', self::SALES_HEADERS, [
+            ['57907016210', 'Transistor 2N3055', '1', '', 'TRS-0001', '', '12000', '', '10'],
+            ['57907016211', 'Kapasitor Elco 470uf 25v', '2', '', '57907016211', '', '8000', '', '10'],
+        ]);
+
+        $summary = $this->runImport(['basic' => $basic, 'sales' => $sales]);
+        $this->assertSame(2, $summary['created']);
+
+        $bySku = Product::where('code', 'TRS-0001')->firstOrFail();
+        $this->assertSame('TRS', $bySku->category->name);
+        $this->assertSame('Transistor', $bySku->category->description);
+
+        $byName = Product::where('code', '57907016211')->firstOrFail();
+        $this->assertSame('CAP', $byName->category->name);
+        $this->assertSame('Capacitor', $byName->category->description);
+
+        $this->assertDatabaseMissing('categories', ['name' => 'Shopee Import']);
+    }
+
+    #[Test]
     public function it_creates_missing_products()
     {
         $basic = $this->makeXlsx('basic_info', self::BASIC_HEADERS, [

@@ -38,7 +38,7 @@ export function renderList() {
             if (item) {
                 const quantityInput = item.querySelector(".quantity-input");
                 const priceInput = item.querySelector(".price-input");
-                const totalElement = item.querySelector("strong");
+                const totalElement = item.querySelector(".cart-item-total");
 
                 if (quantityInput) quantityInput.value = product.quantity;
                 if (priceInput) priceInput.value = product.price;
@@ -84,7 +84,7 @@ export function renderList() {
                     "ms-2"
                 );
                 actionsSection.innerHTML = `
-                <strong>${formatCurrency(product.total)}</strong>
+                <strong class="cart-item-total text-nowrap">${formatCurrency(product.total)}</strong>
                 <div class="btn-group" style="gap: 0.25rem;">
                     <button class="btn btn-outline-success increase-product" data-index="${index}" title="Increase" style="padding: 0.4rem 0.6rem; font-size: 0.85rem;">
                         <i class="ti ti-plus"></i>

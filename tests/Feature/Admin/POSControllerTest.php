@@ -360,6 +360,7 @@ class POSControllerTest extends TestCase
         $this->assertSame(60, substr_count($response->getContent(), 'data-product-id='));
         $response->assertDontSee('id="loadMoreProducts"', false); // no button: scrolling loads more
         $response->assertSee('data-has-more="1"', false);
+        $response->assertSee('container-fluid'); // POS uses full width, not container-xl
         $response->assertViewHas('has_more', true);
     }
 

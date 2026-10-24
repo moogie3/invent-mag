@@ -49,6 +49,9 @@ jobs:
     - name: Run Tests
       run: php artisan test
 
+    - name: Run JS Tests
+      run: npx vitest run
+
     - name: Prepare Artifact
       run: |
         mkdir -p build-artifact

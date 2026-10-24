@@ -260,4 +260,17 @@ class DashboardServiceTest extends TestCase
         $this->assertEquals($expectedData, $chartData['data']);
         $this->assertEquals($expectedFormattedData, $chartData['formatted']);
     }
+
+    #[Test]
+    public function it_counts_null_threshold_products_as_low_stock()
+    {
+        $product = Product::factory()->withStock(5)->create(['low_stock_threshold' => null]);
+
+        $data = $this->dashboardService->getDashboardData();
+
+        $this->assertSame(1, $data['lowStockCount']);
+        $this->assertTrue(
+            $data['lowStockProducts']->contains(fn ($pw) => $pw->product_id === $product->id)
+        );
+    }
 }

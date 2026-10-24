@@ -749,7 +749,7 @@ For issues and suggestions, please submit a GitHub issue.
 
 ## 📜 License
 
-Invent-MAG is licensed under the **MIT License**. See the `LICENSE` file for details.
+Invent-MAG is licensed under the **Apache-2.0 License**. See the `LICENSE` file for details.
 
 ---
 

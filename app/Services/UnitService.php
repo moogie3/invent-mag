@@ -2,13 +2,21 @@
 
 namespace App\Services;
 
+
+use App\Services\Concerns\BuildsListSearch;
 use App\Models\Unit;
 
 class UnitService
 {
-    public function getUnitIndexData(int $entries)
+    use BuildsListSearch;
+    public function getUnitIndexData(array $filters, int $entries)
     {
-        $units = Unit::paginate($entries);
+        $query = Unit::query();
+
+        // Whole-catalog search — the paginator's COUNT(*) shares this WHERE.
+        $this->applyListSearch($query, $filters, ['units.name', 'units.symbol']);
+
+        $units = $query->paginate($entries);
         $totalunit = Unit::count();
 
         return compact('units', 'entries', 'totalunit');

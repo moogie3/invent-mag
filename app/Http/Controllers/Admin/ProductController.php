@@ -31,7 +31,14 @@ class ProductController extends Controller
         try {
             $entries = $request->input('entries', 10);
 
-            $filters = $request->only(['warehouse_id']);
+            $filters = $request->only(['warehouse_id', 'search']);
+
+            if (isset($filters['search'])) {
+                $filters['search'] = trim((string) $filters['search']);
+                if ($filters['search'] === '') {
+                    unset($filters['search']);
+                }
+            }
 
             // Check if warehouse_id was explicitly provided in request
             $warehouseIdProvided = $request->has('warehouse_id');
@@ -55,7 +62,6 @@ class ProductController extends Controller
             $formData = $this->productService->getProductFormData();
 
             $lowStockProducts = Product::getLowStockProducts();
-            $lowStockProductsPerWarehouse = Product::getLowStockProductsPerWarehouse();
             $expiringSoonProducts = $this->productService->getExpiringSoonPOItems();
 
             // Get selected warehouse if warehouse_id is provided AND not empty
@@ -68,7 +74,7 @@ class ProductController extends Controller
             // This shows overall low stock status regardless of filter
             $lowStockCount = Product::lowStockCountAllWarehouses();
 
-            return view('admin.product.index', compact('totalcategory', 'products', 'entries', 'totalproduct', 'lowStockCount', 'lowStockProducts', 'lowStockProductsPerWarehouse', 'expiringSoonCount', 'expiringSoonProducts', 'selectedWarehouse') + $formData);
+            return view('admin.product.index', compact('totalcategory', 'products', 'entries', 'totalproduct', 'lowStockCount', 'lowStockProducts', 'expiringSoonCount', 'expiringSoonProducts', 'selectedWarehouse') + $formData);
         } catch (\Exception $e) {
             Log::error('Failed to load products index: '.$e->getMessage(), ['exception' => $e]);
 
@@ -80,9 +86,8 @@ class ProductController extends Controller
     {
         try {
             $formData = $this->productService->getProductFormData();
-            $lowStockProductsPerWarehouse = Product::getLowStockProductsPerWarehouse();
 
-            return view('admin.product.product-create', $formData + compact('lowStockProductsPerWarehouse'));
+            return view('admin.product.product-create', $formData);
         } catch (\Exception $e) {
             Log::error('Failed to load product create form: '.$e->getMessage(), ['exception' => $e]);
 
@@ -144,9 +149,8 @@ class ProductController extends Controller
         $warehouses = Warehouse::all();
         $mainWarehouse = Warehouse::where('is_main', true)->first();
         $lowStockProducts = Product::getLowStockProducts();
-        $lowStockProductsPerWarehouse = Product::getLowStockProductsPerWarehouse();
 
-        return view('admin.product.product-edit', compact('lowStockProducts', 'lowStockProductsPerWarehouse', 'products', 'categories', 'units', 'suppliers', 'warehouses', 'mainWarehouse'));
+        return view('admin.product.product-edit', compact('lowStockProducts', 'products', 'categories', 'units', 'suppliers', 'warehouses', 'mainWarehouse'));
     }
 
     public function store(Request $request)
@@ -542,6 +546,35 @@ class ProductController extends Controller
                 'success' => false,
                 'message' => 'Error fetching expiring products.',
                 'error_details' => config('app.debug') ? $e->getMessage() : 'Internal server error',
+            ], 500);
+        }
+    }
+
+    /**
+     * Low-stock rows for the low-stock modal, fetched when the modal opens.
+     * Rendering these hundreds of rows into every product page made the
+     * index/create/edit views ~1.1MB and took seconds per load.
+     */
+    public function lowStockPerWarehouse()
+    {
+        try {
+            $items = Product::getLowStockProductsPerWarehouse()
+                ->map(fn ($pw) => [
+                    'id' => $pw->product?->id,
+                    'name' => $pw->product?->name,
+                    'warehouse' => $pw->warehouse?->name,
+                    'quantity' => $pw->quantity,
+                    'threshold' => $pw->product?->low_stock_threshold ?? Product::DEFAULT_LOW_STOCK_THRESHOLD,
+                ])
+                ->values();
+
+            return response()->json($items);
+        } catch (\Exception $e) {
+            Log::error('Failed to load low stock products: '.$e->getMessage(), ['exception' => $e]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Error fetching low stock products.',
             ], 500);
         }
     }

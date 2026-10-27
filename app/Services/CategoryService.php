@@ -2,15 +2,23 @@
 
 namespace App\Services;
 
+
+use App\Services\Concerns\BuildsListSearch;
 use App\Models\Categories;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
 
 class CategoryService
 {
-    public function getCategoryIndexData(int $entries)
+    use BuildsListSearch;
+    public function getCategoryIndexData(array $filters, int $entries)
     {
-        $categories = Categories::paginate($entries);
+        $query = Categories::query();
+
+        // Whole-catalog search — the paginator's COUNT(*) shares this WHERE.
+        $this->applyListSearch($query, $filters, ['categories.name', 'categories.description']);
+
+        $categories = $query->paginate($entries);
         $totalcategory = Categories::count();
 
         return compact('categories', 'entries', 'totalcategory');

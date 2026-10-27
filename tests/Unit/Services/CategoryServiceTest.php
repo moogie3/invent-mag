@@ -36,7 +36,7 @@ class CategoryServiceTest extends TestCase
         Categories::factory()->count(5)->create();
 
         $entries = 3;
-        $result = $this->categoryService->getCategoryIndexData($entries);
+        $result = $this->categoryService->getCategoryIndexData([], $entries);
 
         $this->assertArrayHasKey('categories', $result);
         $this->assertArrayHasKey('entries', $result);

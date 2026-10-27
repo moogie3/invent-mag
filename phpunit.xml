@@ -11,6 +11,7 @@
          beStrictAboutChangesToGlobalState="false"
          beStrictAboutOutputDuringTests="false"
          enforceTimeLimit="true"
+         defaultTimeLimit="30"
          timeoutForSmallTests="30"
          timeoutForMediumTests="60"
          timeoutForLargeTests="600"

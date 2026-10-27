@@ -12,15 +12,23 @@
                         </div>
                         <div class="col text-truncate">
                             <a href="{{ $item['route'] }}" class="text-reset d-block text-decoration-none">
-                                <div class="d-flex justify-content-between align-items-center mb-1">
-                                    <span class="fw-bold fs-3">{{ $item['title'] }}</span>
-                                    <span class="badge bg-red-lt py-1 px-2">
+                                {{-- The title is a nowrap flex item: without
+                                     text-truncate its automatic min-size is
+                                     the FULL string width, so a long product
+                                     name shoves the badge past the column's
+                                     overflow clip and the badge vanishes.
+                                     Truncate the text, pin the badge. Same
+                                     for the meta row: description ellipsizes,
+                                     threshold never gets pushed out. --}}
+                                <div class="d-flex justify-content-between align-items-center gap-2 mb-1">
+                                    <span class="fw-bold fs-3 text-truncate">{{ $item['title'] }}</span>
+                                    <span class="badge bg-red-lt py-1 px-2 flex-shrink-0">
                                         {{ $item['status_text'] }}
                                     </span>
                                 </div>
                                 <div class="text-secondary d-flex align-items-center gap-3 mt-1">
-                                    <span><i class="ti ti-box me-1"></i> {{ $item['description'] }}</span>
-                                    <span><i class="ti ti-settings me-1"></i> {{ __('messages.threshold') }}: <strong>{{ $item['threshold'] }}</strong></span>
+                                    <span class="text-truncate"><i class="ti ti-box me-1"></i> {{ $item['description'] }}</span>
+                                    <span class="flex-shrink-0"><i class="ti ti-settings me-1"></i> {{ __('messages.threshold') }}: <strong>{{ $item['threshold'] }}</strong></span>
                                 </div>
                             </a>
                         </div>

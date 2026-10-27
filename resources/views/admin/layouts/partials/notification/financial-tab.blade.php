@@ -11,9 +11,11 @@
                         </div>
                         <div class="col text-truncate">
                             <a href="{{ $item['route'] }}" class="text-reset d-block text-decoration-none">
-                                <div class="d-flex justify-content-between align-items-center mb-1">
-                                    <span class="fw-bold fs-3">{{ ucfirst($item['type']) }} - {{ $item['label'] }}</span>
-                                    <span class="badge {{ str_replace('text-', 'bg-', $item['status_badge']) }}-lt py-1 px-2">
+                                {{-- Same shrink rule as the low-stock tab:
+                                     truncate the label, pin the badge. --}}
+                                <div class="d-flex justify-content-between align-items-center gap-2 mb-1">
+                                    <span class="fw-bold fs-3 text-truncate">{{ ucfirst($item['type']) }} - {{ $item['label'] }}</span>
+                                    <span class="badge {{ str_replace('text-', 'bg-', $item['status_badge']) }}-lt py-1 px-2 flex-shrink-0">
                                         {{ $item['status_text'] }}
                                     </span>
                                 </div>

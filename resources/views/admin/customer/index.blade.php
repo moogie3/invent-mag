@@ -93,13 +93,13 @@
                                                 <div class="w-100">
                                                     {{ __('messages.search_label') }}
                                                     <div class="ms-2 d-inline-block">
-                                                        <input type="text" id="searchInput" class="form-control form-control-sm">
+                                                        <input type="text" id="searchInput" class="form-control form-control-sm" value="{{ request('search', '') }}" autocomplete="off" data-server-search="1">
                                                     </div>
                                                     <div class="text-end mt-2">
                                                         {{ __('messages.warehouse_search_show') }}
                                                         <div class="mx-1 mt-2 d-inline-block">
                                                             <select name="entries" id="entriesSelect"
-                                                                data-onchange="window.location.href='?entries=' + this.value;">
+                                                                data-onchange="(() => { const u = new URL(window.location.href); u.searchParams.set('entries', this.value); u.searchParams.delete('page'); window.location.href = u.toString(); })();">
                                                                 <option value="10" {{ $entries == 10 ? 'selected' : '' }}>10
                                                                 </option>
                                                                 <option value="25" {{ $entries == 25 ? 'selected' : '' }}>25
@@ -165,7 +165,7 @@
                                                     <td class="sort-address">{{ $customer->address }}</td>
                                                     <td class="sort-phonenumber">{{ $customer->phone_number }}</td>
                                                     <td class="sort-paymentterms">{{ $customer->payment_terms }}</td>
-                                                    <td class="sort-credits">
+                                                    <td class="sort-credits" data-amount="{{ $customerCredits[$customer->id] ?? 0 }}">
                                                         @if(isset($customerCredits[$customer->id]) && $customerCredits[$customer->id] > 0)
                                                             <span class="badge bg-success text-white">{{ \App\Helpers\CurrencyHelper::format($customerCredits[$customer->id]) }}</span>
                                                         @else
@@ -232,7 +232,7 @@
                             </div>
 
                             {{-- PAGINATION --}}
-                            <div class="card-footer d-flex align-items-center">
+                            <div data-pagination-footer class="card-footer d-flex align-items-center">
                                 <p class="m-0 text-secondary">
                                     {{ __('messages.pagination_showing_entries', [
                                         'first' => $customers->firstItem(),

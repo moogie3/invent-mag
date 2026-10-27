@@ -11,8 +11,11 @@
                         </div>
                         <div class="col text-truncate">
                             <a href="{{ $item['route'] }}" class="text-reset d-block text-decoration-none">
-                                <div class="d-flex justify-content-between align-items-center mb-1">
-                                    <span class="fw-bold fs-3">{{ $item['title'] }}</span>
+                                {{-- Truncate here too: the nowrap title would
+                                     otherwise hard-clip mid-word at the
+                                     column edge instead of ellipsizing. --}}
+                                <div class="d-flex justify-content-between align-items-center gap-2 mb-1">
+                                    <span class="fw-bold fs-3 text-truncate">{{ $item['title'] }}</span>
                                 </div>
                                 <div class="text-secondary d-flex flex-wrap gap-3 mt-1">
                                     <span><i class="ti ti-calendar me-1"></i> {{ $item['description'] }}</span>

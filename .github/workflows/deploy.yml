@@ -21,10 +21,21 @@ env:
 
 jobs:
   # ==============================================================================
-  # Job 1: Build and Push Docker Image
+  # Job 1: Test Suite — the gate
+  # Purpose: Nothing is built and nothing is shipped until both the PHP and JS
+  # suites are green. This reuses ci.yml verbatim, so a push and a release can
+  # never be judged by different commands.
+  # ==============================================================================
+  test:
+    name: Test suite (PHP + JS)
+    uses: ./.github/workflows/ci.yml
+
+  # ==============================================================================
+  # Job 2: Build and Push Docker Image
   # Purpose: Build the Docker image from the Dockerfile and push it to the registry.
   # ==============================================================================
   build-and-push-image:
+    needs: test # Dependency: never build an image from a red suite
     runs-on: ubuntu-latest
     permissions:
       contents: read # Read access to the repository
@@ -65,13 +76,13 @@ jobs:
           file: Dockerfile 
 
   # ==============================================================================
-  # Job 2: Deploy to Server
+  # Job 3: Deploy to Server
   # Purpose: Connect to the production server and update the running application.
-  # This runs ONLY if the build-and-push-image job succeeds.
+  # Runs ONLY when the suite is green and the image was built from that same run.
   # ==============================================================================
   deploy-to-server:
     runs-on: ubuntu-latest
-    needs: build-and-push-image # Dependency: Wait for build job
+    needs: [test, build-and-push-image] # Dependency: green suite + image built from it
     if: success() 
     
     steps:

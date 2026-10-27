@@ -1,0 +1,189 @@
+/*
+ * The single motion scale for the whole app.
+ *
+ * Durations used to be picked per file: hover, loaders and reveals ran at
+ * 0.1 / 0.15 / 0.2 / 0.25 / 0.3 / 0.35 / 0.4 / 0.5 / 0.6 depending on where the
+ * rule happened to live - menu-sidebar.css alone used five of them - so nothing
+ * ever lined up with anything else. Every duration now resolves to one of these
+ * three steps; what animates and its easing are untouched.
+ *
+ * This file is @import-ed by app.css (admin + superadmin) and by auth.css, which
+ * is a standalone entry - the login page never loads app.css, so defining these
+ * only in :root of app.css would leave login resolving an undefined variable and
+ * silently dropping its transitions.
+ *
+ * Not applied to infinite decorative loops (the notification pulse and wave),
+ * which are not part of a responsiveness scale.
+ */
+:root {
+    --anim-fast: 0.15s; /* feedback: hover, press, focus */
+    --anim-base: 0.2s; /* default transitions, dropdowns, badges */
+    --anim-slow: 0.3s; /* entrances and reveals: panels, rows, loaders */
+}
+
+/*
+ * Frosted cool-gray dark palette
+ * ==============================
+ *
+ * Tabler ships its own dark tokens with a blue cast --tblr-body-bg: #151f2c,
+ * --tblr-bg-surface: #182433, --tblr-active-bg: #1b293a -- so every surface in
+ * dark mode sat on blue wallpaper: the blue primary, blue links and blue focus
+ * rings had nothing to push against, and status colours next to them read
+ * skewed (red looked magenta, green looked cyan).
+ *
+ * These re-declare ONLY the neutral surfaces, at :root[data-bs-theme="dark"]
+ * (specificity 0,2,0 beats Tabler's [data-bs-theme=dark] at 0,1,0), using the
+ * same single rule the rest of the app's dark chrome already follows:
+ *
+ *     keep the relative luminance, drop the cast:
+ *         new = (x, x+2, x+4) where x = round(L - 1.72)
+ *         because L of (x, x+2, x+4) === x + 1.719
+ *
+ * So each surface keeps exactly the lightness it had - every layer boundary,
+ * border and elevation still reads identically - and only the hue changes from
+ * blue-cast to a whisper of cool, the dark twin of light mode's #f6f8fb.
+ *
+ * A token is skipped when either of these says it carries meaning rather than
+ * being wallpaper:
+ *   - its name names a hue  (primary-/success-/info-/warning-/danger-/... and
+ *     the brand-* family), so the -lt and -bg-subtle tints keep their colour
+ *   - it isn't a desaturated blue surface (whites, text, status colours)
+ *
+ * That is why --tblr-primary-lt stays #16293f while --tblr-bg-surface does not:
+ * blue stays where it means something and stops being the background.
+ *
+ * Frosted is a look, not a backdrop-filter: translucency, a soft white edge and
+ * a lift give the glass. Blur stays on fixed chrome (navbar, sidebar, modal,
+ * dropdowns) where it already was, because one blur pass per card would cost
+ * frames on a 1,169-row table.
+ */
+
+:root[data-bs-theme="dark"] {
+    --tblr-active-bg: #26282a;
+    --tblr-bg-forms: #1c1e20;
+    --tblr-bg-surface: #212325;
+    --tblr-bg-surface-dark: #1c1e20;
+    --tblr-bg-surface-secondary: #26282a;
+    --tblr-bg-surface-tertiary: #1c1e20;
+    --tblr-body-bg: #1c1e20;
+    --tblr-body-bg-rgb: 28, 30, 32;
+    --tblr-btn-color: #1c1e20;
+    --tblr-code-bg: #2a2c2e;
+    --tblr-dark-bg-subtle: #101214;
+    --tblr-dark-border-subtle: #212325;
+    --tblr-dark-lt: #212325;
+    --tblr-dark-lt-rgb: 33, 35, 37;
+    --tblr-light-bg-subtle: #212325;
+    --tblr-light-border-subtle: #454749;
+    --tblr-light-lt: #37393b;
+    --tblr-light-lt-rgb: 55, 57, 59;
+    /* Tabler's dark --tblr-muted (#3a4859, luminance-matched to #454749) sits
+       at 1.7:1 on the body, and its .text-muted rule reads a SECOND token,
+       --tblr-muted-rgb, which Tabler never re-declares for dark at all - so
+       muted text rendered in the light-theme 102,115,130 (3.3:1, 15 elements
+       on the dashboard alone). Both tokens are lifted together to the same
+       neutral that clears 4.5:1 on body #1c1e20 AND card #212325 (4.8/4.6). */
+    --tblr-muted: #8a8c8e;
+    --tblr-muted-rgb: 138, 140, 142;
+    --tblr-muted-lt: #292b2d;
+    --tblr-muted-lt-rgb: 41, 43, 45;
+    --tblr-secondary-bg: #212325;
+    --tblr-secondary-bg-rgb: 33, 35, 37;
+    --tblr-secondary-border-subtle: #424446;
+    --tblr-secondary-lt: #292b2d;
+    --tblr-secondary-lt-rgb: 41, 43, 45;
+    /* Tabler re-declares only --tblr-secondary-fg for dark and leaves the base
+       pair alone, so everything that reads --tblr-secondary/-rgb as TEXT kept
+       the light-theme #667382 (3.06-3.46:1): table <th>, badge counts
+       (--tblr-badge-color), nav-link labels, breadcrumb/pagination/toast/alert
+       text - 32 elements on the dashboard alone. A canary repaint of these two
+       tokens turned every one of them magenta, confirming them as the source.
+       Consumers split cleanly: text/nav usages need the lift (#a8b0b8 clears
+       6.8-7.6:1 on every dark rung), while btn fills pair with -fg, so all
+       three flip together - light fill, dark text (7.6:1) - instead of the
+       light fill inheriting the old near-white -fg (1.9:1). */
+    --tblr-secondary: #a8b0b8;
+    --tblr-secondary-rgb: 168, 176, 184;
+    --tblr-secondary-fg: #1c1e20;
+    --tblr-tertiary-bg: #141618;
+    --tblr-tertiary-bg-rgb: 20, 22, 24;
+    --tblr-dark-mode-border-color-translucent: rgba(103, 105, 107, 0.14);
+    --tblr-border-color: #2a2c2e;
+    --tblr-border-color-active: #3d3f41;
+    --tblr-border-dark-color: #2a2c2e;
+    --tblr-dark-mode-border-color: #2a2c2e;
+    --tblr-dark-mode-border-color-active: #3d3f41;
+    --tblr-dark-mode-border-dark-color: #2a2c2e;
+
+    /*
+     * Frosted elevation - luminance is height
+     * =======================================
+     *
+     * Neutralizing the cast kept every surface at its old lightness, which made
+     * two adjacent layers (body #1c1e20, card #212325) almost identical: with no
+     * hue difference left to draw the seam, and the light-theme card shadow
+     * (rgba(0,0,0,.075)) being invisible on a dark page, cards melted into the
+     * background and every container read as one flat sheet.
+     *
+     * So dark mode separates by HEIGHT instead of by hue:
+     *   - --frz-edge*  a white hairline. On a dark surface white at 6% is a
+     *                   highlight, which is exactly how frosted glass catches
+     *                   light - the brighter the edge, the further forward the
+     *                   layer sits (6% cards, 11% things that float).
+     *   - --frz-shadow-* black lift. A dark page cannot show a light-theme
+     *                   shadow, so shadows get deeper as the layer rises.
+     *   - --frz-surface-* one rung per layer: body #1c1e20 -> card #212325 ->
+     *                   dropdown #26282a -> modal #2b2d2f. Each surface stays
+     *                   neutral (cast <= 4, same as the palette above) so the
+     *                   ladder reads as depth, not as a second colour.
+     *
+     * Component rules that spend these tokens live in app.css (dark elevation).
+     */
+    --frz-edge: rgba(255, 255, 255, 0.06);
+    --frz-edge-strong: rgba(255, 255, 255, 0.11);
+    --frz-surface-1: #212325;
+    --frz-surface-2: #26282a;
+    --frz-surface-3: #2b2d2f;
+    --frz-shadow-1: 0 1px 2px rgba(0, 0, 0, 0.45), 0 4px 14px rgba(0, 0, 0, 0.3);
+    --frz-shadow-2: 0 8px 20px rgba(0, 0, 0, 0.45), 0 20px 48px rgba(0, 0, 0, 0.32);
+    --frz-shadow-3: 0 16px 40px rgba(0, 0, 0, 0.5), 0 40px 80px rgba(0, 0, 0, 0.38);
+}
+
+/* Light elevation - ink instead of light
+   ======================================
+   The dark ladder above exists because shadows vanish on a black page.
+   Light mode failed the other way round: Tabler ships cards with
+   .border-0, so containers had no edge at all, and its default shadow
+   (0 2px 4px rgba(0,0,0,.075)) never escapes the card's own footprint on
+   a #f6f8fb body, so surfaces stayed paper-thin. The navbar's 1px #dadfe5
+   line sat ~3 luminance units from its background, which is why it read
+   as "no line" rather than as a line. (Two stylesheet bugs made it worse:
+   settings.css spent --tblr-border-color-rgb and pos-receipt.css spent
+   --tblr-border-color-light - neither token has ever existed, so those
+   shorthands were invalid at computed-value time and drew NO border.)
+
+   So light mode carries depth with ink and spread instead of with light:
+   --lt-edge*     hairlines in the navy this light theme already uses for
+                  its translucent borders (4,32,69): .16 for a container
+                  edge, .10 for dividers inside a surface.
+   --lt-shadow-*  two rungs per surface. On white a shadow reads by REACH,
+                  not by darkness - a wide low-alpha falloff is visible
+                  where a tight 4px one is not. surface = resting card,
+                  surface-hover = the rung it rises to, bar/bar-scrolled =
+                  the navbar's two heights (light's twin of frz-shadow-1/2).
+
+   Consumers: app.css (.card edge + lift + hover), navbar.css (light bar
+   and its hairline), settings.css, pos.css, pos-receipt.css - the receipt
+   page loads no app.css, so it spends the tokens itself. */
+:root {
+    --lt-edge: rgba(4, 32, 69, 0.16);
+    --lt-edge-soft: rgba(4, 32, 69, 0.1);
+    --lt-shadow-surface: 0 1px 2px rgba(16, 24, 40, 0.06),
+        0 6px 16px rgba(16, 24, 40, 0.1);
+    --lt-shadow-surface-hover: 0 2px 4px rgba(16, 24, 40, 0.08),
+        0 10px 26px rgba(16, 24, 40, 0.15);
+    --lt-shadow-bar: 0 1px 2px rgba(16, 24, 40, 0.06),
+        0 6px 16px rgba(16, 24, 40, 0.1);
+    --lt-shadow-bar-scrolled: 0 2px 4px rgba(16, 24, 40, 0.08),
+        0 14px 34px rgba(16, 24, 40, 0.16);
+}

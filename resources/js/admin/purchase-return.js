@@ -95,31 +95,22 @@ onPageLoad(function () {
         }
     } else if (pathname.includes("/admin/por")) {
         initBulkSelection();
-        
-        // Initialize search functionality for POR index page
-        const searchInput = document.getElementById("searchInput");
-        if (searchInput) {
-            searchInput.addEventListener("keyup", function () {
-                const searchTerm = searchInput.value.toLowerCase().trim();
-                const tableRows = document.querySelectorAll("#invoiceTableBody tr");
-                
-                tableRows.forEach((row) => {
-                    // Skip empty state rows
-                    if (row.querySelector('.empty-state') || row.querySelector('.empty')) {
-                        return;
-                    }
-                    
-                    // Get all text content from the row including nested elements
-                    const rowText = row.innerText.toLowerCase();
-                    const searchText = searchTerm;
-                    
-                    // Check if any text in the row includes the search term
-                    if (rowText.includes(searchText)) {
-                        row.style.display = "";
-                    } else {
-                        row.style.display = "none";
-                    }
-                });
+        // Row visibility on this page is owned by the shared server-side
+        // search module (partials/sorting/serverSearch.js), which pages opt
+        // into with data-server-search on #searchInput. The client-side
+        // filter that used to live here only ever saw the rows of the
+        // current page, so it silently hid matches on other pages - and
+        // left active it would fight the server for control of the same
+        // rows after a swap.
+        //
+        // Re-bind bulk selection after each server-side swap. Attached to
+        // the table container rather than `document` so this hook is
+        // scoped to this page and dies with it on navigation.
+        const purchaseReturnTable = document.getElementById("invoiceTableContainer");
+        if (purchaseReturnTable && !purchaseReturnTable.dataset.bulkRebindAttached) {
+            purchaseReturnTable.dataset.bulkRebindAttached = "true";
+            purchaseReturnTable.addEventListener("listsearch:updated", () => {
+                initBulkSelection();
             });
         }
     }

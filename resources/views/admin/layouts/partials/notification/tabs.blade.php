@@ -81,15 +81,15 @@
     }
 
     [data-bs-theme="dark"] .nav-pills {
-        background-color: #1e293b !important;
+        background-color: #1c1e20 !important;
         border-color: rgba(255, 255, 255, 0.08) !important;
     }
     [data-bs-theme="dark"] .nav-pills .nav-link {
-        color: #94a3b8;
+        color: #a8b0b8;
     }
     [data-bs-theme="dark"] .nav-pills .nav-link:hover:not(.active) {
         background-color: rgba(255, 255, 255, 0.05);
-        color: #e2e8f0;
+        color: #f1f3f5;
     }
     [data-bs-theme="dark"] .nav-pills .nav-link.active {
         background-color: rgba(32, 107, 196, 0.15);

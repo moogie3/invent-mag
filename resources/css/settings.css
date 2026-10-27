@@ -1,7 +1,15 @@
+/* Light/dark elevation for the settings stack.
+   The separators below spent --tblr-border-color-rgb, a token Tabler has
+   never defined: a var() referencing an undefined token is invalid at
+   computed-value time, so the whole shorthand reset (border-style: none)
+   and the section rules drew NO line in either theme - the dark overrides
+   spent the same missing var. Re-homed on tokens.css instead: the light
+   hairlines are --lt-edge* (visible on a white surface), the dark ones
+   --frz-edge (light ink is invisible on a dark card). */
 .settings-section {
     position: relative;
     padding: 1.5rem 0;
-    border-bottom: 1px solid rgba(var(--tblr-border-color-rgb), 0.1);
+    border-bottom: 1px solid var(--lt-edge-soft);
 }
 
 .settings-section:last-child {
@@ -51,7 +59,7 @@
     padding: 1.25rem;
     background: rgba(var(--tblr-light-rgb), 0.3);
     border-radius: 8px;
-    border: 1px solid rgba(var(--tblr-border-color-rgb), 0.08);
+    border: 1px solid var(--lt-edge);
     position: relative;
 }
 
@@ -73,11 +81,11 @@
 
 [data-bs-theme="dark"] .settings-section-content {
     background: rgba(var(--tblr-dark-rgb), 0.2);
-    border-color: rgba(var(--tblr-border-color-rgb), 0.15);
+    border-color: var(--frz-edge);
 }
 
 [data-bs-theme="dark"] .settings-section {
-    border-bottom-color: rgba(var(--tblr-border-color-rgb), 0.15);
+    border-bottom-color: var(--frz-edge);
 }
 
 [data-bs-theme="dark"] .settings-icon-wrapper {
@@ -89,12 +97,12 @@
 .settings-section:hover .settings-icon-wrapper {
     background: rgba(var(--tblr-primary-rgb), 0.15);
     border-color: rgba(var(--tblr-primary-rgb), 0.25);
-    transition: all 0.2s ease;
+    transition: all var(--anim-base) ease;
 }
 
 .settings-section:hover .settings-section-content {
     border-color: rgba(var(--tblr-primary-rgb), 0.15);
-    transition: all 0.2s ease;
+    transition: all var(--anim-base) ease;
 }
 
 /* Responsive adjustments */
@@ -115,15 +123,15 @@
 
 /* Animation for smooth transitions */
 .settings-section {
-    transition: all 0.3s ease;
+    transition: all var(--anim-slow) ease;
 }
 
 .settings-icon-wrapper {
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: all var(--anim-slow) cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .settings-section-content {
-    transition: all 0.3s ease;
+    transition: all var(--anim-slow) ease;
 }
 
 #navbar-options-wrapper.disabled {

@@ -26,6 +26,17 @@ class Warehouse extends Model
     ];
 
     /**
+     * Product::getMainWarehouseId() memoizes which warehouse is the main one for
+     * the length of the request, and WarehouseService can switch it mid-request,
+     * so every write here drops that memo.
+     */
+    protected static function booted(): void
+    {
+        static::saved(fn () => Product::forgetMainWarehouseId());
+        static::deleted(fn () => Product::forgetMainWarehouseId());
+    }
+
+    /**
      * Scope a query to only include the main warehouse.
      *
      * @param  Builder  $query

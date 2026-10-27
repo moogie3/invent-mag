@@ -6,6 +6,7 @@ use App\Models\Tenant;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Hash;
+use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 
 class MultiTenancyTest extends TestCase
@@ -18,7 +19,7 @@ class MultiTenancyTest extends TestCase
         Tenant::forgetCurrent();
     }
 
-    /** @test */
+    #[Test]
     public function tenants_cannot_see_each_others_data(): void
     {
         // 1. Setup Tenant A
@@ -39,7 +40,7 @@ class MultiTenancyTest extends TestCase
         $this->assertNotNull(User::find($userB->id), 'Tenant B should find User B.');
     }
 
-    /** @test */
+    #[Test]
     public function cross_tenant_login_is_blocked()
     {
         // 1. Setup Tenant A with a user
@@ -70,7 +71,7 @@ class MultiTenancyTest extends TestCase
         $this->assertGuest();
     }
 
-    /** @test */
+    #[Test]
     public function correct_tenant_login_succeeds()
     {
         // 1. Setup Tenant A with a user

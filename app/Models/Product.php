@@ -76,8 +76,20 @@ class Product extends Model
         return $this->hasMany(Product::class, 'parent_id');
     }
 
+    /**
+     * Total stock across every warehouse.
+     *
+     * Reads the eager-loaded relation when one exists so a product list stays
+     * at one query for the whole page instead of one per row. Callers that
+     * narrow `productWarehouses` down to a single warehouse must not read this
+     * attribute — they only ever read main_warehouse_stock.
+     */
     public function getTotalStockAttribute()
     {
+        if ($this->relationLoaded('productWarehouses')) {
+            return (float) $this->productWarehouses->sum('quantity');
+        }
+
         return (float) $this->productWarehouses()->sum('quantity');
     }
 
@@ -86,11 +98,34 @@ class Product extends Model
         return $this->total_stock;
     }
 
+    private const MAIN_WAREHOUSE_ID = 'invent-mag.main-warehouse-id';
+
+    /**
+     * Resolved once per application instance — a request under FPM, a single
+     * test under PHPUnit — rather than once per product. Serializing a product
+     * list used to run this query for every row it held.
+     *
+     * The memo stores 0 for "no main warehouse" rather than null, because
+     * Container::bound() is isset()-based: a bound null reads as unbound and
+     * the query would run again on every call.
+     */
     public static function getMainWarehouseId()
     {
-        $mainWarehouse = Warehouse::where('is_main', true)->first();
+        if (! app()->bound(self::MAIN_WAREHOUSE_ID)) {
+            $mainWarehouse = Warehouse::where('is_main', true)->first();
 
-        return $mainWarehouse ? $mainWarehouse->id : null;
+            app()->instance(self::MAIN_WAREHOUSE_ID, $mainWarehouse ? $mainWarehouse->id : 0);
+        }
+
+        return app(self::MAIN_WAREHOUSE_ID) ?: null;
+    }
+
+    /**
+     * Drop the memo so a warehouse saved or deleted in this request is seen at once.
+     */
+    public static function forgetMainWarehouseId(): void
+    {
+        app()->forgetInstance(self::MAIN_WAREHOUSE_ID);
     }
 
     public function getMainWarehouseIdAttribute()
@@ -105,18 +140,14 @@ class Product extends Model
             return 0;
         }
 
-        $stockRecord = $this->productWarehouses()
-            ->where('warehouse_id', $mainWarehouseId)
-            ->first();
+        $stockRecord = $this->stockRecordFor($mainWarehouseId);
 
         return $stockRecord ? max(0, (float) $stockRecord->quantity) : 0;
     }
 
     public function getWarehouseStock($warehouseId)
     {
-        $stockRecord = $this->productWarehouses()
-            ->where('warehouse_id', $warehouseId)
-            ->first();
+        $stockRecord = $this->stockRecordFor($warehouseId);
 
         return $stockRecord ? max(0, (float) $stockRecord->quantity) : 0;
     }
@@ -124,6 +155,20 @@ class Product extends Model
     public function getMainWarehouse()
     {
         return Warehouse::where('is_main', true)->first();
+    }
+
+    /**
+     * One product's stock row, reusing the eager-loaded relation when there is
+     * one. Read paths only: deductStock() and addStock() still go to the
+     * database, because the row they mutate has to be the current one.
+     */
+    private function stockRecordFor($warehouseId): ?ProductWarehouse
+    {
+        if ($this->relationLoaded('productWarehouses')) {
+            return $this->productWarehouses->firstWhere('warehouse_id', $warehouseId);
+        }
+
+        return $this->productWarehouses()->where('warehouse_id', $warehouseId)->first();
     }
 
     public function getStockForWarehouse($warehouseId)

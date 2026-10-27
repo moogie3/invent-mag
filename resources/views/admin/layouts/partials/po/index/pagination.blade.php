@@ -1,4 +1,4 @@
-<div class="card-footer d-flex align-items-center">
+<div data-pagination-footer class="card-footer d-flex align-items-center">
     <p class="m-0 text-secondary">
         {{ __('messages.pagination_showing_entries', ['first' => $pos->firstItem(), 'last' => $pos->lastItem(), 'total' => $pos->total()]) }}
     </p>

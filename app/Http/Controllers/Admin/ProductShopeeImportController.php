@@ -83,9 +83,27 @@ class ProductShopeeImportController extends Controller
             ['phase' => 'idle', 'processed' => 0, 'total' => 0, 'updated_at' => null]
         );
 
+        // Live media counters for this import (total seeded by the import,
+        // done/failed incremented by each download batch). Null when the
+        // import queued no images or the counters already expired.
+        $media = null;
+        $userId = $request->user()?->id;
+        if ($userId !== null) {
+            $base = ShopeeImportService::mediaProgressCacheKey($userId, $token);
+            $total = Cache::get($base);
+            if (is_int($total)) {
+                $media = [
+                    'total' => $total,
+                    'done' => (int) Cache::get($base.'.done', 0),
+                    'failed' => (int) Cache::get($base.'.failed', 0),
+                ];
+            }
+        }
+
         return response()->json(array_merge($progress, [
             // Pending cover-download jobs, so the modal can show the image phase
             'queue_pending' => Queue::size(),
+            'media' => $media,
         ]));
     }
 }

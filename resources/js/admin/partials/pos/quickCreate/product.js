@@ -192,7 +192,7 @@ function addProductToGrid(product) {
     }
 
     setTimeout(() => {
-        productCol.style.transition = "background-color 1s ease";
+        productCol.style.transition = "background-color var(--anim-slow) ease";
         productCol.style.backgroundColor = "#e8f4ff";
 
         setTimeout(() => {

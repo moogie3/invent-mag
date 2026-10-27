@@ -212,9 +212,14 @@ function handleWarehouseDeleteSubmit(form) {
 
 function initWarehouseSearch() {
     const searchInput = document.getElementById('searchInput');
-    const entriesSelect = document.getElementById('entriesSelect');
-    
-    if (searchInput) {
+
+    // Row visibility on this page is owned by the shared server-side search
+    // module (partials/sorting/serverSearch.js), which pages opt into with
+    // data-server-search on #searchInput. The client-side filter below only
+    // ever saw the current page's rows, so it hid matches elsewhere in the
+    // catalog - and left active it would re-hide the rows the server had just
+    // swapped in.
+    if (searchInput && !searchInput.hasAttribute('data-server-search')) {
         searchInput.addEventListener('keyup', function() {
             const value = this.value.toLowerCase();
             const tableBody = document.querySelector('table tbody');
@@ -225,12 +230,13 @@ function initWarehouseSearch() {
             }
         });
     }
-    
-    if (entriesSelect) {
-        entriesSelect.addEventListener('change', function() {
-            window.location.href = '?entries=' + this.value;
-        });
-    }
+
+    // #entriesSelect deliberately has no listener here. Page size is handled
+    // declaratively by data-onchange on the element -- the convention every
+    // other list uses -- so a second listener fired the same navigation twice.
+    // Whichever path runs must rebuild the URL from window.location.href: the
+    // old `'?entries=' + value` started a fresh query string and silently
+    // dropped ?search= and every other active filter.
 }
 
 function setDeleteFormAction(action) {

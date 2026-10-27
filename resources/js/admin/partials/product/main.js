@@ -1,9 +1,10 @@
 import { initModals } from './modals/init.js';
 import { initProductModal, loadExpiringSoonProductsModal } from './modals/product.js'; // Import loadExpiringSoonProductsModal
-import { initBulkSelection, clearProductSelection } from './bulkActions/selection.js';
+import { initBulkSelection, clearProductSelection, restoreCheckboxStates, updateBulkActionsBarVisibility } from './bulkActions/selection.js';
 
 
-import { initializeEntriesSelector, initKeyboardShortcuts, initExport } from './events.js';
+import { initKeyboardShortcuts, initExport } from './events.js';
+import { escapeHtml } from '../../../utils/sanitize.js';
 import { bulkUpdateStock } from './bulkActions/stock.js'; // Import bulkUpdateStock
 import { bulkDeleteProducts } from './bulkActions/delete.js'; // Import bulkDeleteProducts
 import { getStockClassAndText } from './utils/ui.js';
@@ -12,9 +13,24 @@ export function initProductPage() {
         initModals();
         initProductModal();
         initBulkSelection();
-        initializeEntriesSelector();
         initKeyboardShortcuts();
         initExport();
+
+        // Product's table swap is driven by the shared module in
+        // partials/sorting/serverSearch.js (sorting.js). It re-initializes
+        // List.js itself and dispatches `listsearch:updated` on the table
+        // container, which is what this page listens for to rebuild its bulk
+        // selection. Attaching to the container (not `document`) keeps the
+        // hook scoped to this page and out of the way of every other list.
+        const bulkRebindTarget = document.getElementById("invoiceTableContainer");
+        if (bulkRebindTarget && !bulkRebindTarget.dataset.bulkRebindAttached) {
+            bulkRebindTarget.dataset.bulkRebindAttached = "true";
+            bulkRebindTarget.addEventListener("listsearch:updated", () => {
+                initBulkSelection();
+                restoreCheckboxStates();
+                updateBulkActionsBarVisibility();
+            });
+        }
 
         const expiringSoonModalElement = document.getElementById('expiringSoonModal');
         if (expiringSoonModalElement && !expiringSoonModalElement.dataset.handlerAttached) {
@@ -54,6 +70,74 @@ export function initProductPage() {
                                 </tr>
                             `;
                         }
+                    });
+            });
+        }
+
+        // Low-stock modal: fetch its rows on open instead of server-rendering
+        // the whole list into every product page (was ~1.1MB / seconds per load).
+        const lowStockModalElement = document.getElementById('lowStockModal');
+        if (lowStockModalElement && !lowStockModalElement.dataset.handlerAttached) {
+            lowStockModalElement.dataset.handlerAttached = 'true';
+            lowStockModalElement.addEventListener('show.bs.modal', function () {
+                const tbody = document.getElementById('lowStockModalBody');
+                if (!tbody) return;
+
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="5" class="text-center py-4">
+                            <div class="spinner-border text-primary" role="status"></div>
+                            <p class="mt-2 text-muted small mb-0">Loading...</p>
+                        </td>
+                    </tr>`;
+
+                fetch('/admin/product/low-stock')
+                    .then((response) => {
+                        if (!response.ok) {
+                            throw new Error('Network response was not ok');
+                        }
+                        return response.json();
+                    })
+                    .then((data) => {
+                        if (!Array.isArray(data) || data.length === 0) {
+                            tbody.innerHTML = `
+                                <tr>
+                                    <td colspan="5" class="text-center text-muted py-4">-</td>
+                                </tr>`;
+                            return;
+                        }
+
+                        tbody.innerHTML = data
+                            .map((item) => {
+                                return `
+                                    <tr>
+                                        <td>${escapeHtml(item.name ?? '')}</td>
+                                        <td class="text-center">
+                                            ${
+                                                item.warehouse
+                                                    ? `<span class="badge bg-primary-lt text-primary">${escapeHtml(item.warehouse)}</span>`
+                                                    : '<span class="text-muted">N/A</span>'
+                                            }
+                                        </td>
+                                        <td class="text-center">${item.quantity}</td>
+                                        <td class="text-center">${item.threshold ?? 10}</td>
+                                        <td class="text-end">
+                                            <a href="/admin/product/edit/${item.id}"
+                                               class="btn btn-icon btn-ghost-primary" title="Edit">
+                                                <i class="ti ti-edit"></i>
+                                            </a>
+                                        </td>
+                                    </tr>`;
+                            })
+                            .join('');
+                    })
+                    .catch(() => {
+                        tbody.innerHTML = `
+                            <tr>
+                                <td colspan="5" class="text-center text-danger py-4">
+                                    Error loading low stock products. Please try again.
+                                </td>
+                            </tr>`;
                     });
             });
         }

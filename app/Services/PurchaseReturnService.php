@@ -2,6 +2,8 @@
 
 namespace App\Services;
 
+
+use App\Services\Concerns\BuildsListSearch;
 use App\Helpers\CurrencyHelper;
 use App\Helpers\PurchaseHelper;
 use App\Models\Account;
@@ -20,6 +22,7 @@ use Illuminate\Support\Facades\DB;
 
 class PurchaseReturnService
 {
+    use BuildsListSearch;
     protected AccountingService $accountingService;
 
     public function __construct(AccountingService $accountingService)
@@ -73,6 +76,13 @@ class PurchaseReturnService
         if (isset($filters['year']) && $filters['year']) {
             $query->whereYear('return_date', $filters['year']);
         }
+
+        // Whole-catalog search across the return itself, the originating
+        // purchase and that purchase's supplier.
+        $this->applyListSearch($query, $filters, ['purchase_returns.reason', 'purchase_returns.status'], [
+            'purchase' => ['po.invoice'],
+            'purchase.supplier' => ['suppliers.name'],
+        ]);
 
         $returns = $query->paginate($entries);
 

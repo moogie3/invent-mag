@@ -2,6 +2,8 @@
 
 namespace App\Services;
 
+
+use App\Services\Concerns\BuildsListSearch;
 use App\Helpers\CurrencyHelper;
 use App\Models\Categories;
 use App\Models\POItem;
@@ -18,6 +20,7 @@ use Illuminate\Support\Str;
 
 class ProductService
 {
+    use BuildsListSearch;
     public function getPaginatedProducts(int $entries, array $filters = [])
     {
         $query = Product::with(['category', 'supplier', 'unit', 'parent:id,code'])->withCount('variants');
@@ -41,7 +44,16 @@ class ProductService
             });
         }
 
-        $paginator = $query->paginate($entries);
+        // Server-side search: matches the WHOLE catalog, not just the rows of
+        // the current page (the old client-side filter could only ever hide the
+        // 10/25/50 loaded rows). Same fields as bulkExportProducts so "export
+        // what I searched" always matches the listing. LIKE wildcards are
+        // escaped inside applyListSearch().
+        $this->applyListSearch($query, $filters, ['name', 'code', 'barcode']);
+
+        // Deterministic order — LIMIT/OFFSET pagination without ORDER BY can
+        // skip/duplicate rows across pages.
+        $paginator = $query->orderBy('products.name')->paginate($entries);
 
         // Remove expensive appends for the listing
         $paginator->getCollection()->each->setAppends([]);

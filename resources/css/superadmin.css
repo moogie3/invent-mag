@@ -24,7 +24,7 @@
     top: 0;
     display: flex;
     flex-direction: column;
-    transition: width 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    transition: width var(--anim-slow) cubic-bezier(0.25, 0.8, 0.25, 1);
     scrollbar-width: none;
     -ms-overflow-style: none;
 }
@@ -86,7 +86,7 @@
     color: #fff;
     white-space: nowrap;
     letter-spacing: -0.01em;
-    transition: all 0.3s ease;
+    transition: all var(--anim-slow) ease;
     opacity: 1;
     transform: translateX(0);
 }
@@ -138,7 +138,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: all 0.2s ease;
+    transition: all var(--anim-base) ease;
     transform: translateY(-50%);
     z-index: 10;
     opacity: 1;
@@ -164,7 +164,7 @@
 }
 
 [data-bs-theme="dark"] .sidebar-header {
-    background: linear-gradient(135deg, #1e3a8a 0%, #0f172a 100%);
+    background: linear-gradient(135deg, #1e3a8a 0%, #151719 100%);
     border-bottom-color: rgba(255, 255, 255, 0.07);
 }
 
@@ -173,7 +173,7 @@
     padding: 1rem 1.25rem;
     position: relative;
     flex-shrink: 0;
-    transition: padding 0.3s ease;
+    transition: padding var(--anim-slow) ease;
 }
 
 .sidebar.collapsed .sidebar-user {
@@ -220,7 +220,7 @@
     flex-direction: column;
     min-width: 0;
     flex: 1;
-    transition: all 0.3s ease;
+    transition: all var(--anim-slow) ease;
     opacity: 1;
     transform: translateX(0);
 }
@@ -287,7 +287,7 @@
     color: #94a3b8;
     padding: 0 0.625rem;
     white-space: nowrap;
-    transition: all 0.3s ease;
+    transition: all var(--anim-slow) ease;
     overflow: hidden;
 }
 
@@ -308,7 +308,7 @@
     font-weight: 500;
     font-size: 0.8125rem;
     border-radius: 8px;
-    transition: all 0.15s ease;
+    transition: all var(--anim-fast) ease;
     text-decoration: none;
     position: relative;
 }
@@ -342,7 +342,7 @@
     align-items: center;
     justify-content: center;
     flex-shrink: 0;
-    transition: all 0.3s ease;
+    transition: all var(--anim-slow) ease;
 }
 
 .nav-icon-badge {
@@ -353,7 +353,7 @@
     align-items: center;
     justify-content: center;
     flex-shrink: 0;
-    transition: all 0.15s ease;
+    transition: all var(--anim-fast) ease;
 }
 
 .nav-icon-badge i {
@@ -394,7 +394,7 @@
     flex: 1;
     white-space: nowrap;
     overflow: hidden;
-    transition: all 0.3s ease;
+    transition: all var(--anim-slow) ease;
     opacity: 1;
     transform: translateX(0);
 }
@@ -443,7 +443,7 @@
 }
 
 [data-bs-theme="dark"] .sidebar.collapsed .navbar-nav .nav-link:hover .nav-icon-badge {
-    background: #0f172a !important;
+    background: #151719 !important;
 }
 
 [data-bs-theme="dark"] .sidebar.collapsed .navbar-nav .nav-link:hover .nav-icon-badge i {
@@ -467,7 +467,7 @@
     opacity: 0;
     visibility: hidden;
     transform: translateX(-8px) scale(0.95);
-    transition: all 0.15s cubic-bezier(0.25, 0.8, 0.25, 1);
+    transition: all var(--anim-fast) cubic-bezier(0.25, 0.8, 0.25, 1);
     pointer-events: none;
 }
 
@@ -508,7 +508,7 @@
     min-height: 100vh;
     display: flex;
     flex-direction: column;
-    transition: margin-left 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    transition: margin-left var(--anim-slow) cubic-bezier(0.25, 0.8, 0.25, 1);
 }
 
 .main-content.sidebar-collapsed {
@@ -531,7 +531,7 @@
     border-radius: 8px;
     color: #64748b;
     text-decoration: none;
-    transition: all 0.15s ease;
+    transition: all var(--anim-fast) ease;
     font-size: 1.1rem;
 }
 
@@ -555,7 +555,7 @@
 
 /* ── Dark Mode Sidebar ── */
 [data-bs-theme="dark"] .sidebar {
-    background-color: #0f172a;
+    background-color: #151719;
     border-right-color: rgba(255, 255, 255, 0.07);
 }
 
@@ -573,7 +573,7 @@
 }
 
 [data-bs-theme="dark"] .nav-category-label {
-    color: #495057;
+    color: #4d4f51;
 }
 
 [data-bs-theme="dark"] .sidebar .navbar-nav .nav-link {
@@ -582,16 +582,16 @@
 
 [data-bs-theme="dark"] .sidebar .navbar-nav .nav-link:hover {
     background-color: #f8f9fa !important;
-    color: #343a40 !important;
+    color: #37393b !important;
 }
 [data-bs-theme="dark"] .sidebar .navbar-nav .nav-link:hover .nav-icon-badge i,
 [data-bs-theme="dark"] .sidebar .navbar-nav .nav-link.active .nav-icon-badge i {
-    color: #343a40 !important;
+    color: #37393b !important;
 }
 
 [data-bs-theme="dark"] .sidebar .navbar-nav .nav-link.active {
     background-color: #e9ecef !important;
-    color: #343a40 !important;
+    color: #37393b !important;
 }
 
 [data-bs-theme="dark"] .sidebar .navbar-nav .nav-link.active::before {
@@ -613,8 +613,8 @@
 [data-bs-theme="dark"] .nav-icon-teal i { color: #2dd4bf; }
 [data-bs-theme="dark"] .nav-icon-purple   { background: rgba(126,34,206,0.15); }
 [data-bs-theme="dark"] .nav-icon-purple i { color: #c084fc; }
-[data-bs-theme="dark"] .nav-icon-secondary   { background: rgba(100,116,139,0.15); }
-[data-bs-theme="dark"] .nav-icon-secondary i { color: #94a3b8; }
+[data-bs-theme="dark"] .nav-icon-secondary   { background: rgba(113, 115, 117,0.15); }
+[data-bs-theme="dark"] .nav-icon-secondary i { color: #a0a2a4; }
 [data-bs-theme="dark"] .nav-icon-yellow   { background: rgba(146,64,14,0.15); }
 [data-bs-theme="dark"] .nav-icon-yellow i { color: #fcd34d; }
 [data-bs-theme="dark"] .nav-icon-lime   { background: rgba(22,101,52,0.15); }
@@ -640,7 +640,7 @@
 
 /* ── Card & UI Depth Enhancements ── */
 .card {
-    transition: box-shadow 0.2s ease, transform 0.2s ease;
+    transition: box-shadow var(--anim-base) ease, transform var(--anim-base) ease;
 }
 
 .card-hover:hover {
@@ -673,7 +673,7 @@
     background: #ffffff;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03) !important;
     border: 1px solid rgba(226, 232, 240, 0.8) !important;
-    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    transition: all var(--anim-slow) cubic-bezier(0.25, 0.8, 0.25, 1);
 }
 
 .sa-dashboard-card:hover {
@@ -699,11 +699,11 @@
     transform: translateX(4px);
 }
 .sa-card-link .ti-arrow-right {
-    transition: transform 0.2s ease;
+    transition: transform var(--anim-base) ease;
 }
 
 [data-bs-theme="dark"] .sa-dashboard-card {
-    background: #1e293b;
+    background: #26282a;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2) !important;
     border-color: rgba(255, 255, 255, 0.05) !important;
 }
@@ -714,7 +714,7 @@
 }
 
 [data-bs-theme="dark"] .sa-card-title {
-    color: #94a3b8;
+    color: #a0a2a4;
 }
 
 [data-bs-theme="dark"] .sa-card-value {

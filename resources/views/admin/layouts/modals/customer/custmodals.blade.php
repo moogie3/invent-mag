@@ -34,7 +34,7 @@
     </div>
 </div>
 
-<div class="modal fade" id="createCustomerModal" tabindex="-1" aria-labelledby="createCustomerModalLabel"
+<div class="modal modal-blur fade" id="createCustomerModal" tabindex="-1" aria-labelledby="createCustomerModalLabel"
     aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content border-0 shadow-lg rounded-3">
@@ -117,7 +117,7 @@
     </div>
 </div>
 
-<div class="modal fade" id="editCustomerModal" tabindex="-1" aria-labelledby="editCustomerModalLabel"
+<div class="modal modal-blur fade" id="editCustomerModal" tabindex="-1" aria-labelledby="editCustomerModalLabel"
     aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content border-0 shadow-lg rounded-3">

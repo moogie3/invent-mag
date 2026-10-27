@@ -1,55 +1,56 @@
+<div id="invoiceTableContainer" class="position-relative">
 <div class="table-responsive">
     <table class="table card-table table-vcenter">
         <thead class="text-center">
             <tr>
                 <th class="w-1 sticky-top" style="z-index: 1020;"><input type="checkbox" id="selectAll" class="form-check-input"></th>
-                <th class="sortable" data-sort="quotation_number">
-                    <button class="table-sort">{{ __('messages.quotation_number') }}</button>
+                <th class="sortable">
+                    <button class="table-sort" data-sort="sort-invoice">{{ __('messages.quotation_number') }}</button>
                 </th>
-                <th class="sortable" data-sort="customer_id">
-                    <button class="table-sort">{{ __('messages.customer') }}</button>
+                <th class="sortable">
+                    <button class="table-sort" data-sort="sort-customer">{{ __('messages.customer') }}</button>
                 </th>
-                <th class="sortable" data-sort="quotation_date">
-                    <button class="table-sort">{{ __('messages.quotation_date') }}</button>
+                <th class="sortable">
+                    <button class="table-sort" data-sort="sort-quotationdate">{{ __('messages.quotation_date') }}</button>
                 </th>
-                <th class="sortable" data-sort="valid_until">
-                    <button class="table-sort">{{ __('messages.valid_until') }}</button>
+                <th class="sortable">
+                    <button class="table-sort" data-sort="sort-validuntil">{{ __('messages.valid_until') }}</button>
                 </th>
-                <th class="sortable" data-sort="total">
-                    <button class="table-sort">{{ __('messages.quotation_total') }}</button>
+                <th class="sortable">
+                    <button class="table-sort" data-sort="sort-amount">{{ __('messages.quotation_total') }}</button>
                 </th>
-                <th class="sortable" data-sort="tax_amount">
-                    <button class="table-sort">{{ __('messages.tax') }}</button>
+                <th class="sortable">
+                    <button class="table-sort" data-sort="sort-tax">{{ __('messages.tax') }}</button>
                 </th>
                 @php
                     $currentTenant = app('currentTenant');
                     $showPpnCol = $currentTenant instanceof \App\Models\Tenant && $currentTenant->isIndonesian() && $currentTenant->hasFeature('ppn');
                 @endphp
                 @if($showPpnCol)
-                <th class="sortable" data-sort="pph_amount">
-                    <button class="table-sort">{{ __('messages.pph_status') }}</button>
+                <th class="sortable">
+                    <button class="table-sort" data-sort="sort-pph">{{ __('messages.pph_status') }}</button>
                 </th>
                 @endif
-                <th class="sortable" data-sort="status">
-                    <button class="table-sort">{{ __('messages.quotation_status') }}</button>
+                <th class="sortable">
+                    <button class="table-sort" data-sort="sort-status">{{ __('messages.quotation_status') }}</button>
                 </th>
                 <th style="width:180px;text-align:center" class="no-print">{{ __('messages.actions') }}</th>
             </tr>
         </thead>
-        <tbody class="text-center">
+        <tbody class="text-center table-tbody">
             @forelse($quotations as $q)
             <tr>
                 <td><input type="checkbox" class="form-check-input row-checkbox" value="{{ $q->id }}"></td>
-                <td>
+                <td class="sort-invoice">
                     <a href="{{ route('admin.quotations.show', $q->id) }}" class="fw-semibold text-reset">
                         {{ $q->quotation_number }}
                     </a>
                 </td>
-                <td>{{ $q->customer?->name ?? 'N/A' }}</td>
-                <td>{{ $q->quotation_date?->format('d M Y') }}</td>
-                <td>{{ $q->valid_until?->format('d M Y') ?? '-' }}</td>
-                <td>{{ \App\Helpers\CurrencyHelper::format($q->total) }}</td>
-                <td>
+                <td class="sort-customer">{{ $q->customer?->name ?? 'N/A' }}</td>
+                <td class="sort-quotationdate" data-date="{{ $q->quotation_date?->format('Y-m-d') ?? '' }}">{{ $q->quotation_date?->format('d M Y') }}</td>
+                <td class="sort-validuntil" data-date="{{ $q->valid_until?->format('Y-m-d') ?? '' }}">{{ $q->valid_until?->format('d M Y') ?? '-' }}</td>
+                <td class="sort-amount" data-amount="{{ $q->total }}">{{ \App\Helpers\CurrencyHelper::format($q->total) }}</td>
+                <td class="sort-tax">
                     @if(($q->tax_rate ?? 0) > 0)
                         <span class="text-muted">{{ $q->tax_rate }}% ({{ ucfirst($q->tax_type ?? 'exclusive') }})</span>
                     @else
@@ -57,7 +58,7 @@
                     @endif
                 </td>
                 @if($showPpnCol)
-                <td>
+                <td class="sort-pph">
                     @if(($q->pph_enabled ?? false) && ($q->pph_amount ?? 0) > 0)
                         <span class="badge bg-orange-lt">{{ __('messages.withholding_tax') }} {{ $q->pph_rate }}%</span>
                     @else
@@ -65,7 +66,7 @@
                     @endif
                 </td>
                 @endif
-                <td>
+                <td class="sort-status">
                     @php
                         $statusClasses = [
                             'draft' => 'bg-secondary-lt',
@@ -132,4 +133,5 @@
             @endforelse
         </tbody>
     </table>
+</div>
 </div>

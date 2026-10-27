@@ -2018,6 +2018,8 @@ return [
     'import_shopee_progress_queueing' => 'Queueing cover downloads…',
     'import_shopee_progress_images' => 'Cover images: :pending remaining',
     'import_shopee_progress_complete' => 'Import complete',
+    'import_shopee_media_done' => 'All :count cover images imported',
+    'import_shopee_media_partial' => ':done of :total cover images imported (:failed failed)',
     'import_shopee_errors' => 'Errors',
     'import_shopee_summary' => 'Import finished: :updated updated, :created created, :skipped skipped (plan limit), :errors errors.',
     'import_shopee_running' => 'Importing...',

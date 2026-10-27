@@ -20,7 +20,8 @@ class UnitController extends Controller
     public function index(Request $request)
     {
         $entries = $request->input('entries', 10);
-        $data = $this->unitService->getUnitIndexData($entries);
+        $filters = $request->only(['search']);
+        $data = $this->unitService->getUnitIndexData($filters, $entries);
 
         return view('admin.unit.index', $data);
     }

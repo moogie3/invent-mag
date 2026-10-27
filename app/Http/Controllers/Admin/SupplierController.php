@@ -28,7 +28,8 @@ class SupplierController extends Controller
     public function index(Request $request)
     {
         $entries = $request->input('entries', 10);
-        $data = $this->supplierService->getSupplierIndexData($entries);
+        $filters = $request->only(['search']);
+        $data = $this->supplierService->getSupplierIndexData($filters, $entries);
 
         return view('admin.supplier.index', $data);
     }

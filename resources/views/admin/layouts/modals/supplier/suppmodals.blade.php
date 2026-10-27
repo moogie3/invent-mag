@@ -35,7 +35,7 @@
 </div>
 
 {{-- Create Supplier Modal --}}
-<div class="modal fade" id="createSupplierModal" tabindex="-1" aria-labelledby="createSupplierModalLabel"
+<div class="modal modal-blur fade" id="createSupplierModal" tabindex="-1" aria-labelledby="createSupplierModalLabel"
     aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content border-0 shadow-lg rounded-3">
@@ -100,7 +100,7 @@
 </div>
 
 {{-- Edit Supplier Modal --}}
-<div class="modal fade" id="editSupplierModal" tabindex="-1" aria-labelledby="editSupplierModalLabel"
+<div class="modal modal-blur fade" id="editSupplierModal" tabindex="-1" aria-labelledby="editSupplierModalLabel"
     aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content border-0 shadow-lg rounded-3">

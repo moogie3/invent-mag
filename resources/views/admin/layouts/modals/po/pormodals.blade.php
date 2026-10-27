@@ -188,7 +188,7 @@
 </div>
 
 <!-- Purchase Return Status Warning Modal -->
-<div class="modal fade" id="prStatusWarningModal" tabindex="-1" aria-labelledby="prStatusWarningModalLabel"
+<div class="modal modal-blur fade" id="prStatusWarningModal" tabindex="-1" aria-labelledby="prStatusWarningModalLabel"
     aria-hidden="true">
     <div class="modal-dialog modal-sm modal-dialog-centered">
         <div class="modal-content border-0 shadow-lg rounded-3">
@@ -249,7 +249,7 @@
 </div>
 
 <!-- Purchase Return Status Warning Modal -->
-<div class="modal fade" id="prStatusWarningModal" tabindex="-1" aria-labelledby="prStatusWarningModalLabel"
+<div class="modal modal-blur fade" id="prStatusWarningModal" tabindex="-1" aria-labelledby="prStatusWarningModalLabel"
     aria-hidden="true">
     <div class="modal-dialog modal-sm modal-dialog-centered">
         <div class="modal-content border-0 shadow-lg rounded-3">

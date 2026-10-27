@@ -4,7 +4,11 @@
         </div>
 
         <!-- Centered Brand Title -->
-        <h1 class="navbar-brand position-absolute top-50 start-50 translate-middle text-center" id="navbar-brand-title">
+        {{-- start-50 deliberately absent: horizontal centring is owned by
+             #navbar-brand-title in navbar.css (it compensates for the
+             sidebar offset via --main-ml), and start-50's !important would
+             beat that rule. --}}
+        <h1 class="navbar-brand position-absolute top-50 translate-middle text-center" id="navbar-brand-title">
             <a class="nav-link" id="brand-trigger">
                 <i class="ti ti-brand-minecraft fs-2 me-2"></i>Invent-MAG
             </a>
@@ -76,11 +80,6 @@
                 @endforeach
             </ul>
         </nav>
-
-        <!-- Mobile Menu Overlay -->
-        <div class="nav-overlay" id="nav-overlay"></div>
-
-
 
         <!-- Right Side Icons -->
         <div class="d-flex flex-grow-1 justify-content-end align-items-center" id="navbar-right-content">
@@ -440,6 +439,15 @@
         </div>
     </div>
 </header>
+
+{{-- The frosted scrim sits OUTSIDE <header> on purpose: the navbar carries a
+     backdrop-filter (its glass), and a backdrop-filter makes the element a
+     containing block for position:fixed descendants - so an overlay nested
+     inside the header would be sized to the bar (bar-height tall) instead of
+     the viewport, which is exactly the "only the navbar reacts, the page stays
+     plain" bug. At body level it also stacks BELOW the bar, so the bar and its
+     open menu stay crisp while everything behind them is blurred. --}}
+<div class="nav-overlay" id="nav-overlay"></div>
 
 @vite('resources/css/navbar.css')
 @vite('resources/js/admin/layouts/navbar.js')

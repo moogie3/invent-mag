@@ -1,3 +1,6 @@
+@import './tokens.css';
+
+
 @import url("https://rsms.me/inter/inter.css");
 
 .page-loader {
@@ -16,7 +19,7 @@
 
 .main-content {
     opacity: 1;
-    transition: opacity 0.3s ease-in-out;
+    transition: opacity var(--anim-slow) ease-in-out;
 }
 
 :root {
@@ -31,6 +34,24 @@
     width: 100%;
     max-width: 450px;
     margin: 0 auto;
+}
+
+/* This page loads ONLY this stylesheet (receiptbase.blade.php pulls tabler
+   + pos-receipt, never app.css), so the global .card edge/lift from
+   app.css never reaches the paper - and the markup carries .border-0 /
+   .shadow-sm, which are Bootstrap !important utilities that beat the plain
+   rule above. Hence !important here, scoped per theme so the dark receipt
+   spends the frosted ladder. The print block at the bottom mirrors these
+   exact selectors at the same specificity - later in the file - so ink
+   never prints a box the customer does not get. */
+html:not([data-bs-theme="dark"]) .receipt-card {
+    border: 1px solid var(--lt-edge) !important;
+    box-shadow: var(--lt-shadow-surface) !important;
+}
+
+[data-bs-theme="dark"] .receipt-card {
+    border: 1px solid var(--frz-edge) !important;
+    box-shadow: var(--frz-shadow-1) !important;
 }
 
 .receipt-container {
@@ -73,7 +94,12 @@
 
 .customer-section {
     padding: 10px 0;
-    border-bottom: 1px solid var(--tblr-border-color-light);
+    /* was var(--tblr-border-color-light): that token does not exist, so the
+       declaration was invalid at computed-value time and drew no line (the
+       same bug at .table-items tbody td and .payment-rows). The receipt
+       page loads no app.css, so its seams come from Tabler's own token,
+       which does resolve in both themes: #dadfe5 light / #2a2c2e dark. */
+    border-bottom: 1px solid var(--tblr-border-color);
 }
 
 /* Table Styling */
@@ -93,7 +119,7 @@
 .table-items tbody td {
     font-size: 0.8125rem;
     padding: 0.5rem;
-    border-bottom: 1px solid var(--tblr-border-color-light);
+    border-bottom: 1px solid var(--tblr-border-color);
 }
 
 /* Totals Section */
@@ -122,7 +148,7 @@
 .payment-rows {
     margin-top: 10px;
     padding-top: 10px;
-    border-top: 1px dashed var(--tblr-border-color-light);
+    border-top: 1px dashed var(--tblr-border-color);
 }
 
 .receipt-footer {
@@ -190,7 +216,11 @@
         font-size: 10pt;
     }
 
-    .receipt-card {
+    /* selectors reach (0,2,1) to match the screen rules for .receipt-card:
+       a bare .receipt-card (0,1,0) would lose to them even with !important,
+       and the printed receipt would carry a border and a drop shadow */
+    html:not([data-bs-theme="dark"]) .receipt-card,
+    html[data-bs-theme="dark"] .receipt-card {
         box-shadow: none !important;
         border: none !important;
         margin: 0;
@@ -228,10 +258,10 @@
 }
 
 /* Dark Mode Support */
-.theme-dark .table-items thead th {
+[data-bs-theme="dark"] .table-items thead th {
     background-color: var(--tblr-bg-surface);
 }
 
-.theme-dark .totals-section {
+[data-bs-theme="dark"] .totals-section {
     background-color: var(--tblr-bg-surface);
 }

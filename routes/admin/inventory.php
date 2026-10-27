@@ -22,10 +22,6 @@ Route::prefix('warehouses')->group(function () {
         ->name('admin.warehouse')
         ->middleware('can:view-warehouses');
 
-    Route::get('/create', [WarehouseController::class, 'create'])
-        ->name('admin.warehouse.create')
-        ->middleware('can:create-warehouses');
-
     Route::post('/store', [WarehouseController::class, 'store'])
         ->name('admin.warehouse.store')
         ->middleware(['can:create-warehouses', 'plan.limit:warehouses']);

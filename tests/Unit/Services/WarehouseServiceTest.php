@@ -37,7 +37,7 @@ class WarehouseServiceTest extends TestCase
         User::factory()->create(['shopname' => 'Test Shop', 'address' => 'Test Address']);
 
         $entries = 3;
-        $data = $this->warehouseService->getWarehouseIndexData($entries);
+        $data = $this->warehouseService->getWarehouseIndexData([], $entries);
 
         $this->assertArrayHasKey('wos', $data);
         $this->assertArrayHasKey('entries', $data);

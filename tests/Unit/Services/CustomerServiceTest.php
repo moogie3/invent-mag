@@ -37,7 +37,7 @@ class CustomerServiceTest extends TestCase
         Customer::factory()->count(5)->create();
 
         $entries = 3;
-        $result = $this->customerService->getCustomerIndexData($entries);
+        $result = $this->customerService->getCustomerIndexData([], $entries);
 
         $this->assertArrayHasKey('customers', $result);
         $this->assertArrayHasKey('entries', $result);

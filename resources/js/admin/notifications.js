@@ -49,7 +49,7 @@ function initMarkAsRead(config) {
                 .then(data => {
                     if (data.success) {
                         if (targetEl) {
-                            targetEl.style.transition = 'all 0.4s ease';
+                            targetEl.style.transition = 'all var(--anim-slow) ease';
                             targetEl.style.opacity = '0';
                             targetEl.style.transform = 'translateX(20px)';
 

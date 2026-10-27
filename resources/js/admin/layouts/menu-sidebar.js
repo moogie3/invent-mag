@@ -3,7 +3,60 @@
 // without this, the nav-link click bleeds into the new page and immediately closes the sidebar.
 let lastTurboLoadTime = 0;
 
+// ---- Session memory: open submenu panels + sidebar scroll ------------------
+// Kept in this module, NOT in localStorage: a full reload (F5) must reset the
+// sidebar to defaults, and module memory dies with the page - that is the
+// intended semantics (reapply state from memory, not persistent state).
+// Declared up HERE because the readyState boot path further down calls
+// restoreSidebarMemory() during module evaluation - a `let` declared below
+// that call would still be in its temporal dead zone there (the runtime error
+// reads "can't access lexical declaration before initialization"; minified
+// builds show only the mangled name).
+//
+// The open set is SNAPSHOT from the live DOM on turbo:before-cache instead of
+// accumulated from events: every open path (plain click, rail-expand click,
+// active-page chain) lands on the same class - `.collapse.show` on the
+// div#submenu-N wrappers, which is exactly what Bootstrap toggles (the inner
+// ul.nav-submenu never receives .show) - and whatever a rail collapse has
+// already closed is naturally not remembered. The restore runs BEFORE
+// initSidebar() so the sidebar's boot work sees its final state. Navbar-only
+// mode has no .sidebar -> every hook no-ops.
+let rememberedOpenSubmenus = new Set();
+let rememberedSidebarScroll = 0;
+
+// Every sidebar reveal — page load, submenu open — finishes within this window.
+// The per-item step adapts to the item count instead of being fixed, so the menu
+// never takes longer to appear just because it has more entries in it.
+const REVEAL_WINDOW_MS = 320;
+
+// The fast-close / smooth-open classes exist only to pick the transition timing
+// for a single slide. Left behind, they fight the next toggle's cascade (the
+// later-in-source smooth-open rule beats fast-close at equal specificity, so
+// every close after an open ran the slow 0.3s open easing), and navbar.css keys
+// two parts of the bar off them: the frosted layer is off while the bar moves,
+// and the bar's content is hidden (the swish) for exactly as long as they exist.
+// Drop both classes once the motion is over. The getAnimations() guard first
+// defers to a newer toggle whose fresh slide owns the classes - it scheduled its
+// own cleanup - but gives up after a few passes, because content is invisible
+// while these classes are on and must not stay that way.
+function schedulePhaseCleanup() {
+    const sidebarEl = document.querySelector(".sidebar");
+    const mainEl = document.querySelector(".main-content");
+    if (!sidebarEl || !mainEl) return;
+    let passes = 0;
+    const attempt = () => {
+        if (mainEl.getAnimations().length > 0 && ++passes < 4) {
+            setTimeout(attempt, 400);
+            return;
+        }
+        mainEl.classList.remove("main-content-fast-close", "main-content-smooth-open");
+        sidebarEl.classList.remove("sidebar-fast-close", "sidebar-smooth-open");
+    };
+    setTimeout(attempt, 400);
+}
+
 document.addEventListener("usersettingsloaded", function () {
+    restoreSidebarMemory();
     initSidebar();
     syncActiveState();
 });
@@ -11,16 +64,19 @@ document.addEventListener("usersettingsloaded", function () {
 // Also re-init after Turbo navigation
 document.addEventListener("turbo:load", function () {
     lastTurboLoadTime = performance.now();
+    restoreSidebarMemory();
     initSidebar();
     syncActiveState();
 });
 
 // Fallback for contexts without Turbo (e.g. superadmin)
 if (document.readyState === "complete" || document.readyState === "interactive") {
+    restoreSidebarMemory();
     initSidebar();
     syncActiveState();
 } else {
     document.addEventListener("DOMContentLoaded", function () {
+        restoreSidebarMemory();
         initSidebar();
         syncActiveState();
     });
@@ -51,10 +107,97 @@ function syncActiveState() {
     }, 50);
 }
 
+// ---- Session memory: open submenu panels + sidebar scroll
+// (state declared at the top of the file - the readyState boot path calls the
+// restore below during module evaluation, so its `let`s must precede it.)
+function restoreSidebarMemory() {
+    const sidebar = document.querySelector('.sidebar');
+    if (!sidebar) return;
+
+    // With the rail collapsed the submenus are iconless anyway: opening them
+    // there would lay out a column of invisible rows inside the 70px rail
+    // (.sidebar.collapsed hides submenu items by design), so remembered and
+    // chain opens only apply to the expanded rail - the collapsed rail keeps
+    // its load-time appearance (today's default).
+    const railCollapsed = sidebar.classList.contains('collapsed') ||
+        localStorage.getItem('sidebarCollapsed') === 'true';
+
+    if (!railCollapsed) {
+        // Remembered opens, by panel id (div#submenu-N, stable across Turbo
+        // body swaps).
+        rememberedOpenSubmenus.forEach(id => {
+            const el = document.getElementById(id);
+            if (el && el.classList.contains('collapse') && sidebar.contains(el)) {
+                el.classList.add('show');
+            }
+        });
+
+        // The active page's own chain: the selected link must be visible even
+        // when navigation never went through the menu (shortcuts, links in
+        // the content). Derived from the URL - so it also applies on full
+        // loads, while a full load still forgets every remembered open above.
+        const currentPath = window.location.pathname;
+        sidebar.querySelectorAll('.nav-link').forEach(link => {
+            const href = link.getAttribute('href');
+            if (!href || href === '#') return;
+            let linkPath;
+            try {
+                linkPath = new URL(href, window.location.origin).pathname;
+            } catch (err) {
+                return;
+            }
+            if (linkPath !== currentPath && !currentPath.startsWith(linkPath + '/')) return;
+            let panel = link.closest('.collapse');
+            while (panel && sidebar.contains(panel)) {
+                panel.classList.add('show');
+                panel = panel.parentElement ? panel.parentElement.closest('.collapse') : null;
+            }
+        });
+
+        // A restored .show needs a Collapse instance behind it: the rail
+        // collapse hides open panels through
+        // bootstrap.Collapse.getInstance() - a null there would leave the
+        // submenu open inside the icon rail - and the trigger's next click
+        // needs one to toggle against. toggle:false stops the constructor
+        // from flipping an already-open panel closed.
+        sidebar.querySelectorAll('.collapse.show').forEach(panel => {
+            if (window.bootstrap && bootstrap.Collapse) {
+                bootstrap.Collapse.getOrCreateInstance(panel, { toggle: false });
+            }
+        });
+    }
+
+    // Triggers: the server renders every aria-expanded="false"; reflect the
+    // restored truth instead.
+    sidebar.querySelectorAll('[data-bs-toggle="collapse"]').forEach(trigger => {
+        const target = trigger.getAttribute('data-bs-target') || trigger.getAttribute('href');
+        if (!target || target[0] !== '#') return;
+        const panel = sidebar.querySelector(target);
+        if (panel) trigger.setAttribute('aria-expanded', panel.classList.contains('show') ? 'true' : 'false');
+    });
+
+    // Scroll AFTER the same-tick initSidebar() has applied the rail state:
+    // the rail changes the scroll box's height, and a pre-init set would be
+    // clamped against the pre-init box. rAF runs after that synchronous work.
+    requestAnimationFrame(() => {
+        sidebar.scrollTop = rememberedSidebarScroll;
+    });
+}
+
+
 document.addEventListener('turbo:before-cache', () => {
     const sidebar = document.querySelector(".sidebar");
     if (sidebar) {
         sidebar.dataset.turboInitialized = "";
+        // Snapshot what is open + how far down we are so the next page can
+        // reapply both. Class-based on the div#submenu-N panels Bootstrap
+        // actually toggles: it captures every open path and excludes whatever
+        // a rail collapse has already closed. Empty on a full load - F5 resets
+        // the memory by construction.
+        rememberedOpenSubmenus = new Set(
+            Array.from(sidebar.querySelectorAll('.collapse.show'), el => el.id).filter(Boolean)
+        );
+        rememberedSidebarScroll = sidebar.scrollTop;
     }
 });
 
@@ -214,9 +357,14 @@ function initSidebar() {
                 }
             });
 
-            // FAST closing - immediate collapse with quick transition
+            // FAST closing - immediate collapse with quick transition.
+            // The smooth-open classes must come OFF here: they share
+            // specificity with the fast-close ones and win on source order,
+            // so leaving them on made every close run the 0.3s open easing.
             sidebar.classList.add("sidebar-fast-close");
+            sidebar.classList.remove("sidebar-smooth-open");
             mainContent.classList.add("main-content-fast-close");
+            mainContent.classList.remove("main-content-smooth-open");
 
             // Quickly hide text and collapse
             navTexts.forEach((text) => {
@@ -244,15 +392,18 @@ function initSidebar() {
             mainContent.classList.remove("sidebar-collapsed");
             body.classList.add("sidebar-open");
 
-            // Staggered fade-in animation for text
+            // Staggered fade-in animation for text, held to the same window as
+            // the rest of the reveal: a flat 30ms per label left the bottom of
+            // the menu still sliding in 1.3s after the icons had settled.
             setTimeout(() => {
+                const textStep = navTexts.length > 1 ? REVEAL_WINDOW_MS / (navTexts.length - 1) : 0;
                 navTexts.forEach((text, index) => {
                     text.classList.remove("nav-text-fade-out");
                     text.classList.add("nav-text-slide-in");
 
                     setTimeout(() => {
                         text.classList.add("visible");
-                    }, index * 30);
+                    }, index * textStep);
                 });
             }, 100);
 
@@ -264,6 +415,8 @@ function initSidebar() {
                 item.style.transitionDelay = '';
             });
         }
+
+        schedulePhaseCleanup();
     };
 
     // Get persistent sidebar state
@@ -279,6 +432,13 @@ function initSidebar() {
 
     // Initialize with persistent sidebar state
     const initializeSidebar = function () {
+        // A Turbo snapshot cached mid-toggle restores with the phase classes
+        // still on, and a plain load schedules no cleanup for them - navbar.css
+        // hides the bar's content while they exist. They can only be leftovers
+        // here: this runs before any toggle in this page's lifetime.
+        sidebar.classList.remove("sidebar-fast-close", "sidebar-smooth-open");
+        mainContent.classList.remove("main-content-fast-close", "main-content-smooth-open");
+
         const shouldBeCollapsed = getSidebarState();
 
         // Set initial state based on saved preference
@@ -292,28 +452,46 @@ function initSidebar() {
             body.classList.add("sidebar-open");
         }
 
-        // Animate elements into view with faster menu icon
+        // Cascade the links into view, then take the whole menu up together.
+        // A flat 80ms per link gave this 43-link sidebar a 3.3s tail, which is
+        // why the bottom of the menu looked late to arrive on every load.
         const navItems = sidebar.querySelectorAll(".nav-link");
+        const revealStep = navItems.length > 1 ? REVEAL_WINDOW_MS / (navItems.length - 1) : 0;
+
         navItems.forEach((item, index) => {
             item.classList.add("nav-item-animate");
 
             setTimeout(() => {
                 item.classList.add("visible");
-            }, index * 80);
+            }, index * revealStep);
         });
 
         // Add tooltips if sidebar is collapsed AND the setting is enabled (default: enabled when unset)
         if (shouldBeCollapsed && (!window.userSettings || window.userSettings.show_tooltips)) {
-            setTimeout(addTooltips, navItems.length * 40 + 100);
+            setTimeout(addTooltips, REVEAL_WINDOW_MS + 100);
         }
 
-        // Apply staggered animation to initially open submenus
+        // Apply the same bounded cascade to children of submenus already open,
+        // so parents and children line up in one 320ms sweep rather than a
+        // second 100ms-per-item ramp stacked on top of the first.
         sidebar.querySelectorAll('.nav-submenu.show').forEach(openSubmenu => {
             const submenuItems = openSubmenu.querySelectorAll('.nav-item');
+            const subStep = submenuItems.length > 1 ? REVEAL_WINDOW_MS / (submenuItems.length - 1) : 0;
             submenuItems.forEach((item, idx) => {
-                item.style.transitionDelay = `${idx * 100}ms`;
+                item.style.transitionDelay = `${idx * subStep}ms`;
                 item.classList.add('visible');
             });
+
+            // The inline delay is what staggers this sweep, but nothing ever
+            // cleared it, so it rode along on every later transition the same
+            // <li> performed — collapsing the sidebar made open-submenu items
+            // wait up to 320ms before they started moving. Drop it once the
+            // reveal has had time to finish.
+            setTimeout(() => {
+                submenuItems.forEach((item) => {
+                    item.style.transitionDelay = '';
+                });
+            }, REVEAL_WINDOW_MS + 50);
         });
     };
 
@@ -357,13 +535,27 @@ function initSidebar() {
 
                         // Listen for when the submenu is fully shown by Bootstrap
                         targetElement.addEventListener('shown.bs.collapse', function handler() {
-                            // Staggered animation for submenu items
+                            // Bounded cascade: a flat 100ms per child put the tail of a
+                            // submenu nearly a second behind its own first entry.
                             const submenuItems = targetElement.querySelectorAll('.nav-item');
+                            const subStep = submenuItems.length > 1
+                                ? REVEAL_WINDOW_MS / (submenuItems.length - 1)
+                                : 0;
                             submenuItems.forEach((item, idx) => {
-                                item.style.transitionDelay = `${idx * 100}ms`; // Stagger delay
+                                item.style.transitionDelay = `${idx * subStep}ms`;
                                 item.classList.add('visible');
                             });
                             targetElement.removeEventListener('shown.bs.collapse', handler);
+
+                            // Same cleanup as the load-time cascade above: the inline delay only
+                            // exists to stagger this reveal, and left behind it delays every later
+                            // transition the same <li> performs - collapsing the sidebar made these
+                            // items wait out a stale delay before they would start moving.
+                            setTimeout(() => {
+                                submenuItems.forEach((item) => {
+                                    item.style.transitionDelay = '';
+                                });
+                            }, REVEAL_WINDOW_MS + 50);
                         });
 
                         bsCollapse.show(); // Explicitly show the submenu
@@ -407,10 +599,15 @@ function initSidebar() {
             ) {
                 localStorage.setItem("sidebarCollapsed", "true");
                 
-                // Fast closing
+                // Fast closing (and drop the open-phase classes, or the
+                // later-in-source smooth-open transition wins the cascade)
                 currentSidebar.classList.add("sidebar-fast-close");
+                currentSidebar.classList.remove("sidebar-smooth-open");
                 const currentMain = document.querySelector(".main-content");
-                if(currentMain) currentMain.classList.add("main-content-fast-close");
+                if (currentMain) {
+                    currentMain.classList.add("main-content-fast-close");
+                    currentMain.classList.remove("main-content-smooth-open");
+                }
                 
                 currentSidebar.querySelectorAll(".nav-link-title").forEach((text) => text.classList.add("nav-text-fade-out"));
                 
@@ -419,6 +616,8 @@ function initSidebar() {
                     if(currentMain) currentMain.classList.add("sidebar-collapsed");
                     document.body.classList.remove("sidebar-open");
                 }, 50);
+
+                schedulePhaseCleanup();
             }
         });
 

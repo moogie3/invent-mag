@@ -5,6 +5,9 @@ on:
     branches: [ "main", "develop" ]
   pull_request:
     branches: [ "main", "develop" ]
+  # deploy.yml calls this same workflow, so a release tag can never reach
+  # production without this exact suite having passed first.
+  workflow_call:
 
 jobs:
   build-and-test:
@@ -18,7 +21,9 @@ jobs:
       uses: shivammathur/setup-php@v2
       with:
         php-version: '8.2'
-        extensions: bcmath, ctype, fileinfo, json, mbstring, openssl, pdo, tokenizer, xml
+        # phpunit.xml runs the suite on :memory: sqlite, so pdo_sqlite/sqlite3
+        # are load-bearing. pcntl backs PHPUnit's enforceTimeLimit.
+        extensions: bcmath, ctype, fileinfo, json, mbstring, openssl, pcntl, pdo, pdo_sqlite, sqlite3, tokenizer, xml
         coverage: none # Set to 'xdebug' if you want code coverage reports
 
     - name: Copy .env

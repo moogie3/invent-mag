@@ -99,7 +99,7 @@
                                 </tbody>
                             </table>
                         </div>
-                        <div class="card-footer d-flex align-items-center border-top py-3">
+                        <div data-pagination-footer class="card-footer d-flex align-items-center border-top py-3">
                             <p class="m-0 text-secondary">
                                 {{ __('messages.pagination_showing_entries', ['first' => $returns->firstItem(), 'last' => $returns->lastItem(), 'total' => $returns->total()]) }}
                             </p>

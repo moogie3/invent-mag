@@ -10,16 +10,20 @@
                             </span>
                         </div>
                         <div class="col text-truncate">
-                            <div class="d-flex justify-content-between align-items-center mb-1">
-                                <span class="fw-bold fs-3 d-flex align-items-center gap-2">
-                                    {{ $item['title'] }}
+                            {{-- min-width-0 (defined in app.css - Bootstrap's
+                                 min-w-0 is not in this Tabler build) lets the
+                                 nested title flex shrink; its text gets its own
+                                 truncating span and every badge is pinned. --}}
+                            <div class="d-flex justify-content-between align-items-center gap-2 mb-1">
+                                <span class="fw-bold fs-3 d-flex align-items-center gap-2 min-width-0">
+                                    <span class="text-truncate">{{ $item['title'] }}</span>
                                     @if ($item['urgency'] === 'critical')
-                                        <span class="badge bg-danger p-1"></span>
+                                        <span class="badge bg-danger p-1 flex-shrink-0"></span>
                                     @elseif ($item['urgency'] === 'high')
-                                        <span class="badge bg-warning p-1"></span>
+                                        <span class="badge bg-warning p-1 flex-shrink-0"></span>
                                     @endif
                                 </span>
-                                <span class="badge bg-{{ $item['color'] }}-lt py-1 px-2 text-uppercase" style="font-size: 0.65rem; letter-spacing: 0.5px;">
+                                <span class="badge bg-{{ $item['color'] }}-lt py-1 px-2 text-uppercase flex-shrink-0" style="font-size: 0.65rem; letter-spacing: 0.5px;">
                                     {{ str_replace('_', ' ', $item['category'] ?? 'System') }}
                                 </span>
                             </div>

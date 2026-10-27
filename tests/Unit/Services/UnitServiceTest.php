@@ -35,7 +35,7 @@ class UnitServiceTest extends TestCase
         Unit::factory()->count(5)->create();
 
         $entries = 3;
-        $result = $this->unitService->getUnitIndexData($entries);
+        $result = $this->unitService->getUnitIndexData([], $entries);
 
         $this->assertArrayHasKey('units', $result);
         $this->assertArrayHasKey('entries', $result);

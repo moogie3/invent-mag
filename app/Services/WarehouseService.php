@@ -2,15 +2,27 @@
 
 namespace App\Services;
 
+
+use App\Services\Concerns\BuildsListSearch;
 use App\Models\User;
 use App\Models\Warehouse;
 use Dompdf\Dompdf;
 
 class WarehouseService
 {
-    public function getWarehouseIndexData(int $entries)
+    use BuildsListSearch;
+    public function getWarehouseIndexData(array $filters, int $entries)
     {
-        $wos = Warehouse::paginate($entries);
+        $query = Warehouse::query();
+
+        // Whole-catalog search — the paginator's COUNT(*) shares this WHERE.
+        $this->applyListSearch($query, $filters, [
+            'warehouses.name',
+            'warehouses.address',
+            'warehouses.description',
+        ]);
+
+        $wos = $query->paginate($entries);
         $totalwarehouse = Warehouse::count();
         $mainWarehouse = Warehouse::where('is_main', true)->first();
         $shopname = User::whereNotNull('shopname')->value('shopname');

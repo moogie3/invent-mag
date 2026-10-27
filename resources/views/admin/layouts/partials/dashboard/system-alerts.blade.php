@@ -45,8 +45,12 @@
                                 </div>
                                 <div class="flex-grow-1 min-width-0">
                                     <div class="d-flex justify-content-between align-items-start mb-1">
-                                        <div class="fw-bold text-truncate" title="{{ $product->name }}">{{ $product->name }}</div>
-                                        <div class="text-danger fw-bold ms-2">{{ (int)$item->quantity }}</div>
+                                        {{-- min-width-0 lets .text-truncate actually engage: without it
+                                             this flex item keeps min-width:auto (content width), so a
+                                             long imported name refused to shrink and pushed its row
+                                             wider than the card. flex-shrink-0 keeps the count glued. --}}
+                                        <div class="fw-bold text-truncate min-width-0" title="{{ $product->name }}">{{ $product->name }}</div>
+                                        <div class="text-danger fw-bold ms-2 flex-shrink-0">{{ (int)$item->quantity }}</div>
                                     </div>
                                     <div class="d-flex align-items-center flex-wrap gap-2">
                                         <span class="badge bg-secondary-lt" style="font-size: 10px;">{{ $item->warehouse->name ?? 'Unknown' }}</span>
@@ -94,8 +98,10 @@
                                 </div>
                                 <div class="flex-grow-1 min-width-0">
                                     <div class="d-flex justify-content-between align-items-start mb-1">
-                                        <div class="fw-bold text-truncate" title="{{ $product->name }}">{{ $product->name }}</div>
-                                        <div class="fw-semibold small text-nowrap ms-2">{{ $item->expiry_date->format('d M Y') }}</div>
+                                        {{-- same shrink fix as the low-stock row: long name truncates,
+                                             the date keeps its width and stays visible --}}
+                                        <div class="fw-bold text-truncate min-width-0" title="{{ $product->name }}">{{ $product->name }}</div>
+                                        <div class="fw-semibold small text-nowrap ms-2 flex-shrink-0">{{ $item->expiry_date->format('d M Y') }}</div>
                                     </div>
                                     <div class="d-flex align-items-center flex-wrap gap-2">
                                         <span class="badge bg-secondary-lt" style="font-size: 10px;">{{ $item->purchaseOrder->warehouse->name ?? 'N/A' }}</span>

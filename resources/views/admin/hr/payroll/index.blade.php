@@ -62,11 +62,12 @@
                                                 </div>
                                             </div>
                                         </div>
+                                        <div id="invoiceTableContainer">
                                         <div class="table-responsive">
                                             <table class="table card-table table-vcenter">
                                                 <thead style="font-size: large">
                                                     <tr>
-                                                        <th><button class="table-sort fs-4 py-3" data-sort="sort-period">{{ __('messages.period') }}</button></th>
+                                                        <th><button class="table-sort fs-4 py-3" data-sort="sort-runperiod">{{ __('messages.period') }}</button></th>
                                                         <th><button class="table-sort fs-4 py-3" data-sort="sort-status">{{ __('messages.status') }}</button></th>
                                                         <th><button class="table-sort fs-4 py-3" data-sort="sort-run-date">{{ __('messages.hr_run_date') }}</button></th>
                                                         <th><button class="table-sort fs-4 py-3" data-sort="sort-paid-date">{{ __('messages.hr_paid_date') }}</button></th>
@@ -76,7 +77,7 @@
                                                 <tbody class="table-tbody">
                                                     @forelse($runs as $run)
                                                         <tr>
-                                                            <td class="sort-period">{{ \Carbon\Carbon::createFromDate($run->period->year, $run->period->month, 1)->translatedFormat('F Y') }}</td>
+                                                            <td class="sort-runperiod" data-date="{{ $run->period->year }}-{{ str_pad($run->period->month, 2, '0', STR_PAD_LEFT) }}-01">{{ \Carbon\Carbon::createFromDate($run->period->year, $run->period->month, 1)->translatedFormat('F Y') }}</td>
                                                             <td class="sort-status">
                                                                 @switch($run->status)
                                                                     @case('draft')
@@ -116,6 +117,7 @@
                                                     @endforelse
                                                 </tbody>
                                             </table>
+                                        </div>
                                         </div>
                                     </div>
                                 </div>

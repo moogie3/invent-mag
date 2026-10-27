@@ -51,6 +51,16 @@ class ShopeeImportService
     }
 
     /**
+     * Cache base key for the live media-import counters (total set here,
+     * done/failed incremented atomically by each DownloadShopeeCoverImages
+     * batch). Same user+token scoping as progressCacheKey.
+     */
+    public static function mediaProgressCacheKey(?int $userId, string $token): string
+    {
+        return sprintf('shopee_import_media.%d.%s', $userId ?? 0, $token);
+    }
+
+    /**
      * @param  array<string, string>  $paths  file paths keyed by basic/media/sales/shipping
      * @param  string|null  $progressToken  client token for the polled progress bar (null = no UI polling)
      * @return array<string, mixed> summary counts for the UI
@@ -164,7 +174,7 @@ class ShopeeImportService
         }
 
         $report('queuing_images');
-        $summary['images_queued'] = $this->queueCoverDownloads($covers, $summary['errors']);
+        $summary['images_queued'] = $this->queueCoverDownloads($covers, $summary['errors'], $progressToken);
 
         if ($summary['updated'] > 0 || $summary['created'] > 0) {
             $this->activityLogService->log(
@@ -502,9 +512,10 @@ class ShopeeImportService
     /**
      * @param  array<int, array{product_id: int, url: string, current_image: string|null}>  $covers
      * @param  array<int, string>  $errors  appended to when queueing fails
+     * @param  string|null  $progressToken  forwarded to the jobs so they can count done/failed for the modal
      * @return int number of queued image download jobs
      */
-    private function queueCoverDownloads(array $covers, array &$errors): int
+    private function queueCoverDownloads(array $covers, array &$errors, ?string $progressToken = null): int
     {
         // Re-import fast path: a product whose stored image already belongs to
         // this cover URL needs no download — skipping keeps repeat imports from
@@ -527,12 +538,13 @@ class ShopeeImportService
             return 0;
         }
 
+        $userId = auth()->id();
         $queued = 0;
         // Small batches keep each job well under the 300s job timeout even when
         // the CDN stalls on every request (15 items x 15s worst case = 225s).
         foreach (array_chunk($pending, 15) as $chunk) {
             try {
-                DownloadShopeeCoverImages::dispatch($tenantId, $chunk);
+                DownloadShopeeCoverImages::dispatch($tenantId, $chunk, is_int($userId) ? $userId : null, $progressToken);
                 $queued += count($chunk);
             } catch (\Throwable $e) {
                 // Never fail the whole import because the queue is unavailable —
@@ -544,7 +556,27 @@ class ShopeeImportService
             }
         }
 
+        $this->initMediaProgress($userId, $progressToken, $queued);
+
         return $queued;
+    }
+
+    /**
+     * Seed the live media counters the modal polls (done/failed start at 0 and
+     * are incremented by the jobs; only meaningful when a token is present).
+     */
+    private function initMediaProgress(mixed $userId, ?string $progressToken, int $total): void
+    {
+        if ($progressToken === null || $progressToken === '') {
+            return;
+        }
+
+        $base = self::mediaProgressCacheKey(is_int($userId) ? $userId : null, $progressToken);
+        $ttl = now()->addMinutes(15);
+
+        Cache::put($base, $total, $ttl);
+        Cache::put($base.'.done', 0, $ttl);
+        Cache::put($base.'.failed', 0, $ttl);
     }
 
     /**

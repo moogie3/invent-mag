@@ -21,7 +21,8 @@ class WarehouseController extends Controller
     public function index(Request $request)
     {
         $entries = $request->input('entries', 10);
-        $data = $this->warehouseService->getWarehouseIndexData($entries);
+        $filters = $request->only(['search']);
+        $data = $this->warehouseService->getWarehouseIndexData($filters, $entries);
 
         return view('admin.warehouse.index', $data);
     }

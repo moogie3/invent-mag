@@ -35,26 +35,28 @@
             z-index: 2;
         }
 
-        /* Dark mode compatibility */
+        /* Dark mode compatibility - frosted neutral ladder: items sit recessed
+           in the card (#1c1e20 body rung), hover lifts to #26282a. The slate
+           navies (#1e293b / #273449) were retired with the dark blue theme. */
         [data-bs-theme="dark"] .notification-item {
-            background-color: #1e293b !important;
+            background-color: #1c1e20 !important;
             border-color: rgba(255, 255, 255, 0.08) !important;
-            color: #e2e8f0;
+            color: #f1f3f5;
         }
         [data-bs-theme="dark"] .notification-item.transition-all:hover {
             box-shadow: 0 .5rem 1rem rgba(0,0,0,.3) !important;
             border-color: rgba(255, 255, 255, 0.15) !important;
-            background-color: #273449 !important;
+            background-color: #26282a !important;
         }
         [data-bs-theme="dark"] .text-reset {
-            color: #e2e8f0 !important;
+            color: #f1f3f5 !important;
         }
         [data-bs-theme="dark"] .text-secondary,
         [data-bs-theme="dark"] .text-muted {
-            color: #94a3b8 !important;
+            color: #a8b0b8 !important;
         }
         [data-bs-theme="dark"] .mark-as-read-btn {
-            color: #94a3b8;
+            color: #a8b0b8;
             border-color: rgba(255, 255, 255, 0.1);
         }
         [data-bs-theme="dark"] .mark-as-read-btn:hover {

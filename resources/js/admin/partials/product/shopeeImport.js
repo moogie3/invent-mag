@@ -130,42 +130,85 @@ export function initShopeeImport() {
         }, 750);
     }
 
-    // Second stage: the import POST queued cover downloads; poll the pending
-    // job count until the worker drains them (or a 5-minute cap).
+    // Second stage: the import POST queued cover downloads; poll the per-import
+    // media counters (done/failed counted by the download jobs) until every
+    // queued image settles, or fall back to the queue drain (5-minute cap).
     function startImagePhase(token) {
         stopImagePolling();
         if (!msg("progressUrl", "")) return;
 
         let baseline = null;
+        let lastStats = null;
         const imagesLabel = msg(
             "labelProgressImages",
             "Cover images: :pending remaining",
         );
         const completeLabel = msg("labelProgressComplete", "Import complete");
+        const mediaDoneLabel = msg(
+            "labelMediaDone",
+            "All :count cover images imported",
+        );
+        const mediaPartialLabel = msg(
+            "labelMediaPartial",
+            ":done of :total cover images imported (:failed failed)",
+        );
 
-        const finish = () => {
+        const finish = (stats) => {
             stopImagePolling();
             setProgress(100, completeLabel);
-            setTimeout(() => window.location.reload(), 2000);
+            if (stats) {
+                appendMediaResult(
+                    template(
+                        stats.failed > 0 ? mediaPartialLabel : mediaDoneLabel,
+                        {
+                            count: stats.done,
+                            done: stats.done,
+                            total: stats.total,
+                            failed: stats.failed,
+                        },
+                    ),
+                    stats.failed > 0,
+                );
+            }
+            // Short pause so the updated banner is readable before the reload.
+            setTimeout(() => window.location.reload(), 4000);
         };
 
         const tick = () => {
             fetchProgress(token).then((progress) => {
-                if (!progress || typeof progress.queue_pending !== "number") {
+                if (!progress) return;
+
+                const media = progress.media;
+                if (media && typeof media.total === "number" && media.total > 0) {
+                    lastStats = media;
+                    const settled = media.done + media.failed;
+                    const remaining = Math.max(0, media.total - settled);
+                    setProgress(
+                        (settled / media.total) * 100,
+                        template(imagesLabel, { pending: remaining }),
+                    );
+                    if (settled >= media.total) {
+                        finish(media);
+                    }
+                    return;
+                }
+
+                // Fallback: no counters for this import — drain of the (global) queue
+                if (typeof progress.queue_pending !== "number") {
                     return;
                 }
                 const pending = progress.queue_pending;
 
                 if (baseline === null) {
                     if (pending <= 0) {
-                        finish();
+                        finish(null);
                         return;
                     }
                     baseline = pending;
                 }
 
                 if (pending <= 0) {
-                    finish();
+                    finish(null);
                     return;
                 }
 
@@ -180,6 +223,17 @@ export function initShopeeImport() {
         imageTimer = setInterval(tick, 1500);
         imageCapTimer = setTimeout(() => {
             stopImagePolling();
+            // Out of time — surface the partial state instead of freezing silently.
+            if (lastStats && lastStats.done + lastStats.failed < lastStats.total) {
+                appendMediaResult(
+                    template(mediaPartialLabel, {
+                        done: lastStats.done,
+                        total: lastStats.total,
+                        failed: lastStats.failed,
+                    }),
+                    true,
+                );
+            }
         }, 300000);
     }
 
@@ -335,6 +389,30 @@ function renderSummary(summary, form, resultBox) {
     html += "</div>";
     resultBox.innerHTML = html;
     resultBox.style.display = "block";
+}
+
+/**
+ * Append (or replace) the media-completion line inside the green summary
+ * banner, so the result reflects the media phase too — not just the counts
+ * from the initial import response.
+ */
+function appendMediaResult(text, isWarning) {
+    const resultBox = document.getElementById("shopeeImportResult");
+    if (!resultBox) return;
+    const alert = resultBox.querySelector(".alert");
+    if (!alert) return;
+
+    const existing = alert.querySelector(".media-result-line");
+    if (existing) existing.remove();
+
+    const line = document.createElement("div");
+    line.className = `media-result-line small fw-semibold mt-2 ${isWarning ? "text-warning" : "text-success"}`;
+    line.innerHTML = `${
+        isWarning
+            ? '<i class="ti ti-alert-triangle me-1"></i>'
+            : '<i class="ti ti-circle-check me-1"></i>'
+    }${escapeHtml(text)}`;
+    alert.appendChild(line);
 }
 
 function escapeHtml(text) {

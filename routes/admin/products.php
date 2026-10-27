@@ -82,6 +82,10 @@ Route::prefix('product')->group(function () {
         ->name('admin.product.expiring-soon')
         ->middleware('can:view-products');
 
+    Route::get('/low-stock', [ProductController::class, 'lowStockPerWarehouse'])
+        ->name('admin.product.low-stock')
+        ->middleware('can:view-products');
+
     // Stock API Routes
     Route::get('/{id}/main-stock', [ProductStockController::class, 'mainStock'])
         ->name('admin.product.main-stock')

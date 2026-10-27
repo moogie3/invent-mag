@@ -2,6 +2,8 @@
 
 namespace App\Services;
 
+
+use App\Services\Concerns\BuildsListSearch;
 use App\Helpers\CurrencyHelper;
 use App\Helpers\SalesHelper;
 use App\Models\Account;
@@ -21,6 +23,7 @@ use Illuminate\Support\Facades\DB;
 
 class SalesReturnService
 {
+    use BuildsListSearch;
     protected AccountingService $accountingService;
 
     protected SalesService $salesService;
@@ -79,6 +82,13 @@ class SalesReturnService
         if (isset($filters['year']) && $filters['year']) {
             $query->whereYear('return_date', $filters['year']);
         }
+
+        // Whole-catalog search across the return itself, the originating
+        // invoice and that invoice's customer.
+        $this->applyListSearch($query, $filters, ['sales_returns.reason', 'sales_returns.status'], [
+            'sale' => ['sales.invoice'],
+            'sale.customer' => ['customers.name'],
+        ]);
 
         $returns = $query->paginate($entries);
 

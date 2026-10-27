@@ -2,6 +2,8 @@
 
 namespace App\Services;
 
+
+use App\Services\Concerns\BuildsListSearch;
 use App\Helpers\CurrencyHelper;
 use App\Helpers\SalesHelper;
 use App\Models\Account;
@@ -27,6 +29,7 @@ use Illuminate\Support\Facades\DB;
 
 class SalesService
 {
+    use BuildsListSearch;
     protected AccountingService $accountingService;
 
     public function __construct(AccountingService $accountingService)
@@ -49,6 +52,12 @@ class SalesService
         if (isset($filters['year']) && $filters['year']) {
             $query->whereYear('order_date', $filters['year']);
         }
+
+        // Whole-catalog search. Must run BEFORE the count below, or the
+        // header total would disagree with the filtered rows.
+        $this->applyListSearch($query, $filters, ['sales.invoice', 'sales.status'], [
+            'customer' => ['customers.name'],
+        ]);
 
         // Count total before pagination for accurate total
         $totalinvoice = $query->count();

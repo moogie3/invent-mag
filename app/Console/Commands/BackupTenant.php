@@ -257,8 +257,12 @@ class BackupTenant extends Command
         // Create ZIP file with single SQL file
         $backupPath = storage_path('app/backups');
         if (! is_dir($backupPath)) {
-            mkdir($backupPath, 0755, true);
+            mkdir($backupPath, 0777, true);
         }
+        // Web requests run as a different user than this CLI (daemon on XAMPP vs.
+        // the shell user), so a umask-restricted 0700 here made
+        // /admin/settings/backup 500 with "Unable to list contents for 'backups'".
+        @chmod($backupPath, 0777);
 
         $zipPath = "{$backupPath}/{$filename}";
 

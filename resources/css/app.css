@@ -1,3 +1,4 @@
+@import './tokens.css';
 /* Turbo Progress Bar Styling */
 /* Theme toggle icon visibility - JS controls display after load.
    Default matches JS convention: light mode shows moon (click to go dark), dark mode shows sun (click to go light) */
@@ -38,13 +39,15 @@
     display: none;
     justify-content: center;
     align-items: center;
-    transition: opacity 0.2s ease-in-out;
+    transition: opacity var(--anim-base) ease-in-out;
     pointer-events: none;
     opacity: 0;
 }
 
 [data-bs-theme="dark"] .page-loader {
-    background-color: rgba(24, 36, 51, 0.9);
+    /* frosted body #1c1e20 at 92% - was rgba(33,35,37) (card) and, in the
+       partial's inline rule, the retired blue rgba(24,36,51) */
+    background-color: rgba(28, 30, 32, 0.92);
 }
 
 .is-loading-page .page-loader {
@@ -55,7 +58,7 @@
 
 .main-content {
     opacity: 1;
-    transition: opacity 0.2s ease-in-out;
+    transition: opacity var(--anim-base) ease-in-out;
 }
 
 /* Remove or hide the redundant turbo-frame loader to avoid double spinners */
@@ -77,6 +80,21 @@ body.no-animations * {
 /* Exception: navbar-brand needs transform for layout positioning */
 body.no-animations .navbar-brand {
     transform: translate(-50%, -50%) !important;
+}
+
+/*
+ * "Disable animations" has to mean no staged reveal either.
+ *
+ * The kill-switch above only nulls transition/animation, but .nav-item-animate
+ * hides each link with a plain `opacity: 0` — a property, not a transition.
+ * The JS stagger in menu-sidebar.js still walks the links one at a time over
+ * its 320ms window, so with the setting off the menu simply popped in a link
+ * at a time instead of fading. Force the pre-reveal state open so the whole
+ * menu appears at once, which is what the toggle promises.
+ */
+body.no-animations .nav-item-animate {
+    opacity: 1 !important;
+    transform: none !important;
 }
 
 /* Page loader - hide completely when animations disabled */
@@ -115,20 +133,45 @@ body.no-animations .nav-dropdown li.nav-item.dropdown:hover > .dropdown-menu {
 }
 
 /* Fix text color in navbar dropdown when animations disabled */
-body.no-animations .nav-dropdown .dropdown-menu {
-    background-color: rgba(20, 20, 20, 0.98) !important;
-    border: 1px solid rgba(255, 255, 255, 0.15) !important;
+/* Solid menus when animations are off (their fade/visibility transition is
+   gone). Scoped by theme: this used to paint one dark rgba(20,20,20) menu in
+   BOTH themes, so switching enable_animations off in a light workspace
+   produced near-black dropdowns - a settings collision, not a style choice. */
+[data-bs-theme="dark"] body.no-animations .nav-dropdown .dropdown-menu {
+    background-color: rgba(28, 30, 32, 0.98) !important;
+    border: 1px solid var(--frz-edge) !important;
 }
 
-body.no-animations .nav-dropdown .dropdown-menu .dropdown-item {
+html:not([data-bs-theme="dark"]) body.no-animations .nav-dropdown .dropdown-menu {
+    background-color: rgba(255, 255, 255, 0.98) !important;
+    border: 1px solid var(--tblr-border-color) !important;
+}
+
+/* Item colours are scoped by theme too: the old unthemed rule painted
+   #ffffff items in BOTH themes, so in light this block drew white text on
+   the white menu it itself paints (invisible items whenever animations are
+   off). Light follows the palette the :root vars set for the animated menu;
+   dark keeps white-on-dark as before. */
+[data-bs-theme="dark"] body.no-animations .nav-dropdown .dropdown-menu .dropdown-item {
     color: #ffffff !important;
     font-size: 0.8125rem !important;
 }
 
-body.no-animations .nav-dropdown .dropdown-menu .dropdown-item:hover,
-body.no-animations .nav-dropdown .dropdown-menu .dropdown-item:focus {
+html:not([data-bs-theme="dark"]) body.no-animations .nav-dropdown .dropdown-menu .dropdown-item {
+    color: var(--tblr-body-color) !important;
+    font-size: 0.8125rem !important;
+}
+
+[data-bs-theme="dark"] body.no-animations .nav-dropdown .dropdown-menu .dropdown-item:hover,
+[data-bs-theme="dark"] body.no-animations .nav-dropdown .dropdown-menu .dropdown-item:focus {
     color: #ffffff !important;
     background-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+html:not([data-bs-theme="dark"]) body.no-animations .nav-dropdown .dropdown-menu .dropdown-item:hover,
+html:not([data-bs-theme="dark"]) body.no-animations .nav-dropdown .dropdown-menu .dropdown-item:focus {
+    color: var(--tblr-body-color) !important;
+    background-color: rgba(0, 0, 0, 0.06) !important;
 }
 
 /* Exception: navbar-brand needs transform for layout positioning */
@@ -194,7 +237,7 @@ body.no-animations #global-loader {
 /* Remove overriding text color so it stays white */
 /* .toast-content .text-dark and .text-muted were forcing text color */
 
-/* Shopee import action � brand orange #EE4D2D (distinct from blue/gray toolbar buttons) */
+/* Shopee import action — brand orange #EE4D2D (distinct from blue/gray toolbar buttons) */
 .btn-shopee {
     --tblr-btn-bg: #ee4d2d;
     --tblr-btn-border-color: #ee4d2d;
@@ -208,4 +251,267 @@ body.no-animations #global-loader {
     --tblr-btn-disabled-bg: #ee4d2d;
     --tblr-btn-disabled-border-color: #ee4d2d;
     --tblr-btn-disabled-color: rgba(255, 255, 255, 0.75);
+}
+
+/*
+ * Keyboard row selection - Alt+E (edit) and Alt+D (delete).
+ *
+ * selectable-table.js toggles .selected-row as the arrow keys walk the rows,
+ * but the class was never styled anywhere, so selection worked and was
+ * completely invisible. It is drawn as a row hover - the state users already
+ * read as "the row under the cursor" - because that is the affordance the
+ * shortcut is mimicking.
+ *
+ * Deliberately has no transition: with arrow keys stepping one row per keypress,
+ * an instant jump reads as direct manipulation where a fade reads as lag.
+ *
+ * THE TINT GOES THROUGH --tblr-table-bg-state, NOT background-color.
+ * Tabler paints each cell as
+ *   .table>:not(caption)>*>* { background-color: var(--tblr-table-bg); box-shadow: inset 0 0 0 9999px ... }
+ * so a background-color set on the <tr> is underneath an opaque cell and never
+ * shows. Setting the custom property on the row is inherited by every cell and
+ * is what actually tints it. --tblr-active-bg is defined per theme, so light
+ * and dark are covered by one rule with no duplicate.
+ */
+tr.selected-row {
+    --tblr-table-bg-state: var(--tblr-active-bg);
+}
+
+/*
+ * Delete selection (Alt+D) paints its left line in the danger hue; edit
+ * (Alt+E) keeps --tblr-primary blue. Same weight, same inset geometry, so
+ * the two modes are told apart by colour alone without moving a pixel of
+ * layout. Higher specificity than the rule below (one extra class) is
+ * enough to win.
+ */
+tr.selected-row.selected-delete > td:first-child {
+    box-shadow:
+        inset 3px 0 0 0 var(--tblr-danger),
+        inset 0 0 0 9999px var(--tblr-active-bg);
+}
+
+/*
+ * A <tr> cannot reliably paint a shadow, so the marker goes on the first cell.
+ * It restates the tint because this shadow replaces Tabler's on that cell.
+ * Kept inset so row height and column alignment do not move.
+ */
+tr.selected-row > td:first-child {
+    box-shadow:
+        inset 3px 0 0 0 var(--tblr-primary),
+        inset 0 0 0 9999px var(--tblr-active-bg);
+}
+
+/* ==========================================================================
+   Frosted elevation - dark
+   --------------------------------------------------------------------------
+   tokens.css holds the palette and the elevation tokens (--frz-edge,
+   --frz-surface-*, --frz-shadow-*); this is where they are spent.
+
+   Neutralizing the palette removed the hue seam that used to tell adjacent
+   layers apart, and the light-theme card shadow (rgba(0,0,0,.075)) is
+   invisible on a dark page - so every container melted into the next one.
+   In dark mode separation now comes from height instead:
+       body #1c1e20 -> card #212325 -> dropdown #26282a -> modal #2b2d2f
+   each with a white hairline (frosted glass catching light) and a black lift
+   that deepens as the layer rises. The ladder stays neutral, so it reads as
+   depth rather than as a second colour.
+
+   The !important on the card rules is deliberate: Bootstrap's .border-0 and
+   .shadow-sm are !important utilities and many cards use them, and a card
+   with neither edge nor lift disappears in dark mode.
+   ========================================================================== */
+
+[data-bs-theme="dark"] .card {
+    border: 1px solid var(--frz-edge) !important;
+    box-shadow: var(--frz-shadow-1) !important;
+}
+
+/* a card header is its own container inside the card: hairline, not a gap */
+[data-bs-theme="dark"] .card > .card-header {
+    border-bottom: 1px solid var(--frz-edge);
+}
+
+/* menus float above cards: one rung lighter, brighter edge, deeper lift */
+[data-bs-theme="dark"] .dropdown-menu {
+    background-color: var(--frz-surface-2);
+    border-color: var(--frz-edge-strong);
+    box-shadow: var(--frz-shadow-2);
+}
+
+/* modals sit on top of everything */
+[data-bs-theme="dark"] .modal-content {
+    border-color: var(--frz-edge-strong);
+    box-shadow: var(--frz-shadow-3);
+}
+
+/* fields are cut into the surface (darker than the card), so they need the
+   hairline to keep their outline once borders go neutral */
+[data-bs-theme="dark"] .form-control,
+[data-bs-theme="dark"] .form-select,
+[data-bs-theme="dark"] .input-group-text {
+    border-color: var(--frz-edge);
+}
+
+[data-bs-theme="dark"] .list-group-item {
+    border-color: var(--frz-edge);
+}
+
+/* The light twin of the block above - one ladder, both themes.
+   Tabler's light cards ship with .border-0 and .shadow-sm, so on a white
+   page they had neither edge nor lift: card and background read as one
+   sheet and nothing said "this is a container". Same shape as the dark
+   rule, spent in ink: --lt-edge for the seam, --lt-shadow-surface for the
+   resting lift (hover takes it one rung up in the @media (hover: hover)
+   block below).
+   !important mirrors the dark rule for the same reason: .border-0 and
+   .shadow-sm are Bootstrap !important utilities and most cards carry one. */
+html:not([data-bs-theme="dark"]) .card {
+    border: 1px solid var(--lt-edge) !important;
+    box-shadow: var(--lt-shadow-surface) !important;
+}
+
+/* --------------------------------------------------------------------------
+   Dark text colours Tabler never re-tunes for dark mode
+   --tblr-secondary is declared once in :root and not again for dark, so
+   .text-secondary / .btn-outline-secondary kept the light-theme #667382 on a
+   dark card: 3.3:1, under AA (it showed up on 16 dashboard elements).
+   --tblr-danger as text (#d63939 on #212325) measured 3.4:1 for the same
+   reason. Both are text-only lifts - fills and borders keep their tokens.
+   -------------------------------------------------------------------------- */
+[data-bs-theme="dark"] .text-secondary {
+    color: #a8b0b8 !important;
+}
+
+[data-bs-theme="dark"] .btn-outline-secondary {
+    color: #a8b0b8 !important;
+    border-color: rgba(168, 176, 184, 0.5);
+}
+
+/* .link-secondary is a second consumer of --tblr-secondary (same gap) */
+[data-bs-theme="dark"] .link-secondary {
+    color: #a8b0b8 !important;
+}
+
+[data-bs-theme="dark"] .text-danger {
+    color: #f06565 !important;
+}
+
+/* ==========================================================================
+   Light theme: status text that missed WCAG AA
+   --------------------------------------------------------------------------
+   Measured on the live dashboard (1600px, light): status badges paint the
+   VIBRANT status colour on a light tint of itself - #2fb344 on #eaf7ec is
+   2.5:1, #f76707 on #fef0e6 is 2.7:1 - and the trial banner's day count
+   inherits .alert-warning's #f76707 straight onto the page (2.9:1). All are
+   10-14px normal text, which needs 4.5:1.
+
+   These are text-only corrections: same hue, pulled down the lightness ramp
+   until each clears 4.6:1. Fills, borders, icons and dark mode are untouched.
+   Verified with ffdriver/audit-contrast.js (0 failures after this block).
+   ========================================================================== */
+
+html:not([data-bs-theme="dark"]) .badge.bg-success-lt {
+    color: #217e30 !important;
+}
+
+html:not([data-bs-theme="dark"]) .badge.bg-warning-lt {
+    color: #b74c05 !important;
+}
+
+html:not([data-bs-theme="dark"]) .badge.bg-danger-lt {
+    color: #cc2a2a !important;
+}
+
+html:not([data-bs-theme="dark"]) .badge.bg-secondary-lt {
+    color: #616e7c !important;
+}
+
+html:not([data-bs-theme="dark"]) .badge.bg-info-lt {
+    color: #0b62f1 !important;
+}
+
+html:not([data-bs-theme="dark"]) .alert-warning {
+    color: #b74c05;
+}
+
+/* --------------------------------------------------------------------------
+   Two dark text consumers the rules above do not reach:
+   - .bg-*-lt badges paint their OWN color with !important
+     (color: rgba(var(--tblr-danger-rgb)) etc.), so .text-danger never applies
+     to them; on the dark tints that vivid status colour measures 3.1-3.3:1.
+   - .btn-ghost-* colours itself through --tblr-btn-color, not through
+     .btn-outline-*, so "View All"-style ghost buttons kept --tblr-secondary
+     at 3.26:1.
+   Same text-only treatment: same hue family, lifted to clear 4.5:1.
+   -------------------------------------------------------------------------- */
+[data-bs-theme="dark"] .badge.bg-danger-lt {
+    color: #f06565 !important;
+}
+
+[data-bs-theme="dark"] .badge.bg-secondary-lt {
+    color: #a8b0b8 !important;
+}
+
+[data-bs-theme="dark"] .btn-ghost-secondary {
+    color: #a8b0b8 !important;
+}
+
+/* --------------------------------------------------------------------------
+   .min-width-0 - a utility the markup was already using but that no
+   stylesheet ever defined. Without it, flex children keep min-width:auto
+   (content-sized), so .text-truncate never engages: in the dashboard's
+   System Alerts list a long product name pushed its row wide and shoved the
+   quantity/date out of the card. Defining the class makes every existing
+   usage (and the name cells in system-alerts.blade.php) actually shrink.
+   -------------------------------------------------------------------------- */
+.min-width-0 {
+    min-width: 0;
+}
+
+/* --------------------------------------------------------------------------
+   Card hover - ONE elevation lift for every card in the app.
+   Dark raises the shadow one rung on the frosted ladder (--frz-shadow-2, the
+   same lift menus float on); light raises it one rung on its own ladder
+   (--lt-shadow-surface-hover, from tokens.css). The
+   translate is the "something is interactive here" cue that used to exist
+   only on a few hand-picked cards.
+   - !important on the shadow: .shadow-sm/.shadow-0 are Bootstrap !important
+     utilities and most cards carry one.
+   - guarded for prefers-reduced-motion and for the enable_animations=false
+     setting (body.no-animations), same as every other motion in the app.
+   -------------------------------------------------------------------------- */
+.card {
+    transition: transform var(--anim-base) ease, box-shadow var(--anim-base) ease;
+}
+
+@media (hover: hover) {
+    .card:hover {
+        transform: translateY(-2px);
+    }
+
+    html:not([data-bs-theme="dark"]) .card:hover {
+        box-shadow: var(--lt-shadow-surface-hover) !important;
+    }
+
+    [data-bs-theme="dark"] .card:hover {
+        box-shadow: var(--frz-shadow-2) !important;
+    }
+}
+
+/* The global body.no-animations * kill switch (line 74) already drops the
+   transition; what is left to stop is the 2px lift itself, which would
+   otherwise SNAP instead of ease. Same treatment as .nav-item-animate: null
+   the transform, keep the shadow (a colour change, not motion). */
+body.no-animations .card:hover {
+    transform: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .card {
+        transition: none;
+    }
+
+    .card:hover {
+        transform: none;
+    }
 }

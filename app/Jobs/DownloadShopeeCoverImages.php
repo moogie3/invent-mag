@@ -4,11 +4,13 @@ namespace App\Jobs;
 
 use App\Models\Product;
 use App\Models\Tenant;
+use App\Services\Shopee\ShopeeImportService;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
@@ -40,10 +42,15 @@ class DownloadShopeeCoverImages implements ShouldQueue
 
     /**
      * @param  array<int, array{product_id: int, url: string}>  $items
+     * @param  int|null  $progressUserId  owning user of the import progress token
+     * @param  string|null  $progressToken  import modal token; when set, the batch
+     *                                     increments the live media counters the modal polls
      */
     public function __construct(
         public int $tenantId,
         public array $items,
+        public ?int $progressUserId = null,
+        public ?string $progressToken = null,
     ) {}
 
     public function handle(): void
@@ -69,11 +76,38 @@ class DownloadShopeeCoverImages implements ShouldQueue
             }
         }
 
+        $this->reportProgress(count($this->items), $failures);
+
         if ($failures > 0) {
             // Fail the batch so the queue retries it (already-stored covers fast-path
             // on the next attempt); after $tries the batch lands in failed_jobs and
             // the modal's image phase drains to 0 instead of hanging silently.
             throw new \RuntimeException("{$failures} Shopee cover download(s) failed");
+        }
+    }
+
+    /**
+     * Increment the per-import media counters the modal polls. A batch counts
+     * as done only when every item succeeded; failures only count on the final
+     * attempt so a retry that later succeeds doesn't double-count. Best-effort:
+     * progress reporting must never fail a download batch.
+     */
+    private function reportProgress(int $processed, int $failures): void
+    {
+        if ($this->progressUserId === null || ! $this->progressToken) {
+            return;
+        }
+
+        try {
+            $base = ShopeeImportService::mediaProgressCacheKey($this->progressUserId, $this->progressToken);
+
+            if ($failures === 0) {
+                Cache::increment($base.'.done', $processed);
+            } elseif ($this->attempts() >= $this->tries) {
+                Cache::increment($base.'.failed', $processed);
+            }
+        } catch (\Throwable $e) {
+            report($e);
         }
     }
 

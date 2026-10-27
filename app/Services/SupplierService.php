@@ -2,6 +2,8 @@
 
 namespace App\Services;
 
+
+use App\Services\Concerns\BuildsListSearch;
 use App\Models\Supplier;
 use Dompdf\Dompdf;
 use Illuminate\Http\UploadedFile;
@@ -12,9 +14,22 @@ use Illuminate\Validation\Rule;
 
 class SupplierService
 {
-    public function getSupplierIndexData(int $entries)
+    use BuildsListSearch;
+    public function getSupplierIndexData(array $filters, int $entries)
     {
-        $suppliers = Supplier::paginate($entries);
+        $query = Supplier::query();
+
+        // Whole-catalog search — the paginator's COUNT(*) shares this WHERE.
+        $this->applyListSearch($query, $filters, [
+            'suppliers.code',
+            'suppliers.name',
+            'suppliers.phone_number',
+            'suppliers.email',
+            'suppliers.address',
+            'suppliers.location',
+        ]);
+
+        $suppliers = $query->paginate($entries);
         $inCount = Supplier::where('location', 'IN')->count();
         $outCount = Supplier::where('location', 'OUT')->count();
         $totalsupplier = Supplier::count();

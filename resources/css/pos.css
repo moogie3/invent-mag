@@ -1,3 +1,6 @@
+@import './tokens.css';
+
+
 /* ============================
    3. INVOICE CONTAINER STYLES
    ============================ */
@@ -7,12 +10,20 @@
     height: 500px;
 }
 
+/* The cart's scroll container is a bordered box, so it joins the ladder:
+   gainsboro was a warm off-palette grey that had no dark counterpart (it
+   glared as a light seam on a dark cart). --lt-edge / --frz-edge are the
+   same hairline every other container uses, in each theme's ink. */
 #productList {
     flex-grow: 1;
     overflow-y: hidden;
-    border: 1px solid gainsboro;
+    border: 1px solid var(--lt-edge);
     padding: 10px;
     max-height: 500px;
+}
+
+[data-bs-theme="dark"] #productList {
+    border-color: var(--frz-edge);
 }
 
 #productList:hover {
@@ -44,44 +55,41 @@
     background: white;
 }
 
-#productList .list-group-item {
-    transition: all 0.2s ease;
+/* dark: the total box was hardcoded white with no counterpart, so it stayed a
+   light slab in a dark cart - one rung above the card, edge included */
+[data-bs-theme="dark"] #totalPriceContainer {
+    background-color: var(--frz-surface-2);
+    border: 1px solid var(--frz-edge);
 }
 
-#productList .list-group-item:hover {
+#productList .list-group-item {
+    transition: all var(--anim-base) ease;
+}
+
+/* Hover: lift the row.
+   The rules below predate data-bs-theme - they were written against a
+   .theme-dark class the app never sets (no JS adds it either), so they never
+   matched: the black-on-pale hover painted in BOTH themes, and in dark mode
+   every descendant was forced to #000 while the quantity/price inputs kept
+   their dark background - which is exactly where the digits vanished.
+   Light keeps its pale lift; dark gets its own rung and leaves text at the
+   colour the theme already chose, so nothing can be forced black again. */
+html:not([data-bs-theme="dark"]) #productList .list-group-item:hover {
     background-color: #f8f9fa;
     color: #000000 !important;
 }
 
-#productList .list-group-item:hover strong,
-#productList .list-group-item:hover span,
-#productList .list-group-item:hover p,
-#productList .list-group-item:hover div,
-#productList .list-group-item:hover * {
+html:not([data-bs-theme="dark"]) #productList .list-group-item:hover strong,
+html:not([data-bs-theme="dark"]) #productList .list-group-item:hover span,
+html:not([data-bs-theme="dark"]) #productList .list-group-item:hover p,
+html:not([data-bs-theme="dark"]) #productList .list-group-item:hover div,
+html:not([data-bs-theme="dark"]) #productList .list-group-item:hover * {
     color: #000000 !important;
 }
 
-.theme-dark #productList .list-group-item:hover {
-    background-color: var(--tblr-bg-surface-secondary) !important;
-    /* Darker background on hover in dark mode */
-}
-
-.theme-dark #productList .list-group-item:hover strong,
-.theme-dark #productList .list-group-item:hover span,
-.theme-dark #productList .list-group-item:hover p,
-.theme-dark #productList .list-group-item:hover div {
-    color: #000000 !important;
-    /* Force text to black */
-}
-
-.theme-dark #productList .list-group-item:hover * {
-    color: #000000 !important;
-    /* Force all text descendants to black */
-}
-
-.theme-dark #productList .list-group-item:hover .input-group-text {
-    color: #000000 !important;
-    /* Force input group text to black */
+[data-bs-theme="dark"] #productList .list-group-item:hover {
+    background-color: var(--frz-surface-2) !important;
+    border-color: var(--frz-edge);
 }
 
 /* ============================

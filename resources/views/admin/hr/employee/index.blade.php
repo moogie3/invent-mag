@@ -62,6 +62,7 @@
                                                 </div>
                                             </div>
                                         </div>
+                                        <div id="invoiceTableContainer">
                                         <div class="table-responsive">
                                             <table class="table card-table table-vcenter">
                                                 <thead style="font-size: large">
@@ -151,6 +152,7 @@
                                                     @endforelse
                                                 </tbody>
                                             </table>
+                                        </div>
                                         </div>
                                         @if(method_exists($employees, 'links'))
                                             <div class="card-footer d-flex align-items-center">

@@ -13,7 +13,7 @@
 | Metric               | Value                                        |
 | -------------------- | -------------------------------------------- |
 | **🏗️ Architecture**  | Multi-tenant SaaS                            |
-| **🧪 Test Coverage** | 1099 tests / 3317 assertions                |
+| **🧪 Test Coverage** | 1455 tests / 3974 assertions                |
 | **💻 Codebase**      | 451+ commits, 1.5 years development          |
 | **🔐 Security**      | RBAC with 101 permissions, audit logging      |
 | **🐳 DevOps**        | Docker + GitHub Actions CI/CD                |
@@ -397,7 +397,7 @@ Data:
 
 #### Testing
 
-- **1099 Tests / 3317 Assertions:** 42 Feature + 53 Unit PHP + 173 JS Vitest (268 test files)
+- **1455 Tests / 3974 Assertions:** 50 Feature + 66 Unit PHP + 172 JS Vitest (288 test files)
 - **PHPUnit 11+:** Modern PHP testing
 - **Parallel Testing:** `php artisan test --parallel`
 - **Multi-tenancy Tests:** Tenant isolation testing
@@ -474,9 +474,9 @@ Data:
 
 ## 🧪 Test Coverage
 
-**1099 Tests / 3317 Assertions Covering:**
+**1455 Tests / 3974 Assertions Covering:**
 
-### Feature Tests (40)
+### Feature Tests (619)
 
 - Authentication & Authorization (5 tests)
 - Product Management (CRUD, bulk operations)
@@ -489,7 +489,7 @@ Data:
 - Sales Pipeline
 - Multi-tenancy
 
-### Unit Tests (45)
+### Unit Tests (627)
 
 - Service Layer (Dashboard, Sales, POS, Accounting, etc.)
 - Helper Classes (Currency, Sales, Product)
@@ -616,6 +616,7 @@ docker-compose exec app php artisan migrate --seed
 - ✅ **Tutorial Expansion** — Added 4 new tutorial step keys (`tax_auto_sync`, `tax_breakdown_ret`, `opportunity_amount_tax`, `item_discount_type_qt`) to English and Indonesian translations
 - ✅ **Stability Fix** — `onPageLoad` deduplication fix preventing double card rendering and duplicate event listeners on the pipeline page
 - ✅ **Test Suite Hardening** — Fixed 17 previously failing unit tests; 1099 passing, 0 failures
+- ✅ **UI Consistency Pass (both themes)** — frosted elevation ladder in dark mode, a visible edge + shadow system in light mode (cards, navbar seam, standalone pages such as settings/receipt/POS), brand title window-centred in every navigation mode, and a WCAG contrast gate holding at 0 failures in both themes — full rationale in [`docs/CHANGELOG.md`](docs/CHANGELOG.md) (Changes 21–34)
 
 ### Recently Added (v1.8)
 

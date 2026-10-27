@@ -122,7 +122,7 @@
 </div>
 
 <!-- Quick Create Customer Modal -->
-<div class="modal fade" id="quickCreateCustomerModal" tabindex="-1" aria-labelledby="quickCreateCustomerModalLabel"
+<div class="modal modal-blur fade" id="quickCreateCustomerModal" tabindex="-1" aria-labelledby="quickCreateCustomerModalLabel"
     aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content border-0 shadow-lg rounded-3">
@@ -180,7 +180,7 @@
 </div>
 
 <!-- Quick Create Product Modal -->
-<div class="modal fade" id="quickCreateProductModal" tabindex="-1" aria-labelledby="quickCreateProductModalLabel"
+<div class="modal modal-blur fade" id="quickCreateProductModal" tabindex="-1" aria-labelledby="quickCreateProductModalLabel"
     aria-hidden="true">
     <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
         <div class="modal-content border-0 shadow-lg rounded-3">

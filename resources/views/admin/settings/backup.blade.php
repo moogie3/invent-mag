@@ -208,7 +208,24 @@
                                             </div>
 
                                             {{-- Password Form --}}
-                                                    <div class="settings-section">
+                                            {{-- The header is load-bearing layout,
+                                                 not decoration: .settings-section-content
+                                                 carries margin-left:56px to sit under
+                                                 the section title (icon 40 + 16 gap).
+                                                 Without a header that indent just read
+                                                 as misalignment under the full-width
+                                                 alert, and the Save button sat outside
+                                                 the content box - every other section
+                                                 keeps its action inside. --}}
+                                            <div class="settings-section">
+                                                <div class="settings-section-header">
+                                                    <div class="settings-icon-wrapper">
+                                                        <i class="ti ti-key"></i>
+                                                    </div>
+                                                    <div class="settings-section-title">
+                                                        <h3 class="mb-1">{{ __('messages.backup_password') }}</h3>
+                                                    </div>
+                                                </div>
                                                 <form action="{{ route('admin.setting.backup.password') }}" method="POST" id="passwordForm">
                                                     @csrf
                                                     <div class="settings-section-content">
@@ -236,9 +253,7 @@
                                                                 <span class="form-check-label">{{ __('messages.backup_encryption_enable') }}</span>
                                                             </label>
                                                         </div>
-                                                    </div>
-                                                    <div class="card-footer bg-transparent pt-0">
-                                                        <div class="btn-list justify-content-end">
+                                                        <div class="d-flex justify-content-end">
                                                             <button type="submit" class="btn btn-primary">
                                                                 <i class="ti ti-device-floppy me-1"></i>{{ __('messages.save') }}
                                                             </button>

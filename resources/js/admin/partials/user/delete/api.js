@@ -56,7 +56,7 @@ export function initDeleteUserFormSubmission() {
                         `tr:has(a[data-user-id="${currentUserId}"])`
                     );
                     if (userRow) {
-                        userRow.style.transition = "opacity 0.3s";
+                        userRow.style.transition = "opacity var(--anim-slow)";
                         userRow.style.opacity = "0";
                         setTimeout(() => {
                             userRow.remove();

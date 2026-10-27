@@ -138,40 +138,16 @@
                                 <th class="text-end fs-4 fw-bold">{{ __('messages.action') }}</th>
                             </tr>
                         </thead>
-                        <tbody>
-                            @foreach ($lowStockProductsPerWarehouse as $pw)
-                                <tr>
-                                    <td>{{ $pw->product->name }}</td>
-                                    <td class="text-center">
-                                        @if($pw->warehouse)
-                                            <span class="badge bg-primary-lt text-primary">{{ $pw->warehouse->name }}</span>
-                                        @else
-                                            <span class="text-muted">N/A</span>
-                                        @endif
-                                    </td>
-                                    @php
-                                        [
-                                            $stockBadgeClass,
-                                            $stockBadgeText,
-                                        ] = \App\Helpers\ProductHelper::getStockClassAndText($pw->quantity ?? 0, $pw->product->low_stock_threshold ?? 10);
-                                    @endphp
-                                    <td class="text-center">
-                                        <span class="{{ $stockBadgeClass }}">
-                                            {{ $pw->quantity }}
-                                            @if ($stockBadgeText)
-                                                <small>({{ $stockBadgeText }})</small>
-                                            @endif
-                                        </span>
-                                    </td>
-                                    <td class="text-center">{{ $pw->product->low_stock_threshold ?? 10 }}</td>
-                                    <td class="text-end">
-                                        <a href="{{ route('admin.product.edit', $pw->product->id) }}"
-                                            class="btn btn-icon btn-ghost-primary" title="{{ __('messages.edit') }}">
-                                            <i class="ti ti-edit"></i>
-                                        </a>
-                                    </td>
-                                </tr>
-                            @endforeach
+                        <tbody id="lowStockModalBody">
+                            {{-- Fetched on modal open (see main.js) — rendering the
+                                 full low-stock list server-side made every product
+                                 page ~1.1MB and added seconds to each load. --}}
+                            <tr>
+                                <td colspan="5" class="text-center py-4">
+                                    <div class="spinner-border text-primary" role="status"></div>
+                                    <p class="mt-2 text-muted small mb-0">{{ __('messages.loading') }}</p>
+                                </td>
+                            </tr>
                         </tbody>
                     </table>
                     <div class="text-muted small mt-3">
@@ -713,7 +689,9 @@
                     data-label-progress-products="{{ __('messages.import_shopee_progress_products') }}"
                     data-label-progress-queueing="{{ __('messages.import_shopee_progress_queueing') }}"
                     data-label-progress-images="{{ __('messages.import_shopee_progress_images') }}"
-                    data-label-progress-complete="{{ __('messages.import_shopee_progress_complete') }}">
+                    data-label-progress-complete="{{ __('messages.import_shopee_progress_complete') }}"
+                    data-label-media-done="{{ __('messages.import_shopee_media_done') }}"
+                    data-label-media-partial="{{ __('messages.import_shopee_media_partial') }}">
                     @csrf
                     <input type="hidden" name="progress_token" id="shopeeImportProgressToken" value="">
                     <div class="row g-3">

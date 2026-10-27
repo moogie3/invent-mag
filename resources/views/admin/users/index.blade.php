@@ -133,6 +133,7 @@
                                         </div>
 
                                         {{-- TABLE --}}
+                                        <div id="invoiceTableContainer">
                                         <div class="table-responsive">
                                             <table class="table card-table table-vcenter">
                                                 <thead style="font-size: large">
@@ -195,6 +196,7 @@
                                                     @endforeach
                                                 </tbody>
                                             </table>
+                                        </div>
                                         </div>
 
                                         {{-- PAGINATION (if you have pagination for users) --}}

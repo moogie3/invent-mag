@@ -12,8 +12,11 @@ function showLoader() {
     
     const loader = document.getElementById('global-loader');
     if (loader) {
-        // Ensure display:flex is set if it was hidden by previous hideLoader
+        // Re-arm the overlay: hideLoader fades it and drops pointer-events so a
+        // finished page stops swallowing clicks.
         loader.style.display = 'flex';
+        loader.style.opacity = '1';
+        loader.style.pointerEvents = 'all';
         
         // Force a reflow for transition
         loader.offsetHeight;
@@ -34,9 +37,16 @@ function hideLoader() {
     const loader = document.getElementById('global-loader');
     if (loader) {
         document.body.classList.remove('is-loading-page');
-        
-        // After transition finishes, set display:none to completely remove from layout
-        // matches transition: opacity 0.3s ease-in-out in CSS
+
+        // The loader's inline display/opacity/pointer-events outlive the
+        // .is-loading-page !important rules, so until the timeout below landed
+        // it stayed a full-screen, hit-testable layer over a page that already
+        // looked finished — every click (the notification bell, nav links,
+        // table rows) hit it and went nowhere. Fade and disarm immediately;
+        // the transition still plays because display stays flex for 400ms.
+        loader.style.pointerEvents = 'none';
+        loader.style.opacity = '0';
+
         setTimeout(() => {
             if (!document.body.classList.contains('is-loading-page')) {
                 loader.style.display = 'none';

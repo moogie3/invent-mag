@@ -117,7 +117,7 @@
 </div>
 
 <!-- View Warehouse Modal -->
-<div class="modal fade" id="viewWarehouseModal" tabindex="-1" aria-labelledby="viewWarehouseModalLabel"
+<div class="modal modal-blur fade" id="viewWarehouseModal" tabindex="-1" aria-labelledby="viewWarehouseModalLabel"
     aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-xl">
         <div class="modal-content border-0 shadow-lg rounded-3">
@@ -193,7 +193,7 @@
     </div>
 </div>
 
-<div class="modal fade" id="mainWarehouseErrorModal" tabindex="-1" aria-labelledby="mainWarehouseErrorModalLabel"
+<div class="modal modal-blur fade" id="mainWarehouseErrorModal" tabindex="-1" aria-labelledby="mainWarehouseErrorModalLabel"
     aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content border-0 shadow-lg rounded-3">
@@ -212,7 +212,7 @@
     </div>
 </div>
 
-<div class="modal fade" id="createWarehouseModal" tabindex="-1" aria-labelledby="createWarehouseModalLabel"
+<div class="modal modal-blur fade" id="createWarehouseModal" tabindex="-1" aria-labelledby="createWarehouseModalLabel"
     aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content border-0 shadow-lg rounded-3">
@@ -254,7 +254,7 @@
     </div>
 </div>
 
-<div class="modal fade" id="editWarehouseModal" tabindex="-1" aria-labelledby="editWarehouseModalLabel"
+<div class="modal modal-blur fade" id="editWarehouseModal" tabindex="-1" aria-labelledby="editWarehouseModalLabel"
     aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content border-0 shadow-lg rounded-3">

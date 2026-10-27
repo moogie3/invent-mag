@@ -13,7 +13,7 @@
     width: 280px;
     background-color: #fff;
     border-right: 1px solid #e0e6ed;
-    transition: width 0.35s cubic-bezier(0.25, 0.8, 0.25, 1);
+    transition: width var(--anim-slow) cubic-bezier(0.25, 0.8, 0.25, 1);
     z-index: 1030;
     height: 100vh;
     overflow-y: auto;
@@ -36,21 +36,55 @@
     width: 70px;
 }
 
-/* Main Content Area */
+/* Main Content Area
+
+   --main-ml mirrors margin-left EXACTLY, on every rule that sets it. The
+   navbar brand centres itself off this value (navbar.css, #navbar-brand-title):
+   the bar lives in here, so once the sidebar pushes the bar right, "centred in
+   the bar" and "centred in the window" are two different places - the title
+   drifted half the sidebar width right of centre.
+
+   Registered as <length> so it can be transitioned: an unregistered custom
+   property flips instantly, which would snap the title to its final spot at
+   the START of the bar's slide while the bar was still moving. Both
+   properties animate on the same timeline, so the title stays dead-centre
+   through the whole collapse/expand. */
+@property --main-ml {
+    syntax: "<length>";
+    inherits: true;
+    initial-value: 0px;
+}
+
 .main-content {
+    --main-ml: 280px;
     flex-grow: 1;
     margin-left: 280px;
-    transition: margin-left 0.35s cubic-bezier(0.25, 0.8, 0.25, 1);
+    /* A flex item's automatic minimum is its min-content width, and the
+       dashboard's chart canvas reports 1320px. With the sidebar open on a
+       1600px screen that clamped the bar 12px PAST the visible edge (under
+       the scrollbar), so "centre the bar" was centring on a box 12px wider
+       than the window. min-width:0 lets it size to the space it actually
+       has; the too-wide canvas now overflows INSIDE and is clipped by
+       .wrapper's overflow-x: clip, exactly as before - but the bar, its
+       container and the brand title all land on the real window centre. */
+    min-width: 0;
+    transition:
+        margin-left var(--anim-slow) cubic-bezier(0.25, 0.8, 0.25, 1),
+        --main-ml var(--anim-slow) cubic-bezier(0.25, 0.8, 0.25, 1);
     min-height: 100vh;
 }
 
 .main-content.sidebar-collapsed {
+    --main-ml: 70px;
     margin-left: 70px;
 }
 
 /* Sidebar only - margin is already set above */
 
+/* Wins over .sidebar-collapsed above (type + 2 classes beats 2 classes), so
+   the brand's compensation resolves to 0 here too - one rule governs both. */
 body.layout-navbar .main-content {
+    --main-ml: 0px;
     margin-left: 0;
     width: 100%;
     max-width: 100vw;
@@ -67,7 +101,7 @@ body.layout-navbar .main-content {
     text-align: left;
     /* Changed to left */
     margin: 0;
-    transition: all 0.35s cubic-bezier(0.25, 0.8, 0.25, 1);
+    transition: all var(--anim-slow) cubic-bezier(0.25, 0.8, 0.25, 1);
     display: flex;
     flex-direction: row;
     align-items: center;
@@ -94,7 +128,7 @@ body.layout-navbar .main-content {
 .brand-text {
     opacity: 1;
     transform: translateX(0);
-    transition: all 0.35s cubic-bezier(0.25, 0.8, 0.25, 1);
+    transition: all var(--anim-slow) cubic-bezier(0.25, 0.8, 0.25, 1);
     white-space: nowrap;
     line-height: 1.2;
     display: flex;
@@ -112,7 +146,7 @@ body.layout-navbar .main-content {
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: all 0.35s cubic-bezier(0.25, 0.8, 0.25, 1);
+    transition: all var(--anim-slow) cubic-bezier(0.25, 0.8, 0.25, 1);
     width: 20%;
     height: auto;
     flex-shrink: 0;
@@ -123,7 +157,7 @@ body.layout-navbar .main-content {
 .brand-icon .brand-icon {
     /* Handle both cases due to duplicate class in HTML */
     font-size: 1.75rem;
-    transition: all 0.35s cubic-bezier(0.25, 0.8, 0.25, 1);
+    transition: all var(--anim-slow) cubic-bezier(0.25, 0.8, 0.25, 1);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -163,7 +197,7 @@ body.layout-navbar .main-content {
     padding: 0;
     border-bottom: 1px solid #e0e6ed;
     position: relative;
-    transition: padding 0.35s cubic-bezier(0.25, 0.8, 0.25, 1);
+    transition: padding var(--anim-slow) cubic-bezier(0.25, 0.8, 0.25, 1);
     height: 72px;
     /* Use exact height instead of min-height */
 }
@@ -191,7 +225,7 @@ body.layout-navbar .main-content {
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: all var(--anim-base) cubic-bezier(0.4, 0, 0.2, 1);
     transform: translateY(-50%);
     z-index: 10;
     margin-left: 10px;
@@ -214,7 +248,7 @@ body.layout-navbar .main-content {
     padding: 1rem 1.5rem;
     margin-bottom: 0;
     position: relative;
-    transition: padding 0.35s cubic-bezier(0.25, 0.8, 0.25, 1);
+    transition: padding var(--anim-slow) cubic-bezier(0.25, 0.8, 0.25, 1);
 }
 
 .sidebar.collapsed .sidebar-user {
@@ -233,7 +267,7 @@ body.layout-navbar .main-content {
     right: 1rem;
     height: 1px;
     background-color: #e0e6ed;
-    transition: all 0.35s cubic-bezier(0.25, 0.8, 0.25, 1);
+    transition: all var(--anim-slow) cubic-bezier(0.25, 0.8, 0.25, 1);
 }
 
 .sidebar.collapsed .sidebar-user::after {
@@ -246,7 +280,7 @@ body.layout-navbar .main-content {
     align-items: center;
     gap: 0.75rem;
     justify-content: space-between;
-    transition: all 0.35s cubic-bezier(0.25, 0.8, 0.25, 1);
+    transition: all var(--anim-slow) cubic-bezier(0.25, 0.8, 0.25, 1);
     width: 100%;
 }
 
@@ -264,7 +298,7 @@ body.layout-navbar .main-content {
     gap: 0.75rem;
     flex: 1;
     min-width: 0;
-    transition: all 0.35s cubic-bezier(0.25, 0.8, 0.25, 1);
+    transition: all var(--anim-slow) cubic-bezier(0.25, 0.8, 0.25, 1);
 }
 
 .sidebar.collapsed .user-content {
@@ -279,7 +313,7 @@ body.layout-navbar .main-content {
     align-items: center;
     justify-content: center;
     flex-shrink: 0;
-    transition: all 0.35s cubic-bezier(0.25, 0.8, 0.25, 1);
+    transition: all var(--anim-slow) cubic-bezier(0.25, 0.8, 0.25, 1);
 }
 
 .user-avatar .avatar {
@@ -288,7 +322,7 @@ body.layout-navbar .main-content {
     border-radius: 50%;
     background-size: cover;
     background-position: center;
-    transition: all 0.35s cubic-bezier(0.25, 0.8, 0.25, 1);
+    transition: all var(--anim-slow) cubic-bezier(0.25, 0.8, 0.25, 1);
 }
 
 .sidebar.collapsed .user-avatar .avatar {
@@ -301,7 +335,7 @@ body.layout-navbar .main-content {
     flex-direction: column;
     min-width: 0;
     flex: 1;
-    transition: all 0.35s cubic-bezier(0.25, 0.8, 0.25, 1);
+    transition: all var(--anim-slow) cubic-bezier(0.25, 0.8, 0.25, 1);
     opacity: 1;
     transform: translateX(0);
 }
@@ -320,7 +354,7 @@ body.layout-navbar .main-content {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    transition: all 0.35s cubic-bezier(0.25, 0.8, 0.25, 1);
+    transition: all var(--anim-slow) cubic-bezier(0.25, 0.8, 0.25, 1);
 }
 
 .user-role {
@@ -329,7 +363,7 @@ body.layout-navbar .main-content {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    transition: all 0.35s cubic-bezier(0.25, 0.8, 0.25, 1);
+    transition: all var(--anim-slow) cubic-bezier(0.25, 0.8, 0.25, 1);
 }
 
 /* Sidebar Actions (Theme toggle, notifications, etc.) */
@@ -338,11 +372,16 @@ body.layout-navbar .main-content {
     align-items: center;
     gap: 0.25rem;
     flex-shrink: 0;
-    transition: all 0.35s cubic-bezier(0.25, 0.8, 0.25, 1);
+    transition: all var(--anim-slow) cubic-bezier(0.25, 0.8, 0.25, 1);
     opacity: 1;
     transform: translateX(0);
     max-width: none;
-    overflow: hidden;
+    /*
+     * No overflow:hidden here: it clipped the notification dot's wave
+     * (the ::after scales to 3x) so the sidebar's ripple looked cut
+     * short next to the navbar twin. The clip is only needed once the
+     * row itself is collapsing to width 0.
+     */
 }
 
 .sidebar.collapsed .sidebar-actions {
@@ -353,13 +392,14 @@ body.layout-navbar .main-content {
     transform: translateX(20px);
     margin: 0;
     gap: 0;
+    overflow: hidden;
 }
 
 .sidebar-actions .nav-link {
     padding: 0.5rem;
     border-radius: 0.375rem;
     color: #6c757d;
-    transition: all 0.25s cubic-bezier(0.25, 0.8, 0.25, 1);
+    transition: all var(--anim-base) cubic-bezier(0.25, 0.8, 0.25, 1);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -379,7 +419,7 @@ body.layout-navbar .main-content {
 .sidebar-nav {
     flex: 1;
     padding: 1rem 1rem 0 1rem;
-    transition: padding 0.35s cubic-bezier(0.25, 0.8, 0.25, 1);
+    transition: padding var(--anim-slow) cubic-bezier(0.25, 0.8, 0.25, 1);
 }
 
 .sidebar.collapsed .sidebar-nav {
@@ -393,7 +433,13 @@ body.layout-navbar .main-content {
 .sidebar .navbar-nav .nav-item {
     margin-bottom: 0.25rem;
     width: 100%;
-    transition: all 0.35s cubic-bezier(0.25, 0.8, 0.25, 1);
+    /*
+     * --anim-base to match .sidebar .navbar-nav .nav-link directly below: these
+     * two are the rules that actually govern the reveal (both sit at (0,3,0) and
+     * outrank .nav-item-animate and .nav-submenu .nav-item), so if they disagree
+     * the parent link and its child finish fading in at different moments.
+     */
+    transition: all var(--anim-base) cubic-bezier(0.25, 0.8, 0.25, 1);
 }
 
 .sidebar.collapsed .navbar-nav .nav-item {
@@ -410,7 +456,7 @@ body.layout-navbar .main-content {
     color: #495057;
     font-weight: 500;
     border-radius: 0.5rem;
-    transition: all 0.25s cubic-bezier(0.25, 0.8, 0.25, 1);
+    transition: all var(--anim-base) cubic-bezier(0.25, 0.8, 0.25, 1);
     text-decoration: none;
     min-height: 44px;
     position: relative;
@@ -465,7 +511,7 @@ body.layout-navbar .main-content {
     justify-content: center;
     flex-shrink: 0;
     line-height: 1;
-    transition: all 0.35s cubic-bezier(0.25, 0.8, 0.25, 1);
+    transition: all var(--anim-slow) cubic-bezier(0.25, 0.8, 0.25, 1);
 }
 
 .sidebar.collapsed .nav-link-icon {
@@ -481,7 +527,7 @@ body.layout-navbar .main-content {
     line-height: 1.2;
     display: flex;
     align-items: center;
-    transition: all 0.35s cubic-bezier(0.25, 0.8, 0.25, 1);
+    transition: all var(--anim-slow) cubic-bezier(0.25, 0.8, 0.25, 1);
     white-space: nowrap;
     opacity: 1;
     transform: translateX(0);
@@ -502,7 +548,7 @@ body.layout-navbar .main-content {
     width: 16px;
     height: 16px;
     flex-shrink: 0;
-    transition: all 0.35s cubic-bezier(0.25, 0.8, 0.25, 1);
+    transition: all var(--anim-slow) cubic-bezier(0.25, 0.8, 0.25, 1);
     opacity: 1;
     transform: translateX(0);
 }
@@ -520,7 +566,7 @@ body.layout-navbar .main-content {
     padding: 0;
     margin: 0.5rem 0;
     padding-left: 2.5rem;
-    transition: all 0.35s cubic-bezier(0.25, 0.8, 0.25, 1);
+    transition: all var(--anim-slow) cubic-bezier(0.25, 0.8, 0.25, 1);
     max-height: 500px;
     overflow: hidden;
 }
@@ -531,18 +577,42 @@ body.layout-navbar .main-content {
     padding: 0;
 }
 
+/* Dark: a submenu is a nested layer of its own, not just indented text - a
+   hairline rail ties its items together and marks the indent, the same white
+   edge the cards/dropdowns use (see app.css "Frosted elevation"). It sits
+   inside the 2.5rem indent, so it lines up with the parent icon's right edge,
+   and disappears when the sidebar is collapsed (items become icon-only). */
+[data-bs-theme="dark"] .nav-submenu {
+    position: relative;
+}
+
+[data-bs-theme="dark"] .nav-submenu::before {
+    content: "";
+    position: absolute;
+    left: 1.15rem;
+    top: 0.25rem;
+    bottom: 0.25rem;
+    width: 1px;
+    background-color: var(--frz-edge);
+    pointer-events: none;
+}
+
+[data-bs-theme="dark"] .sidebar.collapsed .nav-submenu::before {
+    display: none;
+}
+
 .nav-submenu .nav-link {
     padding: 0.5rem 1rem;
     font-size: 0.875rem;
     min-height: 36px;
-    transition: all 0.25s cubic-bezier(0.25, 0.8, 0.25, 1);
+    transition: all var(--anim-base) cubic-bezier(0.25, 0.8, 0.25, 1);
 }
 
 /* Sidebar Footer */
 .sidebar-footer {
     position: relative;
     padding: 1rem;
-    transition: padding 0.35s cubic-bezier(0.25, 0.8, 0.25, 1);
+    transition: padding var(--anim-slow) cubic-bezier(0.25, 0.8, 0.25, 1);
 }
 
 .sidebar.collapsed .sidebar-footer {
@@ -559,7 +629,7 @@ body.layout-navbar .main-content {
     right: 1rem;
     height: 1px;
     background-color: #e0e6ed;
-    transition: all 0.35s cubic-bezier(0.25, 0.8, 0.25, 1);
+    transition: all var(--anim-slow) cubic-bezier(0.25, 0.8, 0.25, 1);
 }
 
 .sidebar.collapsed .sidebar-footer::before {
@@ -616,7 +686,7 @@ body.layout-navbar .main-content {
     opacity: 0;
     visibility: hidden;
     transform: translateX(-8px) scale(0.95);
-    transition: all 0.15s cubic-bezier(0.25, 0.8, 0.25, 1);
+    transition: all var(--anim-fast) cubic-bezier(0.25, 0.8, 0.25, 1);
     pointer-events: none;
 }
 
@@ -680,37 +750,49 @@ body.layout-navbar .main-content {
 
 /* Animation Classes for JavaScript */
 .sidebar-fast-close {
-    transition: width 0.15s ease-out;
+    transition: width var(--anim-fast) ease-out;
 }
 
 .main-content-fast-close {
-    transition: margin-left 0.15s ease-out;
+    transition:
+        margin-left var(--anim-fast) ease-out,
+        --main-ml var(--anim-fast) ease-out;
 }
 
 .sidebar-smooth-open {
-    transition: width 0.35s cubic-bezier(0.25, 0.8, 0.25, 1);
+    transition: width var(--anim-slow) cubic-bezier(0.25, 0.8, 0.25, 1);
 }
 
 .main-content-smooth-open {
-    transition: margin-left 0.35s cubic-bezier(0.25, 0.8, 0.25, 1);
+    transition:
+        margin-left var(--anim-slow) cubic-bezier(0.25, 0.8, 0.25, 1),
+        --main-ml var(--anim-slow) cubic-bezier(0.25, 0.8, 0.25, 1);
 }
 
 .nav-text-fade-out {
     opacity: 0;
     transform: translateX(-20px);
-    transition: all 0.1s ease-out;
+    transition: all var(--anim-fast) ease-out;
 }
 
 .nav-text-slide-in {
     opacity: 1;
     transform: translateX(0);
-    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    transition: all var(--anim-slow) cubic-bezier(0.25, 0.8, 0.25, 1);
 }
 
 .nav-item-animate {
     opacity: 0;
     transform: translateY(10px);
-    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    /*
+     * --anim-base, not --anim-slow: .sidebar .navbar-nav .nav-link (line 406)
+     * sits at specificity (0,3,0) and beats this rule's (0,1,0), so 0.3s here
+     * never took effect — the link revealed at 0.2s while submenu items below
+     * revealed at 0.3s, and the two never lined up. Matching the value that
+     * actually wins means declared and effective are the same number whichever
+     * rule the cascade picks.
+     */
+    transition: all var(--anim-base) cubic-bezier(0.25, 0.8, 0.25, 1);
 }
 
 .nav-item-animate.visible {
@@ -724,7 +806,7 @@ html[data-bs-theme="dark"] .sidebar,
 body[data-bs-theme="dark"] .sidebar,
 .dark .sidebar,
 [data-theme="dark"] .sidebar {
-    background-color: #0d1520 !important;
+    background-color: #121416 !important;
     border-right-color: rgba(255, 255, 255, 0.08) !important;
 }
 
@@ -773,7 +855,7 @@ html[data-bs-theme="dark"] .user-role,
 body[data-bs-theme="dark"] .user-role,
 .dark .user-role,
 [data-theme="dark"] .user-role {
-    color: #94a3b8 !important;
+    color: #a0a2a4 !important;
 }
 
 [data-bs-theme="dark"] .sidebar-actions .nav-link,
@@ -809,7 +891,7 @@ html[data-bs-theme="dark"] .sidebar .navbar-nav .nav-link,
 body[data-bs-theme="dark"] .sidebar .navbar-nav .nav-link,
 .dark .sidebar .navbar-nav .nav-link,
 [data-theme="dark"] .sidebar .navbar-nav .nav-link {
-    color: #e2e8f0 !important;
+    color: #f1f3f5 !important;
 }
 
 [data-bs-theme="dark"] .sidebar:not(.collapsed) .navbar-nav .nav-link:hover,
@@ -818,7 +900,7 @@ body[data-bs-theme="dark"] .sidebar:not(.collapsed) .navbar-nav .nav-link:hover,
 .dark .sidebar:not(.collapsed) .navbar-nav .nav-link:hover,
 [data-theme="dark"] .sidebar:not(.collapsed) .navbar-nav .nav-link:hover {
     background-color: #f8f9fa !important;
-    color: #343a40 !important;
+    color: #37393b !important;
 }
 
 [data-bs-theme="dark"] .sidebar:not(.collapsed) .navbar-nav .nav-link:hover .nav-link-icon,
@@ -831,7 +913,7 @@ body[data-bs-theme="dark"] .sidebar:not(.collapsed) .navbar-nav .nav-link:hover 
 .dark .sidebar:not(.collapsed) .navbar-nav .nav-link:hover .nav-link-title,
 [data-theme="dark"] .sidebar:not(.collapsed) .navbar-nav .nav-link:hover .nav-link-icon,
 [data-theme="dark"] .sidebar:not(.collapsed) .navbar-nav .nav-link:hover .nav-link-title {
-    color: #343a40 !important;
+    color: #37393b !important;
 }
 
 [data-bs-theme="dark"] .sidebar.collapsed .navbar-nav .nav-link:hover,
@@ -840,7 +922,7 @@ body[data-bs-theme="dark"] .sidebar.collapsed .navbar-nav .nav-link:hover,
 .dark .sidebar.collapsed .navbar-nav .nav-link:hover,
 [data-theme="dark"] .sidebar.collapsed .navbar-nav .nav-link:hover {
     background-color: #f8f9fa !important;
-    color: #343a40 !important;
+    color: #37393b !important;
 }
 
 [data-bs-theme="dark"] .sidebar .navbar-nav .nav-link.active,
@@ -859,7 +941,7 @@ body[data-bs-theme="dark"] .sidebar .navbar-nav .nav-link.active:hover,
 [data-theme="dark"] .sidebar .navbar-nav .nav-link.active:focus,
 [data-theme="dark"] .sidebar .navbar-nav .nav-link.active:hover {
     background-color: #e9ecef !important;
-    color: #343a40 !important;
+    color: #37393b !important;
 }
 
 [data-bs-theme="dark"] .sidebar-lock-btn,
@@ -918,10 +1000,6 @@ html {
     opacity: 0;
     transform: translateY(10px);
 }
-.nav-submenu .nav-item {
-    transition: opacity 0.5s cubic-bezier(0.25, 0.8, 0.25, 1), transform 0.5s cubic-bezier(0.25, 0.8, 0.25, 1);
-}
-
 .nav-submenu .nav-item.visible {
     opacity: 1;
     transform: translateY(0);
@@ -929,5 +1007,5 @@ html {
 
 /* Ensure collapse transitions correctly within a collapsed sidebar */
 .sidebar.collapsed .collapse {
-    transition: max-height 0.35s cubic-bezier(0.25, 0.8, 0.25, 1);
+    transition: max-height var(--anim-slow) cubic-bezier(0.25, 0.8, 0.25, 1);
 }

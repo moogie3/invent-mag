@@ -65,7 +65,7 @@
 
 </head>
 
-<body data-currency-settings='{{ json_encode(['locale' => $currencySettings->locale, 'currency_code' => $currencySettings->currency_code, 'currency_symbol' => $currencySettings->currency_symbol, 'decimal_places' => $currencySettings->decimal_places, 'decimal_separator' => $currencySettings->decimal_separator, 'thousand_separator' => $currencySettings->thousand_separator, 'position' => $currencySettings->position]) }}'
+<body data-route="{{ Route::currentRouteName() }}" data-currency-settings='{{ json_encode(['locale' => $currencySettings->locale, 'currency_code' => $currencySettings->currency_code, 'currency_symbol' => $currencySettings->currency_symbol, 'decimal_places' => $currencySettings->decimal_places, 'decimal_separator' => $currencySettings->decimal_separator, 'thousand_separator' => $currencySettings->thousand_separator, 'position' => $currencySettings->position]) }}'
     class="is-loading-page {{ auth()->check() && (auth()->user()->system_settings['navigation_type'] ?? 'sidebar') === 'navbar' ? 'layout-navbar' : ((auth()->user()->system_settings['navigation_type'] ?? 'sidebar') === 'both' ? 'layout-navbar-v2' : '') }} {{ auth()->check() && (auth()->user()->system_settings['sticky_navbar'] ?? false) ? 'sticky-navbar' : '' }} {{ auth()->check() && (auth()->user()->system_settings['sidebar_lock'] ?? false) ? 'sidebar-locked' : '' }}">
 
     @include('admin.layouts.partials.global-loader')

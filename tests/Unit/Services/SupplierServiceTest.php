@@ -35,7 +35,7 @@ class SupplierServiceTest extends TestCase
     public function it_can_get_supplier_index_data()
     {
         Supplier::factory()->count(5)->create();
-        $data = $this->supplierService->getSupplierIndexData(10);
+        $data = $this->supplierService->getSupplierIndexData([], 10);
 
         $this->assertArrayHasKey('suppliers', $data);
         $this->assertArrayHasKey('entries', $data);

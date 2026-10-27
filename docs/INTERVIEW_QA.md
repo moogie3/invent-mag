@@ -3247,3 +3247,279 @@ The system implements a clever token-based impersonation handoff in `SuperAdmin\
 2. Redirects the superadmin to `https://{tenant.domain}/admin/dashboard?impersonation_token={encrypted_payload}`.
 3. A middleware (`CaptureImpersonation`) intercepting the tenant domain decrypts this token, forcefully logs the superadmin into the `web` guard as that tenant's user, sets session variables, and drops the token from the URL.
 4. To exit, a `POST /admin/stop-impersonating` route (defined in `web.php`) clears the session and redirects the user back across domains to the stored `superadmin_return_url`.
+
+---
+
+## §54 — Two Silent-Answer Performance Bugs (Oct 2026)
+
+> Companion material: the full change rationale lives in
+> [`CHANGELOG.md`](./CHANGELOG.md). The general family of bug these belong to
+> is catalogued in [`FILTERING_PITFALLS.md`](./FILTERING_PITFALLS.md).
+
+Both bugs below share one property worth naming, because it is what makes them
+senior-level interview material: **they produced no error, no warning, and no
+log line.** One made the app 20× slower than it looked like it should be; the
+other returned *plausibly wrong data*. Both were found by measuring, not by
+reading the code.
+
+---
+
+### Q54.1 — Every admin page took 5–6 seconds. The application logs showed no errors and the database showed no slow-query entries. What was it?
+
+**Answer:**
+
+A view composer was registered against a wildcard and was firing **once per
+rendered view** instead of once per request.
+
+```php
+// app/Providers/ViewServiceProvider.php — the bug
+View::composer(['admin.layouts.*', 'admin.*'], function ($view) {
+    $view->with('dueNotifications', $this->getDueNotifications());
+});
+```
+
+A Laravel view composer callback fires **each time a matching view is
+rendered**. The admin layout tree — layout, partials, sidebar menu, navbar,
+notification dropdown, modal shells — renders roughly **61 views for a single
+page**. So `getDueNotifications()`, which touches `subscription_orders`, joins
+`plans`, and performs a date-range scan, executed **61 identical times** to
+produce one page.
+
+**Why it hid from every standard diagnostic:**
+
+- **No error** — every query succeeded.
+- **No slow-query log** — each individual query was ~90 ms. MySQL's slow query
+  log thresholds are set in seconds. 61 × 90 ms is a catastrophe in aggregate
+  and invisible per-query.
+- **No N+1 detector** — Laravel Debugbar / Telescope N+1 reporting keys on
+  *repeated queries inside one collection loop*. Here the repetition lives in
+  the **view rendering phase**, not in a query loop, so the classic N+1
+  heuristics never fire.
+- **No profiler hotspot** — the cost is spread across 61 small, individually
+  unremarkable frames rather than concentrating in one named span.
+
+This is why the fix is worth memorizing: **the unit of optimization was the
+request, but the unit of execution was the view.** Any mismatch between those
+two is a multiplier bug.
+
+**The fix — request-scoped memoization:**
+
+```php
+View::composer(['admin.layouts.*', 'admin.*'], function ($view) {
+    $view->with('dueNotifications', $this->dueNotifications());
+});
+
+private function dueNotifications(): array
+{
+    if (app()->bound('admin.notification_snapshot')) {
+        return app('admin.notification_snapshot');
+    }
+
+    return tap($this->getDueNotifications(), function ($data) {
+        app()->instance('admin.notification_snapshot', $data);
+    });
+}
+```
+
+**Interview follow-up — why not just cache it?**
+
+This is the question that separates the answer from a good answer. Three
+alternatives, three reasons to reject them:
+
+1. **`static $cache`** — a static survives across requests on a reused
+   PHP-FPM worker and lives forever inside a queue worker. The badge would go
+   stale for minutes or hours. Correctness bug traded for a speed win.
+2. **`Cache::remember('due_notifications', 60)`** — replaces 61 queries with 61
+   cache-store round trips (~1–3 ms each). It removes the DB load but not the
+   multiplier, and it introduces an invalidation bug: a resolved payment
+   wouldn't clear the badge for up to 60 s. The cache store also becomes a
+   hard dependency of *every* admin page render.
+3. **Bind the composer to the layout view only, not a wildcard** — reduces 61
+   to 1 but is brittle: any `@include` outside the exact registered path
+   silently loses `$dueNotifications`, producing an undefined-variable bug in
+   production.
+
+`app()->instance()` wins because its scope is **exactly one request** — long
+enough to deduplicate, short enough to never go stale, and with no I/O.
+
+**Measured result:** all admin pages went to **0.30–0.50 s**
+(dashboard 0.46, product 0.43, every list 0.31–0.36).
+
+**How to generalize this in an interview.** The same shape appears as:
+
+- `@include` inside a `@foreach` that calls a service.
+- `View::share('x', $expensiveClosure)` evaluated eagerly at boot.
+- A Blade `@php` block invoking a repository method.
+- A middleware running a query for a nav badge on **every** request, including
+  the ones where the badge isn't rendered.
+- A policy or `Gate::define` closure that queries instead of using a relation
+  already loaded.
+
+The rule: **"compute once for the layout" logic must be memoized explicitly,
+per request.** PHP does not do it for you, and neither does the framework.
+
+---
+
+### Q54.2 — Searching a paginated product list for "elco" returned 4 results. The database contains 56. No error was raised. Explain.
+
+**Answer:**
+
+The search was **client-side row filtering over a server-paginated table** —
+which is structurally incapable of whole-catalog search.
+
+```js
+// resources/js/admin/partials/sorting/search.js — the bug
+export function initSearch() {
+    const searchInput = document.getElementById("searchInput");
+    const tableRows = document.querySelectorAll("#invoiceTableBody tr");
+
+    searchInput.addEventListener("keyup", function () {
+        const searchTerm = searchInput.value.toLowerCase();
+        tableRows.forEach((row) => {
+            row.style.display = row.textContent.toLowerCase().includes(searchTerm) ? "" : "none";
+        });
+    });
+}
+```
+
+`tableRows` is a snapshot of the **rows in the current DOM**. With the server
+returning 10 rows per page, the DOM holds 10 rows. Of the 56 catalog matches,
+~4 are on page 1 and ~52 are on pages 2–6 — they were never sent to the
+browser, so they cannot be shown. The filter isn't wrong about what it can
+see; **its universe is one page.**
+
+**Why this is the most dangerous bug pattern in the list:**
+
+It fails **silently and plausibly**. The user typed `elco`, got 4 rows back,
+and reasonably concluded the catalog had 4 `elco` parts. There is no spinner,
+no error, no partial state — the UI is in a completely valid-looking state
+that happens to be false. Compare Q54.1: that bug at least made itself obvious
+through latency. This one costs data credibility, which is harder to recover.
+
+**The tell.** The bug is 100% deterministic given two facts:
+1. The list is paginated on the server.
+2. The filter runs in the browser against already-rendered rows.
+
+If both hold, whole-catalog search is impossible. The fix is not a patch — it
+is moving the filter to where the data is.
+
+**The fix — query the server, swap the table region:**
+
+- New shared module `resources/js/admin/partials/sorting/serverSearch.js`,
+  opt-in per page via `data-server-search` on `#searchInput`.
+- `search.js` keeps its client-side path for un-migrated pages and **returns
+  early** when the attribute is present — the two behaviors are mutually
+  exclusive by construction, so they can never fight over the same rows.
+- 300 ms debounce + `AbortController`: a fast typist produces exactly one
+  in-flight request, and an out-of-order response can never overwrite a newer
+  one.
+- It re-fetches the **same index URL** with `?search=...`. No second endpoint
+  — so the search query and the list query can never drift apart, and every
+  existing filter, tenant scope, eager load and authorization rule applies
+  automatically.
+- It swaps `#invoiceTableContainer .table-responsive` and the
+  `[data-pagination-footer]` footer via `DOMParser` + `innerHTML`. No full
+  page reload, no layout repaint, no lost scroll position.
+- `history.replaceState` syncs the URL, so refresh / bookmark / back / "send
+  this filtered view to a colleague" all work.
+- LIKE wildcards in the term are escaped with `addcslashes($search, '%_\\')`,
+  so typing `100%` searches for `100%` instead of silently matching every row.
+
+**Follow-up — what breaks when you swap a table with `innerHTML`?**
+
+This is the part that separates a working demo from working code. Three
+things capture references to the old DOM and go stale:
+
+1. **List.js sort handlers.** `initListJs()` binds click handlers to the
+   `<button class="table-sort">` elements inside `<thead>` — which is *inside*
+   the swapped region. After the swap those buttons are new nodes with zero
+   handlers, so sorting silently stops working. The module re-runs
+   `initListJs()` after every swap.
+2. **Bulk-selection handlers** bound per row (`.row-checkbox`). Each page has
+   its own mechanism, so the module dispatches a `listsearch:updated`
+   `CustomEvent` and each page re-initializes its own.
+3. **Selectable-table keyboard navigation** (`Alt+E` / `Alt+D`) in
+   `layouts/selectable-table.js`, which captured `tbody` and `rows` **once at
+   init**. After a swap those nodes are detached and the shortcut walks rows
+   that are no longer in the document.
+
+**Follow-up — why not just re-run the selectable-table initializer?**
+
+Because it attaches a `document`-level `keydown` listener. Re-running it
+stacks a second listener; both fire on every keypress; and destructive actions
+call `performAction` — meaning **Alt+D on a delete shortcut would delete
+twice**. Silent, catastrophic, and only reproducible under a destructive
+action. The fix instead makes `tbody`/`rows` **lazy getters** that re-resolve
+from `#invoiceTableContainer` on every access: one listener, one set of
+closures, so double-firing is structurally impossible rather than merely
+unlikely.
+
+> **Interview takeaway.** "Just call the init function again" is the instinct
+> after any DOM swap, and it is only safe if every initializer is proven
+> idempotent. An initializer that attaches a `document`-level or `window`-level
+> listener is *never* idempotent unless it guards itself. Check before you
+> re-invoke.
+
+**A third, related bug found while fixing this one:**
+
+Changing "entries per page" **dropped the active search**, because the selector
+rebuilt the query string from scratch:
+
+```html
+<select data-onchange="window.location.href='?entries=' + this.value;">
+```
+
+`'?entries=' + value` replaces the *entire* query string — `?search=elco` is
+gone. The product page was doubly broken: a JS handler preserved the params
+correctly, then the `data-onchange` attribute fired *after* it and overwrote
+the result. Fixed by building the URL with the URL API so existing params
+survive:
+
+```js
+const u = new URL(window.location.href);
+u.searchParams.set('entries', this.value);
+u.searchParams.delete('page');
+window.location.href = u.toString();
+```
+
+**Note the shared shape with Q54.1:** in both cases a value that lived in one
+place (the request, or the URL) was *recomputed* somewhere else from an
+incomplete set (a re-query per view, a hardcoded param list). Multiplier bugs
+and state-dropping bugs are the same mistake wearing different clothes:
+**reconstruction from partial information.**
+
+---
+
+### Q54.3 — How would you prevent this class of bug rather than fix it after it ships?
+
+**Answer:**
+
+Four defenses, roughly in order of how much they catch:
+
+1. **Test the count, not the presence.** A test asserting *"searching `elco`
+   returns 56 rows when entries=10"* catches this instantly. A test asserting
+   *"search returns rows"* passes against the broken implementation. Most
+   pagination-search bugs survive because the test never asserts against a
+   dataset larger than one page. **Any test for a paginated list must use a
+   fixture that spans multiple pages.**
+
+2. **Assert on query counts per request.** A `DB::listen()` counter in CI with
+   a hard ceiling (e.g. `expect($queries)->toBeLessThan(30)` on the dashboard)
+   would have caught Q54.1 on the first commit. Aggregate cost is a testable
+   property; nobody tests it.
+
+3. **Make the alternative impossible by construction.** The
+   `data-server-search` guard means a page physically cannot run both the
+   client-side and server-side filter. Design the opt-in so the *wrong* thing
+   requires extra code, rather than relying on everyone remembering not to do
+   it.
+
+4. **Audit every "rebuild the URL" and "compute for the layout" call site.**
+   Both bugs here are instances of reconstruction-from-partial-state. A grep
+   for `window.location.href = '?'` and for `View::composer` with a wildcard
+   is a five-minute audit that pays for itself indefinitely.
+
+The deeper point: **Q54.1 was invisible to profiling and Q54.2 was invisible to
+error monitoring.** Both were only findable by *reasoning about the unit of
+work* — "how many times does this actually run, and over what data?" That
+reasoning is the skill; the specific fixes are just its output.

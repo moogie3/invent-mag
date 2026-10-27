@@ -17,7 +17,7 @@ export function showAddToCartFeedback() {
     feedback.style.width = "60px";
     feedback.style.height = "60px";
     feedback.style.opacity = "0";
-    feedback.style.transition = "opacity 0.3s ease";
+    feedback.style.transition = "opacity var(--anim-slow) ease";
     feedback.innerHTML =
         '<i class="ti ti-check" style="font-size: 24px;"></i>';
 

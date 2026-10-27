@@ -1,14 +1,14 @@
 .tutorial-modal-dialog {
     transform: scale(0.9);
     opacity: 0;
-    transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.4s ease;
+    transition: transform var(--anim-slow) cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity var(--anim-slow) ease;
 }
 .modal.show .tutorial-modal-dialog {
     transform: scale(1);
     opacity: 1;
 }
 .tutorial-step {
-    transition: opacity 0.25s ease;
+    transition: opacity var(--anim-base) ease;
     opacity: 1;
 }
 .tutorial-step.fade-out {
@@ -30,13 +30,13 @@
     margin-bottom: 1.5rem;
     padding: 12px;
     border-radius: 12px;
-    transition: background-color 0.2s ease;
+    transition: background-color var(--anim-base) ease;
 }
 .tutorial-list-item:hover {
     background-color: rgba(32, 107, 196, 0.04);
 }
 .topic-card {
-    transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.2s ease;
+    transition: transform var(--anim-base) cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow var(--anim-base) ease;
     border-radius: 16px;
     border: 1px solid rgba(0,0,0,0.05);
     cursor: pointer;
@@ -66,7 +66,7 @@
     border-radius: 10px;
     text-decoration: none;
     color: inherit;
-    transition: background-color 0.15s ease;
+    transition: background-color var(--anim-fast) ease;
     border: 1px solid transparent;
     margin-bottom: 4px;
 }
@@ -102,12 +102,12 @@
 }
 
 [data-bs-theme="dark"] .subtopic-item {
-    color: #e2e8f0;
+    color: #f1f3f5;
 }
 [data-bs-theme="dark"] .subtopic-item:hover {
     background-color: rgba(32, 107, 196, 0.12);
     border-color: rgba(32, 107, 196, 0.25);
-    color: #e2e8f0;
+    color: #f1f3f5;
 }
 .context-list li {
     margin-bottom: 10px;
@@ -115,38 +115,38 @@
 
 /* Dark mode support */
 [data-bs-theme="dark"] .tutorial-modal-dialog .modal-content {
-    background-color: #1a1c28 !important;
+    background-color: #1b1d1f !important;
 }
 [data-bs-theme="dark"] .tutorial-modal-dialog .modal-footer {
-    background-color: #1a1c28 !important;
+    background-color: #1b1d1f !important;
     border-top-color: rgba(255,255,255,0.08) !important;
 }
 :not([data-bs-theme="dark"]) .tutorial-modal-dialog .modal-footer {
     background-color: #f8f9fa;
 }
 [data-bs-theme="dark"] .tutorial-modal-dialog .modal-footer .btn-ghost-secondary {
-    color: #94a3b8;
+    color: #a0a2a4;
 }
 [data-bs-theme="dark"] .tutorial-modal-dialog .text-dark {
-    color: #e2e8f0 !important;
+    color: #f1f3f5 !important;
 }
 [data-bs-theme="dark"] .tutorial-modal-dialog .text-secondary {
-    color: #94a3b8 !important;
+    color: #a0a2a4 !important;
 }
 [data-bs-theme="dark"] .tutorial-modal-dialog .topic-card h4,
 [data-bs-theme="dark"] .tutorial-modal-dialog .topic-card p {
-    color: #e2e8f0 !important;
+    color: #f1f3f5 !important;
 }
 [data-bs-theme="dark"] .tutorial-modal-dialog .card {
-    background-color: #273449;
+    background-color: #313335;
     border-color: rgba(255,255,255,0.08);
 }
 [data-bs-theme="dark"] .tutorial-modal-dialog .tutorial-list-item {
-    background-color: #273449;
+    background-color: #313335;
     border-color: rgba(255,255,255,0.08);
 }
 [data-bs-theme="dark"] .tutorial-modal-dialog .tutorial-list-item h3 {
-    color: #e2e8f0;
+    color: #f1f3f5;
 }
 [data-bs-theme="dark"] .tutorial-modal-dialog .tutorial-list-item:hover {
     background-color: rgba(32, 107, 196, 0.1);
@@ -171,7 +171,7 @@
     background: #f8fafc;
     border-radius: 12px;
     border: 1px solid #e2e8f0;
-    transition: all 0.2s ease;
+    transition: all var(--anim-base) ease;
 }
 .tutorial-list-item:hover {
     background: #fff;
@@ -190,7 +190,7 @@
     flex-shrink: 0;
 }
 .topic-card {
-    transition: all 0.2s ease;
+    transition: all var(--anim-base) ease;
     border: 1px solid rgba(0,0,0,0.05);
 }
 .topic-card:hover {

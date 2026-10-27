@@ -27,7 +27,7 @@ class PurchaseReturnController extends Controller
     public function index(Request $request)
     {
         $entries = $request->input('entries', 10);
-        $filters = $request->only(['month', 'year']);
+        $filters = $request->only(['month', 'year', 'search']);
         $data = $this->purchaseReturnService->getPurchaseReturnIndexData($filters, $entries);
 
         return view('admin.por.index', $data);

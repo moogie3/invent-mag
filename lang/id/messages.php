@@ -1983,6 +1983,8 @@ return [
     'import_shopee_progress_queueing' => 'Merangkai unduhan foto…',
     'import_shopee_progress_images' => 'Foto sampul: tersisa :pending',
     'import_shopee_progress_complete' => 'Impor selesai',
+    'import_shopee_media_done' => 'Semua :count foto sampul sudah diimpor',
+    'import_shopee_media_partial' => ':done dari :total foto sampul sudah diimpor (:failed gagal)',
     'import_shopee_errors' => 'Galat',
     'import_shopee_summary' => 'Impor selesai: :updated diperbarui, :created dibuat, :skipped dilewati (batas paket), :errors galat.',
     'import_shopee_running' => 'Mengimpor...',

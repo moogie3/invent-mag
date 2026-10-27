@@ -2,6 +2,8 @@
 
 namespace App\Services;
 
+
+use App\Services\Concerns\BuildsListSearch;
 use App\Models\Customer;
 use Dompdf\Dompdf;
 use Illuminate\Support\Facades\Storage;
@@ -11,9 +13,21 @@ use Illuminate\Validation\Rule;
 
 class CustomerService
 {
-    public function getCustomerIndexData(int $entries)
+    use BuildsListSearch;
+    public function getCustomerIndexData(array $filters, int $entries)
     {
-        $customers = Customer::paginate($entries);
+        $query = Customer::query();
+
+        // Whole-catalog search — the paginator's COUNT(*) shares this WHERE.
+        $this->applyListSearch($query, $filters, [
+            'customers.name',
+            'customers.phone_number',
+            'customers.email',
+            'customers.address',
+            'customers.npwp',
+        ]);
+
+        $customers = $query->paginate($entries);
         $totalcustomer = Customer::count();
 
         $customerCredits = [];

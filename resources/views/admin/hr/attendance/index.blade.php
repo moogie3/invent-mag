@@ -62,6 +62,7 @@
                                                 </div>
                                             </div>
                                         </div>
+                                        <div id="invoiceTableContainer">
                                         <div class="table-responsive">
                                             <table class="table card-table table-vcenter">
                                                 <thead style="font-size: large">
@@ -114,6 +115,7 @@
                                                     @endforelse
                                                 </tbody>
                                             </table>
+                                        </div>
                                         </div>
                                     </div>
                                 </div>

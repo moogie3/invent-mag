@@ -188,7 +188,7 @@
 </div>
 
 <!-- Sales Return Status Warning Modal -->
-<div class="modal fade" id="srStatusWarningModal" tabindex="-1" aria-labelledby="srStatusWarningModalLabel"
+<div class="modal modal-blur fade" id="srStatusWarningModal" tabindex="-1" aria-labelledby="srStatusWarningModalLabel"
     aria-hidden="true">
     <div class="modal-dialog modal-sm modal-dialog-centered">
         <div class="modal-content border-0 shadow-lg rounded-3">

@@ -47,6 +47,27 @@ RUN docker-php-ext-configure gd --with-freetype --with-jpeg --with-webp
 # // NOTE: curl is pre-bundled in php:8.2-fpm base image, no need to compile it
 RUN docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd zip intl xml dom simplexml xmlwriter
 
+# // NOTE: OPcache holds compiled bytecode in memory so each request skips the file
+# // read, the parse and the compile. This is the largest single per-request saving
+# // available in production. Guarded because some php:*-fpm tags already ship it.
+RUN if ! php -m | grep -qi '^opcache$'; then docker-php-ext-install opcache; fi
+
+# // NOTE: Production opcache tuning.
+# // validate_timestamps=0 never re-checks a file's mtime. That is safe here only
+# // because every deploy runs `docker-compose pull` + `up -d`, which replaces the
+# // container and therefore the cache: application code is baked into the image, and
+# // the deploy script re-runs view:cache/route:cache into an empty cache afterwards.
+# // If deploys ever stop recreating the container, set this to 1.
+RUN printf '%s\n' \
+    'opcache.enable=1' \
+    'opcache.enable_cli=0' \
+    'opcache.memory_consumption=192' \
+    'opcache.interned_strings_buffer=16' \
+    'opcache.max_accelerated_files=20000' \
+    'opcache.validate_timestamps=0' \
+    'opcache.save_comments=1' \
+    > /usr/local/etc/php/conf.d/opcache-tuning.ini
+
 # Set PHP memory limit
 RUN echo "memory_limit=512M" > /usr/local/etc/php/conf.d/memory-limit.ini
 RUN echo "max_execution_time=300" >> /usr/local/etc/php/conf.d/memory-limit.ini

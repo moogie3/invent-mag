@@ -2,6 +2,8 @@
 
 namespace App\Services;
 
+
+use App\Services\Concerns\BuildsListSearch;
 use App\Helpers\CurrencyHelper;
 use App\Helpers\PurchaseHelper;
 use App\Models\Account;
@@ -23,6 +25,7 @@ use Illuminate\Support\Facades\DB;
 
 class PurchaseService
 {
+    use BuildsListSearch;
     protected AccountingService $accountingService;
 
     public function __construct(AccountingService $accountingService)
@@ -49,6 +52,12 @@ class PurchaseService
         if (isset($filters['year']) && $filters['year']) {
             $query->whereYear('order_date', $filters['year']);
         }
+
+        // Whole-catalog search — applied before pagination so the paginator's
+        // COUNT(*) shares the same WHERE clause.
+        $this->applyListSearch($query, $filters, ['po.invoice', 'po.status'], [
+            'supplier' => ['suppliers.name', 'suppliers.code'],
+        ]);
 
         $pos = $query->paginate($entries);
         $pos->getCollection()->each->setAppends([]);
@@ -117,7 +126,12 @@ class PurchaseService
     public function getPurchaseCreateData()
     {
         $suppliers = Supplier::select('id', 'name', 'email', 'phone_number', 'location')->get();
-        $products = Product::select('id', 'name', 'code', 'price')->get()->each->setAppends(['main_warehouse_stock']);
+        // The create form renders stock_quantity — a total across every warehouse —
+        // for every option, so this has to stay unfiltered or the totals shrink.
+        $products = Product::select('id', 'name', 'code', 'price')
+            ->with('productWarehouses')
+            ->get()
+            ->each->setAppends(['main_warehouse_stock']);
         $warehouses = Warehouse::all();
         $taxes = Tax::active()->get();
         $defaultTax = Tax::default()->first() ?? Tax::active()->first();

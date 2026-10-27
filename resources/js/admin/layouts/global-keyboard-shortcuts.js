@@ -3,7 +3,7 @@ class ShortcutManager {
         if (window.shortcutManager) {
             return window.shortcutManager;
         }
-        
+
         this.shortcuts = [];
         this.descriptions = {
             showHelpModal: "Showing help modal",
@@ -11,30 +11,52 @@ class ShortcutManager {
             closeModal: "Close active modal/popup",
         };
         this.isMac = navigator.platform.toUpperCase().indexOf("MAC") >= 0;
-        
-        // Use a bound function so we can remove it if needed, 
+
+        // Use a bound function so we can remove it if needed,
         // though usually we want this to stay globally.
         this.boundHandleKeydown = this.handleKeydown.bind(this);
         document.addEventListener("keydown", this.boundHandleKeydown);
-        
+
         window.shortcutManager = this;
     }
 
-    register(keys, callback, description) {
-        // Overwrite if keys already exist to prevent accumulation
-        this.unregister(keys);
-        
+    // Route name of the current page, injected server-side on <body data-route>.
+    currentRoute() {
+        return (document.body && document.body.dataset.route) || "";
+    }
+
+    // A shortcut fires only when it is global or its route-prefix scope
+    // matches the current page ("admin.product" covers admin.product.create).
+    scopeMatches(shortcut, route) {
+        if (shortcut.scope === "global") return true;
+        if (!shortcut.scope || !route) return false;
+        return route === shortcut.scope || route.startsWith(shortcut.scope + ".");
+    }
+
+    // scope: "global" = every page; "admin.x" = that route subtree;
+    // omitted = snapshot of the route active right now, so a page script
+    // registering during its own page load is automatically page-scoped.
+    register(keys, callback, description, scope = null) {
+        const resolvedScope = scope === null ? this.currentRoute() : scope;
+
+        // Overwrite same keys within the same scope to prevent accumulation
+        this.unregister(keys, resolvedScope);
+
         this.shortcuts.push({
             keys: keys.toLowerCase(),
             callback,
             description,
+            scope: resolvedScope,
         });
     }
 
-    unregister(keys) {
-        this.shortcuts = this.shortcuts.filter(
-            (shortcut) => shortcut.keys.toLowerCase() !== keys.toLowerCase()
-        );
+    // Omitted scope = remove the key everywhere (legacy callers expect
+    // "kill this key" semantics); explicit scope = replace within scope only.
+    unregister(keys, scope) {
+        this.shortcuts = this.shortcuts.filter((shortcut) => {
+            if (shortcut.keys.toLowerCase() !== keys.toLowerCase()) return true;
+            return scope !== undefined && shortcut.scope !== scope;
+        });
     }
 
     clearPageShortcuts() {
@@ -92,7 +114,11 @@ class ShortcutManager {
         if (alt) pressedModifiers.push("alt");
         if (shift) pressedModifiers.push("shift");
 
+        const route = this.currentRoute();
+
         for (const shortcut of this.shortcuts) {
+            if (!this.scopeMatches(shortcut, route)) continue;
+
             const shortcutParts = shortcut.keys.split("+").map((k) => k.trim());
             const mainKey = shortcutParts.pop();
             const requiredModifiers = shortcutParts;
@@ -124,16 +150,17 @@ class ShortcutManager {
     }
 
     showShortcutsModal() {
-        // console.log(this.shortcuts);
         const modalElement = document.getElementById("keyboardShortcutsModal");
         if (modalElement) {
             const modal = new bootstrap.Modal(modalElement, {});
             const tbody = document.getElementById("keyboardShortcutsList");
             tbody.innerHTML = ""; // Clear previous content
 
+            const route = this.currentRoute();
             const uniqueShortcuts = Array.from(
                 new Map(
                     this.getShortcuts()
+                        .filter((s) => this.scopeMatches(s, route))
                         .map((s) => [s.keys, s])
                 ).values()
             );
@@ -166,7 +193,8 @@ window.shortcutManager.register(
             searchInput.focus();
         }
     },
-    "focusSearch"
+    "focusSearch",
+    "global"
 );
 
 window.shortcutManager.register(
@@ -174,7 +202,8 @@ window.shortcutManager.register(
     () => {
         window.shortcutManager.showShortcutsModal();
     },
-    "showHelpModal"
+    "showHelpModal",
+    "global"
 );
 
 window.shortcutManager.register(
@@ -188,5 +217,6 @@ window.shortcutManager.register(
             }
         }
     },
-    "closeModal"
+    "closeModal",
+    "global"
 );

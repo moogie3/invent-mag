@@ -179,21 +179,32 @@ class AppServiceProvider extends ServiceProvider
 
             View::composer(['admin.layouts.*', 'admin.*'], function ($view) {
                 if (app()->has('currentTenant')) { // Check if a tenant is active
-                    $notificationService = app(NotificationService::class);
-                    $notifications = $notificationService->getDueNotifications();
-                    $notificationCount = $notifications->count();
+                    // Compute notifications once per request, not once per view.
+                    // This composer fires for every admin.* view (~60 per page);
+                    // without memoization each view re-ran 4 query sets (~90ms),
+                    // making every admin page take seconds to render.
+                    $cache = app()->bound('admin.notification_snapshot')
+                        ? app('admin.notification_snapshot')
+                        : null;
 
-                    $view->with('notificationCount', $notificationCount);
-                    $view->with('notifications', $notifications);
+                    if ($cache === null) {
+                        $notifications = app(NotificationService::class)->getDueNotifications();
+                        $systemNotifications = app(SystemNotificationService::class)->getSystemNotifications();
+                        $cache = [
+                            'notifications' => $notifications,
+                            'notificationCount' => $notifications->count(),
+                            'systemNotifications' => $systemNotifications,
+                            'systemNotificationCount' => $systemNotifications->count(),
+                        ];
+                        app()->instance('admin.notification_snapshot', $cache);
+                    }
 
-                    // System notifications (trial, plan expiry, usage limits, setup)
-                    $systemNotificationService = app(SystemNotificationService::class);
-                    $systemNotifications = $systemNotificationService->getSystemNotifications();
-                    $systemNotificationCount = $systemNotifications->count();
+                    $view->with('notificationCount', $cache['notificationCount']);
+                    $view->with('notifications', $cache['notifications']);
 
-                    $view->with('systemNotifications', $systemNotifications);
-                    $view->with('systemNotificationCount', $systemNotificationCount);
-                    $view->with('totalNotificationCount', $notificationCount + $systemNotificationCount);
+                    $view->with('systemNotifications', $cache['systemNotifications']);
+                    $view->with('systemNotificationCount', $cache['systemNotificationCount']);
+                    $view->with('totalNotificationCount', $cache['notificationCount'] + $cache['systemNotificationCount']);
                 } else {
                     // Provide empty defaults for pages without a tenant (like the central login page)
                     $view->with('notificationCount', 0);

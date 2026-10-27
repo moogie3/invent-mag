@@ -1,4 +1,5 @@
 /* Authentication specific styles */
+@import './tokens.css';
 @import url('https://rsms.me/inter/inter.css');
 
 :root {
@@ -32,7 +33,7 @@
     border-radius: 20px;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
     width: 100%;
-    animation: fadeInUp 0.6s ease-out;
+    animation: fadeInUp var(--anim-slow) ease-out;
     backdrop-filter: blur(5px);
 }
 
@@ -95,13 +96,13 @@ html[data-bs-theme="dark"] .theme-toggle-button {
     display: none;
     justify-content: center;
     align-items: center;
-    transition: opacity 0.2s ease-in-out;
+    transition: opacity var(--anim-base) ease-in-out;
     pointer-events: none;
     opacity: 0;
 }
 
 [data-bs-theme="dark"] .page-loader {
-    background-color: rgba(24, 36, 51, 0.9);
+    background-color: rgba(28, 30, 32, 0.92);
 }
 
 .is-loading-page {

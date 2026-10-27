@@ -1,26 +1,15 @@
-let entriesInitialized = false;
 let shortcutsInitialized = false;
 
 document.addEventListener('turbo:before-cache', () => {
-    entriesInitialized = false;
     shortcutsInitialized = false;
 });
 
-export function initializeEntriesSelector() {
-    if (entriesInitialized) return;
-    entriesInitialized = true;
-    
-    const entriesSelect = document.getElementById("entriesSelect");
-    if (entriesSelect && !entriesSelect.dataset.handlerAttached) {
-        entriesSelect.dataset.handlerAttached = 'true';
-        entriesSelect.addEventListener("change", function () {
-            const currentUrl = new URL(window.location);
-            currentUrl.searchParams.set("entries", this.value);
-            currentUrl.searchParams.delete("page");
-            window.location.href = currentUrl.toString();
-        });
-    }
-}
+// Page size has no listener here on purpose: #entriesSelect carries a
+// declarative data-onchange (see partials/product/index/search.blade.php),
+// which is how every other list does it. A second, imperatively attached
+// listener fired the same navigation twice. data-onchange is evaluated by
+// global-event-delegator.js on a document-level `change` listener, so it also
+// survives table swaps that re-run this page's init.
 
 export function initKeyboardShortcuts() {
     if (shortcutsInitialized) return;

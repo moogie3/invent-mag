@@ -138,6 +138,27 @@ onPageLoad(function () {
                     }
                 }
 
+                // A server-side search swap replaces the table region, so the
+                // instance above ends up holding detached checkboxes and
+                // clearSelection() silently does nothing. Rebuild it on every
+                // swap and overwrite the window global so actions.js keeps
+                // pointing at the live instance. Attached to the table
+                // container, not `document`, so the hook is scoped to this page
+                // and dies with it on navigation.
+                const salesTable = document.getElementById("invoiceTableContainer");
+                if (salesTable && !salesTable.dataset.bulkRebindAttached) {
+                    salesTable.dataset.bulkRebindAttached = "true";
+                    salesTable.addEventListener("listsearch:updated", () => {
+                        const boxes = document.querySelectorAll(".row-checkbox");
+                        if (
+                            typeof SalesOrderBulkSelection !== "undefined" &&
+                            boxes.length > 0
+                        ) {
+                            window.salesBulkSelection = new SalesOrderBulkSelection();
+                        }
+                    });
+                }
+
                 window.shortcutManager.register(
                     "alt+n",
                     () => {

@@ -28,7 +28,8 @@ class CustomerController extends Controller
     public function index(Request $request)
     {
         $entries = $request->input('entries', 10);
-        $data = $this->customerService->getCustomerIndexData($entries);
+        $filters = $request->only(['search']);
+        $data = $this->customerService->getCustomerIndexData($filters, $entries);
 
         return view('admin.customer.index', $data);
     }

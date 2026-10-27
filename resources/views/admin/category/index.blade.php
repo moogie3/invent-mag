@@ -48,6 +48,13 @@
                                                 </div>
                                             </div>
 
+{{-- SEARCH: whole-catalog, server-side (partials/sorting/serverSearch.js) --}}
+                                            <div class="mb-3">
+                                                <input type="text" id="searchInput" class="form-control form-control-sm"
+                                                    value="{{ request('search', '') }}" placeholder="{{ __('messages.search') }}…"
+                                                    autocomplete="off" data-server-search="1">
+                                            </div>
+
                                             {{-- TABLE --}}
                                             <div id="invoiceTableContainer">
                                                 <div class="table-responsive">
@@ -115,7 +122,7 @@
                                             </div>
 
                                             {{-- PAGINATION --}}
-                                            <div class="card-footer d-flex align-items-center">
+                                            <div data-pagination-footer class="card-footer d-flex align-items-center">
                                                 <p class="m-0 text-secondary">
                                                     {{ __('messages.pagination_showing_entries', [
                                                         'first' => $categories->firstItem(),

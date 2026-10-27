@@ -20,7 +20,8 @@ class CategoryController extends Controller
     public function index(Request $request)
     {
         $entries = $request->input('entries', 10);
-        $data = $this->categoryService->getCategoryIndexData($entries);
+        $filters = $request->only(['search']);
+        $data = $this->categoryService->getCategoryIndexData($filters, $entries);
 
         return view('admin.category.index', $data);
     }

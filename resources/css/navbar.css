@@ -11,21 +11,59 @@
     position: relative;
 }
 
-/* Dark overlay */
+/* Frosted scrim behind the logo-triggered menu.
+   Hovering the Invent-MAG title adds .active to .nav-container and opens
+   #nav-dropdown; this scrim is what blurs the background - the PAGE, whole
+   viewport width of it, at any scroll position. The blur lives HERE, not on
+   the navbar, so it cannot depend on the bar's .scrolled state (the old
+   behaviour: top of page reacted, scrolled page only dimmed the bar itself).
+
+   SCOPE: page content ONLY - never the sidebar, never the navbar. z 1025
+   sits above the content band - page content tops out at 1020 (Tabler's
+   sticky-* utilities and the ~50 inline z 1020 sticky <th> headers; at
+   EQUAL z DOM order wins, so those headers painted over a 1020 scrim and
+   the table stayed sharp while the page blurred) - and below the two
+   navigations: the sidebar is 1030 at
+   root, the bar is 1030 at rest and 99999 while .active (see the rise rule
+   below) - so in "both" nav mode the rail stays sharp, in navbar-only mode
+   the bar stays sharp, and no hover state can frost either of them. Page
+   floaters top out at 1024 (bulk-actions bars, still under the scrim);
+   nothing else lives in the 1021-1029 gap. It also
+   stays under modals (1055) and toasts (1060), which a menu hover must
+   never dim. The old z 99998 parked the scrim ABOVE the sidebar and frosted
+   the rail together with the page.
+
+   It sits outside <header> at body level (see navbar.blade.php): nested in
+   the header, the bar's own backdrop-filter would make the header its
+   containing block and shrink it to a bar-tall strip - the "only the navbar
+   reacts, the page stays plain" bug.
+
+   Light dims with a MILK tint instead of the old rgba(0,0,0,.4) black dim:
+   white at .55 keeps hierarchy (panel shadows still land) without turning
+   the lights out while the menu is open. Dark keeps its own rgba(16,18,20,.5)
+   below. */
 .nav-overlay {
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(0, 0, 0, 0.5);
+    background: rgba(255, 255, 255, 0.55);
+    backdrop-filter: blur(12px) saturate(140%);
+    -webkit-backdrop-filter: blur(12px) saturate(140%);
     visibility: hidden;
     opacity: 0;
-    transition: opacity 0.1s ease-in-out;
-    z-index: 99998;
+    transition: opacity var(--anim-fast) ease-in-out;
+    z-index: 1025;
 }
 
-/* Navigation dropdown */
+[data-bs-theme="dark"] .nav-overlay {
+    background: rgba(16, 18, 20, 0.5);
+}
+
+/* Navigation dropdown - near-black in BOTH themes on purpose: the menu's
+   contrast comes from the dark panel, not from the scrim behind it (the
+   scrim is the only part that got the light treatment; see .nav-overlay). */
 .nav-dropdown {
     position: absolute;
     top: 100%;
@@ -36,22 +74,48 @@
     box-shadow: 0px 5px 10px rgba(0, 0, 0, 0.2);
     opacity: 0;
     visibility: hidden;
-    transition: opacity 0.3s ease-in-out;
+    transition: opacity var(--anim-slow) ease-in-out;
     z-index: 99999; /* Increased z-index */
     border-radius: 8px;
     padding: 10px 20px;
 }
 
-/* Show menu when active */
-.nav-container.active .nav-overlay {
+/* Show the scrim when the menu opens. The overlay now lives OUTSIDE the
+   header, so the old descendant selector can no longer reach it - :has()
+   derives the state from the same .active class, so the two can never
+   desync (the descendant selector is kept for the nested case). */
+.nav-container.active .nav-overlay,
+body:has(.nav-container.active) .nav-overlay {
     opacity: 1;
     visibility: visible;
+}
+
+/* Bar + open menu rise above the scrim: the scrim is z 1025, which clears
+   the sticky bar's 1030 but NOT a bar without sticky-navbar (plain
+   .nav-container is z auto) - without this lift the frosted layer would sit
+   ON that bar and veil its own text. */
+.nav-container.active,
+body.sticky-navbar .nav-container.active {
+    z-index: 99999 !important;
 }
 
 .nav-container.active .nav-dropdown {
     opacity: 1;
     visibility: visible;
     transform: translateX(-50%) translateY(0);
+}
+
+/* Dark: the mega-menu panel kept the light theme's near-black
+   rgba(20,20,20,.95), which on a dark page reads as a hole punched into the
+   screen rather than a layer above it. It takes the dropdown rung of the
+   frosted ladder instead (tokens.css): translucent + blurred, white hairline,
+   deep lift - same material as every other menu in dark mode. */
+[data-bs-theme="dark"] .nav-dropdown {
+    background: rgba(38, 40, 42, 0.92);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid var(--frz-edge);
+    box-shadow: var(--frz-shadow-2);
 }
 
 /* Navigation links styling */
@@ -163,7 +227,7 @@
 .notification-item {
     border-left: 3px solid transparent;
     padding: 10px 12px;
-    transition: all 0.25s ease;
+    transition: all var(--anim-base) ease;
     margin: 0 4px;
     border-radius: 8px;
 }
@@ -208,7 +272,7 @@
     font-weight: 500;
     font-size: 0.8rem;
     padding: 10px 8px;
-    transition: all 0.25s ease;
+    transition: all var(--anim-base) ease;
     border-radius: 0;
     position: relative;
     opacity: 0.65;
@@ -319,7 +383,7 @@
     display: inline-flex;
     align-items: center;
     gap: 4px;
-    transition: all 0.2s ease;
+    transition: all var(--anim-base) ease;
 }
 
 .notification-footer-link:hover {
@@ -332,7 +396,7 @@
    =================================== */
 
 .system-notification-item {
-    transition: all 0.25s ease;
+    transition: all var(--anim-base) ease;
     margin: 0 4px;
     border-radius: 8px;
     border-left: 3px solid transparent;
@@ -399,7 +463,7 @@
     padding: 3px 12px;
     letter-spacing: 0.01em;
     text-decoration: none;
-    transition: all 0.2s ease;
+    transition: all var(--anim-base) ease;
     display: inline-flex;
     align-items: center;
     gap: 2px;
@@ -499,7 +563,7 @@
 .navbar .nav-link.px-0,
 .navbar .nav-link.px-2 {
     border-radius: 8px !important;
-    transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+    transition: all var(--anim-slow) cubic-bezier(0.25, 0.8, 0.25, 1);
     position: relative;
     padding: 0.5rem !important;
     /* Reduced padding to prevent cutoff */
@@ -522,12 +586,12 @@
 
 .navbar .nav-link:hover i {
     color: #fff !important;
-    transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+    transition: all var(--anim-slow) cubic-bezier(0.25, 0.8, 0.25, 1);
 }
 
 /* FIXED: Notification bell dropdown hover - override Bootstrap defaults */
 .navbar .nav-item.dropdown .nav-link[data-bs-toggle="dropdown"]:hover,
-.navbar .nav-item.dropdown .nav-link[data-bs-toggle="dropdown"]:focus,
+.navbar .nav-item.dropdown .nav-link[data-bs-toggle="dropdown"]:focus-visible,
 .navbar .nav-item.dropdown .nav-link[data-bs-toggle="dropdown"].show {
     background-color: #343a40 !important;
     color: #fff !important;
@@ -540,7 +604,7 @@
 }
 
 .navbar .nav-item.dropdown .nav-link[data-bs-toggle="dropdown"]:hover i,
-.navbar .nav-item.dropdown .nav-link[data-bs-toggle="dropdown"]:focus i,
+.navbar .nav-item.dropdown .nav-link[data-bs-toggle="dropdown"]:focus-visible i,
 .navbar .nav-item.dropdown .nav-link[data-bs-toggle="dropdown"].show i {
     color: #fff !important;
 }
@@ -554,7 +618,7 @@
     opacity: 0;
     visibility: hidden;
     transform: translateY(-10px);
-    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    transition: all var(--anim-slow) cubic-bezier(0.25, 0.8, 0.25, 1);
     pointer-events: none;
 }
 
@@ -578,7 +642,7 @@
 }
 
 .dropdown-menu .dropdown-item {
-    transition: all 0.2s ease;
+    transition: all var(--anim-base) ease;
     border-radius: 4px;
     margin: 0;
     padding: 8px 12px;
@@ -586,7 +650,7 @@
 }
 
 .dropdown-menu .dropdown-item:hover,
-.dropdown-menu .dropdown-item:focus {
+.dropdown-menu .dropdown-item:focus-visible {
     background-color: rgba(var(--tblr-primary-rgb), 0.1) !important;
     color: var(--tblr-primary) !important;
     border-color: transparent !important;
@@ -594,11 +658,11 @@
 }
 
 .dropdown-menu .dropdown-item i {
-    transition: color 0.2s ease;
+    transition: color var(--anim-base) ease;
 }
 
 .dropdown-menu .dropdown-item:hover i,
-.dropdown-menu .dropdown-item:focus i {
+.dropdown-menu .dropdown-item:focus-visible i {
     color: var(--tblr-primary) !important;
 }
 
@@ -606,7 +670,7 @@
 .navbar .nav-item.dropdown>.nav-link:hover .avatar {
     transform: scale(1.1);
     box-shadow: 0 0 0 3px rgba(var(--tblr-primary-rgb), 0.3);
-    transition: all 0.3s ease;
+    transition: all var(--anim-slow) ease;
 }
 
 /* FIXED: Dark mode navbar hover - consistent white background */
@@ -641,7 +705,7 @@
 
 /* FIXED: Dark mode notification bell dropdown hover - override Bootstrap defaults */
 [data-bs-theme="dark"] .navbar .nav-item.dropdown .nav-link[data-bs-toggle="dropdown"]:hover,
-[data-bs-theme="dark"] .navbar .nav-item.dropdown .nav-link[data-bs-toggle="dropdown"]:focus,
+[data-bs-theme="dark"] .navbar .nav-item.dropdown .nav-link[data-bs-toggle="dropdown"]:focus-visible,
 [data-bs-theme="dark"] .navbar .nav-item.dropdown .nav-link[data-bs-toggle="dropdown"].show {
     background-color: #ffffff !important;
     color: #000000 !important;
@@ -654,7 +718,7 @@
 }
 
 [data-bs-theme="dark"] .navbar .nav-item.dropdown .nav-link[data-bs-toggle="dropdown"]:hover i,
-[data-bs-theme="dark"] .navbar .nav-item.dropdown .nav-link[data-bs-toggle="dropdown"]:focus i,
+[data-bs-theme="dark"] .navbar .nav-item.dropdown .nav-link[data-bs-toggle="dropdown"]:focus-visible i,
 [data-bs-theme="dark"] .navbar .nav-item.dropdown .nav-link[data-bs-toggle="dropdown"].show i {
     color: #000000 !important;
 }
@@ -670,13 +734,13 @@
 }
 
 [data-bs-theme="dark"] .dropdown-menu .dropdown-item:hover,
-[data-bs-theme="dark"] .dropdown-menu .dropdown-item:focus {
+[data-bs-theme="dark"] .dropdown-menu .dropdown-item:focus-visible {
     background-color: rgba(var(--tblr-primary-rgb), 0.15) !important;
     color: var(--tblr-primary) !important;
 }
 
 [data-bs-theme="dark"] .dropdown-menu .dropdown-item:hover i,
-[data-bs-theme="dark"] .dropdown-menu .dropdown-item:focus i {
+[data-bs-theme="dark"] .dropdown-menu .dropdown-item:focus-visible i {
     color: var(--tblr-primary) !important;
 }
 
@@ -687,7 +751,7 @@
 }
 
 /* FIXED: Override Bootstrap's btn-outline focus/active states if they exist */
-.navbar .nav-link.btn:focus,
+.navbar .nav-link.btn:focus-visible,
 .navbar .nav-link.btn:active,
 .navbar .nav-link.btn.active,
 .navbar .nav-link.btn.show {
@@ -698,7 +762,7 @@
     outline: none !important;
 }
 
-[data-bs-theme="dark"] .navbar .nav-link.btn:focus,
+[data-bs-theme="dark"] .navbar .nav-link.btn:focus-visible,
 [data-bs-theme="dark"] .navbar .nav-link.btn:active,
 [data-bs-theme="dark"] .navbar .nav-link.btn.active,
 [data-bs-theme="dark"] .navbar .nav-link.btn.show {
@@ -709,33 +773,15 @@
     outline: none !important;
 }
 
-/* Notification bell hover when there's a notification dot */
-.nav-item.dropdown:hover #notification-dot {
-    animation: pulse 1s infinite;
-}
-
-@keyframes pulse {
-    0% {
-        transform: scale(1);
-        opacity: 1;
-    }
-
-    50% {
-        transform: scale(1.2);
-        opacity: 0.7;
-    }
-
-    100% {
-        transform: scale(1);
-        opacity: 1;
-    }
-}
+/* The notification dot plays the SAME wave in the bar and in the sidebar -
+   an extra hover-only pulse here made the twin dots diverge (the sidebar's
+   never had a second keyframe), so hover now leaves the wave running. */
 
 /* Smooth transitions for all hover states */
 .navbar .nav-link,
 .navbar .nav-link i,
 .navbar .avatar {
-    transition: all 0.2s ease;
+    transition: all var(--anim-base) ease;
 }
 
 /* Additional enhancement for notification dropdown hover */
@@ -756,7 +802,7 @@
 /* FIXED: Ensure consistent hover states across all navbar elements */
 .navbar .nav-item .nav-link {
     border-radius: var(--tblr-border-radius);
-    transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+    transition: all var(--anim-slow) cubic-bezier(0.25, 0.8, 0.25, 1);
     position: relative;
     display: flex;
     align-items: center;
@@ -765,7 +811,7 @@
 
 /* FIXED: Universal override for any Bootstrap interference */
 .navbar .nav-item .nav-link:hover,
-.navbar .nav-item .nav-link:focus,
+.navbar .nav-item .nav-link:focus-visible,
 .navbar .nav-item .nav-link.show,
 .navbar .nav-item .nav-link:active {
     background-color: #343a40 !important;
@@ -777,7 +823,7 @@
 }
 
 .navbar .nav-item .nav-link:hover i,
-.navbar .nav-item .nav-link:focus i,
+.navbar .nav-item .nav-link:focus-visible i,
 .navbar .nav-item .nav-link.show i,
 .navbar .nav-item .nav-link:active i {
     color: #fff !important;
@@ -785,7 +831,7 @@
 
 /* FIXED: Dark mode universal override */
 [data-bs-theme="dark"] .navbar .nav-item .nav-link:hover,
-[data-bs-theme="dark"] .navbar .nav-item .nav-link:focus,
+[data-bs-theme="dark"] .navbar .nav-item .nav-link:focus-visible,
 [data-bs-theme="dark"] .navbar .nav-item .nav-link.show,
 [data-bs-theme="dark"] .navbar .nav-item .nav-link:active {
     background-color: #ffffff !important;
@@ -797,7 +843,7 @@
 }
 
 [data-bs-theme="dark"] .navbar .nav-item .nav-link:hover i,
-[data-bs-theme="dark"] .navbar .nav-item .nav-link:focus i,
+[data-bs-theme="dark"] .navbar .nav-item .nav-link:focus-visible i,
 [data-bs-theme="dark"] .navbar .nav-item .nav-link.show i,
 [data-bs-theme="dark"] .navbar .nav-item .nav-link:active i {
     color: #000000 !important;
@@ -805,52 +851,261 @@
 
 /* EXCEPTION: Avatar dropdown should not have background hover effect */
 [data-bs-theme="dark"] .navbar .nav-item.dropdown#avatar-dropdown>.nav-link:hover,
-[data-bs-theme="dark"] .navbar .nav-item.dropdown#avatar-dropdown>.nav-link:focus {
+[data-bs-theme="dark"] .navbar .nav-item.dropdown#avatar-dropdown>.nav-link:focus-visible {
     background-color: transparent !important;
     color: inherit !important;
     transform: none !important;
 }
 
 .navbar .nav-item.dropdown#avatar-dropdown>.nav-link:hover,
-.navbar .nav-item.dropdown#avatar-dropdown>.nav-link:focus {
+.navbar .nav-item.dropdown#avatar-dropdown>.nav-link:focus-visible {
     background-color: transparent !important;
     color: inherit !important;
     transform: none !important;
 }
 
-/* Navbar scrolled effect */
-body.sticky-navbar .navbar.scrolled {
-    background-color: rgba(255, 255, 255, 0.8);
-    backdrop-filter: blur(10px);
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    transition: background-color 0.3s ease-in-out, box-shadow 0.3s ease-in-out, backdrop-filter 0.3s ease-in-out;
-}
+/* Sticky navbar - frosted at EVERY scroll position
+   ------------------------------------------------------------------
+   Glass used to exist only in .scrolled: at the top the bar was a flat
+   opaque sheet (backdrop-filter: none) and only past 50px did it become
+   translucent + blur. So the same bar changed material as you scrolled -
+   and in dark mode the .scrolled shadow was the light-theme
+   rgba(0,0,0,.1), which is invisible on a dark page, leaving a milky
+   strip with nothing tying it to the content beneath.
 
-[data-bs-theme="dark"] body.sticky-navbar .navbar.scrolled {
-    background-color: rgba(30, 41, 59, 0.8);
-    backdrop-filter: blur(10px);
-}
-
-/* Sticky Navbar */
+   The glass is now always on; .scrolled only adds elevation (denser tint,
+   deeper lift). One material, two heights. Note .nav-container and
+   .navbar are the SAME element, so the filter lives on it exactly once. */
 body.sticky-navbar .nav-container {
     position: sticky !important;
     top: 0 !important;
     z-index: 1030 !important;
-    background-color: var(--tblr-bg-surface);
-    border-bottom: 1px solid var(--tblr-border-color);
     margin: 0;
+    background-color: rgba(255, 255, 255, 0.82);
+    border-bottom: 1px solid var(--tblr-border-color);
+    transition: background-color var(--anim-slow) ease-in-out, box-shadow var(--anim-slow) ease-in-out;
+}
+
+/* The glass lives on a ::before, never on .nav-container itself: a
+   backdrop-filter makes an element the containing block for its
+   position:fixed descendants, and #nav-overlay (viewport-sized, fixed) is a
+   descendant - on the bar it collapsed to a bar-height strip, so the page
+   stopped reacting and only the navbar seemed to blur. Painted at z:-1 the
+   pseudo-element still samples the page showing through the bar's translucent
+   tint (so the frosted look is unchanged) but sits below the bar's text. */
+body.sticky-navbar .nav-container::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    backdrop-filter: blur(14px) saturate(160%);
+    -webkit-backdrop-filter: blur(14px) saturate(160%);
 }
 
 [data-bs-theme="dark"] body.sticky-navbar .nav-container {
-    background-color: var(--tblr-bg-surface-dark, #1e293b);
+    background-color: rgba(28, 30, 32, 0.8);
+    border-bottom-color: var(--frz-edge);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
 }
 
-[data-bs-theme="dark"] body.sticky-navbar .navbar {
-    background-color: var(--tblr-bg-surface-dark, #1e293b);
+body.sticky-navbar .navbar.scrolled {
+    background-color: rgba(255, 255, 255, 0.94);
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.1);
 }
 
-body.layout-navbar-v2.sidebar-open #navbar-brand-title {
-    left: calc(50% - 125px);
+[data-bs-theme="dark"] body.sticky-navbar .navbar.scrolled {
+    background-color: rgba(23, 25, 27, 0.92);
+    border-bottom-color: var(--frz-edge-strong);
+    box-shadow: 0 16px 44px rgba(0, 0, 0, 0.5);
+}
+
+/* The bar relaxes its tint while the menu is open
+   ------------------------------------------------------------------
+   Hovering the title frosts the page behind the bar (the scrim stops at
+   the rail: it covers page content only, never sidebar and never the bar -
+   see .nav-overlay) and lifts the bar to 99999. At full rest tint the bar
+   then reads as a crisp sheet parked on a soft scene, so while .active the
+   tint drops a step in BOTH themes and the bar's own 14px glass shows
+   through - the page reads continuously up through bar + scrim.
+
+   Rest and .scrolled rules above are untouched; the existing
+   background-color transition on .nav-container carries the change in and
+   back out. Selectors are theme-scoped ((0,4,1)/(0,5,1), above every rest
+   and scrolled rule) so light and dark can never fight over a tie - the
+   seam block below only paints border/box-shadow and does not collide. */
+html:not([data-bs-theme="dark"]) body.sticky-navbar .nav-container.active {
+    background-color: rgba(255, 255, 255, 0.6);
+}
+
+html:not([data-bs-theme="dark"]) body.sticky-navbar .navbar.scrolled.active {
+    background-color: rgba(255, 255, 255, 0.72);
+}
+
+[data-bs-theme="dark"] body.sticky-navbar .nav-container.active {
+    background-color: rgba(28, 30, 32, 0.65);
+}
+
+[data-bs-theme="dark"] body.sticky-navbar .navbar.scrolled.active {
+    background-color: rgba(23, 25, 27, 0.78);
+}
+
+/* Light bar - a seam you can see under a sheet that actually floats
+   ------------------------------------------------------------------
+   Two failures kept the light bar flat: the seam was 1px of #dadfe5 on a
+   #f6f8fb page (about 3 luminance units - it read as no line at all), and
+   the only shadow it cast was that same colour as an inset twin, so the
+   bar never separated from the content it hovers over.
+
+   Seam: the 1px border keeps its layout but is painted transparent, and a
+   ::after hairline draws it instead - cool navy at the edges lifting to
+   the brand blue exactly at the window centre (the same
+   calc(50% - --main-ml/2 the title uses, so the blue kiss lands under
+   "Invent-MAG" in every navigation mode). The hairline casts its own
+   tight shadow, so the line reads as the top edge of the page rather
+   than as a stray rule, and it stays put when the sidebar slides because
+   it is anchored to the bar, not to the viewport.
+   Lift: --lt-shadow-bar at rest, --lt-shadow-bar-scrolled once scrolled -
+   light's twin of the dark bar's two heights above.
+
+   Selectors are (0,3,1) and only ever match when the dark rules don't, so
+   the two themes can never fight over the same declaration. */
+html:not([data-bs-theme="dark"]) body.sticky-navbar .nav-container {
+    border-bottom-color: transparent;
+    box-shadow: var(--lt-shadow-bar);
+}
+
+html:not([data-bs-theme="dark"]) body.sticky-navbar .nav-container::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: -1px;
+    height: 1px;
+    background: linear-gradient(
+        90deg,
+        rgba(16, 24, 40, 0.2) 0%,
+        rgba(0, 84, 166, 0.34) calc(50% - var(--main-ml, 0px) / 2),
+        rgba(16, 24, 40, 0.2) 100%
+    );
+    box-shadow: 0 2px 6px rgba(16, 24, 40, 0.12);
+    pointer-events: none;
+}
+
+html:not([data-bs-theme="dark"]) body.sticky-navbar .navbar.scrolled {
+    box-shadow: var(--lt-shadow-bar-scrolled);
+}
+
+/* the seam deepens with the bar, otherwise the hairline's shadow reads
+   flat while the lift under it grows */
+html:not([data-bs-theme="dark"]) body.sticky-navbar .navbar.scrolled::after {
+    box-shadow: 0 3px 10px rgba(16, 24, 40, 0.18);
+}
+
+/* Brand centring - window-centred in EVERY navigation mode.
+   ---------------------------------------------------------
+   left:50% (the start-50 utility) centres the title inside its container,
+   and the container sits inside .main-content - which the sidebar pushes
+   right by --main-ml (280px open / 70px rail / 0 navbar-only). So the title
+   was centred on the BAR, landing half the sidebar width right of the
+   window centre: +140px open, +35px on the rail, 0 with navbar-only, which
+   is why it read as "a little to the right" only with both nav types.
+
+   Half the offset is exactly the distance from the bar's centre to the
+   window's, so subtracting it puts the title on the window centreline in
+   all three states - and because --main-ml animates with margin-left
+   (@property in menu-sidebar.css), it stays there while the sidebar
+   slides. start-50 was dropped from the markup: its !important would beat
+   any normal rule, so `left` now lives here, in one place. */
+#navbar-brand-title {
+    left: calc(50% - var(--main-ml, 0px) / 2);
+}
+
+/* Bar content geometry - one resting spot in both sidebar states
+   ------------------------------------------------------------------
+   The container used to be a clamped container-xl (max-width 1320px)
+   centred in the bar. The bar's width crosses that 1320 line mid-slide
+   (rail 1518px -> open 1308px at a 1600px window), so on every toggle
+   the container re-clamped: its left edge leapt ~111px right and every
+   item in the bar - the right-hand icon cluster above all - swished
+   sideways with it, then swished back on close. A fluid container is
+   pinned to the bar, whose right edge never moves, so the cluster rests
+   at the same x in both states - the fixed spot the swish below leaves
+   from and returns to.
+
+   The title's centreing formula is unaffected: it holds for any
+   container that is centred in the bar (or fills it - the same thing
+   when it is fluid), so "Invent-MAG" stays on the window centreline.
+   Below 1400px the clamp never engaged anyway, so nothing changes.
+
+   Both container modes are covered: the bar renders .container-xl by
+   default and .container-fluid while the fluid_layout setting is on
+   (AppServiceProvider's view composer picks the class) - pinning either
+   keeps this one resting spot. */
+.nav-container > .container-xl,
+.nav-container > .container-fluid {
+    max-width: none;
+}
+
+/* The sidebar-toggle swish - out on open, back on close
+   ------------------------------------------------------------------
+   Opening the sidebar swishes the bar's whole content row - icon
+   cluster, centred title, nav links - right and off the edge, and it
+   STAYS gone for the whole time the sidebar is open: an empty frosted
+   strip is the effect, not a fault. Closing is what brings it back -
+   the content slides in from the right and fades up while the rail
+   collapses. The bar itself never moves or hides.
+
+   Keyed on the sidebar's own .collapsed class - the class that actually
+   drives its width - and not on the fast-close/smooth-open phase
+   classes, which only live for one ~400ms slide: this is a state rather
+   than a timer, so it cannot strand, and a fresh page load lands in the
+   right shape with no JS involved. The phase classes now time only the
+   frosted glass (rule below). Transitions read the destination state's
+   timing, so this rule carries the exit (--anim-fast, ease-out - the
+   rail's fast-close values) while the resting rule above carries the
+   return (--anim-slow, the house curve).
+
+   pointer-events: none while gone: an invisible bell you can still
+   click is worse than no bell. Un-matching the selector restores
+   pointer-events with everything else.
+
+   Reduced motion and body.no-animations skip the effect entirely (the
+   selector never matches) instead of dropping the content to opacity 0
+   with the transition nulled by the kill switch. */
+@media (prefers-reduced-motion: no-preference) {
+    body:not(.no-animations) .nav-container > .container-xl,
+    body:not(.no-animations) .nav-container > .container-fluid {
+        transition:
+            transform var(--anim-slow) cubic-bezier(0.25, 0.8, 0.25, 1),
+            opacity var(--anim-slow) cubic-bezier(0.25, 0.8, 0.25, 1);
+    }
+
+    body:not(.no-animations):has(.sidebar:not(.collapsed)) .nav-container > .container-xl,
+    body:not(.no-animations):has(.sidebar:not(.collapsed)) .nav-container > .container-fluid {
+        transform: translateX(180px);
+        opacity: 0;
+        pointer-events: none;
+        transition:
+            transform var(--anim-fast) ease-out,
+            opacity var(--anim-fast) ease-out;
+    }
+}
+
+/* Glass off while the bar is sliding
+   ------------------------------------------------------------------
+   The frosted ::before runs backdrop-filter, which promotes the bar to
+   a GPU layer. That layer is rebuilt on every frame of the ancestor's
+   margin-left/--main-ml transition, and on some GPUs it drops its
+   contents outright - the bar reads as an empty sheet for the length of
+   the animation. Dropping the filter for exactly those frames (the
+   fast-close/smooth-open classes only exist while menu-sidebar.js is
+   animating) keeps the paint on the plain path; with the bar's tint at
+   .8-.99 alpha the blur is barely visible for those 150-300ms anyway.
+   :has() is what lets a descendant's transient state reach the bar. */
+body:has(.main-content.main-content-fast-close, .main-content.main-content-smooth-open) .nav-container::before {
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
 }
 
 /* New styles for collapsed navigation */
@@ -869,7 +1124,7 @@ body.layout-navbar-v2.sidebar-open #navbar-brand-title {
     height: 40px; /* Fixed height for icon */
     overflow: hidden; /* Hide overflowing title initially */
     position: relative;
-    transition: width 0.3s ease-in-out; /* Animate width change */
+    transition: width var(--anim-slow) ease-in-out; /* Animate width change */
 }
 
 .nav-dropdown.collapsed li a .nav-link-title {
@@ -877,7 +1132,7 @@ body.layout-navbar-v2.sidebar-open #navbar-brand-title {
     opacity: 0;
     visibility: hidden;
     white-space: nowrap;
-    transition: max-width 0.3s ease-in-out, opacity 0.3s ease-in-out, visibility 0.3s ease-in-out;
+    transition: max-width var(--anim-slow) ease-in-out, opacity var(--anim-slow) ease-in-out, visibility var(--anim-slow) ease-in-out;
     margin-left: 8px; /* Space between icon and title */
 }
 
@@ -896,7 +1151,7 @@ body.layout-navbar-v2.sidebar-open #navbar-brand-title {
 .dropdown-menu.staggered-open .dropdown-item {
     opacity: 0;
     transform: translateY(-10px);
-    animation: slideIn 0.3s forwards ease-out;
+    animation: slideIn var(--anim-slow) forwards ease-out;
 }
 
 @keyframes slideIn {
@@ -928,6 +1183,18 @@ body.layout-navbar-v2.sidebar-open #navbar-brand-title {
     padding: 0.5rem;
 }
 
+/* Dark: the near-black menu stops floating once the page itself is dark -
+   rgba(20,20,20,.98) is DARKER than the #1c1e20 body, so the menu read as a
+   hole punched into the page rather than a layer above it. Take the dropdown
+   rung of the frosted ladder instead (tokens.css / app.css elevation):
+   one rung above cards, white edge, deep lift. Light keeps the near-black
+   menu by design (white items, see --main-nav-dropdown-item-color). */
+[data-bs-theme="dark"] .nav-dropdown .dropdown-menu {
+    background-color: var(--frz-surface-2) !important;
+    border-color: var(--frz-edge);
+    box-shadow: var(--frz-shadow-2);
+}
+
 /* Style for the dropdown items (the links) */
 .nav-dropdown .dropdown-menu .dropdown-item {
     color: var(--main-nav-dropdown-item-color) !important;
@@ -939,7 +1206,7 @@ body.layout-navbar-v2.sidebar-open #navbar-brand-title {
 
 /* Hover/Focus state for the dropdown items */
 .nav-dropdown .dropdown-menu .dropdown-item:hover,
-.nav-dropdown .dropdown-menu .dropdown-item:focus {
+.nav-dropdown .dropdown-menu .dropdown-item:focus-visible {
     color: var(--main-nav-dropdown-item-hover-color) !important;
     background-color: var(--main-nav-dropdown-item-hover-bg) !important;
     text-decoration: none !important; /* Remove underline on hover */
@@ -956,19 +1223,19 @@ body.layout-navbar-v2.sidebar-open #navbar-brand-title {
 
 /* Dark mode: Notification dropdown container */
 [data-bs-theme="dark"] .notification-dropdown {
-    background-color: #1e293b !important;
+    background-color: #26282a !important;
     border-color: rgba(255, 255, 255, 0.08) !important;
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4), 0 2px 8px rgba(0, 0, 0, 0.2);
 }
 
 /* Dark mode: Notification header */
 [data-bs-theme="dark"] .notification-header {
-    background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+    background: linear-gradient(135deg, #26282a 0%, #151719 100%);
     border-bottom-color: rgba(255, 255, 255, 0.06);
 }
 
 [data-bs-theme="dark"] .notification-header h3 {
-    color: #f1f5f9;
+    color: #f1f3f5;
 }
 
 /* Dark mode: Tabs */
@@ -977,11 +1244,11 @@ body.layout-navbar-v2.sidebar-open #navbar-brand-title {
 }
 
 [data-bs-theme="dark"] .notification-tabs .nav-link {
-    color: #94a3b8;
+    color: #a0a2a4;
 }
 
 [data-bs-theme="dark"] .notification-tabs .nav-link:hover {
-    color: #e2e8f0;
+    color: #f1f3f5;
     background: transparent;
 }
 
@@ -993,7 +1260,7 @@ body.layout-navbar-v2.sidebar-open #navbar-brand-title {
 
 /* Dark mode: Section labels */
 [data-bs-theme="dark"] .notification-section-label {
-    color: #94a3b8;
+    color: #a0a2a4;
 }
 
 /* Dark mode: Notification items */
@@ -1007,11 +1274,11 @@ body.layout-navbar-v2.sidebar-open #navbar-brand-title {
 }
 
 [data-bs-theme="dark"] .notification-item .notification-title {
-    color: #e2e8f0;
+    color: #f1f3f5;
 }
 
 [data-bs-theme="dark"] .notification-item .notification-desc {
-    color: #64748b;
+    color: #717375;
 }
 
 /* Dark mode: Notification icon wrapper */
@@ -1033,11 +1300,11 @@ body.layout-navbar-v2.sidebar-open #navbar-brand-title {
 }
 
 [data-bs-theme="dark"] .system-notification-item .notification-title {
-    color: #e2e8f0;
+    color: #f1f3f5;
 }
 
 [data-bs-theme="dark"] .system-notification-item .notification-desc {
-    color: #64748b;
+    color: #717375;
 }
 
 /* Dark mode: System notification icons */
@@ -1080,7 +1347,7 @@ body.layout-navbar-v2.sidebar-open #navbar-brand-title {
 
 /* Dark mode: Empty state */
 [data-bs-theme="dark"] .notification-empty {
-    color: #64748b;
+    color: #717375;
 }
 
 [data-bs-theme="dark"] .notification-empty-icon {
@@ -1089,7 +1356,7 @@ body.layout-navbar-v2.sidebar-open #navbar-brand-title {
 
 /* Dark mode: More link */
 [data-bs-theme="dark"] .notification-more-link {
-    color: #64748b;
+    color: #717375;
 }
 
 /* Dark mode: Footer */
@@ -1162,5 +1429,5 @@ body.layout-navbar-v2.sidebar-open #navbar-brand-title {
 
 [data-bs-theme="dark"] .bg-black-lt {
     background-color: rgba(255, 255, 255, 0.08);
-    color: #94a3b8;
+    color: #a0a2a4;
 }

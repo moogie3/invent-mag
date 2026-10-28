@@ -446,6 +446,17 @@ body.layout-navbar .main-content {
     width: auto;
     display: flex;
     justify-content: center;
+    /*
+     * min-height + cross-centre: the active marker below is a 30px circle
+     * inside the 44px row band. Without the explicit band, THAT ONE li
+     * would shrink to 30 and every row beneath it would jump 14px whenever
+     * the active page changes; without centring on both axes, the circle
+     * would sit flush-left/top in its band and its glyph would drift off
+     * the column's centre line. Both axes are covered regardless of which
+     * axis the row's flex-direction makes "main".
+     */
+    min-height: 44px;
+    align-items: center;
 }
 
 /* Navigation Links */
@@ -486,10 +497,24 @@ body.layout-navbar .main-content {
     color: #ffffff;
 }
 
-.sidebar.collapsed .navbar-nav .nav-link:hover {
-    transform: scale(1.05);
-    background-color: #343a40;
-    color: #fff;
+/* Rail hover: a frosted DISC, not a square plate (Change 50 - the user's
+   call: "when hovering... we no longer use the square wrap but the circle
+   wrap"). The rail's shape language is now ONE system: rows are square,
+   position is circle, hover is "about to become position", so hover
+   PREVIEWS the circle - a 28px disc centred on the glyph. Every rail row
+   (section or child) is a square box with its glyph centred, so a
+   centred radial-gradient IS a circle wrap - no pseudo-element, no layout
+   cost. Deliberately just UNDER the 30px marker so hover never outshines
+   "you are here" (the old plate did exactly that: in dark mode it was a
+   near-white #f8f9fa square, bigger AND brighter than the marker - see
+   the dark block below). Ink disc on light, frost on dark. The
+   scale(1.05) jolt is retired with the plate. */
+.sidebar.collapsed .navbar-nav .nav-link:hover:not(.active) {
+    transform: none;
+    background-color: transparent;
+    background-image: radial-gradient(circle 14px at center,
+        rgba(0, 0, 0, 0.06) 98%, rgba(0, 0, 0, 0) 100%);
+    color: #1e2126;
 }
 
 /* Active Navigation Link */
@@ -497,6 +522,24 @@ body.layout-navbar .main-content {
     background-color: #212529;
     color: #fff;
     font-weight: bold;
+}
+
+/* Rail active marker: a 30px CIRCLE in the 44px row (was 36px - too close
+   to the band's own size, so it read as a plate; worse, it OVERLAPPED the
+   accent bar: circle x17-x53 against bar x15-x18). 30px restores the
+   hierarchy - 20px section glyph, 16px child glyph, 30px marker - and
+   clears the flush bar by ~5px. Round because shape alone says "you are
+   here": rows are square, position is circle. padding .25rem keeps the
+   20px section glyph inside the 30px box (20+8=28), overflow:hidden plus
+   radius 50% clips cleanly. Centred by the li rules above; icon centre
+   stays on x35, the column's line. */
+.sidebar.collapsed .navbar-nav > .nav-item > .nav-link.active,
+.sidebar.collapsed .collapse.show .nav-submenu .nav-link.active {
+    width: 30px;
+    height: 30px;
+    min-height: 30px;
+    padding: 0.25rem;
+    border-radius: 50%;
 }
 
 /* Navigation Link Components */
@@ -535,8 +578,16 @@ body.layout-navbar .main-content {
 }
 
 .sidebar.collapsed .nav-link-title {
+    /*
+     * flex: 0 0 0, not the inherited flex:1: a grown title silently eats the
+     * row's leftover space (20px row - 16px child icon = 4px), and since
+     * the row centres its CONTENT, that tail parked every child glyph 2px
+     * left of the section column's centre. Title contributes nothing in the
+     * rail, so only the icon participates in the centring maths.
+     */
     opacity: 0;
     width: 0;
+    flex: 0 0 0;
     transform: translateX(-20px);
 }
 
@@ -577,6 +628,95 @@ body.layout-navbar .main-content {
     padding: 0;
 }
 
+/* The collapsed rail renders ONE submenu as icons - the active page's group
+   (menu-sidebar.js keeps only the chain open there). The group is a DRAWER:
+   the li that wraps the section link and its open panel gets a frosted tray
+   - a fill plus a soft edge - and a 3px primary accent bar on its left
+   edge, the "this drawer is open" tab.
+
+   This is the third grouping treatment, and the revision history is the
+   rationale. (1) A hairline at the ladder's 0.11 read as a rendering
+   artifact. (2) A bracket at 0.18 was rejected as "just a bolder line".
+   (3) An indent + per-row L elbow was rejected as "still bad... too
+   plain". The common root: all three are LINES - a 1px stroke has no body
+   at 70px on a 90%-zoomed screen, so any alpha either vanishes or reads as
+   chrome noise. A group does not need a stroke drawn near it; it needs a
+   BODY. A fill is an area, not an edge: it survives scaling and zoom the
+   same way the frosted cards do (app.css "Frosted elevation" - this is
+   that language at rail scale), and a container is the honest metaphor for
+   a group anyway.
+
+   Geometry measured on the built page (1366x768, 2x capture): every rail
+   row - section links AND non-active child links alike - is a 44x44 box
+   at x13 (only the ACTIVE link shrinks, to the 30px circle centred at
+   x35, i.e. x20-x50); the tray border-box and the flush accent bar
+   (x12-x15) sit on the same centre line, so the circle clears the bar by
+   ~5px and no rhythm rule needs touching. Children sit BACK on the
+   section column: with a container doing the grouping, the 8px tab and
+   the elbows had no job left (both retired).
+
+   The alpha numbers: 0.11 fill / 0.14 edge is the ladder's "things that
+   float" band - the tray floats above the rail's background, so it spends
+   the float token's strength, unlike the old lone strokes which had no
+   surface to reinforce them. Light spends ink instead (below). */
+.sidebar.collapsed .navbar-nav > .nav-item:has(> .collapse.show) {
+    position: relative;
+    margin: 3px 6px;
+    padding-bottom: 3px;
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    border-radius: 10px;
+    background-color: rgba(0, 0, 0, 0.05);
+}
+
+/* The accent: a 3px primary bar FLUSH on the tray's left edge - the
+   drawer's colored side, the "this drawer is open" tab. It was a floating
+   bar inset 3px, which the 36px marker literally overlapped (circle
+   x17-x53, bar x15-x18); at left:0 the bar MERGES with the tray's own
+   border and the collision becomes impossible by construction - the 30px
+   marker now clears it by ~5px. It earns its color: in a monochrome rail
+   it is the one thing that says WHICH section owns the white circle,
+   before you read the glyph. The color is the app's real primary measured
+   from a live .btn-primary (rgb(0, 84, 166) - NOT tabler's stock #206bc4;
+   tokens.css redefined the hue), with the measured value as fallback in
+   case the token is ever renamed. The radius follows the tray's left
+   corners so the bar reads as one object with the tray, not a dash. */
+.sidebar.collapsed .navbar-nav > .nav-item:has(> .collapse.show)::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 7px;
+    bottom: 7px;
+    width: 3px;
+    border-radius: 10px 0 0 10px;
+    background-color: var(--tblr-primary, #0054a6);
+    pointer-events: none;
+}
+
+/* Dark flips the tray's ink to the frosted white edge every floating
+   surface uses, same as the retired bracket and hairline did. */
+[data-bs-theme="dark"] .sidebar.collapsed .navbar-nav > .nav-item:has(> .collapse.show) {
+    border-color: rgba(255, 255, 255, 0.14);
+    background-color: rgba(255, 255, 255, 0.11);
+}
+
+/* The rail panel keeps overflow: visible (inherited from before the
+   drawer): it drops the base max-height clip - Bootstrap's .collapse
+   already hides closed panels, and a group longer than 500px must not
+   lose its tail rows in the rail. */
+.sidebar.collapsed .collapse.show .nav-submenu {
+    position: relative;
+    overflow: visible;
+}
+
+/* Child glyphs one step down from section glyphs (1rem vs 1.25rem): the
+   group reads as subordinate WITHOUT shifting sideways. The row itself stays
+   44px, so only the icon shrinks - the hit target never does. */
+.sidebar.collapsed .collapse.show .nav-submenu .nav-link-icon {
+    font-size: 1rem;
+    width: 16px;
+    height: 16px;
+}
+
 /* Dark: a submenu is a nested layer of its own, not just indented text - a
    hairline rail ties its items together and marks the indent, the same white
    edge the cards/dropdowns use (see app.css "Frosted elevation"). It sits
@@ -600,6 +740,14 @@ body.layout-navbar .main-content {
 [data-bs-theme="dark"] .sidebar.collapsed .nav-submenu::before {
     display: none;
 }
+
+/* Rail group cue history: the bracket here was retired in favour of the
+   per-row L elbow, which was itself retired when the DRAWER (the block at
+   the top of this section, by the rail submenu rules) shipped - three line
+   treatments in a row, each rejected (artifact / "bolder line" / "too
+   plain"), because a 1px stroke has no body at rail width. The dark
+   display:none above stays: the EXPANDED-mode hairline has no job in the
+   70px rail. */
 
 .nav-submenu .nav-link {
     padding: 0.5rem 1rem;
@@ -638,6 +786,13 @@ body.layout-navbar .main-content {
 }
 
 .sidebar.collapsed .sidebar-footer .navbar-nav {
+    /*
+     * Shrink-to-fit + centered: the footer column matches the main nav's,
+     * which is also fit-content and centered by .sidebar-nav's align-items.
+     * (An earlier width:100%/stretch attempt anchored the rows at x8 while
+     * the section column sits at x13 - fill and fit do NOT land on the same
+     * line here, so the footer mirrors the main nav's sizing instead.)
+     */
     width: auto;
     display: flex;
     flex-direction: column;
@@ -916,13 +1071,21 @@ body[data-bs-theme="dark"] .sidebar:not(.collapsed) .navbar-nav .nav-link:hover 
     color: #37393b !important;
 }
 
-[data-bs-theme="dark"] .sidebar.collapsed .navbar-nav .nav-link:hover,
-html[data-bs-theme="dark"] .sidebar.collapsed .navbar-nav .nav-link:hover,
-body[data-bs-theme="dark"] .sidebar.collapsed .navbar-nav .nav-link:hover,
-.dark .sidebar.collapsed .navbar-nav .nav-link:hover,
-[data-theme="dark"] .sidebar.collapsed .navbar-nav .nav-link:hover {
-    background-color: #f8f9fa !important;
-    color: #37393b !important;
+/* Dark rail hover: the frost disc (Change 50). This block USED to paint
+   the near-white #f8f9fa square - a 5-selector !important flash that
+   outshone the active marker and fought every softer override (it beat
+   single-selector !important rules on specificity, which is how it hid
+   the disc during the variant renders). Same frost strength as every
+   floating surface in dark; the icon brightens instead of inverting. */
+[data-bs-theme="dark"] .sidebar.collapsed .navbar-nav .nav-link:hover:not(.active),
+html[data-bs-theme="dark"] .sidebar.collapsed .navbar-nav .nav-link:hover:not(.active),
+body[data-bs-theme="dark"] .sidebar.collapsed .navbar-nav .nav-link:hover:not(.active),
+.dark .sidebar.collapsed .navbar-nav .nav-link:hover:not(.active),
+[data-theme="dark"] .sidebar.collapsed .navbar-nav .nav-link:hover:not(.active) {
+    background-color: transparent !important;
+    background-image: radial-gradient(circle 14px at center,
+        rgba(255, 255, 255, 0.10) 98%, rgba(255, 255, 255, 0) 100%);
+    color: #fff !important;
 }
 
 [data-bs-theme="dark"] .sidebar .navbar-nav .nav-link.active,
@@ -995,10 +1158,24 @@ html {
     scroll-behavior: smooth;
 }
 
-/* Staggered animation for submenu items */
-.sidebar.collapsed .nav-submenu .nav-item {
+/* Staggered animation for submenu items.
+   The rail rule used to park ALL submenu items invisible (the rail showed no
+   submenus, and Bootstrap's .collapse only handles display - a panel left
+   .show in the rail laid out blank rows). The rail now renders the active
+   page's group as icons, so the parking moves to CLOSED panels (display:none
+   hides those anyway) and the shown group renders fully - with or without
+   the stagger's .visible class, which restore-opened groups never receive. */
+.sidebar.collapsed .collapse:not(.show) .nav-submenu .nav-item {
     opacity: 0;
     transform: translateY(10px);
+}
+/* Shown rows need no transform reset: the parking rule above is scoped to
+   :not(.show), so a visible row was never parked in the first place. The
+   rail's file-tree tab rule (top of this file) owns the transform for shown
+   rows - it used to be reset to none HERE, same specificity, later in the
+   file, which silently cancelled the 8px tab. */
+.sidebar.collapsed .collapse.show .nav-submenu .nav-item {
+    opacity: 1;
 }
 .nav-submenu .nav-item.visible {
     opacity: 1;

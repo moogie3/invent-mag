@@ -107,6 +107,135 @@ function syncActiveState() {
     }, 50);
 }
 
+// ---- Active-page chain: which panels show WHERE you are --------------------
+// Derived from the URL with the same match rule as syncActiveState (exact hit
+// or path prefix, so /admin/product/edit/9 keeps Product open). Used for every
+// purpose that must never be remembered: restoring the chain on load, the
+// collapsed rail's icon group (only the active section earns rail rows), and
+// deciding which panels a rail collapse may close (everything EXCEPT the
+// chain). A function declaration so it is hoisted - the readyState boot path
+// calls restoreSidebarMemory() during module evaluation.
+function getActiveChainPanels(sidebar) {
+    const currentPath = window.location.pathname;
+    const panels = new Set();
+    sidebar.querySelectorAll(".nav-link").forEach((link) => {
+        const href = link.getAttribute("href");
+        if (!href || href === "#") return;
+        let linkPath;
+        try {
+            linkPath = new URL(href, window.location.origin).pathname;
+        } catch (err) {
+            return;
+        }
+        if (linkPath !== currentPath && !currentPath.startsWith(linkPath + "/")) return;
+        let panel = link.closest(".collapse");
+        while (panel && sidebar.contains(panel)) {
+            panels.add(panel);
+            panel = panel.parentElement ? panel.parentElement.closest(".collapse") : null;
+        }
+    });
+    return panels;
+}
+
+// Bring the panels to the chain's state: close every open panel EXCEPT the
+// chain, and OPEN the chain itself if it happens to be closed. Called from
+// all three paths that enter the rail (manual toggle, click-outside
+// auto-close, sub-768 resize): a non-chain group left open in the 70px rail
+// would show as icons the URL never stood behind - the rail renders the
+// active group only. And the chain can be CLOSED at collapse time: on an
+// active page the section trigger is a normal toggle, so clicking
+// Accounting while ON Accounting closes its dropdown; collapsing right
+// after then produced a rail with no group, no marker, no "you are here"
+// at all (rows 0, active link 0x0 - reproduced before this fix). The chain
+// is derived from the URL every time, so opening it here is the same truth
+// restore applies on load - the rail always shows where you are.
+function closePanelsExceptChain(sidebar) {
+    const chain = getActiveChainPanels(sidebar);
+    // .collapsing too, not just .show: a click on a rail section makes
+    // Bootstrap's data-api (delegated on document, ahead of our own link
+    // handler) START opening that submenu at once, and a re-collapse inside
+    // that ~350ms window met a panel that was neither open nor closed.
+    // The old .show-only query skipped it, its pending transition completed
+    // afterwards, and a ghost group appeared in the rail (reproduced: the
+    // clicked group listed next to the chain). Force-resolving the pending
+    // wait (a synthetic transitionend marks Bootstrap's completion callback
+    // as consumed) lets hide() close it immediately instead. The selector
+    // is bare .collapsing on purpose: mid-transition this bundled Bootstrap
+    // REPLACES the collapse class with collapsing, so .collapse.collapsing
+    // matches nothing (measured: className is exactly "collapsing").
+    sidebar.querySelectorAll(".collapse.show, .collapsing").forEach((panel) => {
+        if (chain.has(panel)) return;
+        if (panel.classList.contains("collapsing")) {
+            panel.dispatchEvent(new Event("transitionend"));
+        }
+        const instance = window.bootstrap && bootstrap.Collapse.getInstance(panel);
+        if (instance) {
+            instance.hide();
+        } else {
+            // No instance means no animation to wait for; every open path
+            // creates one, so this is only a safety net - the next restore
+            // resyncs aria-expanded either way.
+            panel.classList.remove("show");
+        }
+    });
+    chain.forEach((panel) => {
+        if (panel.classList.contains("show")) return;
+        panel.classList.add("show");
+        // Same instance rule as restore: a .show without a Collapse instance
+        // would outlive the rail (the next hide() finds nothing to hide) and
+        // the trigger's next click would have nothing to toggle against.
+        // toggle:false keeps the constructor from flipping it closed again.
+        if (window.bootstrap && bootstrap.Collapse) {
+            bootstrap.Collapse.getOrCreateInstance(panel, { toggle: false });
+        }
+    });
+    // ARIA must reflect the truth we just forced: the chain's triggers are
+    // expanded now, non-chain ones collapsed (hide() already fixed theirs).
+    sidebar.querySelectorAll("[data-bs-toggle='collapse']").forEach((trigger) => {
+        const target = trigger.getAttribute("data-bs-target") || trigger.getAttribute("href");
+        if (!target || target[0] !== "#") return;
+        const panel = sidebar.querySelector(target);
+        if (panel) trigger.setAttribute("aria-expanded", panel.classList.contains("show") ? "true" : "false");
+    });
+}
+
+// Bring the active row into view when entering the rail. The rail can be
+// taller than the screen (a full section list plus the chain runs past the
+// fold on short displays), and .sidebar hides its scrollbar - a cut-off
+// group gives no hint that rows continue below. scrollIntoView with
+// block:'nearest' moves ONLY when the row is fully out of view, so a row
+// that is already visible leaves the remembered scroll position alone.
+function scrollActiveRowIntoView(sidebar) {
+    const active = sidebar.querySelector('.nav-link.active[href]:not([href="#"])');
+    if (active) active.scrollIntoView({ block: 'nearest' });
+}
+
+// Rail tooltip names, resolved at hover (tooltips are created once per link,
+// but the active page changes on every navigation): a submenu row reads
+// "Accounting › General Ledger" - its section, then itself - so the 70px
+// rail's icon row is self-describing; the section row reports where you
+// actually are while its group is open ("Accounting › General Ledger" on the
+// Accounting section, just "Purchasing" while its children are elsewhere).
+function railTooltipText(link) {
+    const titleElement = link.querySelector(".nav-link-title");
+    const title = titleElement ? titleElement.textContent.trim() : "";
+
+    const ownPanel = link.closest(".collapse");
+    if (ownPanel) {
+        const trigger = ownPanel.parentElement
+            ? ownPanel.parentElement.querySelector(":scope > .nav-link")
+            : null;
+        const triggerTitle = trigger ? trigger.querySelector(".nav-link-title") : null;
+        const section = triggerTitle ? triggerTitle.textContent.trim() : "";
+        return section ? section + " › " + title : title;
+    }
+
+    const target = link.getAttribute("data-bs-target");
+    const panel = target ? document.querySelector(target) : null;
+    const activeChild = panel ? panel.querySelector(".nav-link.active .nav-link-title") : null;
+    return activeChild ? title + " › " + activeChild.textContent.trim() : title;
+}
+
 // ---- Session memory: open submenu panels + sidebar scroll
 // (state declared at the top of the file - the readyState boot path calls the
 // restore below during module evaluation, so its `let`s must precede it.)
@@ -114,13 +243,15 @@ function restoreSidebarMemory() {
     const sidebar = document.querySelector('.sidebar');
     if (!sidebar) return;
 
-    // With the rail collapsed the submenus are iconless anyway: opening them
-    // there would lay out a column of invisible rows inside the 70px rail
-    // (.sidebar.collapsed hides submenu items by design), so remembered and
-    // chain opens only apply to the expanded rail - the collapsed rail keeps
-    // its load-time appearance (today's default).
+    // Rail vs expanded decides WHAT may be reapplied. The chain below applies
+    // in BOTH modes - the collapsed rail renders it as its icon group - while
+    // remembered, user-opened extras only reopen in the expanded sidebar
+    // (unlabeled rows in the 70px rail would claim to be the active group).
+    // `!== 'false'` matches getSidebarState()'s null-default below (an unset
+    // key means collapsed), so restore and init can never disagree about the
+    // mode on first boot.
     const railCollapsed = sidebar.classList.contains('collapsed') ||
-        localStorage.getItem('sidebarCollapsed') === 'true';
+        localStorage.getItem('sidebarCollapsed') !== 'false';
 
     if (!railCollapsed) {
         // Remembered opens, by panel id (div#submenu-N, stable across Turbo
@@ -131,41 +262,29 @@ function restoreSidebarMemory() {
                 el.classList.add('show');
             }
         });
-
-        // The active page's own chain: the selected link must be visible even
-        // when navigation never went through the menu (shortcuts, links in
-        // the content). Derived from the URL - so it also applies on full
-        // loads, while a full load still forgets every remembered open above.
-        const currentPath = window.location.pathname;
-        sidebar.querySelectorAll('.nav-link').forEach(link => {
-            const href = link.getAttribute('href');
-            if (!href || href === '#') return;
-            let linkPath;
-            try {
-                linkPath = new URL(href, window.location.origin).pathname;
-            } catch (err) {
-                return;
-            }
-            if (linkPath !== currentPath && !currentPath.startsWith(linkPath + '/')) return;
-            let panel = link.closest('.collapse');
-            while (panel && sidebar.contains(panel)) {
-                panel.classList.add('show');
-                panel = panel.parentElement ? panel.parentElement.closest('.collapse') : null;
-            }
-        });
-
-        // A restored .show needs a Collapse instance behind it: the rail
-        // collapse hides open panels through
-        // bootstrap.Collapse.getInstance() - a null there would leave the
-        // submenu open inside the icon rail - and the trigger's next click
-        // needs one to toggle against. toggle:false stops the constructor
-        // from flipping an already-open panel closed.
-        sidebar.querySelectorAll('.collapse.show').forEach(panel => {
-            if (window.bootstrap && bootstrap.Collapse) {
-                bootstrap.Collapse.getOrCreateInstance(panel, { toggle: false });
-            }
-        });
     }
+
+    // The active page's own chain: the selected link must be visible even
+    // when navigation never went through the menu (shortcuts, links in the
+    // content). Derived from the URL - so F5 forgets every remembered extra
+    // but never where you are, and this is the group the collapsed rail
+    // shows as icons.
+    getActiveChainPanels(sidebar).forEach(panel => {
+        panel.classList.add('show');
+    });
+
+    // A restored .show needs a Collapse instance behind it: the rail
+    // collapse hides open panels through
+    // bootstrap.Collapse.getInstance() - a null there would leave the
+    // submenu open inside the icon rail - and the trigger's next click
+    // needs one to toggle against. toggle:false stops the constructor
+    // from flipping an already-open panel closed. Runs for BOTH modes now,
+    // because the rail-visible chain needs its instance too.
+    sidebar.querySelectorAll('.collapse.show').forEach(panel => {
+        if (window.bootstrap && bootstrap.Collapse) {
+            bootstrap.Collapse.getOrCreateInstance(panel, { toggle: false });
+        }
+    });
 
     // Triggers: the server renders every aria-expanded="false"; reflect the
     // restored truth instead.
@@ -181,6 +300,11 @@ function restoreSidebarMemory() {
     // clamped against the pre-init box. rAF runs after that synchronous work.
     requestAnimationFrame(() => {
         sidebar.scrollTop = rememberedSidebarScroll;
+        // Rail only: the remembered position can leave the newly-opened
+        // chain below the fold. 'nearest' keeps the memory whenever the
+        // active row is already on screen (the common case) and corrects
+        // only a genuinely hidden one.
+        if (railCollapsed) scrollActiveRowIntoView(sidebar);
     });
 }
 
@@ -192,10 +316,16 @@ document.addEventListener('turbo:before-cache', () => {
         // Snapshot what is open + how far down we are so the next page can
         // reapply both. Class-based on the div#submenu-N panels Bootstrap
         // actually toggles: it captures every open path and excludes whatever
-        // a rail collapse has already closed. Empty on a full load - F5 resets
-        // the memory by construction.
+        // a rail collapse has already closed. The active chain is excluded
+        // too - it is derived from the NEXT page's URL at restore, so riding
+        // along as memory would keep yesterday's section open next to
+        // today's. Empty on a full load - F5 resets the memory by
+        // construction.
+        const chain = getActiveChainPanels(sidebar);
         rememberedOpenSubmenus = new Set(
-            Array.from(sidebar.querySelectorAll('.collapse.show'), el => el.id).filter(Boolean)
+            Array.from(sidebar.querySelectorAll('.collapse.show'))
+                .filter(panel => panel.id && !chain.has(panel))
+                .map(panel => panel.id)
         );
         rememberedSidebarScroll = sidebar.scrollTop;
     }
@@ -280,7 +410,6 @@ function initSidebar() {
 
             const tooltip = document.createElement("div");
             tooltip.className = "sidebar-tooltip";
-            tooltip.textContent = text;
 
             document.body.appendChild(tooltip);
             this.tooltips.set(element, tooltip);
@@ -288,6 +417,11 @@ function initSidebar() {
             const showTooltip = (e) => {
                 if (!sidebar.classList.contains("collapsed")) return;
 
+                // Text may be a getter: rail names depend on the ACTIVE page,
+                // which changes per navigation while the tooltip element is
+                // created once. Re-read before measuring - the bubble is
+                // nowrap, so its height must match the fresh text.
+                tooltip.textContent = typeof text === "function" ? text() : text;
                 const rect = element.getBoundingClientRect();
                 tooltip.style.left = rect.right + 10 + "px";
                 tooltip.style.top =
@@ -327,7 +461,10 @@ function initSidebar() {
             if (titleElement) {
                 // Add staggered fade-in animation for collapsed state
                 link.style.animationDelay = `${index * 50}ms`;
-                tooltipManager.create(link, titleElement.textContent.trim());
+                // A getter, not the text as-is: the rail name ("Accounting ›
+                // General Ledger") depends on which page is active, and
+                // syncActiveState keeps changing that after this runs.
+                tooltipManager.create(link, () => railTooltipText(link));
             }
         });
 
@@ -349,13 +486,11 @@ function initSidebar() {
         const navTexts = sidebar.querySelectorAll(".nav-link-title");
 
         if (willCollapse) {
-            // Hide any open submenus before collapsing the sidebar
-            sidebar.querySelectorAll('.collapse.show').forEach(openSubmenu => {
-                const bsCollapse = bootstrap.Collapse.getInstance(openSubmenu);
-                if (bsCollapse) {
-                    bsCollapse.hide();
-                }
-            });
+            // Close every open submenu EXCEPT the active page's chain: the
+            // chain stays .show and becomes the rail's icon group; every
+            // other open panel would appear as unlabeled icons the URL never
+            // stood behind (and, before this rule, as invisible rows).
+            closePanelsExceptChain(sidebar);
 
             // FAST closing - immediate collapse with quick transition.
             // The smooth-open classes must come OFF here: they share
@@ -380,6 +515,9 @@ function initSidebar() {
                 if (!window.userSettings || window.userSettings.show_tooltips) {
                     addTooltips();
                 }
+                // Chain rows can sit below the fold once the rail is 70px -
+                // reveal the active row if (and only if) it ended up hidden.
+                scrollActiveRowIntoView(sidebar);
             }, 50);
         } else {
             // SMOOTH opening - keep the nice opening animation
@@ -525,6 +663,21 @@ function initSidebar() {
 
                 // After a short delay to allow sidebar to open, trigger the collapse
                 setTimeout(() => {
+                    // The sidebar may have been collapsed again inside this
+                    // 500ms window (the user's "close while the submenu is
+                    // still opening" case): opening the target NOW would
+                    // plant an unlabeled ghost group in the icon rail, since
+                    // closePanelsExceptChain already ran on that collapse.
+                    // The chain rule owns whatever shows in the rail. Both
+                    // signals, not just "collapsed": that class lands 50ms
+                    // AFTER the click, and a pending timer firing inside
+                    // that gap saw "not collapsed" and opened anyway
+                    // (reproduced: ghost group in the rail). sidebar-fast-close
+                    // is added SYNCHRONOUSLY by the willCollapse branch, so it
+                    // closes the gap; the expand path removes it synchronously
+                    // too, so a legitimate pending open still runs.
+                    if (sidebar.classList.contains('collapsed')
+                        || sidebar.classList.contains('sidebar-fast-close')) return;
                     // Manually trigger Bootstrap's collapse toggle
                     const targetId = link.getAttribute('data-bs-target');
                     const targetElement = document.querySelector(targetId);
@@ -610,11 +763,25 @@ function initSidebar() {
                 }
                 
                 currentSidebar.querySelectorAll(".nav-link-title").forEach((text) => text.classList.add("nav-text-fade-out"));
-                
+
+                // Same rail rule as the manual toggle: only the active group
+                // stays open. This path never closed panels before - a group
+                // open here survived the collapse as invisible rows.
+                closePanelsExceptChain(currentSidebar);
+
                 setTimeout(() => {
                     currentSidebar.classList.add("collapsed");
                     if(currentMain) currentMain.classList.add("sidebar-collapsed");
                     document.body.classList.remove("sidebar-open");
+                    // Tooltips are rail-only, and this path was the one
+                    // collapse that never attached them - hover in the rail
+                    // stayed silent after an outside click.
+                    if (!window.userSettings || window.userSettings.show_tooltips) {
+                        addTooltips();
+                    }
+                    // Same fold rule as the manual toggle: reveal the active
+                    // row if the collapsed rail pushed it out of view.
+                    scrollActiveRowIntoView(currentSidebar);
                 }, 50);
 
                 schedulePhaseCleanup();
@@ -630,10 +797,14 @@ function initSidebar() {
                 if (currentSidebar && window.innerWidth < 768) {
                     if (!currentSidebar.classList.contains("collapsed")) {
                         localStorage.setItem("sidebarCollapsed", "true");
+                        closePanelsExceptChain(currentSidebar);
                         currentSidebar.classList.add("collapsed");
                         document.body.classList.remove("sidebar-open");
                         const currentMain = document.querySelector(".main-content");
                         if(currentMain) currentMain.classList.add("sidebar-collapsed");
+                        // Narrow screens are the WORST case for the fold -
+                        // reveal the active row if the rail just hid it.
+                        scrollActiveRowIntoView(currentSidebar);
                     }
                 }
             }, 150);

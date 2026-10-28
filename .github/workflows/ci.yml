@@ -56,6 +56,15 @@ jobs:
 
     - name: Run JS Tests
       run: npx vitest run
+      # vitest boots a Vite dev server to run the tests, and
+      # laravel-vite-plugin's ensureCommandShouldRunInEnvironment throws for
+      # any non-build command when env.CI is defined (GitHub Actions always
+      # sets CI=true) - "You should not run the Vite HMR server in CI
+      # environments". The plugin reads the flag via loadEnv(..., "") at
+      # config time, so process.env of this step is in scope; this is the
+      # exact escape hatch the error message names.
+      env:
+        LARAVEL_BYPASS_ENV_CHECK: '1'
 
     - name: Prepare Artifact
       run: |

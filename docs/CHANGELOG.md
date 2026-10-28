@@ -9,6 +9,475 @@ Date-ordered, newest first.
 
 ---
 
+## 2026-10-28 — The Collapsed Rail Shows Where You Are: Active Chain as an Icon Group, `Section › Page` Tooltips, a Drawer Group (Frosted Tray + Primary Accent Bar), a Circular Marker, Both Collapse Paths Fixed, and a Red CI Build Fixed
+
+Scope: the rail feature designed in yesterday's Q&A (active group only +
+tooltips, section click unchanged), the three polish reports that followed the
+first look at it ("the placement of the menu that is not a submenu [is]
+awkward", "can't we make the submenu icon smaller when we click and accessing
+it page", "the aligned top to bottom of the menu is awkward too that they move
+to the left a little bit, any better idea?"), and the GitHub Actions failure
+that came back after batch 1 was pushed. A follow-up review the same day
+rejected the shipped marker ("much more worse than before") and asked for a
+better "you are here" — Change 47 replaces the pill and hairline with a
+circular marker and a group bracket, chosen from rendered candidates.
+
+### Change 45 — Collapsed rail: the active page's group only, as icons with `Section › Page` tooltips
+
+**The design, as answered:** option 1 — the rail shows *only* the active
+submenu (no remembered extras claiming to be where you are); option 3 —
+tooltips, so a bare icon row in 70px is self-describing; clicking a section in
+the rail keeps today's behaviour (expands the sidebar and opens that submenu).
+
+**One source of truth for "where you are":** `getActiveChainPanels(sidebar)`
+(menu-sidebar.js, hoisted function declaration — the readyState boot path
+calls restore during module evaluation) derives the chain from the URL with
+syncActiveState's own match rule (exact hit or path prefix, so
+`/admin/product/edit/9` keeps Product open). Every purpose that must never be
+remembered routes through it:
+
+- **Restore** adds `.show` to the chain in *both* modes, but the remembered,
+  user-opened extras reopen only in the expanded sidebar (Change 43's memory —
+  unlabeled rows in the 70px rail would pose as the active group). The gate is
+  `sidebar.classList.contains('collapsed') || localStorage.getItem('sidebarCollapsed') !== 'false'`
+  — `!== 'false'` matches `getSidebarState()`'s null-default (unset means
+  collapsed), so restore and init can never disagree about the mode on first
+  boot. Panels restored to `.show` get their Collapse instance via
+  `getOrCreateInstance(panel, {toggle: false})` (the rail collapse hides open
+  panels through `getInstance()`; a null would leave the group stuck open in
+  expanded mode), and `aria-expanded` is resynced to the restored truth.
+- **Before-cache snapshot** excludes the chain: memory = user extras only, so
+  riding along as memory can never keep yesterday's section open next to
+  today's. F5 still forgets the extras by construction.
+- **`closePanelsExceptChain(sidebar)`** runs from all three paths that enter
+  the rail — manual toggle, click-outside auto-close, sub-768 resize. The
+  latter two previously left open panels surviving the collapse as *invisible*
+  rows (`.sidebar.collapsed` hid submenu items by design); the outside-click
+  path also gained the `addTooltips()` call it alone was missing (hover in the
+  rail stayed silent after an outside click).
+
+**Tooltips are resolved at hover, not at build:** `tooltipManager.create`
+receives a getter (`() => railTooltipText(link)`) and re-reads it on show,
+because the element is created once while the active page changes per
+navigation. A submenu row reads `Accounting › General Ledger` (its section,
+then itself); the section row reports where you actually are while its group
+is open (`Accounting › General Ledger`), and just `Purchasing` while its
+children are elsewhere.
+
+**The fold:** `.sidebar` scrolls with `scrollbar-width: none`, and a full
+section list plus the chain runs past the fold on short screens (the user's is
+1366×768) — a cut-off group gives no hint that rows continue below.
+`scrollActiveRowIntoView(sidebar)` (`scrollIntoView({block: 'nearest'})` on the
+active link) runs from all three collapse paths and from restore's rAF (after
+Change 43's scroll memory is applied): it moves *only* when the row is fully
+out of view, so an already-visible row keeps the remembered position untouched.
+
+**The alignment answer — one straight column, hierarchy by size instead of a
+jog.** The reports were caused by one rule:
+`.sidebar.collapsed .collapse.show .nav-submenu { padding-left: 0.5rem }` —
+the nudge that made the group "hang off" its section. Measured consequences at
+70px:
+
+- The padding inflated the nav's **intrinsic width**: the submenu subtree
+  measures 44 + 8 = 52, and `.sidebar-nav` (flex column, `align-items:
+  center`) sizes its `.navbar-nav` by fit-content — so with the group open,
+  *every section* parked at **x9** while the children sat at **x17**; without
+  it the column is x13. The whole menu stepped sideways depending on whether a
+  group happened to be showing — literally "they move to the left a little
+  bit" when scanning past it.
+- Nudge removed, the subtree is a stable 44 everywhere: **all 20 rows — 11
+  sections, 6 children, 3 footer items — now measure x=13**, group shown or
+  not.
+- The footer items (Tutorial/Settings/Logout) were the "placement of the menu
+  that is not a submenu" outlier at x13 *while the sections were at x9*. The
+  fix is not to fill (`width: 100%` + `align-items: stretch` was tried first
+  and anchored them at x8 — fill and fit do **not** land on the same line
+  here, reasoned out in the rule's comment) but to keep the footer's
+  shrink-to-fit + centre, which is exactly what the main nav's fit-content +
+  centre now computes: x13 both.
+- **Smaller child glyphs, same hit target:** `.sidebar.collapsed .collapse.show
+  .nav-submenu .nav-link-icon` = `1rem/16px` against the sections'
+  `1.25rem/20px`; rows stay 44px. That was the literal ask ("can't we make
+  the submenu icon smaller…") and it carries the hierarchy once the lateral
+  offset is gone.
+- **Glyph centres align exactly:** a fresh 2px discrepancy (child centre 33 vs
+  section 35) traced to `.nav-link-title { flex: 1 }` — in a centred row the
+  hidden title *grows* into the leftover (20px row − 16px icon = 4px), and the
+  4px tail shifted the glyph left. `.sidebar.collapsed .nav-link-title` now
+  sets `flex: 0 0 0`; both centres measure **35**.
+- **Hairline as the group bracket:** `left: -0.4rem` puts the 1px line at the
+  gutter's midpoint (x6, 6.4px from the column, 6px from the rail edge). Two
+  traps found by pixel measurement: the base `.nav-submenu` has
+  `overflow: hidden`, which would clip a negative-offset `::before` — and also
+  clip any group taller than `max-height: 500px` in the rail — so the rail
+  rule sets `overflow: visible` (Bootstrap's `.collapse` already hides closed
+  panels; the max-height belongs to the expanded mode's animation). And dark
+  uses `--frz-edge-strong` (0.11) rather than `--frz-edge` (0.06): measured
+  over the rail bg, +26 levels vs +13 — in expanded mode the line is
+  decoration beside a 2.5rem indent, in the rail it is one of only two grouping
+  cues, so it takes the ladder's next step up. Light stays `rgba(0,0,0,.16)`.
+
+**Not changed:** clicking a section in the rail still expands the sidebar and
+opens its submenu (probe-covered), and the chain's `.show` panels never
+receive the stagger's `.visible` class — the opacity rules were re-scoped
+(`.collapse:not(.show)` parks, `.collapse.show` renders) so restore-opened
+groups paint fully either way.
+
+### Change 46 — CI: the vitest step tripped laravel-vite-plugin's HMR-in-CI guard
+
+**The failure (after batch 1 was pushed):**
+
+```
+Error: You should not run the Vite HMR server in CI environments. …
+    at ensureCommandShouldRunInEnvironment (…/laravel-vite-plugin/dist/index.js:165:11)
+```
+
+**Why:** `npx vitest run` boots a Vite *server* to run the tests, and
+`ensureCommandShouldRunInEnvironment(command, env)` early-returns only for
+`command === "build" || env.LARAVEL_BYPASS_ENV_CHECK === "1"` — everything
+else throws when `typeof env.CI !== "undefined"`, which GitHub Actions always
+satisfies (`CI=true`). The `env` there is
+`loadEnv(mode, userConfig.envDir || process.cwd(), "")` evaluated at config
+time; with the empty prefix Vite copies **every** `process.env` key into it
+(`key.startsWith("")` is always true), so a step-level env var is in scope.
+
+**Fix:** one env line on the failing step in `.github/workflows/ci.yml`:
+
+```yaml
+- name: Run JS Tests
+  run: npx vitest run
+  env:
+    LARAVEL_BYPASS_ENV_CHECK: '1'
+```
+
+That is the exact remedy the error message names. A `vite.config.js` shim
+(`if (process.env.VITEST) process.env.LARAVEL_BYPASS_ENV_CHECK = '1'`) also
+works — config-file bodies run before the plugin's config hook — but was
+rejected: the workflow owns CI policy, and keeping test-mode conditionals out
+of the build config keeps that file single-purpose.
+
+**Proved locally, both halves:** `CI=true npx vitest run <one file>` →
+reproduces GitHub's error and stack line-for-line;
+`CI=true LARAVEL_BYPASS_ENV_CHECK=1 npx vitest run <one file>` → 1 passed.
+
+### Verification for this change set
+
+**Suites (both green):**
+
+- `npm run build` after every edit round — last run **4.84s**, clean.
+- vitest **172 files / 209 tests passed** (59.48s).
+- PHPUnit **OK — 1,246 tests / 3,974 assertions** (7m27.898s, 239MB), run as
+  `/opt/lampp/bin/php -d memory_limit=2048M vendor/bin/phpunit` (system php
+  still lacks `pdo_sqlite`; environment notes unchanged from the batch above).
+
+**`railprobe` — ALL CHECKS PASSED, 33/33, zero real page errors** (headless
+Firefox, login → ledger → journal → sales round trip):
+
+- expanded mode: chain open, remembered Purchasing survives a turbo hop,
+  aria-resync (6);
+- rail: chain-only (non-chain closed), active row visible/topmost/opaque,
+  hairline drawn, aria (8);
+- geometry: children **and** footer in the section column (x13 = x13 = x13),
+  glyph sizes 16 vs 20, **glyph centres equal**, hairline at the gutter
+  midpoint (5);
+- tooltips: child = `Accounting › General Journal`, section-with-active-child =
+  `Accounting › General Journal`, plain section = `Purchasing` (2);
+- section click expands the sidebar and opens Sales (2); turbo hop to sales
+  then collapse shows *only* the sales group (4); F5 keeps rail + chain and
+  nothing else (3);
+- the fold: at 600px viewport height the active row is revealed
+  (`top=556, bottom=600, scrollTop=43`) (1);
+- **zero page errors** (1).
+
+The only console noise remains `downloadable font … status=2152398850`
+(CDN font fetches, same classification as in the batch above) — reported as
+INFO by the probe instead of failing it, since it is network, not app JS.
+
+**CI fix:** local repro + green re-run described in Change 46; the workflow
+file is otherwise untouched.
+
+### Change 47 — The rail marker, redone: a 36px circle + a group bracket (chosen from the rendered candidates)
+
+**The rejection (same day, after looking at it):** "much more worse than
+before". The diagnosis, honestly: the 44px rounded-square pill is the same
+shape as the row it sits in, so it read as a blob swelling out of the column —
+and a white rounded square is *the* generic active-state treatment, visible in
+every admin template. The hairline beside it was a 1px whisper that read as a
+rendering artifact rather than "these rows belong together". Two instincts were
+offered for a fix ("the background card wrapping the icon smaller", "a circle
+instead of square") plus one firm requirement: tooltips must carry the chain
+only on the *selected* row.
+
+**The marker — both instincts merged (menu-sidebar.css, after "Active
+Navigation Link"):** the active link is now a **36px circle inside the 44px
+row** — smaller than the band (wraps just the glyph, the "smaller card"
+instinct) and round (shape contrast does the "you are here" calling; squares
+are rows, circles are position). Sections and chain children share the rule, so
+the circle means the same thing everywhere in the rail. `padding: 0.5rem`
+keeps the 20px section glyph inside the 36px box (20 + 16 = 36 exactly);
+`overflow: hidden` (base link rule) + `border-radius: 50%` clips cleanly.
+
+**The rhythm guard (same file, `.sidebar.collapsed .navbar-nav .nav-item`):**
+`min-height: 44px; align-items: center`. Without the explicit band, the one
+active `li` would shrink to its 36px link and every row beneath it would jump
+8px every time the active page changes; without centring on the *cross* axis,
+the circle would sit flush top-left in its band and its glyph would drift off
+the column's centre line. Measured after: active link 36×36 at x16.5 (centre
+34.5 ≈ 35, the column line), band exactly 44px, all rows still centre x35.
+
+**The group cue — bracket, not line (both `::before` rules rewritten):** three
+variants were rendered live against the current build (injected CSS, no build)
+and shown side by side with the baseline: (g1) children stepped 8px right —
+rejected: too small to read as hierarchy in a 70px rail, big enough to knock
+the group off the section column, and it's the common admin-rail look anyway;
+(g3) an "open" dot under the section glyph — elegant, but hints at *state*
+rather than *grouping*; (g2, **chosen**) the hairline upgraded into a proper
+**bracket**: `width: 7px`, `border: 1px` on three sides (`border-right: none`
+— the open side faces the rows it contains), `border-radius: 3px 0 0 3px`
+caps top and bottom. The caps are the whole idea: they turn a line into a
+container, the universal "these rows are one contained group" mark. Position
+unchanged in spirit — `left: -0.35rem` keeps the spine at the gutter
+midpoint, `top/bottom: 0.35rem` insets it from the rows.
+
+**Alpha 0.18, deliberately above the edge ladder:** the ladder
+(tokens.css) tops out at `--frz-edge-strong` 0.11 for "things that float";
+the first build of the bracket used that token and was visibly fainter than
+the preview the user had approved. The bracket is not a surface edge — it is
+the rail's only grouping *mark*, a lone 1px stroke on bare background with no
+surface to reinforce (the old hairline at 0.11 is exactly what read as an
+artifact). Dark now spends raw `rgba(255,255,255,0.18)`, with the rationale
+in the rule's comment; light mirrors the hairline's raw `rgba(0,0,0,0.16)`.
+
+**Tooltips — the requirement, verified to the letter:** the ask ("the tooltip
+works only on the submenu that is selected; the others keep showing the
+correct name") is what Change 45 already shipped, so nothing changed in JS —
+but it is now *proved* by the probe rather than asserted: on the journal page,
+hovering the **General Journal** row (active) shows `Accounting › General
+Journal`, while hovering the **General Ledger** row (its sibling) shows
+`Accounting › General Ledger` — its own name under the same section, never
+the active page's. Each row is self-describing; only the row you are *on*
+carries the "you are here" chain.
+
+**Probe updates (railprobe.js):** geometry now compares row **centres** (the
+36px circle's x differs from the 44px rows by design; the column lives at the
+centre line, all = 35); new assertions for the circle (36px, `border-radius:
+50%`, glyph centre on the column, 44px band) and for the sibling tooltip;
+hairline checks became bracket checks (3-sided border, right open, left
+-5.6px). One probe pitfall fixed while adding the sibling check: a synthetic
+`mouseenter` on the section trigger (used earlier in the probe) never gets a
+matching `mouseleave`, so its tooltip stays `.show` and wins the probe's
+`querySelector` — the sibling check clears stale shown tooltips and hovers
+with the real mouse.
+
+### Verification for Change 47
+
+- `npm run build` after every edit round — last run **4.80s**, clean.
+- **`railprobe` — ALL CHECKS PASSED, 37/37, zero real page errors** (same
+  round trip as before): including *active marker is a 36px CIRCLE*, *circle
+  glyph centre on the column line* (35 = 35), *active row band stays 44px*,
+  *group bracket drawn* (`1px/rgba(255,255,255,0.18)/0px` — border, right
+  side open), *tooltip non-active row = Section > own name*.
+- vitest **172 files / 209 tests passed** (67.87s).
+- PHPUnit **OK — 1,246 tests / 3,974 assertions** (5m14.554s, 247MB).
+- Visual proof (page-coordinate captures, 300% zoom):
+  `/tmp/opencode/ffdriver/final-bracket-big.png` — circle wrapping just the
+  glyph, centred in its band; bracket hugging the group; column unbroken.
+  Candidate previews kept beside it: `g0-current`, `g1-indent`, `g2-bracket`,
+  `g3-opendot` (the four rendered options).
+
+**Visual proof for Changes 45–46 (page-coordinate screenshots — DOM-exact, plus the usual kiosk
+grim pass on the 1366×768 display):**
+
+- `/tmp/opencode/ffdriver/rail-page-strip.png` (70×668) — the full column:
+  sections, group, all one line.
+- `/tmp/opencode/ffdriver/rail-page-hover.png` (340×668) — real mouse hover on
+  the active row: white pill + tooltip bubble `Accounting › General Ledger`
+  at x67 (= pill right 57 + 10).
+- `/tmp/opencode/ffdriver/hairline.png` — pixel column at the gutter: x6 =
+  `(44,45,47)` against bg `(18,20,22)` down the whole group (0.11 token; at
+  0.06 it measured `(31,33,35)` — too faint to earn its job).
+- Kiosk grim captures: `rail-group.png`, `rail-tooltip.png` (+ `-crop`
+  variants), window `1322x668+22+78`.
+
+**Probe hygiene:** `/tmp/opencode/ffdriver` was wiped again before this round —
+driver re-created (`puppeteer-core@25.16.0`, works with Firefox 158.0.1);
+scripts for this feature are `railprobe.js` (37 checks after Change 47),
+`align.js`/`icon2.js` (geometry), `hairshot.js`/`pageshot.js`/`cropactive.js`
+(captures), `groupcue.js` (the bracket candidate previews), `railshot.js`
+(kiosk grim).
+
+- All changes intentionally left **uncommitted** — version control is handled
+  manually.
+
+### Change 48 — The bracket became a file tree: children tabbed 8px with an L elbow per row, and both collapse paths fixed
+
+**The rejection (same day, after seeing the bracket built):** "it just a
+bolder line". Fair — and it identifies why both line treatments failed twice:
+a mark drawn BESIDE the rows can only ever read as emphasis. The user proposed
+the pattern every tree UI already teaches: *"the sub menu is tab space a little
+bit, and having a line like L directed to them"* — indent plus elbow, so the
+line CONNECTS parent to child instead of standing next to them.
+
+**The tab is a transform, never padding (menu-sidebar.css, after "The collapsed
+rail renders ONE submenu"):** `.sidebar.collapsed .collapse.show
+.nav-submenu .nav-item { transform: translateX(8px) }`. Change 45 measured why
+padding is forbidden on this subtree: horizontal padding re-inflates the nav's
+fit-content width and shoves every SECTION left; transform moves pixels without
+touching layout maths. Measured after: sections x13, children x21, footer still
+x13, glyph centres step with their rows (35 → 43).
+
+**Two specificity battles on the way:** (1) the rail's reveal rules at the
+file's end set `transform: none` on the same selector — same specificity, later
+in file, so it silently won and the children stayed at x13 (probe caught it:
+`childX` 13, computed transform `none`). The reset is now deleted rather than
+out-specified: its parking partner is scoped to `:not(.show)`, so a shown row
+was never parked and needs no reset — one rule owns the transform. (2) the
+`.nav-submenu .nav-item.visible` stagger rule (3 classes) loses to the rail rule
+(6 classes) on its own, no change needed.
+
+**The elbow (same file, per-row `::before`):** `left: -10px; top: -26px;
+bottom: 50%; width: 10px`, `border-left` + `border-bottom` 1px,
+`border-bottom-left-radius: 4px`. The radius is what makes it read as `└` and
+not a `T`. The geometry chains: rows are 44px + 4px gap = 48px pitch, the box
+spans exactly one pitch (26 above the row + 22 to its centre), so consecutive
+elbows form ONE continuous spine that visually starts under the section glyph;
+the 10px width puts the spine at x11 (left of every glyph) and lands the tick
+on the tabbed row's edge at x21. Ink is the bracket's decision, kept: 0.18 raw
+white on dark (above the edge ladder's 0.11 ceiling — a lone 1px stroke on bare
+background, rationale in the rule's comment), `rgba(0,0,0,0.16)` on light. The
+bracket rules are retired to a comment, not deleted blind.
+
+**Collapse path 1 — "closing the sidebar when the submenu [dropdown] closed":**
+reproduced exactly as reported: on General Ledger, click the Accounting
+trigger (on the ACTIVE page it is a normal toggle — it CLOSES its own
+dropdown), then collapse. The rail showed **nothing**: 0 group rows, active
+link 0x0 — no marker, no "you are here" at all. Cause: `closePanelsExceptChain`
+only *spared* the chain; nothing ever OPENED it. Fix: it now brings the chain
+to `.show` itself (with `getOrCreateInstance(panel, {toggle:false})`, the same
+instance rule restore uses) and resyncs every trigger's `aria-expanded` to the
+truth it just forced. The chain is derived from the URL every time, so this is
+the same truth F5 applies — the rail always shows where you are.
+
+**Collapse path 2 — "close the sidebar when the submenu [is] triggered" (the
+rail section-click race):** the ghost's true origin was found with a
+stack-trace probe, and it was NOT the suspected 500ms timer: tabler's bundled
+Bootstrap registers its own collapse data-api (delegated on document, which
+runs ahead of our link-level `stopPropagation`), and it starts opening the
+clicked submenu at t≈5ms — the same click. A re-collapse inside that ~350ms
+window met a panel that was neither open nor closed: mid-transition this
+bundled Bootstrap REPLACES the `collapse` class with `collapsing` (measured:
+className is exactly `"collapsing"`, so `.collapse.collapsing` matches
+nothing), the old `.collapse.show`-only query skipped it, and its pending
+transition completed afterwards — planting the ghost (measured: `open =
+[submenu-2, submenu-8]`, chain only allowed). Three fixes, each measured:
+(1) `closePanelsExceptChain` now also queries bare `.collapsing`; (2) before
+`hide()`, a synthetic `transitionend` is dispatched so Bootstrap's pending
+completion callback is consumed immediately instead of firing into the rail
+later (`hide()` no-ops while `_isTransitioning`, which is why dispatching
+alone was not enough — the instance must then hide for real); (3) the 500ms
+pending explicit open got its own guard, now checking BOTH `collapsed` AND
+`sidebar-fast-close` — the latter is added synchronously by the willCollapse
+branch, closing the measured 50ms window where only `collapsed` was checked and
+a firing timer still saw "not collapsed".
+
+**Probe (railprobe.js, 37 → 44 checks):** geometry checks rewritten for the
+tree (children x = section x + 8, glyph centres +8, circle centre on the child
+column, elbow `1px/1px/4px/-10px/10px`); both collapse paths became permanent
+scenarios: *closed-chain collapse* (dropdown closed → collapse → chain OPENS,
+rows>0, marker 36x36, aria true) and *rail re-collapse race* (click section in
+rail → toggle at +250ms → wait past the 500ms window → chain only, no ghost).
+
+### Verification for Change 48
+
+- `npm run build` after every edit round — last run **4.88s**, clean.
+- **`railprobe` — ALL CHECKS PASSED, 44/44, zero real page errors** —
+  including *children tabbed +8px* (`section=13 child=21`), *per-row L elbow*
+  (`1px/1px/4px/-10px/10px`), *36px CIRCLE on the child column* (`act=43
+  child=43`), *closed-chain collapse: chain OPENS for the rail* (`rows=6
+  active=36x36 aria=true`), *rail re-collapse race: no ghost group, chain
+  only* (`open=submenu-8`).
+- vitest **172 files / 209 tests passed** (67.04s).
+- PHPUnit **OK — 1,246 tests / 3,974 assertions** (5m50.995s, 241MB).
+- Visual proof: `/tmp/opencode/ffdriver/elbow-hidpi.png` (2× scale) — one
+  continuous spine descending under the section glyph, L ticks landing on each
+  tabbed row, circle on the child column; `/tmp/opencode/ffdriver/circle-group.png`
+  (1× page crop).
+- Debug/repro scripts kept beside them: `racedbg.js` (class/panel timeline),
+  `racedbg2.js` (MutationObserver on the ghost), `racedbg3.js`
+  (Collapse.prototype stack traces — the data-api catch), `racedbg4/5/6.js`
+  (instance state + mid-transition classList sampling), `struct.js` (flex
+  ground truth), `closedchain.js` (path-1 repro).
+
+- All changes intentionally left **uncommitted** — version control is handled
+  manually.
+
+### Change 49 — The bracket/elbow lineage died for good: the group became a DRAWER (frosted tray + 3px primary accent bar), children back on the section column
+
+The user rejected Change 48's elbows on sight ("still bad… maybe something
+much more interesting and not too plain"), which forced the real diagnosis:
+three grouping treatments in a row — hairline (0.11), bracket (0.18),
+indent + L elbows — were **all lines**. A 1px stroke has no body at 70px on
+a 90%-zoomed screen: at low alpha it reads as a rendering artifact, at high
+alpha as "a bolder line". You cannot fix a line by making it a different
+line. The group does not need a stroke drawn *near* it — it needs a BODY.
+
+The drawer: the `li` wrapping the section link and its open panel gets a
+frosted tray (fill + soft edge) — the app's existing elevation language
+(frosted cards) at rail scale — plus a 3px rounded primary bar hugging its
+left edge, the "open file tab" mark. A fill is an area, not an edge, so it
+survives zoom/scaling; a container is the honest metaphor for a group; and
+the accent bar is *functional* — in a monochrome rail it is the one thing
+that says which section owns the white circle before you read the glyph.
+
+Four candidates (t1 6% tray / t2 11% tray / t3 folder-tab plate + tray /
+t4 tray + bar) were rendered live via injected CSS — no build — and the user
+chose t4. The bar's color is the app's **real** primary read off a live
+`.btn-primary`: `rgb(0, 84, 166)` = `#0054a6` (tokens.css redefines tabler's
+stock `#206bc4`), shipped as `var(--tblr-primary, #0054a6)`.
+
+Geometry (measured on the built page, 1366×768, 2× capture): the tray's
+margin/centre math leaves every row exactly where it was — section links
+44×44 at x13, child links + the 36px circle 36×36 at x17, column centre x35,
+tray border-box centred on the same line, so the circle is NOT clipped and
+no rhythm rule needed touching. Children sit BACK on the section column:
+with a container doing the grouping, the 8px tab and the per-row elbows had
+no job left, and both were retired (rules and probe assertions deleted).
+
+Dark tray flips to the same frosted white every floating surface uses
+(`rgba(255,255,255,0.11)` fill / `0.14` edge); light spends ink instead
+(`0.05`/`0.08`), the established ink-vs-frost decision.
+
+Hygiene note: `/tmp` was wiped mid-round by the system tmp cleaner, killing
+the variant renders and the screenshots Change 48 referenced
+(`elbow-hidpi.png`, `circle-group.png` are gone — historical references in
+the text above). The puppeteer driver (`puppeteer-core@25.16.0`) and
+`railprobe.js` were rebuilt from scratch with the drawer's assertions
+(tray radius/fill, accent bar width/color, one-column centres); change 48's
+JS fixes stand untouched (chain-opening, bare `.collapsing`, synthetic
+`transitionend`, dual 500ms guard).
+
+### Verification for Change 49
+
+- `npm run build` clean — **5.75s**.
+- **railprobe — 44/44 ALL PASSED, ZERO PAGE ERRORS**, including *group
+  DRAWER drawn* (`10px/rgba(255,255,255,0.11)/3px/rgb(0,84,166)`), *drawer
+  rows centred on one column* (`section=35 child=35 foot=35`), *tray
+  positioned, 10px radius*, *primary accent bar* (3px/2px/`rgb(0,84,166)`),
+  the 36px circle on the column line inside its 44px band, the fold, both
+  collapse races, and all three tooltip shapes.
+- vitest **209/209 passed (172 files)** — 68.93s.
+- PHPUnit — **OK, 1,246 tests / 3,974 assertions**.
+- Visual: `/tmp/opencode/ffdriver/drawer-hidpi.png` (2× rail crop) — tray,
+  accent bar, circle marker.
+- Scripts (rebuilt in `/tmp/opencode/ffdriver`): `railprobe.js` (44 checks),
+  `drawershot.js` (drawer capture), `trayvariants.js` / `traygeo.js`
+  (pre-wipe render/measurement harnesses, kept as history).
+
+- All changes intentionally left **uncommitted** — version control is handled
+  manually.
+
+---
+
 ## 2026-10-27 (third pass) — Blur With Borders, Badges That Win, Settings Pages in Line, Shortcuts That Stay Home
 
 Scope: four asks after the second pass — the menu-hover scrim had to frost

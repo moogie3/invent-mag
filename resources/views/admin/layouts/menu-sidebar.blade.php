@@ -47,7 +47,7 @@
                 </div>
 
                 <div class="nav-item">
-                    <a href="{{ route('admin.setting.notifications') }}" class="nav-link px-1 position-relative"
+                    <a href="{{ route('admin.notifications') }}" class="nav-link px-1 position-relative"
                         id="notification-bell-sidebar" data-turbolinks-action="replace">
                         <i class="ti ti-bell fs-2"></i>
                         @if (isset($totalNotificationCount) && $totalNotificationCount > 0)

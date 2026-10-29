@@ -168,6 +168,93 @@ class PosServiceTest extends TestCase
     }
 
     #[Test]
+    public function it_treats_null_tax_id_as_no_tax_rather_than_falling_back_to_default()
+    {
+        // Regression: selecting "None (0%)" in the POS tax dropdown submits an
+        // empty tax_id (null after ConvertEmptyStringsToNull). The server used
+        // to fall back to the default 10% tax, so the grand total computed
+        // server-side disagreed with the client and cash validation failed.
+        $user = User::factory()->create();
+        Auth::login($user);
+
+        $customer = Customer::factory()->create();
+        $product = Product::factory()->withStock(10)->create(['selling_price' => 100]);
+
+        $data = [
+            'products' => json_encode([['id' => $product->id, 'quantity' => 2, 'price' => 100]]),
+            'customer_id' => $customer->id,
+            'transaction_date' => now()->format('Y-m-d'),
+            'payment_method' => 'Cash',
+            'discount_total' => 0,
+            'discount_total_type' => 'fixed',
+            'tax_id' => null,
+            'amount_received' => 200,
+        ];
+
+        $sale = $this->posService->createSale($data);
+
+        $this->assertEquals(0.0, $sale->fresh()->total_tax);
+        $this->assertEquals(200.0, $sale->fresh()->total); // 200, no 10% tax added
+        $this->assertNull($sale->fresh()->tax_id);
+        $this->assertEquals('none', $sale->fresh()->tax_type);
+    }
+
+    #[Test]
+    public function it_treats_empty_string_tax_id_as_no_tax()
+    {
+        $user = User::factory()->create();
+        Auth::login($user);
+
+        $customer = Customer::factory()->create();
+        $product = Product::factory()->withStock(10)->create(['selling_price' => 100]);
+
+        $data = [
+            'products' => json_encode([['id' => $product->id, 'quantity' => 2, 'price' => 100]]),
+            'customer_id' => $customer->id,
+            'transaction_date' => now()->format('Y-m-d'),
+            'payment_method' => 'Cash',
+            'discount_total' => 0,
+            'discount_total_type' => 'fixed',
+            'tax_id' => '',
+            'amount_received' => 200,
+        ];
+
+        $sale = $this->posService->createSale($data);
+
+        $this->assertEquals(0.0, $sale->fresh()->total_tax);
+        $this->assertEquals(200.0, $sale->fresh()->total);
+    }
+
+    #[Test]
+    public function it_falls_back_to_default_tax_when_tax_id_key_is_absent()
+    {
+        // Legacy/API clients that omit tax_id entirely keep the old behavior:
+        // the default active tax applies.
+        $user = User::factory()->create();
+        Auth::login($user);
+
+        $customer = Customer::factory()->create();
+        $product = Product::factory()->withStock(10)->create(['selling_price' => 100]);
+
+        $data = [
+            'products' => json_encode([['id' => $product->id, 'quantity' => 2, 'price' => 100]]),
+            'customer_id' => $customer->id,
+            'transaction_date' => now()->format('Y-m-d'),
+            'payment_method' => 'Cash',
+            'discount_total' => 0,
+            'discount_total_type' => 'fixed',
+            'amount_received' => 220,
+        ];
+
+        $sale = $this->posService->createSale($data);
+
+        $defaultTax = Tax::default()->first();
+        $this->assertEquals($defaultTax->id, $sale->fresh()->tax_id);
+        $this->assertEquals(20.0, $sale->fresh()->total_tax); // 200 * 10%
+        $this->assertEquals(220.0, $sale->fresh()->total);
+    }
+
+    #[Test]
     public function it_stores_pph_snapshot_and_creates_pph_journal_on_pos_sale()
     {
         $this->tenant->update(['tax_jurisdiction' => 'ID']);

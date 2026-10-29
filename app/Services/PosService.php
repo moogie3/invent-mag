@@ -158,11 +158,13 @@ class PosService
         $orderDiscountType = $data['discount_total_type'] ?? 'fixed';
         $orderDiscountAmount = SalesHelper::calculateDiscount($totalBeforeDiscounts, $orderDiscount, $orderDiscountType);
 
-        // POS uses the tax selection from the frontend dropdown.  Fall back to the
-        // default active tax when the client omits the selection.
+        // POS uses the tax selection from the frontend dropdown. The dropdown
+        // always submits tax_id — "None (0%)" sends an empty value, which must
+        // be honored as no tax. Only fall back to the default active tax when
+        // the field is absent entirely (clients that omit the selection).
         $defaultTax = Tax::default()->first() ?? Tax::active()->first();
-        $taxId = $data['tax_id'] ?? $defaultTax?->id;
-        $tax = $taxId ? Tax::find($taxId) : $defaultTax;
+        $taxId = array_key_exists('tax_id', $data) ? ($data['tax_id'] ?: null) : $defaultTax?->id;
+        $tax = $taxId ? Tax::find($taxId) : null;
         $taxType = $tax?->type ?? 'none';
         $taxRateVal = $tax?->rate ?? 0;
 

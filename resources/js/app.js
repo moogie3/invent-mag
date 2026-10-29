@@ -7,6 +7,16 @@ import "./bootstrap";
 import * as Turbo from "@hotwired/turbo";
 window.Turbo = Turbo;
 
+// Some admin routes (settings, users, HR) intentionally render outside the
+// main turbo-frame to avoid modal conflicts (see admin/layouts/base.blade.php).
+// When a link inside the frame targets one of those routes, the response has
+// no matching frame and Turbo would show "Content missing". Fall back to a
+// full page visit instead — https://turbo.hotwired.dev/handbook/frames#handling-missing-frames
+document.addEventListener("turbo:frame-missing", function (event) {
+    event.preventDefault();
+    event.detail.visit(event.detail.response);
+});
+
 // Import Alpine
 import Alpine from "alpinejs";
 

@@ -48,13 +48,6 @@
                                                 </div>
                                             </div>
 
-{{-- SEARCH: whole-catalog, server-side (partials/sorting/serverSearch.js) --}}
-                                            <div class="mb-3">
-                                                <input type="text" id="searchInput" class="form-control form-control-sm"
-                                                    value="{{ request('search', '') }}" placeholder="{{ __('messages.search') }}…"
-                                                    autocomplete="off" data-server-search="1">
-                                            </div>
-
                                             {{-- TABLE --}}
                                             <div id="invoiceTableContainer">
                                                 <div class="table-responsive">

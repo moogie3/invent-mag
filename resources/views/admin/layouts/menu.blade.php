@@ -5,8 +5,8 @@
     <h3 class="header"><i class="ti ti-menu-2 me-2"></i>Setting List</h3>
     <hr class="my-3">
     <div class="list-group list-group-transparent">
-        <a href="{{ route('admin.setting.notifications') }}"
-            class="list-group-item list-group-item-action d-flex align-items-center {{ request()->routeIs('admin.setting.notifications') ? 'active' : '' }}">
+        <a href="{{ route('admin.notifications') }}"
+            class="list-group-item list-group-item-action d-flex align-items-center {{ request()->routeIs('admin.notifications', 'admin.setting.notifications') ? 'active' : '' }}">
             <i class="ti ti-bell fs-2 me-2"></i> {{ __('messages.my_notifications') }}
         </a>
         <a href="{{ route('admin.setting.profile.edit') }}"

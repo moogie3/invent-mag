@@ -15,8 +15,9 @@ Route::prefix('notifications')->group(function () {
 });
 
 // User Management Routes - with plan limit on user creation
+// create is excluded: user creation happens via the modal on the index page
 Route::middleware(['role:superuser', 'plan.limit:users'])->group(function () {
-    Route::resource('users', UserController::class)->names('admin.users');
+    Route::resource('users', UserController::class)->except(['create'])->names('admin.users');
 });
 
 // Audit Log - superuser only + Enterprise plan required

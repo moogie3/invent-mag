@@ -23,9 +23,9 @@
                         $tenant = app('currentTenant');
                     @endphp
                     
-                    @if($tenant && $tenant->hasFeature('accounting'))
-                        <!-- Accounting Summary -->
-                        @include('admin.layouts.partials.dashboard.accounting-summary')
+                    @if($tenant && $tenant->hasFeature('accounting') && isset($healthSummary) && $healthSummary !== null)
+                        <!-- Financial Health strip (replaces the old Accounting Summary cards) -->
+                        @include('admin.layouts.partials.dashboard.financial-health-strip')
                     @endif
 
                     <!-- Main Content Section -->

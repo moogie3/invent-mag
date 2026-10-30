@@ -115,6 +115,12 @@ return [
             'plan_feature' => 'accounting', // Professional+
             'children' => [
                 [
+                    'title' => 'messages.financial_health',
+                    'route' => 'admin.accounting.health',
+                    'permission' => 'view-accounting',
+                    'icon' => 'ti ti-heartbeat',
+                ],
+                [
                     'title' => 'messages.ledger',
                     'route' => 'admin.accounting.ledger',
                     'permission' => 'view-accounting',

@@ -9,7 +9,207 @@ Date-ordered, newest first.
 
 ---
 
-## 2026-10-28 — The Collapsed Rail Shows Where You Are: Active Chain as an Icon Group, `Section › Page` Tooltips, a Drawer Group (Frosted Tray + Primary Accent Bar), a Circular Marker, Both Collapse Paths Fixed, and a Red CI Build Fixed
+## 2026-10-30 — Financial Health: a Dashboard Strip + Full Accounting Page (red/green money status, 6-month trends, plain-word next-month outlook), with the Threshold Basis for Every Verdict, a Corrected VAT Note, a Fixed Translator Placeholder, and a Tutorial Page
+
+New feature under **Accounting › Financial Health** (route
+`admin.accounting.health`). It replaces the old 8-card "Accounting Summary"
+on the dashboard with a compact **health strip** that links to a full page.
+Both are driven by one service, `App\Services\FinancialHealthService`,
+composing the existing ledger/subledger services so there is a single source
+of truth. All figures are **posted-GL-only** (draft/void entries excluded);
+sales and purchase flows are read from the subledgers by `order_date`. ~11
+bounded aggregate queries, driver-aware (sqlite in tests, mysql in prod).
+
+**The page** shows: an overall verdict banner, 8 indicator cards, a
+"What Stands Out" rotating plain-word narrative (noise-gated so it only
+speaks to salient moves), a **Next Month Outlook** that chains a projection
+to one closing number with a plain-sentence statement, 3 six-month trend
+charts (ledger revenue-vs-spending, sales-vs-purchases, cash balance), and
+a "Needs Attention" list with drill-down links to the relevant report.
+
+**Outlook chain** (option: chain, not a bare trend line): Holt-Winters
+revenue → 6-month collection ratio → cash-in → 3-month weighted expenses
+(purchases + scheduled payroll + operations, weights 1/2/3) → projected
+month-end cash + runway, each stage carrying a confidence level. A
+best/worst-of-last-6 **expected range** is shown only when there are ≥2
+complete scenario months; otherwise it is hidden by design rather than
+shown as a false-precision band.
+
+### The threshold basis — what makes each verdict "healthy"
+
+Every red/amber/green traces to one rule in `config/financial-health.php`,
+so "why is this red?" always has a stated answer. These are the comparisons
+the user asked to have documented:
+
+| Indicator | What is measured | Green (healthy) | Amber | Red |
+|---|---|---|---|---|
+| **Cash** | Months of spending the balance covers = cash ÷ avg monthly expense (last 3 complete months) | ≥ **3.0** months cover | ≥ **1.0** | < 1.0 |
+| **Revenue** | Last complete month vs the average of the 3 before it | ≥ **95%** of recent average | ≥ **80%** | < 80% |
+| **Profit margin** | Net margin, trailing 3 complete months (GL, posted) | ≥ **10%** | any positive | negative |
+| **Purchases** | Purchases ÷ sales, trailing 3 months (subledger) | ≤ **1.00** (spend within means) | ≤ **1.15** | > 1.15 |
+| **Receivables** | Share of outstanding that is **31+ days** overdue | < **10%** | < **25%** | ≥ 25% |
+| **Payables** | Overdue-31+ payables relative to cash on hand (1.0 = overdue bills equal the cash you hold) | < **1.0×** cash | < **1.5×** | ≥ 1.5× |
+| **Payroll** | Paid payroll ÷ GL revenue (trailing 3 months) | < **1.0** (wage bill under income) | — | ≥ 1.0 (wages alone exceed income) |
+| **Inventory turnover** | Annualised COGS (6-mo GL) ÷ inventory GL balance | ≥ **4.0** turns/yr | ≥ **1.5** | < 1.5 |
+| **Runway** | Months of cash left burning at the current net rate | ≥ **6.0** months | ≥ **3.0** | < 3.0 |
+
+Note the indicators are deliberately *not* a single multiple-of-turnover
+rule — cash is judged as **months of cover** (spending-based), margin as a
+**percentage of revenue**, payables **relative to cash on hand**, and
+turnover as **annualised turns**. The trend window is 6 months, and every
+"vs average" comparison uses **complete months only** (the in-progress
+month is excluded) so day-2-of-month never looks like a revenue crash.
+Narrative lines are noise-gated (skipped when a move is under Rp 100 000
+**and** under 5%) and capped at 6, with the closing outlook statement added
+on top — keeping it "smart and not repetitive."
+
+### What this pass fixed alongside the feature
+
+1. **Translator placeholder bug (`:pct` / `:n` rendered literally).** The
+   page passed `[':pct' => …]` and `['':n' => …]` to `__()`. Laravel's
+   `Translator::makeReplacements` **prepends `:` to every key** itself
+   (`$shouldReplace[':'.$key]`), so a key of `':pct'` is looked up as
+   `'::pct'` and never matches the message's `:pct`. The screenshot showed
+   the literal `after your :pct% collection pace`. Fixed by passing bare
+   keys — `['pct' => …]`, `['n' => …]` — in
+   `financial-health.blade.php`. **Lesson:** message strings carry `:name`;
+   the replace-array key is the **bare** `name`, never `:name`.
+
+2. **VAT note corrected (it was not entirely true).** The old caption
+   claimed "ledger figures are VAT-net" flat-out. Checked against the real
+   tax system (`TaxService`, Settings → Taxes, `SalesService` booking):
+   taxes are **per-tenant, user-created** records (rate/type/active/default,
+   `is_ppn`/`is_pph`); each sale carries an **optional** `tax_id`, and
+   `sales.total` is the grand total **including** any tax charged. The GL
+   credits revenue **net of VAT only when** the tenant is Indonesian **and**
+   the tax is PPN **and** a PPN-Keluaran account is configured — otherwise
+   revenue is credited the **gross** total. So VAT-net is *conditional*, not
+   universal. Reworded (en + id) to: sales figures include any tax charged
+   on the sale; ledger revenue is net of VAT **only where PPN posting
+   applies**.
+
+3. **Header spacing.** Tabler's `.card-header` is a flex row with no gap,
+   so the "Last 6 Months" title and its caption were jammed together
+   (`Last 6 MonthsSales figures…`). Added `ms-3` to the caption div in
+   `financial-health.blade.php` — kept as a trailing subtitle (not
+   right-aligned `ms-auto`) because the caption is long, and a gap reads
+   correctly as a subtitle.
+
+4. **Tutorial (simplified, main points only).** Added a route context for
+   `admin.accounting.health` in `config/tutorial.php` (5 steps, placed
+   before the catch-all accounting patterns) with en/id strings in
+   `lang/*/tutorial.php`: overall verdict, cash & runway, receivables vs
+   payables, profit margin, next-month outlook — the handful of numbers
+   usually worth keeping track of. Also added Financial Health to the
+   Accounting "What to explore?" topic grid, and refreshed the now-stale
+   dashboard `accounting_summary` step (the old panel is gone; it now
+   describes the health strip and links to the page). No further steps were
+   added — the page itself stays the detailed view; the tutorial only names
+   the main numbers.
+
+   **Follow-up (same day):** the tutorial *context* existed but the page had
+   **no icon to open it** — every other page puts a
+   `trigger-tutorial-modal` anchor inside its `page-title` `h2`, and my
+   header had omitted it. Added the anchor to `financial-health.blade.php`,
+   so the info icon now appears beside "Financial Health" and opens the
+   5-step modal (verified live: icon present, modal opens, all 5 steps
+   render).
+
+### New test file — `tests/Unit/Services/FinancialHealthServiceTest.php`
+
+There was no coverage for this service (only the older
+`FinancialReportingServiceTest`). Added **12 tests / 162 assertions**:
+payload structure for `getSummary`/`getOverview`, all 8 indicator keys with
+the exact shape the view reads (`key/label/icon/value/display/status/
+reason/delta`), `overallStatus` ranking (worst-wins) via a subclass probe,
+the empty-tenant degradation path (never flags critical on no data), the
+outlook chain's arithmetic invariants (`projected = cash_now + net`,
+`net = cash_in − expenses`, `cash_in = revenue × collection_ratio`,
+confidence clamped 0–95), range-suppression under 2 scenario months,
+attention-item drill-down URLs, driver-awareness (asserts `sqlite` so the
+`strftime`/`DATE_FORMAT` branches are actually exercised), and a posted-GL
+case proving a revenue posting drives the profit-margin indicator to
+`1.0`/`good`. That last test initially targeted the *revenue* indicator and
+failed — by design the revenue indicator reads the **sales subledger**
+(`order_date`), while the GL feeds **profit/margin**; the test was corrected
+to assert the GL-fed indicator instead.
+
+### Two Blade lessons recorded while building this
+
+- **`@json()` must not contain nested `__()` calls.** Blade's non-greedy
+  match truncates at the first `)` inside nested parens, silently producing
+  a broken payload. Build the array in a `@php` block first, then
+  `@json($payload)`.
+- **Never write a directive name (e.g. `@php`) inside a `{{-- … --}}`
+  comment.** Blade compiles directives even inside comments, so a literal
+  `@php` in a comment pairs with the real `@endphp` and breaks the block.
+
+### Verification
+
+`healthprobe` **21/21 ALL PASSED** (strip 8 cells + narrative + link, CTA
+lands, page title/8 cards/outlook with 8 chain rows + statement, JSON data
+island, 3 charts drawn on **both** Turbo visit and cold load, attention
+rows, sidebar puts Financial Health first under Accounting, zero page
+errors). Live-page check confirms the `:pct`/`:n` placeholders now render
+(`after your 46% collection pace`), the corrected VAT caption, and the
+`ms-3` gap on the trends header, and the tutorial info icon opening the
+5-step Financial Health modal. Translation audit: all **56** feature message
+keys present in **both** `lang/en` and `lang/id`, plus all **7** tutorial
+keys in both locales — no missing or orphaned strings. vitest **209/209
+(172 files)**; PHPUnit **OK — 1,261 tests / 4,145 assertions** (includes
+the new 12-test `FinancialHealthServiceTest`). Screenshots:
+`/tmp/opencode/ffdriver/health-strip.png`, `health-page.png`,
+`health-trends.png`, `health-tutorial.png`. All work left **uncommitted**
+(per the standing arrangement — the user handles git). `docs/CHANGELOG.md`
+updated last; no code or environment edits follow this entry.
+
+---
+
+## 2026-10-29 — Post-Pull Incident: the Custom 500 Was a Cross-User View-Cache Permission Problem (Not the Pulled Code), and the Full Post-Pull Integration Pass
+
+The user committed the local work as `508d1f05` ("refining the sidebar
+animation for sub menu") and pulled `92348f41` ("fixing the turbo bug" —
+touches `menu.blade.php`, `menu-sidebar.blade.php` [notification-bell route
+rename], `app.js`, `PosService`, `PosServiceTest`). Immediately
+`/admin/settings/profile` — and in truth every page using the layout —
+showed Invent-MAG's custom 500.
+
+**Root cause** (`laravel.log`): `file_put_contents(storage/framework/views/
+c4a810a5467c056875cca1d377c27273.php): Failed to open stream: Permission
+denied (View: …/menu.blade.php)`. The pull changed the layout blade, so its
+compiled-view cache entry went stale; Laravel recompiles by writing **in
+place** (no unlink first), but that file was `emberfall`-owned mode 644
+(left behind by artisan/phpunit runs executed as the emberfall user) while
+Apache/PHP runs as `daemon` → `EPERM` → 500 on every page sharing the
+layout. The views dir is 777, so *new* files were never a problem — it only
+bites when an **existing** entry must be overwritten, i.e. right after a
+pull touches a widely-used blade. (The sidebar blade change itself was
+trivial and innocent: a route name on the bell link.)
+
+**Fix**: `rm -rf storage/framework/views/*` — unlinking needs only
+directory write (777 works cross-user); PHP then recompiles every entry
+fresh as `daemon`, restoring a single owner. No passwordless sudo exists on
+this machine, so a `chown` sweep was impossible. **Recurrence rule:** if a
+pull is followed by a custom 500 whose log line reads `Permission denied
+(View: …)`, clear the compiled views and the page heals on the next hit.
+(Prevention, not applied — needs root: give `storage` a single owner, or
+have user-side tooling clear views instead of writing them.)
+
+**Verification**: `profilecheck.js` — `/admin/settings/profile` returns
+**200** after login, the form renders, zero page errors. Because the pull
+touched the sidebar blade, the rail feature was re-verified end-to-end
+against the merged code: `npm run build` **3.07s**; **railprobe 47/47 ALL
+PASSED** (drawer, 30px marker, flush accent, disc hover, tooltips, both
+collapse races, fold, F5); vitest **209/209 (172 files)**; PHPUnit **OK —
+1,249 tests / 3,983 assertions** (3m39.9s; includes the pull's new PosService
+cases). `/tmp` was wiped a **second** time by the system restart
+(`markervariants.js`, `hoverdbg.js`, `drawershot.js` and the Change 49/50
+captures lost again; `railprobe.js` + `drawershot.js` rewritten from the
+session record). Working tree intentionally left **uncommitted**.
+
+---
+
+## 2026-10-28 — The Collapsed Rail Shows Where You Are: Active Chain as an Icon Group, `Section › Page` Tooltips, a Drawer Group (Frosted Tray + Flush Primary Accent), a 30px Circular Marker with Circle-Preview Hover, Both Collapse Paths Fixed, and a Red CI Build Fixed
 
 Scope: the rail feature designed in yesterday's Q&A (active group only +
 tooltips, section click unchanged), the three polish reports that followed the
@@ -466,12 +666,87 @@ JS fixes stand untouched (chain-opening, bare `.collapsing`, synthetic
   the 36px circle on the column line inside its 44px band, the fold, both
   collapse races, and all three tooltip shapes.
 - vitest **209/209 passed (172 files)** — 68.93s.
-- PHPUnit — **OK, 1,246 tests / 3,974 assertions**.
+- PHPUnit — **OK, 1,246 tests / 3,974 assertions** (recorded from the
+  re-run; the first attempt hit an intermittent `CrmServiceTest` failure at
+  line 99 — green in isolation and in every full run since, pre-existing
+  flake unrelated to this CSS/JS work; full story under 2026-10-29).
 - Visual: `/tmp/opencode/ffdriver/drawer-hidpi.png` (2× rail crop) — tray,
   accent bar, circle marker.
 - Scripts (rebuilt in `/tmp/opencode/ffdriver`): `railprobe.js` (44 checks),
   `drawershot.js` (drawer capture), `trayvariants.js` / `traygeo.js`
   (pre-wipe render/measurement harnesses, kept as history).
+
+### Change 50 — Circles everywhere: the marker shrank to 30px, the accent became the tray's FLUSH edge, and hover previews the marker as a frosted disc (the white-square hover retired)
+
+First look at the drawer: "overall much better, BUT" — the marker circle is
+still too big, hover on the submenu should use the circle wrap instead of
+the square, and the circle collides with the blue accent line; what's my
+opinion before proceeding?
+
+Measured diagnosis, all three complaints confirmed:
+- The collision was literal: the 36px marker spans x17-x53, the floating
+  accent bar sat at x15-x18 — a 1-2px overlap, not just visual tension.
+- The hover "square wrap" was a near-white `#f8f9fa` plate (the dark-theme
+  rail hover, `!important` with FIVE attribute-selector variants) — bigger
+  AND brighter than the active marker itself, so hover outshone "you are
+  here". It also beat single-selector `!important` overrides on specificity,
+  which is why the first live variant renders showed the plate instead of
+  the disc (found via a computed-style dump: `background-color` stayed
+  `rgb(248,249,250)` under an `!important: transparent` — then the pixel
+  scan located the white band).
+- The marker's own size (36 in a 44px band) read as a plate, not a marker.
+
+Four candidates rendered live (injected CSS, no build): **t5** flush edge +
+disc hover everywhere / **t6** floating bar + disc everywhere / **t7** no
+bar + disc everywhere / **t8** flush edge + disc on children only (the
+user's literal spec). The user picked **t5**.
+
+Shipped:
+1. **Marker 36px → 30px** — hierarchy restored (20px section glyph, 16px
+   child glyph, 30px marker) and ~5px of clearance from the bar; padding
+   `.5rem` → `.25rem` so the 20px section glyph still fits the box
+   (20+8=28 ≤ 30).
+2. **Accent: floating bar → FLUSH left edge** (`left: 3px`/`radius 2px` →
+   `left: 0`/`radius 10px 0 0 10px`) — the bar merges with the tray's own
+   border and reads as the drawer's colored side; the collision becomes
+   impossible by construction instead of merely avoided.
+3. **Hover: square plate + `scale(1.05)` → a 28px frosted disc** centred on
+   the glyph, painted as a `radial-gradient` on the square row box. Every
+   rail row (section or child) is a 44x44 box with its glyph centred, so a
+   centred gradient IS a circle wrap — no pseudo-element, no layout cost.
+   28px is deliberately just under the 30px marker: hover reads as "about
+   to become position" without outshining position. Ink disc on light
+   (6% black), frost on dark (10% white); the icon brightens instead of
+   inverting; `:not(.active)` so the marker never gets a second disc.
+4. **Why not t8 (children-only circles):** the renders showed two shape
+   languages in one 70px strip — white square on section hover, quiet disc
+   on children — the exact mixed-feel this whole effort deletes. The rail
+   now speaks ONE system: square rows, circle position, circle preview;
+   the expanded sidebar stays rectangles.
+
+Also **corrected a Change 49 measurement error**: "child links 36x36 at
+x17" was wrong — the first `.nav-item` query had matched the ACTIVE link
+(the selected page is its submenu's first row). ALL rail rows are 44x44 at
+x13; only the active link shrinks, to the circle. CSS comments updated to
+the true geometry.
+
+### Verification for Change 50
+
+- `npm run build` clean (5.75s).
+- **railprobe — 47/47 ALL PASSED, ZERO PAGE ERRORS** — new checks: *30px
+  CIRCLE* (`w=30 r=50%`), *accent FLUSH on the tray edge*
+  (`3px/10px 0px 0px 10px/rgb(0,84,166)`), *hover child row: frosted DISC,
+  no plate, no scale* (radial-gradient, `rgba(0,0,0,0)`, `none`),
+  *hover SECTION row: same disc*, *hover ACTIVE row: no second disc*.
+- vitest **209/209 (172 files)**.
+- PHPUnit was in flight when the server restarted; the post-pull re-run is
+  OK (1,249 / 3,983) — see 2026-10-29.
+- Visual: `/tmp/opencode/ffdriver/drawer-hidpi.png` (2×, recaptured after
+  the pull) — 30px marker with air above the flush blue edge.
+- Scripts: `markervariants.js` (t5-t8 renders) and `hoverdbg.js`
+  (computed-style debugging) were lost to the SECOND `/tmp` wipe before
+  their outputs could be committed here; `railprobe.js` and `drawershot.js`
+  were rewritten from the session record.
 
 - All changes intentionally left **uncommitted** — version control is handled
   manually.

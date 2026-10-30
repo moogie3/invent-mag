@@ -21,7 +21,7 @@ return [
     'key_metrics' => 'Key Metrics: The top cards show today\'s sales, purchases, profit, and outstanding receivables/payables updated in real time.',
     'sales_purchase_chart' => 'Sales & Purchase Chart: Toggle between Sales and Purchases using the tabs. Filter by date range (This Week, This Month, This Year, Custom) using the dropdown above the chart.',
     'sales_forecast' => 'Sales Forecast: Available on the Enterprise plan, a predictive forecast chart is shown below the main chart, using historical data to project future sales trends. The forecast uses Holt-Winters (Triple Exponential Smoothing) to capture trend and seasonality. Below the chart, MAPE (Mean Absolute Percentage Error) is displayed — it shows the average forecast error as a percentage; lower is better.',
-    'accounting_summary' => 'Accounting Summary: If accounting is enabled, a financial summary panel shows revenue, expenses, and net income for the selected period.',
+    'accounting_summary' => 'Financial Health: If accounting is enabled, a health strip shows cash, receivables, payables, margin, and a next-month outlook. Click it to open the full Financial Health page.',
     'recent_transactions' => 'Recent Transactions: The main content section shows your latest sales and purchase orders for quick access and review.',
     'quick_actions' => 'Quick Actions: Use the "New Invoice" button (top right) to quickly create a Sales Order or Purchase Order without navigating through the menu.',
     'system_alerts' => 'System Alerts: Low stock warnings and product expiry alerts are surfaced here so you can take action immediately.',
@@ -427,6 +427,15 @@ return [
     'default_accounts' => 'Default Accounts: Link key accounts for Sales Revenue, Cost of Goods Sold (COGS), and other essential transaction types.',
     'cash_receivables' => 'Cash & Receivables: Configure primary Cash account and Accounts Receivable ledger to track customer payments.',
     'reset_option' => 'Reset Option: The danger zone allows resetting the Chart of Accounts to system defaults. Note: This removes all custom account mappings.',
+
+    // Accounting - Financial Health
+    'financial_health' => 'Financial Health',
+    'financial_health_desc' => 'A plain-word read on your money — what is strong, what needs attention, and where next month is heading.',
+    'fh_overview' => 'Overall verdict: The top strip gives one glance — green is healthy, amber needs attention, red is critical.',
+    'fh_cash' => 'Cash & runway: How many months of spending your current cash covers — the single number that decides whether a slow month is a problem.',
+    'fh_receivables_payables' => 'Receivables vs payables: What customers still owe you versus what you still owe suppliers.',
+    'fh_margin' => 'Profit margin: The share of revenue you keep after costs — track it to confirm growth is actually profitable.',
+    'fh_outlook' => 'Next month outlook: A projection of next month\'s cash with a plain sentence on whether you are holding, rising, or tightening.',
 
     // Accounting - General Ledger
     'general_ledger' => 'General Ledger',

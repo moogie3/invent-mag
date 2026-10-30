@@ -82,6 +82,9 @@
 {{-- SCRIPT FOR ACCOUNTING settings --}}
 @vite('resources/js/admin/accounting.js')
 
+{{-- SCRIPT FOR FINANCIAL HEALTH trend charts (Accounting > Financial Health) --}}
+@vite('resources/js/admin/financial-health.js')
+
 {{-- SCRIPT FOR JOURNAL ENTRIES --}}
 @vite('resources/js/admin/journal-entry.js')
 

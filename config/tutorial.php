@@ -61,6 +61,7 @@ return [
             'color' => 'info',
             'icon' => 'ti-calculator',
             'items' => [
+                ['icon' => 'ti-heartbeat', 'label' => 'Financial Health', 'route' => 'admin.accounting.health'],
                 ['icon' => 'ti-building-bank', 'label' => 'Chart of Accounts', 'route' => 'admin.accounting.accounts.index'],
                 ['icon' => 'ti-book', 'label' => 'General Ledger', 'route' => 'admin.accounting.ledger'],
                 ['icon' => 'ti-notebook', 'label' => 'General Journal', 'route' => 'admin.accounting.journal'],
@@ -412,6 +413,12 @@ return [
             'icon' => 'ti-settings',
             'desc' => 'tutorial.system_settings_desc',
             'steps' => ['tutorial.interface_layout', 'tutorial.theme_config', 'tutorial.notifications', 'tutorial.session_security', 'tutorial.performance', 'tutorial.language_localization', 'tutorial.tax_region', 'tutorial.tax_jurisdiction_vs_config', 'tutorial.advanced_options'],
+        ],
+        'admin.accounting.health' => [
+            'title' => 'tutorial.financial_health',
+            'icon' => 'ti-heartbeat',
+            'desc' => 'tutorial.financial_health_desc',
+            'steps' => ['tutorial.fh_overview', 'tutorial.fh_cash', 'tutorial.fh_receivables_payables', 'tutorial.fh_margin', 'tutorial.fh_outlook'],
         ],
         'admin.accounting.ledger*' => [
             'title' => 'tutorial.general_ledger',

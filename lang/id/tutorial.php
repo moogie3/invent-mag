@@ -21,7 +21,7 @@ return [
     'key_metrics' => 'Metrik Utama: Kartu teratas menunjukkan penjualan, pembelian, dan keuntungan hari ini serta piutang dan hutang outstanding yang diperbarui secara real-time.',
     'sales_purchase_chart' => 'Grafik Penjualan & Pembelian: Beralih antara Penjualan dan Pembelian menggunakan tab. Filter berdasarkan rentang tanggal menggunakan dropdown di atas grafik.',
     'sales_forecast' => 'Prediksi Penjualan: Tersedia di paket Enterprise, grafik prediksi ditampilkan di bawah grafik utama menggunakan data historis untuk memproyeksikan tren penjualan. Metode yang digunakan adalah Holt-Winters (Pemulusan Eksponensial Tiga Kali Lipat) yang menangkap tren dan musiman. Metrik akurasi ditampilkan di bawah grafik: MAPE (Mean Absolute Percentage Error / Rata-rata Persentase Kesalahan Absolut) menunjukkan rata-rata kesalahan prediksi dalam persentase — semakin rendah semakin baik.',
-    'accounting_summary' => 'Ringkasan Akuntansi: Jika akuntansi diaktifkan, panel ringkasan keuangan menunjukkan pendapatan, pengeluaran, dan pendapatan bersih.',
+    'accounting_summary' => 'Kesehatan Keuangan: Jika akuntansi diaktifkan, strip kesehatan menampilkan kas, piutang, utang, margin, dan proyeksi bulan depan. Klik untuk membuka halaman Kesehatan Keuangan lengkap.',
     'recent_transactions' => 'Transaksi Terbaru: Bagian konten utama menunjukkan pesanan penjualan dan pembelian terbaru.',
     'quick_actions' => 'Tindakan Cepat: Tombol "Invoice Baru" (kanan atas) untuk membuat Pesanan Penjualan atau Pembelian dengan cepat.',
     'system_alerts' => 'Peringatan Sistem: Peringatan stok rendah dan peringatan kedaluwarsa produk ditampilkan di sini.',
@@ -436,6 +436,15 @@ return [
     'default_accounts' => 'Akun Default: Tautkan akun utama.',
     'cash_receivables' => 'Kas & Piutang: Konfigurasi akun Kas dan Piutang.',
     'reset_option' => 'Opsi Reset: Zona peligros memungkinkan mereset ke default.',
+
+    // Accounting - Financial Health
+    'financial_health' => 'Kesehatan Keuangan',
+    'financial_health_desc' => 'Ringkasan keuangan dengan bahasa sederhana — yang sehat, yang perlu perhatian, dan arah bulan depan.',
+    'fh_overview' => 'Penilaian utama: Strip di atas memberi gambaran sekilas — hijau sehat, kuning perlu perhatian, merah kritis.',
+    'fh_cash' => 'Kas & runway: Berapa bulan pengeluaran yang dapat ditutup saldo kas Anda — angka penentu apakah bulan lambat jadi masalah.',
+    'fh_receivables_payables' => 'Piutang vs utang: Yang masih harus dibayar pelanggan versus yang masih harus Anda bayar ke pemasok.',
+    'fh_margin' => 'Margin laba: Bagian pendapatan yang Anda sisihkan setelah biaya — pantau untuk memastikan pertumbuhan benar-benar menguntungkan.',
+    'fh_outlook' => 'Proyeksi bulan depan: Perkiraan kas bulan depan dengan kalimat sederhana — stabil, naik, atau mengetat.',
 
     // Accounting - General Ledger
     'general_ledger' => 'Buku Besar',

@@ -35,6 +35,17 @@ class DashboardService
         $arAging = $this->getAccountsReceivableAging();
         $apAging = $this->getAccountsPayableAging();
 
+        // Financial Health strip (GL-true red/green money view; replaces the
+        // old subledger Accounting Summary cards). Gated by plan feature AND
+        // the accounting permission, matching the page it links to.
+        $healthSummary = null;
+        $healthUrl = null;
+        $healthTenant = app('currentTenant');
+        if ($healthTenant && $healthTenant->hasFeature('accounting') && auth()->user()?->can('view-accounting')) {
+            $healthSummary = app(FinancialHealthService::class)->getSummary();
+            $healthUrl = route('admin.accounting.health');
+        }
+
         $keyMetrics = $this->formatKeyMetrics($totalLiability, $unpaidLiability, $totalRevenue, $unpaidRevenue, $monthlySales, $outCountUnpaid, $inCountUnpaid);
         $financialItems = $this->prepareFinancialItems($totalLiability, $unpaidLiability, $totalRevenue);
         $invoiceStatusData = $this->prepareInvoiceStatusData($arAging, $apAging); // Pass aging data here
@@ -115,6 +126,8 @@ class DashboardService
             'customerInsights' => $customerInsights,
             'arAging' => $arAging, // Add AR aging to the dashboard data
             'apAging' => $apAging, // Add AP aging to the dashboard data
+            'healthSummary' => $healthSummary, // Financial Health strip data
+            'healthUrl' => $healthUrl, // Link to Accounting > Financial Health
         ];
     }
 

@@ -1,12 +1,18 @@
 <?php
 
 use App\Http\Controllers\Admin\AccountingController;
+use App\Http\Controllers\Admin\FinancialHealthController;
 use App\Http\Controllers\Admin\JournalEntryController;
 use App\Http\Controllers\Admin\OpeningBalanceController;
 
 // Accounting Routes - Protected by plan feature
 Route::prefix('accounting')->middleware(['plan.feature:accounting', 'can:view-accounting'])->group(function () {
     Route::get('/', fn () => redirect()->route('admin.accounting.ledger'));
+
+    // Financial Health — the accounting landing view (red/green money health,
+    // next-month outlook); reachable from the dashboard strip.
+    Route::get('/financial-health', [FinancialHealthController::class, 'index'])
+        ->name('admin.accounting.health');
 
     Route::get('/chart-of-accounts', [AccountingController::class, 'chartOfAccounts'])
         ->name('admin.accounting.chart')

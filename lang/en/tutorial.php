@@ -430,12 +430,13 @@ return [
 
     // Accounting - Financial Health
     'financial_health' => 'Financial Health',
-    'financial_health_desc' => 'A plain-word read on your money — what is strong, what needs attention, and where next month is heading.',
+    'financial_health_desc' => 'A plain-word read on your money — what is strong, what needs attention, and where next month is heading. Use the Period filter to re-date the page, and Compare all to see how each metric moved against its own past.',
     'fh_overview' => 'Overall verdict: The top strip gives one glance — green is healthy, amber needs attention, red is critical.',
     'fh_cash' => 'Cash & runway: How many months of spending your current cash covers — the single number that decides whether a slow month is a problem.',
     'fh_receivables_payables' => 'Receivables vs payables: What customers still owe you versus what you still owe suppliers.',
-    'fh_margin' => 'Profit margin: The share of revenue you keep after costs — track it to confirm growth is actually profitable.',
+    'fh_margin' => 'Net margin: The share of revenue you keep after every cost — track it to confirm growth is actually profitable.',
     'fh_outlook' => 'Next month outlook: A projection of next month\'s cash with a plain sentence on whether you are holding, rising, or tightening.',
+    'fh_compare' => 'Compare & period filter: Every card opens a month-over-month comparison, or use Compare all for the whole table with trend lines. The Period filter re-dates the whole page (presets or a custom range) — balance-sheet metrics stay point-in-time and are marked with a lock.',
 
     // Accounting - General Ledger
     'general_ledger' => 'General Ledger',

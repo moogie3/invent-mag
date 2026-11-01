@@ -67,11 +67,54 @@ return [
         'burden_danger' => 1.0,
     ],
 
+    // ── Period filter ──────────────────────────────────────────────
+    // window_months: complete months the cards aggregate when no filter is
+    // active (the trailing quarter the page has always opened on).
+    // period_max_months: hard cap on a custom range, so one selection can
+    // never ask the service to scan an unbounded stretch of ledger.
+    'window_months' => 3,
+    'period_max_months' => 24,
+
+    // Debt-to-Equity: total liabilities / total equity from posted GL
+    // (equity includes revenue − expense, exactly what the balance sheet
+    // reports). At 1.0 lenders and owners have equal claims; past 2.0 the
+    // business is mostly funded by debt.
+    'debt_to_equity' => [
+        'good' => 1.0,
+        'warn' => 2.0,
+    ],
+
+    // Days Sales Outstanding: current receivables balance ÷ revenue over
+    // the trailing 3 complete months, scaled to that window's day count.
+    // 60 days ≈ two months of sales still outstanding; 90 ≈ a full quarter.
+    'dso' => [
+        'good' => 60,
+        'warn' => 90,
+    ],
+
     // Inventory turnover: annualised COGS (6-month GL) / inventory GL
     // balance. Green >= 4 turns/year, amber >= 1.5, red below.
     'turnover' => [
         'good' => 4.0,
         'warn' => 1.5,
+    ],
+
+    // Gross margin: (revenue − COGS) / revenue over the trailing 3 complete
+    // months — the unit economics BEFORE overheads. Distinct from the net
+    // 'margin' above (which is after every expense). 40%+ is a healthy
+    // product; under 20% the product itself is barely earning.
+    'gross_margin' => [
+        'good' => 0.40,
+        'warn' => 0.20,
+    ],
+
+    // Liquidity: current assets (GL 11xx) vs current liabilities (GL 21xx).
+    // 'current_ratio' good >= 1.5, warn >= 1.0 (below 1.0 = can't cover
+    // short-term bills). 'working_capital' bad below 0 (owed more than
+    // collectable within the year).
+    'liquidity' => [
+        'current_ratio_good' => 1.5,
+        'current_ratio_warn' => 1.0,
     ],
 
     // Runway: months of cash left while burning at the current net rate.

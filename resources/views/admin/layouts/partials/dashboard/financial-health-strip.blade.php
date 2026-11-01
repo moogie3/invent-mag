@@ -7,6 +7,8 @@
     feature + view-accounting permission.
 --}}
 @php
+    use Illuminate\Support\Carbon;
+
     $statusTone = ['good' => 'success', 'warn' => 'warning', 'danger' => 'danger', 'neutral' => 'secondary'];
     $statusLabel = [
         'good' => 'messages.healthy',
@@ -19,6 +21,9 @@
         return match ($ind['display']) {
             'percent' => number_format(($ind['value'] ?? 0) * 100, 1).'%',
             'ratio' => number_format($ind['value'] ?? 0, 1).'×',
+            'days' => $ind['value'] === null
+                ? '—'
+                : number_format($ind['value'], 0).' '.__('messages.days'),
             default => \App\Helpers\CurrencyHelper::format($ind['value'] ?? 0),
         };
     };
@@ -57,6 +62,38 @@
                     </div>
                 @endforeach
             </div>
+
+            {{-- Animated cash/revenue trend — the same Chart.js line the full
+                 Financial Health page draws, at dashboard scale. Data rides
+                 along in the summary payload (no extra queries); the chart
+                 itself is drawn by financial-health.js from the island. --}}
+            @if(! empty($healthSummary['chart']) && ! empty($healthSummary['months']))
+                <div class="mt-3 pt-3 border-top">
+                    <div class="text-muted small mb-1">
+                        <i class="ti ti-chart-line me-1"></i>{{ __('messages.cash_balance_trend') }} · {{ __('messages.revenue') }}
+                    </div>
+                    <div style="position: relative; height: 160px;">
+                        <canvas id="fh-strip-chart"></canvas>
+                    </div>
+                </div>
+                @php
+                    // Data island: type="application/json" is never executed,
+                    // so it needs no CSP nonce (same pattern as the page).
+                    $fhStripPayload = [
+                        'labels' => collect($healthSummary['months'])
+                            ->map(fn ($m) => Carbon::parse($m.'-01')->format('M y'))
+                            ->values()
+                            ->all(),
+                        'cash' => $healthSummary['chart']['cash'],
+                        'revenue' => $healthSummary['chart']['revenue'],
+                        'i18n' => [
+                            'cash' => __('messages.cash'),
+                            'revenue' => __('messages.revenue'),
+                        ],
+                    ];
+                @endphp
+                <script type="application/json" id="fh-strip-data">@json($fhStripPayload)</script>
+            @endif
 
             @if(count($healthSummary['narrative'] ?? []) > 0)
                 <div class="mt-3 pt-3 border-top">

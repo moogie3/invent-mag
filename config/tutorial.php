@@ -418,7 +418,7 @@ return [
             'title' => 'tutorial.financial_health',
             'icon' => 'ti-heartbeat',
             'desc' => 'tutorial.financial_health_desc',
-            'steps' => ['tutorial.fh_overview', 'tutorial.fh_cash', 'tutorial.fh_receivables_payables', 'tutorial.fh_margin', 'tutorial.fh_outlook'],
+            'steps' => ['tutorial.fh_overview', 'tutorial.fh_cash', 'tutorial.fh_receivables_payables', 'tutorial.fh_margin', 'tutorial.fh_outlook', 'tutorial.fh_compare'],
         ],
         'admin.accounting.ledger*' => [
             'title' => 'tutorial.general_ledger',

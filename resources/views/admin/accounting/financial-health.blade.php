@@ -25,6 +25,9 @@
         return match ($ind['display']) {
             'percent' => number_format(($ind['value'] ?? 0) * 100, 1).'%',
             'ratio' => number_format($ind['value'] ?? 0, 1).'×',
+            'days' => $ind['value'] === null
+                ? '—'
+                : number_format($ind['value'], 0).' '.__('messages.days'),
             default => \App\Helpers\CurrencyHelper::format($ind['value'] ?? 0),
         };
     };
@@ -41,6 +44,30 @@
 @endphp
 
 <div class="{{ $containerClass ?? 'container-xl' }}">
+    {{-- Period filter lives in the page-header's right column, not as a card
+         under the pretitles — a filter belongs with the page controls, and
+         keeping it beside the title stops it crowding "Accounting". Presets
+         and custom month ranges both reduce to ONE [from..to] window inside
+         FinancialHealthService::resolvePeriod(), which also rejects
+         future/in-progress months and caps the span. A plain GET form: works
+         without JavaScript, and the URL stays shareable; financial-health.js
+         only syncs preset ↔ month inputs. --}}
+    @php
+        $fhPresetLabels = [
+            'last_month' => __('messages.last_month'),
+            'last_3' => __('messages.last_3_months'),
+            'last_6' => __('messages.last_6_months'),
+            'ytd' => __('messages.year_to_date'),
+            'last_year' => __('messages.last_year'),
+        ];
+        // Nothing submitted = default window; a preset is named; anything
+        // else with from/to set is a custom range.
+        $fhSelectedPreset = $period['preset'] ?? ($period['default'] ? '' : 'custom');
+        // The latest month a filter may point at — the in-progress month's
+        // books are never closed, so the inputs cap at the one before it.
+        $fhMaxMonth = Carbon::now()->startOfMonth()->subMonth()->format('Y-m');
+        $fhRange = $period['from']->format('M Y').' — '.$period['to']->format('M Y');
+    @endphp
     <div class="page-header d-print-none mt-4">
         <div class="row g-2 align-items-center">
             <div class="col">
@@ -55,6 +82,43 @@
                 </h2>
                 <div class="text-muted mt-1">
                     {{ __('messages.financial_health_desc') }}
+                </div>
+            </div>
+            <div class="col-auto">
+                <form method="get" action="{{ route('admin.accounting.health') }}"
+                      class="d-flex align-items-center gap-2 flex-wrap justify-content-end fh-period-form"
+                      id="fhPeriodForm">
+                    <label class="text-muted small mb-0" for="fhPresetSelect">{{ __('messages.period') }}</label>
+                    <select name="preset" id="fhPresetSelect" class="form-select form-select-sm w-auto">
+                        <option value="">{{ __('messages.fh_period_default') }}</option>
+                        @foreach($fhPresetLabels as $value => $label)
+                            <option value="{{ $value }}" @selected($fhSelectedPreset === $value)>{{ $label }}</option>
+                        @endforeach
+                        <option value="custom" @selected($fhSelectedPreset === 'custom')>{{ __('messages.custom_range') }}</option>
+                    </select>
+                    <input type="month" name="from" id="fhFromInput"
+                           class="form-control form-control-sm w-auto fh-custom-range @if($fhSelectedPreset !== 'custom') d-none @endif"
+                           max="{{ $fhMaxMonth }}" value="{{ $period['from']->format('Y-m') }}"
+                           aria-label="{{ __('messages.from') }}">
+                    <input type="month" name="to" id="fhToInput"
+                           class="form-control form-control-sm w-auto fh-custom-range @if($fhSelectedPreset !== 'custom') d-none @endif"
+                           max="{{ $fhMaxMonth }}" value="{{ $period['to']->format('Y-m') }}"
+                           aria-label="{{ __('messages.to') }}">
+                    <button type="submit" class="btn btn-sm btn-primary">
+                        <i class="ti ti-filter me-1"></i>{{ __('messages.apply') }}
+                    </button>
+                    @if(! $period['default'])
+                        <a href="{{ route('admin.accounting.health') }}" class="btn btn-sm btn-secondary">
+                            <i class="ti ti-restore me-1"></i>{{ __('messages.reset') }}
+                        </a>
+                    @endif
+                </form>
+                {{-- The window actually on screen — always visible so a
+                     filtered page can never be mistaken for the default. --}}
+                <div class="text-end mt-1">
+                    <span class="badge bg-primary-lt text-primary fh-period-chip">
+                        <i class="ti ti-calendar-month me-1"></i>{{ __('messages.period_showing', ['range' => $fhRange]) }}
+                    </span>
                 </div>
             </div>
         </div>
@@ -78,6 +142,20 @@
         </div>
 
         {{-- 1) The condition right now — every indicator with its reason --}}
+        <div class="d-flex align-items-center justify-content-between mb-2">
+            <span class="text-muted small text-uppercase fw-bold">{{ __('messages.condition_now') }}</span>
+            {{-- Soft pill matching the page's bg-*-lt badge language; opened
+                 by financial-health.js (inline handlers are blocked by CSP). --}}
+            <button type="button" class="btn btn-sm rounded-pill bg-primary-lt text-primary fh-compare-all" id="fhCompareAllBtn">
+                <i class="ti ti-arrows-left-right me-1"></i>{{ __('messages.compare_all') }}
+            </button>
+        </div>
+        @php
+            // Point-in-time metrics (latest balance-sheet snapshots) never
+            // shift with the period filter — flagged with a lock so the
+            // mismatch is explained before the modal says it out loud.
+            $fhLockedKeys = collect($comparison['rows'])->where('comparable', false)->pluck('key')->all();
+        @endphp
         <div class="row row-cards mb-3">
             @foreach($indicators as $ind)
                 @php $tone = $statusTone[$ind['status']] ?? 'secondary'; @endphp
@@ -88,9 +166,25 @@
                                 <span class="avatar avatar-sm bg-{{ $tone }}-lt text-{{ $tone }}">
                                     <i class="ti {{ $ind['icon'] }}"></i>
                                 </span>
-                                <span class="badge bg-{{ $tone }}-lt text-{{ $tone }}">{{ __($statusLabel[$ind['status']] ?? 'messages.steady') }}</span>
+                                <div class="d-flex align-items-center gap-1">
+                                    <span class="badge bg-{{ $tone }}-lt text-{{ $tone }}">{{ __($statusLabel[$ind['status']] ?? 'messages.steady') }}</span>
+                                    {{-- Opened by financial-health.js (CSP blocks inline handlers). --}}
+                                    <button type="button"
+                                            class="btn btn-sm btn-icon bg-tertiary-lt fh-compare-btn"
+                                            data-fh-key="{{ $ind['key'] }}"
+                                            title="{{ __('messages.compare') }}"
+                                            aria-label="{{ __('messages.compare') }} — {{ $ind['label'] }}">
+                                        <i class="ti ti-arrows-left-right"></i>
+                                    </button>
+                                </div>
                             </div>
-                            <div class="text-muted">{{ $ind['label'] }}</div>
+                            <div class="text-muted">
+                                {{ $ind['label'] }}
+                                @if(! $period['default'] && in_array($ind['key'], $fhLockedKeys, true))
+                                    <i class="ti ti-lock fs-6 text-muted" data-bs-toggle="tooltip"
+                                       title="{{ __('messages.period_point_in_time_hint') }}"></i>
+                                @endif
+                            </div>
                             <div class="h3 mb-1 @if($ind['status'] === 'danger') text-danger @elseif($ind['status'] === 'good') text-success @endif">
                                 {{ $formatValue($ind) }}
                                 @if($ind['delta'] !== null && abs($ind['delta']) >= 0.01)
@@ -129,9 +223,15 @@
             {{-- 3) Next month, as a chain that ends in one number --}}
             <div class="col-lg-6">
                 <div class="card border-0 shadow-sm rounded-3 h-100">
-                    <div class="card-header">
-                        <h3 class="card-title"><i class="ti ti-crystal-ball me-2"></i>{{ __('messages.next_month_outlook') }} — {{ $o['month'] }}</h3>
-                        <span class="badge bg-{{ $confTone }}-lt text-{{ $confTone }}">{{ __('messages.confidence') }}: {{ __($confLabel) }}</span>
+                    <div class="card-header flex-wrap">
+                        <h3 class="card-title"><i class="ti ti-crystal-ball me-2"></i>{{ __('messages.next_month_outlook') }}</h3>
+                        {{-- Own row so the month + confidence badge never crowd
+                             the title — the header wraps here instead of
+                             squeezing the badge into the text at 1366px. --}}
+                        <div class="d-flex align-items-center gap-2 mt-1 w-100">
+                            <span class="badge bg-secondary-lt text-secondary">{{ $o['month'] }}</span>
+                            <span class="badge bg-{{ $confTone }}-lt text-{{ $confTone }}">{{ __('messages.confidence') }}: {{ __($confLabel) }}</span>
+                        </div>
                     </div>
                     <div class="card-body">
                         <div class="d-flex justify-content-between mb-2">
@@ -250,7 +350,11 @@
                                         @if($item['amount'] !== null)
                                             <span class="font-weight-medium">{{ $fmt($item['amount']) }}</span>
                                         @endif
-                                        <a href="{{ $item['url'] }}" class="btn btn-sm btn-outline-primary">{{ $item['link_label'] }}</a>
+                                        {{-- Soft pill matching the Compare-all
+                                             button, tinted by the item's own
+                                             severity so it sits in the same
+                                             bg-*-lt language as the row icon. --}}
+                                        <a href="{{ $item['url'] }}" class="btn btn-sm rounded-pill bg-{{ $tone }}-lt text-{{ $tone }}">{{ $item['link_label'] }}</a>
                                     </div>
                                 </div>
                             @endforeach
@@ -259,8 +363,179 @@
                 </div>
             </div>
         </div>
+
+        {{-- 6) Plain-language explainer: every card, the outlook, the colors.
+             The section itself stays open — the intro and the color legend
+             are always useful. Each metric entry, however, is collapsed to
+             its title until clicked: reference material a user reads once,
+             so 16 paragraphs of prose never bury the legend. Toggles are
+             wired in financial-health.js (CSP blocks inline handlers). --}}
+        @php
+            // Each entry is [label key, body key] rendered in the order the
+            // cards appear, so the explainer reads top-to-bottom with the grid.
+            $explainerCards = [
+                ['understanding_cash', 'understanding_cash_body'],
+                ['understanding_revenue', 'understanding_revenue_body'],
+                ['understanding_purchases', 'understanding_purchases_body'],
+                ['understanding_receivables', 'understanding_receivables_body'],
+                ['understanding_payables', 'understanding_payables_body'],
+                ['understanding_payroll', 'understanding_payroll_body'],
+                ['understanding_turnover', 'understanding_turnover_body'],
+                ['understanding_debt_to_equity', 'understanding_debt_to_equity_body'],
+                ['understanding_gross_margin', 'understanding_gross_margin_body'],
+                ['understanding_net_margin', 'understanding_net_margin_body'],
+                ['understanding_liquidity', 'understanding_liquidity_body'],
+                ['understanding_dso', 'understanding_dso_body'],
+            ];
+            $explainerOutlook = [
+                ['understanding_confidence', 'understanding_confidence_body'],
+                ['understanding_range', 'understanding_range_body'],
+                ['understanding_runway', 'understanding_runway_body'],
+                ['understanding_collection', 'understanding_collection_body'],
+            ];
+            $explainerColors = [
+                ['good', 'ti-circle-check text-success'],
+                ['warn', 'ti-alert-circle text-warning'],
+                ['danger', 'ti-alert-triangle text-danger'],
+                ['neutral', 'ti-circle-minus text-secondary'],
+            ];
+        @endphp
+        <div class="row mt-3">
+            <div class="col-12">
+                <div class="card border-0 shadow-sm rounded-3">
+                    <div class="card-header">
+                        <h3 class="card-title"><i class="ti ti-book-2 me-2"></i>{{ __('messages.understanding_metrics') }}</h3>
+                    </div>
+                    <div class="card-body">
+                        <p class="text-muted mb-4">{{ __('messages.understanding_intro') }}</p>
+
+                        <div class="row">
+                            @foreach($explainerCards as [$label, $body])
+                                <div class="col-lg-6 mb-1">
+                                    {{-- One toggle per metric: title always
+                                         visible, prose one click away.
+                                         btn-ghost-secondary = no box at
+                                         rest, soft tint on hover, so the
+                                         list reads as plain text. --}}
+                                    <button type="button"
+                                            class="btn btn-sm btn-ghost-secondary d-flex align-items-center w-100 justify-content-start text-start px-1 fh-explainer-item"
+                                            aria-expanded="false"
+                                            aria-controls="fh-expl-{{ $label }}">
+                                        <i class="ti ti-chevron-right text-muted me-2 fh-explainer-chevron"></i>
+                                        <span class="fw-bold">{{ __('messages.'.$label) }}</span>
+                                    </button>
+                                    <div class="collapse ps-4" id="fh-expl-{{ $label }}">
+                                        <div class="text-muted small pb-1">{{ __('messages.'.$body) }}</div>
+                                    </div>
+                                </div>
+                            @endforeach
+                        </div>
+
+                        <hr class="my-4">
+
+                        <div class="row">
+                            @foreach($explainerOutlook as [$label, $body])
+                                <div class="col-lg-6 mb-1">
+                                    <button type="button"
+                                            class="btn btn-sm btn-ghost-secondary d-flex align-items-center w-100 justify-content-start text-start px-1 fh-explainer-item"
+                                            aria-expanded="false"
+                                            aria-controls="fh-expl-{{ $label }}">
+                                        <i class="ti ti-chevron-right text-muted me-2 fh-explainer-chevron"></i>
+                                        <span class="fw-bold">{{ __('messages.'.$label) }}</span>
+                                    </button>
+                                    <div class="collapse ps-4" id="fh-expl-{{ $label }}">
+                                        <div class="text-muted small pb-1">{{ __('messages.'.$body) }}</div>
+                                    </div>
+                                </div>
+                            @endforeach
+                        </div>
+
+                        <hr class="my-4">
+
+                        <div class="fw-bold mb-2">{{ __('messages.understanding_colors') }}</div>
+                        <p class="text-muted small mb-2">{{ __('messages.understanding_colors_body') }}</p>
+                        <div class="d-flex flex-wrap gap-3">
+                            @foreach($explainerColors as [$status, $icon])
+                                <span class="d-inline-flex align-items-center small text-muted">
+                                    <i class="ti {{ $icon }} me-1"></i>{{ __($statusLabel[$status]) }}
+                                </span>
+                            @endforeach
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
+
+{{-- Comparison modal — one shared dialog for the per-card drill-down and the
+     "Compare all" table. Shell only; the body is filled by financial-health.js
+     from the #fh-compare-data island (CSP-safe, no inline executable script). --}}
+<div class="modal fade" id="fhCompareModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title d-flex align-items-center">
+                    <i class="ti ti-arrows-left-right me-2"></i><span id="fhCompareTitle">{{ __('messages.compare_title') }}</span>
+                </h3>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{{ __('messages.close') }}"></button>
+            </div>
+            <div class="modal-body" id="fhCompareBody">
+                <div class="text-muted">{{ __('messages.loading') }}</div>
+            </div>
+            <div class="modal-footer">
+                <span class="text-muted small me-auto" id="fhCompareMonths"></span>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ __('messages.close') }}</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+{{-- Comparison payload as a JSON DATA ISLAND (never executed → exempt from the
+     CSP script-src nonce; see the chart island below for why). financial-health.js
+     parses it on every turbo:load to render the modal. --}}
+@php
+    $fhComparePayload = [
+        'rows' => collect($comparison['rows'])->map(fn ($r) => [
+            'key' => $r['key'],
+            'label' => $r['label'],
+            'display' => $r['display'],
+            'status' => $r['status'],
+            'reason' => $r['reason'],
+            'comparable' => $r['comparable'],
+            'higher_is_better' => $r['higher_is_better'],
+            'lock_reason' => $r['lock_reason'],
+            'current' => $r['current'],
+            'previous' => $r['previous'],
+            'delta' => $r['delta'],
+            'trend' => $r['trend'],
+            'spark' => $r['spark'],
+            'spark_labels' => $r['spark_labels'] ?? [],
+        ])->values()->all(),
+        'compared' => $comparison['compared'],
+        'period' => [
+            'default' => $period['default'],
+            'window' => $period['window'],
+        ],
+        'i18n' => [
+            'compare_title' => __('messages.compare_title'),
+            'compare_desc' => __('messages.compare_desc'),
+            'compared_months' => __('messages.compared_months'),
+            'previous_month' => __('messages.previous_month'),
+            'condition_now' => __('messages.condition_now'),
+            'trend_up' => __('messages.trend_up'),
+            'trend_down' => __('messages.trend_down'),
+            'trend_flat' => __('messages.trend_flat'),
+            'trend_chart' => __('messages.trend_chart'),
+            'days' => __('messages.days'),
+            'healthy' => __('messages.healthy'),
+            'needs_attention' => __('messages.needs_attention'),
+            'critical' => __('messages.critical'),
+            'steady' => __('messages.steady'),
+        ],
+    ];
+@endphp
+<script type="application/json" id="fh-compare-data">@json($fhComparePayload)</script>
 
 {{--
     Chart data as a JSON DATA ISLAND (type="application/json" is never

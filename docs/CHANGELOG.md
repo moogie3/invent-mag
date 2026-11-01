@@ -9,6 +9,119 @@ Date-ordered, newest first.
 
 ---
 
+## 2026-10-31 — Financial Health: Net Margin beside Gross Margin, Debt-to-Equity + DSO cards, a Full-Page Explainer, a Period-Comparison Engine (per-card modal + "Compare all"), a Global Period Filter, and a UI-Pass (dashboard chart, outlook spacing, themed buttons, collapsible explainer)
+
+Extends the **Accounting › Financial Health** feature (2026-10-30). Same
+service (`App\Services\FinancialHealthService`), same posted-GL-only
+doctrine, same `config/financial-health.php` threshold basis. This batch
+adds two cards, teaches the whole page, and gives every number a way to be
+compared against its own past — either the month before, or a period the
+user picks.
+
+### The two new indicator cards
+
+- **Net Margin** now sits **beside Gross Margin** so the two read against
+  each other: gross is the product before overheads, net is the true bottom
+  line after every expense (incl. tax). Same window, same noise floor.
+- **Debt-to-Equity** (liabilities ÷ equity) and **Days Sales Outstanding**
+  (AR ÷ recent revenue, scaled to the window's real day count) join the
+  grid as cards 11 and 12. Both carry config thresholds and reason strings
+  (`de_low`/`de_watch`/`de_high`, `dso_fast`/`dso_watch`/`dso_slow`) with a
+  plain-word narrative for each, en + id.
+
+### A full-page explainer ("Understanding These Metrics")
+
+A DRY, array-driven explainer at the bottom of the page: all **12 cards**,
+the **4 outlook concepts** (confidence, expected range, runway, collection
+pace), and the **color legend**, each rendered through
+`__('messages.'.$label)` so it ships in English and Indonesian. It answers
+"what is this number and why does it matter" without leaving the page.
+
+### The period-comparison engine
+
+One engine (`getComparison()`) feeds two surfaces so the math is never
+duplicated:
+
+- **Per-card modal** — every card gets a compare button that opens a modal
+  showing that metric against the prior period.
+- **"Compare all"** — the same engine rendered as a full 12-row table in one
+  modal, with a mini sparkline per flow metric.
+
+**Honesty rules** (the part that makes it trustworthy):
+
+- Both sides are **single complete months** by default (the in-progress
+  month is never compared as if it were finished); with a filter, the whole
+  selected period is compared against the **preceding window of equal
+  length**.
+- **5 flow metrics** (cash, revenue, net margin, gross margin, purchases)
+  carry a real monthly series and get a true delta.
+- **7 balance-sheet snapshots** (receivables, payables, payroll, turnover,
+  working capital, debt-to-equity, DSO) are **point-in-time by design** and
+  are returned **locked** with a `lock_reason` rather than a fabricated
+  delta — the UI shows a lock icon on the card and in the table row.
+- Margins are recomputed **from each window's own revenue and cost** (never
+  a trailing average), and suppress the aggregate when the window's revenue
+  is below the noise floor (`noise.amount`, 100k) — so a thin month shows
+  "—", not a made-up percentage.
+
+### The global period filter
+
+A preset **and** custom range, both reducing to one `[from..to]` window so
+everything downstream sees exactly one thing:
+
+- **Presets** `last_month` / `last_3` / `last_6` / `ytd` / `last_year`, plus
+  a **custom** from/to month range. Cap `period_max_months` (24).
+- Validation, in order: unparseable input → default rolling window; never
+  the future or the in-progress month; `from` can never sit after `to`;
+  span capped at the max. The resolved `window` (indicator span),
+  `comparison_window`, and `series_from` (loads one extra window early so
+  the prior side has real data) all derive from that one range.
+- **Reason/narrative strings carry `{period}` / `{period_adj}` slots** so no
+  line ever claims "3 months" when a different span is on screen. A one-month
+  window reads "a single month"/"monthly"; a 3-month window reads "3
+  months"/"3-month". en + id.
+- The dashboard strip keeps its own default window (it has no filter), so
+  only the full page is filter-scoped.
+
+### The UI pass (this batch's polish)
+
+- **Dashboard chart** — the animated cash/revenue line the Financial Health
+  page already drew is now also on the dashboard strip, driven by the same
+  `chart` payload the summary already computes (no extra queries).
+- **Outlook header** — the "Next Month Outlook" title and its confidence
+  badge were cramped; the badge now sits on its own row with breathing room.
+- **"Compare all" button** — restyled to a soft `bg-primary-lt` pill that
+  matches the page's badge language instead of a generic button.
+- **Compare modal graph** — flow metrics now carry a **sparkline column**
+  (with real month labels in the per-card view); the aggregate is omitted
+  rather than faked when the window is below the noise floor.
+- **Collapsible explainer** — "Understanding These Metrics" is now
+  **collapsed by default** (it is reference material, not daily reading),
+  one click from the header, via `financial-health.js` (CSP blocks inline
+  handlers and the Turbo data-api is unreliable).
+
+### Verification for this change
+
+- **phpunit (full):** **1,279 tests / 4,319 assertions**, 1 failure — the
+  **pre-existing** `FinancialReportingServiceTest::test_generate_income_
+  statement_calculates_net_income_correctly` (a month-end date bug in
+  untouched code, confirmed against baseline via stash/pop; not fixed here).
+- **FinancialHealthServiceTest:** **30 tests / 338 assertions, 0 failures** —
+  adds period-resolution, comparison-window, sparkline-label, and
+  Indonesian-placeholder coverage.
+- **vitest:** **172 files / 209 tests, 0 failures.**
+- **npm run build:** clean after every JS/Blade edit; view cache cleared.
+- **Health probe (headless Firefox):** **32/32 checks pass** — filter bar,
+  preset↔custom sync, lock icons, outlook spacing, collapsible explainer,
+  both modals (per-card + compare-all), dashboard chart, and the 3-month
+  filtered view ("Showing: Jul 2026 — Sep 2026").
+- **Note:** the three new card icons (`ti-rotate`, `ti-balance`,
+  `ti-hourglass`) load from the Tabler CDN webfont and render correctly in a
+  real browser; a headless screenshot may show a fallback glyph if the font
+  has not finished loading.
+
+---
+
 ## 2026-10-30 — Financial Health: a Dashboard Strip + Full Accounting Page (red/green money status, 6-month trends, plain-word next-month outlook), with the Threshold Basis for Every Verdict, a Corrected VAT Note, a Fixed Translator Placeholder, and a Tutorial Page
 
 New feature under **Accounting › Financial Health** (route

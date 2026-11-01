@@ -439,12 +439,13 @@ return [
 
     // Accounting - Financial Health
     'financial_health' => 'Kesehatan Keuangan',
-    'financial_health_desc' => 'Ringkasan keuangan dengan bahasa sederhana — yang sehat, yang perlu perhatian, dan arah bulan depan.',
+    'financial_health_desc' => 'Ringkasan keuangan dengan bahasa sederhana — yang sehat, yang perlu perhatian, dan arah bulan depan. Pakai filter Periode untuk mengubah rentang tanggal halaman, dan Bandingkan semua untuk melihat gerak tiap metrik dibanding masa lalunya.',
     'fh_overview' => 'Penilaian utama: Strip di atas memberi gambaran sekilas — hijau sehat, kuning perlu perhatian, merah kritis.',
     'fh_cash' => 'Kas & runway: Berapa bulan pengeluaran yang dapat ditutup saldo kas Anda — angka penentu apakah bulan lambat jadi masalah.',
     'fh_receivables_payables' => 'Piutang vs utang: Yang masih harus dibayar pelanggan versus yang masih harus Anda bayar ke pemasok.',
-    'fh_margin' => 'Margin laba: Bagian pendapatan yang Anda sisihkan setelah biaya — pantau untuk memastikan pertumbuhan benar-benar menguntungkan.',
+    'fh_margin' => 'Margin laba bersih: Bagian pendapatan yang Anda sisihkan setelah semua biaya — pantau untuk memastikan pertumbuhan benar-benar menguntungkan.',
     'fh_outlook' => 'Proyeksi bulan depan: Perkiraan kas bulan depan dengan kalimat sederhana — stabil, naik, atau mengetat.',
+    'fh_compare' => 'Bandingkan & filter periode: Setiap kartu membuka perbandingan bulan-ke-bulan, atau pakai Bandingkan semua untuk seluruh tabel dengan garis tren. Filter Periode mengubah tanggal seluruh halaman (preset atau rentang kustom) — metrik neraca tetap titik-waktu dan ditandai gembok.',
 
     // Accounting - General Ledger
     'general_ledger' => 'Buku Besar',

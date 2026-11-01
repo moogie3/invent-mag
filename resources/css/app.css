@@ -506,6 +506,32 @@ body.no-animations .card:hover {
     transform: none;
 }
 
+/* ── Financial Health › "Understanding These Metrics" per-entry toggles ──
+   btn-ghost-secondary's hover repaints BOTH background and text with the
+   secondary tone — in the dark theme that reads as "everything went gray,
+   where did the label go". The toggle's job is only to show WHERE you can
+   click, so the hover keeps the label's own colour and just lays a subtle
+   surface tint underneath (the same surface-tertiary the cards use, so it
+   works in light and dark without a second rule). Chevron and label keep
+   their resting colours; the tint is the only thing that moves. */
+.btn.fh-explainer-item.btn-ghost-secondary {
+    --tblr-btn-color: inherit;
+    --tblr-btn-hover-color: inherit;
+    --tblr-btn-hover-bg: var(--tblr-bg-surface-tertiary);
+    --tblr-btn-hover-border-color: transparent;
+    --tblr-btn-active-color: inherit;
+    --tblr-btn-active-bg: var(--tblr-bg-surface-tertiary);
+    border-radius: var(--tblr-border-radius);
+    transition: background-color 0.15s ease;
+}
+
+/* The label span keeps its inherited colour on hover (the button-level
+   inherit above can still be overridden by the btn's own color var). */
+.btn.fh-explainer-item.btn-ghost-secondary:hover span,
+.btn.fh-explainer-item.btn-ghost-secondary:focus-visible span {
+    color: inherit;
+}
+
 @media (prefers-reduced-motion: reduce) {
     .card {
         transition: none;

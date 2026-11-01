@@ -1842,6 +1842,8 @@ Tax double-submissions to DJP are a legal problem. Protection at 5 levels:
 
 **Still deferred:** listing sync (create/update Shopee listings from Invent-MAG) and TikTok integration — the current feature is catalog *import* only.
 
+**Planned (not built):** a downstream **accounting / Financial Health integration** for Shopee. Once listing sync exists, Shopee orders and payouts can post into the GL (revenue, COGS, marketplace fees, settlements) so marketplace sales feed the same ledger the Financial Health page reads — turning Shopee from a catalog source into a revenue channel the dashboards already measure. Deliberately deferred until listing sync ships, since it depends on order/payout data the import-only feature does not yet pull.
+
 ---
 
 ## 6. Competitive Positioning

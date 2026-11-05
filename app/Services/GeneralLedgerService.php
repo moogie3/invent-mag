@@ -89,6 +89,32 @@ class GeneralLedgerService
 
         $transactionsBalance = ($aggregates->total_debit ?? 0) - ($aggregates->total_credit ?? 0);
 
+        // The Opening Balance page writes the same figure twice: into
+        // Account.opening_balance AND into an opening journal entry.
+        // Trial Balance sums only the journal, so adding the denormalized
+        // field on top of the journal sum here counted it twice — the GL
+        // reported 2,000 where the Trial Balance reported 1,000 for the
+        // same opening balance. (AccountSeeder never sets the field, which
+        // is why the seeded path was always correct.)
+        //
+        // The check is deliberately date-independent: when the account has
+        // an opening entry at all, the journal is the source of truth and
+        // the field must not be added — otherwise a start date BEFORE the
+        // opening date would still double-count once the period reaches it.
+        $hasOpeningEntry = DB::table('transactions')
+            ->join('journal_entries', 'transactions.journal_entry_id', '=', 'journal_entries.id')
+            ->where('transactions.account_id', $accountId)
+            ->where('journal_entries.entry_type', JournalEntry::ENTRY_TYPE_OPENING)
+            ->when($tenantId, function ($query) use ($tenantId) {
+                $query->where('transactions.tenant_id', $tenantId)
+                    ->where('journal_entries.tenant_id', $tenantId);
+            })
+            ->exists();
+
+        if ($hasOpeningEntry) {
+            $openingBalanceFromAccount = 0;
+        }
+
         // Return the opening balance from account + transactions before start date
         return $openingBalanceFromAccount + $transactionsBalance;
     }

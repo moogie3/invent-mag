@@ -32,6 +32,7 @@ class PlanFeatureGateTest extends TestCase
         'api_access',
         'audit_compliance',
         'shopee_import',
+        'efaktur_api',
     ];
 
     protected function setUp(): void

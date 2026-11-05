@@ -862,7 +862,7 @@ class SalesForecastService
 
 **Committed Future Enhancements:**
 
-- **PJAP API (Klikpajak)** — Phase 2: Direct DJP submission (enterprise only)
+- **PJAP API (Klikpajak)** — Phase 2: Direct DJP submission (enterprise only) — ✅ shipped 2026-11-05 (see §9.3 Phase 2 note below)
 
 ### 9.3 e-Faktur PPN Compliance (Implemented July 2026)
 
@@ -886,10 +886,10 @@ Indonesia's DJP (Direktorat Jenderal Pajak) requires PKP businesses to issue ele
 - Nav item filtered by `NavigationServiceProvider` plan feature check
 - The e-Faktur system is jurisdiction-gated via NavigationServiceProvider. The `tax_jurisdiction` field on Tenant controls feature visibility. Routes remain accessible via direct URL for Professional+ tenants regardless of jurisdiction.
 
-**Future (Phase 2):**
-- PJAP API direct submission via Klikpajak (`PjapInterface` contract)
-- Real-time approval/rejection status from DJP
-- Enterprise-only premium automation
+**Phase 2 (completed 2026-11-05):**
+- PJAP API direct submission via Klikpajak (`PjapInterface` contract) — `SubmitFakturPajakJob` / `PollFakturPajakStatusJob` on the dedicated `tax-submissions` queue
+- Approval/rejection status polled from DJP (30s first poll, 5 min re-poll, 10 attempts)
+- Enterprise-only premium automation (`efaktur_api` slug; requires the tenant's separate Mekari Klikpajak subscription — CSV export remains the free fallback on every plan)
 
 **PPN Masukan (Input VAT on Purchases):**
 - `po` snapshot fields: `ppn_enabled` (bool), `ppn_rate` (nullable decimal), `ppn_amount` (decimal, default 0)

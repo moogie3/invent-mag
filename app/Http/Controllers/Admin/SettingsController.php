@@ -32,6 +32,11 @@ class SettingsController extends Controller
             'auto_logout_time' => 'required|numeric|min:0',
             'data_refresh_rate' => 'required|integer|min:0',
             'system_language' => 'required|in:en,id',
+            // Optional: present only when the Tax Region section renders
+            // (starter plan hides it). The select itself lives outside
+            // this form — a hidden field inside mirrors its value so
+            // "Save Settings" persists the jurisdiction too.
+            'tax_jurisdiction' => 'nullable|string|in:,ID',
         ]);
 
         $checkboxFields = [
@@ -51,6 +56,16 @@ class SettingsController extends Controller
         ];
 
         $settingsToSave = $validatedData;
+
+        // tax_jurisdiction is a tenant attribute, not a per-user system
+        // setting — strip it before merging into system_settings and apply
+        // it to the tenant with the same guard as the AJAX endpoint.
+        $jurisdictionProvided = $request->has('tax_jurisdiction');
+        $jurisdictionResult = null;
+        if ($jurisdictionProvided) {
+            $jurisdictionResult = $this->applyTaxJurisdiction($validatedData['tax_jurisdiction'] ?? null);
+        }
+        unset($settingsToSave['tax_jurisdiction']);
 
         foreach ($checkboxFields as $field) {
             $settingsToSave[$field] = $request->input($field) ? true : false;
@@ -93,11 +108,22 @@ class SettingsController extends Controller
             // never block settings save for logging failure
         }
 
-        if ($request->ajax()) {
-            return response()->json(['success' => true, 'message' => 'System settings updated successfully.', 'settings' => $settingsToSave]);
+        // Settings save proceeds even when the jurisdiction change was
+        // refused by the safeguard — but the message must say so, otherwise
+        // a success toast would claim a jurisdiction change that never
+        // happened (the exact bug this path fixes).
+        $message = 'System settings updated successfully.';
+        if ($jurisdictionResult !== null && ! $jurisdictionResult['success']) {
+            $message .= ' '.$jurisdictionResult['message'];
+        } elseif ($jurisdictionResult['changed'] ?? false) {
+            $message .= ' '.__('messages.tax_jurisdiction_saved');
         }
 
-        return redirect()->route('admin.setting.index')->with('success', 'System settings updated successfully.');
+        if ($request->ajax()) {
+            return response()->json(['success' => true, 'message' => $message, 'settings' => $settingsToSave]);
+        }
+
+        return redirect()->route('admin.setting.index')->with('success', $message);
     }
 
     public function getSettings()
@@ -138,26 +164,61 @@ class SettingsController extends Controller
 
     public function updateTaxJurisdiction(Request $request)
     {
-        $tenant = app('currentTenant');
-
         $validated = $request->validate([
             'tax_jurisdiction' => 'nullable|string|max:10',
         ]);
 
-        $jurisdiction = $validated['tax_jurisdiction'] ?: null;
+        $result = $this->applyTaxJurisdiction($validated['tax_jurisdiction'] ?? null);
+
+        if (! $result['success']) {
+            return response()->json([
+                'success' => false,
+                'message' => $result['message'],
+            ], 422);
+        }
+
+        if ($request->ajax()) {
+            return response()->json([
+                'success' => true,
+                'message' => $result['message'],
+            ]);
+        }
+
+        return redirect()->route('admin.setting.index')->with('success', $result['message']);
+    }
+
+    /**
+     * Apply a tax-jurisdiction change, enforcing the ID→None safeguard.
+     *
+     * Shared by updateTaxJurisdiction() (the AJAX select) and update()
+     * (the hidden field mirrored into the main settings form) so both
+     * save paths apply identical rules — before this, only the select
+     * handled the field and the main form silently dropped it.
+     *
+     * @return array{success: bool, changed: bool, message: string}
+     */
+    private function applyTaxJurisdiction(?string $jurisdiction): array
+    {
+        /** @var \App\Models\Tenant $tenant */
+        $tenant = app('currentTenant');
+
+        $jurisdiction = $jurisdiction ?: null;
 
         // Block switching away from ID if draft FakturPajak or unissued PPN sales exist
         if ($tenant->tax_jurisdiction === 'ID' && $jurisdiction !== 'ID') {
             $check = $tenant->canDisableIndonesianJurisdiction();
             if (! $check['safe']) {
-                return response()->json([
-                    'success' => false,
-                    'message' => $check['message'],
-                ], 422);
+                return ['success' => false, 'changed' => false, 'message' => $check['message']];
             }
         }
 
-        $tenant->update(['tax_jurisdiction' => $jurisdiction]);
+        // Idempotent: a Save Settings click that didn't touch the select
+        // still posts the current value — skip the write and the extra
+        // "jurisdiction saved" note in the toast.
+        $changed = ($tenant->tax_jurisdiction ?? null) !== $jurisdiction;
+        if ($changed) {
+            $tenant->update(['tax_jurisdiction' => $jurisdiction]);
+        }
 
         if ($jurisdiction === 'ID') {
             $created = app(TaxService::class)->ensureIndonesianDefaults($tenant);
@@ -169,14 +230,7 @@ class SettingsController extends Controller
             }
         }
 
-        if ($request->ajax()) {
-            return response()->json([
-                'success' => true,
-                'message' => __('messages.tax_jurisdiction_saved'),
-            ]);
-        }
-
-        return redirect()->route('admin.setting.index')->with('success', __('messages.tax_jurisdiction_saved'));
+        return ['success' => true, 'changed' => $changed, 'message' => __('messages.tax_jurisdiction_saved')];
     }
 
     public function updateThemeMode(Request $request)

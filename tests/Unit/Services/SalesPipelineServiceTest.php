@@ -3,6 +3,7 @@
 namespace Tests\Unit\Services;
 
 use App\Models\Customer;
+use App\Models\JournalEntry;
 use App\Models\PipelineStage;
 use App\Models\Product;
 use App\Models\Sales;
@@ -217,6 +218,51 @@ class SalesPipelineServiceTest extends TestCase
         $this->assertDatabaseHas('sales', ['sales_opportunity_id' => $opportunity->id]);
         $this->assertDatabaseHas('sales_opportunities', ['id' => $opportunity->id, 'status' => 'converted', 'sales_id' => $salesOrder->id]);
         $this->assertEquals(8, $product->fresh()->stock_quantity);
+    }
+
+    #[Test]
+    public function it_posts_a_balanced_invoice_journal_on_conversion()
+    {
+        $opportunity = SalesOpportunity::factory()->hasItems(1, ['quantity' => 2, 'price' => 100])->create(['status' => 'won']);
+        $product = Product::find($opportunity->items->first()->product_id);
+        $product->update(['price' => 40]); // unit cost for COGS
+        $product->productWarehouses()->first()->update(['quantity' => 10]);
+
+        $salesOrder = $this->salesPipelineService->convertToSalesOrder($opportunity);
+
+        // The PPh columns are now written explicitly like every other sales
+        // writer — off, because the pipeline has no withholding selection.
+        $this->assertFalse($salesOrder->pph_enabled);
+        $this->assertEqualsWithDelta(0, $salesOrder->pph_amount, 0.01);
+        // Test tenant is not Indonesian → no PPN snapshot either.
+        $this->assertFalse($salesOrder->ppn_enabled);
+        $this->assertEqualsWithDelta(0, $salesOrder->ppn_amount, 0.01);
+
+        $journal = JournalEntry::where('sourceable_type', Sales::class)
+            ->where('sourceable_id', $salesOrder->id)
+            ->where('description', 'Sale Invoice #'.$salesOrder->invoice)
+            ->first();
+
+        $this->assertNotNull($journal, 'Pipeline conversion must post a journal entry');
+
+        $settings = $this->tenant->accounting_settings;
+        $this->assertEqualsWithDelta(
+            $journal->transactions()->where('type', 'debit')->sum('amount'),
+            $journal->transactions()->where('type', 'credit')->sum('amount'),
+            0.01,
+            'Journal must balance'
+        );
+
+        // No default tax in this test: revenue = 2 × 100
+        $this->assertEqualsWithDelta(200, $journal->transactions()->where('account_id', $settings['accounts_receivable_account_id'])->where('type', 'debit')->sum('amount'), 0.01);
+        $this->assertEqualsWithDelta(200, $journal->transactions()->where('account_id', $settings['sales_revenue_account_id'])->where('type', 'credit')->sum('amount'), 0.01);
+
+        // Dr COGS / Cr Inventory at product cost: 2 × 40 = 80 — GL inventory
+        // now moves with the physical stock the conversion decrements.
+        $this->assertEqualsWithDelta(80, $journal->transactions()->where('account_id', $settings['cost_of_goods_sold_account_id'])->where('type', 'debit')->sum('amount'), 0.01);
+        $this->assertEqualsWithDelta(80, $journal->transactions()->where('account_id', $settings['inventory_account_id'])->where('type', 'credit')->sum('amount'), 0.01);
+
+        $this->assertSame(1, JournalEntry::where('sourceable_type', Sales::class)->where('sourceable_id', $salesOrder->id)->count());
     }
 
     #[Test]

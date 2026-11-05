@@ -76,7 +76,7 @@
                             </div>
                             <div>
                                 <h3 class="mb-1 fw-bold fs-4">3. Operations</h3>
-                                <p class="text-secondary mb-0">Manage daily tasks: <strong>Purchase Orders, Sales, Returns, POS, and Pipeline</strong>.</p>
+                                <p class="text-secondary mb-0">Manage daily tasks: <strong>Purchase Orders, Sales, Returns, POS, Pipeline, and e-Faktur (PPN)</strong>.</p>
                             </div>
                         </div>
 

@@ -162,20 +162,76 @@
                     </div>
                 </div>
 
-                {{-- Phase 2 notice --}}
-                <div class="card border-0 shadow-sm rounded-3 border-start border-warning border-3">
-                    <div class="card-body py-3">
-                        <div class="d-flex align-items-start gap-3">
-                            <i class="ti ti-clock fs-3 text-warning"></i>
-                            <div>
-                                <div class="fw-semibold">{{ __('messages.efaktur_klikpajak_coming_soon') }}</div>
-                                <div class="text-muted small">
-                                    {{ __('messages.efaktur_klikpajak_desc') }}
+                {{-- Phase 2 — Klikpajak PJAP credentials (Enterprise: efaktur_api) --}}
+                @planHas('efaktur_api')
+                    <div class="card border-0 shadow-sm rounded-3">
+                        <div class="card-header">
+                            <h3 class="card-title mb-0">
+                                <i class="ti ti-cloud-upload me-2 text-muted"></i>
+                                {{ __('messages.efaktur_klikpajak_title') }}
+                            </h3>
+                        </div>
+                        <div class="card-body">
+                            <p class="text-muted small mb-3">{{ __('messages.efaktur_klikpajak_card_hint') }}</p>
+
+                            {{-- Separate form: only the Klikpajak fields are posted,
+                                 so saving credentials never touches jurisdiction/PKP data --}}
+                            <form method="POST" action="{{ route('admin.efaktur.settings.save') }}">
+                                @csrf
+                                <div class="mb-3">
+                                    <label class="form-label fw-semibold" for="klikpajak_api_key">{{ __('messages.efaktur_klikpajak_api_key') }}</label>
+                                    <input type="text" name="klikpajak_api_key" id="klikpajak_api_key"
+                                        class="form-control font-monospace @error('klikpajak_api_key') is-invalid @enderror"
+                                        value="{{ old('klikpajak_api_key', $tenant->klikpajak_api_key) }}"
+                                        placeholder="Client-ID / API Key"
+                                        autocomplete="off">
+                                    @error('klikpajak_api_key')<div class="invalid-feedback">{{ $message }}</div>@enderror
+                                    <div class="form-text">{{ __('messages.efaktur_klikpajak_api_key_hint') }}</div>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label fw-semibold" for="klikpajak_secret">{{ __('messages.efaktur_klikpajak_secret') }}</label>
+                                    <input type="password" name="klikpajak_secret" id="klikpajak_secret"
+                                        class="form-control @error('klikpajak_secret') is-invalid @enderror"
+                                        value="{{ old('klikpajak_secret', $tenant->klikpajak_secret) }}"
+                                        placeholder="••••••••••••••••"
+                                        autocomplete="new-password">
+                                    @error('klikpajak_secret')<div class="invalid-feedback">{{ $message }}</div>@enderror
+                                </div>
+
+                                <div class="mb-3">
+                                    {{-- Hidden "0" first: unchecked boxes post nothing, this keeps the field present --}}
+                                    <input type="hidden" name="klikpajak_use_sandbox" value="0">
+                                    <div class="form-check form-switch">
+                                        <input class="form-check-input" type="checkbox" name="klikpajak_use_sandbox" id="klikpajak_use_sandbox" value="1"
+                                            {{ old('klikpajak_use_sandbox', $tenant->klikpajak_use_sandbox ?? true) ? 'checked' : '' }}>
+                                        <label class="form-check-label fw-semibold" for="klikpajak_use_sandbox">
+                                            {{ __('messages.efaktur_klikpajak_sandbox') }}
+                                        </label>
+                                    </div>
+                                    <div class="form-text">{{ __('messages.efaktur_klikpajak_sandbox_hint') }}</div>
+                                </div>
+
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="ti ti-device-floppy me-1"></i>{{ __('messages.efaktur_save_settings') }}
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                @else
+                    {{-- Professional plan: ppn without efaktur_api --}}
+                    <div class="card border-0 shadow-sm rounded-3 border-start border-primary border-3">
+                        <div class="card-body py-3">
+                            <div class="d-flex align-items-start gap-3">
+                                <i class="ti ti-cloud-off fs-3 text-primary"></i>
+                                <div>
+                                    <div class="fw-semibold">{{ __('messages.efaktur_klikpajak_enterprise_only') }}</div>
+                                    <div class="text-muted small">{{ __('messages.efaktur_klikpajak_enterprise_hint') }}</div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                </div>
+                @endplanHas
             </div>
         </div>
         </div>

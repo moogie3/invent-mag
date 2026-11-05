@@ -146,7 +146,7 @@
             <span class="text-muted small text-uppercase fw-bold">{{ __('messages.condition_now') }}</span>
             {{-- Soft pill matching the page's bg-*-lt badge language; opened
                  by financial-health.js (inline handlers are blocked by CSP). --}}
-            <button type="button" class="btn btn-sm rounded-pill bg-primary-lt text-primary fh-compare-all" id="fhCompareAllBtn">
+            <button type="button" class="btn btn-sm rounded-pill bg-primary-lt text-primary fh-soft-action fh-compare-all" id="fhCompareAllBtn">
                 <i class="ti ti-arrows-left-right me-1"></i>{{ __('messages.compare_all') }}
             </button>
         </div>
@@ -352,9 +352,10 @@
                                         @endif
                                         {{-- Soft pill matching the Compare-all
                                              button, tinted by the item's own
-                                             severity so it sits in the same
-                                             bg-*-lt language as the row icon. --}}
-                                        <a href="{{ $item['url'] }}" class="btn btn-sm rounded-pill bg-{{ $tone }}-lt text-{{ $tone }}">{{ $item['link_label'] }}</a>
+                                             severity; fh-soft-action adds the
+                                             border + hover that make it read
+                                             as a button, not a badge. --}}
+                                        <a href="{{ $item['url'] }}" class="btn btn-sm rounded-pill bg-{{ $tone }}-lt text-{{ $tone }} fh-soft-action">{{ $item['link_label'] }}</a>
                                     </div>
                                 </div>
                             @endforeach

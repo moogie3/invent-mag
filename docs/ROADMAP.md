@@ -14,8 +14,8 @@
 2. [Current Feature State & Plan Tiers](#2-current-feature-state--plan-tiers)
 3. [Immediate Frontend / Marketing Fixes](#3-immediate-frontend--marketing-fixes)
 4. [e-Faktur & PPN Compliance — Full Robust Implementation](#4-e-faktur--ppn-compliance--full-robust-implementation)
-   - [Phase 1 — PPN Foundation & Faktur Pajak](#phase-1--ppn-foundation--faktur-pajak-estimated-3-4-weeks)
-   - [Phase 2 — PJAP API Direct Submission](#phase-2--pjap-api-direct-submission-estimated-3-4-weeks)
+   - [Phase 1 — PPN Foundation & Faktur Pajak](#phase-1--ppn-foundation--faktur-pajak--completed-july-2026)
+   - [Phase 2 — PJAP API Direct Submission](#phase-2--pjap-api-direct-submission--completed-2026-11-05)
 5. [Other Planned Features](#5-other-planned-features)
 6. [Competitive Positioning](#6-competitive-positioning)
 7. [Architecture Decisions](#7-architecture-decisions)
@@ -43,9 +43,9 @@ This section documents the actual architecture so all future development stays s
 - Feature check: `$tenant->hasFeature('accounting')` → checks JSON array
 - Route-level guard: `->middleware('plan.feature:accounting')` → `CheckPlanFeature` middleware
 - Blade-level guard: `@planHas('accounting') ... @endPlanHas`
-- Feature slugs currently in use (verified against `database/seeders/PlanSeeder.php` + route middleware): `accounting`, `pos`, `crm`, `sales_pipeline`, `stock_opname`, `sales_returns`, `purchase_returns`, `hr`, `cash_flow`, `quotations`, `ppn`, `financial_reports`, `multi_currency`, `sales_forecasting`, `api_access`, `audit_compliance`, `bank_reconciliation` (+ non-gated baseline slugs: `products`, `inventory`, `sales`, `purchases`, `invoices`, `dashboard`, `basic_reports`, `customers`, `suppliers`)
+- Feature slugs currently in use (verified against `database/seeders/PlanSeeder.php` + route middleware): `accounting`, `pos`, `crm`, `sales_pipeline`, `stock_opname`, `sales_returns`, `purchase_returns`, `hr`, `cash_flow`, `quotations`, `ppn`, `efaktur_api`, `financial_reports`, `multi_currency`, `sales_forecasting`, `api_access`, `audit_compliance`, `bank_reconciliation` (+ non-gated baseline slugs: `products`, `inventory`, `sales`, `purchases`, `invoices`, `dashboard`, `basic_reports`, `customers`, `suppliers`)
 - **Plan gating is enforced at the route layer** (`->middleware('plan.feature:<slug>')` on each route group) and controller layer for dashboard widgets (sales forecasting). Every Professional/Enterprise feature is verified gated by `tests/Feature/Admin/PlanFeatureGateTest.php` (15 tests — blocked/allowed per tier, JSON 403 for API clients, legacy no-plan full access). The dead `feature_routes` map was removed from `config/plans.php` in Aug 2026.
-- **New e-Faktur feature slug to add (Phase 2)**: `efaktur_api` (Enterprise only) — `ppn` (Phase 1) is already added to Professional & Enterprise plans
+- **e-Faktur feature slug (Phase 2) — ADDED 2026-11-05**: `efaktur_api` (Enterprise only), via migration `2026_11_04_000001_add_efaktur_api_feature_to_plans.php` — `ppn` (Phase 1) is already added to Professional & Enterprise plans
 - How to add a feature to a plan: migration that updates the JSON array (see `2026_04_18_071144_add_stock_opname_feature_to_plans.php` as pattern)
 
 ### 1.3 The "Invoice" Model is `Sales`
@@ -242,7 +242,7 @@ return $dompdf->stream('FP-' . $faktur->nsfp . '.pdf', ['Attachment' => false]);
 **Plan tier for e-Faktur:**
 - Phase 1 (PPN + Faktur Pajak PDF + CSV export): **Professional & Enterprise** — depends on accounting module
 - Phase 2 (PJAP API direct submission): **Enterprise** — premium automation
-- Feature slugs to add: `efaktur_api` (Phase 2) — `ppn` (Phase 1) already added
+- Feature slug: `efaktur_api` (Phase 2) — **added 2026-11-05**, Enterprise only; `ppn` (Phase 1) already added
 
 ---
 
@@ -1171,7 +1171,51 @@ Route::prefix('efaktur')->name('admin.efaktur.')->middleware(['plan.feature:ppn'
 
 ---
 
-### Phase 2 — PJAP API Direct Submission (Estimated: 3–4 weeks)
+### Phase 2 — PJAP API Direct Submission ✅ COMPLETED (2026-11-05)
+
+> **Implementation status (shipped 2026-11-05).** The
+> specification below was implemented as written in §2.1–§2.8, with seven
+> deliberate deviations from the illustrative snippets (full rationale and
+> the 35-test matrix in `docs/CHANGELOG.md`, entry *2026-11-05*):
+>
+> | # | Snippet says | Shipped | Why |
+> |---|---|---|---|
+> | 1 | `handle(PjapInterface $pjap)` method injection | `Tenant::find(...)->makeCurrent()` + `app(PjapInterface::class)` inside `handle()` | queue workers have no HTTP tenant context; the container resolves the per-tenant binding before `handle()` runs |
+> | 2 | guard on `isSubmittable()` | `pjap_submission_id !== null \|\| status ∉ {draft, submitted}` | a `submitted` row **without** a submission id is a failed attempt being retried — `isSubmittable()` would swallow every retry (the `X-Idempotency-Key` makes the repeat safe) |
+> | 3 | `checkStatus()` returns a normalized array | throws on API failure | a failed check must retry, never fabricate a verdict or stamp `djp_response_at` with junk |
+> | 4 | `Authorization` + `X-Idempotency-Key` headers | plus `X-API-Secret` | Klikpajak requires the secret header |
+> | 5 | dispatch on the dedicated redis `tax` connection | `->onQueue('tax-submissions')` on the **default** connection; the `tax` connection ships as opt-in (`TAX_QUEUE_CONNECTION`) | existing workers and the sync test environment keep working; the §2.6 topology is one env var away |
+> | 6 | register in `config/app.php` `providers` | `bootstrap/providers.php` | Laravel 11+ moved the provider list |
+> | 7 | one settings form | the Klikpajak card posts on its own form; `saveSettings()` gates jurisdiction logic on `$request->has('tax_jurisdiction')` | the card sends no jurisdiction fields — without a key-presence gate every Klikpajak save would null the tenant's jurisdiction |
+>
+> **External dependency (by design):** Klikpajak is a **Mekari** product —
+> production submissions require the tenant's *own* active Mekari Klikpajak
+> subscription, billed separately from Invent-MAG (the settings card says
+> so). CSV export (Phase 1) remains free on every plan, and `PjapInterface`
+> keeps the provider swappable. **Before the first production call, verify
+> against Mekari's current API docs:** (a) which plan tier includes API
+> access, (b) the auth model — this build follows §2.3's
+> `Authorization: Bearer <api_key>` + `X-API-Secret`, *not* the older
+> "OAuth2 token" idea in `PPN_EVOLUTION.md`, (c) endpoint/payload field
+> names. Sandbox is the default (`klikpajak_use_sandbox = true`).
+>
+> **Deployment prerequisites:** (1) `php artisan migrate` (adds
+> `efaktur_api` to the Enterprise plan); (2) a queue worker listening on
+> the **`tax-submissions`** queue (default connection — or set
+> `TAX_QUEUE_CONNECTION=tax` and use the §2.6 supervisor block). Without a
+> listener, submissions sit in the queue. Note: `submitBatch()` and
+> `PjapInterface::cancel()` are **service-level only** today — no bulk
+> button or API-cancel UI yet (Phase 1 local cancel still handles the UI).
+>
+> **Provider swap procedure (code-level, deliberate):** every call site
+> knows only `PjapInterface`. To run a different PJAP: (1) add
+> `App\Services\Pjap\<Provider>Service implements PjapInterface`;
+> (2) return it from the binding closure in
+> `app/Providers/EFakturServiceProvider.php` (the single swap point);
+> (3) point the settings fields/labels (`klikpajak_*` columns, card copy)
+> at the new provider. No job, controller, route, or test changes. A
+> runtime UI provider selector is intentionally deferred until a second
+> provider actually exists.
 
 Phase 1 gives CSV export parity with Zahir Online. Phase 2 is the differentiator:
 - One-click "Submit ke DJP" button on Faktur Pajak detail page
@@ -1663,6 +1707,11 @@ Tax double-submissions to DJP are a legal problem. Protection at 5 levels:
 | Application | `isSubmittable()` check at job start — rejects if already submitted |
 | Database Transaction | `DB::transaction()` + `lockForUpdate()` on NSFP allocation |
 
+**As implemented (2026-11-05):** the application-layer guard is the wider
+`pjap_submission_id !== null || status ∉ {draft, submitted}` (deviation 2
+in the status block above) — a `submitted` row without a submission id is a
+failed retry and must fall through, not be rejected.
+
 ---
 
 ## 5. Other Planned Features
@@ -1863,7 +1912,7 @@ Tax double-submissions to DJP are a legal problem. Protection at 5 levels:
 | Multi-currency | ❌ | ✅ | ✅ (paid add-on) |
 | AI Sales Forecasting | ❌ | ✅ Enterprise | ❌ |
 | e-Faktur CSV + PDF | ✅ Completed | ✅ Completed | ✅ (CSV only) |
-| e-Faktur Direct API | 🔜 Phase 2 | 🔜 Phase 2 | ❌ |
+| e-Faktur Direct API (Klikpajak) | ❌ | ✅ Enterprise | ❌ |
 | REST API | ❌ | ✅ Enterprise | ❌ |
 | Free Trial | 30 days | 30 days | 30 days |
 
@@ -1873,11 +1922,11 @@ Tax double-submissions to DJP are a legal problem. Protection at 5 levels:
 3. CRM & sales pipeline (unique in this price range)
 4. AI Sales Forecasting — Holt-Winters (unique in Indonesian ERP market)
 5. RESTful API (Enterprise)
-6. Post Phase 2: one-click DJP submission vs Zahir's manual CSV
+6. One-click DJP submission (Phase 2, shipped Nov 2026) vs Zahir's manual CSV
 
 **Gaps to address:**
 1. ~~Only 7-day trial vs Zahir's 30-day~~ ✅ **30-day trial implemented (July 2026)**
-2. e-Faktur Phase 2 (PJAP API direct submission) not yet live — Phase 1 (CSV + PDF) complete = Zahir parity, Phase 2 = superior
+2. ~~e-Faktur Phase 2 not yet live~~ ✅ **Phase 2 shipped Nov 2026** — one-click DJP submission via Mekari Klikpajak (Enterprise; requires the tenant's separate Klikpajak subscription), superior to Zahir's manual CSV
 3. Zahir has been in market since 1999 (brand trust gap — takes time to close)
 
 ---

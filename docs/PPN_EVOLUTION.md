@@ -21,7 +21,7 @@
 12. [Faktur Pajak Lifecycle](#faktur-pajak-lifecycle)
 13. [What Was Changed (Complete File List)](#what-was-changed-complete-file-list)
 14. [Key Files Reference](#key-files-reference)
-15. [Phase 2: PJAP API (Planned)](#phase-2-pjap-api-planned)
+15. [Phase 2: PJAP API (Completed)](#phase-2-pjap-api-completed)
 16. [PPh (Withholding Tax) Implementation](#pph-withholding-tax-implementation)
 17. [Remaining Backlog](#remaining-backlog)
 
@@ -777,22 +777,22 @@ Quick-reference for files most relevant to PPN/e-Faktur implementation and the P
 
 ---
 
-## Phase 2: PJAP API (Planned)
+## Phase 2: PJAP API (Completed)
 
-Phase 2 will integrate directly with DJP via **Klikpajak PJAP** (Application Service Provider), eliminating the need for CSV export and the desktop e-Faktur application.
+Phase 2 (completed **2026-11-05**) integrates directly with DJP via **Klikpajak PJAP** (Application Service Provider), eliminating the need for CSV export and the desktop e-Faktur application. Enterprise-only (`efaktur_api` slug); production use requires the tenant's **own Mekari Klikpajak subscription** (separate from Invent-MAG — CSV export stays free on every plan). Full implementation notes and the seven spec deviations: `docs/CHANGELOG.md` entry *2026-11-05*; deployment prerequisites: ROADMAP §4 Phase 2 status block.
 
-### Planned Deliverables
+### Deliverables (status as shipped 2026-11-05)
 
-| #   | Deliverable             | Description                                          |
-| --- | ----------------------- | ---------------------------------------------------- |
-| 1   | PJAP API client service | HTTP client for Klikpajak REST API                   |
-| 2   | OAuth2 token management | Auto-refresh DJP authentication tokens               |
-| 3   | Faktur Pajak submission | One-click submit from web UI                         |
-| 4   | Status polling          | Auto-update FP status from DJP                       |
-| 5   | Faktur Pengganti        | Replacement invoice flow                             |
-| 6   | Pembatalan via API      | Cancel FP through API instead of manually            |
-| 7   | NSFP auto-allocation    | Fetch NSFP numbers from DJP instead of manual import |
-| 8   | Batch submission        | Submit multiple FP in one API call                   |
+| #   | Deliverable             | Description                                          | Status |
+| --- | ----------------------- | ---------------------------------------------------- | ------ |
+| 1   | PJAP API client service | HTTP client for Klikpajak REST API                   | ✅ `app/Services/Pjap/KlikpajakService.php` |
+| 2   | OAuth2 token management | Auto-refresh DJP authentication tokens               | ❌ not implemented — the build uses `Authorization: Bearer <api_key>` + `X-API-Secret` per ROADMAP §2.3; verify Mekari's current auth model before first production call |
+| 3   | Faktur Pajak submission | One-click submit from web UI                         | ✅ "Submit ke DJP" button → queued `SubmitFakturPajakJob` |
+| 4   | Status polling          | Auto-update FP status from DJP                       | ✅ `PollFakturPajakStatusJob` (30s first poll, 5 min re-poll, 10 attempts) |
+| 5   | Faktur Pengganti        | Replacement invoice flow                             | ❌ not implemented |
+| 6   | Pembatalan via API      | Cancel FP through API instead of manually            | ✅ service-level (`PjapInterface::cancel`) — UI still uses the Phase 1 local cancel |
+| 7   | NSFP auto-allocation    | Fetch NSFP numbers from DJP instead of manual import | ❌ not implemented (manual NSFP import remains) |
+| 8   | Batch submission        | Submit multiple FP in one API call                   | ✅ service-level (`submitBatch`) — no bulk UI button yet |
 
 ### API Flow
 
@@ -811,6 +811,16 @@ Update FakturPajak.status = 'submitted'
     ↓
 Store DJP reference number
 ```
+
+> **As built (2026-11-05):** the real flow is
+> `POST admin/efaktur/{faktur}/submit` → `SubmitFakturPajakJob` (queue
+> `tax-submissions`) → `KlikpajakService::submit()` — `POST {base}/v1/faktur/upload`
+> with `Authorization: Bearer <api_key>` + `X-API-Secret` +
+> `X-Idempotency-Key` — then `PollFakturPajakStatusJob` (30s first poll,
+> 5 min re-poll) normalizing the verdict to `approved`/`rejected`/`pending`
+> with `djp_reference_number`. There is **no `KlikpajakClient` class and no
+> OAuth2 token step** in the shipped build (see the Phase 2 status block in
+> ROADMAP §4); the diagram above is the original planned flow.
 
 ---
 
@@ -883,7 +893,7 @@ All three reuse the existing universal `is_pph` mechanism. No separate engines o
 | -------------------------- | ------------- | ------------------------ |
 | ~~Bank Reconciliation~~        | Professional+ | ✅ DONE Aug 2026 (CSV-based; variance gate, entry locking, reconciled badges) |
 | Advanced Multi-Currency    | Professional+ | Planned                  |
-| e-Faktur Phase 2: PJAP API | Enterprise    | Planned (8 deliverables) |
+| ~~e-Faktur Phase 2: PJAP API~~ | Enterprise    | ✅ DONE Nov 2026 (core submit/poll/cancel/batch in code; OAuth2, Faktur Pengganti, NSFP auto-fetch not implemented) |
 
 ### MEDIUM Priority
 

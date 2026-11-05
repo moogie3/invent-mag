@@ -3,6 +3,7 @@
 namespace Tests\Unit\Services;
 
 use App\Models\Account;
+use App\Models\JournalEntry;
 use App\Models\Product;
 use App\Models\Sales;
 use App\Models\SalesReturn;
@@ -253,6 +254,133 @@ class SalesReturnServiceTest extends TestCase
         ];
 
         $this->salesReturnService->updateSalesReturn($salesReturn, $updateData);
+    }
+
+    public function test_it_reverses_ppn_from_original_journal_net_base()
+    {
+        $this->tenant->update(['tax_jurisdiction' => 'ID']);
+
+        $ppnKeluaranAccount = Account::create([
+            'name' => 'PPN Keluaran '.$this->tenant->id,
+            'code' => '2130-'.$this->tenant->id,
+            'type' => 'liability',
+            'tenant_id' => $this->tenant->id,
+        ]);
+        $this->tenant->update([
+            'accounting_settings' => array_merge(
+                $this->tenant->accounting_settings ?? [],
+                ['ppn_keluaran_account_id' => $ppnKeluaranAccount->id]
+            ),
+        ]);
+
+        // Parent sale: subtotal 200 + PPN 11% = 222 gross, VAT already
+        // recognised at sale creation (Dr AR 222 / Cr Revenue 200 /
+        // Cr PPN Keluaran 22) — exactly what SalesService now posts.
+        $this->sale->update([
+            'ppn_enabled' => true,
+            'ppn_rate' => 11.0,
+            'ppn_amount' => 22.0,
+            'tax_rate' => 11,
+            'tax_type' => 'exclusive',
+            'total' => 222.0,
+        ]);
+
+        $this->sale->salesItems()->create([
+            'product_id' => $this->product->id,
+            'quantity' => 2,
+            'price' => 100,
+            'customer_price' => 100,
+            'discount' => 0,
+            'total' => 200,
+        ]);
+
+        $settings = $this->tenant->accounting_settings;
+        $originalJournal = JournalEntry::create([
+            'date' => now(),
+            'description' => 'Sale Invoice #'.$this->sale->invoice,
+            'sourceable_id' => $this->sale->id,
+            'sourceable_type' => Sales::class,
+            'status' => 'posted',
+        ]);
+        $originalJournal->transactions()->create([
+            'account_id' => $settings['accounts_receivable_account_id'],
+            'type' => 'debit',
+            'amount' => 222.0,
+        ]);
+        $originalJournal->transactions()->create([
+            'account_id' => $settings['sales_revenue_account_id'],
+            'type' => 'credit',
+            'amount' => 200.0,
+        ]);
+        $originalJournal->transactions()->create([
+            'account_id' => $ppnKeluaranAccount->id,
+            'type' => 'credit',
+            'amount' => 22.0,
+        ]);
+
+        $captured = [];
+        $this->accountingServiceMock
+            ->shouldReceive('createJournalEntry')
+            ->once()
+            ->with(
+                Mockery::any(),
+                Mockery::any(),
+                Mockery::on(function ($transactions) use (&$captured) {
+                    $captured[] = $transactions;
+
+                    return true;
+                }),
+                Mockery::any()
+            );
+
+        // Full return of the 200 net — ratio must be measured against the
+        // ORIGINAL journal's revenue credit (200), not sale->total (222).
+        $returnData = [
+            'sales_id' => $this->sale->id,
+            'return_date' => Carbon::now()->format('Y-m-d'),
+            'reason' => 'Full return',
+            'status' => 'Completed',
+            'items' => json_encode([
+                ['product_id' => $this->product->id, 'returned_quantity' => 2, 'price' => 100],
+            ]),
+        ];
+
+        $salesReturn = $this->salesReturnService->createSalesReturn($returnData);
+
+        $this->assertEquals(200, $salesReturn->total_amount);
+        $this->assertCount(1, $captured);
+
+        $transactions = $captured[0];
+
+        // Full VAT reversal (22), not 200/222 × 22 = 19.82, and not the
+        // silent zero the broken account_name read produced.
+        $this->assertEquals(
+            22.0,
+            $this->sumTransactions($transactions, $ppnKeluaranAccount->name, 'debit')
+        );
+        // Revenue fully reversed for the returned goods
+        $this->assertEquals(
+            200.0,
+            $this->sumTransactions($transactions, Account::find($settings['sales_revenue_account_id'])->name, 'debit')
+        );
+        // AR credited for goods (200) + the reversed VAT (22)
+        $this->assertEquals(
+            222.0,
+            $this->sumTransactions($transactions, Account::find($settings['accounts_receivable_account_id'])->name, 'credit')
+        );
+    }
+
+    /** Sum transaction amounts matching an account name and direction. */
+    private function sumTransactions(array $transactions, string $accountName, string $type): float
+    {
+        $sum = 0.0;
+        foreach ($transactions as $transaction) {
+            if ($transaction['account_name'] === $accountName && $transaction['type'] === $type) {
+                $sum += (float) $transaction['amount'];
+            }
+        }
+
+        return $sum;
     }
 
     protected function tearDown(): void

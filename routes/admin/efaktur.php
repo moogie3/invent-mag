@@ -23,4 +23,10 @@ Route::prefix('efaktur')->name('admin.efaktur.')->middleware(['plan.feature:ppn'
     Route::get('/{fakturPajak}', [EFakturController::class, 'show'])->name('show');
     Route::get('/{fakturPajak}/print', [EFakturController::class, 'print'])->name('print');
     Route::post('/{fakturPajak}/cancel', [EFakturController::class, 'cancel'])->name('cancel');
+
+    // Phase 2 — PJAP API direct submission (DJP via Klikpajak).
+    // One tier above 'ppn': Enterprise only (feature slug efaktur_api).
+    Route::post('/{fakturPajak}/submit', [EFakturController::class, 'submitToDjp'])
+        ->middleware('plan.feature:efaktur_api')
+        ->name('submit');
 });

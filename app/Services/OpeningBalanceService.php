@@ -47,13 +47,24 @@ class OpeningBalanceService
     }
 
     /**
-     * Get all existing opening balances.
+     * Get all existing opening balances, optionally for a single date.
      */
-    public function getAllOpeningBalances(): Collection
+    public function getAllOpeningBalances(?string $balanceDate = null): Collection
     {
-        return OpeningBalance::with('account')
-            ->orderBy('balance_date', 'desc')
-            ->get();
+        $query = OpeningBalance::with('account')
+            ->orderBy('balance_date', 'desc');
+
+        // whereDate() rather than where(): balance_date is cast to 'date', so
+        // the driver binds it as '2026-01-01 00:00:00'. A MySQL DATE column
+        // truncates that (matches), SQLite stores it verbatim (does not).
+        // Filtering here also avoids Collection->where(), which compares a
+        // Carbon against the 'Y-m-d' string with loose equality and never
+        // matches — leaving the setup form permanently blank on every driver.
+        if ($balanceDate) {
+            $query->whereDate('balance_date', $balanceDate);
+        }
+
+        return $query->get();
     }
 
     /**
@@ -152,10 +163,10 @@ class OpeningBalanceService
         try {
             DB::transaction(function () use ($balances, $balanceDate, $notes, $validation, $openingBalanceEquity) {
                 // Delete existing opening balances for the same date
-                OpeningBalance::where('balance_date', $balanceDate)->delete();
+                OpeningBalance::whereDate('balance_date', $balanceDate)->delete();
 
                 // Delete existing opening balance journal entries for the same date
-                JournalEntry::where('date', $balanceDate)
+                JournalEntry::whereDate('date', $balanceDate)
                     ->where('entry_type', JournalEntry::ENTRY_TYPE_OPENING)
                     ->delete();
 
@@ -251,15 +262,15 @@ class OpeningBalanceService
         try {
             DB::transaction(function () use ($balanceDate) {
                 // Delete opening balance journal entries
-                JournalEntry::where('date', $balanceDate)
+                JournalEntry::whereDate('date', $balanceDate)
                     ->where('entry_type', JournalEntry::ENTRY_TYPE_OPENING)
                     ->delete();
 
                 // Delete opening balance records
-                OpeningBalance::where('balance_date', $balanceDate)->delete();
+                OpeningBalance::whereDate('balance_date', $balanceDate)->delete();
 
                 // Reset account opening balance fields
-                Account::where('opening_balance_date', $balanceDate)->update([
+                Account::whereDate('opening_balance_date', $balanceDate)->update([
                     'opening_balance' => 0,
                     'opening_balance_date' => null,
                 ]);
@@ -285,7 +296,7 @@ class OpeningBalanceService
         $query = OpeningBalance::with('account');
 
         if ($balanceDate) {
-            $query->where('balance_date', $balanceDate);
+            $query->whereDate('balance_date', $balanceDate);
         }
 
         $balances = $query->get();

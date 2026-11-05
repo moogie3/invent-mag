@@ -5,10 +5,8 @@ namespace App\Services;
 use App\Helpers\SalesHelper;
 use App\Models\Customer;
 use App\Models\PipelineStage;
-use App\Models\ProductWarehouse;
 use App\Models\Quotation;
 use App\Models\Sales;
-use App\Models\SalesItem;
 use App\Models\SalesOpportunity;
 use App\Models\SalesPipeline;
 use App\Models\Tax;
@@ -365,6 +363,12 @@ class SalesPipelineService
                 }
             }
 
+            // PPN snapshot — same gate as createSale(). PPh stays off: the
+            // pipeline has no withholding-tax selection (identical to
+            // createSale() when no pph_tax_id is supplied), but the columns
+            // are written explicitly like every other sales writer.
+            $ppnApplied = app('currentTenant')->isIndonesian() && ($tax?->is_ppn ?? false);
+
             $salesOrder = Sales::create([
                 'invoice' => $invoice,
                 'customer_id' => $opportunity->customer_id,
@@ -383,45 +387,31 @@ class SalesPipelineService
                 'status' => 'Unpaid',
                 'type' => Sales::TYPE_REGULAR,
                 'sales_opportunity_id' => $opportunity->id,
+                'customer_credit_used' => 0,
                 'notes' => $opportunity->notes,
                 'terms_conditions' => $opportunity->terms_conditions,
+                'ppn_enabled' => $ppnApplied,
+                'ppn_rate' => $ppnApplied ? $taxRate : null,
+                'ppn_amount' => $ppnApplied ? $taxAmount : 0,
+                'pph_enabled' => false,
+                'pph_rate' => null,
+                'pph_amount' => 0,
+                'pph_tax_id' => null,
             ]);
 
-            foreach ($opportunityItems as $item) {
-                SalesItem::create([
-                    'sales_id' => $salesOrder->id,
-                    'product_id' => $item->product_id,
-                    'quantity' => $item->quantity,
-                    'discount' => 0,
-                    'discount_type' => 'fixed',
-                    'customer_price' => round($item->price),
-                    'total' => round($item->quantity * $item->price),
-                ]);
+            // Line items, stock movement, COGS and the sale journal in one
+            // step — previously this path decremented physical stock but
+            // posted no journal at all, so GL inventory drifted from
+            // physical inventory and revenue never reached the ledger.
+            $lineItems = $opportunityItems->map(fn ($item) => [
+                'product_id' => $item->product_id,
+                'quantity' => $item->quantity,
+                'price' => $item->price,
+                'discount' => 0,
+                'discount_type' => 'fixed',
+            ])->values()->all();
 
-                // Deduct from Main Warehouse pivot
-                $stockRecord = ProductWarehouse::where('product_id', $item->product_id)
-                    ->where('warehouse_id', $mainWarehouse->id)
-                    ->where('tenant_id', $opportunity->tenant_id ?? Auth::user()->tenant_id)
-                    ->first();
-
-                $currentStock = $stockRecord ? $stockRecord->quantity : 0;
-
-                if ($currentStock < $item->quantity) {
-                    throw new \Exception('Insufficient stock for product: '.$item->product->name.'. Available: '.$currentStock.', Requested: '.$item->quantity);
-                }
-
-                if ($stockRecord) {
-                    $stockRecord->decrement('quantity', $item->quantity);
-                } else {
-                    // This case shouldn't happen if validation passes, but create pivot if missing and allowed
-                    ProductWarehouse::create([
-                        'product_id' => $item->product_id,
-                        'warehouse_id' => $mainWarehouse->id,
-                        'quantity' => -$item->quantity,
-                        'tenant_id' => $opportunity->tenant_id ?? Auth::user()->tenant_id,
-                    ]);
-                }
-            }
+            app(SalesService::class)->finalizeConvertedSale($salesOrder, $lineItems);
 
             $opportunity->update([
                 'status' => 'converted',

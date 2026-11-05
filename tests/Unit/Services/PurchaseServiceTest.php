@@ -579,6 +579,99 @@ class PurchaseServiceTest extends TestCase
         $this->assertEquals(218.0, $purchase->fresh()->total);
     }
 
+    /**
+     * Non-Indonesian control for the test above: with the same PPh tax the
+     * total must stay at the gross 222, and the journal must carry only the
+     * Inventory/AP pair — no PPh Payable line for an amount never withheld.
+     */
+    #[Test]
+    public function test_it_does_not_apply_pph_for_non_indonesian_tenant()
+    {
+        $this->tenant->update(['tax_jurisdiction' => 'US']);
+        $this->assertFalse(app('currentTenant')->isIndonesian());
+
+        $pphTax = Tax::create([
+            'name' => 'PPh 23',
+            'rate' => 2,
+            'type' => 'exclusive',
+            'is_active' => true,
+            'is_pph' => true,
+        ]);
+
+        $pphPayableAccount = Account::where('code', '2150-'.$this->tenant->id)->first();
+        $this->assertNotNull($pphPayableAccount, 'PPh Payable account not found in seeder.');
+
+        $this->tenant->update([
+            'accounting_settings' => array_merge(
+                $this->tenant->accounting_settings ?? [],
+                ['pph_payable_account_id' => $pphPayableAccount->id]
+            ),
+        ]);
+
+        $supplier = Supplier::factory()->create();
+        $warehouse = Warehouse::factory()->create();
+        $product = Product::factory()->create();
+
+        ProductWarehouse::updateOrCreate(
+            ['product_id' => $product->id, 'warehouse_id' => $warehouse->id, 'tenant_id' => $product->tenant_id],
+            ['quantity' => 0]
+        );
+
+        $regularTax = Tax::create([
+            'name' => 'PPN 11%',
+            'rate' => 11,
+            'type' => 'exclusive',
+            'is_active' => true,
+            'is_default' => true,
+            'is_pph' => false,
+        ]);
+
+        $purchaseData = [
+            'invoice' => 'PO-NonID-001',
+            'supplier_id' => $supplier->id,
+            'warehouse_id' => $warehouse->id,
+            'order_date' => now()->toDateString(),
+            'due_date' => now()->addDays(30)->toDateString(),
+            'discount_total' => 0,
+            'discount_total_type' => 'fixed',
+            'tax_id' => $regularTax->id,
+            'pph_tax_id' => $pphTax->id,
+            'products' => json_encode([
+                ['product_id' => $product->id, 'quantity' => 2, 'price' => 100],
+            ]),
+        ];
+
+        $accountingSettings = app('currentTenant')->accounting_settings;
+        $inventoryAccountName = Account::find($accountingSettings['inventory_account_id'])->name;
+        $accountsPayableAccountName = Account::find($accountingSettings['accounts_payable_account_id'])->name;
+
+        // Subtotal 200, PPN 11% = 22 → gross 222. PPh 2% is NOT withheld for
+        // a non-ID tenant, so AP credits the full 222 (not 218) and there is
+        // no PPh Payable line to post.
+        $this->accountingServiceMock
+            ->shouldReceive('createJournalEntry')
+            ->once()
+            ->with(
+                'Purchase Order #PO-NonID-001',
+                Mockery::any(),
+                Mockery::on(function ($transactions) use ($inventoryAccountName, $accountsPayableAccountName) {
+                    $this->assertCount(2, $transactions);
+                    $this->assertEquals(222, $this->findTransactionAmount($transactions, $inventoryAccountName, 'debit'));
+                    $this->assertEquals(222, $this->findTransactionAmount($transactions, $accountsPayableAccountName, 'credit'));
+
+                    return true;
+                }),
+                Mockery::type(Purchase::class)
+            );
+
+        $purchase = $this->purchaseService->createPurchase($purchaseData);
+
+        $fresh = $purchase->fresh();
+        $this->assertEquals(0, (int) $fresh->pph_enabled);
+        $this->assertEquals(0.0, (float) $fresh->pph_amount);
+        $this->assertEquals(222.0, (float) $fresh->total, 'total must not shrink for a non-ID tenant');
+    }
+
     private function findTransactionAmount(array $transactions, string $accountName, string $type): ?float
     {
         foreach ($transactions as $transaction) {

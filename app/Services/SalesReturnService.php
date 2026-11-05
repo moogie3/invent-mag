@@ -229,9 +229,15 @@ class SalesReturnService
             }
 
             // Get original journal entry from the sale to calculate proportional COGS
+            // Read the original journal through the account relation:
+            // transactions store account_id, and Transaction has no
+            // account_name attribute — reading it directly always yielded
+            // null, zeroing the return ratio and silently skipping every
+            // proportional COGS/PPN/PPh reversal line.
             $originalJournalEntries = JournalEntry::where('sourceable_type', Sales::class)
                 ->where('sourceable_id', $sale->id)
                 ->where('status', 'posted')
+                ->with('transactions.account')
                 ->get();
 
             $originalSalesRevenueAmount = 0;
@@ -239,10 +245,10 @@ class SalesReturnService
 
             foreach ($originalJournalEntries as $journalEntry) {
                 foreach ($journalEntry->transactions as $transaction) {
-                    if ($transaction->account_name === $salesRevenueAccount->name && $transaction->type === 'credit') {
+                    if ($transaction->account?->name === $salesRevenueAccount->name && $transaction->type === 'credit') {
                         $originalSalesRevenueAmount = $transaction->amount;
                     }
-                    if ($transaction->account_name === $costOfGoodsSoldAccount->name && $transaction->type === 'debit') {
+                    if ($transaction->account?->name === $costOfGoodsSoldAccount->name && $transaction->type === 'debit') {
                         $originalCOGSAmount = $transaction->amount;
                     }
                 }
@@ -274,7 +280,11 @@ class SalesReturnService
                 if ($ppnKeluaranAccountId) {
                     $ppnKeluaranAccount = Account::find($ppnKeluaranAccountId);
                     if ($ppnKeluaranAccount) {
-                        $returnRatio = $totalAmount > 0 && $sale->total > 0 ? $totalAmount / $sale->total : 0;
+                        // Ratio against the ORIGINAL journal's revenue credit
+                        // (the net base this return's amount is denominated
+                        // in) — sale->total is gross of PPN, so dividing by it
+                        // under-reversed the VAT even on a full return.
+                        $returnRatio = $totalAmount > 0 && $originalSalesRevenueAmount > 0 ? $totalAmount / $originalSalesRevenueAmount : 0;
                         $proportionalPpn = round($sale->ppn_amount * $returnRatio, 2);
 
                         if ($proportionalPpn > 0) {
@@ -293,7 +303,8 @@ class SalesReturnService
                 if ($pphReceivableAccountId) {
                     $pphReceivableAccount = Account::find($pphReceivableAccountId);
                     if ($pphReceivableAccount) {
-                        $returnRatio = $totalAmount > 0 && $sale->total > 0 ? $totalAmount / $sale->total : 0;
+                        // Same net-base ratio as the PPN block above.
+                        $returnRatio = $totalAmount > 0 && $originalSalesRevenueAmount > 0 ? $totalAmount / $originalSalesRevenueAmount : 0;
                         $proportionalPph = round($sale->pph_amount * $returnRatio, 2);
                         if ($proportionalPph > 0) {
                             // Reverse original PPh: Dr AR / Cr PPh Receivable
@@ -683,9 +694,12 @@ class SalesReturnService
 
         $totalAmount = $salesReturn->total_amount;
 
+        // See createSalesReturn(): transactions store account_id only, so
+        // resolve names through the relation or the base amounts stay 0.
         $originalJournalEntries = JournalEntry::where('sourceable_type', Sales::class)
             ->where('sourceable_id', $sale->id)
             ->where('status', 'posted')
+            ->with('transactions.account')
             ->get();
 
         $originalSalesRevenueAmount = 0;
@@ -693,10 +707,10 @@ class SalesReturnService
 
         foreach ($originalJournalEntries as $journalEntry) {
             foreach ($journalEntry->transactions as $transaction) {
-                if ($transaction->account_name === $salesRevenueAccount->name && $transaction->type === 'credit') {
+                if ($transaction->account?->name === $salesRevenueAccount->name && $transaction->type === 'credit') {
                     $originalSalesRevenueAmount = $transaction->amount;
                 }
-                if ($transaction->account_name === $costOfGoodsSoldAccount->name && $transaction->type === 'debit') {
+                if ($transaction->account?->name === $costOfGoodsSoldAccount->name && $transaction->type === 'debit') {
                     $originalCOGSAmount = $transaction->amount;
                 }
             }
@@ -721,7 +735,9 @@ class SalesReturnService
             if ($ppnKeluaranAccountId) {
                 $ppnKeluaranAccount = Account::find($ppnKeluaranAccountId);
                 if ($ppnKeluaranAccount) {
-                    $returnRatio = $totalAmount > 0 && $sale->total > 0 ? $totalAmount / $sale->total : 0;
+                    // Net-base ratio (original revenue credit), not sale->total
+                    // which is gross of PPN — see createSalesReturn().
+                    $returnRatio = $totalAmount > 0 && $originalSalesRevenueAmount > 0 ? $totalAmount / $originalSalesRevenueAmount : 0;
                     $proportionalPpn = round($sale->ppn_amount * $returnRatio, 2);
 
                     if ($proportionalPpn > 0) {
@@ -738,7 +754,8 @@ class SalesReturnService
             if ($pphReceivableAccountId) {
                 $pphReceivableAccount = Account::find($pphReceivableAccountId);
                 if ($pphReceivableAccount) {
-                    $returnRatio = $totalAmount > 0 && $sale->total > 0 ? $totalAmount / $sale->total : 0;
+                    // Net-base ratio — see createSalesReturn().
+                    $returnRatio = $totalAmount > 0 && $originalSalesRevenueAmount > 0 ? $totalAmount / $originalSalesRevenueAmount : 0;
                     $proportionalPph = round($sale->pph_amount * $returnRatio, 2);
                     if ($proportionalPph > 0) {
                         // Reverse original PPh: Dr AR / Cr PPh Receivable

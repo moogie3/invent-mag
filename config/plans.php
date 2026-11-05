@@ -30,6 +30,7 @@ return [
         'cash_flow' => 'Cash Flow Statement',
         'quotations' => 'Quotations',
         'ppn' => 'e-Faktur PPN (Indonesian Tax Invoice)',
+        'efaktur_api' => 'e-Faktur Direct API Submission (DJP via Klikpajak)',
 
         'sales_forecasting' => 'Sales Forecasting (Holt-Winters)',
         'api_access' => 'RESTful API Access',
@@ -62,6 +63,7 @@ return [
         'hr' => 'The HR Module (Employees, Attendance & Payroll) is available on the Professional plan and above.',
         'quotations' => 'Quotations are available on the Professional plan and above.',
         'ppn' => 'e-Faktur PPN compliance is available on the Professional plan and above.',
+        'efaktur_api' => 'Direct DJP submission via Klikpajak is available on the Enterprise plan.',
         'bank_reconciliation' => 'Bank Reconciliation is available on the Professional plan and above.',
         'shopee_import' => 'Shopee Product Import is available on the Enterprise plan.',
     ],

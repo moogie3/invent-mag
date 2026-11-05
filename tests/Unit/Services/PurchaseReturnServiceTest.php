@@ -2,6 +2,8 @@
 
 namespace Tests\Unit\Services;
 
+use App\Models\Account;
+use App\Models\JournalEntry;
 use App\Models\POItem;
 use App\Models\Product;
 use App\Models\ProductWarehouse;
@@ -62,6 +64,154 @@ class PurchaseReturnServiceTest extends TestCase
         $this->assertArrayHasKey('total_returns', $data);
         $this->assertArrayHasKey('total_amount', $data);
         $this->assertEquals(5, $data['total_returns']);
+    }
+
+    #[Test]
+    public function test_it_reverses_ppn_masukan_and_pph_payable_from_original_journal()
+    {
+        $this->tenant->update(['tax_jurisdiction' => 'ID']);
+
+        $ppnMasukanAccount = Account::create([
+            'name' => 'PPN Masukan '.$this->tenant->id,
+            'code' => '1160-'.$this->tenant->id,
+            'type' => 'asset',
+            'tenant_id' => $this->tenant->id,
+        ]);
+        $pphPayableAccount = Account::create([
+            'name' => 'PPh Payable '.$this->tenant->id,
+            'code' => '2140-'.$this->tenant->id,
+            'type' => 'liability',
+            'tenant_id' => $this->tenant->id,
+        ]);
+        $this->tenant->update([
+            'accounting_settings' => array_merge(
+                $this->tenant->accounting_settings ?? [],
+                [
+                    'ppn_masukan_account_id' => $ppnMasukanAccount->id,
+                    'pph_payable_account_id' => $pphPayableAccount->id,
+                ]
+            ),
+        ]);
+
+        // Create a stock record so the service can decrement
+        ProductWarehouse::firstOrCreate(
+            [
+                'product_id' => $this->product->id,
+                'warehouse_id' => $this->purchase->warehouse_id,
+                'tenant_id' => $this->purchase->tenant_id,
+            ],
+            ['quantity' => 50]
+        );
+
+        POItem::firstOrCreate(
+            ['po_id' => $this->purchase->id, 'product_id' => $this->product->id],
+            [
+                'quantity' => 10,
+                'remaining_quantity' => 10,
+                'price' => 100,
+                'total' => 1000,
+                'discount' => 0,
+                'discount_type' => 'fixed',
+            ]
+        );
+
+        // Original purchase journal as PurchaseService posts it:
+        // subtotal 200 + PPN 11% (22) − PPh 2% (4) → AP 218.
+        //   Dr Inventory 200 / Dr PPN Masukan 22 / Cr PPh Payable 4 / Cr AP 218
+        $settings = $this->tenant->accounting_settings;
+        $originalJournal = JournalEntry::create([
+            'date' => now(),
+            'description' => 'Purchase '.$this->purchase->invoice,
+            'sourceable_id' => $this->purchase->id,
+            'sourceable_type' => Purchase::class,
+            'status' => 'posted',
+        ]);
+        $originalJournal->transactions()->create([
+            'account_id' => $settings['inventory_account_id'],
+            'type' => 'debit',
+            'amount' => 200.0,
+        ]);
+        $originalJournal->transactions()->create([
+            'account_id' => $ppnMasukanAccount->id,
+            'type' => 'debit',
+            'amount' => 22.0,
+        ]);
+        $originalJournal->transactions()->create([
+            'account_id' => $pphPayableAccount->id,
+            'type' => 'credit',
+            'amount' => 4.0,
+        ]);
+        $originalJournal->transactions()->create([
+            'account_id' => $settings['accounts_payable_account_id'],
+            'type' => 'credit',
+            'amount' => 218.0,
+        ]);
+
+        $captured = [];
+        $this->accountingServiceMock
+            ->shouldReceive('createJournalEntry')
+            ->once()
+            ->with(
+                Mockery::any(),
+                Mockery::any(),
+                Mockery::on(function ($transactions) use (&$captured) {
+                    $captured[] = $transactions;
+
+                    return true;
+                }),
+                Mockery::any()
+            );
+
+        // Full return of the 200 net
+        $returnData = [
+            'purchase_id' => $this->purchase->id,
+            'return_date' => now()->format('Y-m-d'),
+            'reason' => 'Full return',
+            'status' => 'Completed',
+            'items' => json_encode([
+                ['product_id' => $this->product->id, 'returned_quantity' => 2, 'price' => 100, 'return_price' => 100],
+            ]),
+        ];
+
+        $purchaseReturn = $this->purchaseReturnService->createPurchaseReturn($returnData);
+
+        $this->assertEquals(200, $purchaseReturn->total_amount);
+        $this->assertCount(1, $captured);
+
+        $transactions = $captured[0];
+
+        // The input VAT asset and the withholding liability must be
+        // reversed proportionally — before the account_name fix these
+        // reads always resolved to null, so no reversal lines were
+        // ever emitted and both accounts stayed permanently overstated.
+        $this->assertEquals(
+            22.0,
+            $this->sumTransactions($transactions, $ppnMasukanAccount->name, 'credit')
+        );
+        $this->assertEquals(
+            4.0,
+            $this->sumTransactions($transactions, $pphPayableAccount->name, 'debit')
+        );
+        // AP: debit for goods (200) + VAT no longer owed (22), credit for
+        // the withholding owed again (4) → net debit 218 = the original AP.
+        $apName = Account::find($settings['accounts_payable_account_id'])->name;
+        $this->assertEquals(
+            218.0,
+            $this->sumTransactions($transactions, $apName, 'debit')
+                - $this->sumTransactions($transactions, $apName, 'credit')
+        );
+    }
+
+    private function sumTransactions(array $transactions, string $accountName, string $type): float
+    {
+        $sum = 0.0;
+        foreach ($transactions as $transaction) {
+            if ($transaction['account_name'] === $accountName && $transaction['type'] === $type) {
+                $sum += (float) $transaction['amount'];
+            }
+        }
+
+        return $sum;
     }
 
     #[Test]

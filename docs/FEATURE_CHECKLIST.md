@@ -191,7 +191,7 @@
 - [x] Probability scoring
 - [x] Expected close dates
 - [x] Quotation / Estimate PDF Generation
-- [x] Pipeline conversion to sales orders
+- [x] Pipeline conversion to sales orders — **both paths journal at conversion (Nov 2026):** `SalesService::finalizeConvertedSale()` posts exactly what `createSale()` posts (FIFO COGS, VAT split, PPh withholding, stock check) for quotation- and pipeline-converted sales alike
 - [x] Stage progression tracking
 - [x] Opportunity product associations
 
@@ -502,7 +502,7 @@
 - [x] **PPN Masukan (Input VAT) on Purchases** — `ppn_enabled/rate/amount` snapshot fields on `po`; PPN Masukan debited to Input VAT asset account (1160) instead of capitalizing into inventory; `ppn_masukan_account_id` wired into accounting settings (seeder + backfill + registration); select on Accounting Settings page
 - [x] **SPT Masa PPN summary includes PPN Masukan** — `EFakturService::getSptMasaSummary()` now returns `total_ppn_masukan`, `net_ppn_payable` and `ppn_credit` from `po` records (auto-scoped to tenant, filtered by period + `ppn_enabled`)
 - [x] **PPN Keluaran recognized at sale creation (Phase 1E)** — VAT split journal (`Dr AR gross / Cr Revenue net / Cr PPN Keluaran`) posted in `SalesService::createSale()` and `PosService` for Indonesian PPN sales; Faktur Pajak generation no longer posts a PPN journal (compliance-only); sales returns reverse PPN without requiring a Faktur Pajak
-- [ ] **Phase 2 — PLANNED:** Klikpajak PJAP API direct DJP submission (Enterprise only)
+- [x] **Phase 2 — DONE (Nov 2026):** Klikpajak PJAP API direct DJP submission (Enterprise only, `efaktur_api` slug) — `PjapInterface` contract + `KlikpajakService`, `SubmitFakturPajakJob`/`PollFakturPajakStatusJob` on the `tax-submissions` queue, "Submit ke DJP" button on the faktur detail page, Klikpajak settings card (requires the tenant's separate Mekari Klikpajak subscription); 35 tests, deviations documented in CHANGELOG 2026-11-05
 
 ---
 
@@ -638,7 +638,7 @@
 
 - [x] Bank reconciliation — completed (Aug 2026): CSV import (BCA/Mandiri/BNI/BRI), auto-match (±5 days, exact amount), manual match, variance gate (0.005), reconciliation lock (blocked journal reversals/voids/unposts), "Terekonsiliasi" badges, opening-balance prefill
 - [ ] Advanced multi-currency (real-time rates)
-- [ ] e-Faktur Phase 2: PJAP API (Klikpajak direct DJP submission)
+- [x] e-Faktur Phase 2: PJAP API (Klikpajak direct DJP submission) — completed Nov 2026 (Enterprise-gated via `efaktur_api`; see ROADMAP §4 Phase 2 status block)
 
 ### Medium Priority
 

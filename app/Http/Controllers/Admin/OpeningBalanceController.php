@@ -24,8 +24,7 @@ class OpeningBalanceController extends Controller
         $accounts = $this->openingBalanceService->getAccountsForSetup();
         $balanceDate = $request->input('date', Carbon::now()->startOfMonth()->toDateString());
 
-        $existingBalances = $this->openingBalanceService->getAllOpeningBalances()
-            ->where('balance_date', $balanceDate)
+        $existingBalances = $this->openingBalanceService->getAllOpeningBalances($balanceDate)
             ->keyBy('account_id')
             ->toArray();
 

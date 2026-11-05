@@ -193,24 +193,43 @@ class PurchaseReturnService
             $inventoryAccount = Account::find($accountingSettings['inventory_account_id'] ?? null);
             $accountsPayableAccount = Account::find($accountingSettings['accounts_payable_account_id'] ?? null);
             $purchaseAccount = Account::find($accountingSettings['cost_of_goods_sold_account_id'] ?? null); // Use COGS account for Purchase
+            // Optional tax accounts — only used to reverse what the original
+            // purchase actually posted (see below).
+            $ppnMasukanAccount = Account::find($accountingSettings['ppn_masukan_account_id'] ?? null);
+            $pphPayableAccount = Account::find($accountingSettings['pph_payable_account_id'] ?? null);
 
             if (! $inventoryAccount || ! $accountsPayableAccount || ! $purchaseAccount) {
                 throw new \Exception('Required accounts (Inventory, Accounts Payable, Purchases) not found for Purchase Return. Please check Accounting Settings.');
             }
 
             // Get original journal entry from the purchase to calculate proportional amounts
+            // Read the original journal through the account relation:
+            // transactions store account_id, and Transaction has no
+            // account_name attribute — reading it directly always yielded
+            // null, so the PPN Masukan/PPh Payable reversals (and the
+            // proportional COGS lines) never fired.
             $originalJournalEntries = JournalEntry::where('sourceable_type', Purchase::class)
                 ->where('sourceable_id', $purchase->id)
                 ->where('status', 'posted')
+                ->with('transactions.account')
                 ->get();
 
             $originalPurchaseAmount = 0;
+            $originalPpnMasukanAmount = 0;
+            $originalPphPayableAmount = 0;
 
             foreach ($originalJournalEntries as $journalEntry) {
                 foreach ($journalEntry->transactions as $transaction) {
-                    if ($transaction->account_name === $inventoryAccount->name && $transaction->type === 'debit') {
+                    if ($originalPurchaseAmount === 0 && $transaction->account?->name === $inventoryAccount->name && $transaction->type === 'debit') {
                         $originalPurchaseAmount = $transaction->amount;
-                        break 2;
+                    }
+                    // What the original purchase actually booked to input VAT
+                    // and withholding — reversed proportionally further down.
+                    if ($ppnMasukanAccount && $originalPpnMasukanAmount === 0 && $transaction->account?->name === $ppnMasukanAccount->name && $transaction->type === 'debit') {
+                        $originalPpnMasukanAmount = $transaction->amount;
+                    }
+                    if ($pphPayableAccount && $originalPphPayableAmount === 0 && $transaction->account?->name === $pphPayableAccount->name && $transaction->type === 'credit') {
+                        $originalPphPayableAmount = $transaction->amount;
                     }
                 }
             }
@@ -238,6 +257,38 @@ class PurchaseReturnService
                 // Reduce Inventory (items returned from stock)
                 ['account_name' => $inventoryAccountName, 'type' => 'credit', 'amount' => $proportionalPurchase],
             ];
+
+            // PPN Masukan reversal: the original purchase debited the input
+            // VAT asset (Dr Inventory net / Dr PPN Masukan / Cr AP gross), so
+            // a return credits PPN Masukan back proportionally and debits AP
+            // for the VAT portion no longer owed — the mirror image of the
+            // PPN Keluaran reversal in SalesReturnService. Without this, a
+            // returned purchase left the input VAT asset (and the payable
+            // reduction) permanently overstated. Only reverses what the
+            // original journal actually posted.
+            if ($originalPpnMasukanAmount > 0) {
+                $proportionalPpn = round($originalPpnMasukanAmount * $returnRatio, 2);
+                if ($proportionalPpn > 0) {
+                    // Cr. PPN Masukan (reduce input VAT asset)
+                    $transactions[] = ['account_name' => $ppnMasukanAccount->name, 'type' => 'credit', 'amount' => $proportionalPpn];
+                    // Dr. AP (this VAT is no longer owed to the supplier)
+                    $transactions[] = ['account_name' => $accountsPayableAccountName, 'type' => 'debit', 'amount' => $proportionalPpn];
+                }
+            }
+
+            // PPh Payable reversal: the original purchase credited the
+            // withholding liability (less was withheld from the supplier
+            // payment), so a return debits it back and credits AP for the
+            // amount owed again.
+            if ($originalPphPayableAmount > 0) {
+                $proportionalPph = round($originalPphPayableAmount * $returnRatio, 2);
+                if ($proportionalPph > 0) {
+                    // Dr. PPh Payable (reverse the withholding liability)
+                    $transactions[] = ['account_name' => $pphPayableAccount->name, 'type' => 'debit', 'amount' => $proportionalPph];
+                    // Cr. AP (the withheld amount is owed again)
+                    $transactions[] = ['account_name' => $accountsPayableAccountName, 'type' => 'credit', 'amount' => $proportionalPph];
+                }
+            }
 
             $this->accountingService->createJournalEntry(
                 "Purchase Return for PO #{$purchase->invoice}",

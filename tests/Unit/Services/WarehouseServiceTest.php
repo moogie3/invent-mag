@@ -98,8 +98,11 @@ class WarehouseServiceTest extends TestCase
     #[Test]
     public function it_returns_error_if_updating_to_second_main_warehouse()
     {
-        Warehouse::factory()->create(['is_main' => true]);
-        $warehouse = Warehouse::factory()->create(['is_main' => false]);
+        // Pin explicit names: the factory draws from faker->word(), and
+        // updateWarehouse() checks duplicate names BEFORE the second-main
+        // check, so a random name collision would return the wrong error.
+        Warehouse::factory()->create(['is_main' => true, 'name' => 'Main Warehouse']);
+        $warehouse = Warehouse::factory()->create(['is_main' => false, 'name' => 'Branch Warehouse']);
         $data = ['is_main' => true, 'name' => $warehouse->name, 'address' => $warehouse->address, 'description' => $warehouse->description];
         $result = $this->warehouseService->updateWarehouse($warehouse, $data);
 

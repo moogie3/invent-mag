@@ -236,8 +236,11 @@ class PosService
         return DB::transaction(function () use ($data, $products, $dbProducts, $grandTotal, $orderDiscount, $orderDiscountType, $tax, $taxAmount, $taxRateVal, $taxId, $taxType, $mainWarehouse, $invoice, $amountReceived, $taxable) {
             $pphTaxId = $data['pph_tax_id'] ?? null;
             $pphTax = $pphTaxId ? Tax::find($pphTaxId) : null;
-            $pphTaxRate = $pphTax ? (float) $pphTax->rate : 0;
-            $pphAmount = SalesHelper::calculatePphAmount($taxable, $pphTaxRate);
+            // Gate like the snapshot below: for a non-Indonesian tenant the
+            // total must not shrink, since pph_amount is recorded as 0.
+            $pphApplied = app('currentTenant')->isIndonesian() && ($pphTax?->is_pph ?? false);
+            $pphTaxRate = $pphApplied && $pphTax ? (float) $pphTax->rate : 0;
+            $pphAmount = $pphApplied ? SalesHelper::calculatePphAmount($taxable, $pphTaxRate) : 0;
             // Update grandTotal to subtract PPh
             $grandTotal = max(0, $grandTotal - $pphAmount);
 

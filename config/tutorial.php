@@ -22,6 +22,9 @@ return [
                 ['icon' => 'ti-currency-dollar', 'label' => 'Currencies', 'route' => 'admin.setting.currency.edit'],
                 ['icon' => 'ti-building', 'label' => 'Company Profile', 'route' => 'admin.setting.profile.edit'],
                 ['icon' => 'ti-calculator', 'label' => 'Accounting Setup', 'route' => 'admin.setting.accounting'],
+                ['icon' => 'ti-bell-cog', 'label' => 'Notification Settings', 'route' => 'admin.setting.notifications'],
+                ['icon' => 'ti-crown', 'label' => 'Subscription Plan', 'route' => 'admin.setting.plan'],
+                ['icon' => 'ti-file-invoice', 'label' => 'e-Faktur Settings', 'route' => 'admin.efaktur.settings'],
             ],
         ],
         'masterdata' => [
@@ -53,6 +56,7 @@ return [
                 ['icon' => 'ti-arrow-back-up', 'label' => 'Purchase Returns', 'route' => 'admin.por.index'],
                 ['icon' => 'ti-chart-line', 'label' => 'Sales Pipeline', 'route' => 'admin.sales_pipeline.index'],
                 ['icon' => 'ti-clipboard-check', 'label' => 'Stock Opname', 'route' => 'admin.stock-opname.index'],
+                ['icon' => 'ti-file-invoice', 'label' => 'e-Faktur (PPN)', 'route' => 'admin.efaktur.index'],
             ],
         ],
         'accounting' => [
@@ -107,6 +111,7 @@ return [
                 ['icon' => 'ti-shield-lock', 'label' => 'Audit Log', 'route' => 'admin.audit-log.index'],
                 ['icon' => 'ti-users', 'label' => 'User Management', 'route' => 'admin.users.index'],
                 ['icon' => 'ti-database', 'label' => 'Backup', 'route' => 'admin.setting.backup.index'],
+                ['icon' => 'ti-bell', 'label' => 'Notifications', 'route' => 'admin.notifications'],
             ],
         ],
     ],

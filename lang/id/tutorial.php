@@ -173,6 +173,10 @@ return [
     'view_all_topics' => 'Lihat Semua Topik',
     'next_view_topics' => 'Berikut: Lihat Topik',
     'back' => 'Kembali',
+    'skip_tutorial' => 'Lewati Tutorial',
+    'next' => 'Berikutnya',
+    'got_it' => 'Mengerti!',
+    'back_to_categories' => 'Kembali ke Kategori',
 
     // Sales Orders list
     'sales_orders' => 'Pesanan Penjualan',
@@ -769,7 +773,7 @@ return [
     'efaktur_faktur_info' => 'Informasi Faktur: Lihat nomor NSFP, tanggal faktur, masa pajak, invoice referensi, dan tarif PPN untuk Faktur Pajak ini.',
     'efaktur_seller_buyer' => 'Penjual & Pembeli: Informasi penjual (perusahaan Anda) dan pembeli di-snapshot saat Faktur Pajak dibuat dan tidak dapat diubah.',
     'efaktur_tax_summary' => 'Ringkasan Pajak: Lihat DPP (dasar pengenaan pajak), PPN (PPN keluaran), PPnBM (pajak barang mewah jika berlaku), dan total tagihan.',
-    'efaktur_djp_tracking' => 'Status DJP: Jika Faktur Pajak sudah disubmit ke DJP, Anda akan melihat tanggal submission dan nomor referensi DJP di sini.',
+    'efaktur_djp_tracking' => 'Status DJP: Di paket Enterprise dengan Klikpajak terkonfigurasi, gunakan tombol "Submit ke DJP" (kanan atas) untuk mengirim faktur draft langsung ke DJP — status diperbarui otomatis setelah DJP merespons. Setelah submit, tanggal submission dan nomor referensi DJP tampil di sini. Tanpa API, ekspor CSV lalu impor ke aplikasi desktop DJP.',
     'efaktur_items_table' => 'Tabel Item: Setiap item dari invoice penjualan asli ditampilkan dengan nama produk, harga satuan, jumlah, diskon, DPP, dan PPN.',
     'efaktur_print_cancel' => 'Cetak & Batalkan: Gunakan "Cetak PDF" untuk menghasilkan dokumen PDF yang sesuai standar DJP. "Batalkan" hanya tersedia untuk Faktur Pajak draft dan akan mengembalikan NSFP ke pool.',
 
@@ -783,7 +787,7 @@ return [
     'efaktur_ppn_rate' => 'Tarif PPN: Tarif PPN saat ini adalah 11% (berlaku sejak 1 April 2022). Ubah field ini jika DJP mengubah tarif di masa mendatang.',
     'efaktur_nsfp_pool' => 'Pool NSFP: NSFP (Nomor Seri Faktur Pajak) diperlukan untuk setiap Faktur Pajak. Impor dari portal DJP dalam jumlah banyak.',
     'efaktur_nsfp_import' => 'Import NSFP: Tempel nomor NSFP satu per baris dalam format XXX.XXX-YY.XXXXXXXX. Nomor duplikat dilewati otomatis. Impor NSFP sebelum membuat Faktur Pajak.',
-    'efaktur_klikpajak' => 'Klikpajak API (Segera Hadir): Phase 2 akan menambahkan submission langsung ke DJP via PJAP Klikpajak, sehingga tidak perlu mengunduh file CSV atau menggunakan aplikasi desktop.',
+    'efaktur_klikpajak' => 'Klikpajak API (Submission Langsung ke DJP): Simpan API key dan secret yang diterbitkan oleh Mekari Klikpajak untuk mengaktifkan submit Faktur Pajak draft langsung ke DJP satu klik — tanpa unduh CSV, tanpa aplikasi desktop e-Faktur. Aktifkan sakelar sandbox untuk menguji ke sandbox DJP sebelum produksi. Tersedia di paket Enterprise; tanpa itu Anda tetap dapat mengekspor CSV.',
 
     // General / Welcome
     'general_navigation' => 'Navigasi: Gunakan menu sidebar di kiri untuk menavigasi.',

@@ -186,8 +186,10 @@ class FinancialHealthControllerTest extends TestCase
 
         // Class order in the markup is fixed — assert against it directly
         // (attribute-quoted, so a stray match elsewhere can't pass).
+        // fh-soft-action is what makes it read as a button (border + hover)
+        // rather than a static badge.
         $this->assertStringContainsString(
-            'class="btn btn-sm rounded-pill bg-primary-lt text-primary fh-compare-all"',
+            'class="btn btn-sm rounded-pill bg-primary-lt text-primary fh-soft-action fh-compare-all"',
             $html
         );
     }

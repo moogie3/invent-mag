@@ -313,6 +313,58 @@ class PosServiceTest extends TestCase
         $this->assertEquals(216.0, $sale->fresh()->total);
     }
 
+    /**
+     * Non-Indonesian control for the test above: the same PPh tax must NOT
+     * reduce the total, because pph_amount is recorded as 0 — subtracting it
+     * anyway would make the total disagree with the snapshot on the same row.
+     */
+    #[Test]
+    public function it_does_not_apply_pph_on_pos_sale_when_tenant_not_indonesian()
+    {
+        $this->tenant->update(['tax_jurisdiction' => 'US']);
+        $this->assertFalse(app('currentTenant')->isIndonesian());
+
+        $pphTax = Tax::create([
+            'name' => 'PPh 23',
+            'rate' => 2,
+            'type' => 'exclusive',
+            'is_active' => true,
+            'is_pph' => true,
+        ]);
+
+        $user = User::factory()->create();
+        Auth::login($user);
+
+        $customer = Customer::factory()->create();
+        $product = Product::factory()->withStock(10)->create(['selling_price' => 100]);
+
+        $productsPayload = json_encode([
+            ['id' => $product->id, 'quantity' => 2, 'price' => 100],
+        ]);
+
+        $data = [
+            'products' => $productsPayload,
+            'customer_id' => $customer->id,
+            'transaction_date' => now()->format('Y-m-d'),
+            'payment_method' => 'Cash',
+            'discount_total' => 0,
+            'discount_total_type' => 'fixed',
+            'tax_id' => Tax::first()->id,
+            'pph_tax_id' => $pphTax->id,
+            'amount_received' => 300,
+        ];
+
+        $sale = $this->posService->createSale($data);
+
+        // Subtotal 200, tax 10% exclusive = 20. Ungated, PPh 2% of 200 = 4
+        // would have taken this to 216 while pph_amount stayed 0.
+        $fresh = $sale->fresh();
+        $this->assertEquals(220.0, (float) $fresh->total, 'total must not shrink for a non-ID tenant');
+        $this->assertEquals(0.0, (float) $fresh->pph_amount);
+        $this->assertFalse((bool) $fresh->pph_enabled);
+        $this->assertNull($fresh->pph_tax_id);
+    }
+
     #[Test]
     public function it_splits_vat_out_of_revenue_on_indonesian_ppn_pos_sale()
     {

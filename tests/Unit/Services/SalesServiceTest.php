@@ -567,6 +567,154 @@ class SalesServiceTest extends TestCase
     }
 
     #[Test]
+    public function it_books_receivable_at_gross_plus_pph_when_pph_applied()
+    {
+        $this->tenant->update(['tax_jurisdiction' => 'ID']);
+
+        $regularTax = Tax::create([
+            'name' => 'PPN 11%',
+            'rate' => 11,
+            'type' => 'exclusive',
+            'is_active' => true,
+            'is_default' => true,
+            'is_pph' => false,
+        ]);
+
+        $pphTax = Tax::create([
+            'name' => 'PPh 23',
+            'rate' => 2,
+            'type' => 'exclusive',
+            'is_active' => true,
+            'is_pph' => true,
+        ]);
+
+        $pphReceivableAccount = Account::create([
+            'name' => 'PPh Receivable '.$this->tenant->id,
+            'code' => '1150'.$this->tenant->id,
+            'type' => 'asset',
+            'tenant_id' => $this->tenant->id,
+        ]);
+        $this->tenant->update([
+            'accounting_settings' => array_merge(
+                $this->tenant->accounting_settings ?? [],
+                ['pph_receivable_account_id' => $pphReceivableAccount->id]
+            ),
+        ]);
+
+        $customer = Customer::factory()->create();
+        $warehouse = Warehouse::factory()->create(['is_main' => true]);
+        $product = Product::factory()->create(['price' => 50]);
+        ProductWarehouse::updateOrCreate(
+            ['product_id' => $product->id, 'warehouse_id' => $warehouse->id, 'tenant_id' => $product->tenant_id],
+            ['quantity' => 10]
+        );
+
+        $products = json_encode([
+            ['product_id' => $product->id, 'quantity' => 2, 'customer_price' => 100, 'discount' => 0, 'discount_type' => 'fixed'],
+        ]);
+        $data = [
+            'products' => $products,
+            'customer_id' => $customer->id,
+            'warehouse_id' => $warehouse->id,
+            'order_date' => now()->toDateString(),
+            'due_date' => now()->addMonth()->toDateString(),
+            'tax_id' => $regularTax->id,
+            'pph_tax_id' => $pphTax->id,
+        ];
+
+        // Subtotal 200, PPN 11% = 22, PPh 2% = 4.
+        // grandTotal = 200 + 22 − 4 = 218; the customer owes the GROSS
+        // 222 before the withholding entry credits AR back by 4.
+        $accountingSettings = app('currentTenant')->accounting_settings;
+        $salesRevenueAccountName = Account::find($accountingSettings['sales_revenue_account_id'])->name;
+        $accountsReceivableAccountName = Account::find($accountingSettings['accounts_receivable_account_id'])->name;
+        $pphReceivableAccountName = Account::find($accountingSettings['pph_receivable_account_id'])->name;
+
+        $captured = [];
+        $this->accountingServiceMock
+            ->shouldReceive('createJournalEntry')
+            ->twice()
+            ->with(
+                Mockery::any(),
+                Mockery::any(),
+                Mockery::on(function ($transactions) use (&$captured) {
+                    $captured[] = $transactions;
+
+                    return true;
+                }),
+                Mockery::type(Sales::class)
+            );
+
+        $sale = $this->salesService->createSale($data);
+
+        $this->assertEquals(218.0, $sale->fresh()->total);
+        $this->assertEquals(4.0, $sale->fresh()->pph_amount);
+
+        $this->assertCount(2, $captured);
+
+        // Main entry: AR debited at the GROSS the customer owes (222),
+        // not at the net-of-withholding total — otherwise the separate
+        // withholding entry (Cr AR 4) deducts the PPh twice.
+        $this->assertEquals(222.0, $this->findTransactionAmount($captured[0], $accountsReceivableAccountName, 'debit'));
+        $this->assertEquals(222.0, $this->findTransactionAmount($captured[0], $salesRevenueAccountName, 'credit'));
+
+        // Withholding entry: Dr PPh Receivable / Cr AR for exactly the PPh.
+        $this->assertEquals(4.0, $this->findTransactionAmount($captured[1], $pphReceivableAccountName, 'debit'));
+        $this->assertEquals(4.0, $this->findTransactionAmount($captured[1], $accountsReceivableAccountName, 'credit'));
+    }
+
+    #[Test]
+    public function it_does_not_shrink_total_with_pph_on_update_when_tenant_not_indonesian()
+    {
+        $pphTax = Tax::create([
+            'name' => 'PPh 23',
+            'rate' => 2,
+            'type' => 'exclusive',
+            'is_active' => true,
+            'is_pph' => true,
+        ]);
+
+        $warehouse = Warehouse::factory()->create();
+        $product = Product::factory()->create();
+        ProductWarehouse::updateOrCreate(
+            ['product_id' => $product->id, 'warehouse_id' => $warehouse->id, 'tenant_id' => $product->tenant_id],
+            ['quantity' => 10]
+        );
+
+        $sale = Sales::factory()->create(['warehouse_id' => $warehouse->id]);
+        SalesItem::factory()->create(['sales_id' => $sale->id, 'product_id' => $product->id, 'quantity' => 1]);
+        ProductWarehouse::where('product_id', $product->id)
+            ->where('warehouse_id', $warehouse->id)
+            ->update(['quantity' => 9]);
+
+        $products = json_encode([
+            ['product_id' => $product->id, 'quantity' => 2, 'customer_price' => 100, 'discount' => 0, 'discount_type' => 'fixed'],
+        ]);
+        $data = [
+            'products' => $products,
+            'customer_id' => $sale->customer_id,
+            'warehouse_id' => $warehouse->id,
+            'order_date' => now()->toDateString(),
+            'due_date' => now()->addMonths(2)->toDateString(),
+            'pph_tax_id' => $pphTax->id,
+        ];
+
+        $this->salesService->updateSale($sale, $data);
+
+        $fresh = $sale->fresh();
+        // Subtotal 200, no tax — total must NOT shrink by the PPh amount,
+        // and the snapshot must record no withholding for a non-ID tenant.
+        // total_tax pins the jurisdiction filter too: without it the
+        // fallback would pick the PPh tax as the regular tax (4.0) and
+        // the ungated PPh would subtract it again — cancelling to 200.
+        $this->assertEquals(200.0, (float) $fresh->total);
+        $this->assertEquals(0.0, (float) $fresh->total_tax);
+        $this->assertEquals(0.0, (float) $fresh->pph_amount);
+        $this->assertFalse((bool) $fresh->pph_enabled);
+        $this->assertNull($fresh->pph_tax_id);
+    }
+
+    #[Test]
     public function it_does_not_store_pph_when_tenant_not_indonesian()
     {
         $pphTax = Tax::create([

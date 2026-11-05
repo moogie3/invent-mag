@@ -42,7 +42,9 @@ class NotificationServiceTest extends TestCase
         // Low stock product
         Product::factory()->withStock(5)->create(['low_stock_threshold' => 10]);
         // Expiring POItem
-        $product = Product::factory()->create();
+        // Fixed high stock vs threshold: a bare factory rolls random stock (0-1000)
+        // and threshold (5-20), which can land low-stock and add a 6th notification.
+        $product = Product::factory()->withStock(500)->create(['low_stock_threshold' => 10]);
         $purchase = Purchase::factory()->create(['due_date' => now()->addYear(), 'status' => 'Paid']);
         POItem::factory()->create(['product_id' => $product->id, 'po_id' => $purchase->id, 'expiry_date' => now()->addDays(20)]);
 

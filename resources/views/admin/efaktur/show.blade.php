@@ -23,6 +23,19 @@
                    class="btn btn-outline-secondary me-2">
                     <i class="ti ti-printer me-1"></i>{{ __('messages.efaktur_print_pdf') }}
                 </a>
+                {{-- Phase 2: one-click DJP submission via PJAP (Enterprise + configured) --}}
+                @planHas('efaktur_api')
+                    @if($fakturPajak->isSubmittable() && app('currentTenant')->klikpajak_api_key)
+                        <form method="POST" action="{{ route('admin.efaktur.submit', $fakturPajak) }}"
+                              class="d-inline me-2"
+                              onsubmit="return confirm('{{ __('messages.efaktur_confirm_submit') }}')">
+                            @csrf
+                            <button type="submit" class="btn btn-primary">
+                                <i class="ti ti-send me-1"></i>{{ __('messages.efaktur_submit_to_djp') }}
+                            </button>
+                        </form>
+                    @endif
+                @endplanHas
                 @if($fakturPajak->isSubmittable())
                     <form method="POST" action="{{ route('admin.efaktur.cancel', $fakturPajak) }}"
                           class="d-inline"

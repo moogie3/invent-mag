@@ -186,7 +186,7 @@ The `tenants` table (landlord migration) contains:
 | `pkp_status` | Whether the tenant is a PKP (VAT-registered) business |
 | `pkp_date` | Date of PKP registration |
 | `ppn_rate` | Default PPN rate (%) — defaults to `11.00` |
-| `klikpajak_api_key` | KlikPajak PJAP API key (Phase 2 — stored for future e-invoice submission) |
+| `klikpajak_api_key` | KlikPajak PJAP API key (Phase 2 — used by the live direct-submission flow) |
 | `klikpajak_secret` | KlikPajak PJAP API secret (Phase 2) |
 | `klikpajak_use_sandbox` | Whether KlikPajak calls use the sandbox environment (Phase 2) |
 | `tax_jurisdiction` | `ID` or null — set to `ID` enables Indonesian tax enforcement (PPN/PPh) |
@@ -363,7 +363,7 @@ The navigation config (`config/navigation.php`) has a `plan_feature` key per men
 | `stock_opname, accounting, crm, sales_pipeline, financial_reports, multi_currency, hr, cash_flow, quotations, ppn, bank_reconciliation` | ✗ | ✓ | ✓ |
 | `sales_forecasting, api_access, audit_compliance` | ✗ | ✗ | ✓ |
 
-Note: `efaktur_api` (e-Faktur Phase 2 — PJAP direct DJP submission) is an **Enterprise-only** slug planned but not yet live; `ppn` (Phase 1 — Faktur Pajak PDF + DJP CSV) is already on Professional & Enterprise. See ROADMAP §4.
+Note: `efaktur_api` (e-Faktur Phase 2 — PJAP direct DJP submission) is an **Enterprise-only** slug, live since 2026-11-05 (migration `2026_11_04_000001`); `ppn` (Phase 1 — Faktur Pajak PDF + DJP CSV) is already on Professional & Enterprise. See ROADMAP §4.
 
 **Backward compatibility:** Tenants without a plan assigned (legacy tenants) get enterprise-level access. The config key `plans.legacy_full_access = true` controls this behavior.
 
@@ -1645,7 +1645,7 @@ Used when a deal is won without a formal quote — the opportunity is converted 
 ```
 SalesOpportunity → Quotation → Sales (via quotation.converted_to_sales_id on conversion)
 ```
-Used when a formal PDF quote is issued. The `SalesOpportunity::quotations()` hasMany relationship links opportunities to multiple quotations (e.g., a revised quote after negotiation). When a quotation status transitions to `Accepted` and is "Converted" (`QuotationController::convert()` — only `accepted` quotations qualify), a `Sales` record is created and the quotation is set to `status = converted` with `converted_to_sales_id` pointing at the new sales order (`Quotation::convertedToSales()` relationship).
+Used when a formal PDF quote is issued. The `SalesOpportunity::quotations()` hasMany relationship links opportunities to multiple quotations (e.g., a revised quote after negotiation). When a quotation status transitions to `Accepted` and is "Converted" (`QuotationController::convert()` — only `accepted` quotations qualify), a `Sales` record is created and the quotation is set to `status = converted` with `converted_to_sales_id` pointing at the new sales order (`Quotation::convertedToSales()` relationship). Since Nov 2026 the conversion also posts the sale's journal immediately via `SalesService::finalizeConvertedSale()` — identical to `createSale()` (same stock check, FIFO COGS, PPN split, PPh withholding), so a converted sale is financially indistinguishable from a directly-created one.
 
 **Why both paths are needed:** Some deals are won verbally and then billed directly (no document trail needed). Others require a formal written quote for procurement approval on the customer's side. Forcing all deals through the quotation path would add unnecessary friction to fast-moving sales. Both paths eventually produce a `Sales` record, which is the canonical financial document.
 
@@ -1909,7 +1909,7 @@ sale.isPpn()               ← derived helper on Sale model
 
 1. **Sale creation — PPN recognized at creation, not at Faktur issuance (Phase 1E).** When the tenant `isIndonesian()`, the selected tax has `is_ppn = true`, and `ppn_keluaran_account_id` is configured, `SalesService::createSale()` posts the **5-leg VAT-split journal**: `Dr AR gross / Cr Revenue net / Cr PPN Keluaran / Dr COGS / Cr Inventory`. Revenue is booked **net of VAT** (this resolved the "revenue booked gross" audit caveat). If the PPN Keluaran account is missing it falls back to the legacy 4-leg gross journal — no crash. `PosService` applies the identical split for Indonesian PPN sales.
 2. **Faktur Pajak generation is compliance-only** — since Phase 1E it posts **no journal** (`postPpnKeluaranJournalEntry()` was deleted). `EFakturService::generateFakturPajak()` validates `pkp_status`, `isPpn()`, and no existing FP; allocates an NSFP; computes `DPP = sale.total - sale.total_tax` and `PPN = sale.total_tax` (no independent recalculation → no FP/sale divergence); creates `FakturPajak` + `FakturPajakItem` records.
-3. **Draft → submit:** the admin reviews on the e-Faktur index by tax period (masa pajak), then exports the **DJP CSV** (FK header row + OF item rows, UTF-8 BOM for Excel/Indonesian locale, amounts in **integer cents** per the DJP spec) and uploads it to the DJP desktop app — or, in Phase 2, submits via the PJAP API. Status moves to `submitted`.
+3. **Draft → submit:** the admin reviews on the e-Faktur index by tax period (masa pajak), then exports the **DJP CSV** (FK header row + OF item rows, UTF-8 BOM for Excel/Indonesian locale, amounts in **integer cents** per the DJP spec) and uploads it to the DJP desktop app — or, since Phase 2 (Nov 2026), submits via the PJAP API. Status moves to `submitted`.
 4. **Cancel (draft only):** the NSFP is marked `cancelled` (returned to the pool) and any *legacy* FakturPajak-sourced PPN journal is reversed (backward compatibility only).
 5. **SPT Masa PPN:** `EFakturService::getSptMasaSummary()` rolls **PPN Keluaran** (from issued Fakturs) against **PPN Masukan** (from `po.ppn_amount` where `ppn_enabled`) and returns `total_ppn_masukan`, `net_ppn_payable` (Keluaran − Masukan, floored at 0), and `ppn_credit` (Lebih Bayar when Masukan exceeds).
 
@@ -1946,16 +1946,17 @@ All withholding taxes run on the **universal `is_pph` mechanism**: a `Tax` flagg
 
 ---
 
-### Q24.6 — What is planned for e-Faktur Phase 2 (PJAP API), and why is it Enterprise-gated?
+### Q24.6 — What does e-Faktur Phase 2 (PJAP API) deliver, and why is it Enterprise-gated?
 
 **Answer:**
 
-Phase 2 (planned, ~3-4 weeks) adds **direct DJP submission** — a "Submit ke DJP" button on the Faktur Pajak detail page, real-time approval/rejection status, and bulk month-end submission — eliminating the manual CSV download and the DJP desktop app. Phase 1 (CSV + PDF) is **Zahir parity**; Phase 2 is the differentiator.
+Phase 2 (shipped 2026-11-05) adds **direct DJP submission** — a "Submit ke DJP" button on the Faktur Pajak detail page and approval/rejection status polled from DJP — eliminating the manual CSV download and the DJP desktop app (bulk month-end submission exists at service level; no bulk button yet). Phase 1 (CSV + PDF) is **Zahir parity**; Phase 2 is the differentiator.
 
 - **PJAP choice:** **Mekari Klikpajak** (best REST docs, full sandbox, most widely used), abstracted behind an `App\Contracts\PjapInterface` contract (`submit`, `submitBatch`, `checkStatus`, `cancel`, `testConnection`) so the provider can be swapped without touching business logic. `KlikpajakService` binds per-tenant (each tenant has its own credentials).
 - **Idempotency:** submissions carry an `X-Idempotency-Key` (`FP-{id}-{nsfp}`) with `retry(3)`, so a retried request can never create a duplicate Faktur; `checkStatus()` normalizes to `pending|approved|rejected`.
 - **Queue isolation:** submission/status jobs dispatch to a dedicated **`tax-submissions`** queue so DJP jobs are never starved by other background work.
-- **Gating:** the `efaktur_api` feature slug is **Enterprise-only** (planned, not yet live); `ppn` (Phase 1) is already on Professional & Enterprise. This matches the market split: Phase 1 is the compliance baseline for every Indonesian PKP tenant, Phase 2 is premium automation for the largest tenants.
+- **External dependency:** Klikpajak is a Mekari product — the tenant needs its **own Mekari Klikpajak subscription** (billed separately from Invent-MAG) for production submissions; the settings card states this. CSV export remains the free fallback on every plan.
+- **Gating:** the `efaktur_api` feature slug is **Enterprise-only** (live since 2026-11-05); `ppn` (Phase 1) is already on Professional & Enterprise. This matches the market split: Phase 1 is the compliance baseline for every Indonesian PKP tenant, Phase 2 is premium automation for the largest tenants.
 
 ---
 
@@ -2434,7 +2435,7 @@ The system uses a **custom `ActivityLogService`** + `ActivityLog` model (no `spa
 - Understands the distinction between the `SuperAdmin` model (platform-level, separate auth guard) and the `superuser` Spatie role (tenant-level, all permissions within a tenant) — and can explain why both are architecturally correct
 - Can walk the full e-Faktur lifecycle: 5-leg VAT split at sale creation → compliance-only Faktur Pajak generation → NSFP FIFO with `lockForUpdate()` → DJP CSV (FK/OF, UTF-8 BOM, integer cents) → SPT Masa PPN (Keluaran − Masukan, Lebih Bayar)
 - Knows why `PPh 22` was replaced by `PPh Final 0.5%` *in place* (existing `pph_tax_id` references stay valid) and can articulate the single-PPh-Payable (2150) rationale
-- Explains that e-Faktur Phase 2 (Klikpajak PJAP behind `PjapInterface`, idempotency keys, dedicated `tax-submissions` queue) is planned and Enterprise-gated via the `efaktur_api` slug
+- Explains that e-Faktur Phase 2 (Klikpajak PJAP behind `PjapInterface`, idempotency keys, dedicated `tax-submissions` queue) shipped in Nov 2026 and is Enterprise-gated via the `efaktur_api` slug (requires the tenant's separate Mekari Klikpajak subscription)
 
 ---
 

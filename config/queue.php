@@ -72,6 +72,19 @@ return [
             'after_commit' => false,
         ],
 
+        // e-Faktur DJP submissions (roadmap §2.6). Jobs are dispatched with
+        // ->onQueue('tax-submissions') on the DEFAULT connection, so this
+        // connection is opt-in: point TAX_QUEUE_CONNECTION=tax at it to run
+        // tax submissions on a dedicated redis worker instead.
+        'tax' => [
+            'driver' => 'redis',
+            'connection' => env('REDIS_QUEUE_CONNECTION', 'default'),
+            'queue' => env('TAX_QUEUE', 'tax-submissions'),
+            'retry_after' => (int) env('TAX_QUEUE_RETRY_AFTER', 120),
+            'block_for' => null,
+            'after_commit' => false,
+        ],
+
     ],
 
     /*

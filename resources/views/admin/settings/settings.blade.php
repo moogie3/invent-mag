@@ -391,6 +391,19 @@
                                             </div>
                                         </div>
 
+                                        {{-- The Tax Region select below sits OUTSIDE this form
+                                             (it saves itself via AJAX), which is why "Save
+                                             Settings" used to report success while silently
+                                             dropping the jurisdiction. Mirror the select's
+                                             value into a hidden field so both save paths
+                                             persist the same value. Rendered only when the
+                                             section itself renders (same plan gate). --}}
+                                        @if(($tenant->plan->slug ?? '') !== 'starter')
+                                        <input type="hidden" name="tax_jurisdiction"
+                                            id="taxJurisdictionFormField"
+                                            value="{{ $tenant->tax_jurisdiction ?? '' }}">
+                                        @endif
+
                                     </form>
 
                                     <!-- Tax Region (outside main form — saved independently via AJAX) -->
@@ -447,9 +460,27 @@
 document.addEventListener('DOMContentLoaded', function() {
     var taxJurisdictionSelect = document.getElementById('taxJurisdictionSelect');
     if (taxJurisdictionSelect) {
+        var jurisdictionFormField = document.getElementById('taxJurisdictionFormField');
+
+        var showError = function(message) {
+            if (window.InventMagApp && typeof InventMagApp.showToast === 'function') {
+                InventMagApp.showToast('Error', message, 'error');
+            } else {
+                alert(message);
+            }
+        };
+
         taxJurisdictionSelect.addEventListener('change', function() {
             var jurisdiction = this.value;
-            var select = this;
+            var previousValue = jurisdictionFormField ? jurisdictionFormField.value : '';
+
+            // Keep the hidden mirror in step immediately: if the user hits
+            // "Save Settings" while this request is in flight, both paths
+            // must agree on the value or the save can revert the change.
+            if (jurisdictionFormField) {
+                jurisdictionFormField.value = jurisdiction;
+            }
+
             fetch('{{ route("admin.setting.update-tax-jurisdiction") }}', {
                 method: 'PUT',
                 headers: {
@@ -468,6 +499,12 @@ document.addEventListener('DOMContentLoaded', function() {
             })
             .then(function(result) {
                 if (result.data && result.data.success) {
+                    // Queue the success toast for after the reload — the same
+                    // sessionStorage handshake the main Save Settings path
+                    // uses (handleNotificationsOnLoad in settings.js). The
+                    // old code reloaded silently, so users saw no confirm.
+                    sessionStorage.setItem('settingsSaved', 'true');
+                    sessionStorage.setItem('settingsMessage', result.data.message || 'Tax jurisdiction updated.');
                     window.location.reload();
                     return;
                 }
@@ -475,9 +512,21 @@ document.addEventListener('DOMContentLoaded', function() {
                     window.location.reload();
                     return;
                 }
-                alert((result.data && result.data.message) || 'Failed to update tax jurisdiction.');
+                // Revert both controls to the last persisted value so the UI
+                // never shows a jurisdiction that didn't save.
+                if (jurisdictionFormField) {
+                    jurisdictionFormField.value = previousValue;
+                }
+                taxJurisdictionSelect.value = previousValue;
+                showError((result.data && result.data.message) || 'Failed to update tax jurisdiction.');
             })
-            .catch(function(err) { alert('An error occurred while updating tax jurisdiction.'); });
+            .catch(function(err) {
+                if (jurisdictionFormField) {
+                    jurisdictionFormField.value = previousValue;
+                }
+                taxJurisdictionSelect.value = previousValue;
+                showError('An error occurred while updating tax jurisdiction.');
+            });
         });
     }
 });

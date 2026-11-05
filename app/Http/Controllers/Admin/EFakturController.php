@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Jobs\SubmitFakturPajakJob;
 use App\Models\FakturPajak;
 use App\Models\NsfpPool;
 use App\Models\Sales;
@@ -150,31 +151,55 @@ class EFakturController extends Controller
             'pkp_status' => 'boolean',
             'pkp_date' => 'nullable|date',
             'ppn_rate' => 'numeric|min:0|max:100',
+            // Phase 2 — Klikpajak PJAP credentials (posted from their own card)
+            'klikpajak_api_key' => 'nullable|string|max:255',
+            'klikpajak_secret' => 'nullable|string|max:255',
+            'klikpajak_use_sandbox' => 'nullable|boolean',
         ]);
 
-        // Ensure pkp_status is a boolean (checkbox sends '1' or omits key)
-        $validated['pkp_status'] = $request->boolean('pkp_status');
-
-        // Normalize empty string to null
-        $validated['tax_jurisdiction'] = $validated['tax_jurisdiction'] ?: null;
+        // Clear stored credentials when the fields are posted empty
+        if (array_key_exists('klikpajak_api_key', $validated)) {
+            $validated['klikpajak_api_key'] = $validated['klikpajak_api_key'] ?: null;
+        }
+        if (array_key_exists('klikpajak_secret', $validated)) {
+            $validated['klikpajak_secret'] = $validated['klikpajak_secret'] ?: null;
+        }
+        if (array_key_exists('klikpajak_use_sandbox', $validated)) {
+            // The form carries a hidden "0" so unchecking the box still posts
+            $validated['klikpajak_use_sandbox'] = $request->boolean('klikpajak_use_sandbox');
+        }
 
         $tenant = app('currentTenant');
-        $wasIndonesian = $tenant->tax_jurisdiction === 'ID';
-        $willBeIndonesian = ($validated['tax_jurisdiction'] ?? null) === 'ID';
 
-        // Safeguard: block disabling Indonesian jurisdiction if draft FakturPajak exist
-        if ($wasIndonesian && ! $willBeIndonesian) {
-            $check = $tenant->canDisableIndonesianJurisdiction();
-            if (! $check['safe']) {
-                return back()->withErrors([
-                    'tax_jurisdiction' => $check['message'],
-                ])->withInput();
+        // Jurisdiction/PKP fields come from the main settings form, the
+        // Klikpajak credentials from their own card — so only run the
+        // jurisdiction logic (and the PKP checkbox fallback) when the main
+        // form was the one submitted, or a Klikpajak save would silently
+        // turn Indonesian jurisdiction off.
+        if ($request->has('tax_jurisdiction')) {
+            // Ensure pkp_status is a boolean (checkbox sends '1' or omits key)
+            $validated['pkp_status'] = $request->boolean('pkp_status');
+
+            // Normalize empty string to null
+            $validated['tax_jurisdiction'] = $validated['tax_jurisdiction'] ?: null;
+
+            $wasIndonesian = $tenant->tax_jurisdiction === 'ID';
+            $willBeIndonesian = $validated['tax_jurisdiction'] === 'ID';
+
+            // Safeguard: block disabling Indonesian jurisdiction if draft FakturPajak exist
+            if ($wasIndonesian && ! $willBeIndonesian) {
+                $check = $tenant->canDisableIndonesianJurisdiction();
+                if (! $check['safe']) {
+                    return back()->withErrors([
+                        'tax_jurisdiction' => $check['message'],
+                    ])->withInput();
+                }
             }
         }
 
         $tenant->update($validated);
 
-        if ($willBeIndonesian) {
+        if (($validated['tax_jurisdiction'] ?? null) === 'ID') {
             $created = app(TaxService::class)->ensureIndonesianDefaults($tenant);
             if (! empty($created)) {
                 Log::info('Auto-created default Indonesian tax records', [
@@ -185,6 +210,30 @@ class EFakturController extends Controller
         }
 
         return back()->with('success', __('messages.efaktur_settings_saved'));
+    }
+
+    // -----------------------------------------------------------------------
+    // Submit ke DJP (Phase 2) — queue a PJAP submission for a draft faktur
+    // -----------------------------------------------------------------------
+
+    public function submitToDjp(FakturPajak $fakturPajak)
+    {
+        $this->authorize('create-efaktur');
+
+        if (! $fakturPajak->isSubmittable()) {
+            return back()->with('error', __('messages.efaktur_not_submittable'));
+        }
+
+        $tenant = app('currentTenant');
+        if (! $tenant->klikpajak_api_key) {
+            return back()->with('error', __('messages.efaktur_klikpajak_not_configured'));
+        }
+
+        // Queued: DJP/PJAP calls take seconds each; the job owns the
+        // idempotency guards (WithoutOverlapping + pjap_submission_id check).
+        SubmitFakturPajakJob::dispatch($fakturPajak)->onQueue('tax-submissions');
+
+        return back()->with('success', __('messages.efaktur_queued_for_djp'));
     }
 
     public function importNsfp(Request $request)

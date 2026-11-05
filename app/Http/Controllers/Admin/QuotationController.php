@@ -120,8 +120,11 @@ class QuotationController extends Controller
 
             $pphTaxId = $request->pph_tax_id ?? null;
             $pphTax = $pphTaxId ? Tax::find($pphTaxId) : null;
-            $pphRate = $pphTax ? (float) $pphTax->rate : 0;
-            $pphAmount = SalesHelper::calculatePphAmount($taxableAmount, $pphRate);
+            // Gate like the snapshot below: for a non-Indonesian tenant the
+            // total must not shrink, since pph_amount is recorded as 0.
+            $pphApplied = app('currentTenant')->isIndonesian() && ($pphTax?->is_pph ?? false);
+            $pphRate = $pphApplied && $pphTax ? (float) $pphTax->rate : 0;
+            $pphAmount = $pphApplied ? SalesHelper::calculatePphAmount($taxableAmount, $pphRate) : 0;
             $total = max(0, $total - $pphAmount);
 
             $quotation = Quotation::create([
@@ -225,8 +228,11 @@ class QuotationController extends Controller
 
             $pphTaxId = $request->pph_tax_id ?? null;
             $pphTax = $pphTaxId ? Tax::find($pphTaxId) : null;
-            $pphRate = $pphTax ? (float) $pphTax->rate : 0;
-            $pphAmount = SalesHelper::calculatePphAmount($taxableAmount, $pphRate);
+            // Gate like the snapshot below: for a non-Indonesian tenant the
+            // total must not shrink, since pph_amount is recorded as 0.
+            $pphApplied = app('currentTenant')->isIndonesian() && ($pphTax?->is_pph ?? false);
+            $pphRate = $pphApplied && $pphTax ? (float) $pphTax->rate : 0;
+            $pphAmount = $pphApplied ? SalesHelper::calculatePphAmount($taxableAmount, $pphRate) : 0;
             $total = max(0, $total - $pphAmount);
 
             $quotation->update([
@@ -306,15 +312,29 @@ class QuotationController extends Controller
             DB::beginTransaction();
 
             $items = $quotation->items ?? [];
-            $productsData = [];
+            $lineItems = [];
             foreach ($items as $item) {
-                $productsData[] = [
+                $lineItems[] = [
                     'product_id' => $item['product_id'],
                     'quantity' => $item['quantity'],
                     'price' => $item['price'],
                     'discount' => $item['discount'] ?? 0,
+                    'discount_type' => $item['discount_type'] ?? $item['discountType'] ?? 'fixed',
                 ];
             }
+
+            if ($lineItems === []) {
+                throw new \Exception('This quotation has no line items to convert.');
+            }
+
+            // PPN snapshot — same gate as createSale(): the e-Faktur fields
+            // only apply when the tenant is Indonesian AND the quotation's
+            // tax is a PPN tax. pph_* are copied from the quotation, which
+            // already applied the identical gate when it was saved (the
+            // quotation's total is net of pph_amount, so the sale must carry
+            // it too or the journal would not balance against the total).
+            $tax = $quotation->tax_id ? Tax::find($quotation->tax_id) : null;
+            $ppnApplied = app('currentTenant')->isIndonesian() && ($tax?->is_ppn ?? false);
 
             $sales = Sales::create([
                 'customer_id' => $quotation->customer_id,
@@ -330,12 +350,28 @@ class QuotationController extends Controller
                 'total_tax' => $quotation->tax_amount,
                 'tax_type' => $quotation->tax_type,
                 'total' => $quotation->total,
-                'status' => 'pending',
+                // 'Unpaid' like every other sale path — the old 'pending'
+                // status was a dead end (no transition existed and the
+                // dashboards only count Unpaid/Partial).
+                'status' => 'Unpaid',
                 'invoice' => $this->salesService->generateInvoiceNumber(),
                 'type' => Sales::TYPE_REGULAR,
+                'customer_credit_used' => 0,
                 'notes' => $quotation->notes,
                 'terms_conditions' => $quotation->terms_conditions,
+                'ppn_enabled' => $ppnApplied,
+                'ppn_rate' => $ppnApplied ? $quotation->tax_rate : null,
+                'ppn_amount' => $ppnApplied ? $quotation->tax_amount : 0,
+                'pph_enabled' => (bool) $quotation->pph_enabled,
+                'pph_rate' => $quotation->pph_rate,
+                'pph_amount' => $quotation->pph_amount ?? 0,
+                'pph_tax_id' => $quotation->pph_tax_id,
             ]);
+
+            // Items, stock movement, COGS and the sale journal — without
+            // this call the converted sale reached the sales table but
+            // never the ledger (and had no line items at all).
+            $this->salesService->finalizeConvertedSale($sales, $lineItems);
 
             $quotation->update([
                 'status' => 'converted',

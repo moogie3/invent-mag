@@ -265,10 +265,15 @@ class PurchaseService
                 $finalTotal = $afterDiscount + $taxAmount;
             }
 
-            $pphAmount = PurchaseHelper::calculatePphAmount($afterDiscount, $pphTaxRate);
+            $isIndonesian = app('currentTenant')->isIndonesian();
+            // Gate the withholding the same way the snapshot below is gated:
+            // for a non-Indonesian tenant (or a non-PPh tax) the amount must
+            // not reduce finalTotal, because pph_amount is recorded as 0 —
+            // total would shrink by an amount no record accounts for.
+            $pphApplied = $isIndonesian && ($pphTax?->is_pph ?? false);
+            $pphAmount = $pphApplied ? PurchaseHelper::calculatePphAmount($afterDiscount, $pphTaxRate) : 0;
             $finalTotal = max(0, $finalTotal - $pphAmount);
 
-            $isIndonesian = app('currentTenant')->isIndonesian();
             $ppnEnabled = $isIndonesian && ($tax?->is_ppn ?? false);
             $ppnAmount = $ppnEnabled ? $taxAmount : 0;
 
@@ -431,10 +436,15 @@ class PurchaseService
                 $finalTotal = $afterDiscount + $taxAmount;
             }
 
-            $pphAmount = PurchaseHelper::calculatePphAmount($afterDiscount, $pphTaxRate);
+            $isIndonesian = app('currentTenant')->isIndonesian();
+            // Gate the withholding the same way the snapshot below is gated:
+            // for a non-Indonesian tenant (or a non-PPh tax) the amount must
+            // not reduce finalTotal, because pph_amount is recorded as 0 —
+            // total would shrink by an amount no record accounts for.
+            $pphApplied = $isIndonesian && ($pphTax?->is_pph ?? false);
+            $pphAmount = $pphApplied ? PurchaseHelper::calculatePphAmount($afterDiscount, $pphTaxRate) : 0;
             $finalTotal = max(0, $finalTotal - $pphAmount);
 
-            $isIndonesian = app('currentTenant')->isIndonesian();
             $ppnEnabled = $isIndonesian && ($tax?->is_ppn ?? false);
             $ppnAmount = $ppnEnabled ? $taxAmount : 0;
 

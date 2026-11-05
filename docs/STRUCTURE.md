@@ -54,6 +54,8 @@ invent-mag/
 │   │       ├── CheckExpiredSubscriptions.php
 │   │       ├── ProcessScheduledPlanChanges.php
 │   │       └── ResetDemoTenant.php
+│   ├── Contracts
+│   │   └── PjapInterface.php
 │   ├── DTOs
 │   │   └── TransactionDTO.php
 │   ├── Exceptions
@@ -190,6 +192,10 @@ invent-mag/
 │   │       ├── LogoutResponse.php
 │   │       ├── PasswordResetResponse.php
 │   │       └── VerifyEmailResponse.php
+│   ├── Jobs
+│   │   ├── DownloadShopeeCoverImages.php
+│   │   ├── PollFakturPajakStatusJob.php
+│   │   └── SubmitFakturPajakJob.php
 │   ├── Mail
 │   │   ├── ContactFormMail.php
 │   │   └── SubscriptionInvoiceMail.php
@@ -258,6 +264,7 @@ invent-mag/
 │   ├── Providers
 │   │   ├── AppServiceProvider.php
 │   │   ├── AuthServiceProvider.php
+│   │   ├── EFakturServiceProvider.php
 │   │   ├── FortifyServiceProvider.php
 │   │   ├── NavigationServiceProvider.php
 │   │   └── TestingServiceProvider.php
@@ -297,6 +304,8 @@ invent-mag/
 │   │   ├── NotificationService.php
 │   │   ├── OpeningBalanceService.php
 │   │   ├── PayrollService.php
+│   │   ├── Pjap
+│   │   │   └── KlikpajakService.php
 │   │   ├── PlanService.php
 │   │   ├── PosService.php
 │   │   ├── ProductService.php
@@ -387,6 +396,7 @@ invent-mag/
     │   │   ├── CustomerControllerTest.php
     │   │   ├── CustomerCrmControllerTest.php
     │   │   ├── DashboardControllerTest.php
+    │   │   ├── EfakturApiTest.php
     │   │   ├── EfakturSettingsTest.php
     │   │   ├── JournalEntryControllerTest.php
     │   │   ├── NotificationControllerTest.php
@@ -620,10 +630,14 @@ invent-mag/
     │   │   │   └── SetLocaleTest.php
     │   │   └── Requests
     │   │       └── ProfileUpdateRequestTest.php
+    │   ├── Jobs
+    │   │   ├── PollFakturPajakStatusJobTest.php
+    │   │   └── SubmitFakturPajakJobTest.php
     │   ├── Models
     │   │   ├── ProductStockTest.php
     │   │   ├── SalesIsPphTest.php
     │   │   ├── TaxIsPphTest.php
+    │   │   ├── TaxJurisdictionScopeTest.php
     │   │   └── TenantCanDisableIndonesianJurisdictionTest.php
     │   ├── Observers
     │   └── Services
@@ -646,8 +660,10 @@ invent-mag/
     │       ├── EFakturServiceSptMasukanTest.php
     │       ├── FinancialReportingServiceTest.php
     │       ├── GeneralLedgerServiceTest.php
+    │       ├── KlikpajakServiceTest.php
     │       ├── ManualJournalEntryServiceTest.php
     │       ├── NotificationServiceTest.php
+    │       ├── OpeningBalanceGlTbConsistencyTest.php
     │       ├── OpeningBalanceServiceTest.php
     │       ├── PlanServiceTest.php
     │       ├── PosServiceTest.php

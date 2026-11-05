@@ -781,7 +781,7 @@ return [
     'efaktur_faktur_info' => 'Invoice Information: View the NSFP number, invoice date, tax period, reference invoice, and PPN rate for this Faktur Pajak.',
     'efaktur_seller_buyer' => 'Seller & Buyer: Both the seller (your company) and buyer information are snapshotted at the time of Faktur Pajak creation and cannot be changed.',
     'efaktur_tax_summary' => 'Tax Summary: View the DPP (tax base), PPN (output VAT), PPnBM (luxury goods tax if applicable), and total billing amount.',
-    'efaktur_djp_tracking' => 'DJP Status: If the Faktur Pajak has been submitted to DJP, you will see the submission date and DJP reference number here.',
+    'efaktur_djp_tracking' => 'DJP Status: On the Enterprise plan with Klikpajak configured, use the "Submit ke DJP" button (top right) to send this draft straight to DJP — the status updates automatically once DJP responds. After submission you will see the submission date and DJP reference number here. Without the API, export CSV and import it into the DJP desktop app instead.',
     'efaktur_items_table' => 'Items Table: Each line item from the original sales invoice is listed with product name, unit price, quantity, discount, DPP, and PPN.',
     'efaktur_print_cancel' => 'Print & Cancel: Use "Print PDF" to generate a DJP-compliant PDF document. "Cancel" is only available for draft Faktur Pajak and will release the NSFP back to the pool.',
 
@@ -795,5 +795,5 @@ return [
     'efaktur_ppn_rate' => 'VAT Rate: The current PPN rate is 11% (effective since April 1, 2022). Update this field if DJP changes the rate in the future.',
     'efaktur_nsfp_pool' => 'NSFP Pool: NSFP (Nomor Seri Faktur Pajak) numbers are required for each Faktur Pajak. Import them from the DJP portal in bulk.',
     'efaktur_nsfp_import' => 'NSFP Import: Paste NSFP numbers one per line in the format XXX.XXX-YY.XXXXXXXX. Duplicate numbers are automatically skipped. Import NSFP before generating Faktur Pajak.',
-    'efaktur_klikpajak' => 'Klikpajak API (Coming Soon): Phase 2 will add direct DJP submission via Klikpajak PJAP, eliminating the need to download CSV files or use the desktop application.',
+    'efaktur_klikpajak' => 'Klikpajak API (Direct DJP Submission): Save the API key and secret issued by Mekari Klikpajak to enable one-click submission of draft Faktur Pajak directly to DJP — no CSV download, no desktop e-Faktur app. Turn the sandbox switch on to test against the DJP sandbox before going live. Available on the Enterprise plan; without it you can keep exporting CSV.',
 ];

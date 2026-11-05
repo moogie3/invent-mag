@@ -375,10 +375,16 @@ class SalesService
             $taxableAmount = $subTotal - $orderDiscountAmount;
             $taxAmount = SalesHelper::calculateTaxAmount($taxableAmount, $taxRate, $taxType);
 
+            // PPh only applies when the tenant is Indonesian AND the selected
+            // tax carries the is_pph flag. Gating the RATE/AMOUNT here (not
+            // just the snapshot) keeps grandTotal consistent with the stored
+            // flags — otherwise an API-submitted PPh tax in Universal mode
+            // would silently shrink the total without any withholding booked.
             $pphTaxId = $data['pph_tax_id'] ?? null;
             $pphTax = $pphTaxId ? Tax::find($pphTaxId) : null;
-            $pphTaxRate = $pphTax ? (float) $pphTax->rate : 0;
-            $pphAmount = SalesHelper::calculatePphAmount($taxableAmount, $pphTaxRate);
+            $pphApplied = app('currentTenant')->isIndonesian() && ($pphTax?->is_pph ?? false);
+            $pphTaxRate = $pphApplied && $pphTax ? (float) $pphTax->rate : 0;
+            $pphAmount = $pphApplied ? SalesHelper::calculatePphAmount($taxableAmount, $pphTaxRate) : 0;
 
             if ($taxType === 'inclusive') {
                 $grandTotal = $taxableAmount;
@@ -543,9 +549,19 @@ class SalesService
             $costOfGoodsSoldAccountName = $costOfGoodsSoldAccount->name;
             $inventoryAccountName = $inventoryAccount->name;
 
+            // When PPh withholding applies, the separate withholding entry
+            // below (Dr PPh Receivable / Cr AR) already removes the withheld
+            // amount from AR — so THIS entry must book AR at the GROSS the
+            // customer owes BEFORE withholding (grandTotal + pphAmount).
+            // Booking AR at grandTotal here and crediting AR again in the
+            // withholding entry deducted the PPh twice, and the revenue
+            // credit below (grandTotal − ppn) was likewise understated by
+            // the withheld amount in the exclusive-tax case.
+            $arBase = $grandTotal + $pphAmount;
+
             $transactions = [
-                ['account_name' => $accountsReceivableAccountName, 'type' => 'debit', 'amount' => $grandTotal],
-                ['account_name' => $salesRevenueAccountName, 'type' => 'credit', 'amount' => $grandTotal],
+                ['account_name' => $accountsReceivableAccountName, 'type' => 'debit', 'amount' => $arBase],
+                ['account_name' => $salesRevenueAccountName, 'type' => 'credit', 'amount' => $arBase],
                 ['account_name' => $costOfGoodsSoldAccountName, 'type' => 'debit', 'amount' => $totalCostOfGoods],
                 ['account_name' => $inventoryAccountName, 'type' => 'credit', 'amount' => $totalCostOfGoods],
             ];
@@ -566,7 +582,7 @@ class SalesService
 
                     foreach ($transactions as &$transaction) {
                         if ($transaction['account_name'] === $salesRevenueAccountName && $transaction['type'] === 'credit') {
-                            $transaction['amount'] = round($grandTotal - $taxAmount, 2);
+                            $transaction['amount'] = round($arBase - $taxAmount, 2);
                         }
                     }
                     unset($transaction);
@@ -628,6 +644,217 @@ class SalesService
         });
     }
 
+    /**
+     * Finish a sale created by a conversion path (quotation → sale,
+     * pipeline → sale): create the line items, move stock, cost the sale
+     * (FIFO batches, exactly like createSale()), and post the same journal
+     * entries createSale() posts — Dr AR / Cr Revenue (+ PPN Keluaran
+     * split), Dr COGS / Cr Inventory, plus the PPh withholding and
+     * credit-usage entries.
+     *
+     * Everything is derived from the sale's stored fields, which the
+     * conversion paths populate with the same gates createSale() uses
+     * (isIndonesian() && is_ppn / is_pph), so a converted sale is
+     * indistinguishable from a directly-created one in the ledger —
+     * previously neither conversion path posted a journal at all, leaving
+     * GL revenue, COGS and inventory out of step with the sales table.
+     *
+     * @param  array<int, array{product_id: int, quantity: int|float, price: int|float, discount?: int|float, discount_type?: string}>  $lineItems
+     *
+     * @throws \Exception when stock is insufficient or accounting accounts are missing
+     */
+    public function finalizeConvertedSale(Sales $sale, array $lineItems): void
+    {
+        if ($lineItems === []) {
+            throw new \Exception('No products in the order');
+        }
+
+        $stockRecords = ProductWarehouse::whereIn('product_id', array_column($lineItems, 'product_id'))
+            ->where('warehouse_id', $sale->warehouse_id)
+            ->where('tenant_id', $sale->tenant_id)
+            ->get()
+            ->keyBy('product_id');
+
+        // Resolve products and verify stock for EVERY line before mutating
+        // anything, so a shortage cannot leave half a sale behind.
+        $products = [];
+        foreach ($lineItems as $line) {
+            $product = Product::where('id', $line['product_id'])
+                ->where('tenant_id', $sale->tenant_id)
+                ->first();
+
+            if (! $product) {
+                throw new \Exception("Product with ID {$line['product_id']} not found in this tenant.");
+            }
+
+            $products[$product->id] = $product;
+
+            $availableStock = isset($stockRecords[$product->id]) ? (float) $stockRecords[$product->id]->quantity : 0;
+            $requestedQty = (int) $line['quantity'];
+
+            if ($availableStock < $requestedQty) {
+                throw new \Exception("Insufficient stock for product: {$product->name}. Available: {$availableStock}, Requested: {$requestedQty}");
+            }
+        }
+
+        $totalCostOfGoods = 0;
+
+        foreach ($lineItems as $line) {
+            $product = $products[$line['product_id']];
+
+            SalesItem::create([
+                'sales_id' => $sale->id,
+                'product_id' => $product->id,
+                'quantity' => $line['quantity'],
+                'customer_price' => $line['price'],
+                'discount' => $line['discount'] ?? 0,
+                'discount_type' => $line['discount_type'] ?? 'fixed',
+                'total' => SalesHelper::calculateTotal(
+                    $line['price'],
+                    $line['quantity'],
+                    $line['discount'] ?? 0,
+                    $line['discount_type'] ?? 'fixed'
+                ),
+            ]);
+
+            if (isset($stockRecords[$product->id])) {
+                $stockRecords[$product->id]->decrement('quantity', $line['quantity']);
+            }
+
+            // FIFO batch costing — identical to createSale()
+            $poItems = POItem::where('product_id', $product->id)
+                ->where('remaining_quantity', '>', 0)
+                ->orderBy('expiry_date', 'asc')
+                ->orderBy('created_at', 'asc')
+                ->get();
+
+            $quantityToDecrement = $line['quantity'];
+            $itemCOGS = 0;
+
+            foreach ($poItems as $poItem) {
+                if ($quantityToDecrement <= 0) {
+                    break;
+                }
+
+                $decrement = min($poItem->remaining_quantity, $quantityToDecrement);
+                $itemCOGS += $decrement * $poItem->price;
+                $poItem->decrement('remaining_quantity', $decrement);
+                $quantityToDecrement -= $decrement;
+            }
+
+            if ($quantityToDecrement > 0) {
+                $itemCOGS += $quantityToDecrement * $product->price;
+            }
+
+            $totalCostOfGoods += $itemCOGS;
+        }
+
+        $accountingSettings = app('currentTenant')->accounting_settings ?? [];
+
+        $salesRevenueAccount = Account::find($accountingSettings['sales_revenue_account_id'] ?? null);
+        $accountsReceivableAccount = Account::find($accountingSettings['accounts_receivable_account_id'] ?? null);
+        $costOfGoodsSoldAccount = Account::find($accountingSettings['cost_of_goods_sold_account_id'] ?? null);
+        $inventoryAccount = Account::find($accountingSettings['inventory_account_id'] ?? null);
+
+        if (! $salesRevenueAccount || ! $accountsReceivableAccount || ! $costOfGoodsSoldAccount || ! $inventoryAccount) {
+            throw new \Exception('One or more required accounts (Sales Revenue, AR, COGS, Inventory) not found. Please check Accounting Settings.');
+        }
+
+        $salesRevenueAccountName = $salesRevenueAccount->name;
+        $accountsReceivableAccountName = $accountsReceivableAccount->name;
+        $costOfGoodsSoldAccountName = $costOfGoodsSoldAccount->name;
+        $inventoryAccountName = $inventoryAccount->name;
+
+        // The sale's stored total is already net of PPh (both conversion
+        // paths copy the same max(0, total - pphAmount) arithmetic their
+        // source document computed), so AR must be booked at the GROSS the
+        // customer owes BEFORE withholding — same rule as createSale().
+        $pphAmount = (float) $sale->pph_amount;
+        $ppnAmount = (float) $sale->ppn_amount;
+        $arBase = (float) $sale->total + $pphAmount;
+
+        $transactions = [
+            ['account_name' => $accountsReceivableAccountName, 'type' => 'debit', 'amount' => $arBase],
+            ['account_name' => $salesRevenueAccountName, 'type' => 'credit', 'amount' => $arBase],
+            ['account_name' => $costOfGoodsSoldAccountName, 'type' => 'debit', 'amount' => $totalCostOfGoods],
+            ['account_name' => $inventoryAccountName, 'type' => 'credit', 'amount' => $totalCostOfGoods],
+        ];
+
+        // VAT split — Indonesian PPN sales book the output VAT to the PPN
+        // Keluaran liability instead of inflating revenue (same fallback as
+        // createSale(): without the account configured the gross stays in
+        // revenue). ppn_enabled already carries the isIndonesian() && is_ppn
+        // gate applied at conversion time.
+        if ($sale->ppn_enabled && $ppnAmount > 0) {
+            $ppnKeluaranAccount = ! empty($accountingSettings['ppn_keluaran_account_id'])
+                ? Account::find($accountingSettings['ppn_keluaran_account_id'])
+                : null;
+
+            if ($ppnKeluaranAccount) {
+                $transactions[] = ['account_name' => $ppnKeluaranAccount->name, 'type' => 'credit', 'amount' => $ppnAmount];
+
+                foreach ($transactions as &$transaction) {
+                    if ($transaction['account_name'] === $salesRevenueAccountName && $transaction['type'] === 'credit') {
+                        $transaction['amount'] = round($arBase - $ppnAmount, 2);
+                    }
+                }
+                unset($transaction);
+            }
+        }
+
+        $this->accountingService->createJournalEntry(
+            "Sale Invoice #{$sale->invoice}",
+            Carbon::parse($sale->order_date),
+            $transactions,
+            $sale
+        );
+
+        // PPh withholding entry — pph_enabled already carries the
+        // isIndonesian() && is_pph gate applied at conversion time.
+        if ($pphAmount > 0 && $sale->pph_enabled) {
+            $pphReceivableAccountId = $accountingSettings['pph_receivable_account_id'] ?? null;
+
+            if ($pphReceivableAccountId) {
+                $pphReceivableAccount = Account::find($pphReceivableAccountId);
+
+                if ($pphReceivableAccount) {
+                    $this->accountingService->createJournalEntry(
+                        "PPh Withholding on Sale #{$sale->invoice}",
+                        Carbon::parse($sale->order_date),
+                        [
+                            ['account_name' => $pphReceivableAccount->name, 'type' => 'debit', 'amount' => $pphAmount],
+                            ['account_name' => $accountsReceivableAccountName, 'type' => 'credit', 'amount' => $pphAmount],
+                        ],
+                        $sale
+                    );
+                }
+            }
+        }
+
+        // Credit usage entry — conversions never apply customer credit
+        // today, kept for exact parity with createSale().
+        $creditUsed = (float) $sale->customer_credit_used;
+        if ($creditUsed > 0) {
+            $customerCreditAccountId = $accountingSettings['customer_credit_account_id'] ?? null;
+
+            if ($customerCreditAccountId) {
+                $customerCreditAccount = Account::find($customerCreditAccountId);
+
+                if ($customerCreditAccount) {
+                    $this->accountingService->createJournalEntry(
+                        "Credit Applied to Invoice #{$sale->invoice}",
+                        Carbon::parse($sale->order_date),
+                        [
+                            ['account_name' => $customerCreditAccount->name, 'type' => 'debit', 'amount' => $creditUsed],
+                            ['account_name' => $accountsReceivableAccountName, 'type' => 'credit', 'amount' => $creditUsed],
+                        ],
+                        $sale
+                    );
+                }
+            }
+        }
+    }
+
     public function updateSale(Sales $sale, array $data): Sales
     {
         return DB::transaction(function () use ($sale, $data) {
@@ -687,8 +914,13 @@ class SalesService
 
             $pphTaxId = $data['pph_tax_id'] ?? null;
             $pphTax = $pphTaxId ? Tax::find($pphTaxId) : null;
-            $pphTaxRate = $pphTax ? (float) $pphTax->rate : 0;
-            $pphAmount = SalesHelper::calculatePphAmount($taxableAmount, $pphTaxRate);
+            // Same gate as createSale(): total must not shrink for a PPh
+            // tax the tenant's jurisdiction doesn't honour (the snapshot
+            // below would record 0, leaving total reduced by an amount
+            // nothing accounts for).
+            $pphApplied = app('currentTenant')->isIndonesian() && ($pphTax?->is_pph ?? false);
+            $pphTaxRate = $pphApplied && $pphTax ? (float) $pphTax->rate : 0;
+            $pphAmount = $pphApplied ? SalesHelper::calculatePphAmount($taxableAmount, $pphTaxRate) : 0;
 
             if ($taxType === 'inclusive') {
                 $grandTotal = $taxableAmount;

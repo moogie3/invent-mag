@@ -9,6 +9,1010 @@ Date-ordered, newest first.
 
 ---
 
+## 2026-11-05 — Converted Sales Finally Reach the Journal (`finalizeConvertedSale()` Mirrors `createSale()` for Both Conversion Paths, and the `pending` Dead End Goes with It), e-Faktur Phase 2 (Direct DJP Submission via the Mekari Klikpajak PJAP — Contract, Two Queued Jobs, Five Idempotency Layers, Enterprise Gate: built to `docs/ROADMAP.md` §Phase 2 with seven deliberate deviations, each recorded here), and the "What would you like to explore?" Grid Caught Up with Every Sidebar Page (5 entries, en/id parity restored, two regression guards, and one assertion that was reading its own tutorial text), Closed Out with Two Conversion Edge Tests, the Mekari Klikpajak Subscription Disclosure, and Every `docs/` File Checked for Stale Claims)
+
+This entry closes the one item yesterday's pass left open, ships the
+roadmap's differentiator, and answers the *"we added a lot of pages — is
+the tutorial menu complete?"* report — in that order. The three
+workstreams share a shape: each was a path that **looked** finished from
+the UI (the converted sale sits in the sales table, the Klikpajak card
+renders, the tutorial grid opens without error) while being wrong or
+incomplete underneath. Every claim below is backed by a test added this
+pass. All work remains **uncommitted** — 64 files (52 modified, 12 new) —
+git is the user's to run.
+
+### Part 1 — Yesterday's open gap, closed: both conversion paths now post exactly what `createSale()` posts
+
+**The decision (yesterday's open question): journal at conversion.**
+Between "post the journal the moment the conversion commits" and "post it
+when the sale leaves `pending`", the first was chosen: one moment of
+truth, no status choreography, and both conversion paths become
+structurally identical to `createSale()`. The alternative would have
+required inventing a transition nobody owns — the exact defect the old
+`pending` status already was.
+
+**The fix is one shared method, not two parallel patches.**
+`SalesService::finalizeConvertedSale(Sales $sale, array $lineItems)`
+(`app/Services/SalesService.php:666`) mirrors `createSale()` step for
+step:
+
+1. **Stock is verified for every line before anything mutates**, so a
+   shortage aborts the whole conversion (both call sites run it inside
+   their transaction) with `createSale()`'s exact message:
+   `Insufficient stock for product: {name}. Available: {a}, Requested: {r}`.
+2. `SalesItem` rows are written and `ProductWarehouse` decremented.
+3. **FIFO batch costing** — `POItem` by `expiry_date` then `created_at`,
+   `remaining_quantity` decremented, remainder at product cost — the same
+   query `createSale()` uses, so COGS cannot diverge between paths.
+4. The four required accounts (Sales Revenue, AR, COGS, Inventory) are
+   resolved from accounting settings or the whole conversion throws.
+5. **Invoice journal**: Dr AR / Cr Revenue at **Gross** (`total +
+   pph_amount` — the stored total is already net of PPh, so AR must carry
+   what the customer owes), Dr COGS / Cr Inventory for the FIFO cost.
+6. **PPN split** when `ppn_enabled && ppn_amount > 0`: credit PPN
+   Keluaran and shrink the revenue credit to `gross − ppn` (same
+   account-missing fallback as `createSale()`).
+7. **PPh withholding entry** when `pph_enabled && pph_amount > 0`:
+   Dr PPh Receivable / Cr AR.
+8. **Credit-usage entry** at `customer_credit_used > 0` — conversions
+   currently set it to 0 explicitly, so the branch is parity insurance,
+   dead code by construction.
+
+Both call sites now pass through it: `QuotationController::convertToSales`
+(`:374`) and `SalesPipelineService::convertToSalesOrder` (`:414`). The
+gates are carried on the sale's own fields — `ppn_enabled` /
+`pph_enabled` are computed by each conversion with the same
+`isIndonesian() && is_ppn / is_pph` rule every other writer uses, so the
+journal never has to know about jurisdictions.
+
+**Every cascade from yesterday's Part 2, resolved:**
+
+| # | Yesterday's consequence | Now |
+|---|---|---|
+| 1 | GL revenue missed converted sales; statements and dashboards disagreed | invoice journal posted at conversion — `JournalEntry` rows and the sales table agree |
+| 2 | Pipeline skipped COGS → GL inventory drifted from physical inventory | COGS pair posted from the same FIFO cost the stock move used |
+| 3 | `addPayment` debited an AR that was never debited | AR debited at gross like `createSale()` |
+| 4 | Quotation status `pending` was a dead end (no transition existed) | status is now **`Unpaid`** — what dashboards count — with `customer_credit_used = 0` written explicitly like every other path |
+| 5 | Returns against such sales silently skipped reversal (no original journal → ratios 0) | the original journal exists → PPN/PPh/COGS reversal ratios compute |
+| 6 | Pipeline wrote no `pph_rate`/`pph_amount` at all | written explicitly as `false`/`null`/`0` — an opportunity carries no PPh; the quotation path copies its gated values instead |
+
+**Tests (+3):**
+
+| File | Test |
+|---|---|
+| `SalesPipelineServiceTest` | `it_posts_a_balanced_invoice_journal_on_conversion` |
+| `QuotationControllerTest` | `test_convert_to_sales_posts_ppn_split_journal_for_indonesian_tenant` |
+| `QuotationControllerTest` | `test_convert_to_sales_copies_gated_pph_and_posts_withholding_journal` |
+
+### Part 2 — e-Faktur Phase 2: direct DJP submission through the Mekari Klikpajak PJAP
+
+Phase 1 gave CSV parity with Zahir. Phase 2 (`docs/ROADMAP.md` §Phase 2,
+lines 1174–1665) is the differentiator — one-click submission, real
+status from the DJP, no CSV, no desktop app — and it is now built:
+
+| Roadmap § | Shipped |
+|---|---|
+| 2.2 contract | `app/Contracts/PjapInterface.php` — the five methods verbatim (`submit`, `submitBatch`, `checkStatus`, `cancel`, `testConnection`) |
+| 2.3 service | `app/Services/Pjap/KlikpajakService.php` — full upload payload, `X-Idempotency-Key: FP-{id}-{nsfp}`, `retry(3, 1s)` on `submit()`, status normalization (`APPROVED`/`DITOLAK`/unknown/missing → `approved`/`rejected`/`pending`), batch map by `faktur_id`, `cancel`, `testConnection` (reachable + HTTP-failure variants) |
+| 2.4 provider | `EFakturServiceProvider` binds `PjapInterface` **per tenant** from `klikpajak_api_key`/`klikpajak_secret`/`klikpajak_use_sandbox` + `services.klikpajak` URLs (sandbox default for safety) |
+| 2.5 jobs | `SubmitFakturPajakJob` (`tries 3`, `backoff 300`, `timeout 60`, `WithoutOverlapping('faktur-{id}')`, attempt bookkeeping `error_attempt_{n}`, `failed()` → revert to `draft` + `failed_permanently`) and `PollFakturPajakStatusJob` (first poll +30s, re-poll every 5 min, `tries 10`; approved/rejected are terminal; after max polls the faktur stays `submitted`/`pending` for a manual check — exactly §2.5) |
+| 2.6 queue | `tax` connection added to `config/queue.php` (opt-in) and every dispatch uses `->onQueue('tax-submissions')` |
+| 2.7 UI | `show.blade.php` submit form behind `@planHas('efaktur_api')` **and** `isSubmittable()` **and** a configured API key; route `admin.efaktur.submit` behind `plan.feature:efaktur_api` + `authorize('create-efaktur')`; controller rejects non-draft and unconfigured tenants with dedicated messages before dispatching |
+| plan gate | `efaktur_api` slug in `config/plans.php` (label + upsell line), `PlanSeeder` Enterprise features, migration `2026_11_04_000001_add_efaktur_api_feature_to_plans`, `PlanFeatureGateTest::ENTERPRISE_ONLY_FEATURES` extended |
+
+**Idempotency — the five layers of §2.8:**
+
+| Layer | Implementation |
+|---|---|
+| Database | `UNIQUE` on `nsfp` (Phase 1, unchanged) |
+| HTTP | `X-Idempotency-Key: FP-{id}-{nsfp}` on every call (asserted in both the service and job tests) |
+| Queue | `WithoutOverlapping('faktur-{id}')` |
+| Application | the submit guard below (widened — deviation 2) |
+| Transaction | `lockForUpdate()` on NSFP allocation (Phase 1, unchanged) |
+
+**Seven deliberate deviations from the roadmap's literal code** (the spec
+is prose with illustrative snippets; each of these was needed for a
+reason the snippet cannot see):
+
+| # | Roadmap says | Built | Why |
+|---|---|---|---|
+| 1 | `handle(PjapInterface $pjap)` method injection | `Tenant::find($id)?->makeCurrent()` then `app(PjapInterface::class)` **inside** `handle()` | queue workers have no HTTP tenant context; the container resolves the per-tenant binding *before* `handle()` runs, so method injection would bind a null tenant |
+| 2 | guard on `isSubmittable()` | `pjap_submission_id !== null \|\| ! in_array(status, ['draft','submitted'])` | a `submitted` row **without** a `pjap_submission_id` is a failed attempt being retried — `isSubmittable()` would swallow every retry; idempotency of the repeat rests on the `X-Idempotency-Key` |
+| 3 | `checkStatus()` returns a normalized array | throws `RuntimeException` on API failure | a failed check must retry, never fabricate a verdict or stamp `djp_response_at` with junk; the poll job re-throws and Laravel retries (`backoff 60`) with the faktur row untouched |
+| 4 | `Authorization` + `X-Idempotency-Key` | plus **`X-API-Secret`** | Klikpajak requires the secret header |
+| 5 | dispatch on a dedicated redis `tax` connection | `->onQueue('tax-submissions')` on the **default** connection; the `tax` connection ships as opt-in (`TAX_QUEUE_CONNECTION`) | existing workers and the sync test environment keep working unchanged; the dedicated-worker topology of §2.6 remains a one-env-var switch |
+| 6 | register in `config/app.php` `providers` | `bootstrap/providers.php` | Laravel 11+ moved the provider list; same effect |
+| 2.7-adjacent | one settings form | the **Klikpajak card posts on its own form** to `admin.efaktur.settings.save`, and `saveSettings()` gates all jurisdiction logic on `$request->has('tax_jurisdiction')` | the card sends no jurisdiction fields; without a key-presence gate (`Request::has()` is key-presence — the same signal Fix D relied on) every Klikpajak save would null the tenant's jurisdiction |
+
+**UI/settings + copy:** the settings page gained a Klikpajak card (API
+key, API secret, sandbox toggle, hints) for Enterprise and an upsell
+banner for plans without `efaktur_api`; CSV export stays as the
+fallback on every plan. **14 new message keys × en/id**
+(`efaktur_submit_to_djp`, `efaktur_queued_for_djp`,
+`efaktur_klikpajak_*`, …).
+
+**Tests (+35):**
+
+| File | n | Proves |
+|---|---|---|
+| `tests/Feature/Admin/EfakturApiTest.php` | 9 | professional plan → upgrade redirect + no job; enterprise → job pushed **on `tax-submissions`** with the right faktur; non-draft and unconfigured rejected; Klikpajak form saves its own fields; a Klikpajak-only save **never touches `tax_jurisdiction`/NPWP/PKP/PPN rate**; settings card vs upsell; show-page button rendered only when enabled |
+| `tests/Unit/Services/KlikpajakServiceTest.php` | 14 | exact URL/method/auth/idempotency/payload; 500 → throws after **3 attempts** (`retry(3, 1s)` retries 500s); 200-without-`submission_id` throws; status normalization ×4; `checkStatus` failure throws (1 attempt — no retry); `testConnection` ×3; batch map/failure/malformed; `cancel` true/false |
+| `tests/Unit/Jobs/SubmitFakturPajakJobTest.php` | 6 | success → `submitted`/`pending_djp` + `retry_count` + delayed poll chained; skips when PJAP already holds it or state is terminal; failure → `error_attempt_1`, re-thrown, 3 HTTP attempts, no poll; a `submitted`-without-id row **resubmits**; `failed()` reverts to `draft` |
+| `tests/Unit/Jobs/PollFakturPajakStatusJobTest.php` | 6 | approved → `djp_reference_number` + chain stops; rejected → terminal with reason; pending/missing → re-dispatch delayed, row otherwise untouched; no `pjap_submission_id` → silent; API failure → re-thrown, row untouched |
+
+**Test-infrastructure facts worth recording** (each cost a debugging
+round): `Http::fake()` **merges** stubs — the first matching stub wins
+for the whole test, so one fake per test and `Http::sequence()` for
+varying responses; `Queue::fake()` is **mandatory** in every job test
+(phpunit runs `QUEUE_CONNECTION=sync`, and a delayed self-re-dispatch
+would recurse); PHPUnit 11's `AssertionFailedError extends RuntimeException`,
+so failure tests use the `$caught = null` flag pattern — `$this->fail()`
+inside `catch (\RuntimeException)` would be swallowed by the catch.
+
+### Part 3 — The tutorial grid: every sidebar page, and the two decisions asked before touching it
+
+**The report was right: five pages were missing** from the "What would
+you like to explore?" grid (the sidebar and the contextual per-route
+guides had them; only the grid lagged):
+
+| Missing page | Route | Added under |
+|---|---|---|
+| e-Faktur (PPN faktur list) | `admin.efaktur.index` | Operations |
+| e-Faktur Settings (PKP/NSFP/Klikpajak) | `admin.efaktur.settings` | Configuration |
+| Notifications | `admin.notifications` | Administration |
+| Subscription Plan | `admin.setting.plan` | Configuration |
+| Notification Settings | `admin.setting.notifications` | Configuration |
+
+**Two decisions were asked first (user-answered), one opinion given:**
+
+1. **Financial Health stays in Accounting** (my recommendation, taken):
+   it is a live ledger *snapshot* with no period-select → generate →
+   export flow, so it does not match the Reports category's contract;
+   every Reports child carries its own `plan_feature` while Financial
+   Health is gated on `accounting` + `view-accounting`, so moving it
+   would mean re-gating for no gain; and its route is
+   `admin.accounting.health` with a dashboard strip linking there.
+2. **e-Faktur placement → Operations (list) + Configuration (settings)**
+   — the grid's categories are thematic, not a menu copy, so a
+   near-empty seventh card was avoided.
+3. **Dashboard skipped** — always the first sidebar item, already has
+   its own contextual guide; the grid exists for pages that need
+   discovery.
+
+**Edits:** `config/tutorial.php` gained the 5 entries; the modal's
+step-1 Operations overview now names e-Faktur; `lang/en|id/tutorial.php`
+`efaktur_klikpajak` was rewritten (it still said *"Coming Soon: Phase 2
+will add…"* — Phase 2 shipped this session) and `efaktur_djp_tracking`
+now describes the "Submit ke DJP" button plus the CSV fallback; the ID
+file gained the four keys it was missing (`skip_tutorial`, `next`,
+`got_it`, `back_to_categories`) — **en/id parity restored: 662/662**,
+those four previously fell back to English (`fallback_locale = en`).
+
+**Two regression guards (+2, in `TutorialServiceTest`) so this gap
+cannot silently reopen:**
+
+- `test_every_sidebar_page_appears_in_the_tutorial_grid` — walks
+  `config/navigation.php` and fails with the missing route names. Two
+  documented carve-outs: `admin.accounting.chart` ↔
+  `admin.accounting.accounts.index` are the same Chart of Accounts
+  feature on two routes (sidebar links the tree, grid links the
+  manager), and `admin.dashboard` is excluded per decision 3.
+- `test_every_tutorial_grid_route_exists` — the modal wraps `route()`
+  in `try/catch` and renders a dead `#` link on exception, so a typo
+  dies **silently in production**; the test makes it loud. (`admin.sales_pipeline.pipelines.index`
+  / `opportunities.index` are JSON endpoints, not pages, and are
+  correctly absent from both sides.)
+
+### Part 4 — The two failures the new text produced: one real collision, one pre-existing flake
+
+1. **`EfakturApiTest::show_page_renders_submit_button_only_when_enabled`
+   — `assertDontSee('Submit ke DJP')` failed** because the rewritten
+   `efaktur_djp_tracking` guide now quotes that exact label, and the
+   tutorial modal renders on every page for every plan. The label is no
+   longer a unique signal, so the test asserts on the **form action URL**
+   (`route('admin.efaktur.submit', $faktur)`) for both see/dont-see —
+   the button's presence, not its wording, is what the test means.
+2. **`WarehouseServiceTest::it_returns_error_if_updating_to_second_main_warehouse`
+   — random-order flake, pre-existing and unrelated.**
+   `updateWarehouse()` checks *duplicate name* (line 65) **before**
+   *second main* (line 69), and `WarehouseFactory` names come from
+   `faker->word` — when both warehouses draw the same word, the wrong
+   error wins (`'This warehouse already exists.'`). The test never
+   pinned its names; it now does (`Main Warehouse` / `Branch Warehouse`).
+   The service's check order was left alone — name-first is defensible
+   pre-existing behaviour, not this session's to reorder.
+
+### Part 5 — Hardening pass: two conversion edge tests, the Mekari subscription disclosure, and every `docs/` file brought current
+
+**Two edge tests, both driving the real conversion path.** Added to
+`tests/Feature/Admin/QuotationControllerTest.php` (file now 33 tests),
+each POSTs to `route('admin.quotations.convert-to-sales')` and exercises
+the real `QuotationController::convert()` → `SalesService::finalizeConvertedSale()`
+stack — no application code mocked, arithmetic asserted against the same
+accounting-settings keys the implementation reads:
+
+1. `test_convert_to_sales_keeps_gross_in_revenue_when_ppn_keluaran_account_is_missing`
+   — ID tenant + `is_ppn` tax, but the default `CreatesTenant` settings
+   carry **no** `ppn_keluaran_account_id` (the test asserts that
+   precondition so it can never silently pass on a future settings
+   change). The e-Faktur snapshot still travels with the sale
+   (`ppn_enabled`, `ppn_amount = 110`), yet the journal is the plain
+   four-line form — Dr AR 1110 / Cr Revenue 1110 (VAT left inside
+   revenue) / Dr COGS 400 / Cr Inventory 400, balanced — pinning
+   `createSale()`'s documented account-missing fallback at the
+   conversion call site instead of failing the whole conversion.
+2. `test_convert_to_sales_for_non_indonesian_tenant_posts_plain_four_line_journal`
+   — US tenant: the PPN gate is jurisdiction **and** tax `is_ppn`, so
+   no snapshot applies (`ppn_enabled`/`pph_enabled` false, amounts 0),
+   exactly **one** journal entry with four transactions, and
+   AR = revenue = the full 1110 total with no VAT split or withholding.
+   A converted sale for a non-ID tenant must be indistinguishable from
+   any other non-ID sale.
+
+**Mekari subscription disclosure (user-approved copy).**
+`efaktur_klikpajak_card_hint` (en + id) now states that production
+direct submission requires an **active Mekari Klikpajak subscription —
+separate from and on top of the tenant's Invent-MAG plan**. Previously
+the card only said credentials are "issued by Mekari Klikpajak", which
+left the paid-subscription requirement to be discovered at go-live. Free
+paths (CSV export, sandbox testing) are unaffected.
+
+**Docs pass — all 16 `docs/*.md` files reviewed; 7 needed updates:**
+
+| File | What changed |
+|---|---|
+| `ROADMAP.md` | Phase 2 heading → `✅ COMPLETED (2026-11-05)` with the full status block: 7-deviation table, external-dependency note, deployment prerequisites, **provider-swap procedure** (code-level via `EFakturServiceProvider`, UI selector deliberately deferred), §2.8 as-implemented footnote; TOC anchors fixed (Phase 1 was broken too); `efaktur_api` moved from "slug to add" → live; competitive table row → `✅ Enterprise`; advantages/gaps list updated |
+| `FEATURE_CHECKLIST.md` | both Phase 2 boxes → `[x]` with the shipped details; pipeline-conversion line now records that both conversion paths journal at conversion |
+| `PPN_EVOLUTION.md` | TOC + heading → *Completed*; deliverables table gains per-item status (✅ client/submit/poll/cancel/batch — ❌ OAuth2, Faktur Pengganti, NSFP auto-fetch); API-flow diagram annotated with the as-built request shape; backlog row → done-with-caveats |
+| `ARCHITECTURE_ASSESSMENT.md` | market-fit row + gaps paragraph: Phase 2 no longer "remains planned" |
+| `INTERVIEW_QA.md` | Q24.6 rewritten from planned → shipped (incl. the Mekari dependency bullet); `efaktur_api` gating note, `klikpajak_api_key` schema note, and status-flow line updated; Q21.1 conversion answer now mentions the journal-at-conversion |
+| `TECHNICAL_SPECIFICATION.md` | "Committed Future Enhancements" → shipped pointer; §9.3 Future(Phase 2) block → as-built (jobs, poll cadence, gating) |
+| `STRUCTURE.md` | the changeset's new files added to the tree: `app/Contracts/PjapInterface.php`, `app/Jobs/` (both new jobs **and** the pre-existing `DownloadShopeeCoverImages.php` the tree had never listed), `EFakturServiceProvider`, `Services/Pjap/KlikpajakService`, and the 6 new test files |
+
+**Deliberately untouched:** `DEPLOYMENT_CHECKLIST*.md` (both are
+release-scoped snapshots — "Applies to the changeset that…", "Aug 2026"
+/ "2026-10" — and a Phase-2 deployment note would misrepresent their
+scope; the live prerequisites live in ROADMAP §4's status block and in
+the Deployment note below), `TAXATION_SYSTEM.md` / `TAXATION_IMPROVEMENT.md`
+(factual/historical — zero Phase 2 claims), the setup guides,
+`FILTERING_PITFALLS.md`, `LANDING_PAGE_CMS.md`, and `ACTUAL_TREE.txt`
+(historical snapshot). `CHANGELOG.md` is this entry. A final sweep
+(`grep` for `not yet live|remains planned|🔜|PLANNED:`) shows only two
+intentional hits: the roadmap's future PPh 21 line and a struck-through
+gap item.
+
+### Verification
+
+- **`php artisan test` (PHP 8.5.12): EXIT 0 — 1,356 tests / 4,687
+  assertions, 0 failures** (317s). Delta over yesterday's 1,314/4,482 is
+  exactly **+3 (Part 1) + 35 (Phase 2) + 2 (tutorial) + 2 edge tests
+  (Part 5) = +42**.
+- **Full PHPUnit on PHP 8.2 (`/opt/lampp/bin/php -d memory_limit=2048M
+  vendor/bin/phpunit`): OK (1,356 tests, 4,687 assertions), 0
+  deprecation lines** (5m11s) — the vendor deprecation patch from
+  yesterday's entry still holds.
+- `npm run build` clean.
+- **Live DB intact (re-verified after Part 5):** tenant 3
+  `tax_jurisdiction = 'ID'`, 16
+  opening-balance rows, 1 opening journal entry. The Phase 2 migration
+  **was missing on live** and was run this session: `efaktur_api` now
+  `starter=0 / professional=0 / enterprise=1`.
+- All work **uncommitted** (64 files: 52 modified, 12 new) by design —
+  the user runs git.
+
+**Still open (unchanged from yesterday, reported not actioned):** (1)
+composer advisories / the Laravel ≥12.60 upgrade decision — also the
+permanent home of the vendor deprecation patch (it reverts on the next
+`composer install`/`update`); (2) pre-existing:
+`updatePurchaseReturn` never touches the journal, returns have no
+PPN/PPh entry UI. **Closed since yesterday:** converted sales never
+posting journals (Part 1 above).
+
+**Deployment note for Phase 2:** jobs dispatch onto the default
+connection's `tax-submissions` queue — production needs a worker
+listening on that queue name (or `TAX_QUEUE_CONNECTION=tax` plus the
+supervisor block from §2.6) before submissions run asynchronously;
+otherwise they wait in the queue table.
+
+---
+## 2026-11-04 — The Cross-Module Consistency Verdict (Every PPh Writer Audited: Zero Ungated; the Non-ID Path Given Its First Five Tests, Each Proven Against a Reverted Fix), the One Real Gap Found and Left Open — Quotation- and Pipeline-Converted Sales Never Reach the Journal at All — and `php artisan test` on the System PHP Was Never About the Code: Two PHPs on One Machine, a Child Process That Ignores `-d`, a One-in-Fifty Factory Flake, and PHP 8.5's Deprecated PDO Constant
+
+This entry answers the session's questions, in order: *is the accounting
+consistent across every module that touches the journal, is the
+opening-balance work still sound, why did `php artisan test` suddenly stop
+working when it "used to just run fine"?, what to do about PHP 8.5's
+deprecated-PDO-constant warnings in otherwise-green test output, and what
+the two VS Code test trees ("Laravel Tests" / "PHPUnit Tests") actually
+are?*
+
+### Part 1 — The audit: how PPh is gated, and where it had never been tested
+
+**The rule.** Withholding tax (PPh) applies only when **both** conditions
+hold: the tenant's `tax_jurisdiction` is Indonesia (`isIndonesian()`), and
+the selected tax row is actually a PPh tax (`is_pph`). The helpers that do
+the arithmetic — `SalesHelper::calculatePphAmount` / `PurchaseHelper::calculatePphAmount`
+— are deliberately **pure calculators**: they know nothing about tenants.
+Gating belongs to the *writer*, the code that persists the result.
+
+**Tally across `app/` (final, this pass):**
+
+- **7 write sites** persist `'pph_amount' => …` — `SalesService` (create,
+  update), `PosService`, `PurchaseService` (×2), `QuotationController`
+  (store, update) — and the **7 paired `'pph_rate' => …`** sites. Every one
+  is wrapped in `$isIndonesian && ($pphTax?->is_pph ?? false) ? … : 0|null`.
+  (Two further occurrences of each key are the `float` cast declarations in
+  the `Sales`/`Purchase` models — not writes.)
+- **7 external `calculatePphAmount()` call sites**, every one guarded:
+  `$pphApplied ? …Helper::calculatePphAmount(...) : 0`. The 4 remaining
+  calls are *inside* the two helpers (one per calculator per helper) —
+  internal, by design.
+- **Ungated writers outside the helpers: 0.**
+
+The journal itself carries **no PPh logic** — it posts whatever transactions
+the writer hands it. That is the correct layering: one gate at each writer,
+and every path (sale, POS sale, purchase, quotation store *and* update)
+inherits the same rule.
+
+**The coverage gap this audit exposed.** Every existing test exercised only
+the **ID path** (gate on). Nothing anywhere proved the gate *off* — so a
+regression that applied PPh to a US-tenant quotation would have passed CI.
+Five tests were added, mirroring the `SalesServiceTest` pattern
+(`$this->tenant->update(['tax_jurisdiction' => 'US'])` plus an ID control
+test):
+
+| File | Test |
+|---|---|
+| `QuotationControllerTest` | `test_store_does_not_apply_pph_for_non_indonesian_tenant` |
+| `QuotationControllerTest` | `test_store_applies_pph_for_indonesian_tenant` (control) |
+| `QuotationControllerTest` | `test_update_does_not_apply_pph_for_non_indonesian_tenant` |
+| `PosServiceTest` | `it_does_not_apply_pph_on_pos_sale_when_tenant_not_indonesian` |
+| `PurchaseServiceTest` | `test_it_does_not_apply_pph_for_non_indonesian_tenant` |
+
+**Each test was proven to catch its bug**, not merely to pass: the gate was
+temporarily reverted (PPh applied regardless of jurisdiction), the test was
+run, and it failed with exactly the wrong numbers — quotation total
+**1,090 instead of the required 1,110** (and `pph_amount` non-zero),
+POS total **216 instead of 220**, purchase failing its assertion — then the
+fix was restored (diff-verified identical) and everything went green again.
+
+### Part 2 — The one real gap: converted sales never reach the journal (found, **not** fixed)
+
+Probing "does *every* path that creates a `Sales` row post a journal?" found
+the answer is **no** — and this was not previously known or documented.
+There are exactly four `Sales::create()` sites:
+
+| Path | Journal at creation? |
+|---|---|
+| `SalesService::createSale` | ✅ invoice entry (Dr AR / Cr Revenue, COGS pair, PPN Keluaran split for ID tenants) + optional PPh withholding + credit-usage entries |
+| `PosService` | ✅ three entries (invoice, COGS, cash) |
+| `QuotationController::convertToSales` | ❌ **none** |
+| `SalesPipelineService::convertToSalesOrder` | ❌ **none** |
+
+Consequences of the two ❌ paths, in cascade order:
+
+1. **GL revenue misses the sale.** `FinancialReportingService` (and every
+   other statement) reads *posted `JournalEntry` rows*; the sales dashboards
+   read the `sales` table. A converted sale therefore appears in one and
+   not the other — the two disagree by exactly the converted amount.
+2. **Pipeline conversions also skip COGS.** `convertToSalesOrder` decrements
+   `ProductWarehouse` directly (physical stock moves) but posts no
+   Dr COGS / Cr Inventory — so **GL inventory diverges from physical
+   inventory** for every pipeline order.
+3. **Payments make it worse, not better.** `addPayment` posts Dr Cash /
+   Cr AR for cash received — against an AR that was never debited.
+4. **`status = 'pending'` is a dead end.** The quotation path sets it;
+   nothing in the codebase ever transitions it (the dashboard only counts
+   `Unpaid`/`Partial`, and `SalesController` contains no status handling at
+   all — zero matches for "status").
+5. **Returns against such sales can't reverse.** `SalesReturnService`
+   reads the *original* journal to compute proportional PPN/PPh/COGS
+   reversal ratios; no original journal → ratio 0 → the reversal lines
+   silently skip.
+6. **Pipeline conversions additionally write no `pph_rate`/`pph_amount`**
+   at all — inconsistent with every other writer even before journaling.
+
+**Not fixed here.** The fix is a design decision, not a patch: should the
+conversion post the journal immediately (mirroring `createSale`), or should
+the sale be journaled when it leaves `pending` (and who moves it)? Both
+`convertToSales` and `convertToSalesOrder` are reported for exactly that
+decision rather than silently choosing one.
+
+### Part 3 — `php artisan test`: two PHPs, one machine, and a child process that ignores `-d`
+
+**Symptom.** Plain `php artisan test` failed with `could not find driver
+(Connection: sqlite … PRAGMA foreign_keys = ON)`, later an OOM fatal, later
+still 15 `GD extension is not installed` errors — while the same suite ran
+green moments earlier under a different binary.
+
+**Root cause — there are two PHPs, and the system one was never equipped:**
+
+| | XAMPP: `/opt/lampp/bin/php` (8.2.12) | Arch system: `/usr/bin/php` (8.5.12) |
+|---|---|---|
+| `pdo_sqlite` / `sqlite3` | bundled, enabled | **never installed** before 2026-11-03 21:40 |
+| `gd` | bundled | still missing |
+| `memory_limit` | **512M** | **128M** (the suite peaks ≈171M) |
+
+`/var/log/pacman.log` covers the machine's entire life (it starts
+2026-05-01, the build date): the php package was installed 2026-05-15
+(8.5.6) and upgraded six times since, but **the first-ever
+`pacman -S php-sqlite` entry is 2026-11-03T21:40:33 — run by the user,
+following this session's instructions** (the two extension lines in
+`/etc/php/php.ini` were uncommented four minutes later, `php.ini` mtime
+2026-11-03 21:44). So the system `php` could **never** have run this suite
+before — this is not a regression, and **`sudo pacman -Syu` is exonerated**:
+the Nov 2 upgrade only took php 8.5.12-1 → 8.5.12-3 and touched neither
+sqlite nor composer. The project's own history explains the memory of it
+"just working": it began on **Windows XAMPP** (the `dump_binary_path` in
+`config/database.php` still reads `C:/xampp/mysql/bin`), where these
+extensions are enabled by default, and every green run on this machine —
+including all of this session's — used XAMPP's PHP.
+
+The shell history pins down the user's three attempts, all on the system
+PHP: **Nov 3, 19:07 and 20:09** ("could not find driver"), then **21:48** —
+after the sqlite install — which got far enough to die on the two remaining
+walls (128M limit, no GD).
+
+**The detail that made it deceptive:** collision's `artisan test` **always
+spawns a child** — `Process([PHP_BINARY, 'vendor/phpunit/phpunit/phpunit',
+…])` (or paratest under `--parallel`) — and the child does **not** inherit
+the parent's `-d` flags. `php -d memory_limit=2G artisan test` raises the
+*parent*; the child still reads `/etc/php/php.ini`. **php.ini is the only
+lever** for the child.
+
+**Verification without sudo:** `PHP_INI_SCAN_DIR=/etc/php/conf.d:<dir>`
+with a two-line override (`memory_limit = 1024M`, `extension=…/gd.so` in a
+scratch dir) reaches the child, which made the user's exact command
+runnable end-to-end on PHP 8.5.12: **`php artisan test` → EXIT 0,
+1,314 tests / 4,482 assertions, 0 failures** (302s). The gd `.so` came
+from the same mirror as php-sqlite (`php-gd-8.5.12-3`, loaded via `-d` into
+a scratch dir — no system files touched).
+
+**Both commands have since been applied by the user** (verified this pass:
+`gd`, `pdo_sqlite`, `sqlite3` all loaded; `memory_limit = 512M` at
+`/etc/php/php.ini:430`; `extension=gd` at line 921):
+
+```
+sudo pacman -S php-gd
+# then in /etc/php/php.ini:
+#   line 921:  ;extension=gd        →  extension=gd
+#   line 430:  memory_limit = 128M  →  memory_limit = 512M
+```
+
+so plain `php artisan test` now works out of the box — re-verified
+end-to-end after the deprecation fix in Part 5: **EXIT 0, 1,314 tests /
+4,482 assertions, 0 failures, zero deprecation lines** (157s). (The
+XAMPP alternative, `/opt/lampp/bin/php artisan test`, never needed any of
+it.)
+
+### Part 4 — The one-in-fifty flake: `NotificationServiceTest`
+
+**Symptom.** `it_can_get_due_notifications` failed intermittently —
+`Failed asserting that actual size 6 matches expected size 5` at the
+`assertCount(5, …)` — roughly one run in fifty, in suites otherwise green.
+
+**Root cause — randomness in the factory, not in the service.** The test's
+fourth product was created with a bare `Product::factory()->create()`. The
+factory rolls `low_stock_threshold` ∈ [5, 20] *and* (in its `afterCreating`
+hook) stock ∈ [0, 1000] — so with ≈1–2% probability that product itself
+lands in the low-stock window, a **6th** "Low Stock Alert" notification
+appears and the count assertion breaks. The service was never wrong.
+
+**Proven, not guessed:** forcing the exact condition (a factory product
+inside the window) reproduced the identical failure at line 69; the fix
+makes the product deterministic — `withStock(500)` with
+`low_stock_threshold = 10`, comfortably outside any window. Result:
+**60/60 consecutive green runs** of the file (the flake previously fired
+~1/50).
+
+### Part 5 — PHP 8.5's deprecated PDO constant: purged from our config, then traced into the framework's own copy and eliminated at the source (zero deprecation output on both printers)
+
+PHP 8.5 deprecates `PDO::MYSQL_ATTR_SSL_CA` (`use Pdo\Mysql::ATTR_SSL_CA
+instead`). `config/database.php` read it eagerly while building both mysql
+and mariadb option arrays — on every config load, i.e. every test.
+
+**Fix (version-safe, behaviour-identical):** the options array is now built
+**only when `MYSQL_ATTR_SSL_CA` is actually set** (otherwise it was an
+empty-after-`array_filter` array anyway) and, when set, uses
+`Pdo\Mysql::ATTR_SSL_CA` if that class exists (PHP ≥ 8.5) falling back to
+the old constant (PHP < 8.5 — the XAMPP side). Verified on both: env set →
+the attribute is passed, env unset → empty array, exactly as before.
+
+**The vendor copy — traced and eliminated (same session, after the
+user's green-but-noisy runs):** two notices still originated in
+`vendor/laravel/framework/config/database.php` — the framework's own
+copy. A backtrace pinned the chain: on **every** boot,
+`LoadConfiguration::getBaseConfiguration()`
+(`Illuminate/Foundation/Bootstrap/LoadConfiguration.php:191`) `require`s
+**every** `*.php` in `vendor/laravel/framework/config/` — the app's
+`config/database.php` overrides the vendor file's *values*, never its
+*execution*. Three dead ends were established before the working fix:
+
+- **Masking in `phpunit.xml` does not work.** A
+  `<ini name="error_reporting" value="22527"/>` line (E_ALL minus
+  E_DEPRECATED on both PHPs) was tried and **proved ineffective**:
+  PHPUnit's `ErrorHandler::enable()` overwrites the level at run start
+  (`ErrorHandler.php:233`, `error_reporting(original &
+  UNHANDLEABLE_LEVELS)`), and PHP invokes the handler regardless of the
+  mask — the events were still collected. The line has been removed
+  again; `phpunit.xml` is byte-identical to its committed state.
+- **A PHPUnit baseline only half-works.** `--generate-baseline` / the
+  root `baseline=` attribute would silence direct `phpunit` runs (the
+  Collector returns early on `ignoredByBaseline` issues), but
+  `php artisan test` ignores baselines entirely: collision's
+  `DefaultPrinter::testPhpDeprecationTriggered` marks the test
+  `DEPRECATED` **unconditionally** — it never reads the flag. Since the
+  user runs `php artisan test`, a baseline alone would have left the
+  noise exactly where it bothers them.
+- **Upgrading the framework** (the constant is fixed upstream in
+  ≥ 12.60) is the permanent cure but a major upgrade — Part 6.
+
+**The fix applied — collision's own patch, by hand:** it turns out
+`nunomaduro/collision` **ships** `scripts/fix-pdo-constant.php`, written
+by its authors for this exact constant — but it targets
+`__DIR__.'/../vendor/…`, a path that only exists inside collision's own
+development repo, so it silently no-ops in app installs. Its transform was
+applied verbatim to all four reads of the constant in the framework:
+`(PHP_VERSION_ID >= 80500 ? Pdo\Mysql::ATTR_SSL_CA : PDO::MYSQL_ATTR_SSL_CA)`
+— the 2 firing sites (`config/database.php:61/81`, the mysql + mariadb
+option arrays) plus 2 dormant ones in `MySqlSchemaState.php` (schema
+dump/load, which would otherwise warn the moment `schema:dump` runs on
+PHP 8.5). Behaviour-identical by construction: the same integer on every
+PHP, and on PHP < 8.5 the ternary's else-branch is literally the original
+expression. `vendor/` is git-ignored, so the working tree is untouched by
+it — and it **reverts on the next `composer install`/`update`**, which is
+one more reason the Laravel upgrade in Part 6 is the permanent answer.
+
+**Result: zero deprecation lines in the output of both runners, on both
+PHPs** — see Verification.
+
+### Part 6 — Composer: 51 advisories, framework update blocked (reported, **not** actioned)
+
+- `composer audit` (installed): **5 advisories, all `laravel/framework`** —
+  incl. **PKSA-b41t-wbzk-9q51** (TokenGuard authentication bypass through
+  non-string API credentials), debug-page XSS, signed-URL path confusion,
+  and two CRLF-injection-in-default-email-rule reports.
+- `composer audit --locked`: **51 advisories across 13 packages** (the
+  wider set includes dev-only dependencies), plus **3 abandoned** packages
+  (`dragon-code/*`).
+- **`composer update laravel/framework` cannot resolve at all:** Composer
+  2.11's advisory blocking (a feature that arrived with 2.11.0 on Oct 29)
+  rejects **every** version satisfying the root constraint `^11.31`
+  (v11.31.0 … v11.57.1) against **9 PKSA advisory IDs**, because the fixed
+  versions are ≥ 12.60 / ≥ 13.10 — a major upgrade. The documented escape
+  hatches (`policy.advisories.ignore-id`, `policy.advisories.block=false`)
+  exist but were **not** used: this is the owner's call, not a silent
+  downgrade of the security policy.
+
+### Part 7 — The two VS Code test trees ("Laravel Tests" / "PHPUnit Tests") are two extensions running one suite
+
+The Testing sidebar showed both trees listing the same tests — they are
+**two extensions each registering its own test controller**, not two
+suites: "Laravel Tests" comes from `laravel.vscode-laravel` (the label is
+a literal in its `dist/extension.js`), "PHPUnit Tests" from
+`devsense.phptools-vscode` (PHP Tools; label in `out/src/extension.js`).
+Every run is therefore duplicated — keep either tree (the Laravel one
+drives `php artisan test`, PHP Tools drives phpunit directly) and ignore
+or disable the other; there is no data difference between them.
+
+Counts: phpunit is authoritative — **1,314** (`--list-tests` prints 1,317
+lines minus 3 headers; **0 data providers** anywhere in `tests/`, and the
+only PHP files outside the two suites are `tests/TestCase.php` and
+`tests/Traits/CreatesTenant.php` with **0** test methods). PHP Tools'
+tree showed 1,320 (+6) — a quirk of its own discovery parser, not missing
+or extra tests. (An earlier "123/123" reading was simply a partial run.)
+
+### Verification
+
+- **Full PHPUnit on PHP 8.2 (XAMPP): 1,314 tests / 4,482 assertions,
+  0 failures** — multiple runs including the final post-Part-5 run
+  (**EXIT 0, 0 deprecation lines**, 2m41s); the delta over the
+  2026-11-03 entry's 1,309/4,448 is exactly the five gate tests above.
+- **`php artisan test` on PHP 8.5.12 (system): EXIT 0, 1,314 / 4,482,
+  0 failures, 0 deprecation lines** (157s) — now fully out of the box:
+  the user's installed gd + 512M (Part 3) plus the Part 5 vendor patch;
+  the same command previously ended in `! … deprecated` markers on every
+  boot.
+- **Flake fix:** `NotificationServiceTest` **60/60** consecutive green.
+- **Module sweep probe: 15 routes HTTP 200**, no error banners, no console
+  errors (Firefox `NS_BINDING_ABORTED` background-XHR flakes re-requested
+  standalone → 200; `/admin/journal` 404 was the probe's wrong path —
+  correct: `/admin/accounting/journal`).
+- **Live tenant 3 intact:** `tax_jurisdiction = 'ID'`, `isIndonesian =
+  true`, 16 opening-balance rows, 1 opening journal entry.
+- `npm run build` clean.
+
+**Still open (reported, awaiting a decision):** (1) converted sales never
+post journals — Part 2; (2) composer advisories / Laravel 12 major
+upgrade — Part 6, which is also the permanent home of the Part 5 vendor
+patch (it reverts on the next `composer install`/`update`); (3)
+pre-existing, unchanged: `updatePurchaseReturn`
+never touches the journal, returns have no PPN/PPh entry UI, and
+`Transaction` still has no `account_name` accessor (all remaining readers
+now go through the `account` relation, so the NULL bug has no other
+victims). All work remains **uncommitted** — 27 files (25 modified,
+2 new) — as always, git is the user's to run.
+
+---
+## 2026-11-03 — Opening Balance (New-Tenant Onboarding): the General Ledger Counted Every Opening Figure Twice, the Page Never Re-Shown What It Had Saved, and Delete Quietly Matched Nothing on the Test Driver
+
+Follow-up to the 2026-11-02 audit. That pass asked whether the tax and
+button work left anything inconsistent; checking the answer meant opening
+the one area the audit never touched — **`/admin/accounting/opening-balance`**,
+the first thing a new tenant touches. It is the page that configures the
+correct balance *before* accounting starts, so an error here is not a
+reporting nuance: it is the foundation every later statement stands on.
+
+Three separate defects, one of them user-visible in production on day one.
+
+### Part 1 — The General Ledger reported double the opening balance
+
+**Symptom.** Save an opening balance of 1,000 on the setup page, then open
+**Accounting › General Ledger** for any period after that date: the opening
+balance reads **2,000**. The Trial Balance for the same date reads **1,000**.
+The two core statements disagree about the same number.
+
+**Root cause — one figure written twice, then summed from both copies.**
+`OpeningBalanceService::saveOpeningBalances()` persists each figure into
+three places:
+
+1. an `OpeningBalance` row (the page's own record);
+2. `Account.opening_balance` — a denormalised column on the account;
+3. a real **opening journal entry** (`entry_type = 'opening'`) with genuine
+   `Transaction` rows, so the Trial Balance can see it.
+
+The Trial Balance (`AccountingReportService::generateTrialBalance`) sums
+**transactions only** — `withSum` over `transactions`, filtered to posted
+entries on or before the end date. It counts the opening balance **once**,
+correctly.
+
+`GeneralLedgerService::calculateOpeningBalance()` did something different: it
+added `Account.opening_balance` **and** separately `SUM`ed every transaction
+dated before the start date, with no `entry_type` filter. Because the save
+path writes both representations, the same 1,000 entered the result twice —
+**2,000 vs the Trial Balance's 1,000**, a difference exactly equal to the
+opening balance.
+
+**Why nobody had seen it.** `AccountSeeder::seedOpeningBalances()` creates
+the opening journal entry but **never sets `Account.opening_balance`** — the
+column stays `0`. On the seeded path the field contributes nothing and the GL
+is correct by accident. The bug lives only on the path a real new user takes:
+the setup page. Live tenant 3 confirmed it — 16 `OpeningBalance` rows, 1
+opening entry (16 transactions), `Account.opening_balance = 0` on every
+account — i.e. the seeded, working shape.
+
+**Fix — make the journal the single source of truth when it exists.** In
+`calculateOpeningBalance()`, an `EXISTS` check asks whether the account has
+*any* opening entry; if it does, `Account.opening_balance` is suppressed
+before the sum. The journal is then counted exactly once, matching the Trial
+Balance.
+
+The check is deliberately **date-independent**. The obvious version — suppress
+the field only when an opening entry falls *before* the start date — would
+reintroduce the double count the moment the period reached the opening date,
+and would show a doubled balance for a start date *before* it. A start date
+of 2025-12-01 against an entry dated 2026-01-01 must report 0 (nothing has
+happened yet), not 1,000. `EXISTS` on `entry_type = 'opening'` alone gives
+that: the field contributes only when the journal is not already carrying the
+figure.
+
+**Design intent preserved.** An `Account.opening_balance` with *no* opening
+entry is still honoured — `GeneralLedgerServiceTest`'s
+`test_opening_balance_includes_account_opening_balance` builds exactly that
+(500 on a bare account, no journal) and still passes. The fix only suppresses
+the field when the journal already carries it; it does not delete the field's
+meaning.
+
+**Reach.** The GL page routes `getGeneralLedger` → `calculateOpeningBalance`,
+and so do the PDF and CSV exports (`AccountingController` export branch), so
+the doubled figure was visible on screen and in both export formats.
+
+### Part 2 — The setup page never re-shown what it had saved (production, every driver)
+
+**Symptom.** Save opening balances, reload the page: every debit and credit
+input renders **blank**. The data is in the database — the summary card even
+totals it — but the form comes back empty, so the user cannot see or amend
+what they entered.
+
+**Root cause — a date compared in PHP instead of SQL.** `index()` built its
+prefill by filtering a Collection:
+
+```php
+$existingBalances = $this->openingBalanceService->getAllOpeningBalances()
+    ->where('balance_date', $balanceDate)   // Carbon vs 'Y-m-d' string
+```
+
+`balance_date` is cast to `date`, so each model holds a **Carbon**;
+`$balanceDate` is the request's `'Y-m-d'` **string**. Laravel's
+`Collection::where` with two arguments uses loose equality — but a `Carbon`
+*is* `Stringable`, so it bypasses the "one side is an object" short-circuit
+and falls through to `$retrieved == $value`. PHP then compares the object by
+its string form:
+
+```
+Carbon('2026-01-01 00:00:00') == '2026-01-01'   →   false
+```
+
+`'2026-01-01 00:00:00'` is not `'2026-01-01'`, so the comparison never
+matches — **on any database driver**, because it never reaches SQL. `$existing`
+was always `null` and every input fell back to `0`.
+
+**Fix.** The date filter moved into the query, where it belongs:
+`getAllOpeningBalances()` takes an optional `?string $balanceDate` and applies
+`whereDate('balance_date', $balanceDate)`; `index()` passes it and drops the
+PHP-side filter. Proven against live tenant 3 (16 seeded rows dated
+2026-09-01):
+
+```
+OLD (Collection->where with string)  = 0 rows   ← form rendered blank
+NEW (whereDate in SQL)               = 16 rows  ← form prefills
+```
+
+### Part 3 — Date equality matched nothing on the test driver (and delete silently no-op'd)
+
+**Symptom.** `deleteOpeningBalances('2026-01-01')` returned *"Opening
+balances deleted successfully."* and reset `Account.opening_balance` to 0 —
+but left the opening journal entry and its transactions in place, so the
+General Ledger still showed 1,000. Re-saving on the same date would likewise
+have stacked a second opening entry instead of replacing the first.
+
+**Root cause — a `DATE` column, a `date` cast, and two drivers that disagree
+about the bound value.** `journal_entries.date` and
+`opening_balances.balance_date` are `DATE` columns whose models cast them to
+`date`. On write, Laravel binds the cast as `'2026-01-01 00:00:00'`:
+
+- **MySQL truncates** the time part to store `2026-01-01`, so a subsequent
+  `where('date', '2026-01-01')` matched — which is why production appeared
+  healthy;
+- **SQLite stores the value verbatim** as `'2026-01-01 00:00:00'`, so the
+  string comparison against `'2026-01-01'` matched **nothing**.
+
+phpunit.xml runs the suite on SQLite `:memory:`, so every equality filter in
+this path silently matched zero rows under test. Production was correct only
+by accident of MySQL's type coercion — the code was never driver-independent.
+
+**Fix — `whereDate()` at every equality site.** Six call sites in
+`OpeningBalanceService` (two in `saveOpeningBalances`'s pre-delete, three in
+`deleteOpeningBalances`, one in `getSummary`) now use `whereDate(...)`, which
+compares the date part on both drivers. Range comparisons elsewhere in the
+codebase (`<=`, `>=` — `CashFlowService`, `BankReconciliationService`,
+`FinancialReportingService`, `AccountingReportService`, …) are unaffected:
+a `'2026-01-01 00:00:00'` value still orders correctly against a bare date,
+so only *equality* was ever at risk. A sweep confirmed **no equality date
+filters remain** in `app/`.
+
+No index exists on `journal_entries.date` or `opening_balances.balance_date`
+beyond the `(tenant_id, account_id, balance_date)` unique key, so
+`whereDate`'s inability to use a bare-column index costs nothing here.
+
+**One expectation in the new test was wrong, not the code.** The first draft
+asserted that `calculateOpeningBalance(start = '2026-01-01')` returns 1,000
+for an entry *dated* 2026-01-01. The query is strictly `date < startDate`, so
+an entry on the start date is **in-period**, not "before" it: opening 0, the
+entry appears as a transaction, closing 1,000. The test now asserts the
+invariant that actually matters — **closing balance is 1,000 for every start
+date** (2025-12-01, 2026-01-01, 2026-02-01) and equals the Trial Balance,
+while the opening figure itself is 0 on the opening date and 1,000 after it,
+never 2,000.
+
+### Verification
+
+- **New regression suite** `tests/Unit/Services/OpeningBalanceGlTbConsistencyTest`
+  — **6 tests / 32 assertions**, covering: GL↔TB agreement after a save,
+  the closing-balance invariant across three start dates, the posted entry
+  being reversible by the page's Delete button, re-save replacing rather than
+  stacking, the date-based prefill/summary lookups, and the bare-field case.
+- **Full PHPUnit: 1,309 tests / 4,448 assertions, 0 failures** (5m42s,
+  255MB peak) — up from 1,303/4,416, i.e. exactly these 6 tests and 32
+  assertions. *(Superseded the next day: **1,314 / 4,482** after the five
+  gate tests added in the 2026-11-04 entry below.)* Affected suites re-run
+  green first: `GeneralLedgerServiceTest`,
+  `OpeningBalanceServiceTest`, `OpeningBalanceControllerTest`,
+  `AccountingControllerTest`, `BankReconciliationControllerTest`.
+- **Live prefill probe** (headless Firefox, GET-only) on
+  `/admin/accounting/opening-balance?date=2026-09-01`: **6/6 PASS** — all 5
+  seeded figures prefilled with their real values (Cash 50000, Bank 200000,
+  AR 75000, Allowance credit 2500, Inventory 100000) and an unrelated date
+  still rendering blank inputs.
+- **Health probe 50/50** across the 8 routes + settings wiring (one run
+  showed a single Firefox `NS_BINDING_ABORTED` navigation flake; immediate
+  re-run 50/50), including the mirror check proving the probe leaves the live
+  tenant untouched (`before=ID after=ID`).
+- **Module sweep probe: 15 routes, all HTTP 200**, no error banners and no
+  console errors (background XHRs showed the usual Firefox
+  `NS_BINDING_ABORTED` navigation flakes — each affected endpoint returned
+  200 when re-requested standalone). One probe miss was the probe's own
+  bug: `/admin/journal` 404s because the correct path is
+  `/admin/accounting/journal`.
+- **Live tenant 3 state confirmed intact** after probing: 16 opening-balance
+  rows, 1 opening entry (16 txns), `Account.opening_balance = 0` everywhere,
+  `tax_jurisdiction = 'ID'`, `isIndonesian = true`.
+- `npm run build` clean (5.33s).
+
+**Not changed:** `Account.opening_balance` is still written by
+`saveOpeningBalances()` and still read by `BankReconciliationService` as the
+bank-reconciliation prefill — that consumer wants the field and was left
+alone. The three-representation design (rows + column + journal) is retained;
+only the *counting* was corrected.
+
+---
+
+## 2026-11-02 — Buttons That Look Like Buttons (Financial Health soft pills), and the Tax-Jurisdiction Audit: Why "Success" Didn't Apply the Jurisdiction, a Scope Fix for the Dropdown Leak, and the `account_name` NULL Bug That Silently Zeroed Every Return Reversal
+
+Two pieces of work in one pass: a small affordance fix on the Financial
+Health page, and an end-to-end audit of tax jurisdiction across accounting,
+sales, sales return, purchase, purchase return, and the tax pages
+themselves.
+
+### Part 1 — The soft pills read as badges, not buttons
+
+**Symptom.** "Compare all" and the per-item severity link pills on
+**Accounting › Financial Health** are `rounded-pill bg-*-lt text-*` — flat
+tint, no border, no hover, no pointer cursor. First-time users never suspect
+they are clickable.
+
+**Fix.** A new `.fh-soft-action` class (`resources/css/app.css`) that keeps
+the approved tint but restores every button signal:
+
+- a 1px border tinted by `currentColor`, so **one rule** covers
+  primary/warning/danger/… instead of a class per tone;
+- a hover/focus-visible that deepens the tint — it needs `!important`
+  because the `bg-*-lt` utility also carries `!important` and would
+  otherwise win the cascade;
+- `cursor: pointer` plus a faint elevation shadow, and an inset shadow on
+  `:active`.
+
+`color-mix(in srgb, currentColor …)` keeps the border translucent in **both**
+themes; browsers without it simply fall back to today's borderless pill —
+the fix degrades to the previous look rather than to nothing. Applied to the
+Compare-all button and the severity link pills; the markup assertion in
+`FinancialHealthControllerTest` was updated to match the fixed class order.
+
+### Part 2 — Tax jurisdiction: "it saves, but it doesn't apply"
+
+**The report.** Changing *Tax Jurisdiction* on the settings page showed a
+success toast, but the change did not apply to the rest of the system.
+
+**Root cause — two save paths, and only one of them knew about the field.**
+The jurisdiction `<select id="taxJurisdictionSelect">` lives in its own
+"Tax Region" section **outside** `<form id="systemSettingsForm">`, because it
+saves itself over AJAX (`admin.setting.update-tax-jurisdiction`). The main
+**Save Settings** button posts the *form* — which contained **no
+`tax_jurisdiction` field at all**. So:
+
+- the AJAX path worked and toasted success;
+- the main-form path *also* toasted success ("System settings updated
+  successfully.") while silently omitting the jurisdiction.
+
+Which behaviour the user saw depended on which control they touched, and a
+save racing an in-flight jurisdiction request could revert it. A success
+toast over a dropped field is the worst possible version of this bug: the UI
+was certain, and wrong.
+
+**Fix D — one field, one helper, one message.**
+
+1. A hidden `<input type="hidden" name="tax_jurisdiction">` now sits **inside**
+   the form, under the same plan gate as the section (starter plans don't
+   render the section, so the field is absent — and `Request::has()` in
+   Laravel is *key-presence* based, which is exactly the signal needed to
+   leave those tenants untouched).
+2. A `change` listener mirrors the select into the hidden input **immediately**,
+   so if the user hits Save while the AJAX request is still in flight both
+   paths agree on the value.
+3. `SettingsController::update()` now handles `tax_jurisdiction` through
+   **`applyTaxJurisdiction()`** — the same helper `updateTaxJurisdiction()`
+   uses, so the e-Faktur draft safeguard and the "switching away never
+   deletes tax rows" behaviour are identical on both paths. The helper returns
+   `{success, changed, message}` and is idempotent: an unchanged value reports
+   "updated", never a false "jurisdiction saved".
+4. The response message now **discloses** the jurisdiction outcome — including
+   when a switch is *refused* (unissued PPN sale / draft e-Faktur). Settings
+   still save in that case, but the toast says the jurisdiction did not move,
+   instead of claiming it did. The non-AJAX redirect previously hardcoded
+   `System settings updated successfully.` and dropped the note entirely; it
+   now carries `$message`.
+5. The toast survives the post-save reload via the existing `sessionStorage`
+   handshake (`settingsSaved` / `settingsMessage`), and a failed AJAX save
+   **reverts both controls** to the last persisted value so the UI never
+   displays a jurisdiction that isn't real.
+
+**Fix E — the dropdown leak (selection disagreed with the journal).**
+PPN and PPh tax records only exist for the Indonesian jurisdiction, but
+`Tax::active()` / `Tax::default()` returned them to *every* tenant. A
+non-ID tenant could therefore select PPN 11% as its default and have the
+forms offer it, while the journal side (correctly) gated on
+`isIndonesian()` — so the document would store a tax the books ignored.
+
+The fix is a single `scopeForJurisdiction()` on `Tax`, applied **inside**
+`scopeActive()` and `scopeDefault()`, which covers all **25** call sites at
+once rather than hunting them individually. Non-ID tenants now see only
+non-PPN/PPh taxes in dropdowns *and* in fallback resolution (an unbound
+tenant is treated as non-Indonesian). The `TaxController` management page is
+deliberately **left unfiltered** — an admin must still be able to see and
+edit every tax row.
+
+**The bug underneath: `account_name` was always NULL.**
+While auditing the return paths, a pre-existing defect surfaced that made
+*every* proportional reversal silently do nothing. `Transaction` has no
+`account_name` column and no accessor — its schema is
+`id, tenant_id, journal_entry_id, account_id, type, amount`. Every
+`$transaction->account_name` read therefore evaluated to `null`, so:
+
+- the "what did the original journal actually post to VAT / withholding"
+  lookups matched nothing → ratio denominators and numerators were 0;
+- the code treated that as "nothing to reverse" and **skipped the PPN, PPh
+  and COGS reversal lines entirely**, leaving input VAT and withholding
+  permanently overstated on every return.
+
+Fixed at **7 read sites** (SalesReturnService ×2 blocks,
+PurchaseReturnService ×1 block of 3 reads) by resolving
+`$transaction->account?->name` and eager-loading `transactions.account` on
+the source entries. `AccountingService` already used `account_id` correctly,
+and the export/audit services already went through the `account` relation —
+the return services were the only victims. Grep now finds zero
+`transaction->account_name` reads under `app/`, `resources/`, `tests/`.
+
+**Accuracy fixes found during the same audit:**
+
+- **PPh gating.** Every `calculatePphAmount()` call site is now gated on
+  `$pphApplied = isIndonesian() && is_pph` (Sales create + update, Purchase
+  ×2, Pos, Quotation ×2). Previously a non-ID tenant selecting a PPh tax
+  stored and *subtracted* withholding it must never apply.
+- **AR booked at gross.** The sales journal now debits receivables at
+  `$grandTotal + $pphAmount`. The separate withholding entry already credits
+  AR for the PPh; booking AR at the net total deducted it **twice**.
+- **Sales-return PPN reversal** uses the original journal's *net* revenue
+  credit as the ratio base, not `$sale->total` (which is gross — using it
+  under-reversed a full return: 19.82 instead of 22.00).
+- **Purchase-return reversal** reads what the original journal actually
+  posted to PPN Masukan and PPh Payable and reverses those proportionally,
+  rather than recomputing from today's rates.
+
+### Verification
+
+- **Full phpunit: 1303 tests / 4416 assertions, 0 failures** — including
+  the previously known `FinancialReportingServiceTest::test_generate_income_statement_calculates_net_income_correctly`
+  flake, which passed this run.
+- **vitest: 209 / 209** (172 files).
+- New/extended tests: `SettingsTaxJurisdictionTest` (8 — hidden-field
+  persist, no-field untouched, idempotent no-false-claim, blocked switch
+  discloses but still saves), `SalesServiceTest` (29 — AR gross 222 +
+  withholding journal amounts, update non-ID no-shrink with a `total_tax`
+  discriminator that distinguishes all four fix states), `SalesReturnServiceTest`
+  (9 — full PPN reversal 22.00 off the net base), `PurchaseReturnServiceTest`
+  (6 — PPN Masukan 22 / PPh Payable 4 / AP net 218 reversal), and a new
+  `TaxJurisdictionScopeTest` (6 — non-ID excludes PPN/PPh from active +
+  default, ID sees them, both create-dropdowns filtered with a non-null
+  fallback, and an empty-list/null-default case that must not fatal).
+- Browser probe **50/50** across `/admin/sales`, `/admin/sales/create`,
+  `/admin/po`, `/admin/po/create`, `/admin/sales-returns`, `/admin/por`,
+  `/admin/efaktur`, `/admin/settings` — no console errors, no failed
+  requests, no error banners — plus the settings wiring checks (select,
+  options, hidden field inside the form, live mirror, and that the probe
+  itself leaves the tenant untouched).
+- A live save round-trip proved **both** paths end-to-end: the AJAX toggle
+  persists and toasts ("Yurisdiksi pajak berhasil diperbarui."), and the main
+  Save Settings path persists a jurisdiction value that was armed *without*
+  firing the AJAX handler — i.e. the hidden field alone carried it. The live
+  tenant was verified back on `ID` afterwards.
+- `npm run build` clean; compiled view cache cleared after blade edits.
+
+### Reported, not fixed (pre-existing, out of scope for this pass)
+
+- **`updatePurchaseReturn` never touches the journal.** Updating an existing
+  purchase return adjusts stock and totals but posts no reversing entry, so
+  the GL drifts from the document on every edit. `createPurchaseReturn` is
+  correct; only the update path is missing. Left as-is deliberately — it is
+  a separate behavioural change, not part of the jurisdiction work.
+- **Returns have no PPN/PPh UI.** Sales- and purchase-return screens don't
+  expose tax controls; tax comes from the parent document's snapshot. Fine
+  for full returns, but a *partial* return can't be given its own tax
+  treatment from the UI.
+- `Transaction` still has no `account_name` accessor — the reads were fixed
+  at the call sites rather than by adding a real accessor/relationship
+  alias, which would be the more durable fix if more code starts reading it.
+
+---
+
 ## 2026-10-31 — Financial Health: Net Margin beside Gross Margin, Debt-to-Equity + DSO cards, a Full-Page Explainer, a Period-Comparison Engine (per-card modal + "Compare all"), a Global Period Filter, and a UI-Pass (dashboard chart, outlook spacing, themed buttons, collapsible explainer)
 
 Extends the **Accounting › Financial Health** feature (2026-10-30). Same

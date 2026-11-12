@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Mail\SalesInvoiceMail;
 use App\Models\Customer;
 use App\Models\Product;
 use App\Models\Sales;
@@ -10,6 +11,7 @@ use App\Services\SalesService;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Validation\Rule;
 
 class SalesController extends Controller
@@ -197,6 +199,39 @@ class SalesController extends Controller
                 ->withErrors(['error' => 'Something went wrong: '.$e->getMessage()])
                 ->withInput();
         }
+    }
+
+    /**
+     * Email the invoice PDF to the customer. Open to every plan (invoice_email
+     * has no route gate); failures come back as a flash error, never a 500.
+     */
+    public function sendInvoice($id)
+    {
+        $sale = Sales::with('customer')->findOrFail($id);
+        $email = $sale->customer?->email;
+        $redirect = redirect()->route('admin.sales.show', $sale->id);
+
+        if (! $email) {
+            return $redirect->with('error', __('messages.invoice_email_missing'));
+        }
+
+        try {
+            Mail::to($email)->send(new SalesInvoiceMail($sale));
+        } catch (\Exception $e) {
+            // Scoped to Exception on purpose: every failure this route
+            // absorbs (SMTP transport, address compliance, PDF/view build,
+            // and the warnings Laravel converts to ErrorException) is one,
+            // so the user gets the flash instead of a 500. A PHP Error
+            // (TypeError, call on null) is a bug rather than a mail failure
+            // and is left to surface loudly instead of wearing
+            // "email failed" behind one log line. The class is logged next
+            // to the message so the two are never confused.
+            Log::error('Invoice email failed', ['sales_id' => $sale->id, 'exception' => $e::class, 'message' => $e->getMessage()]);
+
+            return $redirect->with('error', __('messages.invoice_email_failed'));
+        }
+
+        return $redirect->with('success', __('messages.invoice_email_sent', ['email' => $email]));
     }
 
     public function getCustomerPrice(Customer $customer, Product $product)

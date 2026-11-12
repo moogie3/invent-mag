@@ -72,11 +72,18 @@ Route::prefix('sales')->group(function () {
     Route::post('/{id}/payment', [SalesController::class, 'addPayment'])
         ->name('admin.sales.add-payment')
         ->middleware('can:edit-sales');
+
+    Route::post('/{id}/send-invoice', [SalesController::class, 'sendInvoice'])
+        ->name('admin.sales.send-invoice')
+        ->middleware('can:edit-sales');
 });
 
 // Sales Return Routes - Protected by plan feature
 Route::middleware('plan.feature:sales_returns')->group(function () {
     Route::get('sales-returns/sale/{sale}', [SalesReturnController::class, 'getSalesItems'])->name('admin.sales-returns.items');
+    // Before the resource: this is a 2-segment path that {salesReturn} would
+    // otherwise swallow and fail to bind.
+    Route::get('sales-returns/derive-reversal', [SalesReturnController::class, 'deriveReversal'])->name('admin.sales-returns.derive-reversal');
     Route::get('sales-returns/{salesReturn}/modal-view', [SalesReturnController::class, 'modalView'])->name('admin.sales-returns.modal-view');
     Route::resource('sales-returns', SalesReturnController::class)->names('admin.sales-returns');
     Route::post('sales-returns/bulk-delete', [SalesReturnController::class, 'bulkDelete'])->name('admin.sales-returns.bulk-delete');

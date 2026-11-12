@@ -1,5 +1,6 @@
 import { formatCurrency } from '../../../../utils/currencyFormatter.js';
 import { validateForm } from "../../../utils/formValidator.js";
+import { TaxReversalPreview } from "../../../utils/taxReversalPreview.js";
 
 export class PurchaseReturnEdit {
     constructor() {
@@ -13,6 +14,7 @@ export class PurchaseReturnEdit {
         this.totalAmountInput = document.getElementById('total-amount');
         this.itemsInput = document.getElementById('items-json');
         this.existingItemsInput = document.getElementById('purchase-return-items');
+        this.taxPreview = new TaxReversalPreview(document.getElementById('tax-reversal-preview'));
 
         this.returnedItems = {}; // This will hold the current state of returned items, keyed by PO item ID
         this.allPurchaseItems = []; // This will hold all items from the original purchase
@@ -181,6 +183,7 @@ export class PurchaseReturnEdit {
             totalAmount += item.price * item.returned_quantity;
         }
         this.totalAmountInput.value = formatCurrency(totalAmount);
+        this.taxPreview.update('purchase_id', this.purchaseSelect.value, totalAmount);
     }
 
     handleSubmit(event) {

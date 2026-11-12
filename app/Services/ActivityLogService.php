@@ -105,20 +105,6 @@ class ActivityLogService
         return $this->log($module, ActivityLog::ACTION_EXPORT, $description);
     }
 
-    public function logPayment(string $module, string $description, $model = null): ActivityLog
-    {
-        return $this->log(
-            $module,
-            ActivityLog::ACTION_PAYMENT,
-            $description,
-            null,
-            $model ? $model->toArray() : null,
-            $model ? get_class($model) : null,
-            $model?->id,
-            $this->guessLabel($model)
-        );
-    }
-
     // -------------------------------------------------------------------------
     // Query helpers (used by AuditLogController)
     // -------------------------------------------------------------------------

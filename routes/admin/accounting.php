@@ -102,6 +102,7 @@ Route::prefix('accounting')->middleware(['plan.feature:accounting', 'can:view-ac
         Route::get('/{journalEntry}/edit', [JournalEntryController::class, 'edit'])->name('admin.accounting.journal-entries.edit');
         Route::put('/{journalEntry}', [JournalEntryController::class, 'update'])->name('admin.accounting.journal-entries.update');
         Route::post('/{journalEntry}/post', [JournalEntryController::class, 'post'])->name('admin.accounting.journal-entries.post');
+        Route::post('/{journalEntry}/unpost', [JournalEntryController::class, 'unpost'])->name('admin.accounting.journal-entries.unpost');
         Route::post('/{journalEntry}/void', [JournalEntryController::class, 'void'])->name('admin.accounting.journal-entries.void');
         Route::post('/{journalEntry}/reverse', [JournalEntryController::class, 'reverse'])->name('admin.accounting.journal-entries.reverse');
         Route::delete('/{journalEntry}', [JournalEntryController::class, 'destroy'])

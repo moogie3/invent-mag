@@ -36,6 +36,21 @@
                         </form>
                     @endif
                 @endplanHas
+                {{-- Phase 2: void a faktur DJP already accepted (Faktur Batal).
+                     Only meaningful once PJAP holds a submission id; drafts are
+                     covered by the local cancel below. --}}
+                @planHas('efaktur_api')
+                    @if($fakturPajak->pjap_submission_id && $fakturPajak->status !== 'cancelled' && app('currentTenant')->klikpajak_api_key)
+                        <form method="POST" action="{{ route('admin.efaktur.cancel.djp', $fakturPajak) }}"
+                              class="d-inline me-2"
+                              onsubmit="return confirm('{{ __('messages.efaktur_confirm_cancel_djp') }}')">
+                            @csrf
+                            <button type="submit" class="btn btn-outline-danger">
+                                <i class="ti ti-ban me-1"></i>{{ __('messages.efaktur_cancel_djp') }}
+                            </button>
+                        </form>
+                    @endif
+                @endplanHas
                 @if($fakturPajak->isSubmittable())
                     <form method="POST" action="{{ route('admin.efaktur.cancel', $fakturPajak) }}"
                           class="d-inline"

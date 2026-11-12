@@ -62,7 +62,14 @@ class PurchaseReturnController extends Controller
         $statusClass = PurchaseReturnHelper::getStatusClass($por->status);
         $statusText = PurchaseReturnHelper::getStatusText($por->status);
 
-        return view('admin.por.show', compact('por', 'statusClass', 'statusText'));
+        // What this return reverses in the ledger, derived by the same code
+        // path the journal uses, so the screen cannot disagree with the GL.
+        $taxReversal = $this->purchaseReturnService->deriveReversal(
+            $por->purchase,
+            (float) $por->total_amount,
+        );
+
+        return view('admin.por.show', compact('por', 'statusClass', 'statusText', 'taxReversal'));
     }
 
     public function edit(PurchaseReturn $por)
@@ -95,6 +102,25 @@ class PurchaseReturnController extends Controller
         return redirect()->route('admin.por.index')->with('success', 'Purchase return deleted successfully.');
     }
 
+    /**
+     * The proportional tax reversal a return against this purchase will
+     * book, as JSON for the create/edit form's live preview. It calls
+     * deriveReversal(), the same code path the journal and the show page
+     * use, so the preview cannot disagree with what gets posted.
+     */
+    public function deriveReversal(Request $request)
+    {
+        $purchase = Purchase::whereKey($request->integer('purchase_id'))
+            ->where('tenant_id', app('currentTenant')->id)
+            ->first();
+
+        abort_unless($purchase, 404);
+
+        $total = max(0, (float) $request->query('total', 0));
+
+        return response()->json($this->purchaseReturnService->deriveReversal($purchase, $total));
+    }
+
     public function getPurchaseItems(Purchase $purchase)
     {
         $purchase->load(['items.product', 'purchaseReturns.items']);
@@ -125,9 +151,12 @@ class PurchaseReturnController extends Controller
     public function bulkComplete(Request $request)
     {
         $ids = $request->input('ids');
-        $purchaseReturns = PurchaseReturn::whereIn('id', $ids)->get();
-        foreach ($purchaseReturns as $pr) {
-            $pr->update(['status' => 'Completed']);
+        $counts = $this->purchaseReturnService->bulkCompletePurchaseReturns($ids);
+
+        // Log only the rows that actually transitioned: a canceled row that
+        // was skipped never became Completed, and logging it would say so.
+        $completedReturns = PurchaseReturn::whereIn('id', $counts['completed_ids'])->get();
+        foreach ($completedReturns as $pr) {
             app(ActivityLogService::class)->logUpdate(
                 ActivityLog::MODULE_PURCHASE_RETURN,
                 "Bulk marked purchase return #{$pr->id} as Completed",
@@ -135,7 +164,39 @@ class PurchaseReturnController extends Controller
             );
         }
 
-        return response()->json(['success' => true, 'message' => 'Selected purchase returns have been marked as completed.']);
+        return response()->json([
+            'success' => true,
+            'message' => $this->bulkCompleteMessage($counts, 'purchase return'),
+            'counts' => $counts,
+        ]);
+    }
+
+    /**
+     * Turn the service's per-row counts into one sentence for the result
+     * toast. Canceled rows are reported as skipped, never as failures: the
+     * batch succeeded for every row it could complete.
+     *
+     * @param  array{completed: int, already_completed: int, skipped: int}  $counts
+     */
+    private function bulkCompleteMessage(array $counts, string $noun): string
+    {
+        $parts = [];
+
+        if ($counts['completed'] > 0) {
+            $parts[] = $counts['completed'].' '.$noun.($counts['completed'] > 1 ? 's' : '').' marked as completed';
+        }
+        if ($counts['already_completed'] > 0) {
+            $parts[] = $counts['already_completed'].' '.$noun.($counts['already_completed'] > 1 ? 's' : '').' already completed';
+        }
+        if ($counts['skipped'] > 0) {
+            $parts[] = $counts['skipped'].' '.$noun.($counts['skipped'] > 1 ? 's' : '').' skipped: canceled returns cannot be completed';
+        }
+
+        if ($parts === []) {
+            return 'No '.$noun.'s were selected.';
+        }
+
+        return implode('. ', $parts).'.';
     }
 
     public function bulkCancel(Request $request)

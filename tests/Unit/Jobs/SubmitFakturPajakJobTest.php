@@ -60,14 +60,14 @@ class SubmitFakturPajakJobTest extends TestCase
     public function it_submits_and_queues_the_status_poll(): void
     {
         Queue::fake();
-        Http::fake(['*' => Http::response(['data' => ['submission_id' => 'SUB-42']], 200)]);
+        Http::fake(['*' => Http::response(['code' => '00', 'data' => ['id' => 42, 'approval_status' => 'DRAFT']], 200)]);
         $faktur = $this->makeFaktur();
 
         (new SubmitFakturPajakJob($faktur))->handle();
 
         $faktur->refresh();
         $this->assertSame('submitted', $faktur->status);
-        $this->assertSame('SUB-42', $faktur->pjap_submission_id);
+        $this->assertSame('42', $faktur->pjap_submission_id);
         $this->assertSame('pending_djp', $faktur->pjap_status);
         $this->assertNotNull($faktur->djp_submitted_at);
         $this->assertEquals(1, $faktur->retry_count);
@@ -149,7 +149,7 @@ class SubmitFakturPajakJobTest extends TestCase
         // status='submitted' WITHOUT a pjap_submission_id is a failed attempt
         // being retried — the job must fall through and resubmit.
         Queue::fake();
-        Http::fake(['*' => Http::response(['data' => ['submission_id' => 'SUB-2']], 200)]);
+        Http::fake(['*' => Http::response(['code' => '00', 'data' => ['id' => 2, 'approval_status' => 'DRAFT']], 200)]);
         $faktur = $this->makeFaktur([
             'status' => 'submitted',
             'pjap_status' => 'error_attempt_1',
@@ -158,7 +158,7 @@ class SubmitFakturPajakJobTest extends TestCase
         (new SubmitFakturPajakJob($faktur))->handle();
 
         $faktur->refresh();
-        $this->assertSame('SUB-2', $faktur->pjap_submission_id);
+        $this->assertSame('2', $faktur->pjap_submission_id);
         $this->assertSame('pending_djp', $faktur->pjap_status);
         Queue::assertPushedOn('tax-submissions', PollFakturPajakStatusJob::class);
     }

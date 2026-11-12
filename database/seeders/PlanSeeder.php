@@ -46,6 +46,7 @@ class PlanSeeder extends Seeder
                     'pos',
                     'sales_returns',
                     'purchase_returns',
+                    'invoice_email',
                 ],
             ],
             [
@@ -86,6 +87,7 @@ class PlanSeeder extends Seeder
                     'quotations',
                     'ppn',
                     'bank_reconciliation',
+                    'invoice_email',
                 ],
             ],
             [
@@ -132,6 +134,7 @@ class PlanSeeder extends Seeder
                     'hr',
                     'shopee_import',
                     'efaktur_api',
+                    'invoice_email',
                 ],
             ],
         ];

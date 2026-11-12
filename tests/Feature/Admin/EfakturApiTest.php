@@ -2,6 +2,8 @@
 
 namespace Tests\Feature\Admin;
 
+use App\Jobs\CancelFakturPajakJob;
+use App\Jobs\SubmitFakturPajakBatchJob;
 use App\Jobs\SubmitFakturPajakJob;
 use App\Models\FakturPajak;
 use App\Models\Plan;
@@ -50,13 +52,20 @@ class EfakturApiTest extends TestCase
         $this->tenant->makeCurrent();
     }
 
-    private function makeFaktur(string $status = 'draft'): FakturPajak
+    /**
+     * nsfp is UNIQUE, and a few tests here create more than one faktur, so
+     * the serial is derived rather than hardcoded.
+     */
+    private function makeFaktur(string $status = 'draft', ?string $pjapSubmissionId = null): FakturPajak
     {
+        static $serial = 0;
+        $serial++;
+
         $sale = Sales::factory()->create();
 
         return FakturPajak::create([
             'sales_id' => $sale->id,
-            'nsfp' => '010.000-26.00000001',
+            'nsfp' => sprintf('010.000-26.%08d', $serial),
             'tanggal_faktur' => '2026-11-04',
             'masa_pajak' => 10,
             'tahun_pajak' => 2026,
@@ -71,6 +80,7 @@ class EfakturApiTest extends TestCase
             'ppnbm' => 0,
             'ppn_rate' => 11.00,
             'status' => $status,
+            'pjap_submission_id' => $pjapSubmissionId,
         ]);
     }
 
@@ -220,5 +230,227 @@ class EfakturApiTest extends TestCase
         $this->get(route('admin.efaktur.show', $faktur))
             ->assertOk()
             ->assertDontSee($submitUrl, false);
+    }
+
+    // -----------------------------------------------------------------------
+    // Bulk submit (submitBatch): Phase 2, roadmap "no bulk button yet"
+    // -----------------------------------------------------------------------
+
+    #[Test]
+    public function batch_submit_endpoint_is_blocked_on_professional_plan(): void
+    {
+        $this->assignPlan('professional');
+        $faktur = $this->makeFaktur();
+        Queue::fake();
+
+        $response = $this->post(route('admin.efaktur.batch.submit'), [
+            'faktur_ids' => [$faktur->id],
+        ]);
+
+        $response->assertStatus(302);
+        $this->assertStringContainsString('admin/settings/plan/upgrade', $response->headers->get('Location'));
+        Queue::assertNotPushed(SubmitFakturPajakBatchJob::class);
+    }
+
+    #[Test]
+    public function batch_submit_queues_one_job_with_only_the_draft_ids(): void
+    {
+        $this->assignPlan('enterprise');
+        $this->tenant->update(['klikpajak_api_key' => 'key-123']);
+        $draft = $this->makeFaktur();
+        $approved = $this->makeFaktur('approved');
+        Queue::fake();
+
+        $response = $this->post(route('admin.efaktur.batch.submit'), [
+            'faktur_ids' => [$draft->id, $approved->id],
+        ]);
+
+        $response->assertStatus(302);
+
+        // The flash carries both halves: what was queued, and what was
+        // skipped. Asserting only the first would hide a lost skip notice.
+        $response->assertSessionHas(
+            'success',
+            __('messages.efaktur_batch_queued', ['count' => 1])
+                .' '.__('messages.efaktur_batch_skipped', ['count' => 1])
+        );
+
+        Queue::assertPushedOn('tax-submissions', SubmitFakturPajakBatchJob::class);
+        Queue::assertPushed(
+            SubmitFakturPajakBatchJob::class,
+            fn (SubmitFakturPajakBatchJob $job) => $job->fakturIds === [$draft->id]
+                && $job->tenantId === $this->tenant->id
+        );
+    }
+
+    #[Test]
+    public function batch_submit_with_nothing_selected_shows_a_visible_error(): void
+    {
+        $this->assignPlan('enterprise');
+        $this->tenant->update(['klikpajak_api_key' => 'key-123']);
+        Queue::fake();
+
+        // No validation error bag on this page, so an empty selection must
+        // arrive as a flash the index actually renders.
+        $response = $this->post(route('admin.efaktur.batch.submit'), ['faktur_ids' => []]);
+
+        $response->assertStatus(302);
+        $response->assertSessionHas('error', __('messages.efaktur_batch_none_selected'));
+        Queue::assertNotPushed(SubmitFakturPajakBatchJob::class);
+    }
+
+    #[Test]
+    public function batch_submit_requires_configured_api_credentials(): void
+    {
+        $this->assignPlan('enterprise');
+        $faktur = $this->makeFaktur();
+        Queue::fake();
+
+        $response = $this->post(route('admin.efaktur.batch.submit'), [
+            'faktur_ids' => [$faktur->id],
+        ]);
+
+        $response->assertSessionHas('error', __('messages.efaktur_klikpajak_not_configured'));
+        Queue::assertNotPushed(SubmitFakturPajakBatchJob::class);
+    }
+
+    #[Test]
+    public function batch_submit_never_reaches_another_tenants_faktur(): void
+    {
+        $this->assignPlan('enterprise');
+        $this->tenant->update(['klikpajak_api_key' => 'key-123']);
+        Queue::fake();
+
+        // A forged id list must collapse to "nothing submittable" rather
+        // than cross the tenant scope on FakturPajak.
+        $response = $this->post(route('admin.efaktur.batch.submit'), [
+            'faktur_ids' => [999999],
+        ]);
+
+        $response->assertSessionHas('error', __('messages.efaktur_not_submittable'));
+        Queue::assertNotPushed(SubmitFakturPajakBatchJob::class);
+    }
+
+    #[Test]
+    public function index_shows_the_bulk_form_only_on_enterprise_with_credentials(): void
+    {
+        $this->assignPlan('enterprise');
+        $this->tenant->update(['klikpajak_api_key' => 'key-123']);
+        $this->makeFaktur();
+
+        $batchUrl = route('admin.efaktur.batch.submit');
+
+        $this->get(route('admin.efaktur.index'))
+            ->assertOk()
+            ->assertSee('action="'.$batchUrl.'"', false)
+            ->assertSee('id="efakturSelectAll"', false);
+
+        // Feature present but credentials missing: the button would only fail.
+        $this->tenant->update(['klikpajak_api_key' => null]);
+        $this->tenant->refresh()->makeCurrent();
+
+        $this->get(route('admin.efaktur.index'))
+            ->assertOk()
+            ->assertDontSee($batchUrl, false);
+
+        // And off the feature entirely.
+        $this->assignPlan('professional');
+        $this->tenant->update(['klikpajak_api_key' => 'key-123']);
+        $this->tenant->refresh()->makeCurrent();
+
+        $this->get(route('admin.efaktur.index'))
+            ->assertOk()
+            ->assertDontSee($batchUrl, false);
+    }
+
+    // -----------------------------------------------------------------------
+    // Cancel at DJP (PjapInterface::cancel): roadmap "no API-cancel UI yet"
+    // -----------------------------------------------------------------------
+
+    #[Test]
+    public function cancel_djp_endpoint_is_blocked_on_professional_plan(): void
+    {
+        $this->assignPlan('professional');
+        $faktur = $this->makeFaktur('submitted', 'PJAP-1');
+        Queue::fake();
+
+        $response = $this->post(route('admin.efaktur.cancel.djp', $faktur));
+
+        $response->assertStatus(302);
+        $this->assertStringContainsString('admin/settings/plan/upgrade', $response->headers->get('Location'));
+        Queue::assertNotPushed(CancelFakturPajakJob::class);
+    }
+
+    #[Test]
+    public function cancel_djp_queues_the_job_for_a_submitted_faktur(): void
+    {
+        $this->assignPlan('enterprise');
+        $this->tenant->update(['klikpajak_api_key' => 'key-123']);
+        $faktur = $this->makeFaktur('submitted', 'PJAP-1');
+        Queue::fake();
+
+        $response = $this->post(route('admin.efaktur.cancel.djp', $faktur));
+
+        $response->assertStatus(302);
+        $response->assertSessionHas('success', __('messages.efaktur_cancel_queued_for_djp'));
+        Queue::assertPushedOn('tax-submissions', CancelFakturPajakJob::class);
+        Queue::assertPushed(
+            CancelFakturPajakJob::class,
+            fn (CancelFakturPajakJob $job) => $job->faktur->is($faktur)
+        );
+    }
+
+    #[Test]
+    public function cancel_djp_refuses_a_faktur_djp_never_received(): void
+    {
+        $this->assignPlan('enterprise');
+        $this->tenant->update(['klikpajak_api_key' => 'key-123']);
+        $faktur = $this->makeFaktur('approved'); // no pjap_submission_id
+        Queue::fake();
+
+        $response = $this->post(route('admin.efaktur.cancel.djp', $faktur));
+
+        $response->assertSessionHas('error', __('messages.efaktur_not_submitted_to_djp'));
+        Queue::assertNotPushed(CancelFakturPajakJob::class);
+    }
+
+    #[Test]
+    public function cancel_djp_refuses_an_already_cancelled_faktur(): void
+    {
+        $this->assignPlan('enterprise');
+        $this->tenant->update(['klikpajak_api_key' => 'key-123']);
+        $faktur = $this->makeFaktur('cancelled', 'PJAP-1');
+        Queue::fake();
+
+        $response = $this->post(route('admin.efaktur.cancel.djp', $faktur));
+
+        $response->assertSessionHas('error', __('messages.efaktur_already_cancelled'));
+        Queue::assertNotPushed(CancelFakturPajakJob::class);
+    }
+
+    #[Test]
+    public function show_page_offers_djp_cancel_only_when_pjap_holds_the_faktur(): void
+    {
+        $this->assignPlan('enterprise');
+        $this->tenant->update(['klikpajak_api_key' => 'key-123']);
+
+        $submitted = $this->makeFaktur('submitted', 'PJAP-1');
+        $cancelUrl = route('admin.efaktur.cancel.djp', $submitted);
+
+        $this->get(route('admin.efaktur.show', $submitted))
+            ->assertOk()
+            ->assertSee('action="'.$cancelUrl.'"', false);
+
+        // Never submitted: nothing to void at DJP, and the local cancel stays.
+        $draft = $this->makeFaktur();
+        $this->get(route('admin.efaktur.show', $draft))
+            ->assertOk()
+            ->assertDontSee(route('admin.efaktur.cancel.djp', $draft), false);
+
+        // Off the feature: no DJP cancel at all.
+        $this->assignPlan('professional');
+        $this->get(route('admin.efaktur.show', $submitted))
+            ->assertOk()
+            ->assertDontSee($cancelUrl, false);
     }
 }

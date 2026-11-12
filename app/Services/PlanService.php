@@ -47,14 +47,6 @@ class PlanService
         return $tenant->hasFeature($feature);
     }
 
-    /**
-     * Check if a specific tenant has access to a feature.
-     */
-    public function checkFeature(Tenant $tenant, string $feature): bool
-    {
-        return $tenant->hasFeature($feature);
-    }
-
     // -------------------------------------------------------------------------
     // Limit Checks
     // -------------------------------------------------------------------------

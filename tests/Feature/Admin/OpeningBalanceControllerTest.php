@@ -90,10 +90,11 @@ class OpeningBalanceControllerTest extends TestCase
         $assetAccount = Account::where('code', '1140-'.$tenantId)->first();
         $equityAccount = Account::where('code', '3100-'.$tenantId)->first();
 
-        // Skip if equity account doesn't exist (depends on COA being reset)
-        if (! $assetAccount || ! $equityAccount) {
-            $this->markTestSkipped('Required accounts not found');
-        }
+        // AccountSeeder runs in setUp, so these must exist. Asserting it
+        // keeps the test honest: a silent skip would drop the store
+        // assertions below without anyone noticing.
+        $this->assertNotNull($assetAccount, 'AccountSeeder must provide account 1140 for this tenant.');
+        $this->assertNotNull($equityAccount, 'AccountSeeder must provide account 3100 for this tenant.');
 
         $balances = [
             $assetAccount->id => ['debit' => 1000, 'type' => 'debit'],
@@ -114,9 +115,9 @@ class OpeningBalanceControllerTest extends TestCase
         $tenantId = app('currentTenant')->id;
         $assetAccount = Account::where('code', '1140-'.$tenantId)->first();
 
-        if (! $assetAccount) {
-            $this->markTestSkipped('Required account not found');
-        }
+        // Same rule as the store test: the seeder guarantees this account, so
+        // a missing one is a failure, not a reason to stop testing deletes.
+        $this->assertNotNull($assetAccount, 'AccountSeeder must provide account 1140 for this tenant.');
 
         OpeningBalance::create([
             'tenant_id' => $tenantId,

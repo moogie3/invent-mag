@@ -74,14 +74,6 @@ class PurchaseReturn extends Model
         return $this->morphMany(Payment::class, 'paymentable');
     }
 
-    /**
-     * Get all of the journal entries for the purchase return.
-     */
-    public function journalEntries(): MorphMany
-    {
-        return $this->morphMany(JournalEntry::class, 'transactionable');
-    }
-
     protected $casts = [
         'return_date' => 'date',
         'total_amount' => 'float',

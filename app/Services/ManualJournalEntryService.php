@@ -68,6 +68,15 @@ class ManualJournalEntryService
     }
 
     /**
+     * Unpost a posted journal entry, returning it to draft. Refuses entries
+     * that are reconciled or already reversed by a dependent entry.
+     */
+    public function unpost(JournalEntry $journalEntry): JournalEntry
+    {
+        return $this->accountingService->unpostJournalEntry($journalEntry);
+    }
+
+    /**
      * Void a journal entry.
      */
     public function void(JournalEntry $journalEntry, string $reason): JournalEntry

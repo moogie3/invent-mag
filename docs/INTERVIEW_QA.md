@@ -42,7 +42,7 @@
 
 **Answer:**
 
-Invent-MAG is a **monolithic Laravel MVC application with a dedicated Service Layer**. It is not a microservices system — all modules (inventory, sales, accounting, HR, CRM, POS, forecasting) live in a single Laravel 11 codebase.
+Invent-MAG is a **monolithic Laravel MVC application with a dedicated Service Layer**. It is not a microservices system: all modules (inventory, sales, accounting, HR, CRM, POS, forecasting) live in a single Laravel 12 codebase.
 
 The key architectural decisions are:
 
@@ -73,7 +73,7 @@ A candidate should note:
 **Answer:**
 
 **Backend:**
-- PHP 8.2 with Laravel 11.31
+- PHP 8.2+ (tested through 8.5) with Laravel 12.71
 - `spatie/laravel-multitenancy` ^4.0 — domain-based multi-tenancy
 - `spatie/laravel-permission` ^6.20 — RBAC (roles + permissions)
 - `spatie/laravel-backup` ^9.3 — installed as a dependency but **not** used for tenant backups; the `backup:tenant` Artisan command is a custom implementation (see Q20.2)
@@ -745,7 +745,7 @@ CREDIT: Inventory (Asset)                         $180   [restore inventory]
 
 Purchase returns use the Purchase Returns account (code 5120) for the credit side, not the AP account directly (which would create a self-cancelling entry).
 
-**Bulk return operations (July 2026):** Both `bulkCompleteSalesReturns()` and `bulkCancelSalesReturns()` process each return individually through `completeSalesReturn()` / `cancelSalesReturn()`, creating journal entries, adjusting stock, and issuing/reversing credits as needed. Purchase return bulk operations similarly use `cancelPurchaseReturn()` for reversal side effects.
+**Bulk return operations (July 2026):** Both `bulkCompleteSalesReturns()` and `bulkCancelSalesReturns()` process each return individually through `completeSalesReturn()` / `cancelSalesReturn()`. The journal entry is posted **once**, by `createSalesReturn()` at the moment the return and its stock are created: completion issues the customer credit and finalizes status, and cancel reverses the stock and the journal entry. Purchase return bulk operations similarly use `cancelPurchaseReturn()` for reversal side effects.
 
 ---
 
@@ -1787,7 +1787,7 @@ All operations are audit-logged via the **custom** `ActivityLog`/`AccountingAudi
 
 **Answer:**
 
-The routes were registered **without the `/api/` prefix and without the `api` middleware group** in production. In `bootstrap/app.php`, Laravel 11's automatic `/api` prefixing is applied by the framework's default route registration — but this project used a custom `using:` closure:
+The routes were registered **without the `/api/` prefix and without the `api` middleware group** in production. In `bootstrap/app.php`, Laravel's automatic `/api` prefixing is applied by the framework's default route registration, but this project used a custom `using:` closure:
 
 ```php
 // BEFORE (buggy)
@@ -1950,7 +1950,7 @@ All withholding taxes run on the **universal `is_pph` mechanism**: a `Tax` flagg
 
 **Answer:**
 
-Phase 2 (shipped 2026-11-05) adds **direct DJP submission** — a "Submit ke DJP" button on the Faktur Pajak detail page and approval/rejection status polled from DJP — eliminating the manual CSV download and the DJP desktop app (bulk month-end submission exists at service level; no bulk button yet). Phase 1 (CSV + PDF) is **Zahir parity**; Phase 2 is the differentiator.
+Phase 2 (shipped 2026-11-05) adds **direct DJP submission**: a "Submit ke DJP" button on the Faktur Pajak detail page and approval/rejection status polled from DJP, eliminating the manual CSV download and the DJP desktop app (bulk month-end submission is available as a batch-submit button on the Faktur Pajak index, Enterprise-only). Phase 1 (CSV + PDF) is **Zahir parity**; Phase 2 is the differentiator.
 
 - **PJAP choice:** **Mekari Klikpajak** (best REST docs, full sandbox, most widely used), abstracted behind an `App\Contracts\PjapInterface` contract (`submit`, `submitBatch`, `checkStatus`, `cancel`, `testConnection`) so the provider can be swapped without touching business logic. `KlikpajakService` binds per-tenant (each tenant has its own credentials).
 - **Idempotency:** submissions carry an `X-Idempotency-Key` (`FP-{id}-{nsfp}`) with `retry(3)`, so a retried request can never create a duplicate Faktur; `checkStatus()` normalizes to `pending|approved|rejected`.
@@ -2069,7 +2069,7 @@ Matched journal entries become **immutable** once a reconciliation completes. `a
 
 **Status values:** `Pending`, `Completed`, `Canceled`
 
-**Cancel** (`cancelPurchaseReturn()`) — if cancelling a `Completed` return: restores stock, restores `remaining_quantity` via `incrementPOItemRemaining()`, reverses the return journal entry via `AccountingService::reverseJournalEntry()`, then sets status `Canceled`.
+**Cancel** (`cancelPurchaseReturn()`): reverts for every live status (`Pending` or `Completed`), since creation posts the journal and moves stock the moment the return is born: restores stock, restores `remaining_quantity` via `incrementPOItemRemaining()`, reverses each live journal entry via `AccountingService::reverseJournalEntry()`, then sets status `Canceled`. A `Canceled` return returns early, which is the idempotency guard.
 
 **No "SupplierCredit" model exists** — purchase returns directly reduce AP via the journal entry (no credit note record analogous to `CustomerCredit`).
 

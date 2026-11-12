@@ -120,7 +120,7 @@
 - [x] Payment tracking
 - [x] Invoice generation (PDF)
 - [x] Sales returns processing (with configurable accounting entries)
-- [x] **Sales return bulk operations with full side effects** — bulk complete creates journal entries + issues credits; bulk cancel reverses stock + journal entries
+- [x] **Sales return bulk operations with full side effects**: bulk complete issues credits + finalizes status (the journal entry is posted once, when the return is created and its stock moves, so completion must not book it again); bulk cancel reverses stock + journal entries
 - [x] **Sales return tax breakdown** — return show page displays tax rate and type label in the summary
 - [x] Refund handling
 - [x] **Consistent payment status labels** - Paid, Partially Paid, Unpaid (with sub-states: Pending, Due Today, Due in X Days, Overdue), Returned
@@ -646,8 +646,9 @@
 - [x] **e-Faktur CSV export** — DJP FK/OF format with UTF-8 BOM, amounts in cents
 - [x] **PPN Masukan (Input VAT) tracking** — PPN on purchases (`po.ppn_enabled`) recorded as Input VAT (1160) with SPT Masa PPN summary showing Keluaran − Masukan = Kurang/Lebih Bayar
 - [ ] Bank integrations (BCA, BNI, Mandiri)
-- [ ] WhatsApp invoice delivery
-- [ ] Midtrans payment links on invoices
+- [x] Invoice email delivery (button on invoice view, PDF attached, `invoice_email` slug on all plans, en/id copy)
+- [ ] ~~WhatsApp invoice delivery~~ superseded by the email delivery above (Nov 2026): WhatsApp Cloud API and Fonnte both bill per message, and the PDF is the same
+- [ ] ~~Midtrans payment links on invoices~~ ❌ Declined (2026-11-06): tenants settle by bank transfer or cash at the office; built then reverted before commit
 
 ### Low Priority
 

@@ -72,6 +72,9 @@ Route::prefix('po')->group(function () {
 
 // Purchase Return Routes - Protected by plan feature
 Route::middleware('plan.feature:purchase_returns')->group(function () {
+    // Before the resource: this is a 2-segment path that {por} would
+    // otherwise swallow and fail to bind.
+    Route::get('por/derive-reversal', [PurchaseReturnController::class, 'deriveReversal'])->name('admin.por.derive-reversal');
     Route::resource('por', PurchaseReturnController::class)->names('admin.por');
     Route::get('por/{por}/modal-view', [PurchaseReturnController::class, 'modalView'])->name('admin.por.modal-view');
     Route::get('por/purchase/{purchase}', [PurchaseReturnController::class, 'getPurchaseItems'])->name('admin.por.items');

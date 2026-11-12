@@ -1,8 +1,8 @@
 # Invent-MAG — Product Roadmap
 
-> **Last updated:** August 2026  
+> **Last updated:** November 2026  
 > **Version:** 2.5  
-> **Stack:** Laravel 11 · Blade/Alpine.js · MySQL · Redis · Dompdf · Spatie Multitenancy · Spatie Permission  
+> **Stack:** Laravel 12 · Blade/Alpine.js · MySQL · Redis · Dompdf · Spatie Multitenancy · Spatie Permission  
 > **Deployment:** Railway (backend — current production) · Docker image published to GHCR and deployed to a VPS via GitHub Actions on release tags · Vercel (frontend/marketing)  
 > **Domain:** https://invent-mag.web.id
 
@@ -1183,7 +1183,7 @@ Route::prefix('efaktur')->name('admin.efaktur.')->middleware(['plan.feature:ppn'
 > | 1 | `handle(PjapInterface $pjap)` method injection | `Tenant::find(...)->makeCurrent()` + `app(PjapInterface::class)` inside `handle()` | queue workers have no HTTP tenant context; the container resolves the per-tenant binding before `handle()` runs |
 > | 2 | guard on `isSubmittable()` | `pjap_submission_id !== null \|\| status ∉ {draft, submitted}` | a `submitted` row **without** a submission id is a failed attempt being retried — `isSubmittable()` would swallow every retry (the `X-Idempotency-Key` makes the repeat safe) |
 > | 3 | `checkStatus()` returns a normalized array | throws on API failure | a failed check must retry, never fabricate a verdict or stamp `djp_response_at` with junk |
-> | 4 | `Authorization` + `X-Idempotency-Key` headers | plus `X-API-Secret` | Klikpajak requires the secret header |
+> | 4 | `Authorization` + `X-Idempotency-Key` headers | HMAC-SHA256 request signing (`Date` + `Digest` + `Authorization: hmac username=...`) instead of `Bearer` + `X-API-Secret`; endpoints under `{base}/v1/efaktur/out...`; responses unwrapped from the `{code, message, data}` envelope | reconciled to Mekari's **live** Klikpajak Public API v1 docs on 2026-11-05: the `Bearer`/`X-API-Secret` model and `/v1/faktur/upload` endpoints assumed by the snippet did not exist (full note below) |
 > | 5 | dispatch on the dedicated redis `tax` connection | `->onQueue('tax-submissions')` on the **default** connection; the `tax` connection ships as opt-in (`TAX_QUEUE_CONNECTION`) | existing workers and the sync test environment keep working; the §2.6 topology is one env var away |
 > | 6 | register in `config/app.php` `providers` | `bootstrap/providers.php` | Laravel 11+ moved the provider list |
 > | 7 | one settings form | the Klikpajak card posts on its own form; `saveSettings()` gates jurisdiction logic on `$request->has('tax_jurisdiction')` | the card sends no jurisdiction fields — without a key-presence gate every Klikpajak save would null the tenant's jurisdiction |
@@ -1192,20 +1192,37 @@ Route::prefix('efaktur')->name('admin.efaktur.')->middleware(['plan.feature:ppn'
 > production submissions require the tenant's *own* active Mekari Klikpajak
 > subscription, billed separately from Invent-MAG (the settings card says
 > so). CSV export (Phase 1) remains free on every plan, and `PjapInterface`
-> keeps the provider swappable. **Before the first production call, verify
-> against Mekari's current API docs:** (a) which plan tier includes API
-> access, (b) the auth model — this build follows §2.3's
-> `Authorization: Bearer <api_key>` + `X-API-Secret`, *not* the older
-> "OAuth2 token" idea in `PPN_EVOLUTION.md`, (c) endpoint/payload field
-> names. Sandbox is the default (`klikpajak_use_sandbox = true`).
+> keeps the provider swappable.
+>
+> **API contract verified against Mekari's live docs (2026-11-05):** the
+> Klikpajak Public API v1 collection (Postman) and the developers.mekari.com
+> HMAC spec were checked directly, and `KlikpajakService` was rewritten to
+> match: HMAC request signing with the tenant's **Client ID / Client Secret**
+> from a developers.mekari.com app registration (no Bearer token, no
+> `X-API-Secret`; `Date` + `Digest` headers, 300s clock skew), base URLs
+> `https://sandbox-api.mekari.com/v2/klikpajak` / `https://api.mekari.com/v2/klikpajak`,
+> endpoints `POST/GET /v1/efaktur/out...`, `PUT .../cancel`,
+> `GET /v1/subscription`, the `{code, message, data}` envelope ("00" ok,
+> "02" bulk accepted, "03" bulk in progress, "04" approve/cancel ok, "1801"
+> bulk finished with failures) and Mekari's `client_reference_id` / `customer`
+> / `items` payload shape. One nuance to watch on the first live call: the
+> canonical spec signs the request line **with** the query string
+> (`pathWithQueryParam`) while the Postman demo script uses the bare path:
+> if a real call returns 401, flip `headers()` in the service. What is still
+> missing before the first production call: **real credentials** (app
+> registration is manual via Mekari sales, secret shown once) + an active
+> subscription. Sandbox is the default (`klikpajak_use_sandbox = true`).
 >
 > **Deployment prerequisites:** (1) `php artisan migrate` (adds
 > `efaktur_api` to the Enterprise plan); (2) a queue worker listening on
 > the **`tax-submissions`** queue (default connection — or set
 > `TAX_QUEUE_CONNECTION=tax` and use the §2.6 supervisor block). Without a
 > listener, submissions sit in the queue. Note: `submitBatch()` and
-> `PjapInterface::cancel()` are **service-level only** today — no bulk
-> button or API-cancel UI yet (Phase 1 local cancel still handles the UI).
+> `PjapInterface::cancel()` are no longer service-level only: the index
+> now has a checkbox column with a "Submit Selected to DJP" button, and the
+> show page has "Cancel at DJP". `cancel()` throws on transport failure so
+> the queued cancel's retries, backoff and `failed()` are reachable;
+> a business refusal from DJP still returns false.
 >
 > **Provider swap procedure (code-level, deliberate):** every call site
 > knows only `PjapInterface`. To run a different PJAP: (1) add
@@ -1276,6 +1293,17 @@ interface PjapInterface
 ```
 
 #### 2.3 Klikpajak Service Implementation
+
+> **Live-docs reconciliation (2026-11-05):** the service and provider
+> snippets below are the original illustrative spec. The shipped
+> `KlikpajakService` was rewritten against Mekari's **live** Klikpajak
+> Public API v1 docs: HMAC request signing with clientId/clientSecret
+> (`Date`/`Digest`/`Authorization: hmac ...` headers, no Bearer or
+> `X-API-Secret`), `{base}/v1/efaktur/out...` endpoints on mekari.com hosts,
+> the `{code, message, data}` response envelope, and Mekari's
+> `client_reference_id` / `customer` / `items` payload shape. Treat the
+> snippets below as historical; the shipped file and the Phase 2 status
+> block at the top of this section are authoritative.
 
 **`app/Services/Pjap/KlikpajakService.php`**
 
@@ -1662,7 +1690,7 @@ stopwaitsecs=60
 Add to `resources/views/admin/efaktur/show.blade.php` — a button visible only if:
 - Faktur is in `draft` status
 - Tenant has `efaktur_api` plan feature
-- Tenant has Klikpajak API key configured
+- Tenant has the Klikpajak Client ID configured (stored in the `klikpajak_api_key` column)
 
 ```blade
 @planHas('efaktur_api')
@@ -1711,6 +1739,177 @@ Tax double-submissions to DJP are a legal problem. Protection at 5 levels:
 `pjap_submission_id !== null || status ∉ {draft, submitted}` (deviation 2
 in the status block above) — a `submitted` row without a submission id is a
 failed retry and must fall through, not be rejected.
+
+---
+
+#### 2.9 Deploy Runbook: Phase 2 on a live tenant
+
+Everything a production host needs before the first **Submit ke DJP** button
+can be pressed. It is env, four data migrations, one queue worker, an
+assets build, a verification checklist and a rollback note: no application
+code changes. Run it in order; each step names the failure it prevents.
+
+**1. Environment: no new required keys**
+
+| Key | Default | Purpose |
+|---|---|---|
+| `KLIKPAJAK_SANDBOX_URL` | `https://sandbox-api.mekari.com/v2/klikpajak` | Mekari sandbox host |
+| `KLIKPAJAK_PRODUCTION_URL` | `https://api.mekari.com/v2/klikpajak` | Mekari live host |
+
+Both have working defaults in `config/services.php`, so a host that already
+runs Phase 1 needs no new env at all:
+
+```bash
+php artisan config:clear && php artisan cache:clear
+```
+
+**Tenant credentials are not env**: they are ordinary tenant columns
+(shipped with Phase 1 in `2026_07_17_000004`), set per tenant from
+**e-Faktur → Settings**:
+
+| Column | Holds |
+|---|---|
+| `klikpajak_api_key` | Mekari **Client ID** (the HMAC username) |
+| `klikpajak_secret` | Mekari **Client Secret** (the signing key) |
+| `klikpajak_use_sandbox` | `true` by default: a tenant that has not flipped it always talks to sandbox |
+
+**2. Migration: four, all data-only**
+
+```bash
+php artisan migrate --force
+php artisan migrate:status | grep efaktur_api    # must show Ran
+php artisan migrate:status | grep invoice_email  # must show Ran
+php artisan migrate:status | grep reverse_journal_entries  # must show Ran
+php artisan migrate:status | grep restore_stock  # must show Ran
+```
+
+`2026_11_04_000001_add_efaktur_api_feature_to_plans.php` appends
+`efaktur_api` to the **enterprise** plan's `features` array. There is **no
+schema change**, and the `in_array()` guard makes a re-run a no-op, so it is
+safe on live. Verify the result:
+
+```sql
+SELECT features FROM plans WHERE slug = 'enterprise';   -- must contain efaktur_api
+```
+
+This exact step was **missed on live on 2026-11-05** and had to be run out
+of band: the button renders for nobody until it lands.
+
+`2026_11_05_000002_add_invoice_email_feature_to_plans.php` is the second,
+and it ships with the release that added email delivery (§5.4). It appends
+`invoice_email` to **every** plan's `features` array, which is what makes the
+"available on all tiers" claim true. Same `in_array()` no-op guard, no schema
+change, safe on live. Nothing gates on the slug, so a missed run costs only
+the plan pages not listing the row:
+
+```sql
+SELECT slug, features FROM plans;   -- every row must contain invoice_email
+```
+
+`2026_11_08_000001_reverse_journal_entries_of_canceled_returns.php` is the
+third, and it corrects data the cancel bug had already written. Before the
+2026-11-08 fix, `cancelSalesReturn()`/`cancelPurchaseReturn()` only reverted
+the GL when the return was `Completed`, so every return canceled from
+`Pending` kept the journal entry its creation had posted: 41 rows on the
+reference database (20 sales, 21 purchase; AR/AP over-reversed by Rp 35,860
+and Rp 68,930). The migration writes one balanced reversal per live entry
+(exactly what `reverseJournalEntry()` would write), dated the day it runs,
+selected by the live-entry test the cancel paths use (no reversal points
+at the entry), so a re-run finds nothing to do, and
+it writes nothing at all on a database where no canceled return holds a live
+entry. Verify:
+
+```sql
+-- must return 0 rows (swap in App\Models\PurchaseReturn + purchase_returns
+-- for the purchase half; both halves were 41 rows before the migration):
+SELECT je.id FROM journal_entries je
+JOIN sales_returns sr
+  ON je.sourceable_type = 'App\\Models\\SalesReturn' AND je.sourceable_id = sr.id
+WHERE sr.status = 'Canceled' AND je.status = 'posted'
+  AND NOT EXISTS (SELECT 1 FROM journal_entries r WHERE r.reversed_entry_id = je.id);
+```
+
+`2026_11_08_000002_restore_stock_of_canceled_returns.php` is the fourth,
+the stock half of the same bug: the 41 canceled returns also kept the stock
+their creation had moved (52 units too many on sales, 111 too few on
+purchase; product 28 / warehouse 17 was left at -4). It corrects only the
+returns the GL half marked (the marker lives in the reversal's notes), so a
+return the old gate already reverted from Completed is never corrected
+twice; on this database that is the same 41 rows. It mirrors both cancel
+paths per item row and runs the `po_items.remaining_quantity` walks with
+their original filters and caps. Verify:
+
+```sql
+-- must return 0:
+SELECT COUNT(*) FROM product_warehouse WHERE quantity < 0;
+```
+
+Run both corrections inside the deploy window: no cancel should land
+between them and the fixed code (together they correct rows the bug
+already wrote, and neither re-runs).
+
+**3. The queue worker: the step that is easy to forget**
+
+All three dispatch sites (`EFakturController@submitToDjp`,
+`SubmitFakturPajakJob`, `PollFakturPajakStatusJob`) use
+`->onQueue('tax-submissions')` on the **default** connection:
+
+- **Default setup (no env change):** jobs land on `default`, so whatever
+  worker already runs `queue:work` picks them up. Confirm one is alive:
+  `ps aux | grep "[q]ueue:work"`.
+- **Dedicated worker (§2.6):** set `TAX_QUEUE_CONNECTION=tax` and install
+  the supervisor block from §2.6 verbatim, then
+  `supervisorctl reread && supervisorctl update`.
+
+**Failure mode if this step is skipped:** nothing errors; submissions
+simply sit in the `jobs` table and the UI stays on `submitted`-pending
+forever. That is the whole reason §2.6 exists.
+
+**4. Assets: only if this release changed JS/CSS**
+
+```bash
+npm run build && php artisan optimize
+```
+
+**5. Verification checklist, in order**
+
+1. `php artisan migrate:status | grep efaktur_api` → **Ran**.
+2. Enterprise `features` contains `efaktur_api`.
+3. `php artisan migrate:status | grep reverse_journal_entries` → **Ran**,
+   and the canceled-return leak query above returns **0 rows**; likewise
+   `grep restore_stock` → **Ran**, with `SELECT COUNT(*) FROM
+   product_warehouse WHERE quantity < 0` → **0**.
+4. A worker is alive for the queue the jobs actually land on.
+5. Tenant plan is **enterprise**: the button is wrapped in
+   `@planHas('efaktur_api')`, and the whole e-Faktur area sits behind
+   `plan.feature:ppn`, so both gates must pass.
+6. Tenant has Client ID + Secret set, and `klikpajak_use_sandbox = 1`.
+7. Generate a Faktur → it is `draft` → **Submit ke DJP** is visible.
+8. First submission goes to **sandbox**. Watch `storage/logs/laravel.log`
+   for the HMAC signature headers and the `{code, message, data}` envelope;
+   a 401 there is a Client ID/Secret mismatch, not a code fault.
+9. Only after a clean sandbox round-trip, flip `klikpajak_use_sandbox` off
+   for that tenant: Mekari production requires an active subscription.
+
+**6. Rollback**
+
+- Migration `down()` removes `efaktur_api` from the plan, which hides the
+  button for every tenant at once: the effective kill switch.
+- The correction migrations' `down()`s delete only what they wrote: the GL
+  one removes the reversal entries carrying its notes marker (their
+  transactions first), so the originals go live again; the stock one puts
+  every stock row back with the opposite delta and runs the PO walks in
+  reverse, exact while nothing else moved in between.
+- Worker and env changes are additive; removing a worker only queues jobs,
+  it loses no data.
+- No schema to revert; credentials are UI-set columns.
+
+**Standing open item:** the **first live Mekari call has never been made**.
+It needs a Client ID/Secret registered at developers.mekari.com and an
+active Klikpajak subscription. Everything above is verified against the
+contract and `KlikpajakServiceTest`, not against Mekari's servers: one
+known ambiguity is recorded in §2.2 (the canonical spec signs the request
+line with the query string; Mekari's own Postman demo signs the bare path).
 
 ---
 
@@ -1779,46 +1978,55 @@ failed retry and must fall through, not be rejected.
 
 ---
 
-### 5.4 WhatsApp Invoice Delivery
+### 5.4 Invoice Delivery by Email ✅ Shipped (2026-11-06)
 
-**Why:** Indonesian businesses overwhelmingly use WhatsApp Business for customer communication. Sending invoice PDFs via WhatsApp outperforms email for this market segment.
+**Decision (2026-11-06): shipped as email, not WhatsApp.** WhatsApp Business Cloud API (Meta) and Fonnte were the candidates; both bill per message, and that cost buys nothing over the SMTP the platform already sends subscription invoices with. Email is free per send, available on every plan, and the customer's address already sits on the `customers` record.
 
-**How:** 
-- Primary: WhatsApp Business Cloud API (Meta) — direct, official, no per-message fee at low volume
-- Alternative: Fonnte (`fonnte.com`) — popular in Indonesia, simpler API, per-message pricing
+**Flow (as built):** "Send Invoice Email" button on the invoice view (behind `@can('edit-sales')`) → `SalesController::sendInvoice()` → `SalesInvoiceMail` (markdown body with the itemised table, invoice PDF attached) → the existing SMTP mailer. The send is synchronous, so a transport failure comes back as a flash error instead of dying in a queued job; a customer with no email on file gets a clear error and nothing is sent.
 
-**Flow:** Button on invoice view page → generates PDF → sends via WhatsApp API → includes payment link (Midtrans Snap URL)
+**Gating:** `invoice_email` feature slug, declared on all three plans, no route gate.
 
-**Complexity:** Low-Medium (~1 week). High business impact for Indonesian market.
+**Deploy note:** live `plans.features` gains the slug only when
+`2026_11_05_000002_add_invoice_email_feature_to_plans.php` runs (§2.9 step 2,
+`php artisan migrate --force`). Until then the "all tiers" claim is true of
+the code and false of the database; nothing gates on the slug, so the only
+visible effect is the plan pages not listing it.
 
----
+**PDF:** the attachment and the Print button both come from `SalesService::renderInvoicePdf()`, so the emailed document is byte-identical to the printed one.
 
-### 5.5 Midtrans Payment Links on Invoices
+**Not included:** a payment link inside the email (see §5.5).
 
-**Status:** Midtrans Snap already integrated for SaaS subscription payments (`Api/PaymentController.php`, `BillingService.php`).
-
-**Extension:** Generate Snap payment links on customer invoices. On payment webhook, update `sales.status = 'Paid'` and create journal entry automatically (Dr Cash, Cr AR).
-
-**Complexity:** Low (~1 week — Midtrans SDK already installed and configured).
+**Complexity:** Low. ✅ Completed.
 
 ---
 
-### 5.6 SPT Report Templates
+### 5.5 Midtrans Payment Links on Invoices ❌ Declined (2026-11-06)
 
-**Why:** Monthly SPT Masa PPN filing is mandatory for PKP businesses in Indonesia. Providing templates that auto-populate from existing data saves manual work and reduces errors.
+**Decision (2026-11-06): built, then reverted.** Tenants settle customer invoices **by bank transfer directly, or in cash when the salesperson visits the office**, so a hosted Midtrans checkout on the customer invoice would not be used ("having this, I don't think they will use it at all"). It would also mean a Midtrans credential set per tenant: the `.env` keys hold the platform's own subscription billing money, not the tenant's revenue.
+
+**What was removed before commit:** `PaymentLinkService`, the per-tenant key settings page, the pay-link button, the webhook invoice branch (`sales.status = 'Paid'` plus Dr Cash/Cr AR), 21 tests and the `payment_links` slug. Nothing of it ships.
+
+**What stays:** the subscription flow (`Api/PaymentController.php`, `Api/Webhook/MidtransController.php`) is untouched; that is the platform's own billing.
+
+**Complexity:** n/a.
+
+---
+
+### 5.6 SPT Report Templates: ❌ Declined (2026-11-05)
+
+**Decision (2026-11-05): dropped deliberately.** Invent-MAG is not, and does not try to be, a full accounting/tax suite ("we can't be all in one"). Monthly SPT Masa PPN *filing* stays where it already works: DJP's own tools (and Klikpajak, for Phase 2 tenants). The preparation side below already shipped, which is what Indonesian SMBs actually use this system for.
 
 **Current state (Aug 2026):** PPN Keluaran (output VAT) summary exists via `EFakturService::getSptMasaSummary()` (masa/tahun, faktur counts, DPP, PPN). PPN Masukan (input VAT) tracking on purchases shipped (Phase 1D) — `po` carries `ppn_enabled/rate/amount` snapshots, the purchase journal debits Input VAT (1140→1160), and the SPT summary now returns `total_ppn_masukan`, `net_ppn_payable` and `ppn_credit` (Kurang/Lebih Bayar).
 
 **VAT accounting note (Phase 1E, Aug 2026):** PPN Keluaran is now recognized at **sale creation** — `SalesService::createSale()` and `PosService` post a VAT-split journal (`Dr AR gross / Cr Revenue net / Cr PPN Keluaran`) for Indonesian PPN sales, so revenue is booked net of VAT and the Faktur Pajak carries no journal (compliance-only). Sales returns reverse PPN whenever the original sale `isPpn()` (no Faktur Pajak required).
 
-**What:**
-- SPT Masa PPN form template pre-filled from sales/purchase data
+**What shipped and stays:**
 - PPN Keluaran (output VAT) summary from Faktur Pajak — ✅ done
 - PPN Masukan (input VAT) summary from purchase data — ✅ done (prerequisite shipped Aug 2026: `po.ppn_enabled` snapshot + PPN Masukan 1160 journal)
 - PPN Kurang Bayar / Lebih Bayar (net payable/credit) — ✅ done (summary cards on e-Faktur index)
-- Export to DJP-compatible format (CSV or PDF)
+- DJP-compatible export: ✅ done as Phase 1's CSV (the format the desktop/Coretax tools import)
 
-**Complexity:** Medium (~1-2 weeks). Blocked on PPN Masukan/input VAT tracking, not on tax record changes.
+**What is declined:** the pre-filled SPT Masa PPN *form* template and PDF form generation. Revisit only if real tenants ask for it after filing manually for a while.
 
 ---
 

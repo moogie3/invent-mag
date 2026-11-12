@@ -21,12 +21,15 @@ onPageLoad(function () {
         sessionStorage.removeItem("salesReturnBulkDeleteSuccess");
     }
     if (sessionStorage.getItem("salesReturnBulkCompleteSuccess")) {
+        const bulkCompleteType =
+            sessionStorage.getItem("salesReturnBulkCompleteType") || "success";
         InventMagApp.showToast(
-            "Success",
+            bulkCompleteType === "warning" ? "Warning" : "Success",
             sessionStorage.getItem("salesReturnBulkCompleteSuccess"),
-            "success",
+            bulkCompleteType,
         );
         sessionStorage.removeItem("salesReturnBulkCompleteSuccess");
+        sessionStorage.removeItem("salesReturnBulkCompleteType");
     }
     if (sessionStorage.getItem("salesReturnBulkCancelSuccess")) {
         InventMagApp.showToast(
@@ -328,6 +331,12 @@ window.bulkMarkCompletedSalesReturns = function () {
                     sessionStorage.setItem(
                         "salesReturnBulkCompleteSuccess",
                         data.message || "Sales returns marked as completed.",
+                    );
+                    // A batch that skipped canceled rows is a warning, not a
+                    // success: the user selected N rows and fewer went through.
+                    sessionStorage.setItem(
+                        "salesReturnBulkCompleteType",
+                        (data.counts?.skipped ?? 0) > 0 ? "warning" : "success",
                     );
                     window.location.reload();
                 } else {

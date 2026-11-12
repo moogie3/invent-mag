@@ -2,18 +2,23 @@
 
 namespace Tests\Feature\Admin;
 
+use App\Helpers\CurrencyHelper;
+use App\Mail\SalesInvoiceMail;
 use App\Models\Account;
 use App\Models\Customer;
+use App\Models\Payment;
 use App\Models\Product;
 use App\Models\ProductWarehouse;
 use App\Models\Sales;
 use App\Models\SalesItem;
+use App\Models\User;
 use App\Models\Warehouse;
 use Carbon\Carbon;
 use Database\Factories\SalesFactory;
 use Database\Seeders\AccountSeeder;
 use Database\Seeders\RoleSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Mail;
 use Mockery;
 use Tests\TestCase;
 use Tests\Traits\CreatesTenant;
@@ -258,6 +263,304 @@ class SalesControllerTest extends TestCase
             'paymentable_type' => Sales::class,
             'amount' => 50,
         ]);
+    }
+
+    public function test_it_can_email_an_invoice_to_the_customer()
+    {
+        Mail::fake();
+
+        $sale = SalesFactory::new()->create([
+            'customer_id' => $this->customer->id,
+            'user_id' => $this->user->id,
+        ]);
+        SalesItem::factory()->create(['sales_id' => $sale->id, 'product_id' => $this->product->id]);
+
+        $response = $this->post(route('admin.sales.send-invoice', $sale->id));
+
+        $response->assertRedirect(route('admin.sales.show', $sale->id));
+        $response->assertSessionHas('success', __('messages.invoice_email_sent', ['email' => $this->customer->email]));
+
+        Mail::assertSent(SalesInvoiceMail::class, function (SalesInvoiceMail $mail) use ($sale) {
+            return $mail->hasTo($this->customer->email) && $mail->sale->is($sale);
+        });
+    }
+
+    public function test_emailing_an_invoice_without_a_customer_email_reports_an_error()
+    {
+        Mail::fake();
+
+        $customer = Customer::factory()->create(['email' => null]);
+        $sale = SalesFactory::new()->create([
+            'customer_id' => $customer->id,
+            'user_id' => $this->user->id,
+        ]);
+
+        $response = $this->post(route('admin.sales.send-invoice', $sale->id));
+
+        $response->assertRedirect(route('admin.sales.show', $sale->id));
+        $response->assertSessionHas('error', __('messages.invoice_email_missing'));
+        Mail::assertNothingSent();
+    }
+
+    public function test_emailing_an_invoice_surfaces_a_transport_failure_as_an_error_flash()
+    {
+        Mail::shouldReceive('to')->once()->andThrow(new \RuntimeException('SMTP down'));
+
+        $sale = SalesFactory::new()->create([
+            'customer_id' => $this->customer->id,
+            'user_id' => $this->user->id,
+        ]);
+
+        $response = $this->post(route('admin.sales.send-invoice', $sale->id));
+
+        $response->assertRedirect(route('admin.sales.show', $sale->id));
+        $response->assertSessionHas('error', __('messages.invoice_email_failed'));
+    }
+
+    public function test_a_php_error_in_the_send_path_is_not_masked_as_a_mail_failure()
+    {
+        // The catch is scoped to \Exception, not \Throwable: a transport
+        // failure is a mail problem and gets the friendly flash, but a PHP
+        // Error is a bug in the code and must surface as a 500 rather than
+        // be reported to the user as "the email failed".
+        Mail::shouldReceive('to')->once()->andThrow(new \Error('bug in the mail path'));
+
+        $sale = SalesFactory::new()->create([
+            'customer_id' => $this->customer->id,
+            'user_id' => $this->user->id,
+        ]);
+
+        $response = $this->post(route('admin.sales.send-invoice', $sale->id));
+
+        $response->assertStatus(500);
+        $response->assertSessionMissing('error');
+    }
+
+    public function test_emailing_an_invoice_requires_edit_permission()
+    {
+        Mail::fake();
+
+        $sale = SalesFactory::new()->create([
+            'customer_id' => $this->customer->id,
+            'user_id' => $this->user->id,
+        ]);
+        $userWithoutRole = User::factory()->create(['tenant_id' => $this->tenant->id]);
+
+        $this->actingAs($userWithoutRole)
+            ->post(route('admin.sales.send-invoice', $sale->id))
+            ->assertStatus(403);
+
+        Mail::assertNothingSent();
+    }
+
+    public function test_the_invoice_view_renders_the_send_email_button()
+    {
+        $sale = SalesFactory::new()->create([
+            'customer_id' => $this->customer->id,
+            'user_id' => $this->user->id,
+            'type' => Sales::TYPE_REGULAR,
+        ]);
+        SalesItem::factory()->create(['sales_id' => $sale->id, 'product_id' => $this->product->id]);
+
+        $this->get(route('admin.sales.show', $sale->id))
+            ->assertStatus(200)
+            ->assertSee(route('admin.sales.send-invoice', $sale->id), false)
+            ->assertSee(__('messages.send_invoice_email'), false)
+            ->assertSee('data-invoice-email-send', false);
+    }
+
+    public function test_the_send_button_is_wired_to_its_loading_state_script()
+    {
+        // The button's pending state has to live in a bundled script: the
+        // project runs strict CSP (inline handlers were extracted to
+        // legacy-inline-scripts.js on purpose). Three source lines must stay
+        // in step - the hook on the form, the @vite entry, and the selector
+        // the script binds to. Clicking it is not possible in this
+        // environment, so the wiring is asserted where it lives.
+        $header = file_get_contents(
+            resource_path('views/admin/layouts/partials/sales/view/header.blade.php')
+        );
+        $this->assertStringContainsString('data-invoice-email-send', $header);
+
+        $script = file_get_contents(resource_path('views/admin/layouts/script.blade.php'));
+        $this->assertStringContainsString('resources/js/admin/sales/invoice-email.js', $script);
+
+        $js = file_get_contents(resource_path('js/admin/sales/invoice-email.js'));
+        $this->assertStringContainsString('form[data-invoice-email-send]', $js);
+        $this->assertStringContainsString('turbo:submit-end', $js);
+        $this->assertStringContainsString('aria-busy', $js);
+    }
+
+    public function test_the_invoice_email_carries_the_invoice_details_and_pdf_attachment()
+    {
+        // A distinctive name: the factory draws a random faker word, which can
+        // collide with ordinary text in the rendered HTML and make the
+        // occurrence count below meaningless.
+        $product = Product::factory()->create(['name' => 'ZQX Invoice Marker 4471']);
+
+        $sale = SalesFactory::new()->create([
+            'customer_id' => $this->customer->id,
+            'user_id' => $this->user->id,
+        ]);
+        SalesItem::factory()->create(['sales_id' => $sale->id, 'product_id' => $product->id]);
+        SalesItem::factory()->create(['sales_id' => $sale->id, 'product_id' => $product->id]);
+
+        $mailable = new SalesInvoiceMail($sale);
+
+        $mailable->assertHasSubject(__('messages.invoice_email_subject', [
+            'invoice' => $sale->invoice,
+            'company' => config('app.name'),
+        ]));
+
+        $html = $mailable->render();
+        $this->assertStringContainsString($sale->invoice, $html);
+        $this->assertStringContainsString($product->name, $html);
+        $this->assertSame(2, substr_count($html, $product->name));
+
+        // The intro is written with the invoice number, and no placeholder is
+        // ever handed to the customer as text.
+        $this->assertStringNotContainsString(':invoice', $html);
+        $this->assertStringNotContainsString(':balance', $html);
+
+        // The three figures every invoice email states, in the amount summary.
+        $this->assertStringContainsString(__('messages.grand_total'), $html);
+        $this->assertStringContainsString(__('messages.total_paid'), $html);
+        $this->assertStringContainsString(__('messages.balance'), $html);
+
+        $attachments = $mailable->attachments();
+        $this->assertCount(1, $attachments);
+        $this->assertSame('invoice-'.$sale->invoice.'.pdf', $attachments[0]->as);
+    }
+
+    public function test_an_unmapped_status_is_shown_as_its_own_word_not_a_raw_translation_key()
+    {
+        // The status cell builds a translation key from the stored status. If
+        // the word has no key, the customer must see the status itself, never
+        // the raw "messages.something" lookup string.
+        $sale = $this->saleWithKnownTotals(['status' => 'Awaiting Payment']);
+
+        $html = (new SalesInvoiceMail($sale))->render();
+
+        $this->assertStringContainsString('Awaiting Payment', $html);
+        $this->assertStringNotContainsString('messages.awaiting payment', $html);
+
+        // And a mapped status still reads as the translated label.
+        $mapped = $this->saleWithKnownTotals(['status' => 'Unpaid']);
+        $mappedHtml = (new SalesInvoiceMail($mapped))->render();
+        $this->assertStringContainsString(__('messages.unpaid'), $mappedHtml);
+    }
+
+    /**
+     * A sale whose stored total matches its line items, so the email's
+     * summary closes: gross - paid = balance.
+     */
+    private function saleWithKnownTotals(array $overrides = []): Sales
+    {
+        $product = Product::factory()->create(['selling_price' => 500]);
+
+        $sale = SalesFactory::new()->create(array_merge([
+            'customer_id' => $this->customer->id,
+            'user_id' => $this->user->id,
+            'order_discount' => 0,
+            'order_discount_type' => 'fixed',
+            'tax_rate' => 0,
+            'tax_type' => 'none',
+            'total_tax' => 0,
+            'status' => 'Unpaid',
+        ], $overrides));
+
+        SalesItem::factory()->create([
+            'sales_id' => $sale->id,
+            'product_id' => $product->id,
+            'quantity' => 2,
+            'customer_price' => 500,
+            'total' => 1000,
+            'discount' => 0,
+            'discount_type' => 'fixed',
+        ]);
+
+        $sale->refresh();
+        $sale->load('salesItems');
+        $sale->update(['total' => $sale->grand_total]);
+        $sale->refresh();
+
+        return $sale;
+    }
+
+    public function test_an_unpaid_invoice_email_states_the_balance_still_due()
+    {
+        $sale = $this->saleWithKnownTotals();
+
+        $html = (new SalesInvoiceMail($sale))->render();
+
+        $this->assertSame(1000.0, (float) $sale->balance);
+        $this->assertStringContainsString('<table class="panel"', $html);
+        $this->assertStringContainsString(__('messages.invoice_email_unpaid_note', [
+            'balance' => CurrencyHelper::format($sale->balance),
+        ]), $html);
+        $this->assertStringNotContainsString(__('messages.invoice_email_partial_note', [
+            'paid' => CurrencyHelper::format($sale->total_paid),
+            'amount' => CurrencyHelper::format($sale->total),
+            'balance' => CurrencyHelper::format($sale->balance),
+        ]), $html);
+    }
+
+    public function test_a_partially_paid_invoice_email_states_what_is_left()
+    {
+        $sale = $this->saleWithKnownTotals(['status' => 'Partial']);
+        Payment::factory()->create([
+            'paymentable_id' => $sale->id,
+            'paymentable_type' => Sales::class,
+            'amount' => 400,
+            'payment_date' => now(),
+        ]);
+        $sale->refresh();
+
+        $html = (new SalesInvoiceMail($sale))->render();
+
+        $this->assertSame(600.0, (float) $sale->balance);
+        $this->assertStringContainsString('<table class="panel"', $html);
+        $this->assertStringContainsString(__('messages.invoice_email_partial_note', [
+            'paid' => CurrencyHelper::format($sale->total_paid),
+            'amount' => CurrencyHelper::format($sale->total),
+            'balance' => CurrencyHelper::format($sale->balance),
+        ]), $html);
+        // The amounts themselves are in the summary, not only in the note.
+        $this->assertStringContainsString(CurrencyHelper::format($sale->balance), $html);
+    }
+
+    public function test_a_settled_invoice_email_asks_for_nothing()
+    {
+        $sale = $this->saleWithKnownTotals(['status' => 'Paid']);
+        Payment::factory()->create([
+            'paymentable_id' => $sale->id,
+            'paymentable_type' => Sales::class,
+            'amount' => 1000,
+            'payment_date' => now(),
+        ]);
+        $sale->refresh();
+
+        $html = (new SalesInvoiceMail($sale))->render();
+
+        $this->assertSame(0.0, (float) $sale->balance);
+        // No due-amount callout: the summary already shows it settled.
+        $this->assertStringNotContainsString('<table class="panel"', $html);
+        $this->assertStringContainsString(CurrencyHelper::format(0), $html);
+    }
+
+    public function test_it_can_print_the_invoice_as_a_pdf()
+    {
+        $sale = SalesFactory::new()->create([
+            'customer_id' => $this->customer->id,
+            'user_id' => $this->user->id,
+        ]);
+        SalesItem::factory()->create(['sales_id' => $sale->id, 'product_id' => $this->product->id]);
+
+        $response = $this->get(route('admin.sales.print', $sale->id));
+
+        $response->assertStatus(200);
+        $response->assertHeader('Content-Type', 'application/pdf');
+        $this->assertStringStartsWith('%PDF', $response->getContent());
     }
 
     public function test_it_can_bulk_delete_sales()

@@ -524,6 +524,137 @@ body.layout-navbar .main-content {
     font-weight: bold;
 }
 
+/* Parent of the current page. Only the child's row earns .active - the black
+   pill (near-white in dark) means "this is the page you are on" and nothing
+   else may wear it - so the section above gets a different KIND of claim: a
+   primary-tinted tray (fill + matching inset edge) plus the app's primary
+   icon and a 500 -> 600 title step. This is the rail's open-section body at
+   row scale: the rail settled on a fill after three rejected line attempts
+   (hairline "artifact", bracket "just a bolder line", elbow "too plain") on
+   the principle that a group needs a BODY, not a stroke - the edge here only
+   reinforces the fill the way the tray's own border does, and an inset
+   shadow draws it without moving the row a pixel (a real border would push
+   this row's icon 1px off the column the siblings share). Tinted surface vs
+   solid fill divides parent from page; a second pill would flatten the
+   hierarchy it is meant to explain. Scoped to the expanded sidebar: on the
+   rail the open drawer's tray + accent bar already name the section, and a
+   tint there would compete with the 30px position circle.
+
+   Hover: in light the tint deepens and the ink stays ink - declining the
+   shared dark plate is deliberate, because that plate's white text and
+   white chevron are painted for a dark surface and would vanish on a pale
+   one. In dark the existing !important white flash wins (fighting it is the
+   trap dark.css documents); the tray returns on mouse-out. */
+.sidebar:not(.collapsed) .navbar-nav .nav-link.has-active-child {
+    background-color: rgba(var(--tblr-primary-rgb, 0, 84, 166), 0.08);
+    box-shadow: inset 0 0 0 1px rgba(var(--tblr-primary-rgb, 0, 84, 166), 0.18);
+}
+
+.sidebar:not(.collapsed) .navbar-nav .nav-link.has-active-child .nav-link-icon {
+    color: var(--tblr-primary, #0054a6);
+}
+
+.sidebar:not(.collapsed) .navbar-nav .nav-link.has-active-child .nav-link-title {
+    font-weight: 600;
+}
+
+.sidebar:not(.collapsed) .navbar-nav .nav-link.has-active-child:hover {
+    background-color: rgba(var(--tblr-primary-rgb, 0, 84, 166), 0.14);
+    color: #495057;
+}
+
+.sidebar:not(.collapsed) .navbar-nav .nav-link.has-active-child:hover .nav-link-title {
+    color: #495057;
+}
+
+/* Dark: the same tray, deepened - an alpha that reads on white vanishes on
+   #121416 (the rail's dark tray flips to frost for the same reason). The
+   primary hue stays because the row's claim IS the primary icon; every
+   value here loses to the dark hover !important block by design. */
+[data-bs-theme="dark"] .sidebar:not(.collapsed) .navbar-nav .nav-link.has-active-child,
+html[data-bs-theme="dark"] .sidebar:not(.collapsed) .navbar-nav .nav-link.has-active-child,
+body[data-bs-theme="dark"] .sidebar:not(.collapsed) .navbar-nav .nav-link.has-active-child,
+.dark .sidebar:not(.collapsed) .navbar-nav .nav-link.has-active-child,
+[data-theme="dark"] .sidebar:not(.collapsed) .navbar-nav .nav-link.has-active-child {
+    background-color: rgba(var(--tblr-primary-rgb, 0, 84, 166), 0.28);
+    box-shadow: inset 0 0 0 1px rgba(var(--tblr-primary-rgb, 0, 84, 166), 0.45);
+}
+
+/* Closed sidebar (rail): the parent row wears the SAME claim it wears when
+   the sidebar is open - a primary-tinted body plus the primary glyph - only
+   at rail scale. Purely additive: the drawer's tray, its 3px accent bar,
+   the 30px position circle and the hover disc further down are all
+   untouched; this paints nothing but the row that owns the open section.
+   It keys off .has-active-child rather than the tray, so the mark is on
+   screen from first paint - the server renders no "show" class, and the
+   drawer only opens once menu-sidebar.js runs.
+
+   No inset edge here, unlike the expanded row. In the rail the row sits
+   flush inside the drawer (measured: tray border-box starts at x12, the
+   44px row at x13), so a 1px ring would stack directly against the tray's
+   own border and rebuild the double line the expanded sidebar just shed.
+   The tray already frames this row - a container IS the edge - so the fill
+   alone carries the claim, which is the same "a group needs a BODY, not a
+   stroke" reading that produced the tray in the first place.
+
+   The alphas match the expanded row (0.08 light / 0.28 dark) so the parent
+   is one identity in both modes rather than two; dark is deepened because
+   it paints over the tray's frost instead of the bare rail. Hover holds a
+   deepened tint rather than letting it blink off - this rule outranks the
+   rail's transparent-plus-disc hover - and the disc still shows because it
+   lives in background-image, which nothing here touches. In dark the
+   existing !important white flash wins, exactly as it does expanded:
+   fighting it is the trap dark.css documents, and the tint returns on
+   mouse-out. The primary glyph is light-only in effect: dark.css pins
+   every sidebar icon to #727476 !important, which is pre-existing and
+   deliberately not fought. .active and .has-active-child can never
+   co-occur - a parent carries no route of its own, so menu-sidebar.js's
+   href="#" skip keeps .active off it - so nothing here can shadow the
+   position marker. */
+.sidebar.collapsed .navbar-nav .nav-link.has-active-child {
+    background-color: rgba(var(--tblr-primary-rgb, 0, 84, 166), 0.08);
+}
+
+.sidebar.collapsed .navbar-nav .nav-link.has-active-child .nav-link-icon {
+    color: var(--tblr-primary, #0054a6);
+}
+
+.sidebar.collapsed .navbar-nav .nav-link.has-active-child:hover:not(.active) {
+    background-color: rgba(var(--tblr-primary-rgb, 0, 84, 166), 0.14);
+}
+
+[data-bs-theme="dark"] .sidebar.collapsed .navbar-nav .nav-link.has-active-child,
+html[data-bs-theme="dark"] .sidebar.collapsed .navbar-nav .nav-link.has-active-child,
+body[data-bs-theme="dark"] .sidebar.collapsed .navbar-nav .nav-link.has-active-child,
+.dark .sidebar.collapsed .navbar-nav .nav-link.has-active-child,
+[data-theme="dark"] .sidebar.collapsed .navbar-nav .nav-link.has-active-child {
+    background-color: rgba(var(--tblr-primary-rgb, 0, 84, 166), 0.28);
+}
+
+/* Audit finding #12: light mode gives the marked parent's glyph the primary
+   color (.has-active-child .nav-link-icon above), but dark.css pins every
+   sidebar icon to #727476 !important, so the dark row told two stories -
+   primary tray, grey glyph. The claim is restated here in a LIFTED primary.
+   The literal #0054a6 lands ~2:1 against the tray painted just above
+   (rgba primary 0.28 over #121416 is about rgb(13,38,62)), under the 3:1
+   non-text contrast needs, so color-mix blends the SAME hue 62% primary /
+   38% white: ~4.8:1 on that tray, ~5.8:1 on the bare sidebar - the same
+   reason navbar.css switches register for its near-black panel. The
+   :not(:hover) keeps the dark hover flash out of it: that state paints the
+   row #f8f9fa and hands the icon its own #37393b, and a lifted blue would
+   fail on white, so hover stays exactly as it was. The !important is
+   required, not decorative: the pin it overrides is !important, so only an
+   outranking !important hands the glyph back - and the pin itself stays
+   untouched. One selector covers the rail and the expanded tray because the
+   claim is the same in both; rows without an active parent never match. */
+[data-bs-theme="dark"] .sidebar .navbar-nav .nav-link.has-active-child:not(:hover) .nav-link-icon i,
+html[data-bs-theme="dark"] .sidebar .navbar-nav .nav-link.has-active-child:not(:hover) .nav-link-icon i,
+body[data-bs-theme="dark"] .sidebar .navbar-nav .nav-link.has-active-child:not(:hover) .nav-link-icon i,
+.dark .sidebar .navbar-nav .nav-link.has-active-child:not(:hover) .nav-link-icon i,
+[data-theme="dark"] .sidebar .navbar-nav .nav-link.has-active-child:not(:hover) .nav-link-icon i {
+    color: color-mix(in srgb, var(--tblr-primary, #0054a6) 62%, #ffffff) !important;
+}
+
 /* Rail active marker: a 30px CIRCLE in the 44px row (was 36px - too close
    to the band's own size, so it read as a plate; worse, it OVERLAPPED the
    accent bar: circle x17-x53 against bar x15-x18). 30px restores the

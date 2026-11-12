@@ -46,7 +46,14 @@
         @endif
 
         {{-- PKP warning if not configured (Indonesian tenants only) --}}
-        @php $tenant = app('currentTenant'); @endphp
+        @php
+            $tenant = app('currentTenant');
+            // Batch submit needs the Enterprise efaktur_api feature AND live
+            // Klikpajak credentials; without both the button would only fail.
+            $canSubmitBatch = $tenant instanceof \App\Models\Tenant
+                && $tenant->hasFeature('efaktur_api')
+                && ! empty($tenant->klikpajak_api_key);
+        @endphp
         @if($tenant instanceof \App\Models\Tenant && $tenant->isIndonesian() && !$tenant->pkp_status)
             <div class="alert alert-warning mb-4">
                 <i class="ti ti-alert-triangle me-2"></i>
@@ -156,12 +163,29 @@
                     <i class="ti ti-list me-2 text-muted"></i>
                     {{ __('messages.efaktur_table_title') }} — {{ \Carbon\Carbon::create()->month($masa)->format('F') }} {{ $tahun }}
                 </h3>
+                @if($canSubmitBatch)
+                    {{-- Lives outside the form and posts it via the form= attribute --}}
+                    <button type="submit" form="efakturBatchForm" class="btn btn-primary"
+                            onclick="return confirm('{{ __('messages.efaktur_batch_confirm') }}')">
+                        <i class="ti ti-send me-1"></i>{{ __('messages.efaktur_batch_submit') }}
+                    </button>
+                @endif
             </div>
             <div class="card-body p-0">
+                @if($canSubmitBatch)
+                    <form method="POST" action="{{ route('admin.efaktur.batch.submit') }}" id="efakturBatchForm">
+                        @csrf
+                @endif
                 <div class="table-responsive">
                     <table class="table table-hover table-vcenter mb-0">
                         <thead class="table-light">
                             <tr>
+                                @if($canSubmitBatch)
+                                    <th class="w-1">
+                                        <input type="checkbox" id="efakturSelectAll" class="form-check-input"
+                                               aria-label="{{ __('messages.select_all') }}">
+                                    </th>
+                                @endif
                                 <th>NSFP</th>
                                 <th>{{ __('messages.date') }}</th>
                                 <th>{{ __('messages.efaktur_buyer') }}</th>
@@ -175,6 +199,17 @@
                         <tbody>
                             @forelse($fakturs as $faktur)
                                 <tr>
+                                    @if($canSubmitBatch)
+                                        <td>
+                                            {{-- Only drafts can go to DJP, so only drafts are selectable --}}
+                                            @if($faktur->isSubmittable())
+                                                <input type="checkbox" name="faktur_ids[]"
+                                                       class="form-check-input efaktur-batch-check"
+                                                       value="{{ $faktur->id }}"
+                                                       aria-label="{{ __('messages.efaktur_batch_select_row', ['nsfp' => $faktur->nsfp]) }}">
+                                            @endif
+                                        </td>
+                                    @endif
                                     <td>
                                         <a href="{{ route('admin.efaktur.show', $faktur) }}" class="fw-semibold font-monospace">
                                             {{ $faktur->nsfp }}
@@ -205,7 +240,7 @@
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="8" class="text-center text-muted py-5">
+                                    <td colspan="{{ $canSubmitBatch ? 9 : 8 }}" class="text-center text-muted py-5">
                                         <i class="ti ti-file-x fs-2 d-block mb-2"></i>
                                         {{ __('messages.efaktur_empty') }}
                                     </td>
@@ -214,6 +249,9 @@
                         </tbody>
                     </table>
                 </div>
+                @if($canSubmitBatch)
+                    </form>
+                @endif
             </div>
             @if($fakturs->hasPages())
                 <div class="card-footer">
@@ -224,4 +262,29 @@
         </div>
     </div>
 </div>
+
+@if($canSubmitBatch)
+<script>
+(function () {
+    const master = document.getElementById('efakturSelectAll');
+    const form = document.getElementById('efakturBatchForm');
+    if (!master || !form) return;
+
+    const rowChecks = () => Array.from(form.querySelectorAll('.efaktur-batch-check'));
+
+    // Select-all only touches selectable rows: non-draft fakturs render
+    // without a checkbox, so they are skipped rather than re-checked.
+    master.addEventListener('change', function () {
+        rowChecks().forEach((box) => { box.checked = master.checked; });
+    });
+
+    // Clearing the last row must clear the master box, or it stays ticked
+    // and the next submit looks like a bulk action that was never taken.
+    form.addEventListener('change', function () {
+        const boxes = rowChecks();
+        master.checked = boxes.length > 0 && boxes.every((box) => box.checked);
+    });
+})();
+</script>
+@endif
 @endsection

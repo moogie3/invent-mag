@@ -13,7 +13,6 @@ return [
     // Topics grid
     'what_to_explore' => 'What would you like to explore?',
     'select_category' => 'Select a category to see available pages.',
-    'topics_title' => 'All Topics',
 
     // Dashboard
     'dashboard' => 'Dashboard',
@@ -753,9 +752,6 @@ return [
     'quick_guide' => 'Quick Guide:',
 
     // Buttons
-    'skip_close' => 'Skip / Close',
-    'view_all_topics' => 'View All Topics',
-    'next_view_topics' => 'Next: View Topics',
     'back' => 'Back',
     // Buttons
     'skip_tutorial' => 'Skip Tutorial',
@@ -795,5 +791,5 @@ return [
     'efaktur_ppn_rate' => 'VAT Rate: The current PPN rate is 11% (effective since April 1, 2022). Update this field if DJP changes the rate in the future.',
     'efaktur_nsfp_pool' => 'NSFP Pool: NSFP (Nomor Seri Faktur Pajak) numbers are required for each Faktur Pajak. Import them from the DJP portal in bulk.',
     'efaktur_nsfp_import' => 'NSFP Import: Paste NSFP numbers one per line in the format XXX.XXX-YY.XXXXXXXX. Duplicate numbers are automatically skipped. Import NSFP before generating Faktur Pajak.',
-    'efaktur_klikpajak' => 'Klikpajak API (Direct DJP Submission): Save the API key and secret issued by Mekari Klikpajak to enable one-click submission of draft Faktur Pajak directly to DJP — no CSV download, no desktop e-Faktur app. Turn the sandbox switch on to test against the DJP sandbox before going live. Available on the Enterprise plan; without it you can keep exporting CSV.',
+    'efaktur_klikpajak' => 'Klikpajak API (Direct DJP Submission): Save the Client ID and Client Secret issued by Mekari (developers.mekari.com) to enable one-click submission of draft Faktur Pajak directly to DJP: no CSV download, no desktop e-Faktur app. Requests are HMAC-signed with those credentials. Turn the sandbox switch on to test against the DJP sandbox before going live. Available on the Enterprise plan; without it you can keep exporting CSV.',
 ];

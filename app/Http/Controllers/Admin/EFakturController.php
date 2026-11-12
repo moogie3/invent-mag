@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Jobs\CancelFakturPajakJob;
+use App\Jobs\SubmitFakturPajakBatchJob;
 use App\Jobs\SubmitFakturPajakJob;
 use App\Models\FakturPajak;
 use App\Models\NsfpPool;
@@ -234,6 +236,89 @@ class EFakturController extends Controller
         SubmitFakturPajakJob::dispatch($fakturPajak)->onQueue('tax-submissions');
 
         return back()->with('success', __('messages.efaktur_queued_for_djp'));
+    }
+
+    // -----------------------------------------------------------------------
+    // Bulk submit ke DJP (Phase 2): one PJAP call for many draft fakturs
+    // -----------------------------------------------------------------------
+
+    public function submitBatch(Request $request)
+    {
+        $this->authorize('create-efaktur');
+
+        // Deliberately not a hard 'required' rule: the index page renders
+        // session() flashes only, so a validation error would be silent.
+        // Empty selection is handled below where it can actually be seen.
+        $request->validate([
+            'faktur_ids'   => ['nullable', 'array'],
+            'faktur_ids.*' => ['integer'],
+        ]);
+
+        $selected = array_values((array) $request->input('faktur_ids', []));
+
+        if ($selected === []) {
+            return back()->with('error', __('messages.efaktur_batch_none_selected'));
+        }
+
+        $tenant = app('currentTenant');
+        if (! $tenant->klikpajak_api_key) {
+            return back()->with('error', __('messages.efaktur_klikpajak_not_configured'));
+        }
+
+        // Restrict to what is actually submittable. The tenant scope on
+        // FakturPajak means ids from another tenant never match, so a forged
+        // list collapses to an empty selection instead of crossing tenants.
+        $ids = FakturPajak::whereIn('id', $selected)
+            ->where('status', 'draft')
+            ->pluck('id')
+            ->all();
+
+        if ($ids === []) {
+            return back()->with('error', __('messages.efaktur_not_submittable'));
+        }
+
+        $skipped = count($selected) - count($ids);
+
+        // Queued: the bulk transport polls DJP for up to ~2 minutes.
+        SubmitFakturPajakBatchJob::dispatch($ids, $tenant->id)->onQueue('tax-submissions');
+
+        $message = __('messages.efaktur_batch_queued', ['count' => count($ids)]);
+
+        if ($skipped > 0) {
+            $message .= ' '.__('messages.efaktur_batch_skipped', ['count' => $skipped]);
+        }
+
+        return back()->with('success', $message);
+    }
+
+    // -----------------------------------------------------------------------
+    // Cancel at DJP (Phase 2): void a faktur DJP already accepted
+    // -----------------------------------------------------------------------
+
+    public function cancelAtDjp(FakturPajak $fakturPajak)
+    {
+        $this->authorize('create-efaktur');
+
+        // Without a PJAP id there is nothing to void on DJP's side; the
+        // Phase 1 local cancel (cancelFakturPajak) covers drafts instead.
+        if (! $fakturPajak->pjap_submission_id) {
+            return back()->with('error', __('messages.efaktur_not_submitted_to_djp'));
+        }
+
+        if ($fakturPajak->status === 'cancelled') {
+            return back()->with('error', __('messages.efaktur_already_cancelled'));
+        }
+
+        $tenant = app('currentTenant');
+        if (! $tenant->klikpajak_api_key) {
+            return back()->with('error', __('messages.efaktur_klikpajak_not_configured'));
+        }
+
+        // Queued: DJP/PJAP calls take seconds; the job owns the idempotency
+        // guard and only writes local state after DJP confirms the void.
+        CancelFakturPajakJob::dispatch($fakturPajak)->onQueue('tax-submissions');
+
+        return back()->with('success', __('messages.efaktur_cancel_queued_for_djp'));
     }
 
     public function importNsfp(Request $request)

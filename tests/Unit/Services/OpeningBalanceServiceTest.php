@@ -135,12 +135,10 @@ class OpeningBalanceServiceTest extends TestCase
     #[Test]
     public function it_gets_summary()
     {
-        $tenantId = app('currentTenant')->id;
-        $account = Account::where('code', '1140-'.$tenantId)->first();
-
-        if (! $account) {
-            $this->markTestSkipped('Required account not found');
-        }
+        // No account lookup here: getSummary reads the opening balance rows,
+        // not the chart of accounts. The guard that used to sit in this test
+        // skipped silently whenever an account was missing, so the assertions
+        // below could quietly stop running.
 
         // Get the summary without any opening balances
         $summary = $this->openingBalanceService->getSummary(now()->toDateString());

@@ -195,7 +195,8 @@
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ __('messages.cancel') }}</button>
                     <button type="submit" class="btn btn-primary">{{ __('messages.save') }}</button>
                 </div>
-                <input type="hidden" id="updateRouteBase" value="{{ route('admin.customer.update', '') }}">
+                {{-- L12: route() rejects an empty parameter, so strip a placeholder segment to get the id-less base. --}}
+                <input type="hidden" id="updateRouteBase" value="{{ Str::beforeLast(route('admin.customer.update', ['id' => 'placeholder']), '/placeholder') }}">
             </form>
         </div>
     </div>

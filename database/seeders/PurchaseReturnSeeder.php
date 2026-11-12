@@ -105,9 +105,18 @@ class PurchaseReturnSeeder extends Seeder
                 'tenant_id' => $tenantId,
             ]);
 
+            // A return created as Canceled holds no stock and no live journal
+            // entry: the cancel path unwinds both, so a row born Canceled must
+            // never have moved stock or booked an entry in the first place.
+            $isCanceled = $status === 'Canceled';
+
             // Create PurchaseReturnItems
             foreach ($returnItemsData as $itemData) {
                 $purchaseReturnItem = $purchaseReturn->items()->create($itemData);
+
+                if ($isCanceled) {
+                    continue;
+                }
 
                 // Update product stock (increment as it's a return to stock)
                 // Note: Purchase return usually means returning TO supplier, so stock should DECREMENT.
@@ -124,20 +133,22 @@ class PurchaseReturnSeeder extends Seeder
                 }
             }
 
-            // Create Journal Entry for Purchase Return
-            $description = "Purchase Return for PO {$purchase->invoice}, Return #{$purchaseReturn->id}";
-            $transactions = [];
+            if (! $isCanceled) {
+                // Create Journal Entry for Purchase Return
+                $description = "Purchase Return for PO {$purchase->invoice}, Return #{$purchaseReturn->id}";
+                $transactions = [];
 
-            // Debit Accounts Payable / Cash (depending on original payment type or refund status)
-            // For simplicity, we'll assume a credit to a Purchase Returns account and debit to AP/Cash
-            // More complex logic might be needed here based on refund status
-            $transactions[] = ['account_code' => '2110-'.$tenantId, 'type' => 'debit', 'amount' => $totalReturnAmount];
-            $transactions[] = ['account_code' => '1140-'.$tenantId, 'type' => 'credit', 'amount' => $totalReturnAmount]; // Adjust inventory
+                // Debit Accounts Payable / Cash (depending on original payment type or refund status)
+                // For simplicity, we'll assume a credit to a Purchase Returns account and debit to AP/Cash
+                // More complex logic might be needed here based on refund status
+                $transactions[] = ['account_code' => '2110-'.$tenantId, 'type' => 'debit', 'amount' => $totalReturnAmount];
+                $transactions[] = ['account_code' => '1140-'.$tenantId, 'type' => 'credit', 'amount' => $totalReturnAmount]; // Adjust inventory
 
-            try {
-                $this->accountingService->createJournalEntry($description, Carbon::parse($returnDate), $transactions, $purchaseReturn);
-            } catch (\Exception $e) {
-                $this->command->error("Failed to create journal entry for purchase return {$purchaseReturn->id}: ".$e->getMessage());
+                try {
+                    $this->accountingService->createJournalEntry($description, Carbon::parse($returnDate), $transactions, $purchaseReturn);
+                } catch (\Exception $e) {
+                    $this->command->error("Failed to create journal entry for purchase return {$purchaseReturn->id}: ".$e->getMessage());
+                }
             }
 
             $count++;
@@ -145,5 +156,6 @@ class PurchaseReturnSeeder extends Seeder
 
         $this->command->info('Purchase Return seeding completed!');
         $this->command->info("Created {$count} purchase returns with items, stock updates, and journal entries.");
+        $this->command->info('Canceled returns carry items only: no stock move and no journal entry.');
     }
 }

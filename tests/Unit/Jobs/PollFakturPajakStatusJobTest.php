@@ -58,35 +58,35 @@ class PollFakturPajakStatusJobTest extends TestCase
     #[Test]
     public function it_marks_the_faktur_approved_with_the_djp_reference(): void
     {
-        Http::fake(['*' => Http::response(['data' => [
-            'status'           => 'APPROVED',
-            'nomor_faktur_djp' => '010.000-26.00000099',
-            'keterangan'       => null,
+        Http::fake(['*' => Http::response(['code' => '00', 'data' => [
+            'approval_status' => 'APPROVED',
+            'invoice_status' => 'NORMAL',
+            'document_number' => '000.21.01230099',
         ]], 200)]);
-        $faktur = $this->makeFaktur(['pjap_submission_id' => 'SUB-7']);
+        $faktur = $this->makeFaktur(['pjap_submission_id' => '49']);
 
         (new PollFakturPajakStatusJob($faktur))->handle();
 
         $faktur->refresh();
         $this->assertSame('approved', $faktur->status);
         $this->assertSame('approved', $faktur->pjap_status);
-        $this->assertSame('010.000-26.00000099', $faktur->djp_reference_number);
+        $this->assertSame('000.21.01230099', $faktur->djp_reference_number);
         $this->assertNotNull($faktur->djp_response_at);
         $this->assertIsArray($faktur->djp_response_payload);
 
         Queue::assertNothingPushed(); // verdict in → chain stops
-        Http::assertSent(fn (Request $request) => str_ends_with($request->url(), '/v1/faktur/status/SUB-7'));
+        Http::assertSent(fn (Request $request) => str_ends_with($request->url(), '/v1/efaktur/out/49'));
     }
 
     #[Test]
     public function it_marks_the_faktur_rejected_with_the_djp_reason(): void
     {
-        Http::fake(['*' => Http::response(['data' => [
-            'status'           => 'DITOLAK',
-            'nomor_faktur_djp' => null,
-            'keterangan'       => 'NPWP pembeli tidak valid',
+        Http::fake(['*' => Http::response(['code' => '00', 'data' => [
+            'approval_status' => 'REJECTED',
+            'invoice_status' => 'NORMAL',
+            'error_msg' => 'NPWP pembeli tidak valid',
         ]], 200)]);
-        $faktur = $this->makeFaktur(['pjap_submission_id' => 'SUB-7']);
+        $faktur = $this->makeFaktur(['pjap_submission_id' => '49']);
 
         (new PollFakturPajakStatusJob($faktur))->handle();
 
@@ -96,7 +96,7 @@ class PollFakturPajakStatusJobTest extends TestCase
         $this->assertNull($faktur->djp_reference_number);
         $this->assertSame(
             'NPWP pembeli tidak valid',
-            $faktur->djp_response_payload['data']['keterangan'] ?? null
+            $faktur->djp_response_payload['data']['error_msg'] ?? null
         );
         Queue::assertNothingPushed(); // rejection is terminal — no re-poll
     }
@@ -104,10 +104,11 @@ class PollFakturPajakStatusJobTest extends TestCase
     #[Test]
     public function it_reschedules_polling_while_the_verdict_is_pending(): void
     {
-        Http::fake(['*' => Http::response(['data' => [
-            'status' => 'PENDING',
+        Http::fake(['*' => Http::response(['code' => '00', 'data' => [
+            'approval_status' => 'DRAFT',
+            'invoice_status' => 'NORMAL',
         ]], 200)]);
-        $faktur = $this->makeFaktur(['pjap_submission_id' => 'SUB-7']);
+        $faktur = $this->makeFaktur(['pjap_submission_id' => '49']);
 
         (new PollFakturPajakStatusJob($faktur))->handle();
 
@@ -125,8 +126,8 @@ class PollFakturPajakStatusJobTest extends TestCase
     #[Test]
     public function it_treats_a_missing_verdict_as_pending_and_reschedules(): void
     {
-        Http::fake(['*' => Http::response(['data' => []], 200)]);
-        $faktur = $this->makeFaktur(['pjap_submission_id' => 'SUB-7']);
+        Http::fake(['*' => Http::response(['code' => '00', 'data' => []], 200)]);
+        $faktur = $this->makeFaktur(['pjap_submission_id' => '49']);
 
         (new PollFakturPajakStatusJob($faktur))->handle();
 
@@ -154,7 +155,7 @@ class PollFakturPajakStatusJobTest extends TestCase
     public function it_rethrows_when_the_status_check_fails(): void
     {
         Http::fake(['*' => Http::response(['message' => 'unavailable'], 500)]);
-        $faktur = $this->makeFaktur(['pjap_submission_id' => 'SUB-7']);
+        $faktur = $this->makeFaktur(['pjap_submission_id' => '49']);
 
         $caught = null;
         try {

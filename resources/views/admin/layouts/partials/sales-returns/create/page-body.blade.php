@@ -93,6 +93,23 @@
                                                 @enderror
                                             </div>
                                         </div>
+                                        {{-- What this return will reverse in the ledger. Filled from
+                                             the server, which derives it with the same code path the
+                                             journal uses, so the preview cannot disagree with the GL. --}}
+                                        <div class="mb-3" id="tax-reversal-preview"
+                                            data-derive-url="{{ route('admin.sales-returns.derive-reversal') }}" hidden>
+                                            <label class="form-label fw-bold">{{ __('messages.tax_reversal_preview') }}</label>
+                                            <div class="d-flex justify-content-between" data-line="ppn" hidden>
+                                                <span class="text-muted">{{ __('messages.return_ppn_reversal') }}</span>
+                                                <span class="fw-bold" data-amount></span>
+                                            </div>
+                                            <div class="d-flex justify-content-between" data-line="pph" hidden>
+                                                <span class="text-muted">{{ __('messages.return_pph_reversal') }}</span>
+                                                <span class="fw-bold" data-amount></span>
+                                            </div>
+                                            <div class="text-muted small" data-line="share" hidden
+                                                data-template="{{ __('messages.return_tax_share', ['percent' => ':percent']) }}"></div>
+                                        </div>
                                         <div class="mb-3">
                                             <label class="form-label fw-bold required">{{ __('messages.status') }}</label>
                                             <select name="status" class="form-select @error('status') is-invalid @enderror" required>

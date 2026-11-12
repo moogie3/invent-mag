@@ -36,6 +36,13 @@ return [
             'serve' => true,
             'throw' => false,
             'report' => false,
+            // storage/app subdirectories are written by both the web server and the
+            // shell user (CLI backups, tests). The 0700 default left a directory
+            // created by one user unreadable by the other, which 500'd
+            // /admin/settings/backup with "Unable to list contents for 'backups'".
+            // "public" yields 0755 (mkdir is still masked by the process umask),
+            // which is enough for either user to list and read.
+            'directory_visibility' => 'public',
         ],
 
         'public' => [

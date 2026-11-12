@@ -116,7 +116,27 @@
                                 </table>
                             </div>
                             <div class="card-footer bg-body-secondary">
-                                @if(($por->tax_rate ?? 0) > 0)
+                                @if(($taxReversal['ppn'] ?? 0) > 0 || ($taxReversal['pph'] ?? 0) > 0)
+                                {{-- Derived by the same code path the journal uses, so this
+                                     cannot disagree with what was booked. --}}
+                                @if(($taxReversal['ppn'] ?? 0) > 0)
+                                <div class="d-flex justify-content-between text-muted mb-2 border-bottom border-light pb-2">
+                                    <div>{{ __('messages.return_ppn_reversal') }}</div>
+                                    <div>{{ \App\Helpers\CurrencyHelper::formatWithPosition($taxReversal['ppn']) }}</div>
+                                </div>
+                                @endif
+                                @if(($taxReversal['pph'] ?? 0) > 0)
+                                <div class="d-flex justify-content-between text-muted mb-2 border-bottom border-light pb-2">
+                                    <div>{{ __('messages.return_pph_reversal') }}</div>
+                                    <div>{{ \App\Helpers\CurrencyHelper::formatWithPosition($taxReversal['pph']) }}</div>
+                                </div>
+                                @endif
+                                @if(($taxReversal['ratio'] ?? 1) < 1)
+                                <div class="text-muted small mb-2">
+                                    {{ __('messages.return_tax_share', ['percent' => round(($taxReversal['ratio'] ?? 0) * 100, 1)]) }}
+                                </div>
+                                @endif
+                                @elseif(($por->tax_rate ?? 0) > 0)
                                 <div class="d-flex justify-content-between text-muted mb-2 border-bottom border-light pb-2">
                                     <div>
                                         {{ __('messages.tax') }}

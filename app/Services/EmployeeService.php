@@ -19,11 +19,6 @@ class EmployeeService
         return [];
     }
 
-    public function getEditData(Employee $employee)
-    {
-        return compact('employee');
-    }
-
     public function create(array $data): Employee
     {
         $validated = $this->validate($data);

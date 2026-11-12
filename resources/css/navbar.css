@@ -152,6 +152,34 @@ body.sticky-navbar .nav-container.active {
     font-size: 18px;
 }
 
+/* You are here, top-nav mode: the section that owns the current page wears
+   the same claim the sidebar gives it (menu-sidebar.css .has-active-child),
+   in the register this panel can carry. The links are white on a near-black
+   panel in BOTH themes, so primary TEXT would fail contrast here (R-25)
+   where it works on the light sidebar: the mark is weight plus a 2px primary
+   underline instead, drawn as an inset shadow so it costs no layout - the
+   panel is a hover overlay whose geometry is already tuned. The #nav-dropdown
+   prefix is deliberate: it has to outrank the dark-theme rule that pins
+   .nav-item.dropdown > .nav-link to white. Scoped to the direct children of
+   the nav's list so the nested .dropdown-item (mark below) is never caught
+   here. */
+#nav-dropdown > ul > li > a.has-active-child,
+#nav-dropdown > ul > li > a.active {
+    font-weight: 600;
+    box-shadow: inset 0 -2px 0 0 var(--tblr-primary);
+}
+
+/* The current page's own row inside an open section. The panel pins item
+   colour with !important (see .dropdown-item below), so only background and
+   weight are set here; Tabler's own .dropdown-item.active background
+   (rgba(0, 0, 0, 0.06)) would be invisible on this near-black panel. The
+   value sits above the panel's hover token (0.1) so the current row stays
+   readable while another row is hovered. */
+.nav-dropdown .dropdown-menu .dropdown-item.active {
+    background-color: rgba(255, 255, 255, 0.16);
+    font-weight: 600;
+}
+
 /* Notification styling - Fixed positioning */
 #notification-dot {
     width: 10px;

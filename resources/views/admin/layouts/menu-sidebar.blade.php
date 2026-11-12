@@ -64,8 +64,20 @@
         <ul class="navbar-nav">
             @foreach ($navigationItems as $item)
                 @can($item['permission'] ?? null)
+                    @php
+                        // A parent carries no 'route' of its own, so .active never lands on
+                        // it - only the child's row lights up, and the section above reads as
+                        // dead. This marks the parent whose submenu holds the page being
+                        // viewed. The whole test lives in NavigationHelper so the top-nav
+                        // mode marks the same section by the same rule: menu-sidebar.js's
+                        // own active rule (exact path, or a path beneath it) rather than an
+                        // exact route-name match, so the parent and its child can never
+                        // disagree, with the permission test last so a parent is never
+                        // marked for a child the user cannot see.
+                        $hasActiveChild = \App\Helpers\NavigationHelper::hasActiveChild($item);
+                    @endphp
                     <li class="nav-item @if(isset($item['children'])) dropdown @endif">
-                        <a class="nav-link {{ isset($item['route']) && request()->routeIs($item['route']) ? 'active' : '' }}" href="{{ isset($item['route']) ? route($item['route']) : '#' }}" data-turbo="true" data-turbo-cache="false" @if(isset($item['children'])) data-bs-toggle="collapse" data-bs-target="#submenu-{{ $loop->index }}" role="button" aria-expanded="false" aria-controls="submenu-{{ $loop->index }}" @endif>
+                        <a class="nav-link {{ isset($item['route']) && request()->routeIs($item['route']) ? 'active' : '' }}{{ $hasActiveChild ? ' has-active-child' : '' }}" href="{{ isset($item['route']) ? route($item['route']) : '#' }}" data-turbo="true" data-turbo-cache="false" @if(isset($item['children'])) data-bs-toggle="collapse" data-bs-target="#submenu-{{ $loop->index }}" role="button" aria-expanded="false" aria-controls="submenu-{{ $loop->index }}" @endif>
                             @if(isset($item['icon']))
                             <div class="nav-link-icon">
                                 <i class="{{ $item['icon'] }}"></i>

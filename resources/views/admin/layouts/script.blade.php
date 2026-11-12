@@ -43,6 +43,9 @@
 {{-- SCRIPT FOR ADMIN SALES RETURN --}}
 @vite('resources/js/admin/sales-return.js')
 
+{{-- SCRIPT FOR SENDING THE INVOICE EMAIL (sales view) --}}
+@vite('resources/js/admin/sales/invoice-email.js')
+
 {{-- SCRIPT FOR ADMIN PO --}}
 @vite('resources/js/admin/purchase-order.js')
 @vite('resources/js/admin/paid-invoice-modal.js')

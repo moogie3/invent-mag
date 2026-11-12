@@ -7,13 +7,9 @@ return [
     'renew_plan' => 'Perbarui Paket',
     'choose_your_plan' => 'Pilih Paket Anda',
     'change_your_plan' => 'Ubah Paket Anda',
-    'ends_today' => 'Paket Anda berakhir hari ini',
-    'ends_tomorrow' => 'Paket Anda berakhir besok',
-    'ends_in_days' => 'Paket Anda berakhir dalam :days hari',
     'change_plan' => 'Ubah Paket',
     'usage_statistics' => 'Statistik Penggunaan',
     'plan_features' => 'Fitur Paket',
-    'you_are_on' => 'Anda saat ini menggunakan paket',
     'plan' => '.',
     'unlimited_access' => 'Akses Tanpa Batas',
     'legacy_desc' => 'Akun Anda saat ini menikmati akses level enterprise warisan (legacy) tanpa batasan.',
@@ -25,24 +21,14 @@ return [
     'of' => 'dari',
     'used' => 'digunakan',
     'your_plan_includes' => 'Paket Anda saat ini mencakup fitur-fitur berikut:',
-    'available_features' => 'Fitur yang Tersedia',
     'trial_ends_in' => 'Masa uji coba Anda berakhir dalam :days hari',
-    'trial_ended' => 'Masa uji coba Anda telah berakhir',
-    'upgrade_to_unlock' => 'Tingkatkan untuk membuka lebih banyak fitur',
-    'feature_requires_upgrade' => 'Fitur ":feature" memerlukan paket :plan atau yang lebih tinggi.',
-    'view_plans' => 'Lihat Paket',
-    'go_back' => 'Kembali',
-    'select_plan' => 'Pilih Paket',
     'current' => 'Saat Ini',
     'billing_monthly' => 'per bulan',
     'plan_comparison' => 'Perbandingan Paket',
-    'choose_plan_desc' => 'Pilih paket yang paling sesuai dengan kebutuhan bisnis Anda.',
     'trial_banner_desc' => 'Anda saat ini menggunakan uji coba gratis. Tersisa :days hari lagi.',
-    'trial_banner_ended' => 'Uji coba gratis Anda telah berakhir. Harap tingkatkan paket untuk terus menggunakan semua fitur.',
     'upgrade_now' => 'Tingkatkan Sekarang',
     'back_to_plan' => 'Kembali ke Paket',
     'switch_plan' => 'Ganti Paket',
-    'confirm_switch' => 'Apakah Anda yakin ingin mengganti ke paket :plan?',
     'confirm_upgrade_title' => 'Konfirmasi Peningkatan',
     'upgrade_to' => 'Tingkatkan ke',
     'upgrade_amount' => 'Jumlah',
@@ -76,15 +62,9 @@ return [
     'secure_payment' => 'Pembayaran Anda aman dan terenkripsi',
     'token_error' => 'Token pembayaran tidak dihasilkan. Silakan coba lagi atau hubungi dukungan.',
     'back_to_plans' => 'Kembali ke Paket',
-    'opening_payment' => 'Membuka jendela pembayaran...',
     'loading' => 'Memuat',
-    'payment_success' => 'Pembayaran berhasil! Mengalihkan...',
-    'payment_pending' => 'Pembayaran pending. Silakan selesaikan pembayaran.',
-    'payment_failed' => 'Pembayaran gagal',
-    'payment_closed' => 'Jendela pembayaran ditutup. Anda dapat mencoba lagi.',
 
     // Success Modal
-    'payment_success_title' => 'Pembayaran Berhasil!',
     'ok' => 'OK',
 
     // Notifikasi Sistem - Status Uji Coba
@@ -94,7 +74,6 @@ return [
     'notif_trial_expired_desc' => 'Uji coba gratis Anda telah berakhir. Harap tingkatkan untuk terus menggunakan semua fitur.',
 
     // Kedaluwarsa Langganan (periode penagihan paket berbayar berakhir)
-    'notif_subscription_expired_title' => 'Langganan Kedaluwarsa',
     'notif_subscription_expired_desc' => 'Langganan Anda telah kedaluwarsa. Harap perpanjang untuk terus menggunakan semua fitur.',
 
     // Notifikasi Sistem - Masa Berlaku Paket

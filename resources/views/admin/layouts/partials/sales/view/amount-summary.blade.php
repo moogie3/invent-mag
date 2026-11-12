@@ -49,7 +49,7 @@
     @else
     <div class="d-flex justify-content-between mb-2 text-muted">
         <div><small>PPN (belum diaktifkan)</small></div>
-        <div><small>—</small></div>
+        <div><small>-</small></div>
     </div>
     @endif
     @endif

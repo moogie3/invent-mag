@@ -29,6 +29,13 @@
                     @endif
                     @if($entry->status === 'posted')
                         @if(!$entry->reversingEntry)
+                            <form action="{{ route('admin.accounting.journal-entries.unpost', $entry) }}" method="POST" class="d-inline"
+                                  data-onsubmit="return confirm('{{ __('messages.unpost_entry_confirm') }}');">
+                                @csrf
+                                <button type="submit" class="btn btn-secondary">
+                                    <i class="ti ti-arrow-back-up me-2"></i>{{ __('messages.unpost_entry') }}
+                                </button>
+                            </form>
                             <button type="button" class="btn btn-warning" data-onclick="reverseEntry('{{ route('admin.accounting.journal-entries.reverse', $entry) }}')">
                                 <i class="ti ti-arrow-back-up me-2"></i>{{ __('messages.reverse') }}
                             </button>

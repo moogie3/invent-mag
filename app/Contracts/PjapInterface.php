@@ -32,6 +32,9 @@ interface PjapInterface
 
     /**
      * Cancel/void a previously submitted Faktur (Faktur Batal).
+     *
+     * @throws \RuntimeException when the PJAP endpoint cannot be reached
+     *                            (a business refusal returns false instead)
      */
     public function cancel(string $pjapSubmissionId): bool;
 

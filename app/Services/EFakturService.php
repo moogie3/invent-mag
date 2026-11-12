@@ -170,23 +170,47 @@ class EFakturService
         });
     }
 
-    // -----------------------------------------------------------------------
-    // PPN Calculation Utility
-    // -----------------------------------------------------------------------
-
     /**
-     * Calculate PPN components for a given subtotal.
-     * Used in the sales form and AJAX endpoint to show real-time PPN preview.
+     * Mirror a DJP-side void (Faktur Batal) back into local state.
+     *
+     * Companion to cancelFakturPajak(): that one guards status='draft' and is
+     * reached from the Phase 1 local cancel button; this one runs only AFTER
+     * PjapInterface::cancel() returned true, so the faktur is already
+     * 'submitted' or 'approved' with a pjap_submission_id. Same bookkeeping,
+     * no status guard, and the PJAP id is cleared so a later retry cannot
+     * re-void a faktur DJP no longer knows about.
+     *
+     * Kept as its own method rather than a shared helper because the draft
+     * path's contract (throw on non-draft) must stay exactly as it is.
      */
-    public function calculatePpn(float $subtotal, ?float $ppnRate = null): array
+    public function cancelSubmittedFakturPajak(FakturPajak $faktur): void
     {
-        $tenant = app('currentTenant');
-        $rate = $ppnRate ?? $tenant->ppn_rate ?? 11.0;
-        $dpp = round($subtotal, 2);
-        $ppn = round($dpp * ($rate / 100), 2);
-        $total = $dpp + $ppn;
+        DB::transaction(function () use ($faktur) {
+            // Reverse any PPN Keluaran journal entry still attached to this
+            // faktur. New fakturs never post one (PPN is recognized at sale
+            // creation), so this only cleans up legacy fakturs generated before
+            // that change.
+            $ppnJournalEntry = JournalEntry::where('sourceable_type', FakturPajak::class)
+                ->where('sourceable_id', $faktur->id)
+                ->where('status', 'posted')
+                ->first();
 
-        return compact('dpp', 'ppn', 'total', 'rate');
+            if ($ppnJournalEntry) {
+                $this->accountingService->reverseJournalEntry(
+                    $ppnJournalEntry,
+                    "Reversal: Faktur Pajak {$faktur->nsfp} cancelled at DJP"
+                );
+            }
+
+            // Mark NSFP as cancelled (DJP numbers cannot be reused once allocated to a faktur)
+            NsfpPool::where('nsfp', $faktur->nsfp)->update(['status' => 'cancelled']);
+
+            $faktur->update([
+                'status'             => 'cancelled',
+                'pjap_status'        => 'cancelled',
+                'pjap_submission_id' => null,
+            ]);
+        });
     }
 
     // -----------------------------------------------------------------------

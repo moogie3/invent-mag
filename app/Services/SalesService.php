@@ -2,8 +2,6 @@
 
 namespace App\Services;
 
-
-use App\Services\Concerns\BuildsListSearch;
 use App\Helpers\CurrencyHelper;
 use App\Helpers\SalesHelper;
 use App\Models\Account;
@@ -17,11 +15,10 @@ use App\Models\Product;
 use App\Models\ProductWarehouse;
 use App\Models\Sales;
 use App\Models\SalesItem;
-use App\Models\SalesReturn;
-use App\Models\SalesReturnItem;
 use App\Models\Tax;
-use App\Models\User; // Added
-use App\Models\Warehouse;
+use App\Models\User;
+use App\Models\Warehouse; // Added
+use App\Services\Concerns\BuildsListSearch;
 use Carbon\Carbon;
 use Dompdf\Dompdf;
 use Illuminate\Support\Facades\Auth;
@@ -30,6 +27,7 @@ use Illuminate\Support\Facades\DB;
 class SalesService
 {
     use BuildsListSearch;
+
     protected AccountingService $accountingService;
 
     public function __construct(AccountingService $accountingService)
@@ -1309,10 +1307,17 @@ class SalesService
         return null;
     }
 
-    public function printInvoice($id)
+    /**
+     * Render the customer invoice PDF. One source for both the print route and
+     * the invoice email attachment, so the emailed document is byte-identical
+     * to the printed one.
+     *
+     * @return array{filename: string, contents: string}
+     */
+    public function renderInvoicePdf($id): array
     {
         $sales = Sales::with(['customer', 'salesItems.product', 'payments'])->findOrFail($id);
-        $tenantId = app('currentTenant')->id ?? null;
+        $tenantId = app('currentTenant')?->id;
         $shopname = User::where('tenant_id', $tenantId)->whereNotNull('shopname')->value('shopname');
         $address = User::where('tenant_id', $tenantId)->whereNotNull('address')->value('address');
 
@@ -1322,7 +1327,21 @@ class SalesService
         $dompdf->setPaper('A4', 'portrait');
         $dompdf->render();
 
-        return $dompdf->stream('invoice-'.$sales->invoice.'.pdf', ['Attachment' => false]);
+        return [
+            'filename' => 'invoice-'.$sales->invoice.'.pdf',
+            'contents' => $dompdf->output(),
+        ];
+    }
+
+    public function printInvoice($id)
+    {
+        $pdf = $this->renderInvoicePdf($id);
+
+        return response($pdf['contents'], 200, [
+            'Content-Type' => 'application/pdf',
+            'Content-Disposition' => 'inline; filename="'.$pdf['filename'].'"',
+            'Content-Length' => strlen($pdf['contents']),
+        ]);
     }
 
     public function getSalesForModal($id)
@@ -1395,108 +1414,6 @@ class SalesService
                 'due_date' => Carbon::parse($sale->due_date)->format('d M Y'),
                 'total' => CurrencyHelper::format($sale->total),
             ];
-        });
-    }
-
-    /**
-     * @deprecated Use SalesReturnService::createSalesReturn() instead.
-     *             This legacy method lacks customer credit creation, proper
-     *             payment-aware status logic, and full journal entries.
-     */
-    public function createSalesReturn(array $data): SalesReturn
-    {
-        return DB::transaction(function () use ($data) {
-            $sale = Sales::findOrFail($data['sales_id']);
-            $items = json_decode($data['items'], true);
-            if (! $items || ! is_array($items)) {
-                throw new \Exception('Invalid items data');
-            }
-
-            $returnedItems = array_filter($items, function ($item) {
-                return isset($item['returned_quantity']) && $item['returned_quantity'] > 0;
-            });
-
-            if (empty($returnedItems)) {
-                throw new \Exception('No items selected for return.');
-            }
-
-            $totalReturnAmount = 0;
-            foreach ($returnedItems as $itemData) {
-                $totalReturnAmount += ($itemData['price'] ?? 0) * $itemData['returned_quantity'];
-            }
-
-            $salesReturn = SalesReturn::create([
-                'sales_id' => $sale->id,
-                'user_id' => Auth::id(),
-                'return_date' => $data['return_date'],
-                'reason' => $data['reason'] ?? null,
-                'total_amount' => $totalReturnAmount,
-                'status' => $data['status'],
-            ]);
-
-            foreach ($returnedItems as $itemData) {
-                $returnedQuantity = $itemData['returned_quantity'];
-                $price = $itemData['price'] ?? 0;
-
-                SalesReturnItem::create([
-                    'sales_return_id' => $salesReturn->id,
-                    'product_id' => $itemData['product_id'],
-                    'quantity' => $returnedQuantity,
-                    'price' => $price,
-                    'total' => $price * $returnedQuantity,
-                ]);
-
-                $product = Product::find($itemData['product_id']);
-                if ($product) {
-                    $warehouseId = $sale->warehouse_id ?? Product::getMainWarehouseId();
-
-                    $stockRecord = ProductWarehouse::firstOrCreate(
-                        ['product_id' => $product->id, 'warehouse_id' => $warehouseId, 'tenant_id' => $product->tenant_id],
-                        ['quantity' => 0]
-                    );
-                    $stockRecord->increment('quantity', $returnedQuantity);
-                }
-            }
-
-            $totalSoldQuantity = $sale->salesItems()->sum('quantity');
-            $totalReturnedQuantity = $sale->salesReturns()->with('items')->get()->flatMap(function ($sr) {
-                return $sr->items;
-            })->sum('quantity');
-
-            if ($totalReturnedQuantity >= $totalSoldQuantity) {
-                $sale->update(['status' => 'Returned']);
-            } elseif ($totalReturnedQuantity > 0) {
-                $sale->update(['status' => 'Partial']);
-            }
-
-            $accountingSettings = app('currentTenant')->accounting_settings ?? [];
-            if (! $accountingSettings || ! isset($accountingSettings['inventory_account_id']) || ! isset($accountingSettings['accounts_receivable_account_id'])) {
-                throw new \Exception('Accounting settings for inventory or accounts receivable are not configured.');
-            }
-
-            $inventoryAccount = Account::find($accountingSettings['inventory_account_id']);
-            $accountsReceivableAccount = Account::find($accountingSettings['accounts_receivable_account_id']);
-
-            if (! $inventoryAccount || ! $accountsReceivableAccount) {
-                throw new \Exception('Required accounts (Inventory, AR) not found for Sales Return. Please check Accounting Settings.');
-            }
-
-            $inventoryAccountName = $inventoryAccount->name;
-            $accountsReceivableAccountName = $accountsReceivableAccount->name;
-
-            $transactions = [
-                ['account_name' => $accountsReceivableAccountName, 'type' => 'credit', 'amount' => $totalReturnAmount],
-                ['account_name' => $inventoryAccountName, 'type' => 'debit', 'amount' => $totalReturnAmount],
-            ];
-
-            $this->accountingService->createJournalEntry(
-                "Sales Return for SO #{$sale->invoice}",
-                Carbon::parse($data['return_date']),
-                $transactions,
-                $salesReturn
-            );
-
-            return $salesReturn;
         });
     }
 }

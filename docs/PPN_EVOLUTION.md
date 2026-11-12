@@ -786,13 +786,13 @@ Phase 2 (completed **2026-11-05**) integrates directly with DJP via **Klikpajak 
 | #   | Deliverable             | Description                                          | Status |
 | --- | ----------------------- | ---------------------------------------------------- | ------ |
 | 1   | PJAP API client service | HTTP client for Klikpajak REST API                   | ✅ `app/Services/Pjap/KlikpajakService.php` |
-| 2   | OAuth2 token management | Auto-refresh DJP authentication tokens               | ❌ not implemented — the build uses `Authorization: Bearer <api_key>` + `X-API-Secret` per ROADMAP §2.3; verify Mekari's current auth model before first production call |
+| 2   | OAuth2 token management | Auto-refresh DJP authentication tokens               | ❌ not implemented. Not needed: every request is signed with Mekari HMAC (Client ID / Client Secret), verified against Mekari's live docs 2026-11-05; there is no token to refresh (ROADMAP §2.3 status block) |
 | 3   | Faktur Pajak submission | One-click submit from web UI                         | ✅ "Submit ke DJP" button → queued `SubmitFakturPajakJob` |
 | 4   | Status polling          | Auto-update FP status from DJP                       | ✅ `PollFakturPajakStatusJob` (30s first poll, 5 min re-poll, 10 attempts) |
 | 5   | Faktur Pengganti        | Replacement invoice flow                             | ❌ not implemented |
-| 6   | Pembatalan via API      | Cancel FP through API instead of manually            | ✅ service-level (`PjapInterface::cancel`) — UI still uses the Phase 1 local cancel |
+| 6   | Pembatalan via API      | Cancel FP through API instead of manually            | ✅ "Cancel at DJP" button → queued `CancelFakturPajakJob` (Phase 1 local cancel remains for FP never submitted) |
 | 7   | NSFP auto-allocation    | Fetch NSFP numbers from DJP instead of manual import | ❌ not implemented (manual NSFP import remains) |
-| 8   | Batch submission        | Submit multiple FP in one API call                   | ✅ service-level (`submitBatch`) — no bulk UI button yet |
+| 8   | Batch submission        | Submit multiple FP in one API call                   | ✅ "Submit Selected to DJP" on the index → queued `SubmitFakturPajakBatchJob` |
 
 ### API Flow
 
@@ -812,13 +812,16 @@ Update FakturPajak.status = 'submitted'
 Store DJP reference number
 ```
 
-> **As built (2026-11-05):** the real flow is
-> `POST admin/efaktur/{faktur}/submit` → `SubmitFakturPajakJob` (queue
-> `tax-submissions`) → `KlikpajakService::submit()` — `POST {base}/v1/faktur/upload`
-> with `Authorization: Bearer <api_key>` + `X-API-Secret` +
-> `X-Idempotency-Key` — then `PollFakturPajakStatusJob` (30s first poll,
-> 5 min re-poll) normalizing the verdict to `approved`/`rejected`/`pending`
-> with `djp_reference_number`. There is **no `KlikpajakClient` class and no
+> **As built (2026-11-05, reconciled to live Mekari docs same day):** the
+> real flow is `POST admin/efaktur/{faktur}/submit` → `SubmitFakturPajakJob`
+> (queue `tax-submissions`) → `KlikpajakService::submit()` →
+> `POST {base}/v1/efaktur/out?auto_approval=true&auto_calculate=true` with
+> HMAC-signed `Date` + `Digest` + `Authorization` headers (Client ID /
+> Client Secret) + `X-Idempotency-Key`, then `PollFakturPajakStatusJob`
+> (30s first poll, 5 min re-poll) reading `GET /v1/efaktur/out/{id}` and
+> normalizing `approval_status` / `invoice_status` to
+> `approved`/`rejected`/`pending` with `document_number` as
+> `djp_reference_number`. There is **no `KlikpajakClient` class and no
 > OAuth2 token step** in the shipped build (see the Phase 2 status block in
 > ROADMAP §4); the diagram above is the original planned flow.
 
@@ -899,10 +902,10 @@ All three reuse the existing universal `is_pph` mechanism. No separate engines o
 
 | Feature                                   | Tier          |
 | ----------------------------------------- | ------------- |
-| SPT Report Templates                      | Professional+ |
+| ~~SPT Report Templates~~                    | n/a         | ❌ Declined Nov 2026: not a full tax suite; summaries + Phase 1 CSV already cover preparation, filing stays in DJP/Klikpajak |
 | Bank Integrations (BCA, BNI, Mandiri API) | Professional+ |
-| WhatsApp Invoice Delivery                 | All           |
-| Midtrans Payment Links on Invoices        | All           |
+| Invoice Email Delivery (replaces WhatsApp) | All          | ✅ Nov 2026: button on the invoice view, PDF attached, `invoice_email` slug |
+| ~~Midtrans Payment Links on Invoices~~     | n/a          | ❌ Declined Nov 2026: tenants settle by bank transfer or cash at the office; built then reverted before commit |
 
 ### LOW Priority
 

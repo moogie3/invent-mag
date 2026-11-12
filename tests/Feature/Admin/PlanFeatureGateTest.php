@@ -101,6 +101,16 @@ class PlanFeatureGateTest extends TestCase
         }
     }
 
+    public function test_invoice_email_delivery_is_available_on_every_plan(): void
+    {
+        foreach (['starter', 'professional', 'enterprise'] as $slug) {
+            $plan = Plan::findBySlug($slug);
+
+            $this->assertNotNull($plan, "Plan '{$slug}' not found");
+            $this->assertTrue($plan->hasFeature('invoice_email'), "Plan '{$slug}' should include invoice_email");
+        }
+    }
+
     public function test_stock_opname_is_gated_by_plan(): void
     {
         $this->assertBlockedOnPlan('starter', route('admin.stock-opname.index'));

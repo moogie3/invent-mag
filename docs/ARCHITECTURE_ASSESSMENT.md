@@ -260,7 +260,7 @@ The CSP was added as a security feature and is marketed as such in the README se
 
 **Why it exists:** Alpine.js uses `x-data` attributes and `@click` handlers that count as inline scripts. Without `'unsafe-inline'`, Alpine does not function.
 
-**The fix:** CSP nonces. Laravel 11 supports `@nonce` in Blade. Generating a per-request nonce and adding it to both the CSP header and all inline `<script>` tags (including Alpine's initialization script) allows Alpine to work while keeping the CSP effective. This requires changes to `SecurityHeaders` middleware and the Blade layout templates.
+**The fix:** CSP nonces. Laravel supports `@nonce` in Blade. Generating a per-request nonce and adding it to both the CSP header and all inline `<script>` tags (including Alpine's initialization script) allows Alpine to work while keeping the CSP effective. This requires changes to `SecurityHeaders` middleware and the Blade layout templates.
 
 Until nonces are implemented, the correct thing to do is to remove the claim that CSP protects against XSS in marketing materials, because it currently does not.
 
@@ -353,7 +353,7 @@ A single route file with 200+ routes is not readable. It makes it hard to:
 - Spot naming conflicts (route names in a 750-line file require search, not review)
 - Do focused code review on a feature (the entire route file appears in every PR that touches routes)
 
-Laravel 11 supports route file splitting natively. The correct structure:
+Laravel supports route file splitting natively. The correct structure:
 
 ```
 routes/

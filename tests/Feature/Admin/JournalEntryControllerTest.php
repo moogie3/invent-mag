@@ -218,6 +218,66 @@ class JournalEntryControllerTest extends TestCase
     }
 
     #[Test]
+    public function it_can_unpost_a_posted_entry_back_to_draft()
+    {
+        $entry = JournalEntry::factory()->create([
+            'tenant_id' => $this->tenant->id,
+            'status' => 'posted',
+        ]);
+
+        $response = $this->post(route('admin.accounting.journal-entries.unpost', $entry));
+
+        $response->assertRedirect();
+        $this->assertDatabaseHas('journal_entries', [
+            'id' => $entry->id,
+            'status' => 'draft',
+        ]);
+    }
+
+    #[Test]
+    public function it_cannot_unpost_a_draft_entry()
+    {
+        $entry = JournalEntry::factory()->create([
+            'tenant_id' => $this->tenant->id,
+            'status' => 'draft',
+        ]);
+
+        $response = $this->post(route('admin.accounting.journal-entries.unpost', $entry));
+
+        $response->assertRedirect();
+        $response->assertSessionHas('error');
+        $this->assertDatabaseHas('journal_entries', [
+            'id' => $entry->id,
+            'status' => 'draft',
+        ]);
+    }
+
+    #[Test]
+    public function it_cannot_unpost_an_entry_that_has_been_reversed()
+    {
+        $entry = JournalEntry::factory()->create([
+            'tenant_id' => $this->tenant->id,
+            'status' => 'posted',
+        ]);
+        JournalEntry::factory()->create([
+            'tenant_id' => $this->tenant->id,
+            'status' => 'posted',
+            'reversed_entry_id' => $entry->id,
+        ]);
+
+        // The reversal is already in the ledger against this entry, so
+        // unposting it would drop the original while its dependent stays.
+        $response = $this->post(route('admin.accounting.journal-entries.unpost', $entry));
+
+        $response->assertRedirect();
+        $response->assertSessionHas('error');
+        $this->assertDatabaseHas('journal_entries', [
+            'id' => $entry->id,
+            'status' => 'posted',
+        ]);
+    }
+
+    #[Test]
     public function it_can_void_posted_journal_entry()
     {
         $entry = JournalEntry::factory()->create([

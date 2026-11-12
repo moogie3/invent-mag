@@ -18,6 +18,10 @@ class BackupControllerTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
+        // Isolate from storage/app: writing the fake zips to the real local disk
+        // recreated storage/app/backups as 0700 under the test user, which the
+        // web server then could not list (backup index 500).
+        Storage::fake('local');
         $this->setupTenant();
         $this->seed(RoleSeeder::class);
         $this->user->assignRole('superuser');

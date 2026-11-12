@@ -13,7 +13,6 @@ return [
     // Topics grid
     'what_to_explore' => 'Apa yang ingin Anda jelajahi?',
     'select_category' => 'Pilih kategori untuk melihat halaman yang tersedia.',
-    'topics_title' => 'Semua Topik',
 
     // Dashboard
     'dashboard' => 'Dasbor',
@@ -169,9 +168,6 @@ return [
     'quick_guide' => 'Panduan Cepat:',
 
     // Buttons
-    'skip_close' => 'Lewati / Tutup',
-    'view_all_topics' => 'Lihat Semua Topik',
-    'next_view_topics' => 'Berikut: Lihat Topik',
     'back' => 'Kembali',
     'skip_tutorial' => 'Lewati Tutorial',
     'next' => 'Berikutnya',
@@ -787,7 +783,7 @@ return [
     'efaktur_ppn_rate' => 'Tarif PPN: Tarif PPN saat ini adalah 11% (berlaku sejak 1 April 2022). Ubah field ini jika DJP mengubah tarif di masa mendatang.',
     'efaktur_nsfp_pool' => 'Pool NSFP: NSFP (Nomor Seri Faktur Pajak) diperlukan untuk setiap Faktur Pajak. Impor dari portal DJP dalam jumlah banyak.',
     'efaktur_nsfp_import' => 'Import NSFP: Tempel nomor NSFP satu per baris dalam format XXX.XXX-YY.XXXXXXXX. Nomor duplikat dilewati otomatis. Impor NSFP sebelum membuat Faktur Pajak.',
-    'efaktur_klikpajak' => 'Klikpajak API (Submission Langsung ke DJP): Simpan API key dan secret yang diterbitkan oleh Mekari Klikpajak untuk mengaktifkan submit Faktur Pajak draft langsung ke DJP satu klik — tanpa unduh CSV, tanpa aplikasi desktop e-Faktur. Aktifkan sakelar sandbox untuk menguji ke sandbox DJP sebelum produksi. Tersedia di paket Enterprise; tanpa itu Anda tetap dapat mengekspor CSV.',
+    'efaktur_klikpajak' => 'Klikpajak API (Submission Langsung ke DJP): Simpan Client ID dan Client Secret yang diterbitkan Mekari (developers.mekari.com) untuk mengaktifkan submit Faktur Pajak draft langsung ke DJP satu klik: tanpa unduh CSV, tanpa aplikasi desktop e-Faktur. Request ditandatangani HMAC dengan kredensial tersebut. Aktifkan sakelar sandbox untuk menguji ke sandbox DJP sebelum produksi. Tersedia di paket Enterprise; tanpa itu Anda tetap dapat mengekspor CSV.',
 
     // General / Welcome
     'general_navigation' => 'Navigasi: Gunakan menu sidebar di kiri untuk menavigasi.',

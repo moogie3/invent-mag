@@ -7,13 +7,9 @@ return [
     'renew_plan' => 'Renew Plan',
     'choose_your_plan' => 'Choose Your Plan',
     'change_your_plan' => 'Change Your Plan',
-    'ends_today' => 'Your plan ends today',
-    'ends_tomorrow' => 'Your plan ends tomorrow',
-    'ends_in_days' => 'Your plan ends in :days days',
     'change_plan' => 'Change Plan',
     'usage_statistics' => 'Usage Statistics',
     'plan_features' => 'Plan Features',
-    'you_are_on' => 'You are currently on the',
     'plan' => 'plan.',
     'unlimited_access' => 'Unlimited Access',
     'legacy_desc' => 'Your account currently enjoys legacy enterprise-level access with no restrictions.',
@@ -25,24 +21,14 @@ return [
     'of' => 'of',
     'used' => 'used',
     'your_plan_includes' => 'Your current plan includes the following features:',
-    'available_features' => 'Available Features',
     'trial_ends_in' => 'Your trial ends in :days days',
-    'trial_ended' => 'Your trial has ended',
-    'upgrade_to_unlock' => 'Upgrade to unlock more features',
-    'feature_requires_upgrade' => 'The ":feature" feature requires the :plan plan or higher.',
-    'view_plans' => 'View Plans',
-    'go_back' => 'Go Back',
-    'select_plan' => 'Select Plan',
     'current' => 'Current',
     'billing_monthly' => 'per month',
     'plan_comparison' => 'Plan Comparison',
-    'choose_plan_desc' => 'Choose the plan that best fits your business needs.',
     'trial_banner_desc' => 'You are currently on a free trial. You have :days days remaining.',
-    'trial_banner_ended' => 'Your free trial has ended. Please upgrade to continue using all features.',
     'upgrade_now' => 'Upgrade Now',
     'back_to_plan' => 'Back to Plan',
     'switch_plan' => 'Switch Plan',
-    'confirm_switch' => 'Are you sure you want to switch to the :plan plan?',
     'confirm_upgrade_title' => 'Confirm Upgrade',
     'upgrade_to' => 'Upgrade to',
     'upgrade_amount' => 'Amount',
@@ -77,15 +63,9 @@ return [
     'secure_payment' => 'Your payment is secure and encrypted',
     'token_error' => 'Payment token not generated. Please try again or contact support.',
     'back_to_plans' => 'Back to Plans',
-    'opening_payment' => 'Opening payment window...',
     'loading' => 'Loading',
-    'payment_success' => 'Payment successful! Redirecting...',
-    'payment_pending' => 'Payment pending. Please complete payment.',
-    'payment_failed' => 'Payment failed',
-    'payment_closed' => 'Payment window closed. You can try again.',
 
     // Success Modal
-    'payment_success_title' => 'Payment Successful!',
     'ok' => 'OK',
 
     // System Notification - Trial Status
@@ -95,7 +75,6 @@ return [
     'notif_trial_expired_desc' => 'Your free trial has ended. Please upgrade to continue using all features.',
 
     // Subscription Expiry (paid plan billing period ended)
-    'notif_subscription_expired_title' => 'Subscription Expired',
     'notif_subscription_expired_desc' => 'Your subscription has expired. Please renew to continue using all features.',
 
     // System Notification - Plan Expiry

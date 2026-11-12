@@ -105,9 +105,18 @@ class SalesReturnSeeder extends Seeder
                 'tenant_id' => $tenantId,
             ]);
 
+            // A return created as Canceled holds no stock and no live journal
+            // entry: the cancel path unwinds both, so a row born Canceled must
+            // never have moved stock or booked an entry in the first place.
+            $isCanceled = $status === 'Canceled';
+
             // Create SalesReturnItems
             foreach ($returnItemsData as $itemData) {
                 $salesReturnItem = $salesReturn->items()->create($itemData);
+
+                if ($isCanceled) {
+                    continue;
+                }
 
                 // Update product stock (increment as it's a customer return back to inventory)
                 $stockRecord = ProductWarehouse::where('product_id', $salesReturnItem->product_id)
@@ -127,19 +136,21 @@ class SalesReturnSeeder extends Seeder
                 }
             }
 
-            // Create Journal Entry for Sales Return
-            $description = "Sales Return for Sales Invoice {$sale->invoice}, Return #{$salesReturn->id}";
-            $transactions = [];
+            if (! $isCanceled) {
+                // Create Journal Entry for Sales Return
+                $description = "Sales Return for Sales Invoice {$sale->invoice}, Return #{$salesReturn->id}";
+                $transactions = [];
 
-            // Debit Sales Returns (or a specific return expense account)
-            // Credit Accounts Receivable / Cash (depending on original payment type or refund status)
-            $transactions[] = ['account_code' => '4100-'.$tenantId, 'type' => 'debit', 'amount' => $totalReturnAmount]; // Reduce revenue
-            $transactions[] = ['account_code' => '1130-'.$tenantId, 'type' => 'credit', 'amount' => $totalReturnAmount]; // Reduce AR
+                // Debit Sales Returns (or a specific return expense account)
+                // Credit Accounts Receivable / Cash (depending on original payment type or refund status)
+                $transactions[] = ['account_code' => '4100-'.$tenantId, 'type' => 'debit', 'amount' => $totalReturnAmount]; // Reduce revenue
+                $transactions[] = ['account_code' => '1130-'.$tenantId, 'type' => 'credit', 'amount' => $totalReturnAmount]; // Reduce AR
 
-            try {
-                $this->accountingService->createJournalEntry($description, Carbon::parse($returnDate), $transactions, $salesReturn);
-            } catch (\Exception $e) {
-                $this->command->error("Failed to create journal entry for sales return {$salesReturn->id}: ".$e->getMessage());
+                try {
+                    $this->accountingService->createJournalEntry($description, Carbon::parse($returnDate), $transactions, $salesReturn);
+                } catch (\Exception $e) {
+                    $this->command->error("Failed to create journal entry for sales return {$salesReturn->id}: ".$e->getMessage());
+                }
             }
 
             $count++;
@@ -147,5 +158,6 @@ class SalesReturnSeeder extends Seeder
 
         $this->command->info('Sales Return seeding completed!');
         $this->command->info("Created {$count} sales returns with items, stock updates, and journal entries.");
+        $this->command->info('Canceled returns carry items only: no stock move and no journal entry.');
     }
 }

@@ -4,7 +4,7 @@
 >
 > **Audience:** Non-developers and developers alike. Each step says *why* it matters.
 >
-> **Applies to:** Backend `invent-mag` (Laravel 11) + Frontend `invent-mag-fe` (Astro). Version 2.1.
+> **Applies to:** Backend `invent-mag` (Laravel 12) + Frontend `invent-mag-fe` (Astro). Version 2.1.
 >
 > **Last updated:** August 2026
 

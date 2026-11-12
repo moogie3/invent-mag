@@ -4,6 +4,7 @@ namespace Tests\Feature\Admin;
 
 use App\Models\Account;
 use App\Models\Customer;
+use App\Models\JournalEntry;
 use App\Models\Product;
 use App\Models\Sales;
 use App\Models\SalesItem;
@@ -157,6 +158,155 @@ class SalesReturnControllerTest extends TestCase
         $response->assertViewHas('salesReturn', $salesReturn);
     }
 
+    /**
+     * The show page must render the DERIVED reversal, the exact figure the
+     * journal books (ratio 0.5 of a 200 net sale -> PPN 11, not 22), rather
+     * than a copy of the parent sale's tax figures.
+     */
+    public function test_it_shows_the_derived_tax_reversal()
+    {
+        $this->tenant->update(['tax_jurisdiction' => 'ID']);
+
+        $tenantId = app('currentTenant')->id;
+        $ppnKeluaranAccount = Account::where('code', '2130-'.$tenantId)->firstOrFail();
+        $this->tenant->update([
+            'accounting_settings' => array_merge(
+                $this->tenant->accounting_settings ?? [],
+                ['ppn_keluaran_account_id' => $ppnKeluaranAccount->id]
+            ),
+        ]);
+
+        $this->sale->update([
+            'ppn_enabled' => true,
+            'ppn_rate' => 11.0,
+            'ppn_amount' => 22.0,
+            'tax_rate' => 11,
+            'tax_type' => 'exclusive',
+            'total' => 222.0,
+        ]);
+
+        // Original sale journal: Dr AR 222 / Cr Revenue 200 /
+        // Cr PPN Keluaran 22, the net base the derivation prorates from.
+        $settings = $this->tenant->accounting_settings;
+        $originalJournal = JournalEntry::create([
+            'date' => now(),
+            'description' => 'Sale Invoice #'.$this->sale->invoice,
+            'sourceable_id' => $this->sale->id,
+            'sourceable_type' => Sales::class,
+            'status' => 'posted',
+        ]);
+        $originalJournal->transactions()->create([
+            'account_id' => $settings['accounts_receivable_account_id'],
+            'type' => 'debit',
+            'amount' => 222.0,
+        ]);
+        $originalJournal->transactions()->create([
+            'account_id' => $settings['sales_revenue_account_id'],
+            'type' => 'credit',
+            'amount' => 200.0,
+        ]);
+        $originalJournal->transactions()->create([
+            'account_id' => $ppnKeluaranAccount->id,
+            'type' => 'credit',
+            'amount' => 22.0,
+        ]);
+
+        // Partial return: 100 of the 200 net, so half the VAT reverses.
+        $salesReturn = SalesReturn::create([
+            'sales_id' => $this->sale->id,
+            'user_id' => $this->user->id,
+            'return_date' => '2025-12-12',
+            'total_amount' => 100,
+            'status' => 'Completed',
+            'reason' => 'Partial return',
+        ]);
+
+        $response = $this->get(route('admin.sales-returns.show', $salesReturn->id));
+
+        $response->assertStatus(200);
+        $response->assertViewHas('taxReversal', function (array $reversal) {
+            return $reversal['ratio'] == 0.5 && $reversal['ppn'] == 11.0;
+        });
+        // The derived figure is actually rendered on the page.
+        $response->assertSee(__('messages.return_ppn_reversal'));
+        $response->assertSee('11');
+    }
+
+    /**
+     * The form preview endpoint must return the same derived figures the
+     * journal books, because it is the same code path.
+     */
+    public function test_it_derives_the_tax_reversal_as_json()
+    {
+        $this->tenant->update(['tax_jurisdiction' => 'ID']);
+
+        $tenantId = app('currentTenant')->id;
+        $ppnKeluaranAccount = Account::where('code', '2130-'.$tenantId)->firstOrFail();
+        $this->tenant->update([
+            'accounting_settings' => array_merge(
+                $this->tenant->accounting_settings ?? [],
+                ['ppn_keluaran_account_id' => $ppnKeluaranAccount->id]
+            ),
+        ]);
+
+        $this->sale->update([
+            'ppn_enabled' => true,
+            'ppn_rate' => 11.0,
+            'ppn_amount' => 22.0,
+            'total' => 222.0,
+        ]);
+
+        $settings = $this->tenant->accounting_settings;
+        $originalJournal = JournalEntry::create([
+            'date' => now(),
+            'description' => 'Sale Invoice #'.$this->sale->invoice,
+            'sourceable_id' => $this->sale->id,
+            'sourceable_type' => Sales::class,
+            'status' => 'posted',
+        ]);
+        $originalJournal->transactions()->create([
+            'account_id' => $settings['accounts_receivable_account_id'],
+            'type' => 'debit',
+            'amount' => 222.0,
+        ]);
+        $originalJournal->transactions()->create([
+            'account_id' => $settings['sales_revenue_account_id'],
+            'type' => 'credit',
+            'amount' => 200.0,
+        ]);
+        $originalJournal->transactions()->create([
+            'account_id' => $ppnKeluaranAccount->id,
+            'type' => 'credit',
+            'amount' => 22.0,
+        ]);
+
+        // Half of the 200 net returned: half the output VAT reverses.
+        $response = $this->getJson(route('admin.sales-returns.derive-reversal', [
+            'sale_id' => $this->sale->id,
+            'total' => 100,
+        ]));
+
+        $response->assertOk();
+        $data = $response->json();
+        $this->assertEquals(0.5, $data['ratio']);
+        $this->assertEquals(11.0, $data['ppn']);
+        $this->assertEquals(0.0, $data['pph']);
+
+        // A zero total derives nothing to reverse, so the preview stays hidden.
+        $empty = $this->getJson(route('admin.sales-returns.derive-reversal', [
+            'sale_id' => $this->sale->id,
+            'total' => 0,
+        ]));
+        $empty->assertOk();
+        $this->assertEquals(0.0, $empty->json('ppn'));
+
+        // An unknown sale is a 404, never another tenant's document.
+        $this->getJson(route('admin.sales-returns.derive-reversal', [
+            'sale_id' => 999999,
+            'total' => 100,
+        ]))->assertNotFound();
+    }
+
     public function test_it_can_display_the_edit_page()
     {
         $salesReturn = SalesReturn::create([
@@ -259,6 +409,27 @@ class SalesReturnControllerTest extends TestCase
         }
     }
 
+    public function test_bulk_complete_skips_canceled_rows_and_reports_them()
+    {
+        $live = SalesReturn::factory()->create(['status' => 'Pending']);
+        $canceled = SalesReturn::factory()->create(['status' => 'Canceled']);
+
+        $response = $this->postJson(route('admin.sales-returns.bulk-complete'), [
+            'ids' => [$live->id, $canceled->id],
+        ]);
+
+        // Option (b): the valid row completes, the canceled row is skipped
+        // and named in the result instead of failing the whole batch.
+        $response->assertOk();
+        $response->assertJson([
+            'success' => true,
+            'counts' => ['completed' => 1, 'already_completed' => 0, 'skipped' => 1],
+        ]);
+        $this->assertStringContainsString('skipped', $response->json('message'));
+        $this->assertDatabaseHas('sales_returns', ['id' => $live->id, 'status' => 'Completed']);
+        $this->assertDatabaseHas('sales_returns', ['id' => $canceled->id, 'status' => 'Canceled']);
+    }
+
     public function test_it_can_bulk_cancel_sales_returns()
     {
         $returns = SalesReturn::factory()->count(3)->create(['status' => 'Pending']);
@@ -271,6 +442,28 @@ class SalesReturnControllerTest extends TestCase
         foreach ($ids as $id) {
             $this->assertDatabaseHas('sales_returns', ['id' => $id, 'status' => 'Canceled']);
         }
+    }
+
+    public function test_bulk_cancel_with_an_already_canceled_row_is_idempotent()
+    {
+        $live = SalesReturn::factory()->create(['status' => 'Pending']);
+        $canceled = SalesReturn::factory()->create(['status' => 'Canceled']);
+
+        $response = $this->postJson(route('admin.sales-returns.bulk-cancel'), [
+            'ids' => [$live->id, $canceled->id],
+        ]);
+
+        // cancelSalesReturn() early-returns on a Canceled row, so re-selecting
+        // one must not revert its stock or reverse its journal a second time.
+        $response->assertOk();
+        $response->assertJson(['success' => true]);
+        $this->assertDatabaseHas('sales_returns', ['id' => $live->id, 'status' => 'Canceled']);
+        $this->assertDatabaseHas('sales_returns', ['id' => $canceled->id, 'status' => 'Canceled']);
+        $this->assertEquals(
+            0,
+            JournalEntry::whereNotNull('reversed_entry_id')->count(),
+            'Neither factory row ever posted an entry, so cancel may not mint a reversal.'
+        );
     }
 
     public function test_it_can_show_modal_view()

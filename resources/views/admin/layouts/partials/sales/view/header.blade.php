@@ -18,6 +18,20 @@
                 <a href="{{ route('admin.sales.print', $sales->id) }}" target="_blank" class="btn btn-secondary me-2">
                     <i class="ti ti-printer me-1"></i> {{ __('messages.print_invoice') }}
                 </a>
+                @can('edit-sales')
+                    <form method="POST" action="{{ route('admin.sales.send-invoice', $sales->id) }}"
+                          class="d-inline me-2" data-invoice-email-send>
+                        @csrf
+                        <button type="submit" class="btn btn-outline-primary" data-bs-toggle="tooltip"
+                            title="{{ $sales->customer?->email ? __('messages.invoice_email_confirm', ['email' => $sales->customer->email]) : __('messages.invoice_email_missing') }}">
+                            <i class="ti ti-mail me-1"></i> {{ __('messages.send_invoice_email') }}
+                        </button>
+                    </form>
+                    {{-- data-invoice-email-send is what admin/sales/invoice-email.js binds to:
+                         the button disables and shows a spinner for the flight of the POST,
+                         so a slow SMTP round trip reads as work in progress instead of a
+                         dead control. --}}
+                @endcan
                 <a href="{{ route('admin.sales.edit', $sales->id) }}" class="btn btn-primary">
                     <i class="ti ti-edit me-1"></i> {{ __('messages.edit_invoice') }}
                 </a>

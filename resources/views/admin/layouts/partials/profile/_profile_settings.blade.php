@@ -128,7 +128,10 @@
         </div>
     </div>
 
-    <div class="card-footer bg-transparent mt-auto">
+    {{-- Borderless action row: a nested .card-footer stacked its border-top on
+         the section hairline above it (double line) and sat misaligned by its
+         own horizontal padding. The section hairline is the only separator. --}}
+    <div class="mt-3 mb-3">
             <div class="btn-list justify-content-end">
                 <button type="submit" class="btn btn-primary">{{ __('messages.update_profile') }}</button>
             </div>
@@ -198,7 +201,10 @@
                 </div>
             </div>
         </div>
-        <div class="card-footer bg-transparent mt-auto">
+        {{-- Borderless action row: a nested .card-footer stacked its border-top on
+         the section hairline above it (double line) and sat misaligned by its
+         own horizontal padding. The section hairline is the only separator. --}}
+    <div class="mt-3 mb-3">
             <div class="btn-list justify-content-end">
                 <button type="submit" id="updatePasswordBtn" class="btn btn-secondary">{{ __('messages.update_password') }}</button>
             </div>
@@ -256,7 +262,10 @@
                 @endif
             </div>
         </div>
-        <div class="card-footer bg-transparent mt-auto">
+        {{-- Borderless action row: a nested .card-footer stacked its border-top on
+         the section hairline above it (double line) and sat misaligned by its
+         own horizontal padding. The section hairline is the only separator. --}}
+    <div class="mt-3 mb-3">
             <div class="btn-list justify-content-end">
                 <button type="submit" class="btn btn-success">{{ __('messages.generate_new_token') }}</button>
             </div>

@@ -18,10 +18,19 @@
         <nav class="nav-dropdown d-none d-md-flex" id="nav-dropdown">
             <ul class="d-flex gap-3">
                 @foreach ($navigationItems as $item)
+                    @php
+                        // The top bar only speaks "you are here" when it is the mode
+                        // on screen: in sidebar mode this header is d-none, and
+                        // marking its copy as well would put two owners of the same
+                        // page into one rendered document. The rule itself is
+                        // shared with the sidebar (NavigationHelper), so the two
+                        // modes can never disagree about which section owns the page.
+                        $topNavActive = ($navigationType ?? 'sidebar') === 'navbar';
+                    @endphp
                     {{-- Check if the item has a special key, e.g., 'reports', 'accounting', or 'administration' --}}
                     @if (isset($item['key']) && in_array($item['key'], ['reports', 'accounting', 'administration']))
                         <li class="nav-item dropdown" id="{{ $item['key'] }}-nav-item">
-                            <a class="nav-link dropdown-toggle" href="#navbar-{{ Str::slug($item['title']) }}"
+                            <a class="nav-link dropdown-toggle{{ $topNavActive && \App\Helpers\NavigationHelper::hasActiveChild($item, false) ? ' has-active-child' : '' }}" href="#navbar-{{ Str::slug($item['title']) }}"
                                 data-bs-toggle="dropdown" data-bs-auto-close="outside" role="button"
                                 aria-expanded="false">
                                 <i class="{{ $item['icon'] }}"></i>
@@ -34,7 +43,7 @@
                                     <div class="dropdown-menu-column">
                                         {{-- Loop through children without permission check for special items --}}
                                         @foreach ($item['children'] as $child)
-                                            <a class="dropdown-item" href="{{ route($child['route']) }}" data-turbo="true">
+                                            <a class="dropdown-item{{ $topNavActive && \App\Helpers\NavigationHelper::isCurrentRoute($child['route'] ?? null) ? ' active' : '' }}" href="{{ route($child['route']) }}" data-turbo="true">
                                                 <i class="{{ $child['icon'] ?? 'ti ti-point' }}"></i>
                                                 <span>{{ __($child['title']) }}</span>
                                             </a>
@@ -48,7 +57,7 @@
                         @can($item['permission'] ?? null)
                             @if (isset($item['children']))
                                 <li class="nav-item dropdown" @if(isset($item['key'])) id="{{ $item['key'] }}-nav-item" @endif>
-                                    <a class="nav-link dropdown-toggle" href="#navbar-{{ Str::slug($item['title']) }}"
+                                    <a class="nav-link dropdown-toggle{{ $topNavActive && \App\Helpers\NavigationHelper::hasActiveChild($item) ? ' has-active-child' : '' }}" href="#navbar-{{ Str::slug($item['title']) }}"
                                         data-bs-toggle="dropdown" data-bs-auto-close="outside" role="button"
                                         aria-expanded="false">
                                         <i class="{{ $item['icon'] }}"></i>
@@ -61,7 +70,7 @@
                                             <div class="dropdown-menu-column">
                                                 @foreach ($item['children'] as $child)
                                                     @can($child['permission'] ?? null)
-                                                        <a class="dropdown-item" href="{{ route($child['route']) }}" data-turbo="true">
+                                                        <a class="dropdown-item{{ $topNavActive && \App\Helpers\NavigationHelper::isCurrentRoute($child['route'] ?? null) ? ' active' : '' }}" href="{{ route($child['route']) }}" data-turbo="true">
                                                             <i class="{{ $child['icon'] ?? 'ti ti-point' }}"></i>
                                                             <span>{{ __($child['title']) }}</span>
                                                         </a>
@@ -72,7 +81,7 @@
                                     </div>
                                 </li>
                             @else
-                                <li><a href="{{ route($item['route']) }}" data-turbo="true"><i class="{{ $item['icon'] }}"></i><span
+                                <li><a href="{{ route($item['route']) }}" data-turbo="true" class="{{ $topNavActive && \App\Helpers\NavigationHelper::isCurrentRoute($item['route']) ? 'active' : '' }}"><i class="{{ $item['icon'] }}"></i><span
                                             class="nav-link-title">{{ __($item['title']) }}</span></a></li>
                             @endif
                         @endcan

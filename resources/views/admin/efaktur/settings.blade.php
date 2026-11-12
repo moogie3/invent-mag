@@ -183,7 +183,7 @@
                                     <input type="text" name="klikpajak_api_key" id="klikpajak_api_key"
                                         class="form-control font-monospace @error('klikpajak_api_key') is-invalid @enderror"
                                         value="{{ old('klikpajak_api_key', $tenant->klikpajak_api_key) }}"
-                                        placeholder="Client-ID / API Key"
+                                        placeholder="Client ID"
                                         autocomplete="off">
                                     @error('klikpajak_api_key')<div class="invalid-feedback">{{ $message }}</div>@enderror
                                     <div class="form-text">{{ __('messages.efaktur_klikpajak_api_key_hint') }}</div>
@@ -197,6 +197,7 @@
                                         placeholder="••••••••••••••••"
                                         autocomplete="new-password">
                                     @error('klikpajak_secret')<div class="invalid-feedback">{{ $message }}</div>@enderror
+                                    <div class="form-text">{{ __('messages.efaktur_klikpajak_secret_hint') }}</div>
                                 </div>
 
                                 <div class="mb-3">

@@ -133,7 +133,27 @@
                             <div class="card-footer bg-body-secondary">
                                 <div class="d-flex justify-content-end">
                                     <div class="text-end">
-                                        @if(($salesReturn->tax_rate ?? 0) > 0)
+                                        @if(($taxReversal['ppn'] ?? 0) > 0 || ($taxReversal['pph'] ?? 0) > 0)
+                                            {{-- Derived by the same code path the journal uses, so this
+                                                 cannot disagree with what was booked. --}}
+                                            @if(($taxReversal['ppn'] ?? 0) > 0)
+                                            <div class="text-muted mb-1">
+                                                {{ __('messages.return_ppn_reversal') }}:
+                                                {{ \App\Helpers\CurrencyHelper::formatWithPosition($taxReversal['ppn']) }}
+                                            </div>
+                                            @endif
+                                            @if(($taxReversal['pph'] ?? 0) > 0)
+                                            <div class="text-muted mb-1">
+                                                {{ __('messages.return_pph_reversal') }}:
+                                                {{ \App\Helpers\CurrencyHelper::formatWithPosition($taxReversal['pph']) }}
+                                            </div>
+                                            @endif
+                                            @if(($taxReversal['ratio'] ?? 1) < 1)
+                                            <div class="text-muted small mb-1">
+                                                {{ __('messages.return_tax_share', ['percent' => round(($taxReversal['ratio'] ?? 0) * 100, 1)]) }}
+                                            </div>
+                                            @endif
+                                        @elseif(($salesReturn->tax_rate ?? 0) > 0)
                                         <div class="text-muted mb-1">
                                             {{ __('messages.tax') }}
                                             ({{ $salesReturn->tax_rate }}%@if(($salesReturn->tax_type ?? 'none') !== 'none'), {{ $salesReturn->tax_type }}@endif):

@@ -220,16 +220,51 @@ Purchase 200 + PPN 11% (exclusive) = 22:
 | | Accounts Payable (2110) — 222 |
 | | PPh Payable (2150) — pph (if withholding applies) |
 
-### 6.5 Sales Return with PPN / PPh
+### 6.5 Sales Return with PPN / PPh / COGS
 
-Proportional reversal based on `return_amount / sale.total`:
+One entry per return (posted at creation, reversed on cancel, never re-posted on complete), built by `SalesReturnService::createSalesReturnJournalEntry()`:
 
 ```
+Cr. Accounts Receivable   return_total
+Dr. Sales Revenue         return_total
+Cr. Cost of Goods Sold    proportional_cogs
+Dr. Inventory             proportional_cogs
+
+[if original sale isPpn()]
 Dr. PPN Keluaran          proportional_ppn
 Cr. Accounts Receivable   proportional_ppn
+
+[if original sale isPph()]
+Dr. Accounts Receivable   proportional_pph
+Cr. PPh Receivable        proportional_pph
 ```
 
-PPN is reversed on return **whenever the original sale `isPpn()`** — a Faktur Pajak is no longer required (Phase 1E). Legacy FakturPajak-sourced PPN journals are still reversed by `cancelFakturPajak()`.
+- **Ratio base is NET of tax** (the original sale's revenue credit), never `sale.total` (which is gross of PPN): `ratio = return_total / net_revenue_base`. Derived by `ReturnTaxHelper::salesReversal()` from the sale's denormalized snapshot, so the return screens and the ledger book the same figure.
+- PPN is reversed on return **whenever the original sale `isPpn()`**, with no Faktur Pajak required (Phase 1E). Legacy FakturPajak-sourced PPN journals are still reversed by `cancelFakturPajak()`.
+- COGS/Inventory reverse proportionally against the original sale's posted COGS.
+- A Canceled return posts nothing: creation from Canceled skips the entry, cancel reverses it, complete refuses a canceled row.
+
+### 6.6 Purchase Return with PPN Masukan / PPh
+
+One entry per return (same create/cancel/complete contract as 6.5), built by `PurchaseReturnService::createPurchaseReturnJournalEntry()`:
+
+```
+Dr. Accounts Payable      return_total
+Cr. Purchase Returns      return_total   (5120, contra-COGS; falls back to Purchases)
+Dr. Purchases/COGS        proportional_purchase
+Cr. Inventory             proportional_purchase
+
+[if the original purchase posted PPN Masukan]
+Cr. PPN Masukan           proportional_ppn
+Dr. Accounts Payable      proportional_ppn
+
+[if the original purchase posted PPh Payable]
+Dr. PPh Payable           proportional_pph
+Cr. Accounts Payable      proportional_pph
+```
+
+- **Ratio base is NET of tax**, and the tax amounts are read from **what the original journal actually posted** (a scan in `deriveReversal()`), not the purchase row's snapshot: legacy and fallback postings may differ, and the ledger is what gets reversed. Derived by `ReturnTaxHelper::purchaseReversal()`.
+- Without the PPN/PPh legs a returned purchase left the input VAT asset and the withholding liability permanently overstated (audit finding C, fixed).
 
 ---
 

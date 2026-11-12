@@ -58,7 +58,7 @@
                 <i class="ti ti-alert-triangle"></i> {{ __('messages.efaktur_not_issued') }}
             </span>
         @else
-            <span class="text-muted">—</span>
+            <span class="text-muted">-</span>
         @endif
     </td>
     @endif

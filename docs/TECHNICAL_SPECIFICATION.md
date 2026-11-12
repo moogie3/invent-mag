@@ -8,7 +8,7 @@
 
 ## Executive Summary
 
-Invent-MAG is a production-ready, enterprise-grade ERP system built on Laravel 11 with 1.5 years of continuous development. This document provides detailed technical specifications for potential buyers, integrators, and technical evaluators.
+Invent-MAG is a production-ready, enterprise-grade ERP system built on Laravel 12 with 1.5 years of continuous development. This document provides detailed technical specifications for potential buyers, integrators, and technical evaluators.
 
 ### Key Technical Highlights
 
@@ -990,7 +990,7 @@ PPh (Pajak Penghasilan) is implemented as a second independent dropdown on sales
 
 | Role                   | Time Required  | Skills              |
 | ---------------------- | -------------- | ------------------- |
-| **Laravel Developer**  | 20-40 hrs/week | PHP 8.2, Laravel 11 |
+| **Laravel Developer**  | 20-40 hrs/week | PHP 8.2+, Laravel 12 |
 | **Frontend Developer** | 10-20 hrs/week | Tailwind, Alpine.js |
 | **DevOps**             | 5-10 hrs/week  | Docker, CI/CD       |
 

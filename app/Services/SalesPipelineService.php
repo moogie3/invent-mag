@@ -13,33 +13,11 @@ use App\Models\Tax;
 use App\Models\User;
 use App\Models\Warehouse;
 use Dompdf\Dompdf;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
 class SalesPipelineService
 {
-    public function getOpportunitiesByFilters(Request $request)
-    {
-        $opportunitiesQuery = SalesOpportunity::with(['customer', 'pipeline', 'stage']);
-
-        if ($request->pipeline_id) {
-            $opportunitiesQuery->where('sales_pipeline_id', $request->pipeline_id);
-        }
-
-        if ($request->stage_id) {
-            $opportunitiesQuery->where('pipeline_stage_id', $request->stage_id);
-        }
-
-        $opportunities = $opportunitiesQuery->get();
-        $totalPipelineValue = $opportunities->sum('amount');
-
-        return [
-            'opportunities' => $opportunities,
-            'total_pipeline_value' => $totalPipelineValue,
-        ];
-    }
-
     public function getSalesPipelineIndexData()
     {
         $pipelines = SalesPipeline::with('stages')->get();

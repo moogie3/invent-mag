@@ -19,6 +19,12 @@ Route::prefix('efaktur')->name('admin.efaktur.')->middleware(['plan.feature:ppn'
     // Generate Faktur Pajak from a sale
     Route::post('/generate/{sale}', [EFakturController::class, 'generate'])->name('generate');
 
+    // Bulk submission: one PJAP call covers every selected draft faktur.
+    // Enterprise only, same gate as the single submit below (efaktur_api).
+    Route::post('/batch-submit', [EFakturController::class, 'submitBatch'])
+        ->middleware('plan.feature:efaktur_api')
+        ->name('batch.submit');
+
     // Individual Faktur Pajak actions
     Route::get('/{fakturPajak}', [EFakturController::class, 'show'])->name('show');
     Route::get('/{fakturPajak}/print', [EFakturController::class, 'print'])->name('print');
@@ -29,4 +35,10 @@ Route::prefix('efaktur')->name('admin.efaktur.')->middleware(['plan.feature:ppn'
     Route::post('/{fakturPajak}/submit', [EFakturController::class, 'submitToDjp'])
         ->middleware('plan.feature:efaktur_api')
         ->name('submit');
+
+    // Void a faktur DJP already accepted (Faktur Batal). Enterprise only.
+    // Distinct from /cancel above, which is the Phase 1 local draft cancel.
+    Route::post('/{fakturPajak}/cancel-djp', [EFakturController::class, 'cancelAtDjp'])
+        ->middleware('plan.feature:efaktur_api')
+        ->name('cancel.djp');
 });

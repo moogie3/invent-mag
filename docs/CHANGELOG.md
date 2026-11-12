@@ -9,6 +9,679 @@ Date-ordered, newest first.
 
 ---
 
+## 2026-11-09: the e-Faktur "Submit Selected to DJP" and "Cancel at DJP" Buttons (both contracts were dead code), the Returns PPN/PPh Split Made Visible and Single-Sourced with the Journal, and Audit #5 Closed as an Accepted Risk
+
+The 2026-11-08 entry closed its own work and left a list; this entry works
+through three items of it: the returns PPN/PPh UI, the e-Faktur
+`submitBatch`/cancel UI, and audit finding #5. One root-cause fix was
+identified and deliberately deferred rather than attempted. Everything is
+**uncommitted**: 74 modified files plus 14 new (this entry included); git
+is the user's to run.
+
+### Part 1: e-Faktur batch submit and cancel at DJP, where both contracts were dead code
+
+The gap was never the API. `EFakturService::submitBatch()` and
+`PjapInterface::cancel()` had existed since Phase 2 (the 2026-11-05
+entry) and nothing in the UI ever called them. Two queued jobs and two
+routes close it:
+
+- **`SubmitFakturPajakBatchJob`** makes one bulk call for the selected
+  rows under `WithoutOverlapping('faktur-batch')`, marks the rows
+  submitted *before* transport so a retry cannot double-submit, and its
+  `failed()` reverts only the rows that never received a PJAP id. The ids
+  are re-read under tenant scope, so a forged id in the request never
+  reaches another tenant's document.
+- **`CancelFakturPajakJob`** changes local state only after DJP confirms,
+  under `WithoutOverlapping('faktur-cancel-{id}')`; a business refusal is
+  logged and stops the chain, and `failed()` leaves state alone. A new
+  `EFakturService::cancelSubmittedFakturPajak()` performs the DJP cancel;
+  the legacy `cancelFakturPajak()` is deliberately byte-identical, since
+  its FP-sourced reversal is a different path.
+- **`KlikpajakService::cancel()` now throws on transport failure** instead
+  of returning false, which is what makes the job's `tries`, `backoff` and
+  `failed()` reachable at all. A DJP refusal (code 1106) still returns
+  false, and `PjapInterface::cancel()` carries the matching `@throws`.
+- Routes `POST /batch-submit` (`admin.efaktur.batch.submit`) and
+  `POST /{fakturPajak}/cancel-djp` (`admin.efaktur.cancel.djp`), both
+  behind `plan.feature:efaktur_api` and both registered **before** the
+  `{fakturPajak}` wildcards. The index gained a checkbox column with
+  select-all and a dynamic colspan, gated by `$canSubmitBatch`; the show
+  page gained a "Cancel at DJP" button with a confirmation. 12 new lang
+  keys in `en` and `id`, plus a generic `select_all`.
+
+Coverage: `EfakturApiTest` 20, `SubmitFakturPajakBatchJobTest` 6,
+`CancelFakturPajakJobTest` 8, `KlikpajakServiceTest` 23 (57 tests, 201
+assertions).
+
+### Part 2: returns PPN/PPh: derived, not entered, from one source the journal and the screens share
+
+The 2026-11-02 audit recorded "Returns have no PPN/PPh UI... a partial
+return can't be given its own tax treatment from the UI". The open
+question was whether to add tax fields the user could type into.
+**Not added, deliberately.** Indonesian practice (Accurate, Jurnal,
+Mekari) derives a return's tax from the original invoice prorated,
+because the reversal has to tie back to the original Faktur Pajak: a
+different rate on the return would be a compliance hazard. It would also
+have been a drift hazard, because **the return's own tax columns are
+never read by the GL** (the journal derives everything from the parent
+document), so a typed value would have been silently ignored unless the
+journal were changed to honor it. Show the derivation instead, and the
+screen cannot disagree with the books.
+
+- **`app/Helpers/ReturnTaxHelper.php`** holds the pure math (`ratio`,
+  `salesReversal`, `purchaseReversal`), and each service grew a public
+  `deriveReversal()` that owns the scan and is called by **both** the
+  journal and the screens. The bases differ by design: a sale's tax comes
+  from its snapshot prorated over the original revenue credit (net of
+  PPN), a purchase's from what its original journal actually posted
+  (Inventory debit, PPN Masukan debit, PPh Payable credit), because a
+  legacy or fallback posting may differ from the purchase row and the
+  ledger is what gets reversed.
+- **Show pages** render `PPN reversal` and `PPh reversal` and, on a
+  partial return, a share line ("N% of the original document"), falling
+  back to the parent's generic tax line when neither applies.
+- **Create and edit forms** gained a live preview served by two new JSON
+  endpoints, `GET /sales-returns/derive-reversal` and
+  `GET /por/derive-reversal`, both registered before the resource
+  wildcards. The shared `TaxReversalPreview` module only decides what to
+  show and does no arithmetic, so there is no second formula that could
+  drift.
+
+Display equals booking, and it is asserted rather than assumed: new
+consistency tests on both sides check that `deriveReversal()` equals the
+figures the journal actually books on a partial return (ratio 0.5 gives
+PPN 11.00, PPh 2.00, COGS 60.00 on the sale, and PPN 11.00, PPh 2.00 on
+the purchase), and feature tests check that the show pages render those
+exact figures. `SalesReturnServiceTest` 16 (73 assertions),
+`PurchaseReturnServiceTest` 12 (57), both controller tests 28 (110).
+Four new lang keys in `en` and `id`.
+
+### Part 3: audit #5 closed as an accepted risk, one root-cause fix deferred
+
+- **#5 (no recorded browser click-through) is closed as an accepted
+  risk**, on the owner's decision. There is no browser in this
+  environment, so the blocker is the environment rather than the code and
+  no further work here could remove it. Verification continues to stand on
+  the build, both suites, and rendered-HTML assertions. Part 6 of the
+  2026-11-08 entry was corrected to say so instead of "cannot be fixed".
+- **Deferred, not attempted (dev-side root fix):** the seeders CI/CD can
+  never run. `.github/workflows/deploy.yml` is tag-triggered, gates on
+  `ci.yml` (`php artisan test`), then SSHes `php artisan migrate --force`,
+  `categories:backfill-shopee`, and `optimize:clear` with the caches. It
+  never seeds, so a broken seeder would only ever surface on a fresh
+  install. Fixing the seeder file itself is the real repair and is left
+  for a dev-side pass.
+- **The two canceled-return correction migrations stay**
+  (`2026_11_08_000001_reverse_journal_entries_of_canceled_returns` and
+  `2026_11_08_000002_restore_stock_of_canceled_returns`, both Ran): their
+  selection is 0, so keeping them writes nothing, while dropping them
+  would undo §2.9 and Parts 5 and 8 of the 2026-11-08 entry and lose the
+  repair. Awaiting the owner's confirmation.
+
+**Gates:** `php artisan test` **1434 passed (5012 assertions)** in 380s;
+`npx vitest run` 172 files / 209 tests; `npm run build` clean; em-dash
+census on added lines **0**; `migrate:status` shows exactly one Pending
+(`2026_11_05_000002_add_invoice_email_feature_to_plans`, the deliberate
+§2.9 hold). Pint was not run: there is no `pint.json`, no composer script
+and no CI step for it, and its default preset fails 18+ untouched files
+at HEAD; the two new job files match their sibling
+`SubmitFakturPajakJob.php` style exactly.
+
+**Still open:** pipeline PPh zeros; the first live Mekari Klikpajak call
+(registered credentials and an active subscription, plus the §2.8
+request-line signing nuance); the first live Midtrans subscription call;
+§5.5 stays declined, so online invoice payment needs that decision
+revisited first; the `invoice_email` migration runs on the next deploy
+(§2.9); the seeder fix above; the keep/drop call on the two correction
+migrations.
+
+---
+
+## 2026-11-08: Laravel 12.71 Clears Every Composer Advisory, the Accounting Save Button's Second Hairline, "You Are Here" Marks for the Expanded Sidebar, the Rail and the Top Nav, Sales Returns Stop Doubling Their GL, a Phase 2 Deploy Runbook, and a Twelve-Finding Anti-Slop Audit
+
+The 2026-11-06 entry closed its own work and left a list; this entry works
+through that list plus what the code needed next. The headline is the
+Laravel 12 upgrade that entry's predecessor reported as blocked, but the
+substance is four correctness fixes (an accounting hairline, a navigation
+mark that existed in one mode only, a GL that doubled itself on completion,
+a canceled return's GL that never unwound) and the audit that found them.
+Everything is **uncommitted**: 51 modified files plus 8 new (this entry
+included); git is the user's to run.
+
+### Part 1: Laravel 12.71, the upgrade Composer had been blocking
+
+**The block (2026-11-05, Part 6 of that entry):** Composer 2.11's advisory
+policy rejected every version satisfying `laravel/framework: ^11.31`, because
+the fixes for 9 PKSA advisory IDs only exist at >= 12.60. The documented
+escape hatches (`policy.advisories.ignore-id`, `policy.advisories.block=false`)
+were deliberately not used: weakening the security policy is the owner's
+call. Reported, not actioned.
+
+**This pass took the upgrade:**
+
+- `composer.json`: `^11.31` -> `^12.69`; `composer update` installed
+  **Laravel v12.71.0** together with its dependency set (symfony/*,
+  flysystem, guzzle, monolog, carbon, and the rest of the lock diff).
+- **`composer audit` and `composer audit --locked` now return zero
+  advisories** (was 5 installed / 51 locked). The escape hatches stayed
+  unused: the advisories are gone, not suppressed.
+- The hand-applied vendor patch from 2026-11-05 Part 5 (the PHP 8.5
+  `PDO::MYSQL_ATTR_SSL_CA` deprecation, patched into the framework's four
+  reads by hand because collision's own fix script no-ops in app installs)
+  left with the regenerated `vendor/`. Framework >= 12.60 ships the fix
+  itself (`MySqlSchemaState` now reads `Pdo\Mysql::ATTR_SSL_CA`), and
+  booting the app prints no deprecation lines. Nothing reverts on the next
+  `composer install` any more.
+- **Upgrade fallout, one pattern:** five edit modals built their update-route
+  base with `route('admin....update', '')`, and Laravel 12's `route()`
+  rejects an empty parameter. Each now passes a placeholder segment and
+  strips it (`Str::beforeLast(route(..., ['id' => 'placeholder']),
+  '/placeholder')`), comment-marked `L12:` so the next reader knows why the
+  indirection exists. Files: category, customer, supplier, tax and unit
+  modals.
+- Pint's preset moved with Laravel (1.29.0): 8 files needed re-formatting;
+  `pint --test` passes on every file this pass touched.
+- **Both runners green on the new framework:** `php artisan test` on PHP
+  8.5.12 and `vendor/bin/phpunit` on PHP 8.2.12 (Laravel 12 requires PHP
+  >= 8.2), identical counts on both (see Verification).
+- **Docs version sweep**, so no document still claims the old framework:
+  ROADMAP stack line, INTERVIEW_QA (stack line plus the `/api` prefixing
+  note, now "Laravel's automatic ..."), TECHNICAL_SPECIFICATION (2 spots),
+  OWNER_SETUP_GUIDE, ARCHITECTURE_ASSESSMENT (2 spots, made
+  version-neutral: "Laravel supports ...").
+
+### Part 2: The accounting settings Save button had a second hairline above it
+
+Same family as the profile-page hairline fixed in the 2026-11-06 entry
+(Part 3), different mechanism, and fixed now where that pass was told not
+to. Inside the form the `.card-footer` was the form's last child, so the
+final `.settings-section` lost the `:last-child { border-bottom: none }`
+exemption every other page's layout gives it: the section drew its own
+bottom hairline immediately above the footer's `border-top`, and Save sat
+under two lines.
+
+**Fix** (`accounting-setting.blade.php`): the footer moves **outside** the
+form, exactly where `settings.blade.php` and `currency-edit.blade.php`
+already place it, and the submit button keeps its association through
+`form="accountingSettingsForm"` (the form carries the matching `id`). The
+last section is the form's last child again, the exemption applies, one
+line remains. Blade-only: no `npm run build`.
+
+### Part 3: The section owning the page now lights up in all three navigation states
+
+**Symptom:** inside a section only the child row lit up. A parent anchor has
+no `route` of its own, so `.active` could never land on it, and the section
+above the current page read as dead whether the sidebar was open or folded.
+
+**Sidebar, both states:** `menu-sidebar.blade.php` marks the parent whose
+submenu holds the page through
+`\App\Helpers\NavigationHelper::hasActiveChild()` and adds
+`has-active-child` to its anchor. `menu-sidebar.css` gains the rules that
+paint it, **+107 lines, 0 deletions** (purely additive, as instructed): a
+block under `.sidebar:not(.collapsed)` for the expanded sidebar and a block
+under `.sidebar.collapsed` for the rail, light and dark variants included,
+so the mark ships for both states instead of one.
+
+**Top nav (audit finding #3):** the same rule now drives the top bar.
+`navbar.blade.php` marks three things: the section parent
+(`has-active-child`), the current child row (`dropdown-item active`), and a
+current leaf link (`active`), all gated on navigation type being exactly
+`navbar`, so a rendered document always has exactly one owner: in `both`
+mode the sidebar owns the page and the bar stays silent (two claims would
+read as two sections owning one page). The three special branches (reports,
+accounting, administration) render children without `@can`, so they pass the
+no-permission variant of the helper: a parent is never marked for a child
+that is not on screen. `navbar.css` gains two rules for the marks: weight
+600 plus a 2px primary underline drawn as an inset shadow (so it costs no
+layout) for the parent, never primary text, because the panel is white on
+near-black in **both** themes and primary text would fail contrast there
+(R-25); and a 0.16 white row background at weight 600 for the current child,
+since Tabler's own `rgba(0, 0, 0, 0.06)` active background is invisible on
+that panel.
+
+**Tests:** `SidebarMenuTest` (new file), **12 tests / 43 assertions**. Five
+sidebar tests (including a CSS-contract test asserting both states' rules in
+the source, because the built bundle is git-ignored and absent from a fresh
+checkout) and seven top-nav tests (exactly one owner in each mode: navbar,
+sidebar, both; a leaf page; a page under no section; the special branch;
+the CSS contract).
+
+### Part 4: Sales returns stopped double-posting on completion and started re-journaling on edit
+
+**Double-post:** `createSalesReturn()` posts the journal when the return is
+created (Pending), and `completeSalesReturn()` posted it **again** on the
+Pending -> Completed transition, so every completed return doubled its GL
+impact. Completion now owns only what creation did not do: the customer
+credit (only now does the money become available). This matches purchase
+returns, where create books the entry and there is no separate "complete"
+booking step.
+
+**Edit re-journals:** `updateSalesReturn()` now reverses whatever the
+previous version posted and posts the updated entry with the new totals;
+before this the GL kept describing the old return forever (the same hole
+`updatePurchaseReturn` had, closed in the 2026-11-06 entry). An edit to
+Canceled keeps only the reversal, and a return edited down to zero nets to
+zero instead of posting an empty entry.
+
+**One reversal guard for three callers:** the new
+`reverseSalesReturnJournalEntries()` skips entries an earlier reversal
+already netted out (`canBeReversed() && ! hasDependentEntries()`), so a
+second edit, or an edit followed by delete/cancel, can never reverse the
+same entry twice and corrupt the GL in the opposite direction. Delete and
+cancel route through it as well. It mirrors
+`PurchaseReturnService::reversePurchaseReturnJournalEntries()`.
+
+**`reason ?? null`:** `reason` is not in the controller's required rules, so
+a form that omitted it reached `updateSalesReturn()` bare and 500'd on an
+undefined key, while create and both purchase-return paths wrote `null`.
+
+**Audit finding #4 (cancel):** `cancelSalesReturn()` and
+`cancelPurchaseReturn()` now revert stock and journal from **every** live
+status, mirroring `delete*()` (the `Canceled` early-return is the
+idempotency guard; the credit half stays guarded by `customer_credit_id`,
+since only completion issues one). Canceled rows were also excluded from the
+three return-quantity recomputes they would otherwise skew: a canceled
+return had already given everything back but kept marking the sale
+Partial/Returned and still counted toward purchase-return quantities.
+
+**Audit finding #8 (one builder):** `createSalesReturn()`'s inline copy of
+the journal block (the 100-plus lines it duplicated) is gone; it calls the
+shared `createSalesReturnJournalEntry(..., strict: true)`.
+Throw-versus-degrade is settled in the docblock: creation **throws** with
+the two messages it always threw, so the transaction rolls the whole return
+back (a return cannot be born holding stock with no booking), while an edit
+still **degrades**, because the entry it replaces already exists and
+degrading there never leaves the GL worse than before. The helper's stale
+"see createSalesReturn()" comments were retargeted to describe the only
+copy.
+
+**Docs:** INTERVIEW_QA's bulk-return paragraph and FEATURE_CHECKLIST's bulk
+line now say the entry is posted once, at creation, so neither describes
+behavior the code no longer has.
+
+### Part 5: ROADMAP gains §2.9, the deploy runbook Phase 2 was missing
+
+The 2026-11-06 open list carried "the Phase 2 deploy runbook (`php artisan
+migrate` + a worker on `tax-submissions`)". It is written as **§2.9**, six
+blocks that each name the failure they prevent:
+
+1. **Environment:** no new required keys (both URLs have working defaults in
+   `config/services.php`); tenant credentials are ordinary columns, set per
+   tenant from e-Faktur -> Settings; the plan must be enterprise with
+   `efaktur_api`.
+2. **Migration: four, all data-only:** `2026_11_04_000001` (`efaktur_api`,
+   missed on live on 2026-11-05, the button rendered for nobody until it
+   ran), `2026_11_05_000002` (`invoice_email`, shipped with §5.4, the
+   row that makes the "all tiers" claim true of the database) and the two
+   canceled-return corrections of Part 8
+   (`2026_11_08_000001` GL, `2026_11_08_000002` stock, which joined the
+   runbook when they shipped). Each gets a `migrate:status` grep and an
+   SQL row check.
+3. **Queue worker on `tax-submissions`:** skipped, and nothing errors;
+   submissions sit in the `jobs` table while the UI stays pending forever.
+4. **Assets**, only if the release changed JS/CSS.
+5. **Verification checklist** in order, from the plan greps down to the
+   first sandbox submission.
+6. **Rollback note:** the efaktur `down()` is the kill switch (the button
+   disappears for every tenant at once), and the corrections' `down()`s
+   delete only what they wrote (reversal entries for the GL, the same rows
+   with opposite deltas for the stock).
+
+§5.4's Gating line carries the matching **deploy note**: until the
+`invoice_email` migration runs, the "all tiers" claim is true of the code
+and false of the database (nothing gates on the slug, so the only visible
+effect is the plan pages not listing it).
+
+### Part 6: Anti-slop audit 001, twelve findings, eleven fixed, one accepted
+
+The anti-slop audit 001 (run 2026-11-07) audits this working tree after the
+fact: 12 findings, a hard-gate re-run, and the evidence held. Its standalone
+file was deleted when the pass closed, at the owner's direction (no extra
+markdown unless asked), so this entry and Part 8 are its record now. The
+owner approved all twelve in one answer ("everything"). **Eleven were
+fixed; #5 was closed afterwards as an accepted risk, on the owner's
+decision (see the 2026-11-09 entry):**
+
+- **#5 (no recorded browser click-through):** there is no browser in this
+  environment, so no click-through happened and none can. Verification
+  stands on the build, both suites, and rendered-HTML assertions; the gap is
+  recorded, not papered over. Accepted as a risk rather than left open:
+  the blocker is the environment, not the code, and no amount of further
+  work here would remove it.
+- **#12 (dark mode: the parent fill shows, the primary icon does not):**
+  first withheld, because every possible rule for it changes the **opened**
+  sidebar in dark mode, which this pass was told not to touch; reported as
+  the owner's call, approved later the same day, then fixed. Part 8 has the
+  rule.
+
+The eleven that were fixed, by number (per-finding detail and the gate
+tables were in the audit file; it is deleted, so the outcomes are
+summarized here):
+
+| # | Fix |
+|---|---|
+| 1, 2 | Em dashes: R-02 forbids the character in text the agent writes, R-37 protects the owner's voice. Resolved as a **sweep of this pass's new text only**: 53 of the 59 census lines across ROADMAP, PurchaseReturnService, KlikpajakService, INTERVIEW_QA, PPN_EVOLUTION, FEATURE_CHECKLIST, `lang` (en + id), tests and the migration, plus the audit file and this entry. HEAD's own em dashes (hundreds) are the owner's voice and were left untouched, spot-checked line by line wherever the diff was ambiguous. Two UI placeholder cells that printed an em dash now print a hyphen. |
+| 3 | Top-nav marking, described in Part 3. |
+| 4 | Cancel revert, described in Part 4. |
+| 6 | Send Invoice Email had no pending state: `data-invoice-email-send` on the form plus a bundled `resources/js/admin/sales/invoice-email.js` that disables the button, swaps its mail icon for a spinner and sets `aria-busy` for the flight of the POST, restored on `turbo:submit-end` so a failed request never strands the control. Bundled and `@vite`d rather than inline because the project runs strict CSP. +1 source-contract test. |
+| 7 | The email's status label resolved through a dynamic key: it now checks `Lang::has()` (fallback locale included) and falls back to the stored status, so a customer can never receive a raw `messages.something` lookup string. +1 test. |
+| 8 | One journal builder with `strict: true` on create, described in Part 4. |
+| 9 | Seven `lang/id` values that said "invoice" now say "Faktur", matching the file's `edit_invoice => 'Edit Faktur'` convention; the `:invoice` placeholders are parameter names and were left alone. |
+| 10 | The §2.9 runbook counts and greps every data migration (four by this entry's close: the two feature flags plus the two canceled-return corrections); §5.4 carries the deploy note, described in Parts 5 and 8. |
+| 11 | `sendInvoice()` catches `\Exception`, not `\Throwable`: transport, address-compliance and PDF/view failures still get the friendly flash, while a PHP Error surfaces as a 500 instead of wearing "email failed" behind one log line. The log context now carries the exception class next to the message. +1 boundary test. |
+| 12 | The dark-mode parent glyph, described in Part 8. |
+
+**Delivery Gate re-run:** R-02 (em dash) **PASS**, 0 in this pass's added
+lines with this entry included; R-03 / R-25 / R-35 (mobile, contrast,
+click-through) **UNVERIFIED**, because there is no browser here;
+Craftsmanship **PASS** (C-4 had failed on findings 3, 4 and 7, all three now
+fixed). The full gate tables were in the audit file, deleted with it at the
+owner's direction.
+
+### Part 7: The backup index 500's third layer
+
+No entry had recorded this one: tests that wrote real zips recreated
+`storage/app/backups` as `0700` under the shell user, which the web server
+then could not list (the same `Unable to list contents for 'backups'` the
+2026-10-25 entry diagnosed with chmod). `config/filesystems.php` now sets
+`directory_visibility => 'public'` (0755) so a directory created by either
+user is readable by the other, and `BackupControllerTest` writes through
+`Storage::fake('local')` so tests never touch the real disk again.
+
+### Part 8: The canceled returns corrected (GL and stock), finding #12 closed, the last dead path deleted
+
+**The GL correction, migration
+`2026_11_08_000001_reverse_journal_entries_of_canceled_returns.php`.**
+Finding #4's fix protects cancels from here on; it cannot touch the rows
+the bug had already written. All **41 canceled returns** (20 sales, 21
+purchase) held a live posted journal entry against a return that no longer
+exists, over-reversing AR/AP by Rp 35,860 and Rp 68,930. On this database
+all 41 are seeded rows: the return seeders book stock and the journal for
+every return they create, whatever status, and never call cancel, so a
+seeded Canceled row is born holding both. The code path that produces the
+same state for a real user existed until this fix, and production runs it.
+The migration
+reverses each one exactly as `AccountingService::reverseJournalEntry()`
+would (swapped transactions, `entry_type = reversal`, `reversed_entry_id`
+set, `sourceable` NULL, dated the day it runs because a correction belongs
+to the open period, no audit row because a migration has no Auth user),
+selected by the live-entry test the cancel paths themselves use (no
+reversal points at the entry; the pointer lives only on reversals, so a
+re-run finds nothing), and it
+writes nothing at all on a database where no canceled return holds a live
+entry. Verified on this database after running: canceled returns with a
+live entry **0** (was 41), every correction nets its original to zero,
+unbalanced/empty/orphan entries all **0**, Completed and Pending returns
+untouched (exactly one live entry each), 0 of the 41 bank-reconciled. It is
+the third migration §2.9 step 2 now counts; the runbook's heading,
+checklist and rollback note grew with it.
+
+**The stock half: approved the same day, applied as migration
+`2026_11_08_000002_restore_stock_of_canceled_returns.php`.** The same bug
+skipped the stock revert: 52 units to decrement on sales, 111 to increment
+on purchase; the visible wound was product 28 in Gudang Surabaya at **-4**
+(purchase return 82 is its signature). The correction was written up row by
+row for review first, the owner approved it, and the migration mirrors both
+cancel paths exactly: per item row, the stock row keyed on the sale's /
+PO's warehouse, then the same `po_items.remaining_quantity` walk with the
+same filters and caps. It selects only canceled returns the GL half
+marked (the marker lives in the reversal's notes): the old gate reverted
+stock and the GL in the same branch, so an entry left live means stock was
+left moved, and a return canceled from Completed, whose stock the gate
+already reverted, is never corrected twice. On this database the marker
+set is the same 41 rows, so the selection changes nothing here; it is what
+makes the migration safe on a database that has Completed-then-Canceled
+returns. The purchase walks deliberately run first so they
+see the pre-correction headroom the review measured (2 units, on purchase
+61 / product 6); after the sales walk that headroom would look larger and
+they would over-credit. `po.status` is deliberately untouched: the four
+POs whose status disagrees with the live-return logic have `updated_at`
+predating their own returns, and 18 POs with no canceled return disagree
+the same way, so it is a property of the seeded rows, not of this bug.
+Verified after running: a row-by-row simulation of both walks on the
+before-image reproduces the after-image on **all 666 `po_items` rows and
+all 1,254 stock rows** (0 mismatches), stock total **+59** (111 - 52),
+`po_items` **-50** (-52 + 2), product 28 / warehouse 17 at **+1**, no
+negative stock anywhere, no row outside its cap. The review document was
+deleted at the same close, at the owner's direction (no extra markdown
+unless asked); this paragraph and §2.9 are its record now.
+
+**#12, approved and fixed.** The refusal stood on the instruction not to
+touch the opened dark sidebar; the owner approved the cost. One rule in
+`menu-sidebar.css` repaints the marked parent's glyph with a lifted
+primary: `color-mix` 62% primary / 38% white lands about 4.8:1 on the dark
+tray where the literal `#0054a6` measures about 2:1, it is scoped
+`:not(:hover)` so the dark hover flash keeps its own `#37393b` icon
+untouched, and it carries `!important` because dark.css's pin does (the pin
+itself stays as it is). One selector covers the rail and the expanded
+sidebar; rows without an active parent never match it. +1
+source-contract test: `SidebarMenuTest` **13 tests / 45 assertions**.
+
+**The last dead path.** `SalesService::createSalesReturn()` was
+deprecated, unreferenced (every caller goes through
+`SalesReturnService::createSalesReturn()`) and a second way to book a
+return. It is deleted, with its two imports that lost their last user
+(`SalesReturn`, `SalesReturnItem`); one creation path is left to reason
+about.
+
+### Verification
+
+- **`php artisan test` (PHP 8.5.12): 1,402 tests / 4,866 assertions, 0
+  failures** (175s).
+- **Full PHPUnit (PHP 8.2.12): OK (1,402 tests, 4,866 assertions)**.
+  Identical counts on both PHPs.
+- Delta over the 1,376 / 4,754 recorded on 2026-11-06: **+26 tests / +112
+  assertions**, in two clean groups: **+13** from this pass's own work (5
+  sidebar-marking, 5 sales-return journal correctness, 3 invoice-email
+  guards: permission, transport failure, PDF print) and **+13** from the
+  audit's fixes (7 top-nav marking, 2 cancel, 1 send-state contract, 1
+  translation fallback, 1 error boundary, 1 dark parent glyph in Part 8).
+- `composer audit` and `composer audit --locked`: **0 advisories**.
+- Pint 1.29: `--test` passes on every touched file.
+- `npm run build` clean; the manifest carries `invoice-email-BdvjaxeR.js`,
+  `navbar-Cb7uz6Z9.css` and `menu-sidebar-BGBJfBWv.css` (rebuilt for
+  Part 8's rule), all newer than their sources.
+- Em dash census over this pass's added lines: **0**, this entry included;
+  HEAD's lines untouched.
+- **Corrections applied here:** `2026_11_08_000001` (GL) ran as batch 3
+  and `2026_11_08_000002` (stock) as batch 4, both verified on the live
+  database (Part 8); `2026_11_05_000002` (`invoice_email`) remains
+  Pending until §2.9 runs on deploy.
+- **Live tenant re-checked:** tenant 3 `tax_jurisdiction = 'ID'`;
+  `efaktur_api` = starter n / professional n / enterprise Y; live
+  `plans.features` still lacks `invoice_email` until §2.9 step 2 runs on
+  deploy.
+- Working tree: **51 modified + 8 new, all uncommitted** (the owner runs
+  git).
+
+**Still open (refreshed):** closed since yesterday: composer advisories and
+the Laravel >= 12.60 upgrade decision (0 advisories on 12.71), and the
+Phase 2 deploy runbook (written as §2.9; its migrations run on the deploy
+itself). Carried forward: pipeline PPh zeros; the first live Mekari
+Klikpajak call (needs registered credentials and an active subscription,
+plus the request-line signing nuance §2.8 records); the first live
+subscription Midtrans call; §5.5 stays declined, so any tenant asking for
+online invoice payment needs that decision revisited first. **Closed by
+the 2026-11-09 pass (see that entry):** the returns PPN/PPh UI (now a
+derived split, single-sourced with the journal) and the e-Faktur
+`submitBatch`/cancel-at-DJP UI. **From the audit:** #5 was closed as an
+accepted risk, because no browser exists in this environment; #12 was
+closed on the day the owner approved it (Part 8). The stock correction
+that was awaiting review was approved and applied the same day (Part 8);
+nothing this entry produced is left waiting.
+
+---
+
+## 2026-11-06: Invoice Delivery Shipped as Email Instead of WhatsApp, §5.5 Payment Links Built Then Declined and Reverted, the Profile Page's Double Hairline Traced to the Oct 27 CSS Fix, the Klikpajak Contract Reconciled to Mekari's Live Docs (HMAC), and Purchase Returns Re-Journaling the GL
+
+Two feature decisions (one of them a build that was thrown away), two bug
+fixes, and a docs pass. Everything is **uncommitted**: 27 modified files
+plus 3 new (this entry included); git is the user's to run.
+
+### Part 1: §5.4 invoice delivery, shipped as email, on every plan
+
+**Decision (user, 2026-11-06):** email, not WhatsApp. WhatsApp Business
+Cloud API and Fonnte were the two candidates in the roadmap; both bill per
+message, and the PDF they would carry is byte-identical to the one email
+sends. The platform already sends subscription invoices over SMTP, so a
+customer invoice costs nothing extra to send and needs no third-party
+account.
+
+**As built:**
+
+- Button `Send Invoice Email` in the invoice view header
+  (`resources/views/admin/layouts/partials/sales/view/header.blade.php`),
+  behind `@can('edit-sales')`, sitting beside Print; its tooltip names the
+  destination address (or says the customer has none).
+- Route `POST /admin/sales/{id}/send-invoice` (`admin.sales.send-invoice`),
+  `can:edit-sales`, in `routes/admin/sales.php`.
+- `SalesController::sendInvoice()`: no customer email → flash
+  `invoice_email_missing` and **nothing is sent**; transport exception →
+  `Log::error` plus flash `invoice_email_failed` (never a 500); success →
+  `invoice_email_sent` with the address. All three paths redirect back to
+  the invoice view, matching `addPayment()`'s convention.
+- `app/Mail/SalesInvoiceMail.php` + `resources/views/emails/sales-invoice.blade.php`:
+  markdown body with the invoice header table and the itemised rows priced
+  through `CurrencyHelper::format()`, subject from `invoice_email_subject`.
+  Deliberately **not queued**: the person clicking the button has to see a
+  dead SMTP connection as a flash error, not as a job that failed silently
+  hours later.
+- PDF: `SalesService::printInvoice()` was split so `renderInvoicePdf()` is
+  the one place the document is built, and the email attaches those same
+  bytes. The print response moved off Dompdf's `stream()` to an explicit
+  `response()` (application/pdf, inline disposition) so a test can assert
+  the header and the `%PDF` magic bytes.
+- Gating: `invoice_email` slug on all three plans, no route gate.
+  `config/plans.php`, `PlanSeeder`, and the (renamed this pass)
+  migration `2026_11_05_000002_add_invoice_email_feature_to_plans.php`.
+  **The live database has not run it**: no `2026_11_05*` rows in
+  `migrations`, and `plans.features` holds neither slug → `php artisan migrate`
+  on deploy.
+- Copy: en + id (`send_invoice_email`, `invoice_email_subject/intro/attachment_note/confirm/sent/missing/failed`).
+- No payment link inside the email, by decision (Part 2).
+
+**7 tests added** (`SalesControllerTest`): happy path (asserted recipient
++ flash), customer with no email (error flash, `Mail::assertNothingSent()`),
+transport failure surfaced as an error flash (the facade throws), a user
+without `edit-sales` getting 403 with nothing sent, the button rendering on
+the view page, the rendered subject/body/attachment name, and the print
+route returning a real PDF.
+
+### Part 2: §5.5 Midtrans payment links, built to spec, then declined by the user (reverted, nothing ships)
+
+**What existed before the revert** (built earlier in this pass): a
+`PaymentLinkService`, per-tenant Midtrans key columns plus a
+`Settings → Payments` page (`admin.setting.payment`), a pay-link button and
+`POST /admin/sales/{id}/payment-link` on unpaid invoices, a webhook branch
+that set `sales.status = 'Paid'` and posted Dr Cash / Cr AR, the
+`payment_links` feature slug, and 21 tests.
+
+**Decision (user, 2026-11-06):** tenants settle customer invoices **by
+bank transfer directly, or in cash when the salesperson visits the office**
+("having this, I don't think they will using it at all"). Per-tenant keys
+were also the wrong shape for this deployment: the `.env` Midtrans
+credentials are the platform's own **subscription** billing money, not any
+tenant's revenue.
+
+**Reverted:** `SalesController`/`SettingsController` payment methods,
+`routes/admin/sales.php` + `routes/admin/settings.php`, the
+`MidtransController` invoice branch, `Sales` fillable/casts, the menu
+entry, `PaymentLinkService`, the migration, `resources/views/admin/settings/payment.blade.php`,
+13 lang keys per locale, and 20 tests (`PaymentLinkServiceTest`,
+`InvoicePaymentWebhookTest`, 4 in `SalesControllerTest`, 3 in
+`SettingsControllerTest`). Kept on purpose: `invoice_email` in the config,
+seeder and migration; the Klikpajak copy keys; and the subscription flow
+(`Api/PaymentController.php`, `Api/Webhook/MidtransController.php`), which
+this feature never needed to touch. `route:list` now shows only the
+pre-existing payment routes (PO/sales payment entry, plan confirm-payment,
+subscription webhook, superadmin pending payments).
+
+### Part 3: The profile page's double hairline, root cause found, fix kept, sibling pages left alone
+
+**Root cause:** commit `0bc4707e` (Oct 27) re-homed invalid CSS
+`.settings-section` variables, which is why section hairlines suddenly had
+something to paint with (before that commit they drew nothing, which is why
+they read as "two new lines" once the Nov 4 asset build shipped). Each
+Save/Update row under a section was a **nested `.card-footer` inside a
+`.card-body`** (invalid Bootstrap placement): its own `border-top` stacked
+on top of the section hairline, and its cap padding pushed the buttons out
+of line.
+
+**Fix (kept, and only where the user asked):** the three action rows in
+`resources/views/admin/layouts/partials/profile/_profile_settings.blade.php`
+are now plain borderless `mt-3 mb-3` rows, and the stray extra `</div>` in
+`profile-edit.blade.php` is gone. The same pattern exists in
+`settings.blade.php`, `accounting-setting.blade.php` and
+`currency-edit.blade.php`; those were edited in the same pass and then
+**restored to HEAD on the user's instruction** ("the double line problem is
+only happening on the profile page, other than profile you shouldn't
+modifying it at all"), so currency-edit is back to exactly its pre-pass
+state. Blade-only change: no `npm run build`, hard-refresh to see it.
+
+### Part 4: Klikpajak contract reconciled to Mekari's live docs (HMAC), and returns re-journaling the GL
+
+Both were recorded as open or as assumptions in yesterday's entry; both
+now carry code and tests.
+
+- **Mekari reconciliation:** the Phase 2 spec's `Authorization: Bearer` +
+  `X-API-Secret` model and the `/v1/faktur/upload` endpoints do not exist
+  in Mekari's current API. `KlikpajakService` was rewritten against the
+  live Klikpajak Public API v1 docs: HMAC-SHA256 request signing with the
+  tenant's Client ID / Client Secret (`Date`, `Digest`,
+  `Authorization: hmac username=...`, 300s clock skew), `mekari.com` hosts
+  with `/v1/efaktur/out...` endpoints, the `{code, message, data}` envelope,
+  and the `client_reference_id` / `customer` / `items` payload shape.
+  `config/services.php`, `EFakturServiceProvider`, and the e-Faktur settings
+  card (Client ID / Client Secret labels + hints, en + id) moved with it.
+  `KlikpajakServiceTest` was rewritten: **net +8 tests** covering signed
+  headers and payload, business-error handling, draft/cancelled verdict
+  normalization, bulk polling, and the connection test; the two job test
+  files were adjusted to the new request shape. One live-call unknown is
+  documented in ROADMAP Phase 2: the canonical spec signs the request line
+  with the query string while Mekari's own Postman demo signs the bare path.
+- **Purchase return re-journal:** `PurchaseReturnService` now re-journals
+  on edit and handles delete/cancel so an edit never reverses the same
+  entry twice (`updatePurchaseReturn` previously touched no journal at all,
+  which was on yesterday's open list). **4 tests added** covering the
+  re-journal, the double-edit case, status→cancelled, and delete-after-edit.
+- **SPT report templates** were marked ❌ Declined in ROADMAP §5.6:
+  summaries plus Phase 1's CSV already cover preparation, and filing stays
+  in DJP/Klikpajak ("we can't be all in one").
+
+### Part 5: Docs pass
+
+| File | What changed |
+|---|---|
+| `ROADMAP.md` | §5.4 rewritten from "WhatsApp Invoice Delivery" to the shipped email flow (button → controller → mailable → SMTP, synchronous, `invoice_email`, shared `renderInvoicePdf()`, explicitly no pay link); §5.5 marked ❌ Declined with the bank-transfer/cash reasoning and the list of what was removed; §5.6 already carried yesterday's decline |
+| `FEATURE_CHECKLIST.md` | WhatsApp line struck through as superseded by the email delivery, its box checked; payment-links line struck through with the decline reason |
+| `PPN_EVOLUTION.md` | MEDIUM table: WhatsApp row → "Invoice Email Delivery (replaces WhatsApp), ✅ Nov 2026"; payment links row → ❌ Declined |
+| untouched on purpose | `TECHNICAL_SPECIFICATION.md`, `STRUCTURE.md`, `INTERVIEW_QA.md` (their Midtrans references are the subscription flow, which did not change), `DEPLOYMENT_CHECKLIST*.md` (release-scoped snapshots), `ARCHITECTURE_ASSESSMENT.md` |
+
+### Verification
+
+- **`php artisan test` (PHP 8.5): 1,376 tests / 4,754 assertions, 0 failures** (173s).
+- **Full PHPUnit on PHP 8.2 (`/opt/lampp/bin/php -d memory_limit=2048M vendor/bin/phpunit`): OK (1,376 tests, 4,754 assertions)** (2m50s).
+- Delta over the 1,356 recorded on 2026-11-05 is **+20 net test methods**:
+  +7 invoice email/print (`SalesControllerTest`), +8 net Klikpajak contract
+  tests (11 added, 3 rewritten/renamed), +4 return re-journal, +1 plan-gate
+  `invoice_email`. The 21 payment-link tests were added and removed inside
+  this same pass, so they net to zero.
+- **Live DB re-checked:** tenant 3 `tax_jurisdiction = 'ID'`; `plans.features`
+  has neither `payment_links` nor `invoice_email` (migration pending on deploy).
+- `public/build` untouched: this pass changed Blade, PHP and lang files only.
+
+**Still open (carried from yesterday):** composer advisories and the
+Laravel ≥12.60 upgrade decision (the vendor deprecation patch reverts on
+the next `composer install`); returns have no PPN/PPh entry UI; the Phase 2
+deploy runbook (`php artisan migrate` + a worker on `tax-submissions`);
+pipeline PPh zeros and the `submitBatch`/cancel UI; the first live Mekari
+Klikpajak call (needs registered credentials + an active Mekari
+subscription) and the first live subscription Midtrans call. **New and
+not actioned:** §5.5 is declined and fully reverted, so any tenant asking
+for online invoice payment needs that decision revisited first.
+
+---
+
 ## 2026-11-05 — Converted Sales Finally Reach the Journal (`finalizeConvertedSale()` Mirrors `createSale()` for Both Conversion Paths, and the `pending` Dead End Goes with It), e-Faktur Phase 2 (Direct DJP Submission via the Mekari Klikpajak PJAP — Contract, Two Queued Jobs, Five Idempotency Layers, Enterprise Gate: built to `docs/ROADMAP.md` §Phase 2 with seven deliberate deviations, each recorded here), and the "What would you like to explore?" Grid Caught Up with Every Sidebar Page (5 entries, en/id parity restored, two regression guards, and one assertion that was reading its own tutorial text), Closed Out with Two Conversion Edge Tests, the Mekari Klikpajak Subscription Disclosure, and Every `docs/` File Checked for Stale Claims)
 
 This entry closes the one item yesterday's pass left open, ships the

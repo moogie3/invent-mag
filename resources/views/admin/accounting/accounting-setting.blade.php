@@ -22,7 +22,15 @@
                             <div
                                 class="@if ((auth()->user()->system_settings['navigation_type'] ?? 'sidebar') === 'navbar') col-9 @else col-12 col-md-9 @endif d-flex flex-column">
                                 <div class="card-body">
-                                    <form action="{{ route('admin.setting.accounting.update') }}" method="POST">
+                                    {{-- id + the button's form attribute keep the submit
+                                         association while the footer sits OUTSIDE the form,
+                                         exactly as settings.blade.php and currency-edit.blade.php
+                                         place it: inside the form the footer was the form's
+                                         :last-child, so the last .settings-section lost its
+                                         ":last-child { border-bottom: none }" exemption and drew
+                                         a hairline right above the footer's own border-top - the
+                                         double line above Save. --}}
+                                    <form id="accountingSettingsForm" action="{{ route('admin.setting.accounting.update') }}" method="POST">
                                         @csrf
                                         <!-- Reset COA Section -->
                                         <div class="settings-section mb-5">
@@ -222,13 +230,14 @@
                                                 </div>
                                             </div>
                                         </div>
-                                        <div class="card-footer bg-transparent mt-auto">
-                                            <div class="btn-list justify-content-end">
-                                                <button type="submit"
-                                                    class="btn btn-primary">{{ __('messages.save_settings') }}</button>
-                                            </div>
-                                        </div>
                                     </form>
+                                </div>
+                                <div class="card-footer bg-transparent mt-auto">
+                                    <div class="btn-list justify-content-end">
+                                        <button type="submit"
+                                            form="accountingSettingsForm"
+                                            class="btn btn-primary">{{ __('messages.save_settings') }}</button>
+                                    </div>
                                 </div>
                             </div>
                         </div>

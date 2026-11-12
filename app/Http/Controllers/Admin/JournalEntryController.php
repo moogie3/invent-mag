@@ -153,6 +153,24 @@ class JournalEntryController extends Controller
     }
 
     /**
+     * Unpost a posted journal entry back to draft.
+     */
+    public function unpost(Request $request, JournalEntry $journalEntry)
+    {
+        try {
+            $entry = $this->manualJournalService->unpost($journalEntry);
+
+            return redirect()->route('admin.accounting.journal-entries.show', $entry)
+                ->with('success', 'Journal entry unposted and returned to draft.');
+        } catch (\Exception $e) {
+            Log::error('Failed to unpost journal entry: '.$e->getMessage());
+
+            return redirect()->back()
+                ->with('error', 'Error unposting journal entry: '.$e->getMessage());
+        }
+    }
+
+    /**
      * Void a journal entry.
      */
     public function void(Request $request, JournalEntry $journalEntry)

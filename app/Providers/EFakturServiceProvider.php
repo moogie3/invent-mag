@@ -17,16 +17,18 @@ class EFakturServiceProvider extends ServiceProvider
         $this->app->bind(PjapInterface::class, function ($app) {
             $tenant = $app->make('currentTenant');
 
+            // Mekari HMAC credentials (developers.mekari.com): the tenant's
+            // klikpajak_api_key column holds the Client ID (HMAC username),
+            // klikpajak_secret the Client Secret (signing key).
             $useSandbox = $tenant->klikpajak_use_sandbox ?? true;
-            $baseUrl    = $useSandbox
-                ? config('services.klikpajak.sandbox_url', 'https://api-sandbox.klikpajak.id')
-                : config('services.klikpajak.production_url', 'https://api.klikpajak.id');
+            $baseUrl = $useSandbox
+                ? config('services.klikpajak.sandbox_url', 'https://sandbox-api.mekari.com/v2/klikpajak')
+                : config('services.klikpajak.production_url', 'https://api.mekari.com/v2/klikpajak');
 
             return new KlikpajakService([
-                'base_url'   => $baseUrl,
-                'api_key'    => $tenant->klikpajak_api_key ?? '',
-                'api_secret' => $tenant->klikpajak_secret ?? '',
-                'npwp'       => $tenant->npwp ?? '',
+                'base_url' => $baseUrl,
+                'client_id' => $tenant->klikpajak_api_key ?? '',
+                'client_secret' => $tenant->klikpajak_secret ?? '',
             ]);
         });
     }

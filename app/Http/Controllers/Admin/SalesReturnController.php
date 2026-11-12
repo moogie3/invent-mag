@@ -82,7 +82,14 @@ class SalesReturnController extends Controller
         $statusClass = SalesReturnHelper::getStatusClass($salesReturn->status);
         $statusText = SalesReturnHelper::getStatusText($salesReturn->status);
 
-        return view('admin.sales-returns.show', compact('salesReturn', 'statusClass', 'statusText'));
+        // What this return reverses in the ledger, derived by the same code
+        // path the journal uses, so the screen cannot disagree with the GL.
+        $taxReversal = $this->salesReturnService->deriveReversal(
+            $salesReturn->sale,
+            (float) $salesReturn->total_amount,
+        );
+
+        return view('admin.sales-returns.show', compact('salesReturn', 'statusClass', 'statusText', 'taxReversal'));
     }
 
     public function edit(SalesReturn $salesReturn)
@@ -92,6 +99,25 @@ class SalesReturnController extends Controller
         $isCompletedOrCanceled = in_array($salesReturn->status, ['Completed', 'Canceled']);
 
         return view('admin.sales-returns.edit', compact('salesReturn', 'sales', 'isCompletedOrCanceled'));
+    }
+
+    /**
+     * The proportional tax reversal a return against this sale will book,
+     * as JSON for the create/edit form's live preview. It calls
+     * deriveReversal(), the same code path the journal and the show page
+     * use, so the preview cannot disagree with what gets posted.
+     */
+    public function deriveReversal(Request $request)
+    {
+        $sale = Sales::whereKey($request->integer('sale_id'))
+            ->where('tenant_id', app('currentTenant')->id)
+            ->first();
+
+        abort_unless($sale, 404);
+
+        $total = max(0, (float) $request->query('total', 0));
+
+        return response()->json($this->salesReturnService->deriveReversal($sale, $total));
     }
 
     public function getSalesItems(Sales $sale, Request $request)
@@ -144,9 +170,41 @@ class SalesReturnController extends Controller
     public function bulkComplete(Request $request)
     {
         $ids = $request->input('ids');
-        $this->salesReturnService->bulkCompleteSalesReturns($ids);
+        $counts = $this->salesReturnService->bulkCompleteSalesReturns($ids);
 
-        return response()->json(['success' => true, 'message' => 'Selected sales returns have been marked as completed.']);
+        return response()->json([
+            'success' => true,
+            'message' => $this->bulkCompleteMessage($counts, 'sales return'),
+            'counts' => $counts,
+        ]);
+    }
+
+    /**
+     * Turn the service's per-row counts into one sentence for the result
+     * toast. Canceled rows are reported as skipped, never as failures: the
+     * batch succeeded for every row it could complete.
+     *
+     * @param  array{completed: int, already_completed: int, skipped: int}  $counts
+     */
+    private function bulkCompleteMessage(array $counts, string $noun): string
+    {
+        $parts = [];
+
+        if ($counts['completed'] > 0) {
+            $parts[] = $counts['completed'].' '.$noun.($counts['completed'] > 1 ? 's' : '').' marked as completed';
+        }
+        if ($counts['already_completed'] > 0) {
+            $parts[] = $counts['already_completed'].' '.$noun.($counts['already_completed'] > 1 ? 's' : '').' already completed';
+        }
+        if ($counts['skipped'] > 0) {
+            $parts[] = $counts['skipped'].' '.$noun.($counts['skipped'] > 1 ? 's' : '').' skipped: canceled returns cannot be completed';
+        }
+
+        if ($parts === []) {
+            return 'No '.$noun.'s were selected.';
+        }
+
+        return implode('. ', $parts).'.';
     }
 
     public function bulkCancel(Request $request)

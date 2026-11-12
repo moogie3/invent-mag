@@ -10,6 +10,7 @@ use App\Models\ProductWarehouse;
 use App\Models\Purchase;
 use App\Models\PurchaseReturn;
 use App\Models\PurchaseReturnItem;
+use App\Models\Transaction;
 use App\Models\User;
 use App\Services\AccountingService;
 use App\Services\PurchaseReturnService;
@@ -202,6 +203,143 @@ class PurchaseReturnServiceTest extends TestCase
         );
     }
 
+    /**
+     * The figure the return SCREENS show must equal the figure the journal
+     * BOOKS. Both read deriveReversal(), so this locks the single source of
+     * truth. The case the audit flagged is a PARTIAL return: it needs its
+     * own proportional treatment, not a copy of the parent's figures.
+     */
+    public function test_the_derived_reversal_equals_what_the_journal_books_on_a_partial_return()
+    {
+        $this->tenant->update(['tax_jurisdiction' => 'ID']);
+
+        $ppnMasukanAccount = Account::create([
+            'name' => 'PPN Masukan '.$this->tenant->id,
+            'code' => '1160-'.$this->tenant->id,
+            'type' => 'asset',
+            'tenant_id' => $this->tenant->id,
+        ]);
+        $pphPayableAccount = Account::create([
+            'name' => 'PPh Payable '.$this->tenant->id,
+            'code' => '2140-'.$this->tenant->id,
+            'type' => 'liability',
+            'tenant_id' => $this->tenant->id,
+        ]);
+        $this->tenant->update([
+            'accounting_settings' => array_merge(
+                $this->tenant->accounting_settings ?? [],
+                [
+                    'ppn_masukan_account_id' => $ppnMasukanAccount->id,
+                    'pph_payable_account_id' => $pphPayableAccount->id,
+                ]
+            ),
+        ]);
+
+        // Create a stock record so the service can decrement
+        ProductWarehouse::firstOrCreate(
+            [
+                'product_id' => $this->product->id,
+                'warehouse_id' => $this->purchase->warehouse_id,
+                'tenant_id' => $this->purchase->tenant_id,
+            ],
+            ['quantity' => 50]
+        );
+
+        POItem::firstOrCreate(
+            ['po_id' => $this->purchase->id, 'product_id' => $this->product->id],
+            [
+                'quantity' => 10,
+                'remaining_quantity' => 10,
+                'price' => 100,
+                'total' => 1000,
+                'discount' => 0,
+                'discount_type' => 'fixed',
+            ]
+        );
+
+        // Original purchase journal as PurchaseService posts it:
+        // subtotal 200 + PPN 11% (22) - PPh 2% (4) -> AP 218.
+        $settings = $this->tenant->accounting_settings;
+        $originalJournal = JournalEntry::create([
+            'date' => now(),
+            'description' => 'Purchase '.$this->purchase->invoice,
+            'sourceable_id' => $this->purchase->id,
+            'sourceable_type' => Purchase::class,
+            'status' => 'posted',
+        ]);
+        $originalJournal->transactions()->create([
+            'account_id' => $settings['inventory_account_id'],
+            'type' => 'debit',
+            'amount' => 200.0,
+        ]);
+        $originalJournal->transactions()->create([
+            'account_id' => $ppnMasukanAccount->id,
+            'type' => 'debit',
+            'amount' => 22.0,
+        ]);
+        $originalJournal->transactions()->create([
+            'account_id' => $pphPayableAccount->id,
+            'type' => 'credit',
+            'amount' => 4.0,
+        ]);
+        $originalJournal->transactions()->create([
+            'account_id' => $settings['accounts_payable_account_id'],
+            'type' => 'credit',
+            'amount' => 218.0,
+        ]);
+
+        $captured = [];
+        $this->accountingServiceMock
+            ->shouldReceive('createJournalEntry')
+            ->once()
+            ->with(
+                Mockery::any(),
+                Mockery::any(),
+                Mockery::on(function ($transactions) use (&$captured) {
+                    $captured[] = $transactions;
+
+                    return true;
+                }),
+                Mockery::any()
+            );
+
+        // PARTIAL return: 1 of 2 units = 100 of the 200 net, so ratio 0.5.
+        $returnData = [
+            'purchase_id' => $this->purchase->id,
+            'return_date' => now()->format('Y-m-d'),
+            'reason' => 'Partial return',
+            'status' => 'Completed',
+            'items' => json_encode([
+                ['product_id' => $this->product->id, 'returned_quantity' => 1, 'price' => 100, 'return_price' => 100],
+            ]),
+        ];
+
+        $purchaseReturn = $this->purchaseReturnService->createPurchaseReturn($returnData);
+
+        $this->assertEquals(100, $purchaseReturn->total_amount);
+        $this->assertCount(1, $captured);
+
+        // What the return SCREENS display...
+        $derived = $this->purchaseReturnService->deriveReversal($this->purchase, (float) $purchaseReturn->total_amount);
+
+        $this->assertEquals(0.5, $derived['ratio']);
+        $this->assertEquals(11.0, $derived['ppn']);
+        $this->assertEquals(2.0, $derived['pph']);
+        $this->assertEquals(100.0, $derived['purchase']);
+
+        // ...must equal what the journal actually BOOKED.
+        $transactions = $captured[0];
+        $bookedPpn = $this->sumTransactions($transactions, $ppnMasukanAccount->name, 'credit');
+        $bookedPph = $this->sumTransactions($transactions, $pphPayableAccount->name, 'debit');
+
+        $this->assertEquals($bookedPpn, $derived['ppn'], 'Screen PPN must equal booked PPN');
+        $this->assertEquals($bookedPph, $derived['pph'], 'Screen PPh must equal booked PPh');
+
+        // And both are genuinely proportional, not the parent's full figures.
+        $this->assertEquals(11.0, $bookedPpn);
+        $this->assertEquals(2.0, $bookedPph);
+    }
+
     private function sumTransactions(array $transactions, string $accountName, string $type): float
     {
         $sum = 0.0;
@@ -284,9 +422,14 @@ class PurchaseReturnServiceTest extends TestCase
     #[Test]
     public function test_it_can_update_a_purchase_return()
     {
+        // Pinned to a live status: the test below hand-simulates a return
+        // that is holding stock, and a Canceled row holds none (the F2 rule
+        // skips its stock halves on edit). The factory's random status made
+        // this test fail on roughly one run in three.
         $purchaseReturn = PurchaseReturn::factory()->create([
             'purchase_id' => $this->purchase->id,
             'total_amount' => 100,
+            'status' => 'Pending',
         ]);
         PurchaseReturnItem::factory()->create([
             'purchase_return_id' => $purchaseReturn->id,
@@ -308,6 +451,11 @@ class PurchaseReturnServiceTest extends TestCase
                 ['product_id' => $this->product->id, 'returned_quantity' => 3, 'price' => 50],
             ]),
         ];
+
+        // Re-journaling runs on update: nothing to reverse (factory return
+        // never posted), then one fresh entry is handed to the accounting
+        // service.
+        $this->accountingServiceMock->shouldReceive('createJournalEntry')->once();
 
         $updatedReturn = $this->purchaseReturnService->updatePurchaseReturn($purchaseReturn, $updateData);
 
@@ -337,6 +485,409 @@ class PurchaseReturnServiceTest extends TestCase
         ];
 
         $this->purchaseReturnService->updatePurchaseReturn($purchaseReturn, $updateData);
+    }
+
+    #[Test]
+    public function test_update_re_journals_the_gl_with_the_new_total()
+    {
+        $service = app(PurchaseReturnService::class);
+
+        // Create: 2 × 50 = 100 → one posted entry, net AP debit 100.
+        $purchaseReturn = $service->createPurchaseReturn([
+            'purchase_id' => $this->purchase->id,
+            'return_date' => now()->format('Y-m-d'),
+            'reason' => 'Damaged in transit',
+            'status' => 'Pending',
+            'items' => json_encode([
+                ['product_id' => $this->product->id, 'returned_quantity' => 2, 'price' => 50],
+            ]),
+        ]);
+
+        $originalEntries = JournalEntry::where('sourceable_type', PurchaseReturn::class)
+            ->where('sourceable_id', $purchaseReturn->id)
+            ->where('status', JournalEntry::STATUS_POSTED)
+            ->get();
+        $this->assertCount(1, $originalEntries);
+        $this->assertEqualsWithDelta(100.0, $this->netAccountsPayableEffect($purchaseReturn), 0.001);
+
+        // Edit: 3 × 50 = 150 → old entry reversed, new entry posted for 150.
+        $service->updatePurchaseReturn($purchaseReturn, [
+            'return_date' => now()->format('Y-m-d'),
+            'reason' => 'Damaged in transit (recount)',
+            'status' => 'Pending',
+            'items' => json_encode([
+                ['product_id' => $this->product->id, 'returned_quantity' => 3, 'price' => 50],
+            ]),
+        ]);
+
+        $entries = JournalEntry::where('sourceable_type', PurchaseReturn::class)
+            ->where('sourceable_id', $purchaseReturn->id)
+            ->get();
+        $this->assertCount(2, $entries);
+
+        $original = $entries->firstWhere('id', $originalEntries->first()->id);
+        $this->assertTrue($original->hasDependentEntries(), 'The pre-edit entry must be reversed.');
+
+        $this->assertEqualsWithDelta(150.0, $this->netAccountsPayableEffect($purchaseReturn), 0.001);
+    }
+
+    #[Test]
+    public function test_a_second_edit_does_not_reverse_the_same_entry_twice()
+    {
+        $service = app(PurchaseReturnService::class);
+
+        $purchaseReturn = $service->createPurchaseReturn([
+            'purchase_id' => $this->purchase->id,
+            'return_date' => now()->format('Y-m-d'),
+            'status' => 'Pending',
+            'items' => json_encode([
+                ['product_id' => $this->product->id, 'returned_quantity' => 2, 'price' => 50],
+            ]),
+        ]);
+        $firstEntryId = JournalEntry::where('sourceable_type', PurchaseReturn::class)
+            ->where('sourceable_id', $purchaseReturn->id)
+            ->value('id');
+
+        // Two successive edits. reverseJournalEntry() leaves the original
+        // 'posted', so without the hasDependentEntries() guard the second
+        // edit would reverse entry #1 a second time.
+        $purchaseReturn = $service->updatePurchaseReturn($purchaseReturn, [
+            'return_date' => now()->format('Y-m-d'),
+            'status' => 'Pending',
+            'items' => json_encode([
+                ['product_id' => $this->product->id, 'returned_quantity' => 3, 'price' => 50],
+            ]),
+        ]);
+        $purchaseReturn = $service->updatePurchaseReturn($purchaseReturn, [
+            'return_date' => now()->format('Y-m-d'),
+            'status' => 'Pending',
+            'items' => json_encode([
+                ['product_id' => $this->product->id, 'returned_quantity' => 4, 'price' => 50],
+            ]),
+        ]);
+
+        $this->assertEquals(
+            1,
+            JournalEntry::where('reversed_entry_id', $firstEntryId)->count(),
+            'The first entry must be reversed exactly once.'
+        );
+        $this->assertCount(
+            3,
+            JournalEntry::where('sourceable_type', PurchaseReturn::class)
+                ->where('sourceable_id', $purchaseReturn->id)
+                ->get()
+        );
+        $this->assertEqualsWithDelta(200.0, $this->netAccountsPayableEffect($purchaseReturn), 0.001);
+    }
+
+    #[Test]
+    public function test_editing_status_to_canceled_reverses_without_reposting_then_reopens()
+    {
+        $service = app(PurchaseReturnService::class);
+        $stockBefore = $this->product->fresh()->stock_quantity;
+
+        $purchaseReturn = $service->createPurchaseReturn([
+            'purchase_id' => $this->purchase->id,
+            'return_date' => now()->format('Y-m-d'),
+            'status' => 'Pending',
+            'items' => json_encode([
+                ['product_id' => $this->product->id, 'returned_quantity' => 2, 'price' => 50],
+            ]),
+        ]);
+        $firstEntryId = JournalEntry::where('sourceable_type', PurchaseReturn::class)
+            ->where('sourceable_id', $purchaseReturn->id)
+            ->value('id');
+        $this->assertEquals($stockBefore - 2, $this->product->fresh()->stock_quantity);
+
+        // Canceled via the edit form: reversal only, no fresh entry. A
+        // canceled return must not leave a live GL impact behind.
+        $purchaseReturn = $service->updatePurchaseReturn($purchaseReturn, [
+            'return_date' => now()->format('Y-m-d'),
+            'status' => 'Canceled',
+            'items' => json_encode([
+                ['product_id' => $this->product->id, 'returned_quantity' => 1, 'price' => 50],
+            ]),
+        ]);
+
+        $this->assertTrue(JournalEntry::findOrFail($firstEntryId)->hasDependentEntries());
+        $this->assertEqualsWithDelta(0.0, $this->netAccountsPayableEffect($purchaseReturn), 0.001);
+        // The GL was not the only half: the old 2 units go back to the
+        // warehouse and the new 1 is NOT taken out, so a Canceled return
+        // holds no stock. The stock half used to decrement unconditionally
+        // and left the canceled row holding 1.
+        $this->assertEquals($stockBefore, $this->product->fresh()->stock_quantity);
+
+        // Re-open it: the already-reversed entry stays reversed exactly once
+        // and a new entry carries the reopened total.
+        $purchaseReturn = $service->updatePurchaseReturn($purchaseReturn, [
+            'return_date' => now()->format('Y-m-d'),
+            'status' => 'Pending',
+            'items' => json_encode([
+                ['product_id' => $this->product->id, 'returned_quantity' => 1, 'price' => 70],
+            ]),
+        ]);
+
+        $this->assertEquals(1, JournalEntry::where('reversed_entry_id', $firstEntryId)->count());
+        $this->assertEqualsWithDelta(70.0, $this->netAccountsPayableEffect($purchaseReturn), 0.001);
+        // The reopened return takes exactly its new 1 unit out: nothing is
+        // handed back for the canceled state it came from, because a canceled
+        // return held nothing to hand back.
+        $this->assertEquals($stockBefore - 1, $this->product->fresh()->stock_quantity);
+    }
+
+    #[Test]
+    public function test_delete_after_edit_does_not_reverse_the_original_entry_twice()
+    {
+        $service = app(PurchaseReturnService::class);
+
+        $purchaseReturn = $service->createPurchaseReturn([
+            'purchase_id' => $this->purchase->id,
+            'return_date' => now()->format('Y-m-d'),
+            'status' => 'Pending',
+            'items' => json_encode([
+                ['product_id' => $this->product->id, 'returned_quantity' => 2, 'price' => 50],
+            ]),
+        ]);
+        $firstEntryId = JournalEntry::where('sourceable_type', PurchaseReturn::class)
+            ->where('sourceable_id', $purchaseReturn->id)
+            ->value('id');
+
+        $purchaseReturn = $service->updatePurchaseReturn($purchaseReturn, [
+            'return_date' => now()->format('Y-m-d'),
+            'status' => 'Pending',
+            'items' => json_encode([
+                ['product_id' => $this->product->id, 'returned_quantity' => 3, 'price' => 50],
+            ]),
+        ]);
+
+        $service->deletePurchaseReturn($purchaseReturn);
+
+        // Delete may only reverse the live post-edit entry; reversing the
+        // already-reversed original again would swing the GL negative.
+        $this->assertEquals(
+            1,
+            JournalEntry::where('reversed_entry_id', $firstEntryId)->count()
+        );
+        $this->assertEqualsWithDelta(0.0, $this->netAccountsPayableEffect($purchaseReturn), 0.001);
+    }
+
+    #[Test]
+    public function test_canceling_a_pending_return_reverts_the_stock_and_the_journal()
+    {
+        $service = app(PurchaseReturnService::class);
+        $stockBefore = $this->product->fresh()->stock_quantity;
+
+        // Created Pending: create already took the goods out of stock and
+        // posted the journal, so cancel from Pending owes both of them back.
+        $purchaseReturn = $service->createPurchaseReturn([
+            'purchase_id' => $this->purchase->id,
+            'return_date' => now()->format('Y-m-d'),
+            'status' => 'Pending',
+            'items' => json_encode([
+                ['product_id' => $this->product->id, 'returned_quantity' => 2, 'price' => 50],
+            ]),
+        ]);
+        $entryId = JournalEntry::where('sourceable_type', PurchaseReturn::class)
+            ->where('sourceable_id', $purchaseReturn->id)
+            ->value('id');
+
+        $this->assertEquals($stockBefore - 2, $this->product->fresh()->stock_quantity);
+        $this->assertEqualsWithDelta(100.0, $this->netAccountsPayableEffect($purchaseReturn), 0.001);
+
+        $service->cancelPurchaseReturn($purchaseReturn);
+
+        // Same contract as cancelSalesReturn() and as deletePurchaseReturn(),
+        // which already reverted unconditionally: the Completed-only gate left
+        // the stock moved and a live GL entry behind for a canceled return.
+        $this->assertEquals('Canceled', $purchaseReturn->fresh()->status);
+        $this->assertEquals($stockBefore, $this->product->fresh()->stock_quantity);
+        $this->assertEqualsWithDelta(0.0, $this->netAccountsPayableEffect($purchaseReturn), 0.001);
+        $this->assertTrue(JournalEntry::findOrFail($entryId)->hasDependentEntries());
+        $this->assertEquals(
+            1,
+            JournalEntry::where('reversed_entry_id', $entryId)->count(),
+            'The entry must be reversed exactly once.'
+        );
+
+        // A canceled return must not keep counting toward the parent
+        // purchase's returned quantity either.
+        $this->purchase->refresh();
+        $this->assertNotEquals('Returned', $this->purchase->status);
+
+        // Canceling twice is a no-op, not a second revert.
+        $service->cancelPurchaseReturn($purchaseReturn);
+        $this->assertEquals($stockBefore, $this->product->fresh()->stock_quantity);
+        $this->assertEquals(1, JournalEntry::where('reversed_entry_id', $entryId)->count());
+        $this->assertEqualsWithDelta(0.0, $this->netAccountsPayableEffect($purchaseReturn), 0.001);
+    }
+
+    public function test_completing_a_canceled_return_is_refused()
+    {
+        $service = app(PurchaseReturnService::class);
+        $stockBefore = $this->product->fresh()->stock_quantity;
+
+        $purchaseReturn = $service->createPurchaseReturn([
+            'purchase_id' => $this->purchase->id,
+            'return_date' => now()->format('Y-m-d'),
+            'status' => 'Pending',
+            'items' => json_encode([
+                ['product_id' => $this->product->id, 'returned_quantity' => 2, 'price' => 50],
+            ]),
+        ]);
+        $service->cancelPurchaseReturn($purchaseReturn);
+        $purchaseReturn = $purchaseReturn->fresh();
+
+        // The bulk action skips canceled rows, so this throw only ever fires
+        // for a direct caller. Without it a Canceled row could be flipped to
+        // Completed and read as a live return while holding no stock and no
+        // journal entry.
+        $refused = false;
+        try {
+            $service->completePurchaseReturn($purchaseReturn);
+        } catch (\Exception $e) {
+            $refused = true;
+            $this->assertStringContainsString('canceled', $e->getMessage());
+        }
+
+        $this->assertTrue($refused, 'completePurchaseReturn() must refuse a canceled return.');
+        $this->assertEquals('Canceled', $purchaseReturn->fresh()->status);
+        $this->assertEquals($stockBefore, $this->product->fresh()->stock_quantity);
+        $this->assertEqualsWithDelta(0.0, $this->netAccountsPayableEffect($purchaseReturn), 0.001);
+    }
+
+    public function test_bulk_complete_skips_canceled_rows_and_counts_them()
+    {
+        $service = app(PurchaseReturnService::class);
+
+        $live = $service->createPurchaseReturn([
+            'purchase_id' => $this->purchase->id,
+            'return_date' => now()->format('Y-m-d'),
+            'status' => 'Pending',
+            'items' => json_encode([
+                ['product_id' => $this->product->id, 'returned_quantity' => 1, 'price' => 50],
+            ]),
+        ]);
+        $canceled = $service->createPurchaseReturn([
+            'purchase_id' => $this->purchase->id,
+            'return_date' => now()->format('Y-m-d'),
+            'status' => 'Pending',
+            'items' => json_encode([
+                ['product_id' => $this->product->id, 'returned_quantity' => 1, 'price' => 50],
+            ]),
+        ]);
+        $service->cancelPurchaseReturn($canceled);
+
+        $counts = $service->bulkCompletePurchaseReturns([$live->id, $canceled->id]);
+
+        $this->assertEquals(1, $counts['completed']);
+        $this->assertEquals(1, $counts['skipped']);
+        $this->assertEquals('Completed', $live->fresh()->status);
+        $this->assertEquals('Canceled', $canceled->fresh()->status);
+    }
+
+    public function test_deleting_a_canceled_return_does_not_move_the_stock_a_second_time()
+    {
+        $service = app(PurchaseReturnService::class);
+        $stockBefore = $this->product->fresh()->stock_quantity;
+
+        $purchaseReturn = $service->createPurchaseReturn([
+            'purchase_id' => $this->purchase->id,
+            'return_date' => now()->format('Y-m-d'),
+            'status' => 'Pending',
+            'items' => json_encode([
+                ['product_id' => $this->product->id, 'returned_quantity' => 2, 'price' => 50],
+            ]),
+        ]);
+        $service->cancelPurchaseReturn($purchaseReturn);
+        $this->assertEquals($stockBefore, $this->product->fresh()->stock_quantity);
+
+        $service->deletePurchaseReturn($purchaseReturn->fresh());
+
+        // cancel already handed the 2 units back, so delete of a Canceled row
+        // is a pure row removal: the unconditional revert it used to do put
+        // the same goods back into the warehouse a second time.
+        $this->assertDatabaseMissing('purchase_returns', ['id' => $purchaseReturn->id]);
+        $this->assertEquals($stockBefore, $this->product->fresh()->stock_quantity);
+    }
+
+    public function test_creating_a_return_born_canceled_moves_no_stock_and_posts_no_journal()
+    {
+        $service = app(PurchaseReturnService::class);
+        $stockBefore = $this->product->fresh()->stock_quantity;
+
+        $purchaseReturn = $service->createPurchaseReturn([
+            'purchase_id' => $this->purchase->id,
+            'return_date' => now()->format('Y-m-d'),
+            'status' => 'Canceled',
+            'items' => json_encode([
+                ['product_id' => $this->product->id, 'returned_quantity' => 2, 'price' => 50],
+            ]),
+        ]);
+
+        // Mirror of the sales-side backstop: a Canceled birth moves no stock
+        // and books nothing, so cancel never owes a revert for it.
+        $this->assertEquals('Canceled', $purchaseReturn->status);
+        $this->assertEquals($stockBefore, $this->product->fresh()->stock_quantity);
+        $this->assertEquals(
+            0,
+            JournalEntry::where('sourceable_type', PurchaseReturn::class)
+                ->where('sourceable_id', $purchaseReturn->id)
+                ->count()
+        );
+    }
+
+    public function test_delete_recalculates_the_purchase_from_live_returns_only()
+    {
+        $service = app(PurchaseReturnService::class);
+
+        $live = $service->createPurchaseReturn([
+            'purchase_id' => $this->purchase->id,
+            'return_date' => now()->format('Y-m-d'),
+            'status' => 'Pending',
+            'items' => json_encode([
+                ['product_id' => $this->product->id, 'returned_quantity' => 2, 'price' => 50],
+            ]),
+        ]);
+        $canceled = $service->createPurchaseReturn([
+            'purchase_id' => $this->purchase->id,
+            'return_date' => now()->format('Y-m-d'),
+            'status' => 'Pending',
+            'items' => json_encode([
+                ['product_id' => $this->product->id, 'returned_quantity' => 1, 'price' => 50],
+            ]),
+        ]);
+        $service->cancelPurchaseReturn($canceled);
+
+        $this->assertEquals('Returned', $this->purchase->fresh()->status);
+
+        $service->deletePurchaseReturn($live->fresh());
+
+        // The canceled sibling still holds its rows for history but has given
+        // its stock back, so it cannot keep the purchase Returned: the
+        // delete-path recount is live-only, like create, edit and cancel.
+        $this->purchase->refresh();
+        $this->assertEquals('Unpaid', $this->purchase->status);
+    }
+
+    /**
+     * Net debit/credit effect on Accounts Payable from everything journaled
+     * against this return: the sourceable entries plus their reversals
+     * (reversal entries carry no sourceable themselves).
+     */
+    private function netAccountsPayableEffect(PurchaseReturn $purchaseReturn): float
+    {
+        $entryIds = JournalEntry::where('sourceable_type', PurchaseReturn::class)
+            ->where('sourceable_id', $purchaseReturn->id)
+            ->pluck('id');
+
+        $reversalIds = JournalEntry::whereIn('reversed_entry_id', $entryIds)->pluck('id');
+
+        $accountsPayableId = $this->tenant->accounting_settings['accounts_payable_account_id'];
+
+        return (float) Transaction::whereIn('journal_entry_id', $entryIds->merge($reversalIds))
+            ->where('account_id', $accountsPayableId)
+            ->selectRaw("SUM(CASE WHEN type = 'debit' THEN amount ELSE -amount END) AS net")
+            ->value('net');
     }
 
     protected function tearDown(): void

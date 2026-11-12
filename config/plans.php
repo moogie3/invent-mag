@@ -37,6 +37,9 @@ return [
         'audit_compliance' => 'Audit Trail & Compliance Logging',
         'bank_reconciliation' => 'Bank Reconciliation',
         'shopee_import' => 'Shopee Product Import (XLSX)',
+
+        // Available on ALL tiers (declared 2026-11-05, no route gate):
+        'invoice_email' => 'Invoice Email Delivery',
     ],
 
     // NOTE: Feature gating is enforced at the ROUTE layer via the

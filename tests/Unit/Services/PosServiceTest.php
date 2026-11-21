@@ -6,11 +6,14 @@ use App\Models\Account;
 use App\Models\Categories;
 use App\Models\Customer;
 use App\Models\JournalEntry;
+use App\Models\POItem;
 use App\Models\Product;
+use App\Models\Purchase;
 use App\Models\Sales;
 use App\Models\SalesItem;
 use App\Models\Supplier;
 use App\Models\Tax;
+use App\Models\Tenant;
 use App\Models\Unit;
 use App\Models\User;
 use App\Services\PosService;
@@ -40,6 +43,41 @@ class PosServiceTest extends TestCase
             'is_active' => true,
             'is_default' => true,
         ]);
+    }
+
+    /**
+     * exists:customers,id is raw SQL and ignores the tenant scope, so the
+     * id of another tenant's customer passed validation and was written
+     * straight onto the POS sale. The customer must be re-resolved through
+     * the scoped model before the sale is written. A walk-in sale carries
+     * no customer at all, and that stays legal.
+     */
+    #[Test]
+    public function it_refuses_a_customer_owned_by_another_tenant()
+    {
+        $otherTenant = Tenant::create(['name' => 'Other Tenant', 'domain' => 'other.localhost']);
+        $foreignCustomer = Customer::factory()->create(['tenant_id' => $otherTenant->id]);
+        $product = Product::factory()->withStock(10)->create(['selling_price' => 100]);
+
+        $refused = null;
+        try {
+            $this->posService->createSale([
+                'products' => json_encode([['id' => $product->id, 'quantity' => 2, 'price' => 100]]),
+                'customer_id' => $foreignCustomer->id,
+                'transaction_date' => now()->format('Y-m-d'),
+                'payment_method' => 'Cash',
+                'discount_total' => 0,
+                'discount_total_type' => 'fixed',
+                'tax_id' => Tax::first()->id,
+                'amount_received' => 300,
+            ]);
+        } catch (\Exception $e) {
+            $refused = $e->getMessage();
+        }
+
+        $this->assertNotNull($refused, 'A customer owned by another tenant must be refused.');
+        $this->assertDatabaseMissing('sales', ['customer_id' => $foreignCustomer->id]);
+        $this->assertEquals(10, $product->fresh()->stock_quantity, 'A refused sale must not move stock.');
     }
 
     #[Test]
@@ -135,6 +173,93 @@ class PosServiceTest extends TestCase
 
         $this->assertEquals(8, $product1->fresh()->stock_quantity);
         $this->assertEquals(17, $product2->fresh()->stock_quantity);
+    }
+
+    /**
+     * The point of sale has to charge the goods it sells, or profit is
+     * overstated on every transaction and the Inventory account keeps
+     * claiming stock that walked out the door. The costing code used to read
+     * $product->cost_price, a column that has never existed on products, so
+     * the value was always null and every POS sale booked Rp 0 of cost while
+     * still decrementing the warehouse.
+     */
+    #[Test]
+    public function it_charges_the_goods_against_inventory_and_consumes_the_batch()
+    {
+        $user = User::factory()->create();
+        Auth::login($user);
+
+        $customer = Customer::factory()->create();
+        // products.price is what the goods cost us; selling_price is what the
+        // cashier charges. The two must not be confused: the POS payload's
+        // "price" is the selling price, the product column's price is cost.
+        $product = Product::factory()->withStock(10)->create([
+            'price' => 40,
+            'selling_price' => 100,
+        ]);
+
+        // A clean purchase, so the batch is exactly what it claims: 10
+        // units at 40 with nothing coming off the order. The line's total
+        // has to agree with its price, because the Inventory debit was
+        // built from that total, and costing now reads the same figure.
+        $purchase = Purchase::factory()->create([
+            'discount_total' => 0,
+            'discount_total_type' => 'fixed',
+            'tax_type' => 'none',
+            'tax_rate' => 0,
+            'total_tax' => 0,
+            'ppn_enabled' => false,
+            'ppn_amount' => 0,
+        ]);
+
+        $batch = POItem::factory()->forPurchase($purchase)->create([
+            'product_id' => $product->id,
+            'price' => 40,
+            'quantity' => 10,
+            'remaining_quantity' => 10,
+            'discount' => 0,
+            'discount_type' => 'fixed',
+            'total' => 400,
+            'expiry_date' => now()->addMonth(),
+        ]);
+
+        $sale = $this->posService->createSale([
+            'products' => json_encode([['id' => $product->id, 'quantity' => 3, 'price' => 100]]),
+            'customer_id' => $customer->id,
+            'transaction_date' => now()->format('Y-m-d'),
+            'payment_method' => 'Cash',
+            'discount_total' => 0,
+            'discount_total_type' => 'fixed',
+            'tax_id' => null,
+            'amount_received' => 300,
+            'change_amount' => 0,
+        ]);
+
+        // The batch was consumed the way a regular sale consumes it.
+        $this->assertEquals(7, $batch->fresh()->remaining_quantity);
+
+        $settings = app('currentTenant')->accounting_settings;
+        $entry = JournalEntry::where('sourceable_type', Sales::class)
+            ->where('sourceable_id', $sale->id)
+            ->where('description', 'POS Sale Invoice #'.$sale->invoice)
+            ->first();
+
+        $this->assertNotNull($entry, 'The POS sale posted no invoice entry.');
+
+        $cogs = $entry->transactions->firstWhere('account_id', $settings['cost_of_goods_sold_account_id']);
+        $inventory = $entry->transactions->firstWhere('account_id', $settings['inventory_account_id']);
+
+        // 3 units at the batch cost of 40 each.
+        $this->assertEqualsWithDelta(120, (float) $cogs->amount, 0.005, 'POS booked no cost of goods.');
+        $this->assertEqualsWithDelta(120, (float) $inventory->amount, 0.005, 'Inventory was never credited.');
+        $this->assertSame('credit', $inventory->type);
+
+        // And the entry still balances.
+        $this->assertEqualsWithDelta(
+            0,
+            $entry->transactions->sum(fn ($t) => $t->type === 'debit' ? $t->amount : -$t->amount),
+            0.005
+        );
     }
 
     #[Test]
@@ -433,5 +558,187 @@ class PosServiceTest extends TestCase
         $this->assertEquals(222.0, $saleJournal->transactions->where('account_id', $arAccount->id)->where('type', 'debit')->first()?->amount);
         $this->assertEquals(200.0, $saleJournal->transactions->where('account_id', $revenueAccount->id)->where('type', 'credit')->first()?->amount);
         $this->assertEquals(22.0, $saleJournal->transactions->where('account_id', $ppnKeluaranAccount->id)->where('type', 'credit')->first()?->amount);
+    }
+
+    /**
+     * The PPN snapshot is what every downstream PPN reader consults: the
+     * e-Faktur guard (isPpn), Tenant::unissuedCount() and the sales-return
+     * PPN reversal all read ppn_enabled/ppn_amount off the row. The POS sale
+     * books the PPN Keluaran split in its journal but never wrote the
+     * snapshot, so a POS PPN sale could not issue a Faktur Pajak and a
+     * return of it reversed none of the VAT the original sale had credited.
+     */
+    #[Test]
+    public function it_stores_the_ppn_snapshot_on_an_indonesian_ppn_pos_sale(): void
+    {
+        $this->tenant->update(['tax_jurisdiction' => 'ID']);
+
+        $ppnTax = Tax::create([
+            'name' => 'PPN 11%',
+            'rate' => 11,
+            'type' => 'exclusive',
+            'is_active' => true,
+            'is_default' => true,
+            'is_ppn' => true,
+        ]);
+
+        $user = User::factory()->create();
+        Auth::login($user);
+
+        $customer = Customer::factory()->create();
+        $product = Product::factory()->withStock(10)->create(['selling_price' => 100]);
+
+        $sale = $this->posService->createSale([
+            'products' => json_encode([['id' => $product->id, 'quantity' => 2, 'price' => 100]]),
+            'customer_id' => $customer->id,
+            'transaction_date' => now()->format('Y-m-d'),
+            'payment_method' => 'Cash',
+            'discount_total' => 0,
+            'discount_total_type' => 'fixed',
+            'tax_id' => $ppnTax->id,
+            'amount_received' => 300,
+        ]);
+
+        $fresh = $sale->fresh();
+
+        // Subtotal 200 + PPN 11% = 222, of which 22 is output VAT.
+        $this->assertTrue((bool) $fresh->ppn_enabled, 'POS PPN sale must flag ppn_enabled, or e-Faktur refuses it.');
+        $this->assertEquals(11.0, (float) $fresh->ppn_rate);
+        $this->assertEquals(22.0, (float) $fresh->ppn_amount);
+        $this->assertTrue($fresh->isPpn());
+    }
+
+    /**
+     * Accounts Receivable must net to zero over the sale's own entries: the
+     * invoice books it, the cash payment clears it and the withholding entry
+     * moves the withheld slice to PPh Receivable. Booking the invoice NET of
+     * PPh (the stored total is already net) while the withholding entry
+     * credits AR again deducted the withheld amount twice and left AR
+     * sitting at minus the PPh. The regular sale path books AR at the gross
+     * (total + pph) for exactly this reason; POS must match it.
+     */
+    #[Test]
+    public function pos_pph_sale_does_not_leave_accounts_receivable_negative(): void
+    {
+        $this->tenant->update(['tax_jurisdiction' => 'ID']);
+
+        $pphTax = Tax::create([
+            'name' => 'PPh 23',
+            'rate' => 2,
+            'type' => 'exclusive',
+            'is_active' => true,
+            'is_pph' => true,
+        ]);
+
+        $pphReceivableAccount = Account::create([
+            'name' => 'PPh Receivable '.$this->tenant->id,
+            'code' => '1170-'.$this->tenant->id,
+            'type' => 'asset',
+            'tenant_id' => $this->tenant->id,
+        ]);
+        $this->tenant->update([
+            'accounting_settings' => array_merge(
+                $this->tenant->accounting_settings ?? [],
+                ['pph_receivable_account_id' => $pphReceivableAccount->id]
+            ),
+        ]);
+
+        $user = User::factory()->create();
+        Auth::login($user);
+
+        $customer = Customer::factory()->create();
+        $product = Product::factory()->withStock(10)->create(['selling_price' => 100]);
+
+        $sale = $this->posService->createSale([
+            'products' => json_encode([['id' => $product->id, 'quantity' => 2, 'price' => 100]]),
+            'customer_id' => $customer->id,
+            'transaction_date' => now()->format('Y-m-d'),
+            'payment_method' => 'Cash',
+            'discount_total' => 0,
+            'discount_total_type' => 'fixed',
+            'tax_id' => Tax::first()->id,
+            'pph_tax_id' => $pphTax->id,
+            'amount_received' => 300,
+        ]);
+
+        // Subtotal 200 + tax 10% = 220 gross, PPh 2% of 200 = 4, net 216.
+        $fresh = $sale->fresh();
+        $this->assertEquals(216.0, (float) $fresh->total);
+        $this->assertEquals(4.0, (float) $fresh->pph_amount);
+
+        $settings = $this->tenant->accounting_settings;
+        $arId = $settings['accounts_receivable_account_id'];
+
+        $arNet = (float) JournalEntry::where('sourceable_type', Sales::class)
+            ->where('sourceable_id', $sale->id)
+            ->get()
+            ->flatMap(fn ($entry) => $entry->transactions)
+            ->filter(fn ($tx) => $tx->account_id === $arId)
+            ->sum(fn ($tx) => $tx->type === 'debit' ? $tx->amount : -$tx->amount);
+
+        $this->assertEqualsWithDelta(
+            0,
+            $arNet,
+            0.005,
+            'The invoice, the cash payment and the PPh withholding must clear AR to zero, not leave it at minus the withheld 4.'
+        );
+    }
+
+    /**
+     * The cash check runs before PPh is subtracted, so it demands the gross
+     * (220) while the customer actually owes the net (216) - the exact figure
+     * the POS cart sends as grandTotalInput. Paying precisely what the
+     * receipt says must not be rejected as "not enough money".
+     */
+    #[Test]
+    public function it_accepts_a_cash_payment_equal_to_the_pph_net_total(): void
+    {
+        $this->tenant->update(['tax_jurisdiction' => 'ID']);
+
+        $pphTax = Tax::create([
+            'name' => 'PPh 23',
+            'rate' => 2,
+            'type' => 'exclusive',
+            'is_active' => true,
+            'is_pph' => true,
+        ]);
+
+        $pphReceivableAccount = Account::create([
+            'name' => 'PPh Receivable '.$this->tenant->id,
+            'code' => '1170-'.$this->tenant->id,
+            'type' => 'asset',
+            'tenant_id' => $this->tenant->id,
+        ]);
+        $this->tenant->update([
+            'accounting_settings' => array_merge(
+                $this->tenant->accounting_settings ?? [],
+                ['pph_receivable_account_id' => $pphReceivableAccount->id]
+            ),
+        ]);
+
+        $user = User::factory()->create();
+        Auth::login($user);
+
+        $customer = Customer::factory()->create();
+        $product = Product::factory()->withStock(10)->create(['selling_price' => 100]);
+
+        // Subtotal 200 + tax 10% = 220 gross, PPh 2% = 4, so the customer
+        // hands over 216 and the tax office withholds 4 of it.
+        $sale = $this->posService->createSale([
+            'products' => json_encode([['id' => $product->id, 'quantity' => 2, 'price' => 100]]),
+            'customer_id' => $customer->id,
+            'transaction_date' => now()->format('Y-m-d'),
+            'payment_method' => 'Cash',
+            'discount_total' => 0,
+            'discount_total_type' => 'fixed',
+            'tax_id' => Tax::first()->id,
+            'pph_tax_id' => $pphTax->id,
+            'amount_received' => 216,
+        ]);
+
+        $fresh = $sale->fresh();
+        $this->assertEquals(216.0, (float) $fresh->total);
+        $this->assertEquals(216.0, (float) $fresh->amount_received);
+        $this->assertEquals(0.0, (float) $fresh->change_amount);
     }
 }

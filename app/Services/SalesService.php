@@ -19,6 +19,7 @@ use App\Models\Tax;
 use App\Models\User;
 use App\Models\Warehouse; // Added
 use App\Services\Concerns\BuildsListSearch;
+use App\Services\Concerns\CostsLineItems;
 use Carbon\Carbon;
 use Dompdf\Dompdf;
 use Illuminate\Support\Facades\Auth;
@@ -27,6 +28,7 @@ use Illuminate\Support\Facades\DB;
 class SalesService
 {
     use BuildsListSearch;
+    use CostsLineItems;
 
     protected AccountingService $accountingService;
 
@@ -162,7 +164,7 @@ class SalesService
                 }
             });
         $taxes = Tax::active()->orderBy('name')->get();
-        $defaultTax = Tax::default()->first() ?? $taxes->first();
+        $defaultTax = Tax::effectiveDefault();
         $sales = [];
         $items = [];
 
@@ -178,6 +180,19 @@ class SalesService
 
     public function applyCustomerCredit(Sales $sale, float $creditAmount): void
     {
+        // A credit can only ever absorb what this invoice still owes. The cap
+        // is read from the stored total, not from $sale->balance, because this
+        // runs right after Sales::create() while the items collection is still
+        // empty and that accessor would compute a wrong figure. total_paid is
+        // an accessor over payments (there is no such column), so it is read
+        // through the model rather than the raw attribute bag.
+        $openBalance = max(
+            0,
+            (float) $sale->getRawOriginal('total') - (float) $sale->total_paid - (float) $sale->customer_credit_used
+        );
+
+        $creditAmount = min(max(0, $creditAmount), $openBalance);
+
         $availableCredits = $this->getActiveCustomerCredits($sale->customer_id);
 
         $remainingCredit = $creditAmount;
@@ -243,7 +258,7 @@ class SalesService
         $sales = Sales::with(['salesItems', 'customer', 'payments', 'warehouse', 'salesReturns.items'])->find($id);
         $customers = Customer::all();
         $taxes = Tax::active()->orderBy('name')->get();
-        $defaultTax = Tax::default()->first() ?? $taxes->first();
+        $defaultTax = Tax::effectiveDefault();
         $isPaid = $sales->status == 'Paid';
         $tax = $defaultTax;
 
@@ -266,7 +281,8 @@ class SalesService
             $sales->order_discount_type ?? 'fixed',
             $sales->tax_rate ?? 0,
             $sales->relationLoaded('salesReturns') ? $sales->salesReturns : collect(),
-            $sales->tax_type ?? 'exclusive'
+            $sales->tax_type ?? 'exclusive',
+            $sales->pph_rate ?? 0
         );
 
         $subtotal = $summary['subtotal'];
@@ -367,7 +383,7 @@ class SalesService
             $orderDiscountAmount = SalesHelper::calculateDiscount($subTotal, $orderDiscount, $orderDiscountType);
 
             $taxId = $data['tax_id'] ?? null;
-            $tax = $taxId ? Tax::find($taxId) : (Tax::default()->first() ?? Tax::active()->first());
+            $tax = $taxId ? Tax::find($taxId) : Tax::effectiveDefault();
             $taxRate = $tax ? (float) $tax->rate : 0;
             $taxType = $tax ? $tax->type : 'none';
             $taxableAmount = $subTotal - $orderDiscountAmount;
@@ -393,6 +409,12 @@ class SalesService
 
             $invoice = $data['invoice'] ?? $this->generateInvoiceNumber();
 
+            // exists:customers,id is raw SQL with no tenant filter, so it
+            // would accept another tenant's customer id. Re-resolve through
+            // the scoped model: a cross-tenant id reads back as null and is
+            // refused before the sale is written.
+            $customer = Customer::findOrFail($data['customer_id']);
+
             $warehouseId = $data['warehouse_id'] ?? Product::getMainWarehouseId();
             if (! $warehouseId) {
                 throw new \Exception('No warehouse specified and no main warehouse configured.');
@@ -400,7 +422,7 @@ class SalesService
 
             $sale = Sales::create([
                 'invoice' => $invoice,
-                'customer_id' => $data['customer_id'],
+                'customer_id' => $customer->id,
                 'user_id' => Auth::id(),
                 'warehouse_id' => $warehouseId,
                 'order_date' => $data['order_date'],
@@ -504,142 +526,223 @@ class SalesService
                     $stockRecords[$product->id]->decrement('quantity', $productData['quantity']);
                 }
 
-                $poItems = POItem::where('product_id', $product->id)
-                    ->where('remaining_quantity', '>', 0)
-                    ->orderBy('expiry_date', 'asc')
-                    ->orderBy('created_at', 'asc')
-                    ->get();
-
-                $quantityToDecrement = $productData['quantity'];
-                $itemCOGS = 0;
-
-                foreach ($poItems as $poItem) {
-                    if ($quantityToDecrement <= 0) {
-                        break;
-                    }
-
-                    $decrement = min($poItem->remaining_quantity, $quantityToDecrement);
-                    $itemCOGS += $decrement * $poItem->price;
-                    $poItem->decrement('remaining_quantity', $decrement);
-                    $quantityToDecrement -= $decrement;
-                }
-
-                if ($quantityToDecrement > 0) {
-                    $itemCOGS += $quantityToDecrement * $product->price;
-                }
-
-                $totalCostOfGoods += $itemCOGS;
+                $totalCostOfGoods += $this->costAndConsumeBatches(
+                    $product->id,
+                    $productData['quantity'],
+                    $product->price
+                );
             }
 
-            $accountingSettings = app('currentTenant')->accounting_settings ?? [];
+            $this->postSaleJournalEntry($sale, $totalCostOfGoods);
 
-            $salesRevenueAccount = Account::find($accountingSettings['sales_revenue_account_id'] ?? null);
-            $accountsReceivableAccount = Account::find($accountingSettings['accounts_receivable_account_id'] ?? null);
-            $costOfGoodsSoldAccount = Account::find($accountingSettings['cost_of_goods_sold_account_id'] ?? null);
-            $inventoryAccount = Account::find($accountingSettings['inventory_account_id'] ?? null);
-
-            if (! $salesRevenueAccount || ! $accountsReceivableAccount || ! $costOfGoodsSoldAccount || ! $inventoryAccount) {
-                throw new \Exception('One or more required accounts (Sales Revenue, AR, COGS, Inventory) not found. Please check Accounting Settings.');
-            }
-
-            $salesRevenueAccountName = $salesRevenueAccount->name;
-            $accountsReceivableAccountName = $accountsReceivableAccount->name;
-            $costOfGoodsSoldAccountName = $costOfGoodsSoldAccount->name;
-            $inventoryAccountName = $inventoryAccount->name;
-
-            // When PPh withholding applies, the separate withholding entry
-            // below (Dr PPh Receivable / Cr AR) already removes the withheld
-            // amount from AR — so THIS entry must book AR at the GROSS the
-            // customer owes BEFORE withholding (grandTotal + pphAmount).
-            // Booking AR at grandTotal here and crediting AR again in the
-            // withholding entry deducted the PPh twice, and the revenue
-            // credit below (grandTotal − ppn) was likewise understated by
-            // the withheld amount in the exclusive-tax case.
-            $arBase = $grandTotal + $pphAmount;
-
-            $transactions = [
-                ['account_name' => $accountsReceivableAccountName, 'type' => 'debit', 'amount' => $arBase],
-                ['account_name' => $salesRevenueAccountName, 'type' => 'credit', 'amount' => $arBase],
-                ['account_name' => $costOfGoodsSoldAccountName, 'type' => 'debit', 'amount' => $totalCostOfGoods],
-                ['account_name' => $inventoryAccountName, 'type' => 'credit', 'amount' => $totalCostOfGoods],
-            ];
-
-            // VAT split — Indonesian PPN sales book the output VAT to the PPN
-            // Keluaran liability at sale creation instead of inflating revenue:
-            //   Dr AR (gross) / Cr Revenue (net of VAT) / Cr PPN Keluaran (ppn)
-            // This matches standard VAT accounting and avoids AR being overstated
-            // by the VAT amount when a Faktur Pajak is issued later. If the PPN
-            // Keluaran account is not configured we gracefully fall back to booking
-            // the full gross to revenue (legacy behaviour).
-            if (app('currentTenant')->isIndonesian() && ($tax?->is_ppn ?? false) && $taxAmount > 0) {
-                $ppnKeluaranAccountId = $accountingSettings['ppn_keluaran_account_id'] ?? null;
-                $ppnKeluaranAccount = $ppnKeluaranAccountId ? Account::find($ppnKeluaranAccountId) : null;
-
-                if ($ppnKeluaranAccount) {
-                    $transactions[] = ['account_name' => $ppnKeluaranAccount->name, 'type' => 'credit', 'amount' => $taxAmount];
-
-                    foreach ($transactions as &$transaction) {
-                        if ($transaction['account_name'] === $salesRevenueAccountName && $transaction['type'] === 'credit') {
-                            $transaction['amount'] = round($arBase - $taxAmount, 2);
-                        }
-                    }
-                    unset($transaction);
-                }
-            }
-
-            $this->accountingService->createJournalEntry(
-                "Sale Invoice #{$sale->invoice}",
-                Carbon::parse($data['order_date']),
-                $transactions,
-                $sale
-            );
-
-            // Create PPh journal entry if PPh is applied
-            if ($pphAmount > 0 && app('currentTenant')->isIndonesian() && ($pphTax?->is_pph ?? false)) {
-                $pphReceivableAccountId = $accountingSettings['pph_receivable_account_id'] ?? null;
-                if ($pphReceivableAccountId) {
-                    $pphReceivableAccount = Account::find($pphReceivableAccountId);
-                    if ($pphReceivableAccount) {
-                        $pphTransactions = [
-                            ['account_name' => $pphReceivableAccount->name, 'type' => 'debit', 'amount' => $pphAmount],
-                            ['account_name' => $accountsReceivableAccountName, 'type' => 'credit', 'amount' => $pphAmount],
-                        ];
-                        $this->accountingService->createJournalEntry(
-                            "PPh Withholding on Sale #{$sale->invoice}",
-                            Carbon::parse($data['order_date']),
-                            $pphTransactions,
-                            $sale
-                        );
-                    }
-                }
-            }
-
-            // Create customer credit usage journal entry if credit was applied
-            $creditUsed = $sale->customer_credit_used;
-            if ($creditUsed > 0) {
-                // Check if a customer credit account exists, otherwise use a discount account
-                $customerCreditAccountId = $accountingSettings['customer_credit_account_id'] ?? null;
-
-                if ($customerCreditAccountId) {
-                    $customerCreditAccount = Account::find($customerCreditAccountId);
-                    if ($customerCreditAccount) {
-                        $creditTransactions = [
-                            ['account_name' => $customerCreditAccount->name, 'type' => 'debit', 'amount' => $creditUsed],
-                            ['account_name' => $accountsReceivableAccountName, 'type' => 'credit', 'amount' => $creditUsed],
-                        ];
-
-                        $this->accountingService->createJournalEntry(
-                            "Credit Applied to Invoice #{$sale->invoice}",
-                            Carbon::parse($data['order_date']),
-                            $creditTransactions,
-                            $sale
-                        );
-                    }
-                }
-            }
+            // No journal entry is booked when customer credit is applied to
+            // this invoice. The credit already sits in Accounts Receivable as
+            // a credit from the return, so consuming it only moves the balance
+            // between documents. Booking a second entry here would double-count
+            // the reduction.
 
             return $sale;
         });
+    }
+
+    /**
+     * Post this sale's journal: Dr AR / Cr Revenue (with the PPN Keluaran
+     * split), Dr COGS / Cr Inventory, plus the PPh withholding entry.
+     *
+     * Every figure is read back off the sale instead of being passed in, because
+     * createSale(), finalizeConvertedSale() and updateSale() all persist the same
+     * snapshot (total, ppn_*, pph_*) before booking, so the ledger can only ever
+     * describe the document the row now carries. AR is booked at the GROSS the
+     * customer owes before withholding: the stored total is already net of PPh and
+     * the withholding entry credits AR a second time, so booking total alone
+     * deducted the withheld amount twice.
+     *
+     * @param  float  $totalCostOfGoods  FIFO cost of the current lines, recomputed
+     *                                   by the caller whenever those lines change.
+     */
+    private function postSaleJournalEntry(Sales $sale, float $totalCostOfGoods): void
+    {
+        $accountingSettings = app('currentTenant')->accounting_settings ?? [];
+
+        $salesRevenueAccount = Account::find($accountingSettings['sales_revenue_account_id'] ?? null);
+        $accountsReceivableAccount = Account::find($accountingSettings['accounts_receivable_account_id'] ?? null);
+        $costOfGoodsSoldAccount = Account::find($accountingSettings['cost_of_goods_sold_account_id'] ?? null);
+        $inventoryAccount = Account::find($accountingSettings['inventory_account_id'] ?? null);
+
+        if (! $salesRevenueAccount || ! $accountsReceivableAccount || ! $costOfGoodsSoldAccount || ! $inventoryAccount) {
+            throw new \Exception('One or more required accounts (Sales Revenue, AR, COGS, Inventory) not found. Please check Accounting Settings.');
+        }
+
+        $salesRevenueAccountName = $salesRevenueAccount->name;
+        $accountsReceivableAccountName = $accountsReceivableAccount->name;
+        $costOfGoodsSoldAccountName = $costOfGoodsSoldAccount->name;
+        $inventoryAccountName = $inventoryAccount->name;
+
+        $pphAmount = (float) $sale->pph_amount;
+        $ppnAmount = (float) $sale->ppn_amount;
+        $arBase = (float) $sale->total + $pphAmount;
+
+        $transactions = [
+            ['account_name' => $accountsReceivableAccountName, 'type' => 'debit', 'amount' => $arBase],
+            ['account_name' => $salesRevenueAccountName, 'type' => 'credit', 'amount' => $arBase],
+            ['account_name' => $costOfGoodsSoldAccountName, 'type' => 'debit', 'amount' => $totalCostOfGoods],
+            ['account_name' => $inventoryAccountName, 'type' => 'credit', 'amount' => $totalCostOfGoods],
+        ];
+
+        // Indonesian PPN sales book the output VAT to the PPN Keluaran
+        // liability instead of inflating revenue:
+        //   Dr AR (gross) / Cr Revenue (net of VAT) / Cr PPN Keluaran (ppn)
+        // This matches standard VAT accounting and avoids AR being overstated
+        // by the VAT amount when a Faktur Pajak is issued later. If the PPN
+        // Keluaran account is not configured we fall back to booking the full
+        // gross to revenue (legacy behaviour). ppn_enabled already carries the
+        // isIndonesian() && is_ppn gate every writer applies.
+        if ($sale->ppn_enabled && $ppnAmount > 0) {
+            $ppnKeluaranAccountId = $accountingSettings['ppn_keluaran_account_id'] ?? null;
+            $ppnKeluaranAccount = $ppnKeluaranAccountId ? Account::find($ppnKeluaranAccountId) : null;
+
+            if ($ppnKeluaranAccount) {
+                $transactions[] = ['account_name' => $ppnKeluaranAccount->name, 'type' => 'credit', 'amount' => $ppnAmount];
+
+                foreach ($transactions as &$transaction) {
+                    if ($transaction['account_name'] === $salesRevenueAccountName && $transaction['type'] === 'credit') {
+                        $transaction['amount'] = round($arBase - $ppnAmount, 2);
+                    }
+                }
+                unset($transaction);
+            }
+        }
+
+        $this->accountingService->createJournalEntry(
+            "Sale Invoice #{$sale->invoice}",
+            Carbon::parse($sale->order_date),
+            $transactions,
+            $sale
+        );
+
+        // PPh withholding entry. pph_enabled already carries the
+        // isIndonesian() && is_pph gate applied at conversion and edit time.
+        if ($pphAmount > 0 && $sale->pph_enabled) {
+            $pphReceivableAccountId = $accountingSettings['pph_receivable_account_id'] ?? null;
+
+            if ($pphReceivableAccountId) {
+                $pphReceivableAccount = Account::find($pphReceivableAccountId);
+
+                if ($pphReceivableAccount) {
+                    $this->accountingService->createJournalEntry(
+                        "PPh Withholding on Sale #{$sale->invoice}",
+                        Carbon::parse($sale->order_date),
+                        [
+                            ['account_name' => $pphReceivableAccount->name, 'type' => 'debit', 'amount' => $pphAmount],
+                            ['account_name' => $accountsReceivableAccountName, 'type' => 'credit', 'amount' => $pphAmount],
+                        ],
+                        $sale
+                    );
+                }
+            }
+        }
+
+        // No journal entry is booked when customer credit is applied to this
+        // invoice. The credit already sits in Accounts Receivable as a credit
+        // from the return, so consuming it only moves the balance between
+        // documents. Booking a second entry here would double-count the
+        // reduction.
+    }
+
+    /**
+     * Rebook the cash receipt half of a POS sale's ledger after an edit.
+     *
+     * A POS sale posts two entries against the sale: the invoice (Dr AR /
+     * Cr Revenue, with COGS and the PPh entry where they apply) and the cash
+     * receipt that settles it (Dr Cash / Cr AR). reverseSaleJournalEntries()
+     * reverses both, but postSaleJournalEntry() only rebuilds the invoice,
+     * so without this the edited sale would say the customer still owes what
+     * they already handed over the counter.
+     *
+     * The recorded payment follows the edited total because a POS sale
+     * settles on the spot: lower the sale and the payment drops with it,
+     * leaving the excess as change; raise it and the difference is collected
+     * before the save, so what was received tracks the new total. A sale
+     * with no payment row at all has no cash to rebook, and the status block
+     * that follows settles it through addPayment() if the form marks it paid.
+     */
+    private function settlePosCashReceipt(Sales $sale): void
+    {
+        $total = round((float) $sale->total, 2);
+        $payments = $sale->payments()->orderBy('id')->get();
+
+        if ($payments->count() === 1) {
+            $payment = $payments->first();
+
+            if (round((float) $payment->amount, 2) !== $total) {
+                $payment->update(['amount' => $total]);
+                $sale->load('payments');
+            }
+
+            if ($sale->amount_received !== null) {
+                $received = (float) $sale->amount_received;
+                $sale->update($received < $total
+                    ? ['amount_received' => $total, 'change_amount' => 0]
+                    : ['change_amount' => round($received - $total, 2)]);
+            }
+        }
+
+        $cashAmount = round((float) $sale->payments()->sum('amount'), 2);
+
+        if ($cashAmount <= 0) {
+            return;
+        }
+
+        $accountingSettings = app('currentTenant')->accounting_settings ?? [];
+
+        if (! isset($accountingSettings['cash_account_id'], $accountingSettings['accounts_receivable_account_id'])) {
+            return;
+        }
+
+        $cashAccount = Account::find($accountingSettings['cash_account_id']);
+        $accountsReceivableAccount = Account::find($accountingSettings['accounts_receivable_account_id']);
+
+        if (! $cashAccount || ! $accountsReceivableAccount) {
+            return;
+        }
+
+        $this->accountingService->createJournalEntry(
+            "POS Payment for Invoice #{$sale->invoice}",
+            Carbon::parse($sale->order_date),
+            [
+                ['account_name' => $cashAccount->name, 'type' => 'debit', 'amount' => $cashAmount],
+                ['account_name' => $accountsReceivableAccount->name, 'type' => 'credit', 'amount' => $cashAmount],
+            ],
+            $sale
+        );
+    }
+
+    /**
+     * Reverse this sale's posted journal entries, the edit path's first half.
+     *
+     * Entries a prior reversal already netted out are skipped:
+     * reverseJournalEntry() leaves the original's status 'posted' (the link
+     * lives on the reversal's reversed_entry_id), so without the guard a second
+     * edit, or an edit followed by delete, would reverse the same entry twice
+     * and corrupt the GL in the opposite direction. Reversal entries never
+     * appear here either: reverseJournalEntry() posts them with no source
+     * document, so the sourceable query below cannot see them.
+     *
+     * Mirrors SalesReturnService::reverseSalesReturnJournalEntries(), which the
+     * return's edit, delete and cancel all route through: one guard, three
+     * callers, so one path cannot be left holding a weaker test.
+     */
+    private function reverseSaleJournalEntries(Sales $sale, string $note): void
+    {
+        $journalEntries = JournalEntry::where('sourceable_type', get_class($sale))
+            ->where('sourceable_id', $sale->id)
+            ->get();
+
+        foreach ($journalEntries as $entry) {
+            if ($entry->canBeReversed() && ! $entry->hasDependentEntries()) {
+                $this->accountingService->reverseJournalEntry($entry, $note);
+            }
+        }
     }
 
     /**
@@ -719,138 +822,19 @@ class SalesService
                 $stockRecords[$product->id]->decrement('quantity', $line['quantity']);
             }
 
-            // FIFO batch costing — identical to createSale()
-            $poItems = POItem::where('product_id', $product->id)
-                ->where('remaining_quantity', '>', 0)
-                ->orderBy('expiry_date', 'asc')
-                ->orderBy('created_at', 'asc')
-                ->get();
-
-            $quantityToDecrement = $line['quantity'];
-            $itemCOGS = 0;
-
-            foreach ($poItems as $poItem) {
-                if ($quantityToDecrement <= 0) {
-                    break;
-                }
-
-                $decrement = min($poItem->remaining_quantity, $quantityToDecrement);
-                $itemCOGS += $decrement * $poItem->price;
-                $poItem->decrement('remaining_quantity', $decrement);
-                $quantityToDecrement -= $decrement;
-            }
-
-            if ($quantityToDecrement > 0) {
-                $itemCOGS += $quantityToDecrement * $product->price;
-            }
-
-            $totalCostOfGoods += $itemCOGS;
+            $totalCostOfGoods += $this->costAndConsumeBatches(
+                $product->id,
+                $line['quantity'],
+                $product->price
+            );
         }
 
-        $accountingSettings = app('currentTenant')->accounting_settings ?? [];
+        $this->postSaleJournalEntry($sale, $totalCostOfGoods);
 
-        $salesRevenueAccount = Account::find($accountingSettings['sales_revenue_account_id'] ?? null);
-        $accountsReceivableAccount = Account::find($accountingSettings['accounts_receivable_account_id'] ?? null);
-        $costOfGoodsSoldAccount = Account::find($accountingSettings['cost_of_goods_sold_account_id'] ?? null);
-        $inventoryAccount = Account::find($accountingSettings['inventory_account_id'] ?? null);
-
-        if (! $salesRevenueAccount || ! $accountsReceivableAccount || ! $costOfGoodsSoldAccount || ! $inventoryAccount) {
-            throw new \Exception('One or more required accounts (Sales Revenue, AR, COGS, Inventory) not found. Please check Accounting Settings.');
-        }
-
-        $salesRevenueAccountName = $salesRevenueAccount->name;
-        $accountsReceivableAccountName = $accountsReceivableAccount->name;
-        $costOfGoodsSoldAccountName = $costOfGoodsSoldAccount->name;
-        $inventoryAccountName = $inventoryAccount->name;
-
-        // The sale's stored total is already net of PPh (both conversion
-        // paths copy the same max(0, total - pphAmount) arithmetic their
-        // source document computed), so AR must be booked at the GROSS the
-        // customer owes BEFORE withholding — same rule as createSale().
-        $pphAmount = (float) $sale->pph_amount;
-        $ppnAmount = (float) $sale->ppn_amount;
-        $arBase = (float) $sale->total + $pphAmount;
-
-        $transactions = [
-            ['account_name' => $accountsReceivableAccountName, 'type' => 'debit', 'amount' => $arBase],
-            ['account_name' => $salesRevenueAccountName, 'type' => 'credit', 'amount' => $arBase],
-            ['account_name' => $costOfGoodsSoldAccountName, 'type' => 'debit', 'amount' => $totalCostOfGoods],
-            ['account_name' => $inventoryAccountName, 'type' => 'credit', 'amount' => $totalCostOfGoods],
-        ];
-
-        // VAT split — Indonesian PPN sales book the output VAT to the PPN
-        // Keluaran liability instead of inflating revenue (same fallback as
-        // createSale(): without the account configured the gross stays in
-        // revenue). ppn_enabled already carries the isIndonesian() && is_ppn
-        // gate applied at conversion time.
-        if ($sale->ppn_enabled && $ppnAmount > 0) {
-            $ppnKeluaranAccount = ! empty($accountingSettings['ppn_keluaran_account_id'])
-                ? Account::find($accountingSettings['ppn_keluaran_account_id'])
-                : null;
-
-            if ($ppnKeluaranAccount) {
-                $transactions[] = ['account_name' => $ppnKeluaranAccount->name, 'type' => 'credit', 'amount' => $ppnAmount];
-
-                foreach ($transactions as &$transaction) {
-                    if ($transaction['account_name'] === $salesRevenueAccountName && $transaction['type'] === 'credit') {
-                        $transaction['amount'] = round($arBase - $ppnAmount, 2);
-                    }
-                }
-                unset($transaction);
-            }
-        }
-
-        $this->accountingService->createJournalEntry(
-            "Sale Invoice #{$sale->invoice}",
-            Carbon::parse($sale->order_date),
-            $transactions,
-            $sale
-        );
-
-        // PPh withholding entry — pph_enabled already carries the
-        // isIndonesian() && is_pph gate applied at conversion time.
-        if ($pphAmount > 0 && $sale->pph_enabled) {
-            $pphReceivableAccountId = $accountingSettings['pph_receivable_account_id'] ?? null;
-
-            if ($pphReceivableAccountId) {
-                $pphReceivableAccount = Account::find($pphReceivableAccountId);
-
-                if ($pphReceivableAccount) {
-                    $this->accountingService->createJournalEntry(
-                        "PPh Withholding on Sale #{$sale->invoice}",
-                        Carbon::parse($sale->order_date),
-                        [
-                            ['account_name' => $pphReceivableAccount->name, 'type' => 'debit', 'amount' => $pphAmount],
-                            ['account_name' => $accountsReceivableAccountName, 'type' => 'credit', 'amount' => $pphAmount],
-                        ],
-                        $sale
-                    );
-                }
-            }
-        }
-
-        // Credit usage entry — conversions never apply customer credit
-        // today, kept for exact parity with createSale().
-        $creditUsed = (float) $sale->customer_credit_used;
-        if ($creditUsed > 0) {
-            $customerCreditAccountId = $accountingSettings['customer_credit_account_id'] ?? null;
-
-            if ($customerCreditAccountId) {
-                $customerCreditAccount = Account::find($customerCreditAccountId);
-
-                if ($customerCreditAccount) {
-                    $this->accountingService->createJournalEntry(
-                        "Credit Applied to Invoice #{$sale->invoice}",
-                        Carbon::parse($sale->order_date),
-                        [
-                            ['account_name' => $customerCreditAccount->name, 'type' => 'debit', 'amount' => $creditUsed],
-                            ['account_name' => $accountsReceivableAccountName, 'type' => 'credit', 'amount' => $creditUsed],
-                        ],
-                        $sale
-                    );
-                }
-            }
-        }
+        // No journal entry is booked when customer credit is applied here
+        // either. Same reason as createSale(): the credit is already an
+        // Accounts Receivable credit from the return, so allocating it against
+        // this invoice needs no second entry.
     }
 
     public function updateSale(Sales $sale, array $data): Sales
@@ -904,7 +888,7 @@ class SalesService
             $orderDiscountAmount = SalesHelper::calculateDiscount($subTotal, $orderDiscount, $orderDiscountType);
 
             $taxId = $data['tax_id'] ?? null;
-            $tax = $taxId ? Tax::find($taxId) : (Tax::default()->first() ?? Tax::active()->first());
+            $tax = $taxId ? Tax::find($taxId) : Tax::effectiveDefault();
             $taxRate = $tax ? (float) $tax->rate : 0;
             $taxType = $tax ? $tax->type : 'none';
             $taxableAmount = $subTotal - $orderDiscountAmount;
@@ -927,8 +911,16 @@ class SalesService
             }
             $grandTotal = max(0, $grandTotal - $pphAmount);
 
+            // Same cross-tenant hole as createSale(): exists: is raw SQL
+            // with no tenant filter, so the update would repoint an existing
+            // sale at another tenant's customer. Re-resolve first. A
+            // walk-in POS sale posts no customer at all and stays customer
+            // less, which findOrFail on an empty id would have thrown on.
+            $customerId = $data['customer_id'] ?? $sale->customer_id;
+            $customer = $customerId ? Customer::findOrFail($customerId) : null;
+
             $sale->update([
-                'customer_id' => $data['customer_id'],
+                'customer_id' => $customer?->id,
                 'order_date' => $data['order_date'],
                 'due_date' => $data['due_date'],
                 'tax_id' => $tax?->id,
@@ -938,7 +930,10 @@ class SalesService
                 'total' => $grandTotal,
                 'order_discount' => $orderDiscount,
                 'order_discount_type' => $orderDiscountType,
-                'payment_type' => $data['payment_type'] ?? '-',
+                // The edit form disables this select on a paid sale, so a
+                // POS sale edited without the field keeps the method it was
+                // rung up with instead of dropping to a placeholder.
+                'payment_type' => $data['payment_type'] ?? $sale->payment_type ?? '-',
                 'notes' => $data['notes'] ?? $sale->notes,
                 'terms_conditions' => $data['terms_conditions'] ?? $sale->terms_conditions,
                 // PPN / e-Faktur fields — derived from selected tax's is_ppn flag.
@@ -953,6 +948,10 @@ class SalesService
                 'pph_amount' => app('currentTenant')->isIndonesian() && ($pphTax?->is_pph ?? false) ? $pphAmount : 0,
                 'pph_tax_id' => app('currentTenant')->isIndonesian() && ($pphTax?->is_pph ?? false) ? $pphTax?->id : null,
             ]);
+
+            // Costed as the lines are written, so the reposted entry below
+            // debits COGS for what the edited sale actually costs.
+            $totalCostOfGoods = 0;
 
             foreach ($products as $productData) {
                 $product = Product::where('id', $productData['product_id'])
@@ -985,29 +984,35 @@ class SalesService
 
                 $stockRecord->decrement('quantity', $productData['quantity']);
 
-                // Reduct from batch (FEFO)
-                $poItems = POItem::where('product_id', $product->id)
-                    ->where('remaining_quantity', '>', 0)
-                    ->orderBy('expiry_date', 'asc')
-                    ->get();
-                $quantityToDecrement = $productData['quantity'];
-                foreach ($poItems as $poItem) {
-                    if ($quantityToDecrement <= 0) {
-                        break;
-                    }
-                    $decrement = min($poItem->remaining_quantity, $quantityToDecrement);
-                    $poItem->decrement('remaining_quantity', $decrement);
-                    $quantityToDecrement -= $decrement;
-                }
+                // Costed the way creation does, so the reposted entry below
+                // debits COGS for what the edited sale actually costs.
+                $totalCostOfGoods += $this->costAndConsumeBatches(
+                    $product->id,
+                    $productData['quantity'],
+                    $product->price
+                );
             }
 
             $sale->refresh();
+
+            // The ledger still describes the document this sale used to be.
+            // Reverse what the previous version posted and post the current
+            // one, or every edit leaves revenue, receivables and VAT holding
+            // the old totals while the invoice shows the new ones. The guard
+            // inside skips entries an earlier edit already netted out, so a
+            // second edit cannot reverse the same entry twice.
+            $this->reverseSaleJournalEntries($sale, "Auto-reversal due to edited Sale #{$sale->invoice}");
+            $this->postSaleJournalEntry($sale, $totalCostOfGoods);
+
+            if ($sale->type === Sales::TYPE_POS) {
+                $this->settlePosCashReceipt($sale);
+            }
 
             if (isset($data['status']) && $data['status'] === 'Paid' && $sale->balance > 0) {
                 $this->addPayment($sale, [
                     'amount' => $sale->balance,
                     'payment_date' => now(),
-                    'payment_method' => $data['payment_type'] ?? 'Manual',
+                    'payment_method' => $data['payment_type'] ?? $sale->payment_type ?? 'Manual',
                     'notes' => 'Invoice manually marked as paid from edit page.',
                 ]);
             } else {
@@ -1132,16 +1137,14 @@ class SalesService
     public function deleteSale(Sales $sale): void
     {
         DB::transaction(function () use ($sale) {
-            // Reverse associated journal entries for accurate accounting
-            $journalEntries = JournalEntry::where('sourceable_type', get_class($sale))
-                ->where('sourceable_id', $sale->id)
-                ->get();
-
-            foreach ($journalEntries as $entry) {
-                if ($entry->status === JournalEntry::STATUS_POSTED && $entry->canBeReversed()) {
-                    $this->accountingService->reverseJournalEntry($entry, "Auto-reversal due to deleted Sale #{$sale->invoice}");
-                }
-            }
+            // One guarded reversal for every entry this sale owns, including
+            // the PPh withholding entry (it is sourceable to the sale too, so
+            // the separate PPh loop this used to run reversed it a SECOND time
+            // and left the ledger holding a stray minus the withholding
+            // amount). The guard also makes delete safe after an edit, which
+            // now reverses as well: without it an edit followed by a delete
+            // would reverse the original twice.
+            $this->reverseSaleJournalEntries($sale, "Auto-reversal due to deleted Sale #{$sale->invoice}");
 
             // Also reverse FakturPajak journal entries (PPN Keluaran)
             $fakturPajak = $sale->fakturPajak()->first();
@@ -1151,7 +1154,7 @@ class SalesService
                     ->get();
 
                 foreach ($fpJournalEntries as $entry) {
-                    if ($entry->status === JournalEntry::STATUS_POSTED && $entry->canBeReversed()) {
+                    if ($entry->canBeReversed() && ! $entry->hasDependentEntries()) {
                         $this->accountingService->reverseJournalEntry($entry, "Auto-reversal due to deleted Sale #{$sale->invoice} (Faktur Pajak {$fakturPajak->nsfp})");
                     }
                 }
@@ -1160,19 +1163,6 @@ class SalesService
                 NsfpPool::where('nsfp', $fakturPajak->nsfp)->update(['status' => 'cancelled']);
                 $fakturPajak->items()->delete();
                 $fakturPajak->delete();
-            }
-
-            // Reverse PPh journal entries
-            if ($sale->isPph() && $sale->pph_amount > 0) {
-                $pphJournalEntries = JournalEntry::where('sourceable_type', get_class($sale))
-                    ->where('sourceable_id', $sale->id)
-                    ->where('description', 'like', '%PPh Withholding%')
-                    ->get();
-                foreach ($pphJournalEntries as $entry) {
-                    if ($entry->status === JournalEntry::STATUS_POSTED && $entry->canBeReversed()) {
-                        $this->accountingService->reverseJournalEntry($entry, "Auto-reversal due to deleted Sale #{$sale->invoice} (PPh)");
-                    }
-                }
             }
 
             foreach ($sale->salesItems as $item) {
@@ -1373,14 +1363,15 @@ class SalesService
     public function generateInvoiceNumber(): string
     {
         $tenantId = auth()->user()->tenant_id ?? null;
+        $scoped = fn () => Sales::query()->when($tenantId, fn ($query) => $query->where('tenant_id', $tenantId));
 
-        $query = Sales::query();
-
-        if ($tenantId) {
-            $query->where('tenant_id', $tenantId);
-        }
-
-        $lastSalesInvoice = $query->orderBy('id', 'desc')->first();
+        // Only rows of this sequence: the old code read the newest row of
+        // any prefix, so a single POS or PL sale made it match no INV
+        // digits and restart at INV-0001, straight into the unique key.
+        $lastSalesInvoice = $scoped()
+            ->where('invoice', 'like', 'INV-%')
+            ->orderBy('id', 'desc')
+            ->first();
 
         $invoiceNumber = 1;
         if ($lastSalesInvoice && preg_match('/INV-(\d+)/', $lastSalesInvoice->invoice, $matches)) {
@@ -1388,7 +1379,16 @@ class SalesService
             $invoiceNumber = $lastNumber + 1;
         }
 
-        return 'INV-'.str_pad($invoiceNumber, 4, '0', STR_PAD_LEFT);
+        // Step past anything already on file: a manually entered invoice
+        // can sit above the newest row's number, and the sequence must
+        // never propose a number this tenant already holds.
+        $invoice = 'INV-'.str_pad($invoiceNumber, 4, '0', STR_PAD_LEFT);
+        while ($scoped()->where('invoice', $invoice)->exists()) {
+            $invoiceNumber++;
+            $invoice = 'INV-'.str_pad($invoiceNumber, 4, '0', STR_PAD_LEFT);
+        }
+
+        return $invoice;
     }
 
     public function getExpiringSalesCount(): int

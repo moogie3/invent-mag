@@ -33,6 +33,25 @@ class ActivityLogSeeder extends Seeder
     {
         $tenantId = $tenant->id;
 
+        // Every row this seeder writes is labelled "Sample {module} {n}",
+        // which nothing else in the application produces, so those rows mark
+        // the seeder as already run. Keying off activity_logs in general
+        // would not work: the seeders that ran earlier in the chain have
+        // already written real entries of their own by this point. The tenant
+        // scope is dropped because this method walks every tenant while only
+        // one of them is bound as current, and the scope would otherwise pin
+        // the lookup to whichever one that happens to be.
+        $alreadySeeded = ActivityLog::withoutGlobalScope(TenantScope::class)
+            ->where('tenant_id', $tenantId)
+            ->where('entity_label', 'like', 'Sample %')
+            ->exists();
+
+        if ($alreadySeeded) {
+            $this->command->info("Activity logs already seeded for tenant {$tenant->name}, skipping.");
+
+            return;
+        }
+
         // Get some users from the database for the logs
         $users = User::withoutGlobalScope(TenantScope::class)
             ->where('tenant_id', $tenantId)

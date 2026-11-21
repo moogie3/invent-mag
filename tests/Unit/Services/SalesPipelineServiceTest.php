@@ -6,9 +6,11 @@ use App\Models\Customer;
 use App\Models\JournalEntry;
 use App\Models\PipelineStage;
 use App\Models\Product;
+use App\Models\Quotation;
 use App\Models\Sales;
 use App\Models\SalesOpportunity;
 use App\Models\SalesPipeline;
+use App\Models\Tax;
 use App\Services\SalesPipelineService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use PHPUnit\Framework\Attributes\Test;
@@ -331,5 +333,72 @@ class SalesPipelineServiceTest extends TestCase
 
         // Stock should REMAIN deducted (still 7, not 10)
         $this->assertEquals(7, $product->fresh()->stock_quantity);
+    }
+
+    #[Test]
+    public function it_never_reuses_a_quotation_number_left_behind_by_a_delete()
+    {
+        $opportunity = SalesOpportunity::factory()->hasItems(1)->create();
+        $prefix = 'QTN-'.now()->format('Ymd');
+        $attributes = [
+            'customer_id' => $opportunity->customer_id,
+            'user_id' => $this->user->id,
+            'quotation_date' => now()->toDateString(),
+            'status' => 'draft',
+        ];
+
+        $first = Quotation::create($attributes + ['quotation_number' => "{$prefix}-0001"]);
+        Quotation::create($attributes + ['quotation_number' => "{$prefix}-0002"]);
+        // Deleting the lower number drops the count back to 1, so a naive
+        // count()+1 proposes 0002 again, straight into the unique key.
+        $first->delete();
+
+        $quotation = $this->salesPipelineService->generateQuotation($opportunity->id);
+
+        $this->assertEquals("{$prefix}-0003", $quotation->quotation_number);
+    }
+
+    #[Test]
+    public function it_saves_generated_quotation_items_into_the_json_column()
+    {
+        $opportunity = SalesOpportunity::factory()->hasItems(2, ['quantity' => 3, 'price' => 50])->create();
+
+        $quotation = $this->salesPipelineService->generateQuotation($opportunity->id);
+
+        $items = $quotation->fresh()->items;
+        $this->assertIsArray($items);
+        $this->assertCount(2, $items);
+        $this->assertEquals(3, $items[0]['quantity']);
+        $this->assertEquals(50, $items[0]['price']);
+        $this->assertEquals(150, $items[0]['total']);
+        $this->assertNotNull($items[0]['product_name']);
+    }
+
+    #[Test]
+    public function it_records_the_default_tax_on_a_generated_quotation()
+    {
+        $tax = Tax::create([
+            'name' => 'Standard 10%',
+            'rate' => 10,
+            'type' => 'exclusive',
+            'is_active' => true,
+            'is_default' => true,
+        ]);
+        $opportunity = SalesOpportunity::factory()->hasItems(1)->create();
+
+        $quotation = $this->salesPipelineService->generateQuotation($opportunity->id);
+
+        $this->assertEquals($tax->id, $quotation->fresh()->tax_id);
+        $this->assertEquals(10, (float) $quotation->tax_rate);
+    }
+
+    #[Test]
+    public function it_numbers_a_converted_opportunity_with_the_invoice_sequence()
+    {
+        $opportunity = SalesOpportunity::factory()->hasItems(1, ['quantity' => 2, 'price' => 100])->create(['status' => 'won']);
+
+        $sales = $this->salesPipelineService->convertToSalesOrder($opportunity);
+
+        $this->assertStringStartsWith('INV-', $sales->invoice);
     }
 }

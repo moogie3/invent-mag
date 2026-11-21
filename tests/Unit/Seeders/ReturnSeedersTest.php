@@ -51,7 +51,12 @@ class ReturnSeedersTest extends TestCase
     public function sales_return_seeder_never_moves_stock_or_books_for_a_canceled_row()
     {
         $sale = Sales::factory()->create(['warehouse_id' => $this->warehouseId]);
-        SalesItem::factory()->count(3)->create([
+        // Enough lines that the seeder's cumulative cap still leaves it room
+        // to build a full sample. The cap is what stops a return exceeding
+        // what the sale shipped, so a fixture of three five-unit lines runs
+        // dry after two or three returns and a run could easily draw no
+        // Canceled row at all, which is the case this test exists to cover.
+        SalesItem::factory()->count(15)->create([
             'sales_id' => $sale->id,
             'product_id' => $this->product->id,
             'quantity' => 5,
@@ -110,7 +115,10 @@ class ReturnSeedersTest extends TestCase
     public function purchase_return_seeder_never_moves_stock_or_books_for_a_canceled_row()
     {
         $purchase = Purchase::factory()->create(['warehouse_id' => $this->warehouseId]);
-        POItem::factory()->count(3)->create([
+        // Same reasoning as the sales fixture: fifteen five-unit lines give
+        // the seeder enough returnable budget to produce a full sample, so a
+        // run is very unlikely to draw no Canceled row.
+        POItem::factory()->count(15)->create([
             'po_id' => $purchase->id,
             'product_id' => $this->product->id,
             'quantity' => 5,

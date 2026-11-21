@@ -3,27 +3,6 @@ invent-mag/
 │   └── workflows
 │       ├── ci.yml
 │       └── deploy.yml
-├── .scribe
-│   ├── endpoints
-│   │   ├── 00.yaml
-│   │   ├── 01.yaml
-│   │   ├── 02.yaml
-│   │   ├── 03.yaml
-│   │   ├── 04.yaml
-│   │   ├── 05.yaml
-│   │   └── custom.0.yaml
-│   ├── endpoints.cache
-│   │   ├── 00.yaml
-│   │   ├── 01.yaml
-│   │   ├── 02.yaml
-│   │   ├── 03.yaml
-│   │   ├── 04.yaml
-│   │   └── 05.yaml
-│   ├── .filehashes
-│   ├── auth.md
-│   └── intro.md
-├── .vscode
-│   └── settings.json
 ├── app
 │   ├── Actions
 │   │   └── Fortify
@@ -34,19 +13,27 @@ invent-mag/
 │   │       └── UpdateUserProfileInformation.php
 │   ├── Console
 │   │   └── Commands
+│   │       ├── BackfillCogs.php
+│   │       ├── BackfillShopeeCategories.php
 │   │       ├── BackupTenant.php
 │   │       ├── CheckExpiredSubscriptions.php
 │   │       ├── ProcessScheduledPlanChanges.php
 │   │       └── ResetDemoTenant.php
+│   ├── Contracts
+│   │   └── PjapInterface.php
 │   ├── DTOs
 │   │   └── TransactionDTO.php
 │   ├── Exceptions
 │   │   └── PlanLimitExceededException.php
 │   ├── Helpers
+│   │   ├── Concerns
+│   │   │   └── CalculatesInvoiceTotals.php
 │   │   ├── CurrencyHelper.php
+│   │   ├── NavigationHelper.php
 │   │   ├── ProductHelper.php
 │   │   ├── PurchaseHelper.php
 │   │   ├── PurchaseReturnHelper.php
+│   │   ├── ReturnTaxHelper.php
 │   │   ├── SalesHelper.php
 │   │   └── SalesReturnHelper.php
 │   ├── Http
@@ -67,12 +54,14 @@ invent-mag/
 │   │   │   │   ├── CustomerCrmController.php
 │   │   │   │   ├── DashboardController.php
 │   │   │   │   ├── EFakturController.php
+│   │   │   │   ├── FinancialHealthController.php
 │   │   │   │   ├── JournalEntryController.php
 │   │   │   │   ├── NotificationController.php
 │   │   │   │   ├── OpeningBalanceController.php
 │   │   │   │   ├── PlanController.php
 │   │   │   │   ├── POSController.php
 │   │   │   │   ├── ProductController.php
+│   │   │   │   ├── ProductShopeeImportController.php
 │   │   │   │   ├── ProductStockController.php
 │   │   │   │   ├── ProfileController.php
 │   │   │   │   ├── PurchaseController.php
@@ -95,7 +84,6 @@ invent-mag/
 │   │   │   │   ├── Auth
 │   │   │   │   │   ├── AuthController.php
 │   │   │   │   │   └── RegisteredUserController.php
-│   │   │   │   ├── V1
 │   │   │   │   ├── Webhook
 │   │   │   │   │   └── MidtransController.php
 │   │   │   │   ├── CmsController.php
@@ -136,8 +124,6 @@ invent-mag/
 │   │   │   ├── SetLocale.php
 │   │   │   └── SetSessionCookieName.php
 │   │   ├── Requests
-│   │   │   ├── Api
-│   │   │   │   └── V1
 │   │   │   ├── Auth
 │   │   │   │   └── LoginRequest.php
 │   │   │   └── ProfileUpdateRequest.php
@@ -174,13 +160,19 @@ invent-mag/
 │   │       ├── LogoutResponse.php
 │   │       ├── PasswordResetResponse.php
 │   │       └── VerifyEmailResponse.php
+│   ├── Jobs
+│   │   ├── CancelFakturPajakJob.php
+│   │   ├── DownloadShopeeCoverImages.php
+│   │   ├── PollFakturPajakStatusJob.php
+│   │   ├── SubmitFakturPajakBatchJob.php
+│   │   └── SubmitFakturPajakJob.php
 │   ├── Mail
 │   │   ├── ContactFormMail.php
+│   │   ├── SalesInvoiceMail.php
 │   │   └── SubscriptionInvoiceMail.php
 │   ├── Models
 │   │   ├── Concerns
 │   │   │   └── BelongsToTenant.php
-│   │   ├── Models
 │   │   ├── Account.php
 │   │   ├── AccountingAuditLog.php
 │   │   ├── ActivityLog.php
@@ -213,7 +205,6 @@ invent-mag/
 │   │   ├── PurchaseReturn.php
 │   │   ├── PurchaseReturnItem.php
 │   │   ├── Quotation.php
-│   │   ├── RecurringJournalEntry.php
 │   │   ├── Role.php
 │   │   ├── Sales.php
 │   │   ├── SalesItem.php
@@ -235,16 +226,20 @@ invent-mag/
 │   │   ├── Unit.php
 │   │   ├── User.php
 │   │   └── Warehouse.php
-│   ├── Multitenancy
 │   ├── Observers
 │   │   ├── ActivityObserver.php
 │   │   └── CustomerCreditObserver.php
 │   ├── Providers
 │   │   ├── AppServiceProvider.php
 │   │   ├── AuthServiceProvider.php
+│   │   ├── EFakturServiceProvider.php
 │   │   ├── FortifyServiceProvider.php
 │   │   ├── NavigationServiceProvider.php
 │   │   └── TestingServiceProvider.php
+│   ├── Rules
+│   │   ├── LineDiscountWithinPrice.php
+│   │   ├── TaxIsSelectable.php
+│   │   └── WholeReturnQuantities.php
 │   ├── Scopes
 │   │   └── TenantScope.php
 │   ├── Services
@@ -256,6 +251,15 @@ invent-mag/
 │   │   │   ├── BniStatementParser.php
 │   │   │   ├── BriStatementParser.php
 │   │   │   └── MandiriStatementParser.php
+│   │   ├── Concerns
+│   │   │   ├── BuildsListSearch.php
+│   │   │   └── CostsLineItems.php
+│   │   ├── Pjap
+│   │   │   └── KlikpajakService.php
+│   │   ├── Shopee
+│   │   │   ├── ShopeeCategoryResolver.php
+│   │   │   ├── ShopeeImportService.php
+│   │   │   └── ShopeeXlsxParser.php
 │   │   ├── AccountingAuditService.php
 │   │   ├── AccountingExportService.php
 │   │   ├── AccountingReportService.php
@@ -275,6 +279,7 @@ invent-mag/
 │   │   ├── DashboardService.php
 │   │   ├── EFakturService.php
 │   │   ├── EmployeeService.php
+│   │   ├── FinancialHealthService.php
 │   │   ├── FinancialReportingService.php
 │   │   ├── GeneralLedgerService.php
 │   │   ├── ManualJournalEntryService.php
@@ -294,6 +299,7 @@ invent-mag/
 │   │   ├── SalesService.php
 │   │   ├── SecurityLogger.php
 │   │   ├── StockOpnameService.php
+│   │   ├── StockValuationService.php
 │   │   ├── SupplierService.php
 │   │   ├── SystemNotificationService.php
 │   │   ├── TaxService.php
@@ -314,6 +320,7 @@ invent-mag/
 │   ├── cors.php
 │   ├── database.php
 │   ├── filesystems.php
+│   ├── financial-health.php
 │   ├── fortify.php
 │   ├── logging.php
 │   ├── mail.php
@@ -327,11 +334,11 @@ invent-mag/
 │   ├── scribe.php
 │   ├── services.php
 │   ├── session.php
+│   ├── shopee_categories.php
 │   ├── superadmin-tutorial.php
 │   ├── turbo-laravel.php
 │   └── tutorial.php
 ├── database
-│   ├── data
 │   ├── factories
 │   │   ├── AccountFactory.php
 │   │   ├── ActivityLogFactory.php
@@ -475,8 +482,19 @@ invent-mag/
 │   │   ├── 2026_08_05_000001_backfill_pph_22_tax_record.php
 │   │   ├── 2026_08_05_000002_backfill_pph_final_tax_record.php
 │   │   ├── 2026_08_11_000001_create_billing_settings_table.php
-│   │   └── 2026_08_11_000002_update_subscription_orders_status_enum.php
-│   ├── schema
+│   │   ├── 2026_08_11_000002_update_subscription_orders_status_enum.php
+│   │   ├── 2026_10_22_000001_add_shopee_import_feature_to_plans.php
+│   │   ├── 2026_10_22_000002_create_jobs_table.php
+│   │   ├── 2026_10_23_000001_add_parent_id_to_products.php
+│   │   ├── 2026_10_23_000002_add_cover_url_to_products_table.php
+│   │   ├── 2026_10_24_000001_backfill_low_stock_threshold_to_default.php
+│   │   ├── 2026_11_04_000001_add_efaktur_api_feature_to_plans.php
+│   │   ├── 2026_11_05_000002_add_invoice_email_feature_to_plans.php
+│   │   ├── 2026_11_08_000001_reverse_journal_entries_of_canceled_returns.php
+│   │   ├── 2026_11_08_000002_restore_stock_of_canceled_returns.php
+│   │   ├── 2026_11_17_000001_document_numbers_unique_per_tenant.php
+│   │   ├── 2026_11_18_000001_make_quantity_columns_integer.php
+│   │   └── 2026_11_20_000001_barcode_unique_per_tenant.php
 │   ├── seeders
 │   │   ├── AccountSeeder.php
 │   │   ├── ActivityLogSeeder.php
@@ -520,9 +538,13 @@ invent-mag/
 │   └── start.sh
 ├── docs
 │   ├── ACCOUNTING_SETUP_GUIDE.md
+│   ├── ACTUAL_TREE.txt
 │   ├── ARCHITECTURE_ASSESSMENT.md
+│   ├── CHANGELOG.md
 │   ├── DEPLOYMENT_CHECKLIST.md
+│   ├── DEPLOYMENT_CHECKLIST_2026_10.md
 │   ├── FEATURE_CHECKLIST.md
+│   ├── FILTERING_PITFALLS.md
 │   ├── INTERVIEW_QA.md
 │   ├── LANDING_PAGE_CMS.md
 │   ├── OWNER_SETUP_GUIDE.md
@@ -549,7 +571,6 @@ invent-mag/
 │   │   ├── app.css
 │   │   ├── auth.css
 │   │   ├── crm.css
-│   │   ├── dark.css
 │   │   ├── error.css
 │   │   ├── menu-sidebar.css
 │   │   ├── navbar.css
@@ -561,7 +582,9 @@ invent-mag/
 │   │   ├── purchase-order.css
 │   │   ├── settings.css
 │   │   ├── srm.css
+│   │   ├── stock-opname.css
 │   │   ├── superadmin.css
+│   │   ├── tokens.css
 │   │   └── tutorial-modal.css
 │   ├── images
 │   │   └── background.jpeg
@@ -617,6 +640,8 @@ invent-mag/
 │   │   │   │   │   │   ├── dom.js
 │   │   │   │   │   │   ├── state.js
 │   │   │   │   │   │   └── totals.js
+│   │   │   │   │   ├── catalog
+│   │   │   │   │   │   └── search.js
 │   │   │   │   │   ├── payment
 │   │   │   │   │   │   ├── api.js
 │   │   │   │   │   │   ├── form.js
@@ -642,10 +667,12 @@ invent-mag/
 │   │   │   │   │   │   ├── table.js
 │   │   │   │   │   │   └── ui.js
 │   │   │   │   │   ├── utils
+│   │   │   │   │   │   ├── datasheet.js
 │   │   │   │   │   │   ├── helpers.js
 │   │   │   │   │   │   └── ui.js
 │   │   │   │   │   ├── events.js
 │   │   │   │   │   ├── main.js
+│   │   │   │   │   ├── shopeeImport.js
 │   │   │   │   │   └── stats.js
 │   │   │   │   ├── profile
 │   │   │   │   │   ├── form.js
@@ -727,7 +754,8 @@ invent-mag/
 │   │   │   │   │       └── SalesReturnEdit.js
 │   │   │   │   ├── sorting
 │   │   │   │   │   ├── listjs.js
-│   │   │   │   │   └── search.js
+│   │   │   │   │   ├── search.js
+│   │   │   │   │   └── serverSearch.js
 │   │   │   │   ├── supplier
 │   │   │   │   │   ├── editModal
 │   │   │   │   │   │   ├── form.js
@@ -783,11 +811,14 @@ invent-mag/
 │   │   │   │   └── upgrade.js
 │   │   │   ├── reports
 │   │   │   │   └── stock-transfer.js
+│   │   │   ├── sales
+│   │   │   │   └── invoice-email.js
 │   │   │   ├── utils
 │   │   │   │   ├── formValidator.js
 │   │   │   │   ├── midtrans.js
 │   │   │   │   ├── onPageLoad.js
-│   │   │   │   └── sound.js
+│   │   │   │   ├── sound.js
+│   │   │   │   └── taxReversalPreview.js
 │   │   │   ├── accounting.js
 │   │   │   ├── adjustment-log.js
 │   │   │   ├── audit-log.js
@@ -799,6 +830,7 @@ invent-mag/
 │   │   │   ├── customer-credit.js
 │   │   │   ├── customer.js
 │   │   │   ├── dashboard.js
+│   │   │   ├── financial-health.js
 │   │   │   ├── global-event-delegator.js
 │   │   │   ├── hr.js
 │   │   │   ├── journal-entry.js
@@ -851,6 +883,7 @@ invent-mag/
 │       │   │   │   └── index.blade.php
 │       │   │   ├── accounting-setting.blade.php
 │       │   │   ├── chart-of-accounts.blade.php
+│       │   │   ├── financial-health.blade.php
 │       │   │   ├── general-ledger-export-pdf.blade.php
 │       │   │   ├── general-ledger.blade.php
 │       │   │   ├── journal-export-pdf.blade.php
@@ -901,7 +934,6 @@ invent-mag/
 │       │   │   │   │   └── auditlogmodals.blade.php
 │       │   │   │   ├── category
 │       │   │   │   │   └── catmodals.blade.php
-│       │   │   │   ├── crm
 │       │   │   │   ├── currency
 │       │   │   │   │   └── currmodals.blade.php
 │       │   │   │   ├── customer
@@ -957,7 +989,6 @@ invent-mag/
 │       │   │   │   │       ├── header.blade.php
 │       │   │   │   │       └── page-body.blade.php
 │       │   │   │   ├── dashboard
-│       │   │   │   │   ├── accounting-summary.blade.php
 │       │   │   │   │   ├── analytics-card.blade.php
 │       │   │   │   │   ├── analytics-metrics.blade.php
 │       │   │   │   │   ├── analytics-stats.blade.php
@@ -965,6 +996,7 @@ invent-mag/
 │       │   │   │   │   ├── customer-insights.blade.php
 │       │   │   │   │   ├── dashboard-header.blade.php
 │       │   │   │   │   ├── dashboard-scripts.blade.php
+│       │   │   │   │   ├── financial-health-strip.blade.php
 │       │   │   │   │   ├── financial-summary.blade.php
 │       │   │   │   │   ├── invoice-status.blade.php
 │       │   │   │   │   ├── key-metrics.blade.php
@@ -1220,7 +1252,6 @@ invent-mag/
 │       │   │   │   │       ├── info-section.blade.php
 │       │   │   │   │       ├── page-body.blade.php
 │       │   │   │   │       ├── pagination.blade.php
-│       │   │   │   │       ├── search.blade.php
 │       │   │   │   │       ├── table-actions.blade.php
 │       │   │   │   │       ├── table-row.blade.php
 │       │   │   │   │       └── table.blade.php
@@ -1355,6 +1386,7 @@ invent-mag/
 │       │   └── notifications.blade.php
 │       ├── emails
 │       │   ├── contact-form.blade.php
+│       │   ├── sales-invoice.blade.php
 │       │   └── subscription-invoice.blade.php
 │       ├── errors
 │       │   ├── 200.blade.php
@@ -1367,7 +1399,6 @@ invent-mag/
 │       │   ├── 429.blade.php
 │       │   ├── 500.blade.php
 │       │   └── 503.blade.php
-│       ├── landing
 │       ├── superadmin
 │       │   ├── audit-log
 │       │   │   ├── index.blade.php
@@ -1391,7 +1422,6 @@ invent-mag/
 │       │   ├── layouts
 │       │   │   ├── modals
 │       │   │   │   └── how-it-works-modal.blade.php
-│       │   │   ├── partials
 │       │   │   ├── base.blade.php
 │       │   │   ├── menu-sidebar.blade.php
 │       │   │   ├── navbar.blade.php
@@ -1447,6 +1477,8 @@ invent-mag/
 │   │   ├── Admin
 │   │   │   ├── AccountingControllerTest.php
 │   │   │   ├── AuditLogControllerTest.php
+│   │   │   ├── BackfillCogsCommandTest.php
+│   │   │   ├── BackfillShopeeCategoriesCommandTest.php
 │   │   │   ├── BackupControllerTest.php
 │   │   │   ├── BankReconciliationControllerTest.php
 │   │   │   ├── CategoryControllerTest.php
@@ -1454,7 +1486,10 @@ invent-mag/
 │   │   │   ├── CustomerControllerTest.php
 │   │   │   ├── CustomerCrmControllerTest.php
 │   │   │   ├── DashboardControllerTest.php
+│   │   │   ├── DocumentNumberingTest.php
+│   │   │   ├── EfakturApiTest.php
 │   │   │   ├── EfakturSettingsTest.php
+│   │   │   ├── FinancialHealthControllerTest.php
 │   │   │   ├── JournalEntryControllerTest.php
 │   │   │   ├── NotificationControllerTest.php
 │   │   │   ├── OpeningBalanceControllerTest.php
@@ -1463,6 +1498,7 @@ invent-mag/
 │   │   │   ├── POSControllerTest.php
 │   │   │   ├── PrintTest.php
 │   │   │   ├── ProductControllerTest.php
+│   │   │   ├── ProductShopeeImportTest.php
 │   │   │   ├── ProductStockControllerTest.php
 │   │   │   ├── ProfileControllerTest.php
 │   │   │   ├── PurchaseControllerTest.php
@@ -1475,16 +1511,17 @@ invent-mag/
 │   │   │   ├── SalesReturnControllerTest.php
 │   │   │   ├── SettingsControllerTest.php
 │   │   │   ├── SettingsTaxJurisdictionTest.php
+│   │   │   ├── SidebarMenuTest.php
 │   │   │   ├── StockOpnameControllerTest.php
 │   │   │   ├── StockTransferControllerTest.php
 │   │   │   ├── SupplierControllerTest.php
 │   │   │   ├── SupplierCrmControllerTest.php
 │   │   │   ├── TaxControllerTest.php
+│   │   │   ├── TaxSelectionValidationTest.php
 │   │   │   ├── UnitControllerTest.php
 │   │   │   ├── UserControllerTest.php
 │   │   │   └── WarehouseControllerTest.php
 │   │   ├── Api
-│   │   │   ├── Auth
 │   │   │   ├── ContactControllerTest.php
 │   │   │   └── TenantLookupControllerTest.php
 │   │   ├── Auth
@@ -1495,7 +1532,8 @@ invent-mag/
 │   │   │   └── PasswordUpdateTest.php
 │   │   ├── HrFeatureTest.php
 │   │   ├── MidtransWebhookTest.php
-│   │   └── MultiTenancyTest.php
+│   │   ├── MultiTenancyTest.php
+│   │   └── ThemeConsistencyTest.php
 │   ├── js
 │   │   ├── app.test.js
 │   │   ├── auth.test.js
@@ -1520,6 +1558,7 @@ invent-mag/
 │   │   ├── layouts-theme-initializer.test.js
 │   │   ├── layouts-theme-toggle.test.js
 │   │   ├── layouts-theme-visibility.test.js
+│   │   ├── onPageLoad.test.js
 │   │   ├── partials-auth-showContentAfterLoading.test.js
 │   │   ├── partials-auth-togglePasswordVisibility.test.js
 │   │   ├── partials-category-handleEditCategoryModal.test.js
@@ -1544,6 +1583,7 @@ invent-mag/
 │   │   ├── partials-pos-cart-dom.test.js
 │   │   ├── partials-pos-cart-state.test.js
 │   │   ├── partials-pos-cart-totals.test.js
+│   │   ├── partials-pos-catalog-search.test.js
 │   │   ├── partials-pos-payment-api.test.js
 │   │   ├── partials-pos-payment-form.test.js
 │   │   ├── partials-pos-payment-modal.test.js
@@ -1556,6 +1596,7 @@ invent-mag/
 │   │   ├── partials-product-bulkActions-export.test.js
 │   │   ├── partials-product-bulkActions-selection.test.js
 │   │   ├── partials-product-bulkActions-stock.test.js
+│   │   ├── partials-product-datasheet.test.js
 │   │   ├── partials-product-events.test.js
 │   │   ├── partials-product-main.test.js
 │   │   ├── partials-product-modals-delete.test.js
@@ -1564,6 +1605,7 @@ invent-mag/
 │   │   ├── partials-product-search-state.test.js
 │   │   ├── partials-product-search-table.test.js
 │   │   ├── partials-product-search-ui.test.js
+│   │   ├── partials-product-shopeeImport.test.js
 │   │   ├── partials-product-stats.test.js
 │   │   ├── partials-product-utils-helpers.test.js
 │   │   ├── partials-product-utils-ui.test.js
@@ -1652,6 +1694,7 @@ invent-mag/
 │   │   ├── purchase-order-edit.test.js
 │   │   ├── purchase-order-view.test.js
 │   │   ├── purchase-order.test.js
+│   │   ├── quotation.test.js
 │   │   ├── recentts.test.js
 │   │   ├── sales-order-bulk-actions.test.js
 │   │   ├── sales-order-bulk-selection.test.js
@@ -1669,6 +1712,7 @@ invent-mag/
 │   │   ├── user.test.js
 │   │   └── warehouse.test.js
 │   ├── Traits
+│   │   ├── AssertsSchemaColumns.php
 │   │   └── CreatesTenant.php
 │   ├── Unit
 │   │   ├── DTOs
@@ -1680,66 +1724,90 @@ invent-mag/
 │   │   │   ├── ProductHelperTest.php
 │   │   │   ├── PurchaseHelperTest.php
 │   │   │   ├── PurchaseReturnHelperTest.php
+│   │   │   ├── ReturnTaxHelperTest.php
 │   │   │   ├── SalesHelperTest.php
 │   │   │   └── SalesReturnHelperTest.php
 │   │   ├── Http
 │   │   │   ├── Middleware
 │   │   │   │   └── SetLocaleTest.php
-│   │   │   └── Requests
-│   │   │       └── ProfileUpdateRequestTest.php
+│   │   │   ├── Requests
+│   │   │   │   └── ProfileUpdateRequestTest.php
+│   │   │   └── Resources
+│   │   │       └── ProductResourceTest.php
+│   │   ├── Jobs
+│   │   │   ├── CancelFakturPajakJobTest.php
+│   │   │   ├── DownloadShopeeCoverImagesTest.php
+│   │   │   ├── PollFakturPajakStatusJobTest.php
+│   │   │   ├── SubmitFakturPajakBatchJobTest.php
+│   │   │   └── SubmitFakturPajakJobTest.php
 │   │   ├── Models
+│   │   │   ├── ProductImageTest.php
+│   │   │   ├── ProductLowStockQueryTest.php
 │   │   │   ├── ProductStockTest.php
+│   │   │   ├── PurchaseIsPphTest.php
 │   │   │   ├── SalesIsPphTest.php
 │   │   │   ├── TaxIsPphTest.php
+│   │   │   ├── TaxJurisdictionScopeTest.php
 │   │   │   └── TenantCanDisableIndonesianJurisdictionTest.php
-│   │   ├── Observers
-│   │   └── Services
-│   │       ├── AccountingAuditServiceTest.php
-│   │       ├── AccountingExportServiceTest.php
-│   │       ├── AccountingReportServiceTest.php
-│   │       ├── AccountingServiceTest.php
-│   │       ├── AccountServiceTest.php
-│   │       ├── ActivityLogServiceTest.php
-│   │       ├── AgingReportServiceTest.php
-│   │       ├── BankStatementParserTest.php
-│   │       ├── BillingServiceTest.php
-│   │       ├── CashFlowServiceTest.php
-│   │       ├── CategoryServiceTest.php
-│   │       ├── ChartOfAccountsServiceTest.php
-│   │       ├── CrmServiceTest.php
-│   │       ├── CurrencyServiceTest.php
-│   │       ├── CustomerServiceTest.php
-│   │       ├── DashboardServiceTest.php
-│   │       ├── EFakturServiceSptMasukanTest.php
-│   │       ├── FinancialReportingServiceTest.php
-│   │       ├── GeneralLedgerServiceTest.php
-│   │       ├── ManualJournalEntryServiceTest.php
-│   │       ├── NotificationServiceTest.php
-│   │       ├── OpeningBalanceServiceTest.php
-│   │       ├── PlanServiceTest.php
-│   │       ├── PosServiceTest.php
-│   │       ├── ProductServiceTest.php
-│   │       ├── ProfileServiceTest.php
-│   │       ├── PurchaseReturnServiceTest.php
-│   │       ├── PurchaseServicePpnMasukanTest.php
-│   │       ├── PurchaseServiceTest.php
-│   │       ├── ReportExporterTest.php
-│   │       ├── SalesForecastServiceTest.php
-│   │       ├── SalesPipelineServiceTest.php
-│   │       ├── SalesReturnServiceTest.php
-│   │       ├── SalesServiceTest.php
-│   │       ├── SecurityLoggerTest.php
-│   │       ├── StockOpnameServiceTest.php
-│   │       ├── SupplierServiceTest.php
-│   │       ├── SystemNotificationServiceTest.php
-│   │       ├── TaxServiceEnsureIndonesianDefaultsTest.php
-│   │       ├── TaxServiceTest.php
-│   │       ├── TenantSetupServiceTest.php
-│   │       ├── TransactionServiceTest.php
-│   │       ├── TutorialServiceTest.php
-│   │       ├── UnitServiceTest.php
-│   │       ├── UserServiceTest.php
-│   │       └── WarehouseServiceTest.php
+│   │   ├── Seeders
+│   │   │   ├── DatabaseSeederTest.php
+│   │   │   └── ReturnSeedersTest.php
+│   │   ├── Services
+│   │   │   ├── AccountingAuditServiceTest.php
+│   │   │   ├── AccountingExportServiceTest.php
+│   │   │   ├── AccountingReportServiceTest.php
+│   │   │   ├── AccountingServiceTest.php
+│   │   │   ├── AccountServiceTest.php
+│   │   │   ├── ActivityLogServiceTest.php
+│   │   │   ├── AgingReportServiceTest.php
+│   │   │   ├── BankStatementParserTest.php
+│   │   │   ├── BillingServiceTest.php
+│   │   │   ├── CashFlowServiceTest.php
+│   │   │   ├── CategoryServiceTest.php
+│   │   │   ├── ChartOfAccountsServiceTest.php
+│   │   │   ├── CrmServiceTest.php
+│   │   │   ├── CurrencyServiceTest.php
+│   │   │   ├── CustomerServiceTest.php
+│   │   │   ├── DashboardServiceTest.php
+│   │   │   ├── DocumentEditJournalTest.php
+│   │   │   ├── EFakturServiceSptMasukanTest.php
+│   │   │   ├── FinancialHealthServiceTest.php
+│   │   │   ├── FinancialReportingServiceTest.php
+│   │   │   ├── GeneralLedgerServiceTest.php
+│   │   │   ├── InventoryInvariantsTest.php
+│   │   │   ├── KlikpajakServiceTest.php
+│   │   │   ├── ManualJournalEntryServiceTest.php
+│   │   │   ├── NotificationServiceTest.php
+│   │   │   ├── OpeningBalanceGlTbConsistencyTest.php
+│   │   │   ├── OpeningBalanceServiceTest.php
+│   │   │   ├── PlanServiceTest.php
+│   │   │   ├── PosServiceTest.php
+│   │   │   ├── ProductServiceTest.php
+│   │   │   ├── ProfileServiceTest.php
+│   │   │   ├── PurchaseReturnServiceTest.php
+│   │   │   ├── PurchaseServicePpnMasukanTest.php
+│   │   │   ├── PurchaseServiceTest.php
+│   │   │   ├── ReportExporterTest.php
+│   │   │   ├── SalesForecastServiceTest.php
+│   │   │   ├── SalesPipelineServiceTest.php
+│   │   │   ├── SalesReturnServiceTest.php
+│   │   │   ├── SalesServiceTest.php
+│   │   │   ├── SecurityLoggerTest.php
+│   │   │   ├── ShopeeCategoryResolverTest.php
+│   │   │   ├── StockOpnameServiceTest.php
+│   │   │   ├── StockValuationServiceTest.php
+│   │   │   ├── SupplierServiceTest.php
+│   │   │   ├── SystemNotificationServiceTest.php
+│   │   │   ├── TaxServiceEnsureIndonesianDefaultsTest.php
+│   │   │   ├── TaxServiceTest.php
+│   │   │   ├── TenantSetupServiceTest.php
+│   │   │   ├── TransactionServiceTest.php
+│   │   │   ├── TutorialServiceTest.php
+│   │   │   ├── UnitServiceTest.php
+│   │   │   ├── UserServiceTest.php
+│   │   │   └── WarehouseServiceTest.php
+│   │   └── Traits
+│   │       └── AssertsSchemaColumnsTest.php
 │   └── TestCase.php
 ├── .dockerignore
 ├── .editorconfig
@@ -1755,6 +1823,7 @@ invent-mag/
 ├── Dockerfile
 ├── graph.png
 ├── LICENSE
+├── NOTICE
 ├── package-lock.json
 ├── package.json
 ├── phpunit.xml

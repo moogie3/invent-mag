@@ -1,11 +1,15 @@
 import { SALES_PIPELINE_ROUTES } from '../common/constants.js';
 
-const convertOpportunityForm = document.getElementById(
-    "convertOpportunityForm"
-);
 let convertOpportunityFormListenerAttached = false;
 
 export function initConvertOpportunityForm() {
+    // Resolved on every call, not once at import: this bundle is shared
+    // by every admin page, so the module usually evaluates before the
+    // convert form exists and a captured reference would be null forever.
+    const convertOpportunityForm = document.getElementById(
+        "convertOpportunityForm"
+    );
+
     if (convertOpportunityFormListenerAttached || !convertOpportunityForm) {
         return;
     }

@@ -54,6 +54,26 @@ class PurchaseReturnServiceTest extends TestCase
         $this->purchaseReturnService = new PurchaseReturnService($this->accountingServiceMock);
     }
 
+    /**
+     * A purchase line to return against: returns are capped at what the PO
+     * actually ordered, so a test that hands goods back has to order them
+     * first. 10 units covers every quantity these tests use.
+     */
+    private function givePurchaseLine(int $quantity = 10): POItem
+    {
+        return POItem::firstOrCreate(
+            ['po_id' => $this->purchase->id, 'product_id' => $this->product->id],
+            [
+                'quantity' => $quantity,
+                'remaining_quantity' => $quantity,
+                'price' => 100,
+                'total' => 1000,
+                'discount' => 0,
+                'discount_type' => 'fixed',
+            ]
+        );
+    }
+
     #[Test]
     public function test_it_can_get_purchase_return_index_data()
     {
@@ -422,6 +442,8 @@ class PurchaseReturnServiceTest extends TestCase
     #[Test]
     public function test_it_can_update_a_purchase_return()
     {
+        $this->givePurchaseLine();
+
         // Pinned to a live status: the test below hand-simulates a return
         // that is holding stock, and a Canceled row holds none (the F2 rule
         // skips its stock halves on edit). The factory's random status made
@@ -490,6 +512,7 @@ class PurchaseReturnServiceTest extends TestCase
     #[Test]
     public function test_update_re_journals_the_gl_with_the_new_total()
     {
+        $this->givePurchaseLine();
         $service = app(PurchaseReturnService::class);
 
         // Create: 2 × 50 = 100 → one posted entry, net AP debit 100.
@@ -531,9 +554,54 @@ class PurchaseReturnServiceTest extends TestCase
         $this->assertEqualsWithDelta(150.0, $this->netAccountsPayableEffect($purchaseReturn), 0.001);
     }
 
+    /**
+     * Zeroing a live return on edit is a designed path, not an accident:
+     * the return hands back the units it held, its journal nets to zero
+     * instead of posting an empty entry, and no item rows remain. This
+     * pins what the empty `if (empty($returnedItems))` block in
+     * updatePurchaseReturn() only ever commented about, so deleting that
+     * dead block cannot quietly change any of it.
+     */
+    #[Test]
+    public function test_editing_a_return_down_to_zero_items_releases_stock_and_nets_the_journal_to_zero()
+    {
+        $this->givePurchaseLine();
+        $service = app(PurchaseReturnService::class);
+        $stockBefore = $this->product->fresh()->stock_quantity;
+
+        $purchaseReturn = $service->createPurchaseReturn([
+            'purchase_id' => $this->purchase->id,
+            'return_date' => now()->format('Y-m-d'),
+            'status' => 'Pending',
+            'items' => json_encode([
+                ['product_id' => $this->product->id, 'returned_quantity' => 2, 'price' => 50],
+            ]),
+        ]);
+
+        $this->assertEquals($stockBefore - 2, $this->product->fresh()->stock_quantity);
+        $this->assertEqualsWithDelta(100.0, $this->netAccountsPayableEffect($purchaseReturn), 0.001);
+
+        $service->updatePurchaseReturn($purchaseReturn, [
+            'return_date' => now()->format('Y-m-d'),
+            'reason' => 'Counted twice, nothing left to return',
+            'status' => 'Pending',
+            'items' => json_encode([
+                ['product_id' => $this->product->id, 'returned_quantity' => 0, 'price' => 50],
+            ]),
+        ]);
+
+        $fresh = $purchaseReturn->fresh();
+
+        $this->assertEquals($stockBefore, $this->product->fresh()->stock_quantity, 'Zeroing a live return must hand its units back.');
+        $this->assertCount(0, $fresh->items, 'A zeroed return holds no item rows.');
+        $this->assertEqualsWithDelta(0.0, (float) $fresh->total_amount, 0.001);
+        $this->assertEqualsWithDelta(0.0, $this->netAccountsPayableEffect($purchaseReturn), 0.001, 'The journal must net to zero rather than post an empty entry.');
+    }
+
     #[Test]
     public function test_a_second_edit_does_not_reverse_the_same_entry_twice()
     {
+        $this->givePurchaseLine();
         $service = app(PurchaseReturnService::class);
 
         $purchaseReturn = $service->createPurchaseReturn([
@@ -583,6 +651,7 @@ class PurchaseReturnServiceTest extends TestCase
     #[Test]
     public function test_editing_status_to_canceled_reverses_without_reposting_then_reopens()
     {
+        $this->givePurchaseLine();
         $service = app(PurchaseReturnService::class);
         $stockBefore = $this->product->fresh()->stock_quantity;
 
@@ -638,6 +707,7 @@ class PurchaseReturnServiceTest extends TestCase
     #[Test]
     public function test_delete_after_edit_does_not_reverse_the_original_entry_twice()
     {
+        $this->givePurchaseLine();
         $service = app(PurchaseReturnService::class);
 
         $purchaseReturn = $service->createPurchaseReturn([
@@ -674,6 +744,7 @@ class PurchaseReturnServiceTest extends TestCase
     #[Test]
     public function test_canceling_a_pending_return_reverts_the_stock_and_the_journal()
     {
+        $this->givePurchaseLine();
         $service = app(PurchaseReturnService::class);
         $stockBefore = $this->product->fresh()->stock_quantity;
 
@@ -723,6 +794,7 @@ class PurchaseReturnServiceTest extends TestCase
 
     public function test_completing_a_canceled_return_is_refused()
     {
+        $this->givePurchaseLine();
         $service = app(PurchaseReturnService::class);
         $stockBefore = $this->product->fresh()->stock_quantity;
 
@@ -757,6 +829,7 @@ class PurchaseReturnServiceTest extends TestCase
 
     public function test_bulk_complete_skips_canceled_rows_and_counts_them()
     {
+        $this->givePurchaseLine();
         $service = app(PurchaseReturnService::class);
 
         $live = $service->createPurchaseReturn([
@@ -787,6 +860,7 @@ class PurchaseReturnServiceTest extends TestCase
 
     public function test_deleting_a_canceled_return_does_not_move_the_stock_a_second_time()
     {
+        $this->givePurchaseLine();
         $service = app(PurchaseReturnService::class);
         $stockBefore = $this->product->fresh()->stock_quantity;
 
@@ -838,6 +912,9 @@ class PurchaseReturnServiceTest extends TestCase
 
     public function test_delete_recalculates_the_purchase_from_live_returns_only()
     {
+        // The purchase sold exactly these 2 units, so the live return of 2
+        // covers the whole order and the purchase reads Returned.
+        $this->givePurchaseLine(2);
         $service = app(PurchaseReturnService::class);
 
         $live = $service->createPurchaseReturn([
@@ -848,7 +925,153 @@ class PurchaseReturnServiceTest extends TestCase
                 ['product_id' => $this->product->id, 'returned_quantity' => 2, 'price' => 50],
             ]),
         ]);
+        // Born Canceled: it holds no stock and no journal, and it is never
+        // counted as returned - exactly the state this test needs beside the
+        // live one (a Pending sibling would push the pair past the 2 ordered).
         $canceled = $service->createPurchaseReturn([
+            'purchase_id' => $this->purchase->id,
+            'return_date' => now()->format('Y-m-d'),
+            'status' => 'Canceled',
+            'items' => json_encode([
+                ['product_id' => $this->product->id, 'returned_quantity' => 1, 'price' => 50],
+            ]),
+        ]);
+
+        $this->assertEquals('Returned', $this->purchase->fresh()->status);
+
+        $service->deletePurchaseReturn($live->fresh());
+
+        // The canceled sibling still holds its rows for history but holds no
+        // stock and no journal entry, so it cannot keep the purchase Returned:
+        // the delete-path recount is live-only, like create, edit and cancel.
+        $this->purchase->refresh();
+        $this->assertEquals('Unpaid', $this->purchase->status);
+    }
+
+    /**
+     * Nothing on the server refused a return larger than the purchase ever
+     * sold: the stock record went negative, the purchase flipped to
+     * Returned and the journal reversed more than was booked. The cap
+     * counts every live (non-Canceled) return against the ordered quantity.
+     */
+    #[Test]
+    public function test_create_refuses_a_return_larger_than_the_purchase_still_owes()
+    {
+        $this->givePurchaseLine(10);
+
+        // Count postings in the test body rather than with a Mockery count
+        // expectation: an unmet count throws during teardown, before
+        // RefreshDatabase rolls its transaction back, and poisons every
+        // test that follows. The mock method is typed, so it must return
+        // a JournalEntry.
+        $journalPostings = 0;
+        $this->accountingServiceMock->shouldReceive('createJournalEntry')
+            ->andReturnUsing(function () use (&$journalPostings) {
+                $journalPostings++;
+
+                return Mockery::mock(JournalEntry::class);
+            });
+
+        $refused = null;
+        try {
+            $this->purchaseReturnService->createPurchaseReturn([
+                'purchase_id' => $this->purchase->id,
+                'return_date' => now()->format('Y-m-d'),
+                'status' => 'Pending',
+                'items' => json_encode([
+                    ['product_id' => $this->product->id, 'returned_quantity' => 11, 'price' => 50],
+                ]),
+            ]);
+        } catch (\Exception $e) {
+            $refused = $e->getMessage();
+        }
+
+        $this->assertNotNull($refused, 'A return larger than the purchase ordered must be refused.');
+        $this->assertStringContainsString('only 10 of the 10 purchased units can still be returned', $refused);
+        $this->assertDatabaseMissing('purchase_returns', ['purchase_id' => $this->purchase->id]);
+        $this->assertEquals(100, $this->product->fresh()->stock_quantity);
+
+        // Fill 6 of the 10 (the one legitimate journal entry)...
+        $this->purchaseReturnService->createPurchaseReturn([
+            'purchase_id' => $this->purchase->id,
+            'return_date' => now()->format('Y-m-d'),
+            'status' => 'Pending',
+            'items' => json_encode([
+                ['product_id' => $this->product->id, 'returned_quantity' => 6, 'price' => 50],
+            ]),
+        ]);
+        $this->assertEquals(94, $this->product->fresh()->stock_quantity);
+
+        // ...then a second live return of 5: it fits on its own, but 6 live
+        // + 5 exceeds the 10 ordered, so it has to be refused too.
+        $refused = null;
+        try {
+            $this->purchaseReturnService->createPurchaseReturn([
+                'purchase_id' => $this->purchase->id,
+                'return_date' => now()->format('Y-m-d'),
+                'status' => 'Pending',
+                'items' => json_encode([
+                    ['product_id' => $this->product->id, 'returned_quantity' => 5, 'price' => 50],
+                ]),
+            ]);
+        } catch (\Exception $e) {
+            $refused = $e->getMessage();
+        }
+
+        $this->assertNotNull($refused, 'Live returns together must not exceed the purchase ordered.');
+        $this->assertStringContainsString('only 4 of the 10 purchased units can still be returned', $refused);
+        $this->assertEquals(1, PurchaseReturn::where('purchase_id', $this->purchase->id)->count());
+        $this->assertEquals(94, $this->product->fresh()->stock_quantity);
+        // Neither refusal may have posted a journal entry.
+        $this->assertEquals(1, $journalPostings);
+    }
+
+    /**
+     * An edit is checked against the OTHER live returns: filling the
+     * purchase's remaining quantity is legitimate (the return's own old
+     * units must not count against it), while an edit that pushes the live
+     * total past what was ordered must be refused before stock and the
+     * journal move.
+     */
+    #[Test]
+    public function test_update_refuses_when_other_live_returns_leave_less_than_requested()
+    {
+        $this->givePurchaseLine(10);
+
+        // Same teardown-safe counting as the create-cap proof: three
+        // legitimate postings (create A, edit A, create B), and the refused
+        // edit must add no fourth.
+        $journalPostings = 0;
+        $this->accountingServiceMock->shouldReceive('createJournalEntry')
+            ->andReturnUsing(function () use (&$journalPostings) {
+                $journalPostings++;
+
+                return Mockery::mock(JournalEntry::class);
+            });
+
+        $a = $this->purchaseReturnService->createPurchaseReturn([
+            'purchase_id' => $this->purchase->id,
+            'return_date' => now()->format('Y-m-d'),
+            'status' => 'Pending',
+            'items' => json_encode([
+                ['product_id' => $this->product->id, 'returned_quantity' => 6, 'price' => 50],
+            ]),
+        ]);
+
+        // A edits itself up to 9: its own 6 live units are excluded from
+        // its own check, and 9 of 10 ordered is inside the cap.
+        $this->purchaseReturnService->updatePurchaseReturn($a, [
+            'return_date' => now()->format('Y-m-d'),
+            'status' => 'Pending',
+            'items' => json_encode([
+                ['product_id' => $this->product->id, 'returned_quantity' => 9, 'price' => 50],
+            ]),
+        ]);
+        $this->assertEquals(9, $a->fresh()->items->sum('quantity'));
+        $this->assertEquals(91, $this->product->fresh()->stock_quantity);
+
+        // B takes the last unit: 9 + 1 = 10 of 10.
+        $this->purchaseReturnService->createPurchaseReturn([
             'purchase_id' => $this->purchase->id,
             'return_date' => now()->format('Y-m-d'),
             'status' => 'Pending',
@@ -856,17 +1079,95 @@ class PurchaseReturnServiceTest extends TestCase
                 ['product_id' => $this->product->id, 'returned_quantity' => 1, 'price' => 50],
             ]),
         ]);
-        $service->cancelPurchaseReturn($canceled);
 
-        $this->assertEquals('Returned', $this->purchase->fresh()->status);
+        // With B live, A may no longer be edited up to 10: A's 10 plus B's
+        // 1 exceeds the 10 ordered.
+        $refused = null;
+        try {
+            $this->purchaseReturnService->updatePurchaseReturn($a, [
+                'return_date' => now()->format('Y-m-d'),
+                'status' => 'Pending',
+                'items' => json_encode([
+                    ['product_id' => $this->product->id, 'returned_quantity' => 10, 'price' => 50],
+                ]),
+            ]);
+        } catch (\Exception $e) {
+            $refused = $e->getMessage();
+        }
 
-        $service->deletePurchaseReturn($live->fresh());
+        $this->assertNotNull($refused, 'An edit that pushes live returns past the ordered quantity must be refused.');
+        // What A may still set itself to: 10 ordered - B's 1 live unit = 9.
+        $this->assertStringContainsString('only 9 of the 10 purchased units can still be returned', $refused);
+        $this->assertEquals(9, $a->fresh()->items->sum('quantity'));
+        $this->assertEquals(90, $this->product->fresh()->stock_quantity);
+        // The refused edit must not have posted a journal entry either.
+        $this->assertEquals(3, $journalPostings);
+    }
 
-        // The canceled sibling still holds its rows for history but has given
-        // its stock back, so it cannot keep the purchase Returned: the
-        // delete-path recount is live-only, like create, edit and cancel.
-        $this->purchase->refresh();
-        $this->assertEquals('Unpaid', $this->purchase->status);
+    /**
+     * Audit F6: the purchase walk had no ORDER BY at all, so which PO line a
+     * return drained depended on whichever index the query planner picked.
+     * Both directions now walk FEFO (earliest expiry, oldest line, id).
+     *
+     * This locks the contract rather than reproducing the old bug: on SQLite
+     * the (po_id, expiry_date) index already returns expiry order, so the
+     * unordered code passes here too. Production runs MariaDB, where the
+     * planner may choose the product_id or primary index instead and hand the
+     * lines back in a different order. The far-expiring line is still created
+     * first, so insertion order cannot quietly match FEFO either.
+     */
+    #[Test]
+    public function test_po_lines_are_drawn_in_expiry_order_and_restored_on_cancel()
+    {
+        $service = app(PurchaseReturnService::class);
+
+        $farExpiry = POItem::factory()->create([
+            'po_id' => $this->purchase->id,
+            'product_id' => $this->product->id,
+            'quantity' => 10,
+            'remaining_quantity' => 10,
+            'expiry_date' => now()->addDays(40),
+        ]);
+        $nearExpiry = POItem::factory()->create([
+            'po_id' => $this->purchase->id,
+            'product_id' => $this->product->id,
+            'quantity' => 10,
+            'remaining_quantity' => 10,
+            'expiry_date' => now()->addDays(10),
+        ]);
+
+        $purchaseReturn = $service->createPurchaseReturn([
+            'purchase_id' => $this->purchase->id,
+            'return_date' => now()->format('Y-m-d'),
+            'status' => 'Pending',
+            'items' => json_encode([
+                ['product_id' => $this->product->id, 'returned_quantity' => 12, 'price' => 50],
+            ]),
+        ]);
+
+        // 12 units to the supplier: 10 off the near line, 2 off the far line.
+        $this->assertEquals(
+            0,
+            (int) $nearExpiry->fresh()->remaining_quantity,
+            'The nearest expiry must be drained first.'
+        );
+        $this->assertEquals(8, (int) $farExpiry->fresh()->remaining_quantity);
+
+        $service->cancelPurchaseReturn($purchaseReturn);
+
+        // Cancel walks the same order, so every unit goes back to the line it
+        // left and the pair ends exactly where it started.
+        $this->assertEquals(
+            10,
+            (int) $nearExpiry->fresh()->remaining_quantity,
+            'Cancel must refill the line create drained.'
+        );
+        $this->assertEquals(10, (int) $farExpiry->fresh()->remaining_quantity);
+        $this->assertEquals(
+            20,
+            (int) POItem::whereIn('id', [$nearExpiry->id, $farExpiry->id])->sum('remaining_quantity'),
+            'A canceled return must leave the PO lines exactly as it found them.'
+        );
     }
 
     /**

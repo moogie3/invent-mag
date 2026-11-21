@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Purchase;
+use App\Rules\LineDiscountWithinPrice;
+use App\Rules\TaxIsSelectable;
 use App\Services\PurchaseService;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
@@ -85,11 +87,11 @@ class PurchaseController extends Controller
             'warehouse_id' => 'required|exists:warehouses,id', // Added
             'order_date' => 'required|date',
             'due_date' => 'required|date',
-            'products' => 'required|json',
-            'discount_total' => 'nullable|numeric',
+            'products' => ['required', 'json', new LineDiscountWithinPrice],
+            'discount_total' => 'nullable|numeric|min:0',
             'discount_total_type' => 'nullable|in:fixed,percentage',
-            'tax_id' => 'nullable|exists:taxes,id',
-            'pph_tax_id' => 'nullable|exists:taxes,id',
+            'tax_id' => ['nullable', new TaxIsSelectable],
+            'pph_tax_id' => ['nullable', new TaxIsSelectable(enforceJurisdiction: false)],
         ]);
 
         try {
@@ -115,11 +117,11 @@ class PurchaseController extends Controller
             'warehouse_id' => 'required|exists:warehouses,id', // Added
             'order_date' => 'required|date',
             'due_date' => 'required|date',
-            'products' => 'required|json',
-            'discount_total' => 'nullable|numeric',
+            'products' => ['required', 'json', new LineDiscountWithinPrice],
+            'discount_total' => 'nullable|numeric|min:0',
             'discount_total_type' => 'nullable|in:fixed,percentage',
-            'tax_id' => 'nullable|exists:taxes,id',
-            'pph_tax_id' => 'nullable|exists:taxes,id',
+            'tax_id' => ['nullable', new TaxIsSelectable],
+            'pph_tax_id' => ['nullable', new TaxIsSelectable(enforceJurisdiction: false)],
         ]);
 
         try {

@@ -241,7 +241,7 @@ Cr. PPh Receivable        proportional_pph
 
 - **Ratio base is NET of tax** (the original sale's revenue credit), never `sale.total` (which is gross of PPN): `ratio = return_total / net_revenue_base`. Derived by `ReturnTaxHelper::salesReversal()` from the sale's denormalized snapshot, so the return screens and the ledger book the same figure.
 - PPN is reversed on return **whenever the original sale `isPpn()`**, with no Faktur Pajak required (Phase 1E). Legacy FakturPajak-sourced PPN journals are still reversed by `cancelFakturPajak()`.
-- COGS/Inventory reverse proportionally against the original sale's posted COGS.
+- COGS/Inventory reverse for what the returned units actually cost: each return line is priced from the batches that covered it (`SalesReturnService::cogsToReverse()` via `StockValuationService::costOfCoveredUnits()`). A proportional share of the original sale's posted COGS survives only as the fallback for a line whose units no batch can price.
 - A Canceled return posts nothing: creation from Canceled skips the entry, cancel reverses it, complete refuses a canceled row.
 
 ### 6.6 Purchase Return with PPN Masukan / PPh

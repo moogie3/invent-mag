@@ -19,6 +19,13 @@
     --anim-fast: 0.15s; /* feedback: hover, press, focus */
     --anim-base: 0.2s; /* default transitions, dropdowns, badges */
     --anim-slow: 0.3s; /* entrances and reveals: panels, rows, loaders */
+
+    /* Compact type sizes, spent by product.css (POS catalog cards) and
+       print-a4.css (printed body text). Lived in app.css :root until the
+       turbo commit stripped the old import block; restored here so every
+       importer (app.css bundle and standalone entries alike) resolves them. */
+    --small-font-size: 12px;
+    --tiny-font-size: 10px;
 }
 
 /*

@@ -26,6 +26,29 @@ class ReturnTaxHelperTest extends TestCase
     }
 
     #[Test]
+    public function ratio_never_exceeds_one()
+    {
+        // A return can never cover more than the invoice it reverses. Above
+        // 1.0 every derived amount (PPN, PPh, COGS, AP) would reverse more
+        // than the original ever booked: a 200 return against a 100 invoice
+        // must book the same reversal as a full 100 return, not double it.
+        $this->assertEquals(1.0, ReturnTaxHelper::ratio(200.0, 100.0));
+
+        $reversal = ReturnTaxHelper::salesReversal(
+            returnTotal: 200.0,
+            originalRevenueBase: 100.0,
+            snapshotPpnAmount: 22.0,
+            isPpn: true,
+            snapshotPphAmount: 10.0,
+            isPph: true,
+        );
+
+        $this->assertEqualsWithDelta(1.0, $reversal['ratio'], 0.0001);
+        $this->assertEqualsWithDelta(22.0, $reversal['ppn'], 0.0001);
+        $this->assertEqualsWithDelta(10.0, $reversal['pph'], 0.0001);
+    }
+
+    #[Test]
     public function sales_reversal_scales_the_snapshot_by_the_net_base_ratio()
     {
         $reversal = ReturnTaxHelper::salesReversal(

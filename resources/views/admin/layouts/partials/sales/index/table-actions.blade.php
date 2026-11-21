@@ -7,15 +7,19 @@
             <a href="{{ route('admin.pos.receipt', $sale->id) }}" class="dropdown-item" target="_blank">
                 <i class="ti ti-receipt me-2"></i> {{ __('messages.view_receipt') }}
             </a>
+
+            <a href="{{ route('admin.sales.edit', $sale->id) }}" class="dropdown-item">
+                <i class="ti ti-edit me-2"></i> {{ __('messages.edit') }}
+            </a>
         @else
             <a href="#" class="dropdown-item view-sales-details-btn" data-id="{{ $sale->id }}">
                 <i class="ti ti-zoom-scan me-2"></i> {{ __('messages.view_details') }}
             </a>
-        @endif
 
-        <a href="{{ route('admin.sales.edit', $sale->id) }}" class="dropdown-item">
-            <i class="ti ti-edit me-2"></i> {{ __('messages.edit') }}
-        </a>
+            <a href="{{ route('admin.sales.edit', $sale->id) }}" class="dropdown-item">
+                <i class="ti ti-edit me-2"></i> {{ __('messages.edit') }}
+            </a>
+        @endif
 
         <button type="button" class="dropdown-item text-danger" data-bs-toggle="modal" data-bs-target="#deleteModal"
             data-onclick="setDeleteFormAction('{{ route('admin.sales.destroy', $sale->id) }}')">

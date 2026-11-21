@@ -1,4 +1,16 @@
 @import './tokens.css';
+/* Feature styles split out of this file in the v1.2 refactor. Their import
+   lines were dropped by the turbo commit (5dff4a1e) and never re-added, so
+   these files shipped but nothing loaded them: POS product cards, the PO and
+   CRM/SRM modals, the dashboard alert tabs and the A4 print rules all lost
+   their styling. Re-importing restores the pre-split behaviour. */
+@import './product.css';
+@import './purchase-order.css';
+@import './crm.css';
+@import './srm.css';
+@import './print-a4.css';
+@import './alerts.css';
+
 /* Turbo Progress Bar Styling */
 /* Theme toggle icon visibility - JS controls display after load.
    Default matches JS convention: light mode shows moon (click to go dark), dark mode shows sun (click to go light) */

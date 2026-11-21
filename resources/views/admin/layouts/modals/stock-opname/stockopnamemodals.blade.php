@@ -44,6 +44,21 @@
                 <i class="ti ti-check-circle text-success" style="font-size: 3rem;"></i>
                 <h3>{{ __('messages.are_you_sure') }}</h3>
                 <div class="text-muted">{{ __('messages.complete_opname_warning') }}</div>
+                {{-- Filled by the preview fetch when the modal opens:
+                     the exact legs completion will book, so the confirm
+                     click is never a blind one. Stays hidden until the
+                     figures arrive; a failed preview leaves the plain
+                     confirmation instead of a stale number. --}}
+                <div class="mt-3 text-start d-none" data-preview-block
+                     data-msg-no-adjustments="{{ __('messages.no_adjustments_to_post') }}"
+                     data-msg-no-journal="{{ __('messages.no_journal_will_post') }}"
+                     data-label-debit="{{ __('messages.debit') }}"
+                     data-label-credit="{{ __('messages.credit') }}"
+                     data-label-excess="{{ __('messages.excess_value') }}"
+                     data-label-shrinkage="{{ __('messages.shrinkage_value') }}">
+                    <div class="fw-bold mb-1">{{ __('messages.adjustments_to_post') }}</div>
+                    <div data-preview-lines></div>
+                </div>
             </div>
             <div class="modal-footer">
                 <div class="w-100">

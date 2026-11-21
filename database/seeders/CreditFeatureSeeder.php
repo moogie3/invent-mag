@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 use App\Models\Customer;
 use App\Models\CustomerCredit;
+use App\Models\JournalEntry;
 use App\Models\Payment;
 use App\Models\Product;
 use App\Models\ProductWarehouse;
@@ -91,6 +92,23 @@ class CreditFeatureSeeder extends Seeder
         $this->command->info("Using warehouse: {$warehouse->name}");
         $this->command->info("Available products: {$products->count()}");
 
+        // The three invoices this seeder writes are tagged INV/CR/TEST, so
+        // their presence means a previous run already did this job. Skipping
+        // matters because cleanUpPreviousTestData() below deletes the sales,
+        // returns and credits it finds but leaves their journal entries
+        // behind: a second run therefore deleted the documents, kept the GL
+        // rows pointing at them, then booked a fresh set. The ledger ended up
+        // carrying both the orphaned entries and the new ones.
+        $alreadySeeded = Sales::where('customer_id', $customer->id)
+            ->where('invoice', 'like', '%INV/CR/TEST/%')
+            ->exists();
+
+        if ($alreadySeeded) {
+            $this->command->info('Credit feature test data already seeded for tenant '.$tenantId.', skipping.');
+
+            return;
+        }
+
         $this->cleanUpPreviousTestData($customer);
 
         $product1 = $products[0];
@@ -109,29 +127,22 @@ class CreditFeatureSeeder extends Seeder
 
         $qty1 = 5;
         $price1 = $product1->selling_price;
-        $total1 = $qty1 * $price1;
 
         $qty2 = 3;
         $price2 = $product2->selling_price;
-        $total2 = $qty2 * $price2;
 
-        $subtotal = $total1 + $total2;
-        $taxRate = 10;
-        $taxAmount = $subtotal * ($taxRate / 100);
-        $grandTotal = $subtotal + $taxAmount;
-
+        // No tax rate, tax amount or total is sent here: createSale()
+        // recomputes all three from the tax record and the line items, so a
+        // second set of figures in this array was never read. It was worse
+        // than dead, though, because the payment below was made against THOSE
+        // numbers instead of the invoice's real total, and every seeded
+        // invoice ended up over- or under-paid while sitting at Paid.
         $salesData = [
             'invoice' => $invoiceNumber,
             'customer_id' => $customer->id,
             'warehouse_id' => $warehouse->id,
             'order_date' => $orderDate->toDateString(),
             'due_date' => $dueDate->toDateString(),
-            'tax_rate' => $taxRate,
-            'tax_amount' => $taxAmount,
-            'total' => $grandTotal,
-            'order_discount' => 0,
-            'order_discount_type' => 'fixed',
-            'payment_type' => 'Transfer',
             'products' => json_encode([
                 ['product_id' => $product1->id, 'quantity' => $qty1, 'customer_price' => $price1, 'discount' => 0, 'discount_type' => 'fixed'],
                 ['product_id' => $product2->id, 'quantity' => $qty2, 'customer_price' => $price2, 'discount' => 0, 'discount_type' => 'fixed'],
@@ -140,8 +151,12 @@ class CreditFeatureSeeder extends Seeder
 
         $sale = $this->salesService->createSale($salesData);
 
+        // Exactly what the invoice owes, read back from the document the
+        // service just wrote.
+        $saleTotal = (float) $sale->fresh()->total;
+
         $sale->payments()->create([
-            'amount' => $grandTotal,
+            'amount' => $saleTotal,
             'payment_date' => $orderDate->copy()->addDays(2),
             'payment_method' => 'Transfer',
             'notes' => 'Full payment for testing credit feature',
@@ -152,7 +167,7 @@ class CreditFeatureSeeder extends Seeder
 
         $this->command->info("Created invoice: {$invoiceNumber}");
         $this->command->info("Status: {$sale->status}");
-        $this->command->info('Total: Rp '.number_format($grandTotal, 0, ',', '.'));
+        $this->command->info('Total: Rp '.number_format($saleTotal, 0, ',', '.'));
 
         $returnDate = Carbon::now()->subDays(5);
         $returnQty = 3;
@@ -200,24 +215,15 @@ class CreditFeatureSeeder extends Seeder
 
         $qty3 = 4;
         $price3 = $product1->selling_price;
-        $total3 = $qty3 * $price3;
 
-        $subtotal2 = $total3;
-        $taxAmount2 = $subtotal2 * ($taxRate / 100);
-        $grandTotal2 = $subtotal2 + $taxAmount2;
-
+        // Same as step 1: the service owns the arithmetic, so only the line
+        // items are handed over and the payment is sized from the invoice.
         $salesData2 = [
             'invoice' => $invoiceNumber2,
             'customer_id' => $customer->id,
             'warehouse_id' => $warehouse->id,
             'order_date' => $orderDate2->toDateString(),
             'due_date' => $orderDate2->copy()->addDays(30)->toDateString(),
-            'tax_rate' => $taxRate,
-            'tax_amount' => $taxAmount2,
-            'total' => $grandTotal2,
-            'order_discount' => 0,
-            'order_discount_type' => 'fixed',
-            'payment_type' => 'Transfer',
             'products' => json_encode([
                 ['product_id' => $product1->id, 'quantity' => $qty3, 'customer_price' => $price3, 'discount' => 0, 'discount_type' => 'fixed'],
             ]),
@@ -225,8 +231,10 @@ class CreditFeatureSeeder extends Seeder
 
         $sale2 = $this->salesService->createSale($salesData2);
 
+        $sale2Total = (float) $sale2->fresh()->total;
+
         $sale2->payments()->create([
-            'amount' => $grandTotal2,
+            'amount' => $sale2Total,
             'payment_date' => $orderDate2->copy()->addDays(1),
             'payment_method' => 'Transfer',
             'notes' => 'Full payment for second invoice',
@@ -264,18 +272,19 @@ class CreditFeatureSeeder extends Seeder
         $orderDate3 = Carbon::now();
         $invoiceNumber3 = 'INV/CR/TEST/'.$tenantId.'/'.Str::random(12);
 
-        $creditToUse = min($totalAvailable, 50000); // Use credit up to 50k or available amount
-
         $qty4 = 1;
         $price4 = $product2->selling_price;
-        $total4 = $qty4 * $price4;
 
-        $subtotal3 = $total4;
-        $taxAmount3 = $subtotal3 * ($taxRate / 100);
-        $grandTotal3 = $subtotal3 + $taxAmount3;
+        // The service caps the credit at what this invoice still owes, so the
+        // seeder only states how much it is willing to use and reads the real
+        // figure back afterwards. Guessing the invoice total here to build the
+        // cap is what put a number the service had already recomputed next to
+        // it: the credit would then be sized against a total that did not
+        // exist, and anything above the invoice's real total would consume
+        // credit for nothing and mark the invoice Paid without cash moving.
+        $creditToUse = min($totalAvailable, 50000);
 
-        $this->command->info('Order subtotal: Rp '.number_format($grandTotal3, 0, ',', '.'));
-        $this->command->info('Credit to apply: Rp '.number_format($creditToUse, 0, ',', '.'));
+        $this->command->info('Credit offered: Rp '.number_format($creditToUse, 0, ',', '.'));
 
         $this->ensureStock($product2->id, $warehouse->id, $tenantId, 50);
 
@@ -285,12 +294,6 @@ class CreditFeatureSeeder extends Seeder
             'warehouse_id' => $warehouse->id,
             'order_date' => $orderDate3->toDateString(),
             'due_date' => $orderDate3->copy()->addDays(30)->toDateString(),
-            'tax_rate' => $taxRate,
-            'tax_amount' => $taxAmount3,
-            'total' => $grandTotal3,
-            'order_discount' => 0,
-            'order_discount_type' => 'fixed',
-            'payment_type' => 'Transfer',
             'customer_credit_amount' => $creditToUse,
             'products' => json_encode([
                 ['product_id' => $product2->id, 'quantity' => $qty4, 'customer_price' => $price4, 'discount' => 0, 'discount_type' => 'fixed'],
@@ -336,6 +339,13 @@ class CreditFeatureSeeder extends Seeder
             Payment::whereIn('paymentable_id', $testInvoices)
                 ->where('paymentable_type', 'App\Models\Sales')
                 ->delete();
+            // The journal entries have to go with the documents they came
+            // from. Deleting the sales and leaving these behind orphaned GL
+            // rows against invoices that no longer exist, and the transactions
+            // follow their journal entry through the cascade.
+            JournalEntry::where('sourceable_type', 'App\Models\Sales')
+                ->whereIn('sourceable_id', $testInvoices)
+                ->delete();
             Sales::whereIn('id', $testInvoices)->delete();
         }
 
@@ -344,6 +354,9 @@ class CreditFeatureSeeder extends Seeder
         })->pluck('id');
 
         if ($testReturns->isNotEmpty()) {
+            JournalEntry::where('sourceable_type', 'App\Models\SalesReturn')
+                ->whereIn('sourceable_id', $testReturns)
+                ->delete();
             SalesReturnItem::whereIn('sales_return_id', $testReturns)->delete();
             SalesReturn::whereIn('id', $testReturns)->delete();
         }

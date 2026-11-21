@@ -33,9 +33,19 @@ class PurchaseReturnService
 
     private function decrementPOItemRemaining($poId, $productId, $quantity)
     {
+        // Explicit FEFO order: SQLite happens to hand these back in expiry
+        // order because of the (po_id, expiry_date) index, but that is a
+        // coincidence of one query plan. MariaDB in production may pick the
+        // product_id or primary index instead and return the lines in a
+        // different order, which would drain a different PO line for the same
+        // return (audit F6). id is the tie-breaker for lines sharing an
+        // expiry and a write timestamp.
         $poItems = POItem::where('po_id', $poId)
             ->where('product_id', $productId)
             ->where('remaining_quantity', '>', 0)
+            ->orderBy('expiry_date', 'asc')
+            ->orderBy('created_at', 'asc')
+            ->orderBy('id', 'asc')
             ->get();
 
         foreach ($poItems as $poItem) {
@@ -50,9 +60,14 @@ class PurchaseReturnService
 
     private function incrementPOItemRemaining($poId, $productId, $quantity)
     {
+        // Same FEFO order as the draw above (audit F6), so refunding walks
+        // the lines in a fixed sequence rather than in table order.
         $poItems = POItem::where('po_id', $poId)
             ->where('product_id', $productId)
             ->whereColumn('remaining_quantity', '<', 'quantity')
+            ->orderBy('expiry_date', 'asc')
+            ->orderBy('created_at', 'asc')
+            ->orderBy('id', 'asc')
             ->get();
 
         foreach ($poItems as $poItem) {
@@ -102,6 +117,59 @@ class PurchaseReturnService
         ];
     }
 
+    /**
+     * Refuse a return that asks for more than this purchase ever sold.
+     *
+     * Per product: what the PO lines ordered, minus every LIVE (non-Canceled)
+     * return already on file, minus on edit the return being edited (its own
+     * old units are being replaced right now). Without this check the stock
+     * record could go negative, the purchase flipped to Returned and the
+     * journal reversed more than the purchase ever booked, and the form
+     * offered quantities a Pending return had already taken.
+     *
+     * @param  array<int|string, array<string, mixed>>  $returnedItems
+     *
+     * @throws \Exception when the request passes what can still be returned.
+     */
+    public function assertReturnable(Purchase $purchase, array $returnedItems, ?PurchaseReturn $excluding = null): void
+    {
+        $orderedByProduct = $purchase->items()
+            ->get()
+            ->groupBy('product_id')
+            ->map(fn ($lines) => $lines->sum('quantity'));
+
+        $liveByProduct = PurchaseReturn::query()
+            ->where('purchase_id', $purchase->id)
+            ->when($excluding, fn ($query) => $query->where('id', '!=', $excluding->id))
+            ->where('status', '!=', 'Canceled')
+            ->with('items')
+            ->get()
+            ->flatMap(fn ($return) => $return->items ?? collect())
+            ->groupBy('product_id')
+            ->map(fn ($items) => $items->sum('quantity'));
+
+        foreach ($returnedItems as $item) {
+            $quantity = (float) ($item['returned_quantity'] ?? 0);
+            if ($quantity <= 0) {
+                continue;
+            }
+
+            $productId = $item['product_id'] ?? null;
+            $ordered = (int) ($orderedByProduct[$productId] ?? 0);
+            $alreadyLive = (int) ($liveByProduct[$productId] ?? 0);
+            $available = $ordered - $alreadyLive;
+
+            if ($quantity > $available) {
+                $name = Product::find($productId)?->name ?? ('#'.$productId);
+                $detail = $ordered > 0
+                    ? "only {$available} of the {$ordered} purchased units can still be returned"
+                    : 'this product is not on the purchase';
+
+                throw new \Exception("Cannot return {$quantity} of \"{$name}\": {$detail}.");
+            }
+        }
+    }
+
     public function createPurchaseReturn(array $data): PurchaseReturn
     {
         return DB::transaction(function () use ($data) {
@@ -118,6 +186,21 @@ class PurchaseReturnService
 
             if (empty($returnedItems)) {
                 throw new \Exception('No items selected for return.');
+            }
+
+            // A return born Canceled holds no stock and no live journal entry:
+            // cancel gives both back, so creating one with them would leave the
+            // row in the state cancel exists to prevent. The form no longer
+            // offers Canceled; this backstop covers seeders, factories and any
+            // caller that bypasses it.
+            $isCanceled = $data['status'] === 'Canceled';
+
+            // Refused before anything is written: over-returning would drive
+            // the stock record negative, mark the purchase Returned and reverse
+            // more of it than was ever booked. A Canceled birth holds nothing,
+            // so it cannot over-return.
+            if (! $isCanceled) {
+                $this->assertReturnable($purchase, $returnedItems);
             }
 
             // Recalculate total amount on the backend to ensure data integrity
@@ -147,13 +230,9 @@ class PurchaseReturnService
                 'tax_type' => $purchase->tax_type ?? 'none',
             ]);
 
-            // A return born Canceled holds no stock and no live journal entry:
-            // cancel gives both back, so creating one with them would leave the
-            // row in the state cancel exists to prevent. The form no longer
-            // offers Canceled; this backstop covers seeders, factories and any
-            // caller that bypasses it.
-            $isCanceled = $data['status'] === 'Canceled';
-
+            // A return born Canceled holds no stock and no live journal entry
+            // (see $isCanceled above): the stock move below is skipped so the
+            // move cancel would have to undo is never made in the first place.
             foreach ($returnedItems as $itemData) {
                 $returnPrice = $itemData['return_price'] ?? $itemData['price'];
                 $returnedQuantity = $itemData['returned_quantity'];
@@ -406,6 +485,20 @@ class PurchaseReturnService
             $wasCanceled = $purchaseReturn->status === 'Canceled';
             $isCanceled = $data['status'] === 'Canceled';
 
+            // Filter for items that are actually being returned: hoisted above
+            // every write so the cap can be checked before anything moves.
+            $returnedItems = array_filter($items, function ($item) {
+                return isset($item['returned_quantity']) && $item['returned_quantity'] > 0;
+            });
+
+            // Refused before the stock revert: the edited return's own old
+            // units are excluded (they are being replaced right now), the other
+            // live returns are not. A Canceled destination holds nothing, so it
+            // cannot over-return either.
+            if (! $isCanceled) {
+                $this->assertReturnable($purchaseReturn->purchase, $returnedItems, $purchaseReturn);
+            }
+
             // Revert old stock quantities before deleting - but only for a
             // return that actually holds them: a Canceled one already gave its
             // stock back on the way to Canceled, and incrementing here would
@@ -429,17 +522,6 @@ class PurchaseReturnService
                 }
             }
             $purchaseReturn->items()->delete();
-
-            // Filter for items that are actually being returned
-            $returnedItems = array_filter($items, function ($item) {
-                return isset($item['returned_quantity']) && $item['returned_quantity'] > 0;
-            });
-
-            if (empty($returnedItems)) {
-                // If you want to allow removing all items, you might handle this differently.
-                // For now, let's assume at least one item should remain for an update.
-                // Or, we can just proceed and it will result in a zero-total return.
-            }
 
             // Recalculate total amount on the backend
             $totalReturnAmount = 0;

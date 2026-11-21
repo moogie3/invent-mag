@@ -24,11 +24,18 @@ class ReturnTaxHelper
     /**
      * Net-base ratio: the return's total over the original booked base.
      * 0 when either side is missing, which zeroes every derived amount and
-     * makes the caller post nothing.
+     * makes the caller post nothing. Capped at 1.0: a return can never
+     * cover more than the invoice it reverses, and a ratio above 1 would
+     * book a larger reversal than the original ever booked (PPN, PPh, COGS
+     * and the AP/AR legs all scale by this number).
      */
     public static function ratio(float $returnTotal, float $originalBase): float
     {
-        return $returnTotal > 0 && $originalBase > 0 ? $returnTotal / $originalBase : 0;
+        if ($returnTotal <= 0 || $originalBase <= 0) {
+            return 0;
+        }
+
+        return min(1.0, $returnTotal / $originalBase);
     }
 
     /**
@@ -48,8 +55,8 @@ class ReturnTaxHelper
 
         return [
             'ratio' => $ratio,
-            'ppn'   => ($isPpn && $snapshotPpnAmount > 0) ? round($snapshotPpnAmount * $ratio, 2) : 0.0,
-            'pph'   => ($isPph && $snapshotPphAmount > 0) ? round($snapshotPphAmount * $ratio, 2) : 0.0,
+            'ppn' => ($isPpn && $snapshotPpnAmount > 0) ? round($snapshotPpnAmount * $ratio, 2) : 0.0,
+            'pph' => ($isPph && $snapshotPphAmount > 0) ? round($snapshotPphAmount * $ratio, 2) : 0.0,
         ];
     }
 
@@ -70,8 +77,8 @@ class ReturnTaxHelper
 
         return [
             'ratio' => $ratio,
-            'ppn'   => $originalPostedPpn > 0 ? round($originalPostedPpn * $ratio, 2) : 0.0,
-            'pph'   => $originalPostedPph > 0 ? round($originalPostedPph * $ratio, 2) : 0.0,
+            'ppn' => $originalPostedPpn > 0 ? round($originalPostedPpn * $ratio, 2) : 0.0,
+            'pph' => $originalPostedPph > 0 ? round($originalPostedPph * $ratio, 2) : 0.0,
         ];
     }
 }

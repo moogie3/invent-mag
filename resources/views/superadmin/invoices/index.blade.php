@@ -95,11 +95,14 @@
                         </tbody>
                     </table>
                 </div>
-                @if($invoices->hasPages())
-                <div class="card-footer d-flex justify-content-center border-top">
-                    {{ $invoices->links() }}
+                <div data-pagination-footer class="card-footer d-flex align-items-center">
+                    <p class="m-0 text-secondary">
+                        {{ __('messages.pagination_showing_entries', ['first' => $invoices->firstItem() ?? 0, 'last' => $invoices->lastItem() ?? 0, 'total' => $invoices->total()]) }}
+                    </p>
+                    <div class="ms-auto">
+                        {{ $invoices->appends(request()->query())->links('vendor.pagination.tabler') }}
+                    </div>
                 </div>
-                @endif
             </div>
         </div>
     </div>

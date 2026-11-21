@@ -41,6 +41,7 @@ class SalesReturnService
             ->where('remaining_quantity', '>', 0)
             ->orderBy('expiry_date', 'asc')
             ->orderBy('created_at', 'asc')
+            ->orderBy('id', 'asc')
             ->get();
 
         foreach ($poItems as $poItem) {
@@ -55,10 +56,18 @@ class SalesReturnService
 
     private function incrementPOItemRemaining($productId, $quantity)
     {
+        // Walks the lines in the same FEFO order the decrement side uses,
+        // with id as the final tie-breaker so two lines written in the same
+        // second still resolve identically on every run. This used to walk in
+        // reverse (audit F6): a sales return added quantity back to the
+        // latest-expiring line while cancel took it from the earliest-expiring
+        // one, so a create/cancel round trip left the two lines out of step
+        // and the batch that was drawn from was not the batch refilled.
         $poItems = POItem::where('product_id', $productId)
             ->whereColumn('remaining_quantity', '<', 'quantity')
-            ->orderByDesc('expiry_date')
-            ->orderByDesc('created_at')
+            ->orderBy('expiry_date', 'asc')
+            ->orderBy('created_at', 'asc')
+            ->orderBy('id', 'asc')
             ->get();
 
         foreach ($poItems as $poItem) {
@@ -108,6 +117,117 @@ class SalesReturnService
         ];
     }
 
+    /**
+     * Price every return line off the invoice line it came from.
+     *
+     * The request's price is never trusted: it drives the return total, the
+     * customer credit, the AR reversal and the tax reversal, so a crafted
+     * request could move all four. The invoice line is the only record of
+     * what the customer actually paid - its net unit price (customer price
+     * less the line's per-unit discount, the same arithmetic the invoice
+     * total itself uses). The line is matched by sales_item_id when the
+     * form sends one (queried through the sale, so an id from another
+     * invoice cannot be reused), else by product. A product the invoice
+     * never sold has no price to hand back, so the whole return is refused.
+     *
+     * @param  array<int|string, array<string, mixed>>  $returnedItems
+     * @return array<int|string, array<string, mixed>>
+     *
+     * @throws \Exception when a returned line has no invoice line behind it.
+     */
+    /**
+     * Refuse a return that asks for more than this sale ever sold.
+     *
+     * Per product: what the invoice lines sold, minus every LIVE
+     * (non-Canceled) return already on file, minus on edit the return being
+     * edited (its own old units are being replaced right now). Without this
+     * check the stock record could gain units that were never sold, the
+     * sale flipped to Returned and the journal reversed more revenue than
+     * the sale ever booked, and the form offered quantities a Pending
+     * return had already taken.
+     *
+     * @param  array<int|string, array<string, mixed>>  $returnedItems
+     *
+     * @throws \Exception when the request passes what can still be returned.
+     */
+    public function assertReturnable(Sales $sale, array $returnedItems, ?SalesReturn $excluding = null): void
+    {
+        $soldByProduct = $sale->salesItems()
+            ->get()
+            ->groupBy('product_id')
+            ->map(fn ($lines) => $lines->sum('quantity'));
+
+        $liveByProduct = SalesReturn::query()
+            ->where('sales_id', $sale->id)
+            ->when($excluding, fn ($query) => $query->where('id', '!=', $excluding->id))
+            ->where('status', '!=', 'Canceled')
+            ->with('items')
+            ->get()
+            ->flatMap(fn ($return) => $return->items ?? collect())
+            ->groupBy('product_id')
+            ->map(fn ($items) => $items->sum('quantity'));
+
+        foreach ($returnedItems as $item) {
+            $quantity = (float) ($item['returned_quantity'] ?? 0);
+            if ($quantity <= 0) {
+                continue;
+            }
+
+            $productId = $item['product_id'] ?? null;
+            $sold = (int) ($soldByProduct[$productId] ?? 0);
+            $alreadyLive = (int) ($liveByProduct[$productId] ?? 0);
+            $available = $sold - $alreadyLive;
+
+            if ($quantity > $available) {
+                $name = Product::find($productId)?->name ?? ('#'.$productId);
+                $detail = $sold > 0
+                    ? "only {$available} of the {$sold} sold units can still be returned"
+                    : 'this product is not on the sale';
+
+                throw new \Exception("Cannot return {$quantity} of \"{$name}\": {$detail}.");
+            }
+        }
+    }
+
+    private function priceFromInvoiceLines(Sales $sale, array $returnedItems): array
+    {
+        $invoiceLines = $sale->salesItems()->get();
+
+        foreach ($returnedItems as $key => $item) {
+            $salesItemId = $item['sales_item_id'] ?? null;
+            $line = $salesItemId
+                ? $invoiceLines->firstWhere('id', $salesItemId)
+                : null;
+
+            if (! $line && isset($item['product_id'])) {
+                $line = $invoiceLines->firstWhere('product_id', $item['product_id']);
+            }
+
+            if (! $line) {
+                $productId = $item['product_id'] ?? null;
+                $name = Product::find($productId)?->name ?? ('#'.$productId);
+                $quantity = $item['returned_quantity'] ?? 0;
+
+                throw new \Exception("Cannot return {$quantity} of \"{$name}\": this product is not on invoice {$sale->invoice}.");
+            }
+
+            $netUnitPrice = $line->customer_price - SalesHelper::calculateDiscountPerUnit(
+                $line->customer_price,
+                $line->discount,
+                $line->discount_type,
+            );
+
+            $returnedItems[$key]['price'] = round($netUnitPrice, 2);
+            $returnedItems[$key]['sales_item_id'] = $line->id;
+            // The line is the source of truth for the product too: pricing
+            // off this line while storing the request's product_id would
+            // price one product and move another product's stock.
+            $returnedItems[$key]['product_id'] = $line->product_id;
+        }
+
+        return $returnedItems;
+    }
+
     public function createSalesReturn(array $data): SalesReturn
     {
         return DB::transaction(function () use ($data) {
@@ -125,42 +245,35 @@ class SalesReturnService
                 throw new \Exception('No items selected for return.');
             }
 
-            $totalAmount = 0;
-            foreach ($returnedItems as $item) {
-                $totalAmount += ($item['price'] ?? 0) * $item['returned_quantity'];
-            }
-
             // Get original sale status BEFORE creating return and modifying it
-            $sale = Sales::find($data['sales_id']);
+            $sale = Sales::findOrFail($data['sales_id']);
             $sale->load('payments');
             $originalSaleStatus = $sale->status;
             $wasPaid = $sale->total_paid >= $sale->grand_total;
 
-            // Calculate return quantities
-            $totalOriginalQuantitySold = $sale->salesItems()->sum('quantity');
-            // Only LIVE returns count: a canceled return has already given its
-            // stock and its journal entry back, so it cannot keep marking the
-            // sale Partial/Returned (cancel keeps the row for history).
-            $totalQuantityReturnedSoFar = $sale->salesReturns()
-                ->where('status', '!=', 'Canceled')
-                ->with('items')->get()->flatMap(function ($sr) {
-                    return $sr->items;
-                })->sum('quantity');
+            // A return born Canceled holds no stock and no live journal entry:
+            // cancel gives both back, so creating one with them would leave the
+            // row in the state cancel exists to prevent. The form no longer
+            // offers Canceled; this backstop covers seeders, factories and any
+            // caller that bypasses it.
+            $isCanceled = $data['status'] === 'Canceled';
 
-            // Update sale status based on return quantity
-            // Only change status for Unpaid invoices
-            // For Paid invoices, keep as Paid (return creates credit, not refund)
-            // Note: We check $wasPaid (actual payment status) not stored status
-            if ($totalQuantityReturnedSoFar >= $totalOriginalQuantitySold) {
-                // Only change to Returned if was NOT paid
-                if (! $wasPaid) {
-                    $sale->update(['status' => 'Returned']);
-                }
-            } elseif ($totalQuantityReturnedSoFar > 0) {
-                // Only change to Partial if was NOT paid
-                if (! $wasPaid) {
-                    $sale->update(['status' => 'Partial']);
-                }
+            // Price every line off the invoice line it came from before any
+            // money is added up (see priceFromInvoiceLines(): the request's
+            // price is never trusted).
+            $returnedItems = $this->priceFromInvoiceLines($sale, $returnedItems);
+
+            // Refused before anything is written: over-returning would give
+            // the warehouse units that were never sold, mark the sale
+            // Returned and reverse more revenue than the sale booked. A
+            // Canceled birth holds nothing, so it cannot over-return.
+            if (! $isCanceled) {
+                $this->assertReturnable($sale, $returnedItems);
+            }
+
+            $totalAmount = 0;
+            foreach ($returnedItems as $item) {
+                $totalAmount += ($item['price'] ?? 0) * $item['returned_quantity'];
             }
 
             // Copy tax data from the original sale.
@@ -184,13 +297,6 @@ class SalesReturnService
                 'user_id' => Auth::id(),
             ]);
 
-            // A return born Canceled holds no stock and no live journal entry:
-            // cancel gives both back, so creating one with them would leave the
-            // row in the state cancel exists to prevent. The form no longer
-            // offers Canceled; this backstop covers seeders, factories and any
-            // caller that bypasses it.
-            $isCanceled = $data['status'] === 'Canceled';
-
             // Create return items - each item tracks which sales line item it came from
             // via sales_item_id. This maintains the exact price and quantity context.
             foreach ($returnedItems as $itemData) {
@@ -211,7 +317,9 @@ class SalesReturnService
                 // have to undo is never made in the first place.
                 $product = Product::find($itemData['product_id']);
                 if ($product && ! $isCanceled) {
-                    $sale = Sales::find($data['sales_id']);
+                    // $sale was resolved through findOrFail() above, so a
+                    // cross-tenant sales id is already refused: re-fetching it
+                    // here with a scoped find() could only ever return null.
                     $warehouseId = $sale->warehouse_id ?? Product::getMainWarehouseId();
 
                     $stockRecord = ProductWarehouse::firstOrCreate(
@@ -225,9 +333,42 @@ class SalesReturnService
                 }
             }
 
-            $sale = Sales::find($data['sales_id']);
-            // Note: Sale status update moved to BEFORE return creation (see above)
-            // This duplicate code is kept for backward compatibility but should be cleaned up later
+            // $sale is already the findOrFail() result from the top of this
+            // transaction, so no second lookup is needed here.
+
+            // Update sale status based on return quantity, AFTER the return
+            // and its item rows exist: the recount has to include the return
+            // it is computing for. Run before the insert (where this block
+            // used to live) the first return of an invoice was invisible to
+            // its own recount, so the block could only ever fire for a
+            // line-less invoice. The update path already counts its row,
+            // because there it exists. Production outcome is unchanged either
+            // way: updateSaleStatus() at the end of this method overwrites
+            // the result with the payments-based status.
+            $totalOriginalQuantitySold = $sale->salesItems()->sum('quantity');
+            // Only LIVE returns count: a canceled return has already given its
+            // stock and its journal entry back, so it cannot keep marking the
+            // sale Partial/Returned (cancel keeps the row for history).
+            $totalQuantityReturnedSoFar = $sale->salesReturns()
+                ->where('status', '!=', 'Canceled')
+                ->with('items')->get()->flatMap(function ($sr) {
+                    return $sr->items;
+                })->sum('quantity');
+
+            // Only change status for Unpaid invoices
+            // For Paid invoices, keep as Paid (return creates credit, not refund)
+            // Note: We check $wasPaid (actual payment status) not stored status
+            if ($totalQuantityReturnedSoFar >= $totalOriginalQuantitySold) {
+                // Only change to Returned if was NOT paid
+                if (! $wasPaid) {
+                    $sale->update(['status' => 'Returned']);
+                }
+            } elseif ($totalQuantityReturnedSoFar > 0) {
+                // Only change to Partial if was NOT paid
+                if (! $wasPaid) {
+                    $sale->update(['status' => 'Partial']);
+                }
+            }
 
             // The journal block itself lives in createSalesReturnJournalEntry(),
             // shared with the edit path. strict: true settles the two callers'
@@ -244,13 +385,14 @@ class SalesReturnService
             // Create customer credit if return is completed and original sale was paid
             // Use actual payment status (wasPaid) instead of stored status
             if ($data['status'] === 'Completed' && $wasPaid) {
+                $creditAmount = $this->creditAmount($sale, $totalAmount, $taxAmount, $taxType);
                 $credit = CustomerCredit::create([
                     'tenant_id' => $sale->tenant_id,
                     'customer_id' => $sale->customer_id,
                     'sales_return_id' => $salesReturn->id,
-                    'amount' => $totalAmount,
+                    'amount' => $creditAmount,
                     'used_amount' => 0,
-                    'available_amount' => $totalAmount,
+                    'available_amount' => $creditAmount,
                     'reason' => 'Sales Return for Invoice #'.$sale->invoice,
                     'status' => 'active',
                 ]);
@@ -283,6 +425,26 @@ class SalesReturnService
             $wasCanceled = $salesReturn->status === 'Canceled';
             $isCanceled = $data['status'] === 'Canceled';
 
+            // Filter for items that are actually being returned, then price
+            // them off the invoice line - both BEFORE the stock revert, so a
+            // request that cannot be honored writes nothing at all (the
+            // transaction would roll back anyway, but the refusal should not
+            // even reach the writes).
+            $returnedItems = array_filter($items, function ($item) {
+                return isset($item['returned_quantity']) && $item['returned_quantity'] > 0;
+            });
+            $returnedItems = $this->priceFromInvoiceLines($sale, $returnedItems);
+
+            // Refused before the stock revert: the edited return's own old
+            // units are excluded (they are being replaced right now), so this
+            // checks what the OTHER live returns leave. Over-editing would
+            // hand the warehouse units that were never sold and reverse more
+            // revenue than the sale booked. A Canceled edit holds nothing, so
+            // it cannot over-return.
+            if (! $isCanceled) {
+                $this->assertReturnable($sale, $returnedItems, $salesReturn);
+            }
+
             // A Canceled return holds no stock, so there is nothing to hand
             // back when the edit touches one: reverting its old items would
             // take goods out of the warehouse the return never put in.
@@ -303,10 +465,6 @@ class SalesReturnService
                 }
             }
             $salesReturn->items()->delete();
-
-            $returnedItems = array_filter($items, function ($item) {
-                return isset($item['returned_quantity']) && $item['returned_quantity'] > 0;
-            });
 
             $totalReturnAmount = 0;
             foreach ($returnedItems as $itemData) {
@@ -422,27 +580,39 @@ class SalesReturnService
                 : null;
 
             if ($data['status'] === 'Completed') {
+                // Same worth as at creation: gross of exclusive tax, net of
+                // withheld PPh (see creditAmount()).
+                $creditAmount = $this->creditAmount($sale, $totalReturnAmount, $updatedTaxAmount, $updatedTaxType);
+
                 if ($credit) {
-                    $credit->update([
-                        'amount' => $totalReturnAmount,
-                        'available_amount' => max(0, $totalReturnAmount - $credit->used_amount),
-                        'status' => 'active',
-                    ]);
+                    // A refunded credit has already been paid out as cash.
+                    // Reactivating it here would hand the customer the same
+                    // money a second time, so it stays spent no matter what
+                    // the edit does to the return.
+                    if ($credit->status !== 'refunded') {
+                        $credit->update([
+                            'amount' => $creditAmount,
+                            'available_amount' => max(0, $creditAmount - $credit->used_amount),
+                            'status' => 'active',
+                        ]);
+                    }
                 } elseif ($wasPaid) {
                     $credit = CustomerCredit::create([
                         'tenant_id' => $sale->tenant_id,
                         'customer_id' => $sale->customer_id,
                         'sales_return_id' => $salesReturn->id,
-                        'amount' => $totalReturnAmount,
+                        'amount' => $creditAmount,
                         'used_amount' => 0,
-                        'available_amount' => $totalReturnAmount,
+                        'available_amount' => $creditAmount,
                         'reason' => 'Sales Return for Invoice #'.$sale->invoice,
                         'status' => 'active',
                     ]);
 
                     $salesReturn->update(['customer_credit_id' => $credit->id]);
                 }
-            } elseif ($credit) {
+            } elseif ($credit && $credit->status !== 'refunded') {
+                // Same guard on the way down: cancel must not erase the fact
+                // that this credit was already paid out as cash.
                 $credit->update(['status' => 'canceled', 'available_amount' => 0]);
             }
 
@@ -539,6 +709,19 @@ class SalesReturnService
 
     public function deleteSalesReturn(SalesReturn $salesReturn): void
     {
+        // Cash has already left for this credit. Deleting the return would
+        // reverse the AR credit that justified the payout while the refund
+        // entry (sourced to the credit, so it survives) stays put, leaving
+        // the ledger claiming the customer both owes the money and has been
+        // paid it. The return is financially settled and must be canceled
+        // instead of deleted.
+        if ($salesReturn->customer_credit_id) {
+            $credit = CustomerCredit::find($salesReturn->customer_credit_id);
+            if ($credit && $credit->status === 'refunded') {
+                throw new \Exception('This return has already been refunded as cash and can no longer be deleted. Cancel it instead.');
+            }
+        }
+
         DB::transaction(function () use ($salesReturn) {
             // Reverse associated journal entries for accurate accounting -
             // through the shared guard, so an entry an edit already reversed
@@ -619,14 +802,31 @@ class SalesReturnService
         });
     }
 
-    public function bulkDeleteSalesReturns(array $ids): void
+    /**
+     * @param  array<int, int>  $ids
+     * @return array{deleted: int, skipped: int, skipped_ids: array<int, int>}
+     */
+    public function bulkDeleteSalesReturns(array $ids): array
     {
-        DB::transaction(function () use ($ids) {
+        $counts = ['deleted' => 0, 'skipped' => 0, 'skipped_ids' => []];
+
+        DB::transaction(function () use ($ids, &$counts) {
             $salesReturns = SalesReturn::whereIn('id', $ids)->with('items')->get();
             foreach ($salesReturns as $salesReturn) {
-                $this->deleteSalesReturn($salesReturn);
+                try {
+                    $this->deleteSalesReturn($salesReturn);
+                    $counts['deleted']++;
+                } catch (\Exception $e) {
+                    // A refunded return is settled and must survive the batch.
+                    // Counting it as skipped rather than failing keeps the rest
+                    // of the selection deletable.
+                    $counts['skipped']++;
+                    $counts['skipped_ids'][] = $salesReturn->id;
+                }
             }
         });
+
+        return $counts;
     }
 
     /**
@@ -696,13 +896,23 @@ class SalesReturnService
             // money become available to the customer.
 
             if ($wasPaid) {
+                // Worth exactly what the create/edit paths would have
+                // issued: gross of exclusive tax, net of withheld PPh
+                // (see creditAmount()). The return carries its own tax
+                // snapshot, so completion reads it from the row.
+                $creditAmount = $this->creditAmount(
+                    $sale,
+                    (float) $salesReturn->total_amount,
+                    (float) ($salesReturn->tax_amount ?? 0),
+                    $salesReturn->tax_type ?? 'none',
+                );
                 $credit = CustomerCredit::create([
                     'tenant_id' => $sale->tenant_id,
                     'customer_id' => $sale->customer_id,
                     'sales_return_id' => $salesReturn->id,
-                    'amount' => $salesReturn->total_amount,
+                    'amount' => $creditAmount,
                     'used_amount' => 0,
-                    'available_amount' => $salesReturn->total_amount,
+                    'available_amount' => $creditAmount,
                     'reason' => 'Sales Return for Invoice #'.$sale->invoice,
                     'status' => 'active',
                 ]);
@@ -748,9 +958,14 @@ class SalesReturnService
      * drift from the figure posted to the ledger. The base is the original
      * sale's revenue CREDIT (net of PPN), never sale->total (gross).
      *
+     * PPN, PPh and the ratio are shares of the sale's value. COGS is not:
+     * it is what the returned stock costs, so pass the return's lines when
+     * they are known (see cogsToReverse()).
+     *
+     * @param  array<array-key, mixed>|null  $returnItems  the return's lines, when known
      * @return array{ratio: float, ppn: float, pph: float, cogs: float}
      */
-    public function deriveReversal(Sales $sale, float $returnTotal): array
+    public function deriveReversal(Sales $sale, float $returnTotal, ?array $returnItems = null): array
     {
         $accountingSettings = app('currentTenant')->accounting_settings ?? [];
 
@@ -795,9 +1010,86 @@ class SalesReturnService
             $sale->isPph(),
         );
 
-        $reversal['cogs'] = $originalCOGSAmount * $reversal['ratio'];
+        $reversal['cogs'] = $this->cogsToReverse($returnItems, $reversal['ratio'], $originalCOGSAmount);
 
         return $reversal;
+    }
+
+    /**
+     * What the return takes back out of COGS: the cost of the stock going
+     * back on the shelf, not a slice of the sale's COGS.
+     *
+     * The stock restore hands the units to specific batches (earliest
+     * expiry first), so the Inventory debit has to be what those units
+     * cost on the shelf, or the ledger and the shelf disagree about what
+     * the returned goods are worth. Value-ratio proration prices them at
+     * their selling share instead, which only coincides with the truth
+     * when the sale's booked cost per unit happens to match the batch
+     * cost: a return against stock replenished at a different price would
+     * restore a different amount than the goods are worth.
+     *
+     * Falls back to the proration when no line detail is passed (the
+     * preview endpoint, which derives from the total alone) or when the
+     * shelf no longer holds the returned units, because in both cases
+     * there is no batch cost to read.
+     *
+     * @param  array<array-key, mixed>|null  $returnItems
+     */
+    private function cogsToReverse(?array $returnItems, float $ratio, float $originalCogs): float
+    {
+        $prorated = $originalCogs * $ratio;
+
+        if (empty($returnItems)) {
+            return $prorated;
+        }
+
+        $valuations = new StockValuationService($this->accountingService);
+        $total = 0.0;
+        $costed = 0;
+
+        foreach ($returnItems as $item) {
+            $productId = (int) ($item['product_id'] ?? 0);
+            $quantity = (int) ($item['returned_quantity'] ?? $item['quantity'] ?? 0);
+
+            if ($productId <= 0 || $quantity <= 0) {
+                continue;
+            }
+
+            $cost = $valuations->costOfCoveredUnits($productId, $quantity);
+
+            if ($cost === null) {
+                // The shelf cannot price these units; one line the batches
+                // cannot cover would make the whole document a guess, so
+                // the return falls back as a unit rather than mixing an
+                // exact figure with an approximation.
+                return $prorated;
+            }
+
+            $total += $cost;
+            $costed++;
+        }
+
+        return $costed > 0 ? round($total, 2) : $prorated;
+    }
+
+    /**
+     * What a customer credit for a return of $returnTotal is worth.
+     *
+     * The credit restores what the customer actually parted with: the net
+     * line plus exclusive tax (an inclusive tax is already inside the
+     * total, and a 'none' or zero rate adds nothing), less the PPh that was
+     * withheld at the source and therefore never reached us - the same
+     * prorated PPh the return journal reverses, derived through
+     * deriveReversal() so the credit and the ledger can never disagree.
+     * Without the tax half the customer was short-changed the VAT on every
+     * credited return; without the PPh half we would hand back money that
+     * was never paid in.
+     */
+    private function creditAmount(Sales $sale, float $returnTotal, float $taxAmount, string $taxType): float
+    {
+        $withheldPph = $this->deriveReversal($sale, $returnTotal)['pph'];
+
+        return round($returnTotal + ($taxType === 'exclusive' ? $taxAmount : 0) - $withheldPph, 2);
     }
 
     /**
@@ -839,8 +1131,9 @@ class SalesReturnService
 
         // The scan, the ratio and both tax reversals come from one shared
         // derivation, so a figure shown on the return screens can never
-        // drift from the figure booked here.
-        $reversal = $this->deriveReversal($sale, $totalAmount);
+        // drift from the figure booked here. The lines travel with it so
+        // COGS is priced from the stock going back on the shelf.
+        $reversal = $this->deriveReversal($sale, $totalAmount, $salesReturn->items->all());
         $proportionalCOGS = $reversal['cogs'];
 
         $transactions = [
@@ -887,6 +1180,72 @@ class SalesReturnService
             $transactions,
             $salesReturn
         );
+    }
+
+    /**
+     * Pay the remaining balance of a return's customer credit back as cash.
+     *
+     * Under the credit-in-AR design the return has already credited Accounts
+     * Receivable, so the customer's credit balance is sitting there as money
+     * owed to them. Cash refund is the mirror of a payment: debit AR to clear
+     * that balance, credit Cash because the money leaves. Only the unallocated
+     * part can be refunded - whatever has already been consumed against an
+     * invoice has been settled by that invoice's own AR debit.
+     */
+    public function refundCustomerCredit(SalesReturn $salesReturn): void
+    {
+        $credit = $salesReturn->customer_credit_id
+            ? CustomerCredit::find($salesReturn->customer_credit_id)
+            : null;
+
+        if (! $credit) {
+            throw new \Exception('This return has no customer credit to refund.');
+        }
+
+        if ($credit->status !== 'active') {
+            throw new \Exception('This credit is no longer active and cannot be refunded.');
+        }
+
+        $refundAmount = (float) $credit->available_amount;
+
+        if ($refundAmount <= 0) {
+            throw new \Exception('There is no credit balance left to refund.');
+        }
+
+        $accountingSettings = app('currentTenant')->accounting_settings ?? [];
+        $accountsReceivableAccount = Account::find($accountingSettings['accounts_receivable_account_id'] ?? null);
+        $cashAccount = Account::find($accountingSettings['cash_account_id'] ?? null);
+
+        if (! $accountsReceivableAccount || ! $cashAccount) {
+            throw new \Exception('Accounts receivable or cash account is not configured. Please check Accounting Settings.');
+        }
+
+        $sale = $salesReturn->sale;
+
+        DB::transaction(function () use ($credit, $refundAmount, $accountsReceivableAccount, $cashAccount, $salesReturn, $sale) {
+            // Sourced to the credit, not the return. Editing or deleting a
+            // return reverses every entry sourced to it, so hanging the
+            // refund off the return would reverse cash that has already left
+            // the building. The credit row outlives its return (the foreign
+            // key is nullOnDelete), so the entry never becomes an orphan.
+            $this->accountingService->createJournalEntry(
+                'Customer Credit Refund for SO #'.($sale->invoice ?? $salesReturn->id),
+                Carbon::parse($salesReturn->return_date),
+                [
+                    ['account_name' => $accountsReceivableAccount->name, 'type' => 'debit', 'amount' => $refundAmount],
+                    ['account_name' => $cashAccount->name, 'type' => 'credit', 'amount' => $refundAmount],
+                ],
+                $credit
+            );
+
+            // available_amount goes to zero so the credit drops out of the
+            // active pool, and the status stops it being re-picked by any
+            // screen that only checks the balance.
+            $credit->update([
+                'available_amount' => 0,
+                'status' => 'refunded',
+            ]);
+        });
     }
 
     public function bulkCancelSalesReturns(array $ids): void

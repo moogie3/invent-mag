@@ -81,6 +81,11 @@ class TaxSeeder extends Seeder
                 'description' => 'PPN 11% with inclusive pricing (tax already included in item prices)',
                 'is_active' => true,
                 'is_default' => false,
+                // Still output VAT, only priced differently: without the flag
+                // this row escaped the jurisdiction filter and could never
+                // split Input VAT on a purchase.
+                'is_ppn' => true,
+                'is_pph' => false,
             ]
         );
     }

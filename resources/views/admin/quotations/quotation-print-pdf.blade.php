@@ -82,7 +82,7 @@
             @foreach($items as $index => $item)
             <tr>
                 <td>{{ $index + 1 }}</td>
-                <td class="text-left">{{ $item->product_name ?? $item->product?->name ?? __('messages.not_available') }}</td>
+                <td class="text-left">{{ $item->product_name ?? $item->name ?? \App\Models\Product::find($item->product_id ?? null)?->name ?? __('messages.not_available') }}</td>
                 <td>{{ $item->quantity }}</td>
                 <td>{{ \App\Helpers\CurrencyHelper::format($item->price) }}</td>
                 <td>

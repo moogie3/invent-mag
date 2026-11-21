@@ -168,16 +168,14 @@
                             </tbody>
                         </table>
                     </div>
-                    @if ($adjustments->hasPages())
-                        <div class="card-footer d-flex align-items-center">
-                            <p class="m-0 text-secondary">
-                                {{ __('messages.pagination_showing_entries', ['first' => $adjustments->firstItem(), 'last' => $adjustments->lastItem(), 'total' => $adjustments->total()]) }}
-                            </p>
-                            <div class="ms-auto">
-                                {{ $adjustments->appends(request()->query())->links('vendor.pagination.tabler') }}
-                            </div>
+                    <div data-pagination-footer class="card-footer d-flex align-items-center">
+                        <p class="m-0 text-secondary">
+                            {{ __('messages.pagination_showing_entries', ['first' => $adjustments->firstItem() ?? 0, 'last' => $adjustments->lastItem() ?? 0, 'total' => $adjustments->total()]) }}
+                        </p>
+                        <div class="ms-auto">
+                            {{ $adjustments->appends(request()->query())->links('vendor.pagination.tabler') }}
                         </div>
-                    @endif
+                    </div>
                 </div>
             </div>
         </div>

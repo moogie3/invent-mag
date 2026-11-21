@@ -253,11 +253,14 @@
                     </form>
                 @endif
             </div>
-            @if($fakturs->hasPages())
-                <div class="card-footer">
-                    {{ $fakturs->links() }}
+            <div data-pagination-footer class="card-footer d-flex align-items-center">
+                <p class="m-0 text-secondary">
+                    {{ __('messages.pagination_showing_entries', ['first' => $fakturs->firstItem() ?? 0, 'last' => $fakturs->lastItem() ?? 0, 'total' => $fakturs->total()]) }}
+                </p>
+                <div class="ms-auto">
+                    {{ $fakturs->appends(request()->query())->links('vendor.pagination.tabler') }}
                 </div>
-            @endif
+            </div>
         </div>
         </div>
     </div>

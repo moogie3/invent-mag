@@ -576,12 +576,12 @@
 
                 <div id="adjustmentAmountContainer" class="mb-3">
                     <label class="form-label" id="adjustmentAmountLabel">{{ __('messages.product_adjustment_amount') }}</label>
-                    <input type="number" class="form-control" id="adjustmentAmount" min="1" value="1">
+                    <input type="number" class="form-control" id="adjustmentAmount" min="1" step="1" value="1">
                 </div>
 
                 <div id="correctionAmountContainer" class="mb-3" style="display: none;">
                     <label class="form-label">{{ __('messages.product_set_exact_quantity') }}</label>
-                    <input type="number" class="form-control" id="correctionAmount" min="0" value="0">
+                    <input type="number" class="form-control" id="correctionAmount" min="0" step="1" value="0">
                 </div>
                 <div class="mb-3 text-center">
                     <span class="badge fs-3 stock-change-badge bg-secondary-lt"

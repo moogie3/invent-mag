@@ -11,6 +11,7 @@
                 $pos->relationLoaded('purchaseReturns') ? $pos->purchaseReturns : collect(),
                 (float) ($pos->tax_rate ?? 0),
                 $pos->tax_type ?? 'none',
+                (float) ($pos->pph_rate ?? 0)
             );
         @endphp
 

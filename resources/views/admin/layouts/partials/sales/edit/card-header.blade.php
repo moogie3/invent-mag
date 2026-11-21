@@ -10,7 +10,7 @@
                 </div>
                 <div>
                     <h2 class="mb-0">{{ __('messages.invoice_no') }}{{ $sales->invoice }}</h2>
-                    <div class="text-muted fs-5">{{ $sales->customer->address }}</div>
+                    <div class="text-muted fs-5">{{ $sales->customer?->address }}</div>
                 </div>
             </div>
         </div>

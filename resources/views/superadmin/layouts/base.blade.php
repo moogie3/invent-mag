@@ -1,5 +1,6 @@
 @php
-    $themeMode = 'light';
+    $superAdminSettings = auth()->guard('super_admin')->user()?->system_settings ?? [];
+    $themeMode = $superAdminSettings['theme_mode'] ?? 'light';
     $platformCurrency = App\Helpers\CurrencyHelper::getPlatformSettings();
 @endphp
 
@@ -29,7 +30,7 @@
     @vite('resources/css/app.css')
     @vite('resources/css/superadmin.css')
 
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+    <link rel="stylesheet" href="{{ asset('tabler/dist/icons/tabler-icons.min.css') }}?2.47.0">
 
     @include('superadmin.layouts.script')
 

@@ -299,8 +299,9 @@ class PurchaseServiceTest extends TestCase
             ]),
         ];
 
-        // Expect createJournalEntry to be called for the payment
-        $this->accountingServiceMock->shouldReceive('createJournalEntry')->once();
+        // Two entries now: the invoice is re-posted for the edited totals,
+        // then the payment the Paid status triggers.
+        $this->accountingServiceMock->shouldReceive('createJournalEntry')->twice();
 
         $this->purchaseService->updatePurchase($purchase, $updateData);
 

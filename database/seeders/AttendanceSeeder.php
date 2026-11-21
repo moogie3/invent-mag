@@ -18,6 +18,21 @@ class AttendanceSeeder extends Seeder
             return;
         }
 
+        // attendance_records is unique on (tenant_id, employee_id, date), and
+        // date is cast to 'date', which Laravel writes as 'Y-m-d H:i:s'. The
+        // updateOrCreate() below looks the row up with the bare 'Y-m-d' string
+        // and the query builder does not apply model casts to a where value, so
+        // the lookup never matches and the insert trips the unique index
+        // instead of updating. Guard with exists() so a second db:seed leaves
+        // the period and its records alone rather than dying on tenant 4 of 6.
+        if (AttendanceRecord::where('tenant_id', $tenantId)->exists()) {
+            if (isset($this->command)) {
+                $this->command->info('Attendance already seeded for tenant '.$tenantId.', skipping.');
+            }
+
+            return;
+        }
+
         // Create a period for last month
         $lastMonth = now()->subMonth();
         $year = $lastMonth->year;

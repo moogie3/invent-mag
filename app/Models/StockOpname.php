@@ -31,4 +31,12 @@ class StockOpname extends Model
     {
         return $this->belongsTo(User::class, 'created_by');
     }
+
+    /**
+     * Get the path to view the model.
+     */
+    public function path(): string
+    {
+        return route('admin.stock-opname.show', $this);
+    }
 }

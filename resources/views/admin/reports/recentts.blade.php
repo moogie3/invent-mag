@@ -494,16 +494,14 @@
                         </table>
                     </div>
 
-                    @if (method_exists($transactions, 'links') && $transactions->hasPages())
-                        <div class="card-footer d-flex align-items-center">
-                            <p class="m-0 text-muted">
-                                {{ __('messages.pagination_showing_entries', ['first' => $transactions->firstItem(), 'last' => $transactions->lastItem(), 'total' => $transactions->total()]) }}
-                            </p>
-                            <div class="ms-auto">
-                                {{ $transactions->appends(request()->query())->links('vendor.pagination.tabler') }}
-                            </div>
+                    <div data-pagination-footer class="card-footer d-flex align-items-center">
+                        <p class="m-0 text-secondary">
+                            {{ __('messages.pagination_showing_entries', ['first' => $transactions->firstItem() ?? 0, 'last' => $transactions->lastItem() ?? 0, 'total' => $transactions->total()]) }}
+                        </p>
+                        <div class="ms-auto">
+                            {{ $transactions->appends(request()->query())->links('vendor.pagination.tabler') }}
                         </div>
-                    @endif
+                    </div>
                 </div>
             </div>
         </div>

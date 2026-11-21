@@ -257,8 +257,8 @@
                             <div data-pagination-footer class="card-footer d-flex align-items-center">
                                 <p class="m-0 text-secondary">
                                     {{ __('messages.pagination_showing_entries', [
-                                        'first' => $suppliers->firstItem(),
-                                        'last' => $suppliers->lastItem(),
+                                        'first' => $suppliers->firstItem() ?? 0,
+                                        'last' => $suppliers->lastItem() ?? 0,
                                         'total' => $suppliers->total(),
                                     ]) }}
                                 </p>

@@ -42,7 +42,7 @@
                     <option value="" data-name="{{ __('messages.none') }}">{{ __('messages.none') }} (0%)</option>
                     @foreach($taxes as $tax)
                         <option value="{{ $tax->id }}" data-name="{{ $tax->name }}" data-rate="{{ $tax->rate }}" data-type="{{ $tax->type }}"
-                            {{ $tax->is_default ? 'selected' : '' }}>
+                            {{ $defaultTax && $defaultTax->id === $tax->id ? 'selected' : '' }}>
                             {{ $tax->name }} ({{ $tax->rate }}%)
                         </option>
                     @endforeach

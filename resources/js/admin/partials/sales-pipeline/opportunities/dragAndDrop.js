@@ -1,7 +1,13 @@
 import { SALES_PIPELINE_ROUTES, CSRF_TOKEN } from '../common/constants.js';
 import { loadPipelineBoard } from '../ui/pipelineBoard.js';
 
-const pipelineBoard = document.getElementById("pipeline-board");
+// Looked up per call rather than once at import. Turbo swaps the page
+// body without re-running this module, so a reference captured here goes
+// stale on the first navigation away and back, and every later count
+// update would quietly query a detached tree.
+function getPipelineBoard() {
+    return document.getElementById("pipeline-board");
+}
 
 export async function moveOpportunity(opportunityId, newStageId, oldStageId) {
     try {
@@ -33,13 +39,14 @@ export async function moveOpportunity(opportunityId, newStageId, oldStageId) {
             "error"
         );
         const pipelineSelectEl = document.getElementById("pipelineSelect");
-        if (pipelineBoard && pipelineSelectEl) {
+        if (getPipelineBoard() && pipelineSelectEl) {
             loadPipelineBoard(pipelineSelectEl.value);
         }
     }
 }
 
 export function updateStageCount(stageId, change) {
+    const pipelineBoard = getPipelineBoard();
     if (!pipelineBoard) return;
     const stageColumn = pipelineBoard.querySelector(
         `[data-stage-id="${stageId}"]`

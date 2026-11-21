@@ -1,3 +1,5 @@
+import Chart from "chart.js/auto";
+import "chartjs-adapter-date-fns";
 
 (function() {
     var el = document.getElementById('dashboard-data');

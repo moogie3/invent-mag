@@ -39,24 +39,11 @@ document.addEventListener('turbo:load', function() {
     });
 })();
 
-// 3. Lazy Loaders for SortableJS and ApexCharts
-document.addEventListener('turbo:load', function () {
-    if (window.location.pathname.includes('/admin/sales-pipeline')) {
-        if (typeof Sortable === 'undefined') {
-            var s = document.createElement('script');
-            s.src = 'https://cdn.jsdelivr.net/npm/sortablejs@1.14.0/Sortable.min.js';
-            document.head.appendChild(s);
-        }
-    }
-    
-    if (window.location.pathname.includes('/admin/dashboard') && typeof ApexCharts === 'undefined') {
-        var s2 = document.createElement('script');
-        // Since we cannot use asset() in JS, we use an absolute path assuming standard public structure
-        // or a CDN fallback. We'll use the relative path from the domain root.
-        s2.src = '/tabler/dist/libs/apexcharts/dist/apexcharts.min.js';
-        document.head.appendChild(s2);
-    }
-});
+// 3. (removed) The lazy CDN loaders that used to live here injected
+// SortableJS and ApexCharts from jsdelivr on turbo:load. Sortable lost a
+// race with the board render, so drag and drop silently did nothing until
+// a full refresh, and the admin dashboard never called ApexCharts at all.
+// Sortable is now a bundled import in pipelineBoard.js.
 
 // 4. Global functions
 window.setDeleteFormAction = function(action) {

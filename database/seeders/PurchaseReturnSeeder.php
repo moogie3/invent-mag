@@ -2,24 +2,19 @@
 
 namespace Database\Seeders;
 
-use App\Models\Product;
 use App\Models\ProductWarehouse;
 use App\Models\Purchase;
 use App\Models\PurchaseReturn;
 use App\Models\User;
-use App\Services\AccountingService;
+use App\Services\PurchaseReturnService;
 use Carbon\Carbon;
 use Faker\Factory;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Auth;
 
 class PurchaseReturnSeeder extends Seeder
 {
-    protected AccountingService $accountingService;
-
-    public function __construct(AccountingService $accountingService)
-    {
-        $this->accountingService = $accountingService;
-    }
+    public function __construct(protected PurchaseReturnService $purchaseReturnService) {}
 
     /**
      * Run the database seeds.
@@ -51,38 +46,106 @@ class PurchaseReturnSeeder extends Seeder
         $faker = Factory::create();
 
         $count = 0;
+        // Units already returned per purchase and product. The loop draws a
+        // random PO up to 15 times, so the same order can come up repeatedly;
+        // without this the seeder could return more units than the PO ever
+        // contained. PurchaseReturnService does not enforce that ceiling
+        // itself, so the allowance has to be held here. A return born Canceled
+        // holds no stock, so it never consumes the allowance.
+        $returnedSoFar = [];
+
         for ($i = 0; $i < 15; $i++) {
             $purchase = $purchases->random();
             $user = $users->random();
+
+            // PurchaseReturnService takes the return's owner from the
+            // authenticated user and purchase_returns.user_id is NOT NULL, so
+            // the randomly chosen user has to be set explicitly or the insert
+            // is rejected.
+            Auth::setUser($user);
+
             $returnDate = $faker->dateTimeBetween($purchase->order_date, 'now');
             $status = $faker->randomElement(PurchaseReturn::$statuses);
+
+            // A return created as Canceled holds no stock and no live journal
+            // entry: the cancel path unwinds both, so a row born Canceled must
+            // never have moved stock or booked an entry in the first place.
+            $isCanceled = $status === 'Canceled';
 
             // Fetch items from the selected purchase
             $poItems = $purchase->items;
 
             if ($poItems->isEmpty()) {
-                continue; // Skip if selected purchase has no items (shouldn't happen with has('poItems'))
+                continue; // Skip if selected purchase has no items (shouldn't happen with has('items'))
             }
 
+            // One PO can carry the same product on more than one line, so the
+            // allowance is counted per product across all of that PO's lines.
+            $orderedByProduct = $poItems->groupBy('product_id')
+                ->map(fn ($lines) => (int) $lines->sum('quantity'));
+
             $returnItemsData = [];
-            $totalReturnAmount = 0;
+            // Quantities already chosen for this return but not yet written to
+            // the warehouse: the decrement only runs once the return row
+            // exists, so the live stock figure below would otherwise look
+            // untouched and every line of the same product would be allowed to
+            // take the whole balance.
+            $pendingDraw = [];
 
             // Randomly select 1 to min(3, number of items) items to return
             $itemsToReturnCount = rand(1, min(3, $poItems->count()));
             $selectedPoItems = $poItems->random($itemsToReturnCount);
 
             foreach ($selectedPoItems as $poItem) {
-                $returnQuantity = rand(1, $poItem->quantity); // Return a quantity less than or equal to original
+                $productId = $poItem->product_id;
+                $alreadyReturned = $returnedSoFar[$purchase->id][$productId] ?? 0;
+                $remaining = (int) ($orderedByProduct[$productId] ?? 0) - $alreadyReturned;
+
+                // Everything this PO ordered of this product has already been
+                // returned, so there is nothing left to hand back.
+                if ($remaining <= 0) {
+                    continue;
+                }
+
+                // You can only hand back what the warehouse still holds. The
+                // decrement the service performs has no guard of its own, so a
+                // return larger than the stock record drove
+                // product_warehouse.quantity negative in seeded data
+                // (ProductSeeder starts some products at 0). A Canceled return
+                // is exempt because it moves nothing. Stock is read live
+                // because earlier iterations of this loop have already taken
+                // their share out of it.
+                if (! $isCanceled) {
+                    $inStock = (int) ProductWarehouse::where('product_id', $productId)
+                        ->where('warehouse_id', $purchase->warehouse_id)
+                        ->where('tenant_id', $tenantId)
+                        ->value('quantity');
+                    $remaining = min($remaining, $inStock - ($pendingDraw[$productId] ?? 0));
+
+                    if ($remaining <= 0) {
+                        continue;
+                    }
+                }
+
+                // Bounded by the line as well as by the PO-wide budget:
+                // $remaining can be far larger than this line ordered, and a
+                // return for more than one line ordered is as wrong as a
+                // return for more than the PO ordered.
+                $returnQuantity = rand(1, min((int) $poItem->quantity, $remaining));
+                if (! $isCanceled) {
+                    $returnedSoFar[$purchase->id][$productId] = $alreadyReturned + $returnQuantity;
+                    $pendingDraw[$productId] = ($pendingDraw[$productId] ?? 0) + $returnQuantity;
+                }
+
+                // Priced off the line the goods came from, so a return of a
+                // discounted line hands back what that line actually charged
+                // rather than the product's list price.
                 $netUnitPrice = $poItem->total / $poItem->quantity;
-                $itemTotal = $returnQuantity * $netUnitPrice;
-                $totalReturnAmount += $itemTotal;
 
                 $returnItemsData[] = [
                     'product_id' => $poItem->product_id,
-                    'quantity' => $returnQuantity,
                     'price' => $netUnitPrice,
-                    'total' => $itemTotal,
-                    'tenant_id' => $tenantId,
+                    'returned_quantity' => $returnQuantity,
                 ];
             }
 
@@ -90,65 +153,24 @@ class PurchaseReturnSeeder extends Seeder
                 continue; // Skip if no items were selected to return
             }
 
-            // Create the PurchaseReturn — copy tax fields from the parent purchase
-            $purchaseReturn = PurchaseReturn::create([
-                'purchase_id' => $purchase->id,
-                'user_id' => $user->id,
-                'return_date' => $returnDate,
-                'reason' => $faker->sentence(),
-                'total_amount' => $totalReturnAmount,
-                'status' => $status,
-                'tax_id' => $purchase->tax_id,
-                'tax_rate' => $purchase->tax_rate ?? 0,
-                'tax_type' => $purchase->tax_type ?? 'none',
-                'tax_amount' => round($totalReturnAmount * (($purchase->tax_rate ?? 0) / 100), 2),
-                'tenant_id' => $tenantId,
-            ]);
+            // The service copies the tax snapshot off the parent order, takes
+            // the stock and the batches back, books a proportional reversal of
+            // whatever the purchase actually posted (including any input VAT
+            // and withholding, which the flat Dr AP / Cr Inventory entry this
+            // seeder used to write by hand never touched) and updates the
+            // order's status.
+            try {
+                $this->purchaseReturnService->createPurchaseReturn([
+                    'purchase_id' => $purchase->id,
+                    'return_date' => Carbon::instance($returnDate),
+                    'reason' => $faker->sentence(),
+                    'status' => $status,
+                    'items' => json_encode($returnItemsData),
+                ]);
+            } catch (\Exception $e) {
+                $this->command->error("Failed to create purchase return against PO {$purchase->invoice}: ".$e->getMessage());
 
-            // A return created as Canceled holds no stock and no live journal
-            // entry: the cancel path unwinds both, so a row born Canceled must
-            // never have moved stock or booked an entry in the first place.
-            $isCanceled = $status === 'Canceled';
-
-            // Create PurchaseReturnItems
-            foreach ($returnItemsData as $itemData) {
-                $purchaseReturnItem = $purchaseReturn->items()->create($itemData);
-
-                if ($isCanceled) {
-                    continue;
-                }
-
-                // Update product stock (increment as it's a return to stock)
-                // Note: Purchase return usually means returning TO supplier, so stock should DECREMENT.
-                // But if the logic implies reversing a purchase, it depends on when stock was added.
-                // Assuming Purchase adds to stock, Return reduces stock.
-
-                $stockRecord = ProductWarehouse::where('product_id', $purchaseReturnItem->product_id)
-                    ->where('warehouse_id', $purchase->warehouse_id)
-                    ->where('tenant_id', $tenantId)
-                    ->first();
-
-                if ($stockRecord) {
-                    $stockRecord->decrement('quantity', $purchaseReturnItem->quantity);
-                }
-            }
-
-            if (! $isCanceled) {
-                // Create Journal Entry for Purchase Return
-                $description = "Purchase Return for PO {$purchase->invoice}, Return #{$purchaseReturn->id}";
-                $transactions = [];
-
-                // Debit Accounts Payable / Cash (depending on original payment type or refund status)
-                // For simplicity, we'll assume a credit to a Purchase Returns account and debit to AP/Cash
-                // More complex logic might be needed here based on refund status
-                $transactions[] = ['account_code' => '2110-'.$tenantId, 'type' => 'debit', 'amount' => $totalReturnAmount];
-                $transactions[] = ['account_code' => '1140-'.$tenantId, 'type' => 'credit', 'amount' => $totalReturnAmount]; // Adjust inventory
-
-                try {
-                    $this->accountingService->createJournalEntry($description, Carbon::parse($returnDate), $transactions, $purchaseReturn);
-                } catch (\Exception $e) {
-                    $this->command->error("Failed to create journal entry for purchase return {$purchaseReturn->id}: ".$e->getMessage());
-                }
+                continue;
             }
 
             $count++;

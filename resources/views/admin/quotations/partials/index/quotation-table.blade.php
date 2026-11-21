@@ -93,9 +93,14 @@
 
                             @can('edit-quotations')
 
+                                {{-- A converted quotation has already become a
+                                     sale, so editing it would only make the
+                                     quote disagree with that sale. --}}
+                                @unless($q->converted_to_sales_id)
                                 <a class="dropdown-item" href="{{ route('admin.quotations.edit', $q->id) }}">
                                     <i class="ti ti-edit me-2"></i> {{ __('messages.edit') }}
                                 </a>
+                                @endunless
 
                             @endcan
 

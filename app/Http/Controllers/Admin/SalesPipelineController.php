@@ -36,7 +36,7 @@ class SalesPipelineController extends Controller
     public function storePipeline(Request $request)
     {
         $request->validate([
-            'name' => 'required|string|max:255|unique:sales_pipelines',
+            'name' => ['required', 'string', 'max:255', Rule::unique('sales_pipelines')->where('tenant_id', auth()->user()->tenant_id)],
             'description' => 'nullable|string',
             'is_default' => 'boolean',
         ]);
@@ -49,7 +49,7 @@ class SalesPipelineController extends Controller
     public function updatePipeline(Request $request, SalesPipeline $pipeline)
     {
         $request->validate([
-            'name' => ['required', 'string', 'max:255', Rule::unique('sales_pipelines')->ignore($pipeline->id)],
+            'name' => ['required', 'string', 'max:255', Rule::unique('sales_pipelines')->where('tenant_id', auth()->user()->tenant_id)->ignore($pipeline->id)],
             'description' => 'nullable|string',
             'is_default' => 'boolean',
         ]);

@@ -193,7 +193,7 @@
     </div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/apexcharts" nonce="{{ $cspNonce ?? '' }}"></script>
+<script src="{{ asset('tabler/dist/libs/apexcharts/dist/apexcharts.min.js') }}" nonce="{{ $cspNonce ?? '' }}"></script>
 <script nonce="{{ $cspNonce ?? '' }}">
     document.addEventListener("DOMContentLoaded", function () {
         const isDark = document.documentElement.getAttribute('data-bs-theme') === 'dark';

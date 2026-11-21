@@ -42,6 +42,20 @@ class TaxControllerTest extends TestCase
         $response->assertViewHas('totalTaxes');
     }
 
+    public function test_index_uses_the_standard_pagination_footer()
+    {
+        Tax::factory()->count(3)->create();
+
+        $response = $this->get(route('admin.setting.tax'));
+
+        $response->assertStatus(200);
+        $this->assertStringContainsString(
+            '<div data-pagination-footer class="card-footer',
+            $response->getContent(),
+            'The footer must carry the pagination marker.'
+        );
+    }
+
     public function test_store_tax_successfully()
     {
         $taxData = [
@@ -180,15 +194,13 @@ class TaxControllerTest extends TestCase
 
     public function test_get_tax_rate_returns_default_tax()
     {
-        $tax = Tax::factory()->create(['rate' => 11, 'type' => 'exclusive']);
+        // Created first, so the lowest-id fallback would pick this one: the
+        // endpoint has to answer with the FLAGGED default instead.
+        $other = Tax::factory()->create(['rate' => 5, 'type' => 'exclusive', 'is_default' => false]);
+        $tax = Tax::factory()->create(['rate' => 11, 'type' => 'exclusive', 'is_default' => true]);
 
-        $this->instance(
-            TaxService::class,
-            Mockery::mock(TaxService::class, function ($mock) use ($tax) {
-                $mock->shouldReceive('getDefault')->once()->andReturn($tax);
-            })
-        );
-
+        // No service mock: the controller resolves the default itself now, so
+        // the answer has to come from the real resolver.
         $response = $this->get(route('admin.setting.tax.get'));
 
         $response->assertStatus(200);
@@ -198,6 +210,7 @@ class TaxControllerTest extends TestCase
             'tax_name' => $tax->name,
             'tax_id' => $tax->id,
         ]);
+        $this->assertNotEquals($other->id, $response->json('tax_id'));
     }
 
     public function test_get_tax_rate_with_specific_id()
@@ -389,5 +402,91 @@ class TaxControllerTest extends TestCase
 
         $response->assertStatus(500)
             ->assertJson(['success' => false, 'message' => $errorMessage]);
+    }
+
+    public function test_index_shows_the_tax_the_app_books_with_not_the_flagged_one()
+    {
+        // setupTenant() leaves tax_jurisdiction NULL, so this tenant is NOT
+        // Indonesian: PPN records are excluded from every booking fallback by
+        // the jurisdiction scope, even when one of them carries is_default.
+        $jurisdictionTax = Tax::factory()->create([
+            'name' => 'PPN 11%',
+            'rate' => 11,
+            'is_ppn' => true,
+            'is_pph' => false,
+            'is_default' => true,
+            'is_active' => true,
+        ]);
+        $bookedWith = Tax::factory()->create([
+            'name' => 'Non-PKP 0%',
+            'rate' => 0,
+            'is_ppn' => false,
+            'is_pph' => false,
+            'is_default' => false,
+            'is_active' => true,
+        ]);
+
+        $response = $this->get(route('admin.setting.tax'));
+
+        $response->assertStatus(200);
+
+        $defaultTax = $response->viewData('defaultTax');
+        $this->assertNotNull($defaultTax, 'The page must always show which tax is in effect.');
+        $this->assertEquals($bookedWith->id, $defaultTax->id);
+        $this->assertNotEquals(
+            $jurisdictionTax->id,
+            $defaultTax->id,
+            'A flagged tax this jurisdiction cannot use must not be shown as the default.'
+        );
+    }
+
+    public function test_store_tax_persists_the_ppn_and_pph_flags()
+    {
+        // Real TaxService: the point of this test is that the flags survive
+        // the whole request, not that the controller forwards an array.
+        $response = $this->post(route('admin.setting.tax.store'), [
+            'name' => 'PPN 11%',
+            'rate' => 11,
+            'type' => 'exclusive',
+            'description' => 'Output VAT',
+            'is_active' => 1,
+            'is_default' => 0,
+            'is_ppn' => 1,
+            'is_pph' => 0,
+        ]);
+
+        $response->assertRedirect(route('admin.setting.tax'));
+        $response->assertSessionHas('success');
+
+        $tax = Tax::where('name', 'PPN 11%')->first();
+        $this->assertNotNull($tax);
+        $this->assertTrue((bool) $tax->is_ppn);
+        $this->assertFalse((bool) $tax->is_pph);
+    }
+
+    public function test_update_tax_turns_the_ppn_flag_off_when_the_switch_is_unchecked()
+    {
+        $tax = Tax::factory()->create(['is_ppn' => true, 'is_pph' => true]);
+
+        // The create/edit modal puts a hidden 0 before each switch, so an
+        // unchecked box submits 0 rather than omitting the key. An omitted key
+        // means "keep the old value", which is exactly what must NOT happen
+        // when someone switches PPN off.
+        $response = $this->put(route('admin.setting.tax.update', $tax->id), [
+            'name' => $tax->name,
+            'rate' => $tax->rate,
+            'type' => $tax->type,
+            'is_active' => 1,
+            'is_default' => 0,
+            'is_ppn' => 0,
+            'is_pph' => 1,
+        ]);
+
+        $response->assertRedirect(route('admin.setting.tax'));
+        $response->assertSessionHas('success');
+
+        $fresh = $tax->fresh();
+        $this->assertFalse((bool) $fresh->is_ppn, 'Posting is_ppn=0 must clear the flag.');
+        $this->assertTrue((bool) $fresh->is_pph, 'The untouched switch must keep its value.');
     }
 }

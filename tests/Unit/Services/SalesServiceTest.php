@@ -4,11 +4,13 @@ namespace Tests\Unit\Services;
 
 use App\Models\Account;
 use App\Models\Customer;
+use App\Models\JournalEntry;
 use App\Models\Product;
 use App\Models\ProductWarehouse;
 use App\Models\Sales;
 use App\Models\SalesItem;
 use App\Models\Tax;
+use App\Models\Tenant;
 use App\Models\User; // Added
 use App\Models\Warehouse;
 use App\Services\AccountingService;
@@ -76,6 +78,58 @@ class SalesServiceTest extends TestCase
     public function it_can_be_instantiated()
     {
         $this->assertInstanceOf(SalesService::class, $this->salesService);
+    }
+
+    /**
+     * exists:customers,id is raw SQL and ignores the tenant scope, so the
+     * id of another tenant's customer passed validation and was written
+     * straight onto the sale: the invoice then pointed at a customer this
+     * tenant cannot see, and every credit and statement read for it came
+     * back empty. The customer must be re-resolved through the scoped
+     * model before the sale is written.
+     */
+    #[Test]
+    public function it_refuses_a_customer_owned_by_another_tenant()
+    {
+        $otherTenant = Tenant::create(['name' => 'Other Tenant', 'domain' => 'other.localhost']);
+        $foreignCustomer = Customer::factory()->create(['tenant_id' => $otherTenant->id]);
+
+        $warehouse = Warehouse::factory()->create(['is_main' => true]);
+        $product = Product::factory()->create(['price' => 50]);
+        ProductWarehouse::updateOrCreate(
+            ['product_id' => $product->id, 'warehouse_id' => $warehouse->id, 'tenant_id' => $product->tenant_id],
+            ['quantity' => 10]
+        );
+
+        // Count rather than with a Mockery count expectation: an unmet
+        // count throws during teardown, before RefreshDatabase rolls its
+        // transaction back, and poisons every test that follows.
+        $journalPostings = 0;
+        $this->accountingServiceMock->shouldReceive('createJournalEntry')
+            ->andReturnUsing(function () use (&$journalPostings) {
+                $journalPostings++;
+
+                return Mockery::mock(JournalEntry::class);
+            });
+
+        $refused = null;
+        try {
+            $this->salesService->createSale([
+                'products' => json_encode([
+                    ['product_id' => $product->id, 'quantity' => 2, 'customer_price' => 100, 'discount' => 0, 'discount_type' => 'fixed'],
+                ]),
+                'customer_id' => $foreignCustomer->id,
+                'warehouse_id' => $warehouse->id,
+                'order_date' => now()->toDateString(),
+                'due_date' => now()->addMonth()->toDateString(),
+            ]);
+        } catch (\Exception $e) {
+            $refused = $e->getMessage();
+        }
+
+        $this->assertNotNull($refused, 'A customer owned by another tenant must be refused.');
+        $this->assertDatabaseMissing('sales', ['customer_id' => $foreignCustomer->id]);
+        $this->assertEquals(0, $journalPostings, 'A refused sale must not post a journal entry.');
     }
 
     #[Test]
@@ -309,6 +363,10 @@ class SalesServiceTest extends TestCase
             'discount_total_type' => 'fixed',
         ];
 
+        // An edit now re-posts the invoice, so the ledger follows the new
+        // totals instead of keeping the ones the sale was created with.
+        $this->accountingServiceMock->shouldReceive('createJournalEntry')->once();
+
         $this->salesService->updateSale($sale, $data);
 
         $this->assertDatabaseHas('sales', ['id' => $sale->id, 'order_discount' => 5]);
@@ -320,6 +378,61 @@ class SalesServiceTest extends TestCase
 
         // New product stock should decrement: 20 - 5 = 15
         $this->assertDatabaseHas('product_warehouse', ['product_id' => $newProduct->id, 'warehouse_id' => $warehouse->id, 'quantity' => 15]);
+    }
+
+    #[Test]
+    public function it_updates_a_pos_sale_and_rebooks_invoice_plus_cash_receipt()
+    {
+        $warehouse = Warehouse::factory()->create();
+        $product = Product::factory()->create();
+        ProductWarehouse::updateOrCreate(
+            ['product_id' => $product->id, 'warehouse_id' => $warehouse->id, 'tenant_id' => $product->tenant_id],
+            ['quantity' => 10]
+        );
+
+        $sale = Sales::factory()->create([
+            'warehouse_id' => $warehouse->id,
+            'type' => Sales::TYPE_POS,
+            'total' => 200,
+            'status' => 'Paid',
+            'payment_type' => 'Cash',
+            'amount_received' => 200,
+            'change_amount' => 0,
+        ]);
+        SalesItem::factory()->create(['sales_id' => $sale->id, 'product_id' => $product->id, 'quantity' => 2]);
+        ProductWarehouse::where('product_id', $product->id)
+            ->where('warehouse_id', $warehouse->id)
+            ->update(['quantity' => 8]);
+        $sale->payments()->create([
+            'amount' => 200,
+            'payment_date' => now(),
+            'payment_method' => 'Cash',
+            'notes' => 'Payment for POS sale '.$sale->invoice,
+        ]);
+
+        // Two reposts: the invoice and then the cash receipt. A plain sale
+        // edit posts only the invoice, which would leave the cash out of the
+        // books once the old receipt has been reversed.
+        $this->accountingServiceMock->shouldReceive('createJournalEntry')->twice();
+
+        $this->salesService->updateSale($sale, [
+            'products' => json_encode([
+                ['product_id' => $product->id, 'quantity' => 1, 'customer_price' => 150],
+            ]),
+            'customer_id' => $sale->customer_id,
+            'order_date' => now()->toDateString(),
+            'due_date' => now()->addDays(7)->toDateString(),
+            'discount_total' => 0,
+            'discount_total_type' => 'fixed',
+        ]);
+
+        $sale->refresh();
+        $this->assertEqualsWithDelta(150.0, (float) $sale->total, 0.005, 'The edited total must follow the new quantity.');
+        $this->assertSame('Paid', $sale->status);
+        $this->assertEqualsWithDelta(0.0, $sale->balance, 0.005, 'A POS sale settles at the counter, so it stays settled after an edit.');
+        $this->assertEqualsWithDelta(150.0, (float) $sale->payments()->first()->amount, 0.005, 'The recorded payment follows the edited total.');
+        $this->assertEqualsWithDelta(50.0, (float) $sale->change_amount, 0.005, '200 was handed over, 150 is now owed, so 50 is change.');
+        $this->assertSame('Cash', $sale->payment_type, 'A payload without payment_type must not blank the method the sale was rung up with.');
     }
 
     #[Test]
@@ -699,6 +812,10 @@ class SalesServiceTest extends TestCase
             'pph_tax_id' => $pphTax->id,
         ];
 
+        // One entry: a non-Indonesian tenant books no withholding, so the
+        // repost is the plain invoice only.
+        $this->accountingServiceMock->shouldReceive('createJournalEntry')->once();
+
         $this->salesService->updateSale($sale, $data);
 
         $fresh = $sale->fresh();
@@ -911,6 +1028,12 @@ class SalesServiceTest extends TestCase
             'due_date' => now()->addMonth()->toDateString(),
             'pph_tax_id' => $pphTax->id,
         ];
+
+        // Two entries: the invoice, plus the withholding entry the edit now
+        // re-posts as well. Before this the withholding was booked once at
+        // creation and never touched again, so reducing the invoice left the
+        // ledger withholding the original amount.
+        $this->accountingServiceMock->shouldReceive('createJournalEntry')->twice();
 
         $this->salesService->updateSale($sale, $data);
 

@@ -38,6 +38,18 @@ class SupplierControllerTest extends TestCase
         $response->assertViewHas('suppliers');
     }
 
+    public function test_empty_supplier_list_reports_zero_in_the_footer()
+    {
+        $response = $this->get(route('admin.supplier'));
+
+        $response->assertStatus(200);
+
+        // firstItem()/lastItem() are null on an empty paginator, so this
+        // multi-line footer must coalesce them to 0 rather than print
+        // "Showing  to of 0 entries" with two blank slots.
+        $response->assertSee('Showing 0 to 0 of 0 entries', false);
+    }
+
     public function test_get_metrics_returns_json()
     {
         $expectedMetrics = [

@@ -65,7 +65,7 @@
                                                     <td>{{ \App\Helpers\CurrencyHelper::formatDate($bill->due_date) }}</td>
                                                     <td class="text-end">{{ $bill->days_overdue }}</td>
                                                     <td class="text-end">
-                                                        {{ \App\Helpers\CurrencyHelper::format($bill->total) }}</td>
+                                                        {{ \App\Helpers\CurrencyHelper::format($bill->balance) }}</td>
                                                 </tr>
                                             @endforeach
                                         </tbody>
@@ -74,7 +74,7 @@
                                                 <td colspan="4" class="text-end">
                                                     {{ __('messages.total_for_bucket', ['bucket' => $bucket]) }}</td>
                                                 <td class="text-end">
-                                                    {{ \App\Helpers\CurrencyHelper::format($bills->sum('total')) }}</td>
+                                                    {{ \App\Helpers\CurrencyHelper::format($bills->sum('balance')) }}</td>
                                             </tr>
                                         </tfoot>
                                     </table>

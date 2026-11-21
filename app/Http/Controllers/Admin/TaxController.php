@@ -22,7 +22,8 @@ class TaxController extends Controller
         $entries = $request->input('entries', 10);
         $taxes = Tax::orderBy('name')->paginate($entries);
         $totalTaxes = Tax::count();
-        $defaultTax = Tax::where('is_default', true)->first();
+        // Resolved, not the raw flag: this is what every document books with.
+        $defaultTax = Tax::effectiveDefault();
 
         return view('admin.tax.tax', compact('taxes', 'totalTaxes', 'defaultTax'));
     }
@@ -39,6 +40,8 @@ class TaxController extends Controller
             'description' => 'nullable|string|max:500',
             'is_default' => 'boolean',
             'is_active' => 'boolean',
+            'is_ppn' => 'boolean',
+            'is_pph' => 'boolean',
         ]);
 
         try {
@@ -72,6 +75,8 @@ class TaxController extends Controller
             'description' => 'nullable|string|max:500',
             'is_default' => 'boolean',
             'is_active' => 'boolean',
+            'is_ppn' => 'boolean',
+            'is_pph' => 'boolean',
         ]);
 
         try {
@@ -134,7 +139,7 @@ class TaxController extends Controller
         $taxId = $request->input('tax_id');
 
         if (! $taxId) {
-            $tax = $this->taxService->getDefault();
+            $tax = Tax::effectiveDefault();
         } else {
             $tax = $this->taxService->findById($taxId);
         }

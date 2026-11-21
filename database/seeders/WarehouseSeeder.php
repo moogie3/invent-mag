@@ -14,6 +14,17 @@ class WarehouseSeeder extends Seeder
     {
         $tenantId = app('currentTenant')->id;
 
+        // updateOrCreate() fires the updated event even when nothing changed,
+        // and the activity log listener records it, so a second run logged
+        // three warehouse updates while creating no new rows.
+        if (Warehouse::where('tenant_id', $tenantId)->exists()) {
+            if (isset($this->command)) {
+                $this->command->info('Warehouses already seeded for tenant '.$tenantId.', skipping.');
+            }
+
+            return;
+        }
+
         Warehouse::updateOrCreate(
             ['name' => 'Gudang Utama Jakarta', 'tenant_id' => $tenantId],
             [

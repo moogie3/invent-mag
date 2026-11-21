@@ -162,11 +162,11 @@ class ReportExporter
                             $invoice->invoice,
                             Carbon::parse($invoice->due_date)->format('Y-m-d'),
                             $invoice->days_overdue,
-                            CurrencyHelper::format($invoice->total),
+                            CurrencyHelper::format($invoice->balance),
                         ]);
                     }
 
-                    fputcsv($file, ['Total for '.$buckets[$bucketKey], '', '', '', CurrencyHelper::format($invoices->sum('total'))]);
+                    fputcsv($file, ['Total for '.$buckets[$bucketKey], '', '', '', CurrencyHelper::format($invoices->sum('balance'))]);
                     fputcsv($file, []);
                 }
             }

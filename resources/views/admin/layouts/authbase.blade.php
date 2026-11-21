@@ -1,8 +1,26 @@
 <!DOCTYPE html>
-<html lang="en" data-bs-theme="light">
+<html lang="en">
 
 <head>
     <meta charset="utf-8" />
+    <script>
+        /*
+         * These pages have no session, so the saved choice lives in
+         * localStorage. It has to be applied here, synchronously, while the
+         * document is still parsing: theme-initializer.js is a module and runs
+         * after first paint, which is what flashed the login page light for a
+         * user who had already saved dark.
+         */
+        (function () {
+            var saved = null;
+            try { saved = localStorage.getItem('theme'); } catch (e) {}
+            var prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+            // Tells the initializer this value was read from storage, so an OS
+            // guess is never written back as if the user had chosen it.
+            window.__inventThemeFromStorage = Boolean(saved);
+            document.documentElement.setAttribute('data-bs-theme', saved || (prefersDark ? 'dark' : 'light'));
+        })();
+    </script>
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <meta http-equiv="X-UA-Compatible" content="ie=edge" />
     {{-- Prevent search engines from indexing the admin login page --}}
@@ -17,7 +35,7 @@
     <link href="{{ asset('tabler/dist/css/tabler-payments.min.css') }}" rel="stylesheet" />
     <link href="{{ asset('tabler/dist/css/tabler-vendors.min.css') }}" rel="stylesheet" />
     @vite('resources/css/auth.css')
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+    <link rel="stylesheet" href="{{ asset('tabler/dist/icons/tabler-icons.min.css') }}?2.47.0">
     @vite('resources/js/admin/layouts/page-loader.js')
 </head>
 

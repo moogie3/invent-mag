@@ -1,10 +1,14 @@
 import { allPipelines } from '../common/state.js';
 
-const pipelineStagesContainer = document.getElementById(
-    "pipelineStagesContainer"
-);
-
 export function renderPipelineStages(pipelineId) {
+    // Queried here rather than at import. This module is bundled into a
+    // script that every admin page loads, so the first time it runs the
+    // stages container is usually not on the screen yet, and Turbo never
+    // re-runs the module once it has. Capturing it up front left this
+    // function permanently returning early and the list stayed empty.
+    const pipelineStagesContainer = document.getElementById(
+        "pipelineStagesContainer"
+    );
     if (!pipelineStagesContainer) return;
 
     const pipeline = allPipelines.find((p) => p.id == pipelineId);

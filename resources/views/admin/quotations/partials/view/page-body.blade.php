@@ -119,7 +119,7 @@
                                         <tr>
                                             <td class="text-center">{{ $index + 1 }}</td>
                                             <td>
-                                                <div class="fw-bold">{{ $item->product_name ?? $item->name ?? __('messages.not_available') }}</div>
+                                                <div class="fw-bold">{{ $item->product_name ?? $item->name ?? \App\Models\Product::find($item->product_id ?? null)?->name ?? __('messages.not_available') }}</div>
                                             </td>
                                             <td class="text-center">{{ $item->quantity }}</td>
                                             <td class="text-end">{{ \App\Helpers\CurrencyHelper::format($item->price) }}</td>

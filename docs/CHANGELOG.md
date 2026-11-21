@@ -9,6 +9,1228 @@ Date-ordered, newest first.
 
 ---
 
+## 2026-11-21: POS Sales Can Be Edited Without Losing the Cash, Barcodes and Document Numbers Became Per-Tenant, Stock Opname Counts Got Search, Filters and a Dry Run, and a Backfill Priced the Sales That Carried No Cost
+
+Work from 2026-11-17 to 2026-11-21, on top of the two entries below. Every
+fix landed test first and was then revert-proven: the fix taken away, the
+exact tests that should fail go red, the fix put back.
+
+### Editing a POS sale works now, and the cash stays cash
+
+The 2026-11-14 entry refused POS edits on three layers because the sales
+edit form re-posts the regular-sale shape: reversing all three POS entries
+(invoice, cash, withholding) and writing a single invoice in their place,
+which turns money the customer already paid into money owed. The refusal
+was the right call that day. It is lifted now, because the shape underneath
+it is fixed:
+
+- `SalesController::edit()` no longer sends POS sales to their receipt, and
+  `update()` no longer refuses them before validation.
+- `SalesService::updateSale()` no longer throws for `TYPE_POS`.
+- `customer_id` is nullable on the sales form, so a walk-in sale with no
+  customer can be revalidated and reposted like any other.
+- After the reverse and repost, `settlePosCashReceipt()` re-books
+  `Dr Cash / Cr Accounts Receivable` for the payment the invoice-shaped
+  repost dropped, so the cash the customer handed over stays in Cash
+  instead of reappearing as a receivable.
+- Repeated edits stay balanced: `hasDependentEntries()` lets the edit path
+  reverse entries that later payments already depend on, and every edit runs
+  the same reverse, repost, re-settle sequence again.
+
+The sales index now renders the Edit link for POS rows (it was hidden from
+them), and the four `admin.pos.*` routes that pointed at `POSController`
+methods which never existed (`create`, `edit`, `update`, `destroy`) were
+deleted rather than left as a 500 waiting to happen; nothing linked to them.
+
+Proof: RED with 5 POS edit tests failing against the old refusal, GREEN on
+60 sales and POS tests, then a `TEMP REVERT` of the `updateSale()` guard
+turned exactly the 2 POS edit tests red again; restored, and the 70
+neighbouring tests stayed green.
+
+### Barcodes and document numbers are unique per tenant, not worldwide
+
+Two migrations, both fixing a global unique key that should never have been
+global:
+
+- **Document numbers** (`2026_11_17_000001_document_numbers_unique_per_tenant.php`).
+  The keys behind `INV-*` and `QTN-*` were global, so the second tenant to
+  reach a number failed on an integrity violation instead of filing its own
+  document. `DocumentNumberingTest` issues the same invoice number and the
+  same quotation number in two tenants, and checks the generator skips
+  numbers already on file.
+- **Barcodes** (`2026_11_20_000001_barcode_unique_per_tenant.php`). The
+  global index meant tenant B's product creation died on tenant A's row with
+  a database error the store path could only report as "Error creating
+  product", while the update rule rejected the edit with a false "already
+  taken". The index is now `(tenant_id, barcode)` and the three barcode
+  rules in `ProductController` scope the same way
+  (`Rule::unique(...)->where('tenant_id', ...)`), so index and rules finally
+  agree. Existing data needs no cleanup: a global unique index already
+  guarantees every stored barcode is distinct, which satisfies the narrower
+  one, and products without a barcode keep their multiple NULLs.
+
+A third migration, `2026_11_18_000001_make_quantity_columns_integer.php`,
+turns the last six float columns into integers. All six hold quantities
+(`stock_adjustments.quantity_before/quantity_after/adjustment_amount`,
+`stock_opname_items.expected_qty/counted_qty/variance`), and a float there
+only ever disagreed with the rest of the app: the item row truncated 2.5 to
+2 while the stock move used the raw 2.5. Live data was checked first and
+holds no fractional value in any of the six, so nothing rounds away, and no
+money moves through these columns, so no journal line changes.
+
+### The stock opname count sheet became a workflow
+
+The count sheet grew from a table into the tool the process needs:
+
+- **Search and filters.** Search by name, code or barcode; filter to All
+  Rows, Variance Only or Uncounted, each with its own empty state ("No
+  rows with a variance yet. Nothing counted, or every count matched." and
+  "Every row has been counted."), so an empty filter reads as an answer
+  rather than a broken page.
+- **Progress and totals.** "x of y rows counted", plus shrinkage value,
+  excess value and variance value for the whole session.
+- **Whole-unit counts only.** A fractional count is rejected at the input
+  and again at save (`test_update_counts_rejects_a_fractional_count`,
+  `test_count_input_is_whole_units_only`).
+- **`variance_value` now says what completion will book.** Missing units
+  are costed through the batches they came from, which is what the Inventory
+  account was charged for them; extra units have no batch to belong to and
+  are worth the buying price. That replaces `abs(variance) * unitCost` and
+  `abs(variance) * price`, so the count screen and the journal can no longer
+  show one number and book another.
+- **`total_variance_value` is recorded on completion.** The column existed
+  and had always stayed null, which reads as "no variance" to anyone
+  querying the table.
+- **Completion has a dry run.** `GET /admin/stock-opname/{id}/complete-preview`
+  reports the adjustments that would post and whether a journal entry would
+  be written, using the same gate `postCorrection()` applies, without
+  writing anything.
+- **Print sheet and scan tools** for the physical count, on the page's own
+  stylesheet (`resources/css/stock-opname.css`, loaded by the show view).
+- **Closed sessions are refused in the service.** `assertStillOpen()`
+  rejects a Completed or Canceled session server-side instead of trusting
+  the screen to have hidden the buttons.
+
+The journal itself is unchanged in shape: shrinkage `Dr Cost of Goods Sold /
+Cr Inventory`, excess `Dr Inventory / Cr Cost of Goods Sold`, one
+consolidated entry per session, posted only when the tenant carries the
+`accounting` feature and both accounts are configured.
+
+### A sales return reverses what the returned units actually cost
+
+`SalesReturnService` used to reverse a proportional share of the original
+sale's COGS (`originalCogs * ratio`). That answers "what fraction of the
+sale came back", not "what did the units that came back cost", and the two
+disagree as soon as batches were bought at different prices.
+`cogsToReverse()` now prices each return line through the batches
+(`StockValuationService::costOfCoveredUnits()`), so the reversal equals
+exactly what those units cost the business. The proportional share survives
+as the fallback, and only when a line's units cannot be priced from batches
+at all: one unpriceable line would make the whole document a guess, so the
+function falls back as a unit rather than mixing an exact figure with an
+approximation.
+
+### `sales:backfill-cogs` gives the sales that carry no cost their cost
+
+The 2026-11-14 entry fixed POS costing going forward and left historical
+zero-cost sales alone ("forward only"). This command is the approved way to
+correct them: sales posted before purchase batches existed, and sales
+posted by the old zero-cost POS path, carry Rp 0 in Cost of Goods Sold, so
+profit reads too high and the Inventory account never fell for goods that
+physically left the warehouse.
+
+`php artisan sales:backfill-cogs {--tenant=} {--apply}`
+(`app/Console/Commands/BackfillCogs.php`) recomputes what each such sale's
+units cost, priced from the batches first and the product's buying price
+when the batches run dry, and posts the shortfall as `Dr Cost of Goods Sold /
+Cr Inventory`, dated the sale's own `order_date` and sourced to that sale,
+so the sale's page and the ledger show the same figure.
+
+- **Dry run is the default.** Without `--apply` it prints what it would
+  book and writes nothing.
+- **Per tenant.** Each tenant runs inside its own `Tenant::execute()`,
+  chunked with `chunkById(100)`; `--tenant=ID` limits it to one.
+- **It never books a negative correction.** A sale the books already price
+  at more than the batches say is reported as overstated and left alone.
+- **Sales with no live entries, and sales whose entries are all reversed,
+  are counted as missing and skipped**: there is nothing to correct
+  against.
+- **Within ±0.005 of correct is not touched.**
+- **Idempotent.** A second run posts nothing more.
+
+Nine tests in `tests/Feature/Admin/BackfillCogsCommandTest.php` cover the
+report, the booking, the re-run, the already-priced sale, the skipped sales,
+the batch-priced correction, the overstated sale and the single-tenant run.
+Proof: RED with 9 failures (the command did not exist), GREEN on 9, then
+both "not in the books" gates removed turned exactly those 2 tests red;
+restored, and the grep for the revert marker came back empty.
+
+### Two rules that finally read inside the JSON line arrays
+
+`products` on sales, purchases and quotations was validated as
+`required|json` and nothing looked inside the array, so a fixed discount
+larger than the line price, a percentage above 100, or a negative discount
+was written straight through: the line total went negative, and with it the
+subtotal, the grand total and the journal lines built from them.
+
+- `App\Rules\LineDiscountWithinPrice` rejects a negative discount, a fixed
+  discount above the line price and a percentage above 100. It reads both
+  payload spellings (`price`/`customer_price`,
+  `discount_type`/`discountType`) because sales, purchases and quotations
+  each send their own. Covered by
+  `SalesControllerTest::test_it_rejects_a_line_discount_larger_than_the_line`
+  (three payloads) and `PurchaseControllerTest::test_it_rejects_a_negative_purchase_discount`.
+- `App\Rules\WholeReturnQuantities` rejects a returned quantity that is not
+  a whole unit and one larger than the line sold. The check it replaced only
+  caught negative numbers. Covered by
+  `SalesReturnControllerTest::test_store_rejects_a_fractional_returned_quantity`.
+
+`TaxIsSelectable` landed with the 2026-11-13 entry and is not repeated here.
+
+### Pages, styles and assets
+
+- **Six stylesheets shipped and nothing loaded them.** The v1.2 refactor
+  split them out of `app.css` and the turbo commit (`5dff4a1e`) dropped the
+  import lines without re-adding them, so POS product cards, the PO and
+  CRM/SRM modals, the dashboard alert tabs and the A4 print rules had no
+  styling at all. The six `@import` lines are back in `app.css`.
+- **Libraries left the CDN.** `script.blade.php` dropped the jQuery and
+  Select2 CDN tags (nothing in `resources/` references either any more) and
+  the Chart.js and date-fns adapter tags; `chartjs-adapter-date-fns` is now
+  a bundled dependency and `@tabler/icons-webfont` is vendored under
+  `public/tabler/dist/icons/`. No page waits on an external host before it
+  can run, and nothing can change version out from under us.
+- **`resources/css/dark.css` was deleted**: no php, js, css or blade file
+  referenced it.
+- **Pagination footers.** `firstItem() ?? 0` on the index pages so an empty
+  page no longer renders a blank range, and the footers on adjustment log,
+  bank reconciliation, recent transactions and users now carry
+  `data-pagination-footer` so the shared rebind finds them after a turbo
+  swap.
+- **The login form opts out of turbo** (`data-turbo="false"`) so the saved
+  theme still applies after submit (`ThemeConsistencyTest`).
+- **A converted quotation loses its Edit link**: editing one would only
+  make the quote disagree with the sale it already became.
+- **A refunded credit now says so.** The sales return page shows the
+  `refunded` badge and a "Refund Credit as Cash" button
+  (`admin.sales-returns.refund`, gated on `create-payments`).
+- **Financial Health gained a Stock Value explainer card**, which states
+  the question the card answers: shelf value against the Inventory account,
+  and what a difference between them means.
+- **`onPageLoad()` is pinned by `tests/js/onPageLoad.test.js`**: the sales
+  pipeline boots it with no id, which is why pressing F5 on that page fired
+  the product fetch twice.
+
+### Docs
+
+`docs/ACTUAL_TREE.txt` was regenerated. It had drifted from the working
+tree in both directions: `.scribe` and `.vscode` were listed but no longer
+exist, `RecurringJournalEntry.php` was still listed after its deletion, and
+93 files across 13 directories were missing entirely, including this
+batch's own migrations, rules, services, stylesheet and tests.
+
+Gates: `php artisan test` 1623 passed (6095 assertions) in 465.09s,
+`npx vitest run` 174 files / 217 tests, `npm run build` clean, Pint pass,
+em-dash census on added lines 0.
+
+---
+
+## 2026-11-14: Editing a Sale Never Reached the Ledger, the Point of Sale Booked No Cost of Goods, and Two Tests Failed at Random
+
+Four findings from reading the document-edit path and the point of sale end
+to end, in the order they were approved.
+
+### Editing a sale or purchase left the ledger describing the old document
+
+`updateSale()` spanned lines 833 to 1001 and contained zero journal calls.
+`updatePurchase()` spanned 368 to 499 and did the same. The document was
+rewritten, the books were not: change a Rp 1,000 invoice to Rp 2,000 and
+revenue, receivables and tax all still said Rp 1,000.
+
+It was easy to reach. The Edit link rendered on every row
+(`table-actions.blade.php:16`), the route checked only `can:edit-sales`, and
+sales have no Draft state, so a sale is posted to the books the second it is
+created. The contrast that marks it an oversight rather than a choice: sales
+returns and purchase returns were already fixed to re-do their accounting on
+edit (changelog 2026-11-08 Part 4 and 2026-11-06). The main invoice was
+simply never given the same treatment.
+
+Now `SalesService` posts through `postSaleJournalEntry()` and reverses
+through `reverseSaleJournalEntries()`, and `PurchaseService` through
+`postPurchaseJournalEntry()` and `reversePurchaseJournalEntries()`. Create,
+convert and edit all call the same builder, so three copies of the sale
+journal became one and creation can no longer disagree with edit.
+`updateSale()` also costs its lines now, which it never did, so the reposted
+entry debits COGS for what the edited sale actually costs.
+
+The reversal carries a guard: `canBeReversed() && !hasDependentEntries()`.
+`reverseJournalEntry()` posts the reversal with no source document and leaves
+the original's status `posted`, so the sourceable query cannot see the
+reversal, while `reversed_entry_id` is what stops a second one. Without that
+guard an edit followed by a delete would reverse the original twice.
+
+**A second bug fell out of the same read.** `deleteSale()` ran three
+reversal loops: every entry sourceable to the sale, the Faktur Pajak entries,
+and then a separate PPh loop. The PPh withholding entry is sourceable to the
+sale as well, so that third loop reversed it a second time and left the
+ledger holding a stray minus of the withholding amount. Delete now routes
+through the shared guarded helper, which is also what makes it safe now that
+an edit reverses too.
+
+Seven tests in `tests/Unit/Services/DocumentEditJournalTest.php` pin the net
+effect on the ledger after an edit, after a second edit, and after a delete,
+for sales and purchases, asserting per-account nets, a sum to zero, and that
+no entry is ever reversed twice.
+
+### Editing a POS sale would have stripped the cash receipt out of the books
+
+Found while verifying the fix above. A POS sale posts three entries, all
+sourced to the sale: the invoice, a cash payment, and a withholding entry
+when PPh applies. The sales edit form re-posts the regular-sale shape, so
+editing one would have reversed all three and posted a single invoice in
+their place.
+
+Measured on a Rp 100 cash sale:
+
+| | Cash | Owed to us | Revenue |
+| --- | --- | --- | --- |
+| before edit | +100 | 0 | -100 |
+| after edit | 0 | +100 | -100 |
+
+The cash disappears and the books claim the customer owes money they already
+paid. Before the re-journal fix this path was accidentally safe, because an
+edit posted nothing at all.
+
+POS sales were refused on three layers: the Edit link no longer rendered
+for them, `SalesController::edit()` redirected them to their receipt the way
+`show()` always has, `update()` refused before validation (403 for JSON, an
+error flash otherwise), and `updateSale()` threw so no other caller could
+reach it. That refusal stood until the repost shape was fixed; the
+2026-11-21 entry above lifts all three layers and renders the Edit link
+for POS rows again.
+
+### The point of sale booked no cost of goods at all
+
+`PosService` costed each line from `$productModel->cost_price`. **That column
+has never existed on products.** No migration ever added it, so the value was
+always null and `?? 0` turned it into zero: every POS transaction booked
+Rp 0 of cost while still decrementing the warehouse.
+
+Two things went wrong at once. Profit was overstated on every cash sale, and
+the Inventory account never fell even though the goods had physically left
+the building. POS also never consumed purchase batches, so batch level
+expiry and FIFO data drifted away from the warehouse totals that regular
+sales keep honest.
+
+Costing is now one shared implementation, `App\Services\Concerns\CostsLineItems`,
+used by all four places that sell something: `createSale()`,
+`finalizeConvertedSale()`, `updateSale()` and `PosService::createSale()`. The
+first three already carried identical copies of the FIFO loop, and a fourth
+copy written by hand for the POS is exactly how the two paths would have
+drifted apart again. Batches are consumed as they are costed, earliest expiry
+first, falling back to `products.price` when they run dry, which is the
+buying price (`StockOpnameService.php:162` says so in as many words).
+
+`tests/Unit/Services/PosServiceTest.php` sells 3 units at a batch cost of 40
+from a batch of 10: COGS books 120, Inventory is credited 120, and the batch
+drops to 7. Against the old code it fails on all three counts.
+
+### Two tests failed at random
+
+- **`StockOpnameFactory`** drew `mt_rand(1, 9999)` for its reference number
+  and made 20 rows at once. A repeat in 20 draws from 9,999 possible values
+  happens about 1.84% of the time, which failed
+  `test_index_displays_paginated_opnames` once every ~25 runs with a UNIQUE
+  constraint on `(tenant_id, reference_number)`. Measured: 4 failures in 60
+  isolated runs. It now counts up, keeping the four digit suffix
+  `generateReferenceNumber()` reads back with `substr(-4)`. No test mixes
+  factory rows with a generated one, so the two sequences cannot meet. 60 of
+  60 runs pass, and a guard test pins the uniqueness.
+
+- **`SalesFactory`** picked `TYPE_POS` or `TYPE_REGULAR` at random on every
+  row, so roughly half of all factory sales were POS sales. That silently
+  flipped every type dependent path: `show()` and now `edit()` both redirect
+  POS sales away, so a test could pass or fail on nothing but the roll. It
+  only bit once the POS guard above landed, failing 7 runs in 8. Every POS
+  test already sets the type explicitly (`POSControllerTest`, `PrintTest`,
+  `PosServiceTest`), so nothing loses coverage by making it always regular.
+  10 of 10 runs pass.
+
+### What was deliberately left alone
+
+- **Read paths.** `getSalesIndexData`, `getSalesMetrics`,
+  `getPurchaseIndexData`, `getPurchaseMetrics`, `getSalesCreateData`,
+  `getSalesViewData` and `getSalesEditData` have zero changed lines. The list
+  and report queries are what they were.
+- **Validation cost.** `TaxIsSelectable` runs one query, the same count as
+  the `exists:taxes,id` rule it replaced.
+- **N+1.** `Tax::effectiveDefault()` is called from 20 sites, none of them
+  inside a loop.
+- **The dangling POS edit routes.** `admin.pos.edit` and `admin.pos.update`
+  point at `POSController` methods that do not exist and would 500. Nothing
+  links to them, so they were recorded here rather than changed that day;
+  the 2026-11-21 entry above deletes all four.
+- **Historical POS sales.** The zero cost already booked, and the batches
+  those sales never consumed, stay as they are. This fix is forward only,
+  the same position taken on the 18 historical `INV/CR/TEST` invoices. That
+  position held until the 2026-11-21 entry above, whose
+  `sales:backfill-cogs` command is the approved correction for them.
+
+Gates: `php artisan test` 1504 passed (5557 assertions) in 222.64s,
+`npx vitest run` 172 files / 209 tests, `npm run build` clean, Pint pass,
+em-dash census on added lines 0.
+
+---
+
+## 2026-11-13: The Tax Page Could Not Create the Two Flags the Whole Ledger Reads, "Which Tax Is the Default" Was Answered Differently in 20 Places, and One Rule Replaced a Validation That Trusted Any Company's Tax
+
+Six findings from reading the tax and jurisdiction path end to end, in the
+order they were approved, followed by a cleanup pass over the two resolvers
+that reading left behind.
+
+### P1: the tax page could not make a tax that splits VAT or withholds
+
+`is_ppn` and `is_pph` decide where the money posts (Output VAT liability,
+withholding payable) and which jurisdiction may select the tax at all. They
+were written by `TaxSeeder` and `ensureIndonesianDefaults()` and read by
+every service that builds a document, but the Tax page's create and edit
+forms never sent them. `TaxController::store` and `update` had no rule for
+them, and `TaxService::create` and `update` never persisted them, so any tax
+created from the UI landed as `is_ppn = 0, is_pph = 0`.
+
+The effect is not cosmetic. `Tax::scopeForJurisdiction()` narrows a
+non-Indonesian tenant to `is_ppn = false AND is_pph = false`, and the journal
+gates read `isIndonesian() && $tax->is_ppn` (`QuotationController.php:342`,
+`PosService.php:333`, `SalesPipelineService.php:348`). A PPN tax created from
+the page was therefore invisible to the jurisdiction filter, appeared in
+dropdowns it should never have reached, and could never split Input VAT on a
+purchase.
+
+Now: hidden `value="0"` companions beside all four switches in both modals
+(`taxmodals.blade.php:135/143` and `:214/222`), `boolean` rules in the
+controller, pass-through in the service with `(bool)` coercion on update,
+`data-is-ppn` and `data-is-pph` on the row (`tax.blade.php:120-121`) read
+back by `handleEditTaxModal.js:15-16`, and four new lang keys in both
+languages.
+
+**The balancing bug this uncovered.** `PurchaseService::createPurchase()`
+built `$inventoryAmount` as the gross the supplier charged and never took the
+input VAT back out of it. On an **exclusive** PPN purchase that happened to
+be right, because gross minus tax lands on the net. On an **inclusive** one
+the tax is already inside the price, so Inventory kept the full gross while
+Input VAT was debited on top of it: debits exceeded credits by the tax and
+`createJournalEntry()` refused the entry. `$inventoryAmount -= $ppnAmount;`
+(line 334) fixes both cases with one expression, and the algebra for each
+case is written above it. Six tests in `PurchaseServicePpnMasukanTest` pin
+the split, including
+`test_create_purchase_with_inclusive_ppn_tax_still_balances`.
+
+### P2: two writers for "which tax is the default"
+
+The Tax page listed the default by reading the raw flag
+(`Tax::where('is_default', true)->first()`), while every document booked with
+`Tax::effectiveDefault()`. When the flagged tax was inactive or belonged to
+another jurisdiction, the page named a default that no document would use.
+`TaxController::index` now resolves the same way the services do, and
+`tax.blade.php:81` compares ids (`$defaultTax->id === $tax->id`) instead of
+re-deriving the flag, so the star follows the resolved tax.
+
+### P3: the seeded "PPN Inclusive" tax carried no flags
+
+`TaxSeeder` created `PPN Inclusive` with `rate => 11` and no `is_ppn`, which
+is exactly the row P1 describes: output VAT priced inclusively and invisible
+to the jurisdiction filter. It now carries `is_ppn => true, is_pph => false`,
+and seeder invariant 7, "Seeded taxes whose flags disagree with their name",
+fails if any seeded tax's flags stop matching what its name says.
+
+### P4: one resolver instead of 20 hand-rolled ones
+
+`Tax::effectiveDefault()` is now the only way the app asks which tax a
+document should book with: the default if it is usable, otherwise the first
+active one, ordered by id so the answer cannot change between runs. It
+replaced 20 call sites across seven files (`PurchaseService` 4,
+`SalesPipelineService` 4, `SalesService` 4, `QuotationController` 4,
+`TaxController` 2, `PosService` 1, `POSController` 1).
+
+Two things went into the resolver itself:
+
+- `scopeDefault()` now requires `is_active`. An inactive tax cannot be chosen
+  in any dropdown, so naming it the default while every document booked with
+  the fallback told two different stories.
+- `TaxService::delete()` promotes the lowest-id **active** tax and skips PPh
+  rows: the default is applied to documents that are not withholding anything,
+  so a withholding tax must never inherit it.
+
+### P5: one rule replaced a validation that trusted any company's tax
+
+Every document validated `tax_id` with a raw `exists:taxes,id`. That is a
+table lookup with no idea who is asking. It said yes to a tax belonging to
+another company, to a switched-off tax, and to a PPN or PPh record this
+jurisdiction cannot use; the writer then resolved the id to null and booked
+0% without a word.
+
+`app/Rules/TaxIsSelectable` is now the shared check, in 14 places (POS 2,
+Purchase 4, Quotation 4, Sales 4). It queries past the tenant scope on
+purpose, so the message can name the company the tax belongs to instead of
+claiming the row does not exist.
+
+Jurisdiction is deliberately **not** enforced on `pph_tax_id`. The service's
+`isIndonesian()` gate already owns PPh jurisdiction, and two tests pin that
+gate as the contract
+(`QuotationControllerTest::test_store_does_not_apply_pph_for_non_indonesian_tenant`
+and `test_update_does_not_apply_pph_for_non_indonesian_tenant`). Enforcing it
+in the rule as well would move the rule from the service to the form and
+break both.
+
+Six tests in `tests/Feature/Admin/TaxSelectionValidationTest.php`, including
+`test_an_indonesian_tenant_may_still_pick_that_ppn_tax`, so the guard does
+not close the door it exists to guard.
+
+### P6: the credit seeder paid invoices past what they total
+
+`CreditFeatureSeeder` sized its payments from its **own** copy of the total
+rather than the figure the service had recomputed, so seeded invoices were
+settled against a number no document ever carried. Payments are now sized
+from `$sale->fresh()->total` (line 156) and `$sale2->fresh()->total` (line
+234), and the credit draw is capped at `min($totalAvailable, 50000)` (line
+285) so the seeder cannot burn more credit than exists.
+
+Seeder invariant 8, "Invoices paid more than they total", joins payments to
+sales and fails on `SUM(payments.amount) > sales.total + 0.005`. It runs
+through `assertQueryReadsExistingColumns()`, so a mistyped column cannot make
+it pass for nothing (the entry below is that guard). It proved itself
+immediately, flagging `INV/CR/TEST/1/... paid 7205.00 of 6550.00`.
+
+### Cleanup: two resolvers deleted, one lang key merged
+
+`TaxService::getAllActive()` and `TaxService::getDefault()` had no callers
+left after P4, and `getDefault()` was also a second, differently ordered copy
+of the same answer. Both are gone; `Tax::effectiveDefault()` is the only
+resolver. The duplicate lang key `tax_set_default`, which said the same thing
+as `tax_set_as_default`, was removed from both languages.
+
+### Deliberately left alone
+
+- **`ppn_enabled`, `ppn_rate`, `ppn_amount` on sales and purchases** are
+  accepted by the controller and then recomputed by the service. They cannot
+  disagree with the journal because the journal never reads them. Same on the
+  purchase order side.
+- **POS `grand_total` and `change_amount` validation** (`min:0`) covers two
+  columns no PHP code reads. It is harmless and returns a clear message;
+  removing it means editing `POSControllerTest:149`.
+- **The `isIndonesian()` journal gate itself.** It was not the root problem,
+  the missing flags were. Changing it would break the two PPh tests above.
+
+Gates: `php artisan test` 1492 passed (5449 assertions) across two clean full
+runs, tax batch 44 passed, quotation and POS batch 60 passed, `npx vitest
+run` 172 files / 209 tests, `npm run build` clean, Pint pass. One pending
+migration (`2026_11_05_000002_add_invoice_email_feature_to_plans`) is
+deliberate.
+
+---
+
+## 2026-11-13: A Schema Guard So a Typoed Column Cannot Make an Invariant Pass for Nothing
+
+`DatabaseSeederTest::negativeStockRows()` carried a second check that looked
+like extra safety and was worth nothing:
+
+```php
+foreach (DB::table('products')->where('stock_quantity', '<', 0)->get([...]) as $row) {
+```
+
+`products` has no `stock_quantity`. The column was removed when multi-warehouse
+support landed (`2025_02_03_063933_create_product.php` line 21, commented out
+with `// Removed for multi-warehouse support`), so the query could never return
+a row. The live check directly above it, `product_warehouse.quantity < 0`, is
+the real stock invariant and stays.
+
+### Why this is worse than a dead line
+
+Deleting it is the four-line fix. The reason to go further is how it failed
+silently.
+
+Every test runs on SQLite, and SQLite's double-quote handling hides exactly
+this mistake:
+
+| Query | SQLite does |
+| --- | --- |
+| `SELECT stock_quantity FROM products` | throws `no such column` |
+| `SELECT "stock_quantity" FROM products` | returns the literal text `stock_quantity` |
+| `WHERE "stock_quantity" < 0` | compares `0` against a string, matches nothing |
+
+Laravel's SQLite grammar emits double quotes for every identifier, so
+`->where('stock_quantity', ...)` and `->get(['stock_quantity'])` both land in
+the second and third rows. No error, no warning, zero rows, assertion green.
+Production runs MariaDB, where backticks mean the same typo is a hard
+`Unknown column` error. So the test suite and production disagree about
+whether the query is valid, and the test suite is the one reporting success.
+
+This is the concrete form of "the test file is not what decides whether the
+code is accurate": a test can be green because it checked nothing.
+
+### The fix: read the SQL that was actually built
+
+`tests/Traits/AssertsSchemaColumns.php` adds two helpers.
+
+**`assertQueryReadsExistingColumns($query)`** takes the query builder, calls
+`toSql()`, and checks every identifier in the SQL Laravel produced against the
+schema. Two rules, because Laravel splits a reference into two quoted tokens
+while a raw fragment writes it as one unquoted token:
+
+1. every quoted token must be one of the tables in the query, or a column of
+   one of them;
+2. every unqualified `table.column` must be a real column of that table.
+
+Bound values never reach the SQL, they become `?` placeholders, so a string
+literal cannot be mistaken for an identifier. A table that does not exist
+fails first, with its own message.
+
+**`assertColumnsExist($table, $columns)`** covers what the parser cannot see:
+columns written by hand inside `selectRaw()` or `havingRaw()` with no table
+name to qualify them, such as `SUM(quantity)` or the bare `type` and `amount`
+in the balance check.
+
+A hand-maintained list alone would not have been enough. It catches schema
+drift, but a typo written in the query and never added to the list still
+passes. Deriving the check from the SQL closes that gap: there is nothing to
+remember to update.
+
+### Wired into every invariant in `DatabaseSeederTest`
+
+Each helper now builds its query, guards it, then runs it:
+
+| Helper | Guarded |
+| --- | --- |
+| `unbalancedPostedJournalEntryIds()` | parsed, plus `transactions.type` / `amount` declared for the raw `havingRaw` |
+| `negativeStockRows()` | parsed for both queries; dead `products` branch removed |
+| `returnedUnitsPerSaleAndProduct()` | parsed, raw is table-qualified |
+| `soldUnitsPerSaleAndProduct()` | parsed, plus `sales_items` declared for the unqualified raw |
+| `returnedUnitsPerPurchaseAndProduct()` | parsed, raw is table-qualified |
+| `orderedUnitsPerPurchaseAndProduct()` | parsed, plus `po_items` declared for the unqualified raw |
+| `canceledReturnsWithALiveJournal()` | both `DB::table` queries parsed; `journal_entries` declared for the `JournalEntry::where()` call, which runs through the model and its tenant scope |
+| tax check in the main test | parsed for `sales.tax_id` and `po.tax_id` |
+
+### The guard is held to account too
+
+`tests/Unit/Traits/AssertsSchemaColumnsTest.php` breaks queries on purpose and
+asserts each one fails: a typo in a `where`, in a `select`, in a `join`, in a
+table-qualified raw fragment, a table that is not there, a declared column that
+is not there. One test replays the exact `stock_quantity` query that used to
+pass silently and requires it to fail now. If any of those start passing, the
+guard has stopped checking and every invariant built on it is vacuous again.
+
+### Deliberately not changed
+
+- `PurchaseReturnServiceTest` and `ReturnSeedersTest` also read
+  `$product->stock_quantity`. Those are correct: `Product` declares it in
+  `$appends` with a `getStockQuantityAttribute()` accessor that sums
+  `product_warehouse`, so they read a computed value, not a missing column.
+- The guard is applied to `DatabaseSeederTest` only, since that is the file
+  under audit. Rolling it across the rest of the invariant suite belongs to
+  the permanent invariant suite step.
+
+Gates: `php artisan test` 1481 passed (5388 assertions), `npx vitest run` 172
+files / 209 tests, `npm run build` clean, Pint pass.
+
+---
+
+## 2026-11-13: The Four Document Seeders Now Call the Services Instead of Writing the Ledger Themselves
+
+The seed path carried its own copy of the accounting. `SalesSeeder`,
+`PurchaseSeeder`, `SalesReturnSeeder` and `PurchaseReturnSeeder` each built
+their journal entries by hand out of hardcoded account codes
+(`1130-{tenant}`, `4100-{tenant}`, `2110-{tenant}`, `1140-{tenant}`) and
+created their documents with raw `Model::create()` calls. Every one of those
+numbers had to be kept in step with the services by hand, and none of them
+were.
+
+### What was wrong
+
+| # | Symptom | Root cause |
+| --- | --- | --- |
+| A | Two writers for output VAT | `SalesSeeder` credited `2130` whenever `tax > 0`, while `SalesService` only books VAT for an Indonesian tenant carrying an `is_ppn` tax. Which one ran decided the ledger. |
+| B | Purchase tax always capitalised into inventory | `PurchaseSeeder` debited the whole gross to `1140` and never split out input VAT, so `1160` stayed empty no matter what the tenant's jurisdiction was. |
+| C | `ppn_enabled` was never written | Only the services derive it from the tenant's jurisdiction and the tax's `is_ppn` flag. The seeders wrote neither column, so every seeded document read as non-VAT. |
+| D | Credits consumed with no credit behind them | `SalesReturnSeeder` wrote the return row but never raised the `CustomerCredit` that a paid invoice's return is supposed to create. |
+| E | Returns bypassed `SalesReturnService` | `SalesReturn::create()` skipped the stock restore, the batch restore, the proportional reversal and the sale status update, and booked a flat `Dr 4100 / Cr 1130` instead. |
+
+While rewriting them a fifth writer turned up: `PurchaseReturnSeeder` booked a
+flat `Dr 2110 / Cr 1140` by hand, which reverses none of the input VAT or
+withholding the original purchase may have posted.
+
+### The fix: one code path
+
+Each seeder now draws its lines, then hands them to the service the screens
+use:
+
+| Seeder | Now calls |
+| --- | --- |
+| `SalesSeeder` | `SalesService::createSale()` then `SalesService::addPayment()` |
+| `PurchaseSeeder` | `PurchaseService::createPurchase()` then `PurchaseService::addPayment()` |
+| `SalesReturnSeeder` | `SalesReturnService::createSalesReturn()` |
+| `PurchaseReturnSeeder` | `PurchaseReturnService::createPurchaseReturn()` |
+
+`createSale()` books the invoice Unpaid and the payment moves it to Paid or
+Partial, which is what happens at runtime; the seeders' old "decide the status
+first, then write a payment that may not match it" order is gone with the code
+that used it.
+
+### The two things that had to be solved first
+
+**Authentication.** All four services take the document's owner from
+`Auth::id()`, and `db:seed` runs with no session bound. `sales.user_id` and
+`po.user_id` are nullable, so sales and purchase orders would silently have
+been written with a null owner, but `sales_returns.user_id` and
+`purchase_returns.user_id` are `constrained('users')` and not null, so both
+return seeders would have failed outright. Each seeder therefore sets the
+randomly chosen user with `Auth::setUser()` before calling the service. It
+does not log in through the session: `SessionGuard::login()` and `logout()`
+both reach for the session and cookie jar, which a console command has no
+business touching.
+
+A side effect worth naming: `AccountingService` only writes an audit row when
+`Auth::check()`, so the seeded documents now carry `accounting_audit_logs`
+rows they never had before. That is what a real user posting them produces.
+
+**The rescale branch.** Both document seeders picked random lines, computed a
+total of their own, and, when the draw fell outside the range they wanted,
+rescaled *that figure* while leaving the lines alone. `SalesSeeder` stored a
+grand total its items did not sum to; `PurchaseSeeder` stored a
+`po_items.total` that no longer equalled `quantity * price`. Since the service
+derives the total from the very lines it is handed, the rescale cannot be
+carried over. It is gone: the draw is retried up to 100 times and then
+accepted as it stands, so one number is computed once, by the code that posts
+it.
+
+### What a fresh seed now produces
+
+Measured against a freshly migrated and seeded database, not against a test
+fixture:
+
+* `user_id` is null on **0 of 318 sales, 300 purchase orders, 86 sales
+  returns and 86 purchase returns** (it was nullable-but-unset on the two
+  document types and would have been a hard failure on the two return types).
+* **0** posted journal entries out of balance, **0** rows of negative stock,
+  **0** units returned past what the parent ever shipped or ordered.
+* **0** `po_items` where `total != quantity * price`, the direct casualty of
+  deleting the rescale.
+* **0** sales or purchases whose stored total disagrees with their own lines
+  recomputed from the discount and tax snapshot.
+* **19 customer credits, all of them parented to a sales return**, with
+  `available + used = amount` and the credit consumed on invoices matching
+  `used_amount` to the cent (it previously ran 7,700 against 350 recorded).
+* **1,190 audit rows**, against none before for these documents.
+
+Findings B and C read as "still zero" on a fresh seed for a reason that is not
+in the seeders: `tax_jurisdiction` is only ever written by the settings and
+e-Faktur screens, so every freshly created tenant is `NULL`, `isIndonesian()`
+is false, and correctly no VAT liability and no `ppn_enabled` flag is booked.
+The split itself is covered by `PurchaseServicePpnMasukanTest`.
+
+### What was deliberately not changed
+
+The live database was not touched, and the live tenant 3 keeps
+`tax_jurisdiction='ID'`. The seeders still skip when their document type
+already exists, so re-running `db:seed` remains a no-op.
+
+---
+
+## 2026-11-13: Customer Credit Made to Follow Design A, an Uncapped Credit Burn Found, a Dead Journal Entry Deleted, and the Missing Cash Refund Path Built
+
+Four credit fixes, in the order they were approved.
+
+### The design that was chosen
+
+Every major ERP with credit notes (Xero, QuickBooks, Odoo, ERPNext,
+Manager.io, Mekari Jurnal) puts a return's credit **inside Accounts
+Receivable**, not in a separate wallet account. This app had the credit
+sitting in a `customer_credits` table that is never booked anywhere, and
+`customer_credit_account_id` is read with `?? null` in two places and written
+by nothing: not `AccountSeeder`, not `CreateNewUser`, not the settings
+validation list. It is a setting that cannot be configured.
+
+Under design A the three operations are:
+
+| Operation | Entry |
+| --- | --- |
+| Return issues credit | `Cr AR` (already implemented) |
+| Credit used on an invoice | **no entry** (both sides already sit in AR) |
+| Credit refunded as cash | `Dr AR / Cr Cash` (**did not exist**) |
+
+### Fix 1: the "Credit Applied" entry was double-counting and is gone
+
+`createSale()` and `finalizeConvertedSale()` each booked
+`Dr CustomerCredit / Cr AR` when a credit was consumed against an invoice.
+Under design A that second entry subtracts the same discount twice: the return
+has already credited AR, and allocating it to an invoice only moves the balance
+between two documents. Neither block could ever run in production anyway,
+because `customer_credit_account_id` is never set, so they were dead code that
+would have been a live bug the moment anyone configured the account. Both
+deleted, each replaced with a comment stating why no entry is booked.
+
+### Fix 2: credit could be burned past what the invoice owed
+
+`applyCustomerCredit()` took whatever it was handed with no ceiling. The
+`CreditFeatureSeeder` asked for `min(available, 50000)`, and the fresh seed
+produced **6 invoices of 350.00 marked `Paid` while consuming 7,700.00 of real
+customer credit and moving 0.00 cash**. Credit is money; burning 7,700 to
+settle 350 is a loss.
+
+The cap is `max(0, total - total_paid - customer_credit_used)`, read from the
+stored `total` rather than `$sale->balance`, because the call site runs
+immediately after `Sales::create()` while `salesItems` is still empty and the
+`balance` accessor would compute 0 and permit everything.
+
+**A bug in the first attempt at this fix, caught while writing it:**
+`total_paid` was read with `getRawOriginal('total_paid')`. There is no
+`total_paid` column. `Sales::getTotalPaidAttribute()` sums the `payments`
+relation, so the raw read returned null, cast to `0.0`, and the cap silently
+became `total`, which is only correct for an unpaid invoice. It is now read
+through the model. This is the same class of error the module audit is meant
+to catch, found by reading the model instead of trusting the first line that
+compiled.
+
+`CreditFeatureSeeder` capped the same way, adding the invoice's own total as
+the third bound.
+
+### Fix 3: the cash refund path, which did not exist
+
+The only settlement for a credit was spending it. There was no refund
+anywhere in the codebase; the sole trace was a comment reading "return creates
+credit, not refund."
+
+Built as **full balance only**, on the return page, per the decisions taken:
+
+- `SalesReturnService::refundCustomerCredit()` books `Dr AR / Cr Cash` for the
+  credit's full `available_amount`, then sets `available_amount = 0` and
+  `status = 'refunded'` in the same transaction, so the credit leaves the
+  spendable pool at the same moment the cash leaves.
+- `POST sales-returns/{salesReturn}/refund`, gated `can:create-payments`.
+  Superuser and staff hold it; POS deliberately does not, since a POS operator
+  should not be able to push cash out of the business.
+- The button lives in the credit note card on the return show page, rendered
+  only while the credit is active with a balance, behind `@can`.
+- New `refunded` status rendered in the return page and in the CRM modal. The
+  modal previously fell through to an "Expired" badge for any unknown status,
+  so a refunded credit would have been shown as expired.
+
+**The refund is sourced to the `CustomerCredit`, not the `SalesReturn`.**
+This was not a stylistic choice. `updateSalesReturn()` and
+`deleteSalesReturn()` both call `reverseSalesReturnJournalEntries()`, which
+reverses *every* entry sourced to the return. Sourcing the refund there would
+have let an ordinary return edit reverse cash that had already left the
+building. The credit row outlives its return (the foreign key is
+`nullOnDelete`), so the entry never orphans.
+
+### Two guards the refund path required
+
+1. **A refunded credit could be resurrected.** `updateSalesReturn()` re-synced
+   any existing credit to `status = 'active'` with a fresh balance on every
+   edit to a Completed return. Editing a return after refunding it would have
+   handed the customer the same money a second time. Both the reactivate and
+   the cancel branch now skip a `refunded` credit.
+
+2. **A refunded return could be deleted, and deleting it lied.**
+   `deleteSalesReturn()` reverses the return's AR credit while the refund entry
+   survives, leaving the ledger claiming the customer both owes the money and
+   has been paid it. It now throws with a message telling the user to cancel
+   instead. Because `bulkDeleteSalesReturns()` loops inside one transaction,
+   that exception would have aborted the whole batch, so it now counts
+   `deleted` and `skipped` per row the way `bulkCompleteSalesReturns()` already
+   did, and the controller reports both. Single `destroy()` catches and flashes
+   the message rather than 500ing.
+
+### Tests
+
+Six new tests: three service tests (refund books `Dr AR`/`Cr Cash` and empties
+the credit, double refund refused, empty balance refused), one for each guard
+(refunded return undeletable, edit neither undoes nor resurrects the credit),
+and three feature tests (refund posts the right accounts, refunds pay out once,
+refund is `403` without the permission).
+
+The permission test needed `$this->user->refresh()` after detaching the role:
+Spatie caches role relations on the model, so `can()` kept answering `true`
+from cache and the route returned 302 instead of 403 until the model was
+reloaded.
+
+---
+
+## 2026-11-13: the Cancel Flow Written Down, Five Seeder Bugs Found by Running the Whole Seed Chain for the First Time, the Nightly Demo Reset Booking Every Sale With No Tax, and `db:seed` Made Safe to Run Twice
+
+Three steps approved in order, plus the idempotency work that came out of
+asking "but what actually happens if you run it twice?"
+
+The theme is that **nobody had ever executed the seed chain in a test**. The
+36 seeders in `DatabaseSeeder` were written, reviewed, and shipped on the
+strength of reading them. Running them turned up five bugs in step 2, one crash
+and six silent duplications in step 3, and a nightly job writing untaxed
+documents into the live demo ledger.
+
+### Part 1: the cancel flow, written down
+
+`docs/ACCOUNTING_SETUP_GUIDE.md` went from **0** mentions of "Canceled" to 14.
+
+- **Two new status tables**, Sales Return Statuses and Purchase Return
+  Statuses (Pending / Completed / Canceled), under Payment Status Reference.
+- **A deliberate deviation from the original plan.** Canceled was *not* added
+  to the Sales Order and Purchase Order status tables, because
+  `Sales::$paymentStatus` and `Purchase::$statuses` contain no such value.
+  Adding it would have introduced a new documentation bug to describe a status
+  no order can ever hold. Canceled belongs to returns, so it got its own tables
+  plus a note saying so.
+- **New `### 7. Canceled Returns (Sales and Purchase)`** with a side-by-side
+  table of what cancel gives back on each side (stock, journal, credit) and
+  the details that are easy to lose: a return born Canceled moves nothing,
+  cancel is idempotent, deleting a Canceled row removes only the row,
+  completing one is refused by the service, bulk Complete skips and counts,
+  editing to Canceled undoes and editing back restores, and the parent status
+  is recomputed from live returns only. HR & Payroll renumbered to `### 8`;
+  no anchor references those headings, so nothing breaks.
+- **Two timing claims corrected.** Sections 5 and 6 both said the journal
+  entry posts "when the return is marked Completed." It posts **at creation**,
+  whatever status the return is born with. Completion only issues the customer
+  credit. The sections now say so and explain what completion actually adds.
+
+### Part 2: five seeder bugs, found by running the chain
+
+`tests/Unit/Seeders/DatabaseSeederTest.php` is new. The full `DatabaseSeeder`
+chain runs in about 30 seconds: 6 tenants, 318 sales, 300 purchase orders,
+1287 journal entries. It asserts that every posted entry balances on its own
+rather than in aggregate, that no stock figure goes negative (naming the
+offending row on failure), that no Canceled return holds a live journal entry,
+that no return exceeds its parent per product, that every seeded sale and
+purchase order carries a tax, and that re-running the accounting seeders
+changes nothing.
+
+Five bugs fell out of it:
+
+| Seeder | Problem |
+|---|---|
+| `AccountSeeder` | `updateOrCreate` looked `balance_date` up as `Y-m-d`, but the `date` cast stores `Y-m-d H:i:s`, so the lookup never matched and every re-run died on the unique index |
+| `StockOpnameSeeder` | Hardcoded `SO-{today}-0001`, colliding with itself on a same-day re-run |
+| `PurchaseSeeder` | Had no re-run guard while its sibling `SalesSeeder` has always had one, so a second run appended 50 more purchase orders **and their journal entries** while sales skipped |
+| `SalesReturnSeeder` | Drew a random sale up to 15 times with no cumulative cap, so one invoice could be returned past what it ever shipped |
+| `PurchaseReturnSeeder` | Same over-return, **and it was the only unguarded stock decrementer in the codebase**, so it drove `product_warehouse.quantity` negative |
+
+Two of the fixes were themselves wrong on the first attempt, which is worth
+recording because both failures were invisible until the test ran:
+
+1. Capping the purchase return against live stock was not enough, because
+   several lines inside one return can target the same product and the
+   decrement only runs after every item has been chosen. Each line therefore
+   saw untouched stock. The seeder now tracks `$pendingDraw` separately.
+2. `rand(1, $remaining)` drew against the *product-wide* budget, so a single
+   line could consume the whole allowance. The draw is now bounded by the line
+   as well: `rand(1, min((int) $poItem->quantity, $remaining))`.
+
+`ReturnSeedersTest`'s fixture had to grow from 3 line items to 15. The new cap
+correctly exhausts a three-line fixture's returnable budget after two or three
+draws, which left a meaningful chance of a run creating **zero** Canceled
+returns and silently dropping the exact path the test exists to cover.
+Assertions are back to exactly 72, stable across four runs.
+
+**The nightly reset was booking untaxed documents.** `ResetDemoTenant` ran
+`TaxSeeder` *after* `PurchaseSeeder` and `SalesSeeder`, while `DatabaseSeeder`
+runs it before, and both of those seeders carry a comment saying it must run
+first. Both resolve their default tax on their first pass and fall back to
+rate 0 / type `none` when none exists. Replicating the old order in a probe
+gave **50 of 50 sales and 50 of 50 purchases with `tax_id = NULL`**, even
+though 6 taxes existed by the end of the run. Fresh installs were fully taxed;
+demo tenants were re-written as untaxed every night. `TaxSeeder` moved above
+`PurchaseSeeder`, and the same probe now reports `untaxed_sales=0 / total=50`.
+
+### Part 3: running `db:seed` twice
+
+The question was whether the remaining unguarded seeders mattered. Measuring
+instead of guessing found something better than either answer: of 35 seeders,
+**one crashed and six duplicated**, and two of those duplicated the general
+ledger.
+
+That corrects a claim made earlier in this pass, that the unguarded seeders
+"don't affect the accounting math." They did:
+
+- `AttendanceSeeder` **crashed** on `attendance_records`. Same bug class as
+  `opening_balances`: `date` is cast to `date`, so `updateOrCreate` looked the
+  row up with a bare `Y-m-d` that never matches the stored `Y-m-d H:i:s`, and
+  the insert tripped the unique key.
+- `ManualJournalEntrySeeder` booked **+6 journal entries and +12
+  transactions** on top of the originals. Every entry balanced on its own, so
+  nothing looked wrong; the ledger had simply doubled for that tenant.
+- `CreditFeatureSeeder` booked **+5 journal entries and +20 transactions**,
+  and had a second problem underneath: `cleanUpPreviousTestData()` deleted the
+  sales, returns and credits it found but left their journal entries behind, so
+  a re-run orphaned GL rows against invoices that no longer existed and then
+  booked a fresh set. The cleanup now deletes the journal entries with the
+  documents (transactions follow through the `onDelete('cascade')`), and a
+  guard stops the seeder from running twice at all.
+- `StockTransferSeeder` (+44 transfer adjustments and a second stock move),
+  `QuotationSeeder` (+5, silently, because quotation numbers are dated and the
+  sequence restarts on a new day instead of colliding) and
+  `SalesOpportunitySeeder` (+5 opportunities, +8 line items).
+
+The rest drifted only in `activity_logs`: `updateOrCreate` fires the `updated`
+event even when nothing is dirty, and the activity log listener records it.
+`Warehouse`, `Product`, `SalesPipeline`, `PipelineStage`, `User` and `Account`
+each wrote a handful of log rows and nothing else. `PermissionSeeder` churned
+`role_has_permissions` by two rows in each direction, because its
+`syncPermissions()` calls strip the extras `RolePermissionSeeder` adds
+afterwards; the syncs now run only when the role has no permissions yet, which
+preserves first-run behaviour exactly.
+
+`ActivityLogSeeder` needed a scope fix of its own. Its guard keys off the
+`entity_label = "Sample {module} {n}"` pattern that only this seeder writes
+(keying off `activity_logs` generally would not work, since earlier seeders
+have already written real entries by the time it runs), but the model carries
+`BelongsToTenant`, and the seeder walks every tenant while only one is bound as
+current. The first version therefore matched one tenant out of six and
+re-seeded 250 rows. The lookup now drops the scope, the same way the seeder
+already queries users.
+
+**One regression, caught immediately.** The `AccountSeeder` guard was first
+written as a bare `Account::where('tenant_id')->exists()`. `ReturnSeedersTest`
+failed instantly: `CreatesTenant` pre-creates six accounts in `setUp`, so the
+guard read those as a finished chart of accounts, skipped `seedAccounts()`,
+and left 4100/1130 missing for the return seeders to book against. The marker
+is now AccountSeeder's own dashed root code (`1000-{tenantId}`), which
+`CreatesTenant` never writes (`1000{tenantId}`, no dash). Settings and opening
+balances deliberately stay outside the guard because they have their own state.
+
+`tests/Unit/Seeders/DatabaseSeederTest.php` gained a second method,
+`a_second_full_seed_is_a_no_op()`, which seeds the full chain, snapshots
+**every** table, seeds again, and requires both no exception and zero drift
+across all of them, then re-checks the accounting invariants so a seeder that
+deleted a row and added another could not pass on counts alone. It was green on
+four consecutive runs against random seeders.
+
+**Gates:** `php artisan test` **1465 passed (5209 assertions)** in 499s;
+`npx vitest run` 172 files / 209 tests; `npm run build` clean; em-dash census
+on added lines **0**; untracked files **1** outside `public/build`
+(`tests/Unit/Seeders/DatabaseSeederTest.php`, git is the user's to run);
+`migrate:status` shows exactly one Pending
+(`2026_11_05_000002_add_invoice_email_feature_to_plans`, the deliberate
+section 2.9 hold); `grep -rn markTestSkipped tests/` returns nothing.
+
+**Still open:** the calculation invariant suite, the third step of the approved
+sequence, has not been started. Two design questions are outstanding for it:
+where the suite lives (`tests/Unit/Invariants/` as one place, or spread into
+the service tests), and whether the 16 models carrying `float` money casts are
+flagged now or treated as a separate migration.
+
+---
+
+## 2026-11-12: One Rule Applied Everywhere (a Canceled Return Holds No Stock, No Journal and No Credit), the Recurring-Journal Feature Deleted as Unreachable, PO Line Order Made Deterministic, 313 Unused Lang Keys Removed, and Two Audit Findings Retracted or Closed
+
+This entry covers the accounting audit committed in `58ee3d56` plus the
+follow-up that finished it. The audit reported findings in five buckets (F for
+correctness, D for dead code, X for doc drift, T for test gaps). Read together
+they were mostly **one invariant wearing several costumes**: a Canceled return
+holds no stock, no live journal and no credit. The cancel path enforced that
+rule, create enforced it, and the journal half of update enforced it. Delete
+forgot it, the stock half of update forgot it, complete forgot it, and the
+purchase side's bulk complete forgot it in a way that also skipped the
+service entirely.
+
+The audit itself was committed in `58ee3d56`; the follow-up in Parts 6 to 9
+and this entry are uncommitted, and git is the user's to run.
+
+### Part 1: the invariant, enforced at every entry point (F1 to F5)
+
+- **F1, delete.** `deleteSalesReturn()` and `deletePurchaseReturn()` reverted
+  stock unconditionally, so deleting a Canceled return moved stock a second
+  time, on top of the move cancel had already undone. Both now check status
+  first. UI reachable: the row Delete button and bulk delete.
+- **F2, edit.** `updateSalesReturn()` and `updatePurchaseReturn()` re-incremented
+  stock for the new items unconditionally while the journal half was already
+  guarded, so an edit to a Canceled row left stock and GL disagreeing. The
+  same gap let a Canceled return keep its customer credit alive. Stock halves
+  are now skipped for a Canceled row and the credit is canceled with it. The
+  two tests that covered this asserted GL only; they now assert both.
+- **F3, complete.** `completeSalesReturn()` early-returned only when the row
+  was already Completed, so completing a Canceled return issued a
+  `CustomerCredit` against a row holding no stock and no journal. Refused now,
+  with a test on each side.
+- **F4, purchase bulk complete.** `PurchaseReturnController::bulkComplete()`
+  ran a raw `$pr->update(['status' => 'Completed'])` in a loop with no
+  transaction, and `completePurchaseReturn()` did not exist anywhere. The
+  service method now exists and the controller calls it.
+- **F5, bulk paths.** Bulk complete and bulk cancel now apply the same
+  per-row guards as the single-row paths and report counts instead of failing
+  or silently half-applying. The server-side `throw` guards inside
+  `completeSalesReturn()` and `completePurchaseReturn()` are deliberate and
+  stay: the UI can hide the option, the service still refuses.
+
+The pattern is now enforced at create, update, complete, cancel, delete, bulk
+complete and bulk cancel, on both sides, and each entry point has a test.
+
+### Part 2: dead code removed (D1, D4, D5, D6, D7)
+
+- **D1:** `AccountingService::getTrialBalance()` deleted. It duplicated the
+  live `AccountingReportService::generateTrialBalance()` and had no callers.
+- **D4:** five zero-ref methods deleted (`ActivityLogService::logPayment`,
+  `EFakturService::calculatePpn`, `EmployeeService::getEditData`,
+  `SalesPipelineService::getOpportunitiesByFilters`, `PlanService::checkFeature`)
+  along with a dead `Request` import.
+- **D5:** `SalesHelper` and `PurchaseHelper` each carried the same six
+  calculation methods and had already drifted apart (`SalesHelper` read
+  `$item->customer_price ?? $item->price`, `PurchaseHelper` read only
+  `$item['price']`). Both now `use` the trait
+  `App\Helpers\Concerns\CalculatesInvoiceTotals`, so there is one copy of the
+  arithmetic instead of two that disagree.
+- **D6:** 313 dead lang keys deleted across six files. The sweep flattened
+  3141 English leaf keys, scanned every source file outside `lang/`, `*.md`
+  and `public/build` for literal hits, and found 401 with none. Of those, 88
+  were protected because they are built at runtime: the `fh_*` namespaces are
+  reached through `__('messages.fh_reason.'.$key)` and
+  `__('messages.fh_narrative.'.$type)`, including nine
+  `fh_narrative.statement_*` keys reached through
+  `template('statement_'.$tone)`. The remaining 313 went: `en/messages` 288,
+  `en/plan` 21, `en/tutorial` 4, `id/messages` 274, `id/plan` 21,
+  `id/tutorial` 4, `accounting` 0. Every file still parses, and the surviving
+  key set in each file matches the expected set exactly, with zero missing and
+  zero extra keys. The `+68` lines visible in the `lang/` diff are pre-existing
+  session work (invoice email, unpost, tax reversal, e-Faktur batch), not this
+  sweep.
+- **D7:** both `journalEntries()` morphs deleted. They pointed at
+  `transactionable_*` relations that do not exist (`JournalEntry` uses
+  `sourceable_*`) and had zero callers.
+
+### Part 3: the unpost button, wired (D3)
+
+`AccountingService::unpostJournalEntry()` existed with no way to reach it.
+It is now a UI button with route, controller action, service method, blade
+markup and `en`/`id` lang keys, covered by three feature tests.
+
+### Part 4: doc drift corrected (X1 to X3)
+
+- **X1:** `INTERVIEW_QA.md` still claimed there was no bulk button for
+  returns, after `ROADMAP.md` and `PPN_EVOLUTION.md` had been fixed.
+- **X2:** `TAXATION_SYSTEM.md` section 6.5 computed the return base as
+  `return_amount / sale.total`, which is gross rather than net, carried no PPh
+  leg and had no purchase-return section. Rewritten, and a section 6.6 added
+  for the purchase side.
+- **X3:** `TAXATION_IMPROVEMENT.md` pointed at `PosController.php`; the real
+  file is `POSController.php`.
+
+### Part 5: test gaps closed (T1 to T4)
+
+- **T1:** delete-of-Canceled tests already existed on both sides.
+- **T2:** the edit-to-Canceled tests now assert stock as well as GL.
+- **T3:** the return seeders were never exercised by anything
+  (`tests/TestCase.php` sets `seedDatabase = false`), yet they bypass the
+  services entirely with raw creates and hand-rolled stock and journal moves.
+  New `tests/Unit/Seeders/ReturnSeedersTest.php` (2 tests, 72 assertions)
+  holds them to the same invariant as the services and checks their
+  already-exist guard is a real no-op on a second run.
+- **T4:** the three silent `markTestSkipped` calls in the opening-balance
+  tests were latent guards that could quietly stop assertions running. They
+  are gone; `grep -rn markTestSkipped tests/` returns nothing.
+
+### Part 6: recurring journal entries deleted as unreachable (D2)
+
+Nothing could ever trigger them. `processRecurringEntries()` and the
+`RecurringJournalEntry` model had no callers outside the service that defined
+them, `routes/console.php` schedules only `tenant:reset-demo`,
+`billing:process-scheduled-changes` and `billing:check-expired`, and there was
+no artisan command, no route, no UI and **no test**, despite `INTERVIEW_QA.md`
+describing the feature as "complete and tested". Deleted: the 151-line model,
+the service method, and the `RecurringJournalEntry` and `DB` imports that
+became dead with it.
+
+The `recurring_journal_entries` table and migration
+`2026_02_11_000003_create_recurring_journal_entries_table.php` are **kept**.
+Dropping them would turn a future rebuild into a data-migration problem, and
+`BackupTenant` still lists the table for backup, which stays correct while the
+table exists. `INTERVIEW_QA.md` Q31.2 and section 43 were rewritten to record
+what the code did and how to rebuild it, and `FEATURE_CHECKLIST.md` no longer
+ticks an infrastructure that is not there.
+
+The Manual Journal Entries page is a different feature and was untouched: all
+eleven `journal-entries` routes and all thirteen service methods the
+controller calls are intact, and its 45 tests pass.
+
+### Part 7: PO line order made deterministic (F6)
+
+`PurchaseReturnService` walked `po_items` with **no `ORDER BY` at all**, so
+which PO line a return drained depended on whichever index the query planner
+picked. `SalesReturnService` did have an order, but ran it backwards:
+`decrement` drew from the earliest expiry while `increment` refilled the
+latest, so a create/cancel round trip could refill a different line than it
+drained and leave two lines trading quantities with each other.
+
+Both directions in both services now walk the same sequence: `expiry_date asc`,
+`created_at asc`, `id asc`. The `id` tie-breaker matters because two lines
+written in the same second are otherwise indistinguishable. The two services
+keep their different scopes on purpose: a sales return draws across every PO
+line for the product (first-expiry-first-out globally), while a purchase
+return goes back to one specific PO.
+
+The repair migration `2026_11_08_000002` carries its own copies of these two
+methods and was left alone: it has already run, and its selection query
+returns zero rows on any database created after the fix, so the ordering inside
+it never executes.
+
+Two tests lock this. The purchase one **cannot** fail against the old code on
+SQLite: the `(po_id, expiry_date)` index already returns expiry order, so it
+locks the contract instead, which matters because production runs MariaDB
+where the planner may choose differently. The sales one **does** reproduce the
+old bug: run against the previous reverse-ordered `increment`, the near-expiry
+line ends at 7 instead of 10 and the test fails.
+
+**Honest limitation:** neither ordering can restore per-line quantities exactly
+in every case, because nothing records which line a given draw came from. Both
+orders do restore the **total** across the lines as long as there is room, and
+that total is what gates how much can still be returned.
+
+### Part 8: two audit findings closed without code
+
+- **F7 was wrong.** It claimed `product_warehouse` had no unique constraint on
+  `(tenant_id, product_id, warehouse_id)`. The create migration has had
+  `$table->unique(['tenant_id', 'product_id', 'warehouse_id'])` since
+  `2026_02_05_043852`, no later migration drops it, and the live database
+  reports `product_warehouse_tenant_id_product_id_warehouse_id_unique` with
+  `Non_unique = 0` across all three columns. No work, no migration; writing
+  one would have failed on a duplicate-free table.
+- **Migration-kept confirmed.** The 2026-11-09 entry left
+  `2026_11_08_000001_reverse_journal_entries_of_canceled_returns` and
+  `2026_11_08_000002_restore_stock_of_canceled_returns` pending the owner's
+  confirmation. Confirmed: both stay applied. Their selection is zero, so
+  keeping them writes nothing, and dropping them would undo the repair.
+
+### Part 9: `OWNER_SETUP_GUIDE.md` section 10.1 refreshed
+
+It claimed the Indonesian jurisdiction creates two tax records. It creates
+three: `PPN 11%`, `PPh 23` (2%) and `PPh Final 0.5%` (PP 23/2018 UMKM). It
+also now records that the Tax Region select saves outside the main Settings
+form, that switching away from Indonesia is refused while draft Faktur Pajak
+or unissued PPN sales exist, that the jurisdiction gates the e-Faktur menu
+alongside the `ppn` plan feature, and that deleting a tax rate that anything
+still references deactivates it rather than removing it, so historical
+`tax_id` values keep resolving.
+
+### Part 10: one flake found by the full suite
+
+`test_it_can_update_a_purchase_return` failed once in two full runs. The
+factory picks a random status from `PurchaseReturn::$statuses`, and the F2 fix
+correctly skips the stock half for a row born Canceled, so the test failed on
+roughly one run in three depending on what the factory drew. The sales mirror
+already pinned its status; the purchase one now does too. Three consecutive
+file runs and two full runs are green.
+
+**Gates:** `php artisan test` **1463 passed (5192 assertions)** in 390s;
+`npx vitest run` 172 files / 209 tests; `npm run build` clean, emitting the
+same `app-Dqd18QFZ.js` hash as before because no JS changed; em-dash census on
+added lines **0**; untracked files **0** outside `public/build`;
+`migrate:status` shows exactly one Pending
+(`2026_11_05_000002_add_invoice_email_feature_to_plans`, the deliberate
+section 2.9 hold); `grep -rn markTestSkipped tests/` returns nothing; no
+source, test, view or doc references the removed recurring-journal code.
+
+**Still open:** `F6` has a documented residual limitation (per-line restore
+without allocation tracking), and the calculation invariant suite is the next
+piece of work.
+
+---
+
 ## 2026-11-09: the e-Faktur "Submit Selected to DJP" and "Cancel at DJP" Buttons (both contracts were dead code), the Returns PPN/PPh Split Made Visible and Single-Sourced with the Journal, and Audit #5 Closed as an Accepted Risk
 
 The 2026-11-08 entry closed its own work and left a list; this entry works
@@ -116,7 +1338,8 @@ Four new lang keys in `en` and `id`.
   `2026_11_08_000002_restore_stock_of_canceled_returns`, both Ran): their
   selection is 0, so keeping them writes nothing, while dropping them
   would undo §2.9 and Parts 5 and 8 of the 2026-11-08 entry and lose the
-  repair. Awaiting the owner's confirmation.
+  repair. Confirmed by the owner on 2026-11-12; see Part 8 of that day's
+  entry.
 
 **Gates:** `php artisan test` **1434 passed (5012 assertions)** in 380s;
 `npx vitest run` 172 files / 209 tests; `npm run build` clean; em-dash

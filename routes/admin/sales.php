@@ -85,6 +85,10 @@ Route::middleware('plan.feature:sales_returns')->group(function () {
     // otherwise swallow and fail to bind.
     Route::get('sales-returns/derive-reversal', [SalesReturnController::class, 'deriveReversal'])->name('admin.sales-returns.derive-reversal');
     Route::get('sales-returns/{salesReturn}/modal-view', [SalesReturnController::class, 'modalView'])->name('admin.sales-returns.modal-view');
+    // Refund is a POST before the resource so {salesReturn} cannot swallow it.
+    Route::post('sales-returns/{salesReturn}/refund', [SalesReturnController::class, 'refundCredit'])
+        ->name('admin.sales-returns.refund')
+        ->middleware('can:create-payments');
     Route::resource('sales-returns', SalesReturnController::class)->names('admin.sales-returns');
     Route::post('sales-returns/bulk-delete', [SalesReturnController::class, 'bulkDelete'])->name('admin.sales-returns.bulk-delete');
     Route::post('sales-returns/bulk-complete', [SalesReturnController::class, 'bulkComplete'])->name('admin.sales-returns.bulk-complete');

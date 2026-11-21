@@ -151,6 +151,68 @@ class PurchaseServicePpnMasukanTest extends TestCase
     }
 
     #[Test]
+    public function test_create_purchase_with_inclusive_ppn_tax_still_balances(): void
+    {
+        $inclusivePpn = Tax::create([
+            'name' => 'PPN Inclusive 11%',
+            'rate' => 11,
+            'type' => 'inclusive',
+            'is_active' => true,
+            'is_default' => true,
+            'is_ppn' => true,
+            'is_pph' => false,
+        ]);
+        $purchaseData = $this->makePurchaseData('PO-PPN-MASUKAN-005', $inclusivePpn);
+
+        $accountingSettings = app('currentTenant')->accounting_settings;
+        $inventoryAccountName = Account::find($accountingSettings['inventory_account_id'])->name;
+        $accountsPayableAccountName = Account::find($accountingSettings['accounts_payable_account_id'])->name;
+        $ppnMasukanAccountName = Account::find($accountingSettings['ppn_masukan_account_id'])->name;
+
+        // Subtotal 200 already CONTAINS the VAT: inclusive 11% -> tax 19.82,
+        // net 180.18. The supplier is owed the gross 200 either way.
+        // Dr Inventory 180.18, Dr PPN Masukan 19.82, Cr AP 200
+        $this->accountingServiceMock
+            ->shouldReceive('createJournalEntry')
+            ->once()
+            ->with(
+                'Purchase Order #PO-PPN-MASUKAN-005',
+                Mockery::any(),
+                Mockery::on(function ($transactions) use ($inventoryAccountName, $accountsPayableAccountName, $ppnMasukanAccountName) {
+                    $this->assertCount(3, $transactions);
+                    $this->assertEquals(180.18, $this->findTransactionAmount($transactions, $inventoryAccountName, 'debit'));
+                    $this->assertEquals(19.82, $this->findTransactionAmount($transactions, $ppnMasukanAccountName, 'debit'));
+                    $this->assertEquals(200, $this->findTransactionAmount($transactions, $accountsPayableAccountName, 'credit'));
+
+                    // The accounting service is mocked here, so nothing in the
+                    // app would catch an unbalanced entry in this test. Balance
+                    // it by hand: this is the whole point of the assertion.
+                    $debits = 0;
+                    $credits = 0;
+                    foreach ($transactions as $transaction) {
+                        if ($transaction['type'] === 'debit') {
+                            $debits += $transaction['amount'];
+                        } else {
+                            $credits += $transaction['amount'];
+                        }
+                    }
+                    $this->assertEquals(round($credits, 2), round($debits, 2));
+
+                    return true;
+                }),
+                Mockery::type(Purchase::class)
+            );
+
+        $purchase = $this->purchaseService->createPurchase($purchaseData);
+
+        $fresh = $purchase->fresh();
+        // Inclusive: the gross the supplier charges does not grow by the tax.
+        $this->assertEquals(200.0, $fresh->total);
+        $this->assertEquals(1, $fresh->ppn_enabled);
+        $this->assertEquals(19.82, $fresh->ppn_amount);
+    }
+
+    #[Test]
     public function test_create_purchase_without_ppn_tax_records_no_ppn_masukan(): void
     {
         $regularTax = Tax::create([

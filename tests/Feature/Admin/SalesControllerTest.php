@@ -6,6 +6,7 @@ use App\Helpers\CurrencyHelper;
 use App\Mail\SalesInvoiceMail;
 use App\Models\Account;
 use App\Models\Customer;
+use App\Models\JournalEntry;
 use App\Models\Payment;
 use App\Models\Product;
 use App\Models\ProductWarehouse;
@@ -13,6 +14,8 @@ use App\Models\Sales;
 use App\Models\SalesItem;
 use App\Models\User;
 use App\Models\Warehouse;
+use App\Services\AccountingService;
+use App\Services\PosService;
 use Carbon\Carbon;
 use Database\Factories\SalesFactory;
 use Database\Seeders\AccountSeeder;
@@ -134,6 +137,53 @@ class SalesControllerTest extends TestCase
         ]);
     }
 
+    /**
+     * A line discount only ever shrinks what the line is worth, so it can
+     * never exceed the line itself. Nothing read the lines inside the
+     * `products` payload, so a fixed 1000 off a 100 price was stored as a
+     * -1800 line: the item rows, the subtotal and every total derived from
+     * them went negative while the stock still left the warehouse.
+     */
+    public function test_it_rejects_a_line_discount_larger_than_the_line()
+    {
+        $payloadFor = function (string $invoice, float $discount, string $type) {
+            return [
+                'invoice' => $invoice,
+                'customer_id' => $this->customer->id,
+                'warehouse_id' => $this->warehouse->id,
+                'order_date' => Carbon::now()->format('Y-m-d'),
+                'due_date' => Carbon::now()->addDays(7)->format('Y-m-d'),
+                'products' => json_encode([
+                    [
+                        'product_id' => $this->product->id,
+                        'quantity' => 2,
+                        'customer_price' => 100,
+                        'discount' => $discount,
+                        'discountType' => $type,
+                    ],
+                ]),
+            ];
+        };
+
+        // A fixed discount above the line price, a percentage above 100 and
+        // a negative discount all turn a line into a credit the customer
+        // never earned.
+        foreach ([[1000, 'fixed'], [150, 'percentage'], [-5, 'fixed']] as [$discount, $type]) {
+            $response = $this->post(
+                route('admin.sales.store'),
+                $payloadFor('INV-'.rand(10000, 99999), $discount, $type)
+            );
+
+            $response->assertSessionHasErrors('products');
+        }
+
+        $this->assertSame(
+            0,
+            Sales::count(),
+            'A rejected discount must not leave a sale behind.'
+        );
+    }
+
     public function test_it_can_display_the_sales_edit_page()
     {
         $sale = SalesFactory::new()->create([
@@ -147,6 +197,273 @@ class SalesControllerTest extends TestCase
         $response->assertStatus(200);
         $response->assertViewIs('admin.sales.sales-edit');
         $response->assertViewHas('sales', $sale);
+    }
+
+    public function test_editing_a_pos_sale_shows_the_edit_form()
+    {
+        $sale = SalesFactory::new()->create([
+            'customer_id' => $this->customer->id,
+            'user_id' => $this->user->id,
+            'type' => Sales::TYPE_POS,
+            'warehouse_id' => $this->warehouse->id,
+        ]);
+
+        $response = $this->get(route('admin.sales.edit', $sale->id));
+
+        $response->assertStatus(200);
+        $response->assertViewIs('admin.sales.sales-edit');
+        $response->assertViewHas('sales', $sale);
+    }
+
+    public function test_editing_a_walk_in_pos_sale_shows_the_edit_form_without_a_customer()
+    {
+        $sale = SalesFactory::new()->create([
+            'customer_id' => null,
+            'user_id' => $this->user->id,
+            'type' => Sales::TYPE_POS,
+            'warehouse_id' => $this->warehouse->id,
+        ]);
+
+        $response = $this->get(route('admin.sales.edit', $sale->id));
+
+        $response->assertStatus(200);
+        $response->assertViewIs('admin.sales.sales-edit');
+    }
+
+    /**
+     * A POS sale's ledger shape is the invoice plus a cash receipt. Editing
+     * it must reverse both old entries and post both again against the new
+     * totals, or the books keep the money the way it was first rung up: no
+     * cash left in the till, receivables standing where cash was received,
+     * revenue on the old total. A second edit on top proves the reversal
+     * guard: each entry may only ever be reversed once.
+     */
+    public function test_updating_a_pos_sale_reposts_the_invoice_and_the_cash_receipt()
+    {
+        $sale = (new PosService(app(AccountingService::class)))->createSale([
+            'transaction_date' => Carbon::now()->format('Y-m-d'),
+            'customer_id' => $this->customer->id,
+            'products' => json_encode([
+                ['id' => $this->product->id, 'quantity' => 2, 'price' => $this->product->selling_price, 'total' => $this->product->selling_price * 2],
+            ]),
+            'discount_total' => 0,
+            'discount_total_type' => 'fixed',
+            'grand_total' => $this->product->selling_price * 2,
+            'payment_method' => 'Cash',
+            'amount_received' => $this->product->selling_price * 2,
+            'change_amount' => 0,
+        ]);
+
+        $unitPrice = (float) $this->product->selling_price;
+        $unitCost = (float) $this->product->price;
+
+        // Creation booked two entries against the sale: invoice and cash receipt.
+        $this->assertSame(
+            2,
+            JournalEntry::where('sourceable_type', Sales::class)->where('sourceable_id', $sale->id)->count()
+        );
+
+        // Ring the sale down from two units to one.
+        $response = $this->put(route('admin.sales.update', $sale->id), $this->posEditPayload($sale, 1));
+
+        $response->assertRedirect(route('admin.sales.show', $sale->id));
+        $response->assertSessionHas('success', 'Sale updated successfully.');
+
+        $sale->refresh();
+        $this->assertEqualsWithDelta($unitPrice, (float) $sale->total, 0.005, 'The edited total must follow the new quantity.');
+        $this->assertSame('Paid', $sale->status);
+        $this->assertEqualsWithDelta(0.0, $sale->balance, 0.005, 'A POS sale settles at the counter, so it stays settled after an edit.');
+        $this->assertEqualsWithDelta($unitPrice, (float) $sale->payments()->first()->amount, 0.005, 'The recorded payment follows the edited total.');
+        $this->assertEqualsWithDelta($unitPrice * 2, (float) $sale->amount_received, 0.005, 'What the customer handed over does not change.');
+        $this->assertEqualsWithDelta($unitPrice, (float) $sale->change_amount, 0.005, 'Change owed is what was handed over minus the new total.');
+        $this->assertSame('Cash', $sale->payment_type, 'The edit form does not post payment_type for a paid sale; it must not blank the method.');
+        $this->assertDatabaseHas('product_warehouse', [
+            'product_id' => $this->product->id,
+            'warehouse_id' => $this->warehouse->id,
+            'quantity' => 99,
+        ]);
+
+        // Old invoice and old cash receipt reversed exactly once, the new
+        // shape posted once: four entries sourced to the sale, two reversals.
+        $this->assertSame(
+            4,
+            JournalEntry::where('sourceable_type', Sales::class)->where('sourceable_id', $sale->id)->count()
+        );
+        $this->assertSame(2, JournalEntry::whereNotNull('reversed_entry_id')->count());
+
+        $this->assertLedgerForSale($sale, [
+            '1130' => 0.0,            // AR: invoiced then settled in cash, both shapes reversed
+            '1110' => $unitPrice,     // Cash: the one unit still rung up
+            '4100' => -$unitPrice,    // Revenue is a credit balance, so debit-positive signing shows it negative
+            '5200' => $unitCost,      // COGS for the single unit
+            '1140' => -$unitCost,     // Inventory credited out with it
+        ], 'after editing a POS sale from 2 units to 1');
+
+        // Second edit, back up to three units: the first repost must be
+        // reversed exactly once too, and the ledger must land on the new
+        // shape rather than on the sum of every edit ever made.
+        $response = $this->put(route('admin.sales.update', $sale->id), $this->posEditPayload($sale, 3));
+
+        $response->assertRedirect(route('admin.sales.show', $sale->id));
+        $response->assertSessionHas('success', 'Sale updated successfully.');
+
+        $sale->refresh();
+        $this->assertEqualsWithDelta($unitPrice * 3, (float) $sale->total, 0.005, 'The second edit must reprice the sale again.');
+        $this->assertSame('Paid', $sale->status);
+        $this->assertEqualsWithDelta(0.0, $sale->balance, 0.005, 'Growing the sale at the counter means collecting the difference, so it stays settled.');
+        $this->assertEqualsWithDelta($unitPrice * 3, (float) $sale->payments()->first()->amount, 0.005, 'The recorded payment follows the grown total.');
+        $this->assertEqualsWithDelta($unitPrice * 3, (float) $sale->amount_received, 0.005, 'The extra cash collected at the counter raises what was handed over.');
+        $this->assertEqualsWithDelta(0.0, (float) $sale->change_amount, 0.005, 'Nothing is left to hand back once received matches the total.');
+        $this->assertDatabaseHas('product_warehouse', [
+            'product_id' => $this->product->id,
+            'warehouse_id' => $this->warehouse->id,
+            'quantity' => 97,
+        ]);
+
+        $this->assertSame(
+            6,
+            JournalEntry::where('sourceable_type', Sales::class)->where('sourceable_id', $sale->id)->count()
+        );
+        $this->assertSame(4, JournalEntry::whereNotNull('reversed_entry_id')->count());
+
+        $this->assertLedgerForSale($sale, [
+            '1130' => 0.0,
+            '1110' => $unitPrice * 3,
+            '4100' => -$unitPrice * 3,
+            '5200' => $unitCost * 3,
+            '1140' => -$unitCost * 3,
+        ], 'after a second edit of the same POS sale');
+    }
+
+    /**
+     * A walk-in POS sale has no customer, and the edit form posts the empty
+     * customer field it renders for one. The edit must go through without
+     * inventing a customer, and marking it paid must record the cash the
+     * till actually took under the sale's own payment method.
+     */
+    public function test_updating_a_walk_in_pos_sale_keeps_it_customer_less()
+    {
+        $sale = SalesFactory::new()->create([
+            'customer_id' => null,
+            'user_id' => $this->user->id,
+            'type' => Sales::TYPE_POS,
+            'warehouse_id' => $this->warehouse->id,
+            'total' => 100,
+            'payment_type' => 'Cash',
+            'status' => 'Paid',
+        ]);
+        SalesItem::factory()->create(['sales_id' => $sale->id, 'product_id' => $this->product->id, 'quantity' => 2]);
+
+        $response = $this->put(route('admin.sales.update', $sale->id), [
+            'customer_id' => '',
+            'order_date' => Carbon::now()->format('Y-m-d'),
+            'due_date' => Carbon::now()->addDays(14)->format('Y-m-d'),
+            'discount_total' => 0,
+            'discount_total_type' => 'fixed',
+            'status' => 'Paid',
+            'products' => json_encode([
+                ['product_id' => $this->product->id, 'quantity' => 2, 'customer_price' => 50],
+            ]),
+        ]);
+
+        $response->assertRedirect(route('admin.sales.show', $sale->id));
+        $response->assertSessionHas('success', 'Sale updated successfully.');
+
+        $this->assertDatabaseHas('sales', ['id' => $sale->id, 'customer_id' => null, 'total' => 100]);
+        $this->assertSame('Paid', $sale->fresh()->status);
+
+        $payment = $sale->payments()->first();
+        $this->assertNotNull($payment, 'Marking the edited walk-in POS sale paid must record the cash it took.');
+        $this->assertEqualsWithDelta(100.0, (float) $payment->amount, 0.005);
+        $this->assertSame('Cash', $payment->payment_method, 'The payment must keep the sale\'s own method, not a generic default.');
+    }
+
+    private function posEditPayload(Sales $sale, int $quantity): array
+    {
+        return [
+            'customer_id' => $this->customer->id,
+            'order_date' => Carbon::now()->format('Y-m-d'),
+            'due_date' => Carbon::now()->addDays(14)->format('Y-m-d'),
+            'discount_total' => 0,
+            'discount_total_type' => 'fixed',
+            'status' => 'Paid',
+            'products' => json_encode([
+                ['product_id' => $this->product->id, 'quantity' => $quantity, 'customer_price' => $this->product->selling_price],
+            ]),
+        ];
+    }
+
+    /**
+     * Net effect one sale has on the ledger: every entry sourced to it, plus
+     * the reversal of each of those, signed debit positive. Reversals carry
+     * the opposite debits and credits already, so they are added, never
+     * subtracted.
+     *
+     * @return array<string, float> account code => signed net
+     */
+    private function ledgerNetFor(Sales $sale): array
+    {
+        $codes = Account::pluck('code', 'id')->all();
+        $net = [];
+
+        $entries = JournalEntry::where('sourceable_type', Sales::class)
+            ->where('sourceable_id', $sale->id)
+            ->get();
+
+        $this->assertNotEmpty($entries, 'The sale posted no journal entry at all.');
+
+        foreach ($entries as $entry) {
+            $reversals = JournalEntry::where('reversed_entry_id', $entry->id)->get();
+
+            $this->assertLessThanOrEqual(
+                1,
+                $reversals->count(),
+                "Entry #{$entry->id} ({$entry->description}) was reversed {$reversals->count()} times. An entry may only ever be reversed once."
+            );
+
+            foreach ($entry->transactions as $transaction) {
+                $code = $codes[$transaction->account_id] ?? "unknown:{$transaction->account_id}";
+                $sign = $transaction->type === 'debit' ? 1 : -1;
+                $net[$code] = ($net[$code] ?? 0.0) + $sign * (float) $transaction->amount;
+            }
+
+            foreach ($reversals as $reversal) {
+                foreach ($reversal->transactions as $transaction) {
+                    $code = $codes[$transaction->account_id] ?? "unknown:{$transaction->account_id}";
+                    $sign = $transaction->type === 'debit' ? 1 : -1;
+                    $net[$code] = ($net[$code] ?? 0.0) + $sign * (float) $transaction->amount;
+                }
+            }
+        }
+
+        return $net;
+    }
+
+    /**
+     * @param  array<string, float>  $expected  account code => signed net, keyed by the bare SAK code
+     */
+    private function assertLedgerForSale(Sales $sale, array $expected, string $stage): void
+    {
+        $net = $this->ledgerNetFor($sale);
+        $tenantId = app('currentTenant')->id;
+
+        foreach ($expected as $code => $amount) {
+            $resolved = $code.'-'.$tenantId;
+
+            $this->assertEqualsWithDelta(
+                $amount,
+                $net[$resolved] ?? 0.0,
+                0.005,
+                sprintf(
+                    '%s: account %s net was %.2f, expected %.2f (whole ledger: %s)',
+                    $stage,
+                    $resolved,
+                    $net[$resolved] ?? 0.0,
+                    $amount,
+                    json_encode(array_map(fn ($v) => round($v, 2), $net))
+                )
+            );
+        }
     }
 
     public function test_it_can_update_a_sale()

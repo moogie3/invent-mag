@@ -98,6 +98,8 @@ class CrmService
                 $sale->order_discount_type ?? 'fixed',
                 $sale->tax_rate ?? 0,
                 $sale->relationLoaded('salesReturns') ? $sale->salesReturns : collect(),
+                $sale->tax_type ?? 'exclusive',
+                $sale->pph_rate ?? 0
             );
 
             $paid = $sale->payments->sum('amount');
@@ -205,6 +207,9 @@ class CrmService
                 $purchase->discount_total ?? 0,
                 $purchase->discount_total_type ?? 'fixed',
                 $purchase->relationLoaded('purchaseReturns') ? $purchase->purchaseReturns : collect(),
+                (float) ($purchase->tax_rate ?? 0),
+                $purchase->tax_type ?? 'none',
+                (float) ($purchase->pph_rate ?? 0)
             );
 
             $paid = $purchase->payments->sum('amount');
@@ -264,6 +269,9 @@ class CrmService
                 $purchase->discount_total ?? 0,
                 $purchase->discount_total_type ?? 'fixed',
                 $purchase->relationLoaded('purchaseReturns') ? $purchase->purchaseReturns : collect(),
+                (float) ($purchase->tax_rate ?? 0),
+                $purchase->tax_type ?? 'none',
+                (float) ($purchase->pph_rate ?? 0)
             );
 
             $paid = $purchase->payments->sum('amount');

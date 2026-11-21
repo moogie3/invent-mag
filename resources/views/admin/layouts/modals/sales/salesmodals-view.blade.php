@@ -112,7 +112,8 @@
                                 $sales->order_discount_type ?? 'fixed',
                                 $sales->tax_rate ?? 0,
                                 $sales->relationLoaded('salesReturns') ? $sales->salesReturns : collect(),
-                                $sales->tax_type ?? 'exclusive'
+                                $sales->tax_type ?? 'exclusive',
+                                $sales->pph_rate ?? 0
                             );
                         @endphp
 

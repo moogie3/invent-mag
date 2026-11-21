@@ -113,16 +113,38 @@
                         @error('description')<div class="invalid-feedback">{{ $message }}</div>@enderror
                     </div>
                     <div class="mb-3">
+                        {{-- The hidden 0 must precede the checkbox: an unchecked
+                             switch then still submits the key, so "off" is a real
+                             value instead of an absent one the service reads as
+                             "leave the old value alone". --}}
                         <div class="form-check form-switch">
+                            <input type="hidden" name="is_active" value="0">
                             <input class="form-check-input" type="checkbox" name="is_active" id="createTaxActive" value="1" checked>
                             <label class="form-check-label" for="createTaxActive">{{ __('messages.tax_active') }}</label>
                         </div>
                     </div>
                     <div class="mb-3">
                         <div class="form-check form-switch">
+                            <input type="hidden" name="is_default" value="0">
                             <input class="form-check-input" type="checkbox" name="is_default" id="createTaxDefault" value="1">
                             <label class="form-check-label" for="createTaxDefault">{{ __('messages.tax_set_as_default') }}</label>
                         </div>
+                    </div>
+                    <div class="mb-3">
+                        <div class="form-check form-switch">
+                            <input type="hidden" name="is_ppn" value="0">
+                            <input class="form-check-input" type="checkbox" name="is_ppn" id="createTaxPpn" value="1">
+                            <label class="form-check-label" for="createTaxPpn">{{ __('messages.tax_is_ppn') }}</label>
+                        </div>
+                        <div class="form-text">{{ __('messages.tax_is_ppn_hint') }}</div>
+                    </div>
+                    <div class="mb-3">
+                        <div class="form-check form-switch">
+                            <input type="hidden" name="is_pph" value="0">
+                            <input class="form-check-input" type="checkbox" name="is_pph" id="createTaxPph" value="1">
+                            <label class="form-check-label" for="createTaxPph">{{ __('messages.tax_is_pph') }}</label>
+                        </div>
+                        <div class="form-text">{{ __('messages.tax_is_pph_hint') }}</div>
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -175,15 +197,33 @@
                     </div>
                     <div class="mb-3">
                         <div class="form-check form-switch">
+                            <input type="hidden" name="is_active" value="0">
                             <input class="form-check-input" type="checkbox" name="is_active" id="editTaxActive" value="1">
                             <label class="form-check-label" for="editTaxActive">{{ __('messages.tax_active') }}</label>
                         </div>
                     </div>
                     <div class="mb-3">
                         <div class="form-check form-switch">
+                            <input type="hidden" name="is_default" value="0">
                             <input class="form-check-input" type="checkbox" name="is_default" id="editTaxDefault" value="1">
                             <label class="form-check-label" for="editTaxDefault">{{ __('messages.tax_set_as_default') }}</label>
                         </div>
+                    </div>
+                    <div class="mb-3">
+                        <div class="form-check form-switch">
+                            <input type="hidden" name="is_ppn" value="0">
+                            <input class="form-check-input" type="checkbox" name="is_ppn" id="editTaxPpn" value="1">
+                            <label class="form-check-label" for="editTaxPpn">{{ __('messages.tax_is_ppn') }}</label>
+                        </div>
+                        <div class="form-text">{{ __('messages.tax_is_ppn_hint') }}</div>
+                    </div>
+                    <div class="mb-3">
+                        <div class="form-check form-switch">
+                            <input type="hidden" name="is_pph" value="0">
+                            <input class="form-check-input" type="checkbox" name="is_pph" id="editTaxPph" value="1">
+                            <label class="form-check-label" for="editTaxPph">{{ __('messages.tax_is_pph') }}</label>
+                        </div>
+                        <div class="form-text">{{ __('messages.tax_is_pph_hint') }}</div>
                     </div>
                 </div>
                 <div class="modal-footer">

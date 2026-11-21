@@ -4,6 +4,7 @@ namespace Tests\Feature\Admin;
 
 use App\Models\Account;
 use App\Models\Customer;
+use App\Models\CustomerCredit;
 use App\Models\JournalEntry;
 use App\Models\Product;
 use App\Models\Sales;
@@ -11,6 +12,7 @@ use App\Models\SalesItem;
 use App\Models\SalesReturn;
 use App\Models\SalesReturnItem;
 use App\Models\Warehouse;
+use App\Services\SalesReturnService;
 use Carbon\Carbon;
 use Database\Seeders\AccountSeeder;
 use Database\Seeders\RoleSeeder;
@@ -131,6 +133,80 @@ class SalesReturnControllerTest extends TestCase
         $response->assertRedirect(route('admin.sales-returns.index'));
         $response->assertSessionHas('success', 'Sales return created successfully.');
         $this->assertDatabaseHas('sales_returns', ['sales_id' => $this->sale->id]);
+    }
+
+    /**
+     * status was validated as required|string and nothing else, so any
+     * string at all was written to the row: the index counts only ever
+     * look for Pending/Completed/Canceled, so a bogus value silently
+     * vanished from every status tile while still sitting in the table.
+     * The allowed values already exist on the model.
+     */
+    public function test_store_rejects_a_status_outside_the_allowed_list()
+    {
+        $response = $this->post(route('admin.sales-returns.store'), [
+            'sales_id' => $this->sale->id,
+            'return_date' => Carbon::now()->format('Y-m-d'),
+            'items' => json_encode([
+                ['product_id' => $this->product->id, 'returned_quantity' => 1, 'price' => 100],
+            ]),
+            'total_amount' => 100,
+            'status' => 'Totally-Made-Up',
+        ]);
+
+        $response->assertSessionHasErrors('status');
+        $this->assertDatabaseMissing('sales_returns', ['sales_id' => $this->sale->id]);
+    }
+
+    /**
+     * The item row casts quantity to integer (2.5 becomes 2) while the
+     * stock move uses the raw 2.5, so shelf and document disagreed by half
+     * a unit. A crafted post could do it: the form's parseInt cannot.
+     */
+    public function test_store_rejects_a_fractional_returned_quantity()
+    {
+        $before = $this->product->fresh()->stock_quantity;
+
+        $response = $this->post(route('admin.sales-returns.store'), [
+            'sales_id' => $this->sale->id,
+            'return_date' => Carbon::now()->format('Y-m-d'),
+            'items' => json_encode([
+                ['product_id' => $this->product->id, 'returned_quantity' => 2.5, 'price' => 100],
+            ]),
+            'total_amount' => 250,
+            'status' => 'Pending',
+        ]);
+
+        $response->assertSessionHasErrors('items');
+        $this->assertDatabaseMissing('sales_returns', ['sales_id' => $this->sale->id]);
+        $this->assertEquals($before, $this->product->fresh()->stock_quantity, 'A refused return must not move stock.');
+    }
+
+    /**
+     * A product the invoice never sold cannot be returned: the service
+     * refuses it, and that refusal has to come back as the flash error the
+     * session partial renders - not as a 500 and not as a silent success
+     * with a return row priced off nothing.
+     */
+    public function test_store_refuses_a_product_that_is_not_on_the_invoice()
+    {
+        $productNotOnInvoice = Product::factory()->create();
+
+        $response = $this->post(route('admin.sales-returns.store'), [
+            'sales_id' => $this->sale->id,
+            'return_date' => Carbon::now()->format('Y-m-d'),
+            'items' => json_encode([
+                ['product_id' => $productNotOnInvoice->id, 'returned_quantity' => 1, 'price' => 100],
+            ]),
+            'total_amount' => 100,
+            'status' => 'Pending',
+            'reason' => 'Not on this invoice',
+        ]);
+
+        $response->assertRedirect();
+        $this->assertNotNull(session('error'), 'The refusal must surface as the flash error.');
+        $this->assertStringContainsString('not on invoice', session('error'));
+        $this->assertDatabaseMissing('sales_returns', ['sales_id' => $this->sale->id]);
     }
 
     public function test_it_can_show_a_sales_return()
@@ -475,5 +551,101 @@ class SalesReturnControllerTest extends TestCase
         $response->assertStatus(200);
         $response->assertViewIs('admin.layouts.modals.sales.srmodals-view');
         $response->assertViewHas('salesReturn', $salesReturn);
+    }
+
+    /**
+     * Build a Completed return against a paid sale, which is the only way a
+     * customer credit comes into existence.
+     */
+    private function returnWithCredit(): SalesReturn
+    {
+        $this->sale->update(['total' => 500]);
+        $this->sale->payments()->create([
+            'amount' => 500,
+            'payment_date' => now()->toDateString(),
+            'payment_method' => 'Cash',
+        ]);
+
+        return app(SalesReturnService::class)->createSalesReturn([
+            'sales_id' => $this->sale->id,
+            'return_date' => now()->format('Y-m-d'),
+            'status' => 'Completed',
+            'items' => json_encode([
+                ['product_id' => $this->product->id, 'returned_quantity' => 1, 'price' => 100],
+            ]),
+        ]);
+    }
+
+    public function test_it_can_refund_a_customer_credit_as_cash()
+    {
+        $salesReturn = $this->returnWithCredit();
+        $creditId = $salesReturn->fresh()->customer_credit_id;
+        $this->assertNotNull($creditId);
+
+        $response = $this->post(route('admin.sales-returns.refund', $salesReturn->id));
+
+        $response->assertRedirect(route('admin.sales-returns.show', $salesReturn->id));
+        $response->assertSessionHas('success');
+
+        $this->assertDatabaseHas('customer_credits', [
+            'id' => $creditId,
+            'status' => 'refunded',
+            'available_amount' => 0,
+        ]);
+
+        // Dr AR / Cr Cash, sourced to the credit so a later return edit or
+        // delete cannot reverse money that has already left.
+        $entry = JournalEntry::where('sourceable_type', CustomerCredit::class)
+            ->where('sourceable_id', $creditId)
+            ->where('description', 'like', 'Customer Credit Refund%')
+            ->first();
+        $this->assertNotNull($entry);
+
+        $settings = $this->tenant->accounting_settings;
+        $types = $entry->transactions->pluck('type', 'account_id');
+        $this->assertEquals('debit', $types[$settings['accounts_receivable_account_id']]);
+        $this->assertEquals('credit', $types[$settings['cash_account_id']]);
+    }
+
+    public function test_refunding_twice_pays_out_only_once()
+    {
+        $salesReturn = $this->returnWithCredit();
+        $creditId = $salesReturn->fresh()->customer_credit_id;
+
+        $this->post(route('admin.sales-returns.refund', $salesReturn->id))
+            ->assertSessionHas('success');
+
+        $second = $this->post(route('admin.sales-returns.refund', $salesReturn->id));
+        $second->assertSessionHas('error');
+
+        $this->assertEquals(
+            1,
+            JournalEntry::where('sourceable_type', CustomerCredit::class)
+                ->where('sourceable_id', $creditId)
+                ->where('description', 'like', 'Customer Credit Refund%')
+                ->count(),
+            'A second refund must not book a second cash-out.'
+        );
+    }
+
+    public function test_refund_is_denied_without_the_payments_permission()
+    {
+        $salesReturn = $this->returnWithCredit();
+
+        // No role, so no create-payments: the route must refuse rather than
+        // let anyone who can view a return push cash out of the business.
+        // Spatie caches the role relations on the model, so the detach has
+        // to be followed by a refresh or can() still answers from cache.
+        $this->user->roles()->detach();
+        $this->user->refresh();
+        $this->assertFalse($this->user->can('create-payments'));
+
+        $this->post(route('admin.sales-returns.refund', $salesReturn->id))
+            ->assertForbidden();
+
+        $this->assertDatabaseHas('customer_credits', [
+            'id' => $salesReturn->fresh()->customer_credit_id,
+            'status' => 'active',
+        ]);
     }
 }

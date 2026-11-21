@@ -67,14 +67,14 @@
                                 <td>{{ $invoice->invoice }}</td>
                                 <td>{{ \App\Helpers\CurrencyHelper::formatDate($invoice->due_date) }}</td>
                                 <td class="text-end">{{ $invoice->days_overdue }}</td>
-                                <td class="text-end">{{ \App\Helpers\CurrencyHelper::format($invoice->total) }}</td>
+                                <td class="text-end">{{ \App\Helpers\CurrencyHelper::format($invoice->balance) }}</td>
                             </tr>
                         @endforeach
                     </tbody>
                     <tfoot>
                         <tr class="fw-bold">
                             <td colspan="4" class="text-end">Total for {{ $buckets[$bucketKey] }}</td>
-                            <td class="text-end">{{ \App\Helpers\CurrencyHelper::format($invoices->sum('total')) }}</td>
+                            <td class="text-end">{{ \App\Helpers\CurrencyHelper::format($invoices->sum('balance')) }}</td>
                         </tr>
                     </tfoot>
                 </table>

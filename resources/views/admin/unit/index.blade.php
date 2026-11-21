@@ -119,8 +119,8 @@
                                             <div data-pagination-footer class="card-footer d-flex align-items-center">
                                                 <p class="m-0 text-secondary">
                                                     {{ __('messages.pagination_showing_entries', [
-                                                        'first' => $units->firstItem(),
-                                                        'last' => $units->lastItem(),
+                                                        'first' => $units->firstItem() ?? 0,
+                                                        'last' => $units->lastItem() ?? 0,
                                                         'total' => $units->total(),
                                                     ]) }}
                                                 </p>

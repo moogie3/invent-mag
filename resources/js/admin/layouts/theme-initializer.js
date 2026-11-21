@@ -2,9 +2,9 @@
     /*
      * Every interactive layout already decides the theme server-side:
      *   base.blade.php / superadmin base  -> data-bs-theme="{{ $themeMode }}"
-     *   authbase / errorbase             -> hardcoded
+     *   authbase / superadmin login      -> applied from localStorage before paint
      *
-     * That value is authoritative — theme-toggle.js writes every change back to
+     * That value is authoritative: theme-toggle.js writes every change back to
      * /admin/settings/update-theme-mode, so the server always holds the user's
      * current choice. Only reach for localStorage/OS when no layout provided one.
      *
@@ -15,7 +15,22 @@
      * itself came up light.
      */
     const root = document.documentElement;
-    if (root.getAttribute('data-bs-theme')) {
+    const provided = root.getAttribute('data-bs-theme');
+
+    if (provided) {
+        /*
+         * A layout rendered the server's choice: copy it into localStorage so
+         * the guest pages (login, error) agree with it on the next visit. The
+         * guard skips pages that just read FROM storage, so an OS guess is
+         * never frozen in as if the user had picked it.
+         */
+        if (!window.__inventThemeFromStorage) {
+            try {
+                if (localStorage.getItem('theme') !== provided) {
+                    localStorage.setItem('theme', provided);
+                }
+            } catch (e) {}
+        }
         return;
     }
 

@@ -136,13 +136,20 @@ class ResetDemoTenant extends Command
                     ProductSeeder::class,
                     CustomerSeeder::class,
                     CurrencySeeder::class,
+                    // TaxSeeder has to come before PurchaseSeeder and
+                    // SalesSeeder, exactly as DatabaseSeeder orders it. Both
+                    // of those resolve their default tax on their first pass
+                    // and fall back to rate 0 / type none when none exists,
+                    // so running it afterwards left every demo sale and
+                    // purchase with tax_id null while a fresh install gave
+                    // them 11% PPN.
+                    TaxSeeder::class,
                     PurchaseSeeder::class,
                     SalesSeeder::class,
                     PurchaseReturnSeeder::class,
                     SalesReturnSeeder::class,
                     CustomerInteractionSeeder::class,
                     SupplierInteractionSeeder::class,
-                    TaxSeeder::class,
                     StockAdjustmentSeeder::class,
                     StockTransferSeeder::class,
                     SalesPipelineSeeder::class,

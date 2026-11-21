@@ -144,11 +144,14 @@
                         </tbody>
                     </table>
                 </div>
-                @if($orders->hasPages())
-                <div class="card-footer d-flex justify-content-center border-top">
-                    {{ $orders->links() }}
+                <div data-pagination-footer class="card-footer d-flex align-items-center">
+                    <p class="m-0 text-secondary">
+                        {{ __('messages.pagination_showing_entries', ['first' => $orders->firstItem() ?? 0, 'last' => $orders->lastItem() ?? 0, 'total' => $orders->total()]) }}
+                    </p>
+                    <div class="ms-auto">
+                        {{ $orders->appends(request()->query())->links('vendor.pagination.tabler') }}
+                    </div>
                 </div>
-                @endif
             </div>
         </div>
     </div>

@@ -180,11 +180,14 @@
                             </tbody>
                         </table>
                     </div>
-                    @if ($reconciliations->hasPages())
-                        <div class="card-footer d-flex align-items-center">
-                            {{ $reconciliations->links() }}
+                    <div data-pagination-footer class="card-footer d-flex align-items-center">
+                        <p class="m-0 text-secondary">
+                            {{ __('messages.pagination_showing_entries', ['first' => $reconciliations->firstItem() ?? 0, 'last' => $reconciliations->lastItem() ?? 0, 'total' => $reconciliations->total()]) }}
+                        </p>
+                        <div class="ms-auto">
+                            {{ $reconciliations->appends(request()->query())->links('vendor.pagination.tabler') }}
                         </div>
-                    @endif
+                    </div>
                 </div>
             </div>
         </div>

@@ -497,11 +497,14 @@ class ShopeeImportService
     }
 
     /**
-     * GTIN/barcode has a GLOBAL unique constraint — only assign when free.
+     * Barcodes are unique per tenant, so only this tenant's rows block
+     * the GTIN: Product's tenant scope supplies that boundary. A context
+     * running without a tenant degrades to checking everywhere, which
+     * can only be more conservative than the constraint requires.
      */
     private function gtinIsAvailable(string $gtin, ?int $exceptProductId = null): bool
     {
-        $query = Product::withoutGlobalScopes()->where('barcode', $gtin);
+        $query = Product::where('barcode', $gtin);
         if ($exceptProductId !== null) {
             $query->where('id', '!=', $exceptProductId);
         }

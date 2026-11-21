@@ -45,10 +45,11 @@
     @vite('resources/js/app.js')
     @vite('resources/js/admin/layouts/menu-sidebar.js')
 
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/themes/material_blue.css">
-    <link rel="preload" href="https://cdn.jsdelivr.net/npm/flatpickr" as="script" crossorigin>
-    <script src="https://cdn.jsdelivr.net/npm/flatpickr" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="{{ asset('tabler/dist/icons/tabler-icons.min.css') }}?2.47.0">
+
+    {{-- Flatpickr is bundled by Vite into the pages that use it (POS,
+         sales order, purchase order, sales pipeline) together with its
+         theme, so it is no longer a blocking global on every page. --}}
 
     {{-- Move all scripts to head for Turbo compatibility --}}
     @include('admin.layouts.script')

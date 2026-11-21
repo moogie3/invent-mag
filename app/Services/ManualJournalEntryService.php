@@ -4,10 +4,8 @@ namespace App\Services;
 
 use App\Models\Account;
 use App\Models\JournalEntry;
-use App\Models\RecurringJournalEntry;
 use Carbon\Carbon;
 use Exception;
-use Illuminate\Support\Facades\DB;
 
 class ManualJournalEntryService
 {
@@ -243,27 +241,5 @@ class ManualJournalEntryService
             ->orderBy('code')
             ->limit(10)
             ->get();
-    }
-
-    /**
-     * Process recurring journal entries.
-     */
-    public function processRecurringEntries(): int
-    {
-        $processed = 0;
-        $recurringEntries = RecurringJournalEntry::dueForGeneration()->get();
-
-        foreach ($recurringEntries as $recurring) {
-            try {
-                DB::transaction(function () use ($recurring) {
-                    $recurring->generateJournalEntry();
-                });
-                $processed++;
-            } catch (Exception $e) {
-                \Log::error("Failed to generate recurring journal entry #{$recurring->id}: {$e->getMessage()}");
-            }
-        }
-
-        return $processed;
     }
 }

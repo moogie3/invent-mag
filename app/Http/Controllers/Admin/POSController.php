@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Product;
 use App\Models\Sales;
 use App\Models\Tax;
+use App\Rules\TaxIsSelectable;
 use App\Services\PosService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -24,6 +25,9 @@ class POSController extends Controller
     {
         $data = $this->posService->getPosIndexData();
         $data['taxes'] = Tax::active()->orderBy('name')->get();
+        // Same resolved default every other document form preselects, so the
+        // cart cannot open on a tax the Tax page does not call the default.
+        $data['defaultTax'] = Tax::effectiveDefault();
 
         return view('admin.pos.index', $data);
     }
@@ -84,8 +88,8 @@ class POSController extends Controller
                 'payment_method' => 'required|string|in:Cash,Card,Transfer,eWallet',
                 'amount_received' => 'nullable|numeric|min:0|required_if:payment_method,Cash',
                 'change_amount' => 'nullable|numeric|min:0',
-                'tax_id' => 'nullable|exists:taxes,id',
-                'pph_tax_id' => 'nullable|exists:taxes,id',
+                'tax_id' => ['nullable', new TaxIsSelectable],
+                'pph_tax_id' => ['nullable', new TaxIsSelectable(enforceJurisdiction: false)],
             ]);
 
             $sale = $this->posService->createSale($request->all());

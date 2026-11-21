@@ -147,7 +147,11 @@ function populateCustomerCredits(credits, totalAvailable) {
                     ? '<span class="badge bg-success text-white">Active</span>'
                     : credit.status === 'used'
                         ? '<span class="badge bg-secondary text-white">Used</span>'
-                        : '<span class="badge bg-warning text-white">Expired</span>';
+                        : credit.status === 'refunded'
+                            ? '<span class="badge bg-info text-white">Refunded</span>'
+                            : credit.status === 'canceled'
+                                ? '<span class="badge bg-secondary text-white">Canceled</span>'
+                                : '<span class="badge bg-warning text-white">Expired</span>';
                 
                 const row = document.createElement("tr");
                 row.innerHTML = `

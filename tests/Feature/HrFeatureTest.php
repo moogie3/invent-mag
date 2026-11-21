@@ -56,6 +56,18 @@ class HrFeatureTest extends TestCase
         $response->assertStatus(200);
     }
 
+    public function test_employee_index_uses_the_standard_pagination_footer(): void
+    {
+        $response = $this->actingAs($this->user)->get('http://'.$this->tenant->domain.'/admin/hr/employee');
+
+        $response->assertStatus(200);
+        $this->assertStringContainsString(
+            '<div data-pagination-footer class="card-footer',
+            $response->getContent(),
+            'The footer must carry the pagination marker.'
+        );
+    }
+
     public function test_can_create_employee(): void
     {
         $response = $this->actingAs($this->user)->post('http://'.$this->tenant->domain.'/admin/hr/employee', [

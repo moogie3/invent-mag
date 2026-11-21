@@ -142,8 +142,16 @@ class SalesHelper
         }
     }
 
-    public static function getCustomerAvailableCredit(int $customerId): float
+    /**
+     * Credit available to a sale's customer. A walk-in POS sale carries no
+     * customer at all, and no customer means no store credit to offer.
+     */
+    public static function getCustomerAvailableCredit(?int $customerId): float
     {
+        if ($customerId === null) {
+            return 0.0;
+        }
+
         return CustomerCredit::forCustomer($customerId)->active()->sum('available_amount');
     }
 }

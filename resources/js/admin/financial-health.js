@@ -4,11 +4,12 @@
 // The page passes its series through a JSON data island
 // (#fh-trend-data, type="application/json" = never executed, so no CSP
 // nonce needed — inline executable scripts break on Turbo visits because
-// the document keeps the FIRST response's nonce). Chart.js itself is the
-// global head CDN build, same as every other chart in the app.
+// the document keeps the FIRST response's nonce).
 //
 // Idempotent per visit: canvases are marked via dataset.fhDrawn, and
 // onPageLoad re-runs on every turbo:load with fresh DOM (fresh canvases).
+import Chart from "chart.js/auto";
+import "chartjs-adapter-date-fns";
 import { onPageLoad } from './utils/onPageLoad.js';
 
 onPageLoad(function () {
@@ -136,7 +137,7 @@ onPageLoad(function () {
         // Mini table sparklines: the row carries its own month axis so the
         // year span is readable at a glance. The cell is tall enough (40px)
         // for line + labels, and ticks are limited to the window's ends so
-        // twelve rows of month names never turn into noise.
+        // thirteen rows of month names never turn into noise.
         const showAxis = !!(opts && opts.axis);
         // Destroy any prior instance (modal reopens reuse the same canvas id).
         const prior = Chart.getChart(canvas);

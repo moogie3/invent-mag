@@ -23,6 +23,10 @@
     },
     "dependencies": {
         "@hotwired/turbo": "^8.0.23",
-        "chart.js": "^4.5.1"
+        "@tabler/icons-webfont": "^2.47.0",
+        "chart.js": "^4.5.1",
+        "chartjs-adapter-date-fns": "^3.0.0",
+        "flatpickr": "^4.6.13",
+        "sortablejs": "^1.15.7"
     }
 }

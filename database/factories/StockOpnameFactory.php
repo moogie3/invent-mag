@@ -11,11 +11,23 @@ class StockOpnameFactory extends Factory
 {
     protected $model = StockOpname::class;
 
+    /**
+     * A sequence, not a random draw. stock_opnames carries
+     * unique(['tenant_id', 'reference_number']), and mt_rand(1, 9999) repeated
+     * across a 20-row batch lands on a duplicate about 1.8% of the time, which
+     * failed test_index_displays_paginated_opnames once every ~25 runs with
+     * SQLSTATE[23000] on the index. The suffix stays four digits because
+     * StockOpnameService::generateReferenceNumber() reads it back with
+     * substr(-4) and increments; no test mixes factory rows with a generated
+     * one, so the two sequences never meet.
+     */
+    private static int $sequence = 0;
+
     public function definition(): array
     {
         return [
             'tenant_id' => null,
-            'reference_number' => 'SO-'.date('ymd').'-'.str_pad(mt_rand(1, 9999), 4, '0', STR_PAD_LEFT),
+            'reference_number' => sprintf('SO-%s-%04d', date('ymd'), ++self::$sequence),
             'warehouse_id' => Warehouse::factory(),
             'status' => 'Draft',
             'scheduled_date' => now()->addDay()->toDateString(),

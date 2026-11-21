@@ -12,9 +12,9 @@ class StockOpnameItem extends Model
     protected $guarded = ['id'];
 
     protected $casts = [
-        'expected_qty' => 'float',
-        'counted_qty' => 'float',
-        'variance' => 'float',
+        'expected_qty' => 'integer',
+        'counted_qty' => 'integer',
+        'variance' => 'integer',
     ];
 
     public function stockOpname()

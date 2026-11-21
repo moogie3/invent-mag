@@ -1,3 +1,5 @@
+import flatpickr from "flatpickr";
+import "flatpickr/dist/themes/material_blue.css";
 import { PurchaseOrderModule } from "../common/PurchaseOrderModule.js";
 import { formatCurrency } from "../../../../utils/currencyFormatter.js";
 import { validateForm } from "../../../utils/formValidator.js";
@@ -52,11 +54,10 @@ export class PurchaseOrderCreate extends PurchaseOrderModule {
     }
 
     initFlatpickr() {
-        if (typeof flatpickr === "undefined") {
-            // console.warn("Flatpickr library not loaded");
-            return;
-        }
-
+        // Flatpickr is a bundled import, so it is always here. The old
+        // `typeof flatpickr === "undefined"` check made the date pickers
+        // silently disappear whenever the CDN had not arrived, with the
+        // warning commented out.
         const flatpickrConfig = {
             dateFormat: "Y-m-d",
             altInput: true,

@@ -125,11 +125,31 @@ class AccountSeeder extends Seeder
             ],
         ];
 
-        $createdCount = $this->seedAccounts($accountsData, $tenantId);
+        // seedAccounts() walks the whole tree with updateOrCreate(), and each
+        // no-op still fires an updated event, so a second run wrote forty-nine
+        // activity log rows while creating no accounts. The marker is the
+        // dashed root code, because a bare existence check is too loose:
+        // CreatesTenant pre-creates accounts like '10005' in test setUp, and
+        // treating those as a finished chart of accounts skipped this seeder
+        // outright and left 4100/1130 missing for anything booking a return.
+        // The settings and the opening balances below stay outside this
+        // guard: they have their own state and still need to run if either is
+        // missing.
+        $chartExists = Account::where('tenant_id', $tenantId)
+            ->where('code', '1000-'.$tenantId)
+            ->exists();
 
-        if (isset($this->command)) {
-            $this->command->info('Chart of Accounts seeded successfully!');
-            $this->command->info("Total accounts created/updated: {$createdCount}");
+        if ($chartExists) {
+            if (isset($this->command)) {
+                $this->command->info('Chart of Accounts already seeded for tenant '.$tenantId.', skipping account creation.');
+            }
+        } else {
+            $createdCount = $this->seedAccounts($accountsData, $tenantId);
+
+            if (isset($this->command)) {
+                $this->command->info('Chart of Accounts seeded successfully!');
+                $this->command->info("Total accounts created/updated: {$createdCount}");
+            }
         }
 
         // Show summary by type
@@ -177,6 +197,23 @@ class AccountSeeder extends Seeder
     private function seedOpeningBalances(int $tenantId, string $codePrefix): void
     {
         $balanceDate = now()->startOfMonth()->subMonth()->toDateString();
+
+        // Opening balances are unique on (tenant_id, account_id, balance_date),
+        // and balance_date is cast to 'date', which Laravel writes as
+        // 'Y-m-d H:i:s'. updateOrCreate() below looks the row up with the bare
+        // 'Y-m-d' string, the query builder does not apply model casts to a
+        // where value, so the lookup never matches and the second insert trips
+        // the unique index instead of updating. Guard with whereDate, the same
+        // call OpeningBalanceService uses, so a re-run leaves the rows and the
+        // opening journal entry alone rather than crashing db:seed halfway
+        // through the tenant loop.
+        if (OpeningBalance::where('tenant_id', $tenantId)->whereDate('balance_date', $balanceDate)->exists()) {
+            if (isset($this->command)) {
+                $this->command->info('Opening balances already seeded for '.$balanceDate.', skipping.');
+            }
+
+            return;
+        }
 
         $balances = [
             '1110-'.$codePrefix => ['debit' => 50000,  'credit' => 0,      'name' => 'Cash'],

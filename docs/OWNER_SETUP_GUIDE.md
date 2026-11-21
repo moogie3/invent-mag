@@ -232,6 +232,26 @@ This one command creates everything you need to start:
 
 > **Never run `migrate:fresh` on a live database** — it wipes all tenants. Add new migrations normally (`php artisan migrate`).
 
+### 6.1 Upgrading an existing install: give old sales their cost of goods
+
+Sales posted before purchase batches existed, and sales posted by the old
+point-of-sale path, carry Rp 0 in Cost of Goods Sold. Profit then reads too
+high and the Inventory account never fell for goods that left the
+warehouse. One command corrects them:
+
+```bash
+php artisan sales:backfill-cogs            # dry run: prints, writes nothing
+php artisan sales:backfill-cogs --apply    # posts the corrections
+php artisan sales:backfill-cogs --tenant=3 # optional: one workspace only
+```
+
+It recomputes what each such sale's units actually cost (from the batches
+first, the product's buying price when the batches run dry) and posts
+`Dr Cost of Goods Sold / Cr Inventory` for the shortfall, dated the sale's
+own date, so the sale page and the ledger show the same figure. It never
+books a negative correction, skips sales the books never held, and a second
+run posts nothing more, so running it twice is safe.
+
 ---
 
 ## 7. Superadmin panel
@@ -326,10 +346,12 @@ Each company uses its own subdomain, e.g. `http://demo-pro.<domain>`. Log in wit
 
 ### 10.1 Tax configuration (important for Indonesian users)
 
-- **Settings → System Settings** → **Tax Region** card: choose the tax jurisdiction.
-- **When jurisdiction is set to Indonesia, the system auto-creates the standard tax records** (`PPN 11%` and `PPh 23 (2%)`) — no manual setup needed for the common case.
-- **Settings → Tax** (`/admin/settings/tax`): full CRUD for tax rates — name, rate (%), type (PPN / PPh / general / no tax), inclusive vs exclusive, and which is the **default** for new documents.
-- Taxes apply to Sales Orders, POS, Purchases, and Quotations. The docs `TAXATION_SYSTEM.md` and `TAXATION_IMPROVEMENT.md` explain the model in depth.
+- **Settings → System Settings** → **Tax Region** card: choose the tax jurisdiction (none, or Indonesia). It saves on its own, outside the main Settings form, so clicking Save Settings without touching the select never rewrites it.
+- **Setting the jurisdiction to Indonesia auto-creates the standard tax records**: `PPN 11%`, `PPh 23` (2%) and `PPh Final 0.5%` (PP 23/2018 UMKM final income tax, for omzet up to Rp4.8 billion). Creation is idempotent: existing PPN/PPh rows are never duplicated and an existing default is left alone, so re-saving is safe.
+- **Switching back out of Indonesia is guarded.** If draft Faktur Pajak rows or unissued PPN sales still exist, the change is refused with the reason and the jurisdiction stays Indonesia.
+- **The jurisdiction also gates the e-Faktur menu**, which appears only for Indonesian tenants and only on a plan carrying the `ppn` feature.
+- **Settings → Tax** (`/admin/settings/tax`): full CRUD for tax rates, covering name, rate (%), type (PPN / PPh / general / no tax), inclusive vs exclusive, and which is the **default** for new documents. A rate that any sale, purchase order, quotation or return still references is **deactivated rather than deleted**, so historical `tax_id` values keep resolving; it is only removed outright once nothing points at it.
+- Taxes apply to Sales Orders, POS, Purchases, and Quotations, and returns inherit the parent document's tax snapshot. `TAXATION_SYSTEM.md` and `TAXATION_IMPROVEMENT.md` explain the model in depth.
 
 ### 10.2 Currency (tenant-level)
 
@@ -431,6 +453,7 @@ Before going live, go through this list:
 | **"Workspace not found"** | Subdomain not seeded or not DNS | Run seeders (Section 6) / fix DNS |
 | **Superadmin edit page 500s** | MySQL down **or** pending migrations | Start MySQL; run `php artisan migrate` |
 | **URLs look stale after changing `.env`** | Cached config | `php artisan config:clear` (or `config:cache` after) |
+| **Profit looks too high / Inventory account larger than the shelf** | Old sales carry Rp 0 cost of goods | `php artisan sales:backfill-cogs` (dry run), then `--apply`; see Section 6.1 |
 
 ---
 

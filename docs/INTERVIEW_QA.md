@@ -518,20 +518,21 @@ Stock opname is a physical inventory count process managed by `StockOpnameServic
 
 **Workflow:**
 
-1. **Create a stock opname session** (`stock_opnames` record) — captures the session date, warehouse, and who initiated it
-2. **System records expected stock** — `stock_opname_items` are pre-populated with `system_quantity` from `product_warehouse.quantity`
-3. **Physical count** — staff enters the actual counted quantity into `stock_opname_items.actual_quantity`
+1. **Create a stock opname session** (`stock_opnames` record): the session date, warehouse, and who initiated it.
+2. **System records expected stock.** `stock_opname_items` are pre-populated with `expected_qty` from `product_warehouse.quantity`.
+3. **Physical count.** Staff enter the counted quantity into `stock_opname_items.counted_qty`. Whole units only: a fractional count is rejected at the input and again at save. The count sheet offers search by name, code or barcode, an "All Rows / Variance Only / Uncounted" filter with its own empty state, "x of y rows counted" progress, and session totals for shrinkage, excess and variance.
 4. **Variance calculation:**
    ```
-   variance = actual_quantity - system_quantity
+   variance = counted_qty - expected_qty
    ```
-   Positive variance = more stock found than system shows (gain)
+   Positive variance = more stock found than system shows (excess)
    Negative variance = less stock than system shows (shrinkage/loss)
-5. **Approval** — a supervisor reviews variances
-6. **Apply adjustments** — on approval:
-   - `product_warehouse.quantity` is updated to match `actual_quantity`
+5. **Completion is direct; there is no approval step.** `completeOpname()` applies the counts as soon as you confirm, guarded by `assertStillOpen()` which refuses a Completed or Canceled session server-side. A dry run exists first: `previewCompletion()` (route `GET /admin/stock-opname/{id}/complete-preview`) reports the adjustments that would post and whether a journal entry would be written, using the same gate the real completion uses, and writes nothing.
+6. **On completion:**
+   - `product_warehouse.quantity` is updated to match `counted_qty`
    - `stock_adjustments` records are created for each variance
-   - Accounting journal entries are posted: Inventory account is debited/credited, with the offset going to an Inventory Adjustment expense/income account
+   - each row's `variance_value` says what will be booked: shrinkage is costed through the batches the units actually came from, excess has no batch to belong to so it is worth the buying price (`StockOpnameService::varianceValue()`), and `total_variance_value` is stored on the session (the column had always stayed null before this was wired)
+   - Accounting posts **one consolidated entry for the session**, only when the tenant carries the `accounting` feature and both accounts are configured (`StockValuationService::postCorrection()`); shrinkage is `Dr Cost of Goods Sold / Cr Inventory`, excess is `Dr Inventory / Cr Cost of Goods Sold`. Without the feature or an account left unconfigured it skips, so stock still adjusts while the books stay untouched.
 
 **Why this matters:** Without stock opname reconciliation, the system's stock numbers diverge from reality over time (due to theft, damage, counting errors, system bugs). Regular opname cycles are a fundamental internal control requirement.
 
@@ -2244,24 +2245,30 @@ Account codes are tenant-scoped: `{base}-{tenantId}` (e.g., `1130-5`).
 - Bulk-inserts `StockOpnameItem` rows in chunks of 500
 
 **`updateCounts(opname, counts)`:**
-- For each product with a non-null `counted_qty`: sets `variance = counted − expected`, `variance_value = abs(variance) × product.cost`
+- For each product with a non-null `counted_qty`: sets `variance = counted − expected` and `variance_value = varianceValue(product, variance)`, which prices shrinkage through the batches the units actually came from and excess at the product's buying price; a fractional count is rejected before any of this runs
 - Transitions `Draft` → `In Progress` on first count save
+- Refuses a session that is already `Completed` or `Canceled` (`assertStillOpen()`), server-side rather than trusting the screen
+
+**`previewCompletion(opname)`:**
+- Dry run behind `GET /admin/stock-opname/{id}/complete-preview`
+- Returns the adjustments that would post and whether a journal entry would be written (same gate the real completion applies), and writes nothing
 
 **`completeOpname(opname)`:**
-- Throws if already `Completed`
+- Throws if already `Completed` (and refuses `Canceled` via `assertStillOpen()`)
 - For each item with `variance != 0`:
   1. Sets `ProductWarehouse.quantity = counted_qty`
   2. Creates a `StockAdjustment` (`increase` or `decrease`, references opname number)
-  3. Accumulates `totalShrinkageValue` and `totalExcessValue` (abs variance × `product.price`)
+  3. Accumulates `totalShrinkageValue` and `totalExcessValue` from each row's `variance_value`
+- Records `total_variance_value = totalExcessValue + totalShrinkageValue` on the session; the column existed and had always stayed null, which reads as "no variance" to anyone querying the table
 - **Accounting** (if `tenant.hasFeature('accounting')` and settings have `inventory_account_id` + `cost_of_goods_sold_account_id`):
   - Shrinkage: `Dr COGS/Expense / Cr Inventory`
   - Excess: `Dr Inventory / Cr COGS/Expense`
-  - Single consolidated journal entry per opname; silently skips if accounts not configured
+  - Single consolidated journal entry per opname (`StockValuationService::postCorrection()`); silently skips if accounts not configured
 - Sets `status = Completed`, `completed_at = now()`
 
 ---
 
-## 31. Opening Balances & Recurring Journal Entries
+## 31. Opening Balances (recurring journal entries removed, see Q31.2)
 
 ### Q31.1 — How are opening balances entered and stored?
 
@@ -2286,19 +2293,31 @@ Account codes are tenant-scoped: `{base}-{tenantId}` (e.g., `1130-5`).
 
 ### Q31.2 — How do recurring journal entries work and are they triggered automatically?
 
-**`RecurringJournalEntry` model** — stored as a template with:
-- `name`, `description`, `frequency` (`daily`/`weekly`/`monthly`/`quarterly`/`yearly`), `interval` (multiplier)
-- `start_date`, `end_date` (optional), `next_generation_date`, `last_generated_at`, `is_active`
-- `transactions` — JSON array of `{account_code, type, amount}` line items
-- `template_account_code` — optional; used to append the account name to the description
+**Removed 2026-11-12 as unreachable dead code.** The table and its migration
+(`2026_02_11_000003_create_recurring_journal_entries_table.php`) are kept;
+everything that would have used them was deleted:
 
-**`isDueForGeneration()`** — `is_active` AND `end_date` not past AND `now() >= next_generation_date`
+- `RecurringJournalEntry` model, 151 lines, including `isDueForGeneration()`,
+  `calculateNextGenerationDate()` and `generateJournalEntry()`
+- `ManualJournalEntryService::processRecurringEntries()`
 
-**`generateJournalEntry()`** — calls `AccountingService::createJournalEntry()` with the template transactions; updates `last_generated_at` and `next_generation_date` via `calculateNextGenerationDate()` (quarterly = `addMonths(interval × 3)`)
+Nothing ever called either one. `routes/console.php` schedules only
+`tenant:reset-demo` (00:00), `billing:process-scheduled-changes` (01:00) and
+`billing:check-expired` (01:30); `app/Console/Commands` holds only
+`BackupTenant`, `CheckExpiredSubscriptions`, `ProcessScheduledPlanChanges`
+and `ResetDemoTenant`. There was no artisan command, no schedule entry, no
+route, no UI and **no test**. The earlier claim that this was "complete and
+tested" was wrong, and that is the reason it was deleted rather than wired up:
+a feature nobody can reach cannot be trusted to be correct.
 
-**`ManualJournalEntryService::processRecurringEntries()`** — loops `RecurringJournalEntry::dueForGeneration()->get()`, runs each in a `DB::transaction()`, increments a counter, logs errors without re-throwing.
+**Why the table stays.** Dropping the migration would destroy rows any tenant
+already holds and turn a future rebuild into a data-migration problem instead
+of a code problem. Rebuilding means writing the model and a
+`tenant:generate-recurring-entries` command again, then wiring the schedule.
 
-**⚠ Not wired to the scheduler.** `routes/console.php` only schedules `billing:check-expired` (01:30), `billing:process-scheduled-changes` (01:00), and `tenant:reset-demo` (00:00). `app/Console/Commands` contains only `BackupTenant`, `CheckExpiredSubscriptions`, `ProcessScheduledPlanChanges`, `ResetDemoTenant`. The recurring-entry infrastructure is complete and tested, but automatic triggering requires a future artisan command + schedule entry.
+**If you rebuild it:** write the tests first and wire the schedule second. An
+entry template that posts journal entries for real is not something to
+schedule before it is covered.
 
 ---
 
@@ -2854,48 +2873,41 @@ Three services handle accounting reports. They operate on distinct report types 
 
 ---
 
-## §43 — Recurring Journal Entries
+## §43 Recurring Journal Entries (removed 2026-11-12)
 
-### Q43.1 How do recurring journal entries work and are they scheduler-wired?
+### Q43.1 How did recurring journal entries work, and why are they gone?
 
-**Model:** `RecurringJournalEntry` — fields: `name`, `description`, `frequency`, `interval`, `start_date`, `end_date` (nullable), `last_generated_at`, `next_generation_date`, `transactions` (JSON array of `{account_code, type, amount}`), `template_account_code` (nullable), `is_active` (bool), `created_by`.
+**Removed as unreachable dead code.** The long version is in Q31.2. The short
+version:
 
-#### Frequencies (5 constants)
-`FREQUENCY_DAILY`, `FREQUENCY_WEEKLY`, `FREQUENCY_MONTHLY`, `FREQUENCY_QUARTERLY`, `FREQUENCY_YEARLY`
+- The `RecurringJournalEntry` model and
+  `ManualJournalEntryService::processRecurringEntries()` were deleted on
+  2026-11-12.
+- Nothing called them: no artisan command, no schedule entry in
+  `routes/console.php`, no route, no UI, no test. The three scheduled commands
+  remain `tenant:reset-demo` (00:00), `billing:process-scheduled-changes`
+  (01:00) and `billing:check-expired` (01:30).
+- The `recurring_journal_entries` table and its migration
+  `2026_02_11_000003_create_recurring_journal_entries_table.php` are kept, so a
+  rebuild starts from working schema rather than from a data migration.
 
-#### `isDueForGeneration()` — three conditions, ALL must pass:
-1. `is_active` must be true
-2. If `end_date` is set, `now()` must not be after `end_date`
-3. `now()` must be on or after `next_generation_date` (same day counts via `isSameDay()`)
+**What the deleted code did**, recorded here so a rebuild does not have to
+rediscover it. A template row held `transactions` as JSON
+(`{account_code, type, amount}` line items) alongside `frequency`,
+`interval`, `start_date`, `end_date`, `next_generation_date` and `is_active`.
+`isDueForGeneration()` required `is_active` to be true, `end_date` not passed,
+and `now()` on or after `next_generation_date` (same day counted).
+`calculateNextGenerationDate()` applied the `interval` multiplier: daily and
+weekly and monthly add `interval` units, quarterly adds `interval × 3` months,
+yearly adds `interval` years. `generateJournalEntry()` then called
+`AccountingService::createJournalEntry()` with the template lines, passing the
+model itself as the sourceable, and advanced `last_generated_at` and
+`next_generation_date`. `processRecurringEntries()` fetched the due set, ran
+each one in its own `DB::transaction()`, logged failures without re-throwing
+so one bad row could not abort the batch, and returned the processed count.
 
-#### `calculateNextGenerationDate()` — uses `interval` multiplier:
-- Daily: `+$interval days`
-- Weekly: `+$interval weeks`
-- Monthly: `+$interval months`
-- Quarterly: `+($interval × 3) months`
-- Yearly: `+$interval years`
-
-#### generateJournalEntry() -- called on the model itself:
-1. Calls isDueForGeneration() -- returns null if not due
-2. Calls AccountingService::createJournalEntry(description, now(), transactions[], model) -- passes the RecurringJournalEntry as the sourceable polymorphic model
-3. Updates last_generated_at = now() and next_generation_date = calculateNextGenerationDate()
-
-#### ManualJournalEntryService::processRecurringEntries(): int
-- Fetches RecurringJournalEntry::dueForGeneration()->get() (scope: active + next_generation_date <= today + end_date not passed)
-- Wraps each generateJournalEntry() in DB::transaction()
-- Logs errors and continues -- partial failures do not abort the batch
-- Returns count of successfully processed entries
-
-#### SCHEDULER NOT WIRED -- CRITICAL FACT
-processRecurringEntries() exists in the service but is **not called by any scheduled command** in routes/console.php. The three scheduled commands are:
-1. tenant:reset-demo -- daily at 00:00
-2. billing:process-scheduled-changes -- daily at 01:00
-3. billing:check-expired -- daily at 01:30
-
-**Recurring journal entries must be triggered manually** -- they do NOT auto-process on a schedule. This is a known gap for a future roadmap item.
-
-#### scopeDueForGeneration scope:
-Active entries where next_generation_date <= today AND (end_date IS NULL OR end_date >= today).
+**Rebuild checklist:** model, artisan command, `routes/console.php` schedule
+entry, tests. Tests first, schedule second.
 
 ---
 

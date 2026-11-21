@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Helpers\SalesHelper;
 use App\Models\Customer;
 use App\Models\PipelineStage;
+use App\Models\Product;
 use App\Models\Quotation;
 use App\Models\Sales;
 use App\Models\SalesOpportunity;
@@ -99,10 +100,21 @@ class SalesPipelineService
 
         return DB::transaction(function () use ($data) {
             \Log::debug('createOpportunity: Inside transaction');
+            // exists: is raw SQL with no tenant filter, so every id on this
+            // request would accept another tenant's row. Re-resolve each one
+            // through its scoped model: a cross-tenant id reads back as null
+            // and is refused before anything is written.
+            $customer = Customer::findOrFail($data['customer_id']);
+            $pipeline = SalesPipeline::findOrFail($data['sales_pipeline_id']);
+            $stage = PipelineStage::findOrFail($data['pipeline_stage_id']);
+            foreach ($data['items'] as $itemData) {
+                Product::findOrFail($itemData['product_id']);
+            }
+
             $opportunity = SalesOpportunity::create([
-                'customer_id' => $data['customer_id'],
-                'sales_pipeline_id' => $data['sales_pipeline_id'],
-                'pipeline_stage_id' => $data['pipeline_stage_id'],
+                'customer_id' => $customer->id,
+                'sales_pipeline_id' => $pipeline->id,
+                'pipeline_stage_id' => $stage->id,
                 'name' => $data['name'],
                 'description' => $data['description'] ?? null,
                 'notes' => $data['notes'] ?? null,
@@ -122,7 +134,7 @@ class SalesPipelineService
             }
             \Log::debug('createOpportunity: Items processed, totalAmount', ['totalAmount' => $totalAmount]);
 
-            $defaultTax = Tax::default()->first() ?? Tax::active()->first();
+            $defaultTax = Tax::effectiveDefault();
             $defaultTaxRate = $defaultTax ? (float) $defaultTax->rate : 0;
             $defaultTaxType = $defaultTax ? $defaultTax->type : 'none';
             $defaultTaxAmount = SalesHelper::calculateTaxAmount($totalAmount, $defaultTaxRate, $defaultTaxType);
@@ -141,10 +153,20 @@ class SalesPipelineService
 
         return DB::transaction(function () use ($opportunity, $data) {
             \Log::debug('updateOpportunity: Inside transaction');
+            // Same scoped re-resolution as createOpportunity(): exists: is
+            // raw SQL and would repoint an existing opportunity at another
+            // tenant's rows.
+            $customer = Customer::findOrFail($data['customer_id']);
+            $pipeline = SalesPipeline::findOrFail($data['sales_pipeline_id']);
+            $stage = PipelineStage::findOrFail($data['pipeline_stage_id']);
+            foreach ($data['items'] as $itemData) {
+                Product::findOrFail($itemData['product_id']);
+            }
+
             $updateData = [
-                'customer_id' => $data['customer_id'],
-                'sales_pipeline_id' => $data['sales_pipeline_id'],
-                'pipeline_stage_id' => $data['pipeline_stage_id'],
+                'customer_id' => $customer->id,
+                'sales_pipeline_id' => $pipeline->id,
+                'pipeline_stage_id' => $stage->id,
                 'name' => $data['name'],
                 'description' => $data['description'] ?? null,
                 'notes' => $data['notes'] ?? null,
@@ -174,7 +196,7 @@ class SalesPipelineService
             }
             \Log::debug('updateOpportunity: Items processed, totalAmount', ['totalAmount' => $totalAmount]);
 
-            $defaultTax = Tax::default()->first() ?? Tax::active()->first();
+            $defaultTax = Tax::effectiveDefault();
             $defaultTaxRate = $defaultTax ? (float) $defaultTax->rate : 0;
             $defaultTaxType = $defaultTax ? $defaultTax->type : 'none';
             $defaultTaxAmount = SalesHelper::calculateTaxAmount($totalAmount, $defaultTaxRate, $defaultTaxType);
@@ -232,7 +254,7 @@ class SalesPipelineService
     {
         $opportunity = SalesOpportunity::with('items.product', 'customer')->findOrFail($opportunityId);
 
-        $quotationNumber = 'QTN-'.now()->format('Ymd').'-'.str_pad(Quotation::where('tenant_id', $opportunity->tenant_id)->count() + 1, 4, '0', STR_PAD_LEFT);
+        $quotationNumber = $this->generateQuotationNumber($opportunity);
 
         $subtotal = 0;
         $items = [];
@@ -256,7 +278,7 @@ class SalesPipelineService
         }
 
         return DB::transaction(function () use ($opportunity, $quotationNumber, $subtotal, $items) {
-            $tax = Tax::default()->first() ?? Tax::active()->first();
+            $tax = Tax::effectiveDefault();
             $taxRate = $tax ? (float) $tax->rate : 0;
             $taxType = $tax ? $tax->type : 'none';
             $taxAmount = SalesHelper::calculateTaxAmount($subtotal, $taxRate, $taxType);
@@ -271,23 +293,54 @@ class SalesPipelineService
                 'status' => 'draft',
                 'subtotal' => round($subtotal, 2),
                 'tax_type' => $taxType,
-                'tax_rate' => $taxRate ?: null,
+                // NOT NULL column: null (no tax configured) crashed the insert.
+                'tax_rate' => $taxRate,
                 'tax_amount' => round($taxAmount, 2),
                 'discount_type' => 'none',
                 'discount_value' => 0,
                 'discount_amount' => 0,
+                'tax_id' => $tax?->id,
                 'total' => round($grandTotal, 2),
                 'sales_opportunity_id' => $opportunity->id,
                 'notes' => $opportunity->notes,
                 'terms_conditions' => $opportunity->terms_conditions,
+                // Quotation has no items() relation, only this JSON cast:
+                // the old items()->create loop threw BadMethodCallException.
+                'items' => $items,
             ]);
-
-            foreach ($items as $itemData) {
-                $quotation->items()->create($itemData);
-            }
 
             return $quotation;
         });
+    }
+
+    /**
+     * Per-day QTN sequence for this tenant, skipping any number already on
+     * file. A count()+1 proposal reuses the number a delete left behind and
+     * hits the per-tenant unique key.
+     */
+    private function generateQuotationNumber(SalesOpportunity $opportunity): string
+    {
+        $prefix = 'QTN-'.now()->format('Ymd');
+        $scoped = fn () => Quotation::where('tenant_id', $opportunity->tenant_id);
+
+        $last = $scoped()
+            ->where('quotation_number', 'like', "{$prefix}-%")
+            ->orderBy('id', 'desc')
+            ->first();
+
+        $newNum = 1;
+        if ($last) {
+            // Everything after the last dash: QTN-20261115-10000 reads as
+            // 10000, not 0000, so the sequence never wraps back to 0001.
+            $newNum = (int) substr($last->quotation_number, strrpos($last->quotation_number, '-') + 1) + 1;
+        }
+
+        do {
+            $quotationNumber = "{$prefix}-".str_pad($newNum, 4, '0', STR_PAD_LEFT);
+            $newNum++;
+        } while ($scoped()->where('quotation_number', $quotationNumber)->exists());
+
+        return $quotationNumber;
     }
 
     public function convertToSalesOrder(SalesOpportunity $opportunity): Sales
@@ -307,18 +360,12 @@ class SalesPipelineService
                 throw new \Exception('No products associated with this opportunity.');
             }
 
-            $lastSalesInvoice = Sales::where('invoice', 'LIKE', 'PL-%')
-                ->latest()
-                ->first();
+            // Same INV sequence every other writer uses: the local PL- block
+            // filed pipeline sales outside the invoice numbering, so the
+            // tenant's next manual invoice did not follow from it.
+            $invoice = app(SalesService::class)->generateInvoiceNumber();
 
-            $invoiceNumber = 1;
-            if ($lastSalesInvoice) {
-                $lastNumber = (int) substr($lastSalesInvoice->invoice, 3);
-                $invoiceNumber = $lastNumber + 1;
-            }
-            $invoice = 'PL-'.str_pad($invoiceNumber, 4, '0', STR_PAD_LEFT);
-
-            $tax = Tax::default()->first() ?? Tax::active()->first();
+            $tax = Tax::effectiveDefault();
             $taxRate = $tax ? (float) $tax->rate : 0;
             $taxType = $tax ? $tax->type : 'none';
 

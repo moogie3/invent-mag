@@ -7,22 +7,17 @@ use App\Models\Customer;
 use App\Models\Product;
 use App\Models\ProductWarehouse;
 use App\Models\Sales;
-use App\Models\SalesItem;
 use App\Models\Tax;
 use App\Models\User;
 use App\Models\Warehouse;
-use App\Services\AccountingService;
+use App\Services\SalesService;
 use Carbon\Carbon;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Auth;
 
 class SalesSeeder extends Seeder
 {
-    protected $accountingService;
-
-    public function __construct(AccountingService $accountingService)
-    {
-        $this->accountingService = $accountingService;
-    }
+    public function __construct(protected SalesService $salesService) {}
 
     /**
      * Run the database seeds.
@@ -44,7 +39,7 @@ class SalesSeeder extends Seeder
         $users = User::where('tenant_id', $tenantId)->get();
         $products = Product::where('tenant_id', $tenantId)->get();
 
-        $warehouseIds = Warehouse::where('tenant_id', $tenantId)->pluck('id')->toArray(); // Fetch warehouse IDs
+        $warehouseIds = Warehouse::where('tenant_id', $tenantId)->pluck('id')->toArray();
 
         if ($customers->isEmpty() || $users->isEmpty() || $products->isEmpty() || empty($warehouseIds)) {
             $this->command->warn('Skipping SalesSeeder for tenant '.app('currentTenant')->name.': Missing dependency data.');
@@ -55,214 +50,148 @@ class SalesSeeder extends Seeder
         $this->command->info('Seeding Sales data for tenant: '.app('currentTenant')->name);
         $this->command->info("Available: {$customers->count()} customers, {$users->count()} users, {$products->count()} products, ".count($warehouseIds).' warehouses');
 
-        // Resolve default tax once — TaxSeeder must run before SalesSeeder
+        $productById = $products->keyBy('id');
+
+        // Resolve default tax once: TaxSeeder must run before SalesSeeder
         $defaultTax = Tax::where('tenant_id', $tenantId)->where('is_default', true)->first()
             ?? Tax::where('tenant_id', $tenantId)->where('is_active', true)->first();
         $taxId = $defaultTax?->id;
         $taxRate = $defaultTax ? (float) $defaultTax->rate : 0.0;
         $taxType = $defaultTax ? $defaultTax->type : 'none';
 
+        $created = 0;
+
         for ($i = 0; $i < 50; $i++) { // Create 50 sample sales
             $customer = $customers->random();
             $user = $users->random();
-            $warehouseId = collect($warehouseIds)->random(); // Pick a warehouse
+
+            // SalesService takes the invoice's owner from the authenticated
+            // user and db:seed runs with no session, so the randomly chosen
+            // user has to be set explicitly or every seeded sale would be
+            // written with a null user_id.
+            Auth::setUser($user);
+
+            $warehouseId = collect($warehouseIds)->random();
             $orderDate = Carbon::now()->subDays(rand(0, 59));
             $dueDate = $orderDate->copy()->addDays(rand(7, 30));
             $paymentType = collect(['Cash', 'Card', 'Transfer', 'eWallet', '-'])->random();
             $status = collect(['Unpaid', 'Paid', 'Partial'])->random();
+            $orderDiscount = rand(0, 20);
+            $orderDiscountType = collect(['percentage', 'fixed'])->random();
 
-            $invoiceNumber = $i + 1;
-            $invoice = 'INV-'.str_pad($invoiceNumber, 5, '0', STR_PAD_LEFT).'-'.$tenantId;
+            $invoice = 'INV-'.str_pad($i + 1, 5, '0', STR_PAD_LEFT).'-'.$tenantId;
 
-            $sales = Sales::create([
-                'invoice' => $invoice,
-                'customer_id' => $customer->id,
-                'user_id' => $user->id,
-                'warehouse_id' => $warehouseId,
-                'order_date' => $orderDate,
-                'due_date' => $dueDate,
-                'payment_type' => $paymentType,
-                'order_discount' => rand(0, 20),
-                'order_discount_type' => collect(['percentage', 'fixed'])->random(),
-                'tax_id' => $taxId,
-                'tax_rate' => $taxRate,
-                'tax_type' => $taxType,
-                'total_tax' => 0,
-                'total' => 0,
-                'status' => $status,
-                'type' => Sales::TYPE_REGULAR,
-                'tenant_id' => $tenantId,
-            ]);
-
-            $totalSalesAmount = 0;
-            $totalTaxAmount = 0;
-            $totalCostOfGoods = 0;
-            $salesItemsData = [];
+            // The lines are drawn first and the totals derived from them,
+            // because createSale() derives the invoice total from the very
+            // lines it is handed. The old seeder computed a total of its own
+            // and, when the draw fell outside the wanted range, rescaled that
+            // figure without touching the lines, so the stored invoice total
+            // and the sum of its items disagreed. Dropping the rescale leaves
+            // one number, computed once, by the code that posts it.
             $attempts = 0;
-            $maxAttempts = 100; // Prevent infinite loops
+            $maxAttempts = 100;
+            $salesItemsData = [];
+            $netSales = 0;
+            $totalCostOfGoods = 0;
+            $grandTotal = 0;
 
             do {
-                $totalSalesAmount = 0;
-                $totalCostOfGoods = 0;
                 $salesItemsData = [];
                 $numberOfItems = rand(1, 5);
 
                 for ($j = 0; $j < $numberOfItems; $j++) {
                     $product = $products->random();
-                    $quantity = rand(1, 5);
-                    $customerPrice = $product->selling_price;
-                    $total = $quantity * $customerPrice;
-                    $totalSalesAmount += $total;
-                    $totalCostOfGoods += $quantity * $product->price;
-
                     $salesItemsData[] = [
                         'product_id' => $product->id,
-                        'quantity' => $quantity,
-                        'customer_price' => $customerPrice,
-                        'discount' => 0,
-                        'discount_type' => 'fixed',
-                        'total' => $total,
-                        'tenant_id' => $tenantId,
+                        'quantity' => rand(1, 5),
+                        'customer_price' => $product->selling_price,
                     ];
                 }
 
-                // Apply discount
-                $discountAmount = 0;
-                if ($sales->order_discount_type === 'percentage') {
-                    $discountAmount = ($totalSalesAmount * $sales->order_discount) / 100;
-                } else {
-                    $discountAmount = $sales->order_discount;
+                $subTotal = 0;
+                $totalCostOfGoods = 0;
+                foreach ($salesItemsData as $line) {
+                    $subTotal += $line['quantity'] * $line['customer_price'];
+                    $totalCostOfGoods += $line['quantity'] * $productById[$line['product_id']]->price;
                 }
-                $netSales = $totalSalesAmount - $discountAmount;
 
-                // Apply tax consistently using SalesHelper (respects exclusive/inclusive/none)
-                $totalTaxAmount = SalesHelper::calculateTaxAmount($netSales, $taxRate, $taxType);
-                $grandTotal = ($taxType === 'inclusive') ? $netSales : ($netSales + $totalTaxAmount);
+                $discountAmount = SalesHelper::calculateDiscount($subTotal, $orderDiscount, $orderDiscountType);
+                $netSales = $subTotal - $discountAmount;
+                $taxAmount = SalesHelper::calculateTaxAmount($netSales, $taxRate, $taxType);
+                $grandTotal = ($taxType === 'inclusive') ? $netSales : ($netSales + $taxAmount);
 
                 $attempts++;
             } while (($grandTotal < 100 || $grandTotal > 10000 || $netSales < $totalCostOfGoods) && $attempts < $maxAttempts);
 
-            // If after maxAttempts totals are still out of range, rescale proportionally
-            if ($grandTotal < 100) {
-                $scaleFactor = rand(100, 1000) / $grandTotal;
-                $netSales *= $scaleFactor;
-                $totalCostOfGoods *= $scaleFactor;
-                $totalTaxAmount = SalesHelper::calculateTaxAmount($netSales, $taxRate, $taxType);
-                $grandTotal = ($taxType === 'inclusive') ? $netSales : ($netSales + $totalTaxAmount);
-            } elseif ($grandTotal > 10000) {
-                $scaleFactor = rand(8000, 10000) / $grandTotal;
-                $netSales *= $scaleFactor;
-                $totalCostOfGoods *= $scaleFactor;
-                $totalTaxAmount = SalesHelper::calculateTaxAmount($netSales, $taxRate, $taxType);
-                $grandTotal = ($taxType === 'inclusive') ? $netSales : ($netSales + $totalTaxAmount);
-            }
-
-            $finalCalculatedTotal = $grandTotal;
-            $totalSalesAmount = $netSales;
-
-            foreach ($salesItemsData as $itemData) {
-                SalesItem::create(array_merge(['sales_id' => $sales->id], $itemData));
-
-                // Decrement stock from the selected warehouse (if it exists in seeding context)
-                // For seeding, assume stock was added via Purchase first. If not, this goes negative.
-                // To fix negative stock in seeders, we should ensure PurchaseSeeder runs BEFORE SalesSeeder
-                // OR initialize stock with a positive value.
-
-                $stockRecord = ProductWarehouse::where('product_id', $itemData['product_id'])
-                    ->where('warehouse_id', $sales->warehouse_id)
-                    ->where('tenant_id', $tenantId)
-                    ->first();
-
-                if ($stockRecord) {
-                    // Ensure enough stock exists before selling to avoid negative numbers in seed
-                    if ($stockRecord->quantity < $itemData['quantity']) {
-                        $stockRecord->update(['quantity' => $stockRecord->quantity + 100]);
-                    }
-                    $stockRecord->decrement('quantity', $itemData['quantity']);
-                } else {
-                    // Initialize with POSITIVE stock to avoid negative numbers during initial seed
-                    ProductWarehouse::create([
-                        'product_id' => $itemData['product_id'],
-                        'warehouse_id' => $sales->warehouse_id,
-                        'quantity' => 100, // Start with 100, then decrement will make it 100 - sold
+            // createSale() refuses to sell stock a warehouse does not hold,
+            // and the purchase orders that stocked these warehouses pick their
+            // own warehouse at random, so the record is topped up before the
+            // lines are handed over rather than after the sale exists.
+            foreach (collect($salesItemsData)->groupBy('product_id') as $productId => $lines) {
+                $stockRecord = ProductWarehouse::firstOrCreate(
+                    [
+                        'product_id' => $productId,
+                        'warehouse_id' => $warehouseId,
                         'tenant_id' => $tenantId,
-                    ]);
-                    // Re-fetch to decrement properly
-                    $stockRecord = ProductWarehouse::where('product_id', $itemData['product_id'])
-                        ->where('warehouse_id', $sales->warehouse_id)
-                        ->where('tenant_id', $tenantId)
-                        ->first();
-                    $stockRecord->decrement('quantity', $itemData['quantity']);
+                    ],
+                    ['quantity' => 0]
+                );
+
+                $needed = collect($lines)->sum('quantity');
+                if ($stockRecord->quantity < $needed) {
+                    $stockRecord->update(['quantity' => $stockRecord->quantity + 100]);
                 }
             }
 
-            $sales->update([
-                'total' => $finalCalculatedTotal,
-                'total_tax' => $totalTaxAmount,
-                'change_amount' => 0, // No change amount for non-POS sales
-            ]);
-
-            $paidAmount = 0;
-            // Add payment logic
-            if ($finalCalculatedTotal > 0) { // Ensure there's an amount to pay
-                if ($status === 'Paid') {
-                    $paidAmount = $finalCalculatedTotal;
-                    $sales->payments()->create([
-                        'amount' => $paidAmount,
-                        'payment_date' => $orderDate->copy()->addDays(rand(0, 5)),
-                        'payment_method' => $paymentType,
-                        'notes' => 'Full payment during seeding.',
-                        'tenant_id' => $tenantId,
-                    ]);
-                } elseif ($status === 'Partial') {
-                    $paidAmount = rand(1, (int) ($finalCalculatedTotal * 0.8)); // Pay between 1 and 80%
-                    $sales->payments()->create([
-                        'amount' => $paidAmount,
-                        'payment_date' => $orderDate->copy()->addDays(rand(0, 5)),
-                        'payment_method' => $paymentType,
-                        'notes' => 'Partial payment during seeding.',
-                        'tenant_id' => $tenantId,
-                    ]);
-                }
-            }
-
-            // Create Journal Entry for the sale
-            $tenantId = app('currentTenant')->id;
             try {
-                // 1. Record the revenue and accounts receivable
-                $revenueTransactions = [
-                    ['account_code' => '1130-'.$tenantId, 'type' => 'debit', 'amount' => $finalCalculatedTotal],
-                    ['account_code' => '4100-'.$tenantId, 'type' => 'credit', 'amount' => $totalSalesAmount],
-                ];
-                if ($totalTaxAmount > 0) {
-                    $revenueTransactions[] = ['account_code' => '2130-'.$tenantId, 'type' => 'credit', 'amount' => $totalTaxAmount];
-                }
-                $this->accountingService->createJournalEntry("Sale - Invoice {$sales->invoice}", $orderDate, $revenueTransactions, $sales);
-
-                // 2. Record the cost of goods sold
-                if ($totalCostOfGoods > 0) {
-                    $cogsTransactions = [
-                        ['account_code' => '5200-'.$tenantId, 'type' => 'debit', 'amount' => $totalCostOfGoods],
-                        ['account_code' => '1140-'.$tenantId, 'type' => 'credit', 'amount' => $totalCostOfGoods],
-                    ];
-                    $this->accountingService->createJournalEntry("COGS for Invoice {$sales->invoice}", $orderDate, $cogsTransactions, $sales);
-                }
-
-                // 3. Record the payment, if any
-                if ($paidAmount > 0) {
-                    $paymentTransactions = [
-                        ['account_code' => '1110-'.$tenantId, 'type' => 'debit', 'amount' => $paidAmount],
-                        ['account_code' => '1130-'.$tenantId, 'type' => 'credit', 'amount' => $paidAmount],
-                    ];
-                    $this->accountingService->createJournalEntry("Payment for Invoice {$sales->invoice}", $orderDate, $paymentTransactions, $sales);
-                }
-
+                $sale = $this->salesService->createSale([
+                    'invoice' => $invoice,
+                    'customer_id' => $customer->id,
+                    'warehouse_id' => $warehouseId,
+                    'order_date' => $orderDate,
+                    'due_date' => $dueDate,
+                    'discount_total' => $orderDiscount,
+                    'discount_total_type' => $orderDiscountType,
+                    'tax_id' => $taxId,
+                    'products' => json_encode($salesItemsData),
+                ]);
             } catch (\Exception $e) {
-                $this->command->error("Failed to create journal entry for sale {$sales->invoice}: ".$e->getMessage());
+                $this->command->error("Failed to create sale {$invoice}: ".$e->getMessage());
+
+                continue;
+            }
+
+            $created++;
+            $sale->update(['payment_type' => $paymentType]);
+
+            // createSale() books every invoice Unpaid; the payment is what
+            // moves it to Paid or Partial, and addPayment() books the cash
+            // against AR and refreshes the status the way the app does when
+            // someone actually takes the money.
+            if ($status !== 'Unpaid' && $sale->grand_total > 0) {
+                $paidAmount = $status === 'Paid'
+                    ? $sale->grand_total
+                    : min(
+                        rand(1, max(1, (int) floor($sale->grand_total * 0.8))),
+                        max(1, (int) floor($sale->grand_total) - 1)
+                    );
+
+                try {
+                    $this->salesService->addPayment($sale, [
+                        'amount' => $paidAmount,
+                        'payment_date' => $orderDate->copy()->addDays(rand(0, 5)),
+                        'payment_method' => $paymentType,
+                        'notes' => $status === 'Paid'
+                            ? 'Full payment during seeding.'
+                            : 'Partial payment during seeding.',
+                    ]);
+                } catch (\Exception $e) {
+                    $this->command->error("Failed to add payment for sale {$invoice}: ".$e->getMessage());
+                }
             }
         }
 
         $this->command->info('Sales seeding completed successfully!');
-        $this->command->info('Created 50 sales invoices with items, payments, and journal entries.');
+        $this->command->info("Created {$created} sales invoices with items, payments, and journal entries.");
     }
 }

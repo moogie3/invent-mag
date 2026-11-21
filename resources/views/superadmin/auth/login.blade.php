@@ -1,8 +1,21 @@
 <!DOCTYPE html>
-<html lang="en" data-bs-theme="light">
+<html lang="en">
 
 <head>
     <meta charset="utf-8" />
+    <script>
+        /*
+         * Same as authbase: no session here, so the saved choice comes from
+         * localStorage and must be applied before first paint.
+         */
+        (function () {
+            var saved = null;
+            try { saved = localStorage.getItem('theme'); } catch (e) {}
+            var prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+            window.__inventThemeFromStorage = Boolean(saved);
+            document.documentElement.setAttribute('data-bs-theme', saved || (prefersDark ? 'dark' : 'light'));
+        })();
+    </script>
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <meta http-equiv="X-UA-Compatible" content="ie=edge" />
     <meta name="robots" content="noindex, nofollow, noarchive">
@@ -16,7 +29,7 @@
     <link href="{{ asset('tabler/dist/css/tabler-payments.min.css') }}" rel="stylesheet" />
     <link href="{{ asset('tabler/dist/css/tabler-vendors.min.css') }}" rel="stylesheet" />
     @vite('resources/css/auth.css')
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+    <link rel="stylesheet" href="{{ asset('tabler/dist/icons/tabler-icons.min.css') }}?2.47.0">
     @vite('resources/js/admin/layouts/page-loader.js')
 </head>
 
@@ -38,7 +51,7 @@
                             <h2 class="h2 mb-0">Super Admin</h2>
                             <div class="text-muted mt-1">Platform Management</div>
                         </div>
-                        <form action="{{ route('superadmin.login') }}" method="POST" autocomplete="off" novalidate>
+                        <form action="{{ route('superadmin.login') }}" method="POST" autocomplete="off" novalidate data-turbo="false">
                             @csrf
                             <div class="mb-3">
                                 <label class="form-label">Email</label>
@@ -83,9 +96,9 @@
         <i class="ti ti-moon" id="theme-icon"></i>
     </button>
 
-    <script src="https://code.jquery.com/jquery-3.7.1.min.js"
-        integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"
-        nonce="{{ $cspNonce ?? '' }}"></script>
+    {{-- Tabler only. jQuery is not used anywhere in this app, and Tabler
+         treats window.jQuery as an optional extra, so loading it here was
+         89 KB of blocking download for nothing. --}}
     <script src="{{ asset('tabler/dist/js/tabler.min.js?1692870487') }}" nonce="{{ $cspNonce ?? '' }}"></script>
     <script src="{{ asset('tabler/dist/js/demo.min.js?1692870487') }}" nonce="{{ $cspNonce ?? '' }}"></script>
 

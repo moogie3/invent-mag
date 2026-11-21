@@ -21,6 +21,20 @@ class StockTransferSeeder extends Seeder
     {
         $tenantId = app('currentTenant')->id;
 
+        // Stock transfers are recorded as two transfer-type adjustments each,
+        // so a second run would have appended another forty-odd rows to the
+        // adjustment log and moved stock again for transfers that already
+        // happened.
+        $alreadySeeded = StockAdjustment::where('tenant_id', $tenantId)
+            ->where('adjustment_type', 'transfer')
+            ->exists();
+
+        if ($alreadySeeded) {
+            $this->command->info('Stock transfers already seeded for tenant '.$tenantId.', skipping.');
+
+            return;
+        }
+
         $systemUser = User::where('tenant_id', $tenantId)->first();
         $systemUserId = $systemUser ? $systemUser->id : 1;
 

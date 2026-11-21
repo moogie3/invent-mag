@@ -71,7 +71,7 @@
                                             <span class="badge bg-blue-lt mt-1">{{ $opname->createdBy->getRoleNames()->first() ?? __('messages.user') }}</span>
                                         </td>
                                         <td>
-                                            <a href="{{ route('admin.stock-opname.show', $opname->id) }}" class="btn btn-icon btn-ghost-primary" title="{{ __('messages.view') ?? 'View' }}">
+                                            <a href="{{ $opname->path() }}" class="btn btn-icon btn-ghost-primary" title="{{ __('messages.view') ?? 'View' }}">
                                                 <i class="ti ti-eye"></i>
                                             </a>
                                         </td>
@@ -97,11 +97,14 @@
                             </tbody>
                         </table>
                     </div>
-                    @if ($opnames->hasPages())
-                        <div class="card-footer d-flex align-items-center">
-                            {{ $opnames->links() }}
+                    <div data-pagination-footer class="card-footer d-flex align-items-center">
+                        <p class="m-0 text-secondary">
+                            {{ __('messages.pagination_showing_entries', ['first' => $opnames->firstItem() ?? 0, 'last' => $opnames->lastItem() ?? 0, 'total' => $opnames->total()]) }}
+                        </p>
+                        <div class="ms-auto">
+                            {{ $opnames->appends(request()->query())->links('vendor.pagination.tabler') }}
                         </div>
-                    @endif
+                    </div>
                 </div>
             </div>
         </div>

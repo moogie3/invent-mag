@@ -91,7 +91,12 @@
             </tbody>
         </table>
     </div>
-    <div class="mt-3">
-        {{ $entries->appends(request()->query())->links() }}
+    <div data-pagination-footer class="d-flex align-items-center mt-3">
+        <p class="m-0 text-secondary">
+            {{ __('messages.pagination_showing_entries', ['first' => $entries->firstItem() ?? 0, 'last' => $entries->lastItem() ?? 0, 'total' => $entries->total()]) }}
+        </p>
+        <div class="ms-auto">
+            {{ $entries->appends(request()->query())->links('vendor.pagination.tabler') }}
+        </div>
     </div>
 @endif

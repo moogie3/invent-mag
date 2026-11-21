@@ -130,7 +130,14 @@
         </thead>
         <tbody>
             @php
-                 $summary = \App\Helpers\PurchaseHelper::calculateInvoiceSummary($pos->items->toArray(), $pos->discount_total, $pos->discount_total_type);
+                 $summary = \App\Helpers\PurchaseHelper::calculateInvoiceSummary(
+                     $pos->items->toArray(),
+                     $pos->discount_total,
+                     $pos->discount_total_type,
+                     (float) ($pos->tax_rate ?? 0),
+                     $pos->tax_type ?? 'none',
+                     (float) ($pos->pph_rate ?? 0)
+                 );
             @endphp
             @foreach($pos->items as $index => $item)
                 @php

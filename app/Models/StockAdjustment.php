@@ -30,9 +30,9 @@ class StockAdjustment extends Model
     ];
 
     protected $casts = [
-        'quantity_before' => 'float',
-        'quantity_after' => 'float',
-        'adjustment_amount' => 'float',
+        'quantity_before' => 'integer',
+        'quantity_after' => 'integer',
+        'adjustment_amount' => 'integer',
     ];
 
     public function product(): BelongsTo

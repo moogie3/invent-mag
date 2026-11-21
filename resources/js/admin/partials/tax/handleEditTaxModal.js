@@ -12,6 +12,8 @@ export function handleEditTaxModal() {
                 const description = button.getAttribute("data-description");
                 const isActive = button.getAttribute("data-is-active") === "1";
                 const isDefault = button.getAttribute("data-is-default") === "1";
+                const isPpn = button.getAttribute("data-is-ppn") === "1";
+                const isPph = button.getAttribute("data-is-pph") === "1";
 
                 const idInput = document.getElementById("editTaxId");
                 const nameInput = document.getElementById("editTaxName");
@@ -20,6 +22,8 @@ export function handleEditTaxModal() {
                 const descriptionInput = document.getElementById("editTaxDescription");
                 const activeCheckbox = document.getElementById("editTaxActive");
                 const defaultCheckbox = document.getElementById("editTaxDefault");
+                const ppnCheckbox = document.getElementById("editTaxPpn");
+                const pphCheckbox = document.getElementById("editTaxPph");
 
                 if (idInput) idInput.value = id;
                 if (nameInput) nameInput.value = name;
@@ -28,6 +32,8 @@ export function handleEditTaxModal() {
                 if (descriptionInput) descriptionInput.value = description || "";
                 if (activeCheckbox) activeCheckbox.checked = isActive;
                 if (defaultCheckbox) defaultCheckbox.checked = isDefault;
+                if (ppnCheckbox) ppnCheckbox.checked = isPpn;
+                if (pphCheckbox) pphCheckbox.checked = isPph;
 
                 const base = document.getElementById("updateTaxRouteBase");
                 const editForm = document.getElementById("editTaxForm");

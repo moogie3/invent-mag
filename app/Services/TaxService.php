@@ -8,16 +8,6 @@ use Illuminate\Support\Facades\DB;
 
 class TaxService
 {
-    public function getAllActive()
-    {
-        return Tax::active()->orderBy('name')->get();
-    }
-
-    public function getDefault()
-    {
-        return Tax::default()->first() ?? Tax::active()->first();
-    }
-
     public function findById(int $id): ?Tax
     {
         return Tax::find($id);
@@ -37,6 +27,12 @@ class TaxService
                 'description' => $data['description'] ?? null,
                 'is_active' => $data['is_active'] ?? true,
                 'is_default' => $data['is_default'] ?? false,
+                // These two decide where the money posts (Output VAT liability,
+                // withholding payable) and which jurisdiction may select the tax.
+                // They were seed-only before, so a tax created from the Tax page
+                // could never split VAT nor withhold anything.
+                'is_ppn' => $data['is_ppn'] ?? false,
+                'is_pph' => $data['is_pph'] ?? false,
             ]);
         });
     }
@@ -57,6 +53,13 @@ class TaxService
                 'description' => $data['description'] ?? $tax->description,
                 'is_active' => $data['is_active'] ?? $tax->is_active,
                 'is_default' => $data['is_default'] ?? $tax->is_default,
+                // Coerced because a model built in the same request has no
+                // attribute for a column the database defaulted: the insert
+                // never returns those values, so $tax->is_ppn is null. The
+                // columns default to false, so (bool) null is exactly the
+                // stored value. Writing the raw null would trip NOT NULL.
+                'is_ppn' => (bool) ($data['is_ppn'] ?? $tax->is_ppn),
+                'is_pph' => (bool) ($data['is_pph'] ?? $tax->is_pph),
             ]);
 
             return $tax->fresh();
@@ -88,7 +91,11 @@ class TaxService
             $tax->delete();
 
             if ($wasDefault) {
-                $next = Tax::active()->first();
+                // Promote the same tax every time: lowest id among the active
+                // ones. A withholding tax must never inherit the default,
+                // because the default is applied to documents that are not
+                // withholding anything, so PPh rows are skipped.
+                $next = Tax::active()->where('is_pph', false)->orderBy('id')->first();
                 if ($next) {
                     $next->update(['is_default' => true]);
                 }

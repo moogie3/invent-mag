@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use App\Models\ActivityLog;
 use App\Models\Purchase;
 use App\Models\PurchaseReturn;
+use App\Rules\WholeReturnQuantities;
 use App\Services\ActivityLogService;
 use App\Services\PurchaseReturnService;
 use App\Services\PurchaseService;
@@ -45,12 +46,21 @@ class PurchaseReturnController extends Controller
         $request->validate([
             'purchase_id' => 'required|exists:po,id',
             'return_date' => 'required|date',
-            'items' => 'required|json',
+            'items' => ['required', 'json', new WholeReturnQuantities],
             'total_amount' => 'required|numeric',
-            'status' => 'required|string',
+            // The index only ever counts Pending/Completed/Canceled, so any
+            // other string written here would sit in the table and vanish
+            // from every status tile. The allowed list lives on the model.
+            'status' => ['required', 'string', 'in:'.implode(',', PurchaseReturn::$statuses)],
         ]);
 
-        $this->purchaseReturnService->createPurchaseReturn($request->all());
+        // A cap refusal is a normal business answer: it comes back as the
+        // flash error the session partial renders, not as a 500.
+        try {
+            $this->purchaseReturnService->createPurchaseReturn($request->all());
+        } catch (\Exception $e) {
+            return back()->with('error', $e->getMessage())->withInput();
+        }
 
         return redirect()->route('admin.por.index')->with('success', 'Purchase return created successfully.');
     }
@@ -85,12 +95,20 @@ class PurchaseReturnController extends Controller
         $request->validate([
             'purchase_id' => 'required|exists:po,id',
             'return_date' => 'required|date',
-            'items' => 'required|json',
+            'items' => ['required', 'json', new WholeReturnQuantities],
             'total_amount' => 'required|numeric',
-            'status' => 'required|string',
+            // The index only ever counts Pending/Completed/Canceled, so any
+            // other string written here would sit in the table and vanish
+            // from every status tile. The allowed list lives on the model.
+            'status' => ['required', 'string', 'in:'.implode(',', PurchaseReturn::$statuses)],
         ]);
 
-        $this->purchaseReturnService->updatePurchaseReturn($por, $request->all());
+        // Same contract as store(): the refusal is a flash error, not a 500.
+        try {
+            $this->purchaseReturnService->updatePurchaseReturn($por, $request->all());
+        } catch (\Exception $e) {
+            return back()->with('error', $e->getMessage())->withInput();
+        }
 
         return redirect()->route('admin.por.index')->with('success', 'Purchase return updated successfully.');
     }
@@ -126,8 +144,11 @@ class PurchaseReturnController extends Controller
         $purchase->load(['items.product', 'purchaseReturns.items']);
 
         $items = $purchase->items->map(function ($item) use ($purchase) {
+            // Every LIVE return holds those units already; only a Canceled one
+            // has given them back. Counting just Completed returns (the old
+            // rule) offered Pending returns' quantities again on the form.
             $returnedQuantity = $purchase->purchaseReturns
-                ->where('status', 'Completed')
+                ->where('status', '!=', 'Canceled')
                 ->flatMap(fn ($pr) => $pr->items ?? collect())
                 ->where('product_id', $item->product_id)
                 ->sum('quantity');

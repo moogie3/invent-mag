@@ -154,20 +154,18 @@
                                             </table>
                                         </div>
                                         </div>
-                                        @if(method_exists($employees, 'links'))
-                                            <div class="card-footer d-flex align-items-center">
-                                                <p class="m-0 text-secondary">
-                                                    {{ __('messages.pagination_showing_entries', [
-                                                        'first' => $employees->firstItem(),
-                                                        'last' => $employees->lastItem(),
-                                                        'total' => $employees->total(),
-                                                    ]) }}
-                                                </p>
-                                                <div class="ms-auto">
-                                                    {{ $employees->appends(request()->query())->links('vendor.pagination.tabler') }}
-                                                </div>
+                                        <div data-pagination-footer class="card-footer d-flex align-items-center">
+                                            <p class="m-0 text-secondary">
+                                                {{ __('messages.pagination_showing_entries', [
+                                                    'first' => $employees->firstItem() ?? 0,
+                                                    'last' => $employees->lastItem() ?? 0,
+                                                    'total' => $employees->total(),
+                                                ]) }}
+                                            </p>
+                                            <div class="ms-auto">
+                                                {{ $employees->appends(request()->query())->links('vendor.pagination.tabler') }}
                                             </div>
-                                        @endif
+                                        </div>
                                     </div>
                                 </div>
                             </div>

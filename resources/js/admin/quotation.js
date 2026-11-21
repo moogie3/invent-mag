@@ -9,7 +9,7 @@ onPageLoad(() => {
     initQuotationTable();
 });
 
-function initQuotationForm() {
+export function initQuotationForm() {
     const form = document.querySelector("#quotationForm");
     if (!form) return;
 
@@ -57,6 +57,23 @@ function initQuotationForm() {
 
     const pphSelector = form.querySelector("#pphSelector");
     if (pphSelector) pphSelector.addEventListener("change", () => recalcQuotationTotals(form));
+
+    // One delegated handler instead of a listener per row: the edit form
+    // renders its rows on the server, so their buttons exist before this
+    // script runs and nothing else was bound to them.
+    if (tableBody) {
+        tableBody.addEventListener("click", (e) => {
+            const removeBtn = e.target.closest(".remove-item-btn");
+            if (!removeBtn) return;
+            removeBtn.closest("tr")?.remove();
+            updateRowNumbers(tableBody);
+            recalcQuotationTotals(form);
+        });
+    }
+
+    // Show real figures on load: the blade renders the summary with zeros
+    // and the edit form arrives with rows the user has not touched yet.
+    recalcQuotationTotals(form);
 }
 
 function addQuotationItemRow(tableBody, productSelector, itemQuantity, itemPrice, currencySettings) {
@@ -130,12 +147,6 @@ function addQuotationItemRow(tableBody, productSelector, itemQuantity, itemPrice
 
     tableBody.appendChild(row);
 
-    row.querySelector(".remove-item-btn").addEventListener("click", () => {
-        row.remove();
-        updateRowNumbers(tableBody);
-        recalcQuotationTotals(document.querySelector("#quotationForm"));
-    });
-
     productSelector.value = "";
     itemQuantity.value = 1;
     itemPrice.value = 0;
@@ -159,7 +170,7 @@ function updateRowNumbers(tableBody) {
     });
 }
 
-function recalcQuotationTotals(form) {
+export function recalcQuotationTotals(form) {
     let subtotal = 0;
     const currencySettingsEl = document.getElementById("currencySettings");
     const decimalPlaces = currencySettingsEl ? parseInt(currencySettingsEl.dataset.decimalPlaces) || 0 : 0;
@@ -183,10 +194,13 @@ function recalcQuotationTotals(form) {
         const price = parseFloat(row.querySelector(".item-price")?.value) || 0;
         const disc = parseFloat(row.querySelector(".item-discount")?.value) || 0;
         const discType = row.querySelector(".item-discount-type")?.value || "percentage";
-        const lineDiscount = discType === "percentage" ? (qty * price * disc) / 100 : disc;
-        const lineTotal = qty * price - lineDiscount;
+        // Same convention as SalesHelper::calculateTotal: a fixed discount
+        // comes off every unit, a percentage comes off every unit's price.
+        const discountPerUnit = discType === "percentage" ? (price * disc) / 100 : disc;
+        const lineTotal = (price - discountPerUnit) * qty;
         const subEl = row.querySelector(".item-subtotal");
-        if (subEl) subEl.textContent = formatCurrency(lineTotal);
+        // It is an input: textContent would change nothing on screen.
+        if (subEl) subEl.value = formatCurrency(lineTotal);
         subtotal += lineTotal;
     });
 
@@ -238,6 +252,18 @@ function recalcQuotationTotals(form) {
 
     const totalEl = form.querySelector("#displayTotal");
     if (totalEl) totalEl.textContent = formatCurrency(finalTotal);
+
+    // The three summary figures the blade renders as zeros: without these
+    // the discount, tax and pph rows stayed at 0 no matter what the form
+    // held, while the total next to them moved.
+    const discountEl = document.getElementById("displayDiscount");
+    if (discountEl) discountEl.textContent = formatCurrency(discountAmount);
+
+    const taxEl = document.getElementById("displayTax");
+    if (taxEl) taxEl.textContent = formatCurrency(taxAmount);
+
+    const pphEl = document.getElementById("displayPph");
+    if (pphEl) pphEl.textContent = formatCurrency(pphAmount);
 }
 
 function initQuotationTable() {

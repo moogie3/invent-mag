@@ -11,6 +11,7 @@ Route::prefix('stock-opname')->middleware('plan.feature:stock_opname')->group(fu
     Route::post('/', [StockOpnameController::class, 'store'])->name('admin.stock-opname.store')->middleware('can:manage-stock-opname');
     Route::get('/create', [StockOpnameController::class, 'create'])->name('admin.stock-opname.create')->middleware('can:manage-stock-opname');
     Route::get('/{stockOpname}', [StockOpnameController::class, 'show'])->name('admin.stock-opname.show')->middleware('can:view-stock-opname');
+    Route::get('/{stockOpname}/complete-preview', [StockOpnameController::class, 'completePreview'])->name('admin.stock-opname.complete-preview')->middleware('can:view-stock-opname');
     Route::post('/{stockOpname}/counts', [StockOpnameController::class, 'updateCounts'])->name('admin.stock-opname.update-counts')->middleware('can:manage-stock-opname');
     Route::post('/{stockOpname}/complete', [StockOpnameController::class, 'complete'])->name('admin.stock-opname.complete')->middleware('can:manage-stock-opname');
     Route::post('/{stockOpname}/cancel', [StockOpnameController::class, 'cancel'])->name('admin.stock-opname.cancel')->middleware('can:manage-stock-opname');
@@ -61,25 +62,9 @@ Route::prefix('pos')->middleware('plan.feature:pos')->group(function () {
         ->name('admin.pos.products')
         ->middleware('can:access-pos');
 
-    Route::get('/create', [POSController::class, 'create'])
-        ->name('admin.pos.create')
-        ->middleware('can:access-pos');
-
     Route::post('/store', [POSController::class, 'store'])
         ->name('admin.pos.store')
         ->middleware('can:access-pos');
-
-    Route::get('/edit/{id}', [POSController::class, 'edit'])
-        ->name('admin.pos.edit')
-        ->middleware('can:access-pos');
-
-    Route::put('/update/{id}', [POSController::class, 'update'])
-        ->name('admin.pos.update')
-        ->middleware('can:access-pos');
-
-    Route::delete('/destroy/{id}', [POSController::class, 'destroy'])
-        ->name('admin.pos.destroy')
-        ->middleware('can:delete-pos-transactions');
 
     Route::get('/receipt/{id}', [POSController::class, 'receipt'])
         ->name('admin.pos.receipt')

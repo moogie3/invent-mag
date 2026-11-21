@@ -19,6 +19,16 @@ class QuotationSeeder extends Seeder
     {
         $tenantId = app('currentTenant')->id;
 
+        // quotation_number is unique and each run draws a fresh date, so the
+        // sequence below starts over at -0001 on a different day instead of
+        // colliding. A second db:seed quietly appended five more quotations
+        // rather than failing.
+        if (Quotation::where('tenant_id', $tenantId)->exists()) {
+            $this->command?->info('Quotations already seeded for tenant '.$tenantId.', skipping.');
+
+            return;
+        }
+
         $customers = Customer::where('tenant_id', $tenantId)->get();
         $products = Product::where('tenant_id', $tenantId)->get();
         $tax = Tax::where('tenant_id', $tenantId)->where('is_default', true)->first()
@@ -73,7 +83,7 @@ class QuotationSeeder extends Seeder
                 ->where('quotation_number', 'like', "{$prefix}-%")
                 ->orderBy('id', 'desc')
                 ->first();
-            $newNum = $last ? (int) substr($last->quotation_number, -4) + 1 : 1;
+            $newNum = $last ? (int) substr($last->quotation_number, strrpos($last->quotation_number, '-') + 1) + 1 : 1;
             $quotationNumber = "{$prefix}-".str_pad($newNum, 4, '0', STR_PAD_LEFT);
 
             Quotation::create([

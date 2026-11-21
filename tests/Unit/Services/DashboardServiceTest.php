@@ -4,6 +4,8 @@ namespace Tests\Unit\Services;
 
 use App\Models\Categories;
 use App\Models\Customer;
+use App\Models\JournalEntry;
+use App\Models\Payment;
 use App\Models\POItem;
 use App\Models\Product;
 use App\Models\Purchase;
@@ -11,9 +13,11 @@ use App\Models\Sales;
 use App\Models\SalesItem;
 use App\Models\Supplier;
 use App\Models\User;
+use App\Services\AgingReportService;
 use App\Services\DashboardService;
 use Carbon\Carbon;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\DB;
 use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 use Tests\Traits\CreatesTenant;
@@ -272,5 +276,326 @@ class DashboardServiceTest extends TestCase
         $this->assertTrue(
             $data['lowStockProducts']->contains(fn ($pw) => $pw->product_id === $product->id)
         );
+    }
+
+    /**
+     * An invoice due today is not yet overdue.
+     *
+     * The aging SQL bucketed on `DATEDIFF(NOW(), due_date) >= 0`, which puts
+     * a document due today into the 1-30 day overdue bucket, and on SQLite
+     * `julianday('now') - julianday(due_date)` is a positive fraction of a
+     * day for the same document, so both drivers got it wrong in the same
+     * direction. AgingReportService already treats it as current, which is
+     * what its own test pins, so the dashboard and the health page were the
+     * ones out of step.
+     */
+    #[Test]
+    public function an_invoice_due_today_is_current_rather_than_overdue(): void
+    {
+        $customer = Customer::factory()->create();
+
+        Sales::factory()->create([
+            'customer_id' => $customer->id,
+            'status' => 'Unpaid',
+            'due_date' => now()->startOfDay(),
+            'total' => 100,
+        ]);
+
+        $data = $this->dashboardService->getDashboardData();
+
+        $this->assertEquals(
+            100,
+            $data['arAging']['current'],
+            'A sale due today belongs in Current, not in an overdue bucket.'
+        );
+        $this->assertEquals(
+            0,
+            $data['arAging']['1-30'],
+            'A sale due today must not be reported as 1-30 days overdue.'
+        );
+    }
+
+    /**
+     * A document genuinely past its due date still lands in the overdue
+     * bucket, so tightening the boundary must not swallow the real cases.
+     */
+    #[Test]
+    public function an_invoice_five_days_overdue_still_lands_in_the_overdue_bucket(): void
+    {
+        $customer = Customer::factory()->create();
+
+        Sales::factory()->create([
+            'customer_id' => $customer->id,
+            'status' => 'Unpaid',
+            'due_date' => now()->subDays(5)->startOfDay(),
+            'total' => 100,
+        ]);
+
+        $data = $this->dashboardService->getDashboardData();
+
+        $this->assertEquals(0, $data['arAging']['current']);
+        $this->assertEquals(100, $data['arAging']['1-30']);
+    }
+
+    /**
+     * Aging answers "how much is still owed", so a partially collected
+     * invoice must contribute its outstanding balance, not the gross total
+     * it was originally billed for.
+     */
+    #[Test]
+    public function ar_aging_counts_the_balance_still_owed_not_the_gross_total(): void
+    {
+        $customer = Customer::factory()->create();
+
+        $sale = Sales::factory()->create([
+            'customer_id' => $customer->id,
+            'status' => 'Partial',
+            'due_date' => now()->subDays(5)->startOfDay(),
+            'total' => 1000,
+        ]);
+
+        Payment::factory()->create([
+            'paymentable_id' => $sale->id,
+            'paymentable_type' => Sales::class,
+            'amount' => 400,
+            'payment_date' => now(),
+        ]);
+
+        $data = $this->dashboardService->getDashboardData();
+
+        $this->assertEquals(
+            600,
+            $data['arAging']['1-30'],
+            'Aging must report the 600 still owed, not the 1000 billed.'
+        );
+    }
+
+    /**
+     * The dashboard, the financial health page and the aged receivables
+     * report are three readers of one number. They used to be three
+     * separate formulas, so the same debt could show a different amount
+     * depending on which screen it was read from.
+     */
+    #[Test]
+    public function the_dashboard_and_the_aging_report_read_the_same_figure(): void
+    {
+        $customer = Customer::factory()->create();
+
+        $sale = Sales::factory()->create([
+            'customer_id' => $customer->id,
+            'status' => 'Partial',
+            'due_date' => now()->subDays(5)->startOfDay(),
+            'total' => 1000,
+        ]);
+
+        Payment::factory()->create([
+            'paymentable_id' => $sale->id,
+            'paymentable_type' => Sales::class,
+            'amount' => 400,
+            'payment_date' => now(),
+        ]);
+
+        $dashboard = $this->dashboardService->getDashboardData();
+        $report = app(AgingReportService::class)->generateAgedReceivables();
+
+        $this->assertEquals(
+            $dashboard['arAging']['1-30'],
+            (float) $report['1-30']->sum('balance'),
+            'Dashboard and report must not disagree about the same debt.'
+        );
+        $this->assertEquals(600, (float) $report['1-30']->sum('balance'));
+    }
+
+    /**
+     * Buying stock is not selling it. COGS is what the ledger booked
+     * against the goods that actually left the warehouse, not the month's
+     * purchase total: buying 5000 of stock and selling 700 of it is a 300
+     * gross profit, not a 4700 loss.
+     */
+    #[Test]
+    public function gross_profit_costs_only_the_stock_that_was_actually_sold(): void
+    {
+        // 5000 of stock bought this month, plus a 1000 sale.
+        Purchase::factory()->create([
+            'order_date' => now(),
+            'total' => 5000,
+            'status' => 'Unpaid',
+        ]);
+        Sales::factory()->create([
+            'order_date' => now(),
+            'total' => 1000,
+            'status' => 'Paid',
+        ]);
+
+        // The sale's journal entry debited COGS for the 700 that left.
+        $this->bookCostOfGoodsSold(700);
+
+        $data = $this->dashboardService->getDashboardData();
+
+        $grossProfit = collect($data['financialItems'])
+            ->firstWhere('label', __('messages.gross_profit'))['value'];
+
+        $this->assertEquals(
+            300,
+            $grossProfit,
+            'Gross profit must cost the 700 sold, not the 5000 bought.'
+        );
+    }
+
+    /**
+     * The analytics tables render $item->name straight from these rows, so a
+     * wrong relation name silently degrades every row to the "Unknown ..."
+     * fallback while the customer/supplier name sits right there in the join.
+     */
+    #[Test]
+    public function top_customers_and_suppliers_show_their_real_names(): void
+    {
+        $customer = Customer::factory()->create(['name' => 'Acme Trading']);
+        Sales::factory()->create([
+            'customer_id' => $customer->id,
+            'order_date' => now(),
+            'total' => 500,
+        ]);
+
+        $supplier = Supplier::factory()->create(['name' => 'Global Parts', 'location' => 'IN']);
+        Purchase::factory()->create([
+            'supplier_id' => $supplier->id,
+            'order_date' => now(),
+            'total' => 700,
+        ]);
+
+        $data = $this->dashboardService->getDashboardData();
+
+        $topCustomer = $data['customerAnalytics']['topCustomers']->first();
+        $this->assertEquals(
+            'Acme Trading',
+            $topCustomer->name,
+            'Top customer table must show the joined customer name, not Unknown Customer.'
+        );
+
+        $topSupplier = $data['supplierAnalytics']['topSuppliers']->first();
+        $this->assertEquals(
+            'Global Parts',
+            $topSupplier->name,
+            'Top supplier table must show the joined supplier name, not Unknown Supplier.'
+        );
+        $this->assertEquals('IN', $topSupplier->location);
+    }
+
+    /**
+     * Net profit must earn and spend the same period: this month's revenue
+     * against this month's purchases. It used to subtract every purchase the
+     * tenant had ever made from a single month of revenue, so the tile slid
+     * further into the red every month the business traded.
+     */
+    #[Test]
+    public function net_profit_subtracts_only_this_months_purchases(): void
+    {
+        // Bought two months ago: belongs to an earlier profit window.
+        Purchase::factory()->create([
+            'order_date' => now()->subMonthsNoOverflow(2)->startOfMonth()->addDay(),
+            'status' => 'Paid',
+            'total' => 5000,
+        ]);
+
+        // Bought this month: the only purchase this month's profit may see.
+        Purchase::factory()->create([
+            'order_date' => now()->startOfMonth()->addDay(),
+            'status' => 'Paid',
+            'total' => 100,
+        ]);
+
+        Sales::factory()->create([
+            'order_date' => now(),
+            'status' => 'Paid',
+            'total' => 1000,
+        ]);
+
+        $data = $this->dashboardService->getDashboardData();
+
+        $netProfit = collect($data['financialItems'])
+            ->firstWhere('label', __('messages.net_profit'))['value'];
+
+        $this->assertEqualsWithDelta(
+            900,
+            $netProfit,
+            0.005,
+            'Net profit must charge this month\'s 100 purchase against this month\'s 1000 revenue, not the 5100 bought in total.'
+        );
+    }
+
+    /**
+     * The "Total Account Receivable" tile must show money customers still
+     * owe. It displayed this month's revenue instead, so a fully collected
+     * month rendered as a huge receivable while a real unpaid invoice never
+     * appeared on it.
+     */
+    #[Test]
+    public function account_receivable_tile_shows_outstanding_balances(): void
+    {
+        // Unpaid invoice the customer still owes.
+        Sales::factory()->create([
+            'status' => 'Unpaid',
+            'total' => 700,
+            'order_date' => now(),
+            'due_date' => now()->addWeek(),
+        ]);
+
+        // Fully paid sale: revenue, but nothing left to collect.
+        Sales::factory()->create([
+            'status' => 'Paid',
+            'total' => 1000,
+            'order_date' => now(),
+        ]);
+
+        $data = $this->dashboardService->getDashboardData();
+
+        $receivable = collect($data['financialItems'])
+            ->firstWhere('label', __('messages.total_account_receivable'))['value'];
+
+        $this->assertEqualsWithDelta(
+            700,
+            $receivable,
+            0.005,
+            'The receivable tile must count the 700 still owed, not the 1700 of revenue booked this month.'
+        );
+    }
+
+    /**
+     * Book one posted journal entry that moves cost out of inventory and
+     * into the tenant's configured COGS account, the same account every
+     * sale and POS entry posts to.
+     */
+    private function bookCostOfGoodsSold(float $amount): void
+    {
+        $tenant = app('currentTenant');
+
+        $entry = JournalEntry::create([
+            'tenant_id' => $tenant->id,
+            'date' => now()->toDateString(),
+            'description' => 'cost of goods sold',
+            'status' => 'posted',
+        ]);
+
+        DB::table('transactions')->insert([
+            [
+                'journal_entry_id' => $entry->id,
+                'tenant_id' => $tenant->id,
+                'account_id' => $tenant->getAccountingSetting('cost_of_goods_sold_account_id'),
+                'type' => 'debit',
+                'amount' => $amount,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'journal_entry_id' => $entry->id,
+                'tenant_id' => $tenant->id,
+                'account_id' => $tenant->getAccountingSetting('inventory_account_id'),
+                'type' => 'credit',
+                'amount' => $amount,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+        ]);
     }
 }

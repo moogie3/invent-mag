@@ -19,6 +19,14 @@ class SalesOpportunitySeeder extends Seeder
     {
         $tenantId = app('currentTenant')->id;
 
+        // Nothing keys these rows, so a second run appended five more
+        // opportunities and their line items alongside the first five.
+        if (SalesOpportunity::where('tenant_id', $tenantId)->exists()) {
+            $this->command?->warn('Sales opportunities already seeded for tenant '.$tenantId.', skipping.');
+
+            return;
+        }
+
         $pipeline = SalesPipeline::where('is_default', true)->where('tenant_id', $tenantId)->first();
         $customers = Customer::where('tenant_id', $tenantId)->get();
         $products = Product::where('tenant_id', $tenantId)->get();

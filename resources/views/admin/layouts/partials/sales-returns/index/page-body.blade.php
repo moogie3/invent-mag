@@ -122,7 +122,7 @@
                         </div>
                         <div data-pagination-footer class="card-footer d-flex align-items-center border-top py-3">
                             <p class="m-0 text-secondary">
-                                {{ __('messages.pagination_showing_entries', ['first' => $returns->firstItem(), 'last' => $returns->lastItem(), 'total' => $returns->total()]) }}
+                                {{ __('messages.pagination_showing_entries', ['first' => $returns->firstItem() ?? 0, 'last' => $returns->lastItem() ?? 0, 'total' => $returns->total()]) }}
                             </p>
                             <div class="ms-auto">
                                 {{ $returns->appends(request()->query())->links('vendor.pagination.tabler') }}

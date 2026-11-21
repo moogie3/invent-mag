@@ -81,11 +81,14 @@
                         </tbody>
                     </table>
                 </div>
-                @if($logs->hasPages())
-                <div class="card-footer d-flex justify-content-center border-top">
-                    {{ $logs->links() }}
+                <div data-pagination-footer class="card-footer d-flex align-items-center">
+                    <p class="m-0 text-secondary">
+                        {{ __('messages.pagination_showing_entries', ['first' => $logs->firstItem() ?? 0, 'last' => $logs->lastItem() ?? 0, 'total' => $logs->total()]) }}
+                    </p>
+                    <div class="ms-auto">
+                        {{ $logs->appends(request()->query())->links('vendor.pagination.tabler') }}
+                    </div>
                 </div>
-                @endif
             </div>
         </div>
     </div>

@@ -2,8 +2,6 @@
 
 namespace App\Services;
 
-
-use App\Services\Concerns\BuildsListSearch;
 use App\Helpers\CurrencyHelper;
 use App\Helpers\PurchaseHelper;
 use App\Models\Account;
@@ -17,6 +15,7 @@ use App\Models\Supplier;
 use App\Models\Tax;
 use App\Models\User;
 use App\Models\Warehouse;
+use App\Services\Concerns\BuildsListSearch;
 use Carbon\Carbon;
 use Dompdf\Dompdf;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
@@ -26,6 +25,7 @@ use Illuminate\Support\Facades\DB;
 class PurchaseService
 {
     use BuildsListSearch;
+
     protected AccountingService $accountingService;
 
     public function __construct(AccountingService $accountingService)
@@ -134,7 +134,7 @@ class PurchaseService
             ->each->setAppends(['main_warehouse_stock']);
         $warehouses = Warehouse::all();
         $taxes = Tax::active()->get();
-        $defaultTax = Tax::default()->first() ?? Tax::active()->first();
+        $defaultTax = Tax::effectiveDefault();
         $pos = []; // Don't load all purchases
 
         return compact('pos', 'suppliers', 'products', 'warehouses', 'taxes', 'defaultTax');
@@ -154,7 +154,7 @@ class PurchaseService
         $isPaid = $pos->status == 'Paid';
         $warehouses = Warehouse::all();
         $taxes = Tax::active()->get();
-        $defaultTax = Tax::default()->first() ?? Tax::active()->first();
+        $defaultTax = Tax::effectiveDefault();
 
         return compact('pos', 'suppliers', 'products', 'items', 'isPaid', 'warehouses', 'taxes', 'defaultTax');
     }
@@ -175,7 +175,8 @@ class PurchaseService
             $pos->discount_total_type,
             $pos->relationLoaded('purchaseReturns') ? $pos->purchaseReturns : collect(),
             (float) ($pos->tax_rate ?? 0),
-            $pos->tax_type ?? 'none'
+            $pos->tax_type ?? 'none',
+            (float) ($pos->pph_rate ?? 0)
         );
         $subtotal = $summary['subtotal'];
         $itemCount = $summary['itemCount'];
@@ -192,6 +193,144 @@ class PurchaseService
         return Purchase::with(['supplier', 'items.product', 'payments', 'purchaseReturns.items'])->findOrFail($id);
     }
 
+    /**
+     * Post this purchase order's journal: Dr Inventory (net of input VAT),
+     * Cr Accounts Payable (net after PPh), plus the PPN Masukan debit and the
+     * PPh payable credit when they apply.
+     *
+     * Every figure except the discount base and the grand total is read back
+     * off the purchase, because createPurchase() and updatePurchase() both
+     * persist the same snapshot (total_tax, tax_type, ppn_*, pph_*) before
+     * booking, so the ledger can only ever describe the document the row now
+     * carries.
+     *
+     * The two that are passed in instead share a single reason. Reading a
+     * figure back means a round trip through PDO, which binds a float as a
+     * string at precision=14 and can land a fraction of a cent on the other
+     * side of the boundary: the debit is built from $afterDiscount and the
+     * payable from $finalTotal, so reading only one of them back is what let
+     * validateTransactions() refuse a PO whose net was 143733.195, an entry
+     * that balances to any eye. The clamp on total is the second reason the
+     * pre-tax base cannot be recovered from the row at all.
+     *
+     * @param  float  $afterDiscount  Order total after the document discount
+     *                                and before tax. Recovering it from total
+     *                                would be wrong exactly on the
+     *                                large-withholding rows where total is
+     *                                clamped at zero.
+     * @param  float  $finalTotal  What the row was just written with, so
+     *                             the payable shares the debit's source
+     *                             rather than a second, lossier read of
+     *                             the same number.
+     */
+    private function postPurchaseJournalEntry(Purchase $purchase, float $afterDiscount, float $finalTotal): void
+    {
+        $taxAmount = (float) $purchase->total_tax;
+        $taxType = $purchase->tax_type ?? 'none';
+        $ppnEnabled = (bool) $purchase->ppn_enabled;
+        $ppnAmount = (float) $purchase->ppn_amount;
+        $pphAmount = (float) $purchase->pph_amount;
+
+        $accountingSettings = app('currentTenant')->accounting_settings ?? [];
+
+        if (! $accountingSettings || ! isset($accountingSettings['inventory_account_id']) || ! isset($accountingSettings['accounts_payable_account_id'])) {
+            throw new \Exception('Accounting settings for inventory or accounts payable are not configured.');
+        }
+
+        $inventoryAccount = Account::find($accountingSettings['inventory_account_id']);
+        $accountsPayableAccount = Account::find($accountingSettings['accounts_payable_account_id']);
+
+        if (! $inventoryAccount || ! $accountsPayableAccount) {
+            throw new \Exception('Required accounts (Inventory, Accounts Payable) not found. Please check Accounting Settings.');
+        }
+
+        $inventoryAccountName = $inventoryAccount->name;
+        $accountsPayableAccountName = $accountsPayableAccount->name;
+
+        // Journal entry: Dr Inventory (net), Cr AP (net after PPh), Cr PPh Payable (withholding).
+        // When PPN Masukan applies, PPN is debited to the Input VAT asset account (1160)
+        // instead of capitalizing it into inventory cost.
+        //
+        // $inventoryAmount starts as the GROSS the supplier charged: the
+        // price plus tax when exclusive, the price itself when inclusive
+        // (the tax is already inside it). Taking the input VAT back out of
+        // that gross is what keeps the entry balanced for BOTH types:
+        //   exclusive -> gross (afterDiscount + tax) - tax = afterDiscount
+        //   inclusive -> gross (afterDiscount)          - tax = afterDiscount - tax
+        // Assigning $afterDiscount instead used to be right only for the
+        // exclusive case; on an inclusive PPN purchase it left Inventory
+        // holding the full gross while Input VAT was debited on top of it,
+        // so debits exceeded credits by the tax and createJournalEntry()
+        // refused the entry.
+        $inventoryAmount = $taxType === 'inclusive' ? $afterDiscount : ($afterDiscount + $taxAmount);
+
+        $ppnMasukanAccountId = $accountingSettings['ppn_masukan_account_id'] ?? null;
+        $ppnMasukanAccount = null;
+
+        if ($ppnEnabled && $ppnAmount > 0 && $ppnMasukanAccountId) {
+            $ppnMasukanAccount = Account::find($ppnMasukanAccountId);
+            if ($ppnMasukanAccount) {
+                $inventoryAmount -= $ppnAmount;
+            }
+        }
+
+        $transactions = [
+            ['account_name' => $inventoryAccountName, 'type' => 'debit', 'amount' => $inventoryAmount],
+            ['account_name' => $accountsPayableAccountName, 'type' => 'credit', 'amount' => $finalTotal],
+        ];
+
+        if ($ppnMasukanAccount) {
+            $transactions[] = ['account_name' => $ppnMasukanAccount->name, 'type' => 'debit', 'amount' => $ppnAmount];
+        }
+
+        // pph_enabled already carries the isIndonesian() && is_pph gate every
+        // writer applies, and pph_amount is recorded as 0 when it does not
+        // hold, so this credits the withholding only when one was taken.
+        if ($pphAmount > 0 && $purchase->pph_enabled) {
+            $pphPayableAccountId = $accountingSettings['pph_payable_account_id'] ?? null;
+            if ($pphPayableAccountId) {
+                $pphPayableAccount = Account::find($pphPayableAccountId);
+                if ($pphPayableAccount) {
+                    $transactions[] = ['account_name' => $pphPayableAccount->name, 'type' => 'credit', 'amount' => $pphAmount];
+                }
+            }
+        }
+
+        $this->accountingService->createJournalEntry(
+            "Purchase Order #{$purchase->invoice}",
+            Carbon::parse($purchase->order_date),
+            $transactions,
+            $purchase
+        );
+    }
+
+    /**
+     * Reverse this purchase order's posted journal entries, the edit path's
+     * first half.
+     *
+     * Entries a prior reversal already netted out are skipped:
+     * reverseJournalEntry() leaves the original's status 'posted' (the link
+     * lives on the reversal's reversed_entry_id), so without the guard a second
+     * edit, or an edit followed by delete, would reverse the same entry twice
+     * and corrupt the GL in the opposite direction. Reversal entries never
+     * appear here either: reverseJournalEntry() posts them with no source
+     * document, so the sourceable query below cannot see them.
+     *
+     * Mirrors SalesReturnService::reverseSalesReturnJournalEntries().
+     */
+    private function reversePurchaseJournalEntries(Purchase $purchase, string $note): void
+    {
+        $journalEntries = JournalEntry::where('sourceable_type', get_class($purchase))
+            ->where('sourceable_id', $purchase->id)
+            ->get();
+
+        foreach ($journalEntries as $entry) {
+            if ($entry->canBeReversed() && ! $entry->hasDependentEntries()) {
+                $this->accountingService->reverseJournalEntry($entry, $note);
+            }
+        }
+    }
+
     public function createPurchase(array $data): Purchase
     {
         return DB::transaction(function () use ($data) {
@@ -201,7 +340,7 @@ class PurchaseService
             }
 
             $taxId = $data['tax_id'] ?? null;
-            $tax = $taxId ? Tax::find($taxId) : (Tax::default()->first() ?? Tax::active()->first());
+            $tax = $taxId ? Tax::find($taxId) : Tax::effectiveDefault();
             $taxRate = $tax ? (float) $tax->rate : 0;
             $taxType = $tax ? $tax->type : 'none';
 
@@ -289,65 +428,7 @@ class PurchaseService
                 'ppn_amount' => $ppnAmount,
             ]);
 
-            // Get accounting settings from tenant
-            $accountingSettings = app('currentTenant')->accounting_settings ?? [];
-
-            if (! $accountingSettings || ! isset($accountingSettings['inventory_account_id']) || ! isset($accountingSettings['accounts_payable_account_id'])) {
-                throw new \Exception('Accounting settings for inventory or accounts payable are not configured.');
-            }
-
-            // Retrieve account names using the IDs from settings
-            // Retrieve account names using the IDs from settings
-            $inventoryAccount = Account::find($accountingSettings['inventory_account_id']);
-            $accountsPayableAccount = Account::find($accountingSettings['accounts_payable_account_id']);
-
-            if (! $inventoryAccount || ! $accountsPayableAccount) {
-                throw new \Exception('Required accounts (Inventory, Accounts Payable) not found. Please check Accounting Settings.');
-            }
-
-            $inventoryAccountName = $inventoryAccount->name;
-            $accountsPayableAccountName = $accountsPayableAccount->name;
-
-            // Journal entry: Dr Inventory (net), Cr AP (net after PPh), Cr PPh Payable (withholding).
-            // When PPN Masukan applies, PPN is debited to the Input VAT asset account (1160)
-            // instead of capitalizing it into inventory cost.
-            $inventoryAmount = $taxType === 'inclusive' ? $afterDiscount : ($afterDiscount + $taxAmount);
-
-            $ppnMasukanAccountId = $accountingSettings['ppn_masukan_account_id'] ?? null;
-            $ppnMasukanAccount = null;
-
-            if ($ppnEnabled && $ppnAmount > 0 && $ppnMasukanAccountId) {
-                $ppnMasukanAccount = Account::find($ppnMasukanAccountId);
-                if ($ppnMasukanAccount) {
-                    $inventoryAmount = $afterDiscount;
-                }
-            }
-
-            $transactions = [
-                ['account_name' => $inventoryAccountName, 'type' => 'debit', 'amount' => $inventoryAmount],
-                ['account_name' => $accountsPayableAccountName, 'type' => 'credit', 'amount' => $finalTotal],
-            ];
-
-            if ($ppnMasukanAccount) {
-                $transactions[] = ['account_name' => $ppnMasukanAccount->name, 'type' => 'debit', 'amount' => $ppnAmount];
-            }
-
-            if ($pphAmount > 0 && app('currentTenant')->isIndonesian() && ($pphTax?->is_pph ?? false)) {
-                $pphPayableAccountId = $accountingSettings['pph_payable_account_id'] ?? null;
-                if ($pphPayableAccountId) {
-                    $pphPayableAccount = Account::find($pphPayableAccountId);
-                    if ($pphPayableAccount) {
-                        $transactions[] = ['account_name' => $pphPayableAccount->name, 'type' => 'credit', 'amount' => $pphAmount];
-                    }
-                }
-            }
-
-            $this->accountingService->createJournalEntry(
-                "Purchase Order #{$purchase->invoice}",
-                Carbon::parse($data['order_date']),
-                $transactions,
-                $purchase
-            );
+            $this->postPurchaseJournalEntry($purchase, $afterDiscount, $finalTotal);
 
             return $purchase;
         });
@@ -375,7 +456,7 @@ class PurchaseService
             $purchase->items()->delete();
 
             $taxId = $data['tax_id'] ?? null;
-            $tax = $taxId ? Tax::find($taxId) : (Tax::default()->first() ?? Tax::active()->first());
+            $tax = $taxId ? Tax::find($taxId) : Tax::effectiveDefault();
             $taxRate = $tax ? (float) $tax->rate : 0;
             $taxType = $tax ? $tax->type : 'none';
 
@@ -462,6 +543,15 @@ class PurchaseService
 
             // Refresh model to get grand_total attribute updated
             $purchase->refresh();
+
+            // The ledger still describes the document this order used to be.
+            // Reverse what the previous version posted and post the current
+            // one, or every edit leaves inventory, payables and input VAT
+            // holding the old totals while the order shows the new ones. The
+            // guard inside skips entries an earlier edit already netted out,
+            // so a second edit cannot reverse the same entry twice.
+            $this->reversePurchaseJournalEntries($purchase, "Auto-reversal due to edited PO #{$purchase->invoice}");
+            $this->postPurchaseJournalEntry($purchase, $afterDiscount, $finalTotal);
 
             // If status is changed to 'Paid' and there's a balance, create a payment.
             if (isset($data['status']) && $data['status'] === 'Paid' && $purchase->balance > 0) {
@@ -555,16 +645,11 @@ class PurchaseService
     public function deletePurchase(Purchase $purchase): void
     {
         DB::transaction(function () use ($purchase) {
-            // Reverse associated journal entries for accurate accounting
-            $journalEntries = JournalEntry::where('sourceable_type', get_class($purchase))
-                ->where('sourceable_id', $purchase->id)
-                ->get();
-
-            foreach ($journalEntries as $entry) {
-                if ($entry->status === JournalEntry::STATUS_POSTED && $entry->canBeReversed()) {
-                    $this->accountingService->reverseJournalEntry($entry, "Auto-reversal due to deleted PO #{$purchase->invoice}");
-                }
-            }
+            // One guarded reversal for every entry this order owns. The guard
+            // is what makes delete safe now that an edit reverses too: without
+            // it an edit followed by a delete would reverse the original a
+            // second time and leave the ledger holding a stray opposite.
+            $this->reversePurchaseJournalEntries($purchase, "Auto-reversal due to deleted PO #{$purchase->invoice}");
 
             foreach ($purchase->items as $item) {
                 // Decrement stock from the specific warehouse

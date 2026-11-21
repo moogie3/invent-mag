@@ -88,6 +88,26 @@ class AccountingControllerTest extends TestCase
     }
 
     #[Test]
+    public function it_shows_the_pagination_footer_when_the_journal_is_empty()
+    {
+        $this->generalLedgerServiceMock->shouldReceive('getJournalEntries')
+            ->andReturn([
+                'entries' => new LengthAwarePaginator(collect([]), 0, 20),
+                'start_date' => '2024-01-01',
+                'end_date' => '2024-01-31',
+            ]);
+
+        $response = $this->actingAs($this->user)->get(route('admin.accounting.journal'));
+
+        $response->assertOk();
+        $this->assertStringContainsString(
+            '<div data-pagination-footer class="card-footer',
+            $response->getContent(),
+            'The footer must carry the pagination marker even with no entries.'
+        );
+    }
+
+    #[Test]
     public function it_can_display_the_general_ledger()
     {
         $this->accountServiceMock->shouldReceive('getAllAccountsOrdered')

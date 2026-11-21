@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Helpers\CurrencyHelper;
 use App\Models\Categories;
 use App\Models\Customer;
+use App\Models\JournalEntry;
 use App\Models\POItem;
 use App\Models\Product;
 use App\Models\ProductWarehouse;
@@ -47,7 +48,7 @@ class DashboardService
         }
 
         $keyMetrics = $this->formatKeyMetrics($totalLiability, $unpaidLiability, $totalRevenue, $unpaidRevenue, $monthlySales, $outCountUnpaid, $inCountUnpaid);
-        $financialItems = $this->prepareFinancialItems($totalLiability, $unpaidLiability, $totalRevenue);
+        $financialItems = $this->prepareFinancialItems($totalLiability, $arAging, $totalRevenue);
         $invoiceStatusData = $this->prepareInvoiceStatusData($arAging, $apAging); // Pass aging data here
         $customerInsights = $this->prepareCustomerInsights();
         $customerAnalytics = $this->getCustomerAnalytics($dates);
@@ -340,6 +341,34 @@ class DashboardService
         return $query->sum('total') ?? 0;
     }
 
+    /**
+     * Cost of goods sold for a window, read straight off the ledger.
+     *
+     * COGS is what the sale and POS journal entries debit against the
+     * tenant's COGS account (5200 in the seeded chart). Taking the month's
+     * purchase total instead cost stock the moment it was bought, so
+     * buying 5000 and selling 700 of it reported a 4700 loss where there
+     * was a 300 gross profit.
+     */
+    private function getCostOfGoodsSold($start, $end): float
+    {
+        $tenant = app('currentTenant');
+        $accountId = $tenant->getAccountingSetting('cost_of_goods_sold_account_id');
+
+        if (! $accountId) {
+            return 0.0;
+        }
+
+        return (float) DB::table('transactions as t')
+            ->join('journal_entries as je', 'je.id', '=', 't.journal_entry_id')
+            ->where('je.tenant_id', $tenant->id)
+            ->where('je.status', JournalEntry::STATUS_POSTED)
+            ->where('t.account_id', $accountId)
+            ->whereBetween('je.date', [$start->toDateString(), $end->toDateString()])
+            ->selectRaw("SUM(CASE t.type WHEN 'debit' THEN t.amount ELSE -t.amount END) AS total")
+            ->value('total');
+    }
+
     private function formatKeyMetrics($totalLiability, $unpaidLiability, $totalRevenue, $unpaidRevenue, $monthlySales, $outCountUnpaid, $inCountUnpaid)
     {
         return [
@@ -408,82 +437,37 @@ class DashboardService
 
     private function getOverdueInvoicesCount()
     {
-        return Purchase::where('status', 'Unpaid')->where('due_date', '<', now())->count();
+        // Compared as a calendar date, not a timestamp: an order due today at
+        // midnight is not overdue at 10am, and `due_date < now()` said it was.
+        return Purchase::where('status', 'Unpaid')->whereDate('due_date', '<', today())->count();
     }
 
     private function getAccountsReceivableAging()
     {
-        $tenantId = app('currentTenant')->id;
-        $driver = DB::connection()->getDriverName();
+        $aging = app(AgingReportService::class);
 
-        // Calculate days overdue: NOW - due_date
-        // SQLite: julianday('now') - julianday(due_date)
-        // MySQL: DATEDIFF(NOW(), due_date)
-
-        $diffSql = $driver === 'sqlite'
-            ? "julianday('now') - julianday(due_date)"
-            : 'DATEDIFF(NOW(), due_date)';
-
-        $results = DB::table('sales')
-            ->selectRaw("
-                SUM(CASE WHEN $diffSql < 0 THEN total ELSE 0 END) as current_amount,
-                SUM(CASE WHEN $diffSql >= 0 AND $diffSql <= 30 THEN total ELSE 0 END) as overdue_1_30,
-                SUM(CASE WHEN $diffSql > 30 AND $diffSql <= 60 THEN total ELSE 0 END) as overdue_31_60,
-                SUM(CASE WHEN $diffSql > 60 AND $diffSql <= 90 THEN total ELSE 0 END) as overdue_61_90,
-                SUM(CASE WHEN $diffSql > 90 THEN total ELSE 0 END) as overdue_90_plus,
-                SUM(CASE WHEN $diffSql >= 0 THEN total ELSE 0 END) as total_overdue
-            ")
-            ->where('tenant_id', $tenantId)
-            ->whereIn('status', ['Unpaid', 'Partial'])
-            ->whereNotNull('due_date')
-            ->first();
-
-        return [
-            'current' => (float) ($results->current_amount ?? 0),
-            '1-30' => (float) ($results->overdue_1_30 ?? 0),
-            '31-60' => (float) ($results->overdue_31_60 ?? 0),
-            '61-90' => (float) ($results->overdue_61_90 ?? 0),
-            '90+' => (float) ($results->overdue_90_plus ?? 0),
-            'total_overdue' => (float) ($results->total_overdue ?? 0),
-        ];
+        return $aging->summarize($aging->generateAgedReceivables());
     }
 
     private function getAccountsPayableAging()
     {
-        $tenantId = app('currentTenant')->id;
-        $driver = DB::connection()->getDriverName();
+        $aging = app(AgingReportService::class);
 
-        $diffSql = $driver === 'sqlite'
-            ? "julianday('now') - julianday(due_date)"
-            : 'DATEDIFF(NOW(), due_date)';
-
-        $results = DB::table('po')
-            ->selectRaw("
-                SUM(CASE WHEN $diffSql < 0 THEN total ELSE 0 END) as current_amount,
-                SUM(CASE WHEN $diffSql >= 0 AND $diffSql <= 30 THEN total ELSE 0 END) as overdue_1_30,
-                SUM(CASE WHEN $diffSql > 30 AND $diffSql <= 60 THEN total ELSE 0 END) as overdue_31_60,
-                SUM(CASE WHEN $diffSql > 60 AND $diffSql <= 90 THEN total ELSE 0 END) as overdue_61_90,
-                SUM(CASE WHEN $diffSql > 90 THEN total ELSE 0 END) as overdue_90_plus,
-                SUM(CASE WHEN $diffSql >= 0 THEN total ELSE 0 END) as total_overdue
-            ")
-            ->where('tenant_id', $tenantId)
-            ->whereIn('status', ['Unpaid', 'Partial'])
-            ->whereNotNull('due_date')
-            ->first();
-
-        return [
-            'current' => (float) ($results->current_amount ?? 0),
-            '1-30' => (float) ($results->overdue_1_30 ?? 0),
-            '31-60' => (float) ($results->overdue_31_60 ?? 0),
-            '61-90' => (float) ($results->overdue_61_90 ?? 0),
-            '90+' => (float) ($results->overdue_90_plus ?? 0),
-            'total_overdue' => (float) ($results->total_overdue ?? 0),
-        ];
+        return $aging->summarize($aging->generateAgedPayables());
     }
 
-    private function prepareFinancialItems($totalLiability, $unpaidLiability, $totalRevenue)
+    private function prepareFinancialItems($totalLiability, $arAging, $totalRevenue)
     {
-        $operatingExpenses = $totalLiability - $unpaidLiability;
+        // Revenue and expenses must cover the SAME window. This month's
+        // expenses used to be every purchase the tenant had ever made
+        // (total liabilities minus unpaid ones), subtracted from a single
+        // month of revenue, so net profit slid further into the red each
+        // month the business traded.
+        $monthStart = now()->startOfMonth();
+        $monthEnd = now()->endOfMonth();
+        $operatingExpenses = Purchase::whereBetween('order_date', [$monthStart, $monthEnd])
+            ->where('status', '!=', 'Unpaid')
+            ->sum('total');
 
         // Previous month
         $lastMonthStart = now()->subMonth()->startOfMonth();
@@ -491,19 +475,21 @@ class DashboardService
 
         $prevMonthPaidLiabilities = Purchase::whereBetween('updated_at', [$lastMonthStart, $lastMonthEnd])->where('status', 'Paid')->sum('total');
         $prevMonthReceivablePaid = Sales::whereBetween('updated_at', [$lastMonthStart, $lastMonthEnd])->where('status', 'Paid')->sum('total');
-        $prevMonthTotalLiability = Purchase::where('order_date', '<=', $lastMonthEnd)->sum('total');
-        $prevMonthUnpaidLiability = Purchase::where('order_date', '<=', $lastMonthEnd)->where('status', 'Unpaid')->sum('total');
-        $prevMonthOperatingExpenses = $prevMonthTotalLiability - $prevMonthUnpaidLiability;
-        $prevMonthTotalRevenue = Sales::whereBetween('order_date', [$lastMonthStart, $lastMonthEnd])->sum('total');
+        $prevMonthOperatingExpenses = Purchase::whereBetween('order_date', [$lastMonthStart, $lastMonthEnd])
+            ->where('status', '!=', 'Unpaid')
+            ->sum('total');
+        // Same column as the current month above (created_at), so the change
+        // percentages compare like with like.
+        $prevMonthTotalRevenue = Sales::whereBetween('created_at', [$lastMonthStart, $lastMonthEnd])->sum('total');
         $prevNetProfit = $prevMonthTotalRevenue - $prevMonthOperatingExpenses;
 
         // New metrics
-        $cogs = $this->getTotalPurchases(['start' => now()->startOfMonth(), 'end' => now()->endOfMonth()]); // Cost of Goods Sold for current month
+        $cogs = $this->getCostOfGoodsSold(now()->startOfMonth(), now()->endOfMonth());
         $grossProfit = $totalRevenue - $cogs;
         $operatingIncome = $grossProfit - $operatingExpenses;
 
         // Previous month for new metrics
-        $prevMonthCogs = $this->getTotalPurchases(['start' => $lastMonthStart, 'end' => $lastMonthEnd]);
+        $prevMonthCogs = $this->getCostOfGoodsSold($lastMonthStart, $lastMonthEnd);
         $prevGrossProfit = $prevMonthTotalRevenue - $prevMonthCogs;
         $prevOperatingIncome = $prevGrossProfit - $prevMonthOperatingExpenses;
 
@@ -533,7 +519,9 @@ class DashboardService
             ],
             [
                 'label' => __('messages.total_account_receivable'),
-                'value' => $totalRevenue,
+                // Outstanding customer balances (current + overdue aging),
+                // not revenue: a fully collected month owes nothing.
+                'value' => $arAging['current'] + $arAging['total_overdue'],
                 'icon' => 'ti-file-invoice',
                 'change' => 0,
             ],
@@ -799,17 +787,17 @@ class DashboardService
 
         $customerLifetimeValue = $totalCustomers > 0 ? Sales::sum('total') / $totalCustomers : 0;
 
-        $topCustomers = Sales::select('customer_id', DB::raw('SUM(total) as total_sales'))
+        $topCustomers = Sales::select('sales.customer_id', 'customers.name as customer_name', DB::raw('SUM(sales.total) as total_sales'))
             ->join('customers', 'sales.customer_id', '=', 'customers.id')
             ->whereNotNull('sales.customer_id')
-            ->groupBy('customer_id', 'customers.name')
+            ->groupBy('sales.customer_id', 'customers.name')
             ->orderByDesc('total_sales')
             ->limit(5)
             ->get()
             ->map(
                 fn ($item) => (object) [
                     'id' => $item->customer_id,
-                    'name' => $item->customers->name ?? 'Unknown Customer',
+                    'name' => $item->customer_name ?? 'Unknown Customer',
                     'total_sales' => $item->total_sales,
                 ],
             );
@@ -846,18 +834,18 @@ class DashboardService
                 ->whereIn('status', ['Unpaid', 'Partial'])
                 ->sum('total') ?? 0;
 
-        $topSuppliers = Purchase::select('supplier_id', DB::raw('SUM(total) as total_purchases'))
+        $topSuppliers = Purchase::select('po.supplier_id', 'suppliers.name as supplier_name', 'suppliers.location as supplier_location', DB::raw('SUM(po.total) as total_purchases'))
             ->join('suppliers', 'po.supplier_id', '=', 'suppliers.id')
             ->whereNotNull('po.supplier_id')
-            ->groupBy('supplier_id', 'suppliers.name', 'suppliers.location')
+            ->groupBy('po.supplier_id', 'suppliers.name', 'suppliers.location')
             ->orderByDesc('total_purchases')
             ->limit(5)
             ->get()
             ->map(
                 fn ($item) => (object) [
                     'id' => $item->supplier_id,
-                    'name' => $item->suppliers->name ?? 'Unknown Supplier',
-                    'location' => $item->suppliers->location ?? 'N/A',
+                    'name' => $item->supplier_name ?? 'Unknown Supplier',
+                    'location' => $item->supplier_location ?? 'N/A',
                     'total_purchases' => $item->total_purchases,
                 ],
             );

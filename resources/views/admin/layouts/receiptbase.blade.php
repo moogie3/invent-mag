@@ -17,9 +17,10 @@
     <link href="{{ asset('tabler/dist/css/tabler-payments.min.css') }}" rel="stylesheet" />
     <link href="{{ asset('tabler/dist/css/tabler-vendors.min.css') }}" rel="stylesheet" />
     @vite('resources/css/pos-receipt.css')
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    {{-- 78mm receipt preview + thermal print rules: receipt and print pages
+         both extend this layout, and pos-receipt.css carries no @page rule. --}}
+    @vite('resources/css/print-receipt.css')
+    <link rel="stylesheet" href="{{ asset('tabler/dist/icons/tabler-icons.min.css') }}?2.47.0">
 </head>
 
 <body class="is-loading-page">

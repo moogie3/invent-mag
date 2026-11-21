@@ -2,24 +2,18 @@
 
 namespace Database\Seeders;
 
-use App\Models\Product;
-use App\Models\ProductWarehouse;
 use App\Models\Sales;
 use App\Models\SalesReturn;
 use App\Models\User;
-use App\Services\AccountingService;
+use App\Services\SalesReturnService;
 use Carbon\Carbon;
 use Faker\Factory;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Auth;
 
 class SalesReturnSeeder extends Seeder
 {
-    protected AccountingService $accountingService;
-
-    public function __construct(AccountingService $accountingService)
-    {
-        $this->accountingService = $accountingService;
-    }
+    public function __construct(protected SalesReturnService $salesReturnService) {}
 
     /**
      * Run the database seeds.
@@ -51,11 +45,32 @@ class SalesReturnSeeder extends Seeder
         $faker = Factory::create();
 
         $count = 0;
+        // Units already handed back per sale and product. The loop draws a
+        // random sale up to 15 times, so one invoice can come up repeatedly;
+        // without this the seeder could return more units than the sale ever
+        // shipped. SalesReturnService does not enforce that ceiling itself
+        // (it only recomputes the totals it is given), so the allowance has
+        // to be held here. A return born Canceled holds no stock, so it never
+        // consumes the allowance.
+        $returnedSoFar = [];
+
         for ($i = 0; $i < 15; $i++) {
             $sale = $sales->random();
             $user = $users->random();
+
+            // SalesReturnService takes the return's owner from the
+            // authenticated user and sales_returns.user_id is NOT NULL, so the
+            // randomly chosen user has to be set explicitly or the insert is
+            // rejected.
+            Auth::setUser($user);
+
             $returnDate = $faker->dateTimeBetween($sale->order_date, 'now');
             $status = $faker->randomElement(SalesReturn::$statuses);
+
+            // A return created as Canceled holds no stock and no live journal
+            // entry: the cancel path unwinds both, so a row born Canceled must
+            // never have moved stock or booked an entry in the first place.
+            $isCanceled = $status === 'Canceled';
 
             // Fetch items from the selected sale
             $salesItems = $sale->salesItems;
@@ -64,25 +79,47 @@ class SalesReturnSeeder extends Seeder
                 continue; // Skip if selected sale has no items (shouldn't happen with has('salesItems'))
             }
 
+            // One sale can carry the same product on more than one line, so the
+            // allowance is counted per product across all of that sale's lines.
+            $soldByProduct = $salesItems->groupBy('product_id')
+                ->map(fn ($lines) => (int) $lines->sum('quantity'));
+
             $returnItemsData = [];
-            $totalReturnAmount = 0;
 
             // Randomly select 1 to min(3, number of items) items to return
             $itemsToReturnCount = rand(1, min(3, $salesItems->count()));
             $selectedSalesItems = $salesItems->random($itemsToReturnCount);
 
             foreach ($selectedSalesItems as $salesItem) {
-                $returnQuantity = rand(1, $salesItem->quantity); // Return a quantity less than or equal to original
+                $productId = $salesItem->product_id;
+                $alreadyReturned = $returnedSoFar[$sale->id][$productId] ?? 0;
+                $remaining = (int) ($soldByProduct[$productId] ?? 0) - $alreadyReturned;
+
+                // Everything this sale ever shipped of this product has already
+                // been returned, so there is nothing left to hand back.
+                if ($remaining <= 0) {
+                    continue;
+                }
+
+                // Bounded by the line as well as by the product-wide budget:
+                // $remaining can be far larger than this line sold, and a
+                // return for more than one line sold is as wrong as a return
+                // for more than the sale sold.
+                $returnQuantity = rand(1, min((int) $salesItem->quantity, $remaining));
+                if (! $isCanceled) {
+                    $returnedSoFar[$sale->id][$productId] = $alreadyReturned + $returnQuantity;
+                }
+
+                // Priced off the line the goods came from, so a return of a
+                // discounted line hands back what that line actually charged
+                // rather than the product's list price.
                 $netUnitPrice = $salesItem->total / $salesItem->quantity;
-                $itemTotal = $returnQuantity * $netUnitPrice;
-                $totalReturnAmount += $itemTotal;
 
                 $returnItemsData[] = [
+                    'sales_item_id' => $salesItem->id,
                     'product_id' => $salesItem->product_id,
-                    'quantity' => $returnQuantity,
                     'price' => $netUnitPrice,
-                    'total' => $itemTotal,
-                    'tenant_id' => $tenantId,
+                    'returned_quantity' => $returnQuantity,
                 ];
             }
 
@@ -90,67 +127,24 @@ class SalesReturnSeeder extends Seeder
                 continue; // Skip if no items were selected to return
             }
 
-            // Create the SalesReturn — copy tax fields from the parent sale
-            $salesReturn = SalesReturn::create([
-                'sales_id' => $sale->id,
-                'user_id' => $user->id,
-                'return_date' => $returnDate,
-                'reason' => $faker->sentence(),
-                'total_amount' => $totalReturnAmount,
-                'status' => $status,
-                'tax_id' => $sale->tax_id,
-                'tax_rate' => $sale->tax_rate ?? 0,
-                'tax_type' => $sale->tax_type ?? 'none',
-                'tax_amount' => round($totalReturnAmount * (($sale->tax_rate ?? 0) / 100), 2),
-                'tenant_id' => $tenantId,
-            ]);
+            // The service copies the tax snapshot off the parent sale, moves
+            // the stock back, restores the batches it was drawn from, books
+            // the reversal off the original posting, updates the sale's status
+            // and raises the customer credit when the invoice had been paid.
+            // None of that was happening here: this seeder wrote the row, the
+            // stock and a flat Dr Sales / Cr AR entry by hand.
+            try {
+                $this->salesReturnService->createSalesReturn([
+                    'sales_id' => $sale->id,
+                    'return_date' => Carbon::instance($returnDate),
+                    'reason' => $faker->sentence(),
+                    'status' => $status,
+                    'items' => json_encode($returnItemsData),
+                ]);
+            } catch (\Exception $e) {
+                $this->command->error("Failed to create sales return against invoice {$sale->invoice}: ".$e->getMessage());
 
-            // A return created as Canceled holds no stock and no live journal
-            // entry: the cancel path unwinds both, so a row born Canceled must
-            // never have moved stock or booked an entry in the first place.
-            $isCanceled = $status === 'Canceled';
-
-            // Create SalesReturnItems
-            foreach ($returnItemsData as $itemData) {
-                $salesReturnItem = $salesReturn->items()->create($itemData);
-
-                if ($isCanceled) {
-                    continue;
-                }
-
-                // Update product stock (increment as it's a customer return back to inventory)
-                $stockRecord = ProductWarehouse::where('product_id', $salesReturnItem->product_id)
-                    ->where('warehouse_id', $sale->warehouse_id)
-                    ->where('tenant_id', $tenantId)
-                    ->first();
-
-                if ($stockRecord) {
-                    $stockRecord->increment('quantity', $salesReturnItem->quantity);
-                } else {
-                    ProductWarehouse::create([
-                        'product_id' => $salesReturnItem->product_id,
-                        'warehouse_id' => $sale->warehouse_id,
-                        'quantity' => $salesReturnItem->quantity,
-                        'tenant_id' => $tenantId,
-                    ]);
-                }
-            }
-
-            if (! $isCanceled) {
-                // Create Journal Entry for Sales Return
-                $description = "Sales Return for Sales Invoice {$sale->invoice}, Return #{$salesReturn->id}";
-                $transactions = [];
-
-                // Debit Sales Returns (or a specific return expense account)
-                // Credit Accounts Receivable / Cash (depending on original payment type or refund status)
-                $transactions[] = ['account_code' => '4100-'.$tenantId, 'type' => 'debit', 'amount' => $totalReturnAmount]; // Reduce revenue
-                $transactions[] = ['account_code' => '1130-'.$tenantId, 'type' => 'credit', 'amount' => $totalReturnAmount]; // Reduce AR
-
-                try {
-                    $this->accountingService->createJournalEntry($description, Carbon::parse($returnDate), $transactions, $salesReturn);
-                } catch (\Exception $e) {
-                    $this->command->error("Failed to create journal entry for sales return {$salesReturn->id}: ".$e->getMessage());
-                }
+                continue;
             }
 
             $count++;

@@ -491,6 +491,24 @@ Understanding payment statuses helps you read the General Ledger and financial r
 
 > **Note:** The `partial` key in language files maps to "Partially Paid" (EN) and "Dibayar Sebagian" (ID) for both Sales and Purchase orders.
 
+### Sales Return Statuses
+
+| Status | Meaning |
+|--------|---------|
+| **Pending** | The return already holds stock and has a posted journal entry. Waiting to be completed |
+| **Completed** | Finalized. If the original invoice was paid, a Customer Credit Note now exists for it |
+| **Canceled** | Holds no stock, no live journal entry and no credit. Kept as a history row only |
+
+### Purchase Return Statuses
+
+| Status | Meaning |
+|--------|---------|
+| **Pending** | The return already holds its stock deduction and has a posted journal entry |
+| **Completed** | Finalized against the supplier's payable |
+| **Canceled** | Holds no stock, no live journal entry and no credit. Kept as a history row only |
+
+> **Note:** `Canceled` is a **return** status only. Sales and purchase orders themselves move between Paid, Partial/Partially Paid, Unpaid and Returned, and never carry it.
+
 ---
 
 ## How Transactions Flow
@@ -571,7 +589,10 @@ Journal Entry:
 
 ### 5. Sales Return (Completed)
 
-When a sales return is marked **Completed**:
+The stock movement and the journal entry below are posted **when the return is
+created**, whether it is born Pending or Completed. Marking it Completed does
+not book a second entry; it issues the customer credit. What a completed return
+carries:
 
 ```
 Transaction: Customer returns Rp 200,000 worth of goods
@@ -588,13 +609,15 @@ Journal Entry:
 The return reverses the original sale entry, so it debits **Sales Revenue (4100)** (not a "Sales Returns" contra account) and credits **Accounts Receivable (1130)**.
 
 Additionally:
-- Inventory is restocked and COGS reversed (Dr Inventory / Cr Cost of Goods Sold) proportionally to the returned amount
+- Inventory is restocked and COGS reversed (Dr Inventory / Cr Cost of Goods Sold). The reversal is priced from what the returned units actually cost: each return line goes through the batches that covered it (`SalesReturnService::cogsToReverse()` using `StockValuationService::costOfCoveredUnits()`). A proportional share of the original sale's COGS is used only as a fallback, when a line's units cannot be priced from batches at all
 - If the original sale carried PPN, the PPN Keluaran portion is reversed proportionally
-- If the original invoice was **Paid**, a **Customer Credit Note** is automatically created for future purchases
+- If the original invoice was **Paid**, a **Customer Credit Note** is automatically created for future purchases. A return born Completed receives it at creation; a return completed later receives it when you mark it Completed
 
 ### 6. Purchase Return (Completed)
 
-When a purchase return is marked **Completed**:
+The stock movement and the journal entry below are posted **when the return is
+created**, whatever status it is born with. Marking it Completed only finalizes
+the row; it books nothing extra. What a completed return carries:
 
 ```
 Transaction: Return Rp 100,000 worth of goods to supplier
@@ -612,7 +635,46 @@ Additionally:
 - Inventory is deducted from the warehouse
 - The purchase order amount is adjusted accordingly
 
-### 7. HR & Payroll Processing
+Both happen at creation, not at completion, so a Pending purchase return has
+already reduced stock and moved the GL.
+
+### 7. Canceled Returns (Sales and Purchase)
+
+**A canceled return holds no stock, no live journal entry and no credit.**
+Every entry point enforces that one rule, on both the sales side and the
+purchase side.
+
+A return can be canceled from **Pending** or from **Completed**, and the effect
+is the same either way, because creation already moved the stock and posted the
+journal:
+
+| | Sales return | Purchase return |
+|---|---|---|
+| Stock | The restocked quantity is taken back out of the warehouse, and `remaining_quantity` on the PO lines is drained again | The deducted quantity is added back to the warehouse, and `remaining_quantity` on the PO lines is refunded |
+| Journal | A reversal entry cancels the original one, so revenue and receivables return to where the sale left them | A reversal entry cancels the original one, so accounts payable and the returned cost return to where the purchase left them |
+| Credit | Any Customer Credit Note issued by completion is set to `canceled` with `available_amount` 0 | Not applicable, purchase returns issue no credit |
+
+Details worth knowing:
+
+- **Born Canceled:** a return created with status Canceled moves no stock and
+  posts no journal entry at all, so there is nothing to undo later.
+- **Cancel is idempotent:** canceling an already-canceled return is a no-op, so
+  a double click or a repeated bulk action cannot reverse the GL twice.
+- **Delete of a Canceled return removes only the row.** Stock and the journal
+  were already undone on the way to Canceled, so reverting again would restore
+  the goods twice and leave the warehouse holding more than was ever sold.
+  Deleting a **live** return still reverts both.
+- **Completing a Canceled return is refused** by the service, which throws
+  rather than issuing a credit against a row holding nothing. The bulk Complete
+  action skips these rows and reports how many it skipped instead of failing
+  the whole batch.
+- **Editing a return to Canceled** undoes stock, journal and credit the same
+  way, and editing it back to a live status puts them back.
+- The parent sale or purchase status is recomputed from the returns that are
+  still live, so a canceled return cannot leave an invoice marked Returned with
+  nothing actually returned.
+
+### 8. HR & Payroll Processing
 
 Payroll uses a two-step accounting sync:
 
@@ -719,6 +781,19 @@ The Opening Balance Equity account is used for balancing. Don't manually post to
 - Set opening balances if migrating from another system
 - Verify accounting integration settings
 - Review individual account transactions
+
+---
+
+### Problem: Profit looks too high and Inventory never falls
+
+**Possible causes:**
+1. Sales posted before any purchase batch existed carry Rp 0 Cost of Goods Sold
+2. Sales posted by the old point-of-sale path booked no cost at all (fixed 2026-11-14, historical rows left as they were)
+
+**Solution:**
+- Run `php artisan sales:backfill-cogs` and read the dry-run report
+- Re-run with `--apply` to post `Dr Cost of Goods Sold / Cr Inventory` for the shortfall, dated each sale's own date
+- `--tenant=ID` limits the run to one workspace; the command is idempotent, so a second run posts nothing more
 
 ---
 

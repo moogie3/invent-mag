@@ -158,6 +158,7 @@ class ProductController extends Controller
         $request->validate([
             'code' => ['required', 'string', 'max:100', Rule::unique('products', 'code')->where('tenant_id', auth()->user()->tenant_id)],
             'name' => ['required', 'string', 'max:255', Rule::unique('products', 'name')->where('tenant_id', auth()->user()->tenant_id)],
+            'barcode' => ['nullable', 'string', 'max:100', Rule::unique('products', 'barcode')->where('tenant_id', auth()->user()->tenant_id)],
             'low_stock_threshold' => 'nullable|integer|min:1',
             'price' => 'required|numeric|min:0',
             'selling_price' => 'required|numeric|min:0',
@@ -228,7 +229,7 @@ class ProductController extends Controller
         $request->validate([
             'code' => ['required', 'string', Rule::unique('products', 'code')->where('tenant_id', auth()->user()->tenant_id)],
             'name' => ['required', 'string', Rule::unique('products', 'name')->where('tenant_id', auth()->user()->tenant_id)],
-            'barcode' => 'nullable|string',
+            'barcode' => ['nullable', 'string', 'max:100', Rule::unique('products', 'barcode')->where('tenant_id', auth()->user()->tenant_id)],
             'low_stock_threshold' => 'nullable|integer|min:1',
             'price' => 'required|numeric',
             'selling_price' => 'required|numeric',
@@ -263,7 +264,7 @@ class ProductController extends Controller
 
         $request->validate([
             'code' => ['required', 'string', 'max:100', Rule::unique('products', 'code')->where('tenant_id', auth()->user()->tenant_id)->ignore($product->id)],
-            'barcode' => 'nullable|string|max:100|unique:products,barcode,'.$product->id,
+            'barcode' => ['nullable', 'string', 'max:100', Rule::unique('products', 'barcode')->where('tenant_id', auth()->user()->tenant_id)->ignore($product->id)],
             'name' => ['required', 'string', 'max:255', Rule::unique('products', 'name')->where('tenant_id', auth()->user()->tenant_id)->ignore($product->id)],
             'low_stock_threshold' => 'nullable|integer|min:1',
             'price' => 'required|numeric|min:0',
@@ -467,7 +468,10 @@ class ProductController extends Controller
     {
         $request->validate([
             'product_id' => 'required|integer|exists:products,id',
-            'adjustment_amount' => 'required|numeric|min:1', // Can be positive or negative, validation for negative will be handled by adjustment_type
+            // Integer, not numeric: the stock record, the adjustment row and
+            // every quantity column behind them are integers, so 2.5 would
+            // move the shelf by 2.5 while the log stored 2.
+            'adjustment_amount' => 'required|integer|min:1', // Can be positive or negative, validation for negative will be handled by adjustment_type
             'adjustment_type' => 'required|in:increase,decrease,correction',
             'reason' => 'nullable|string|max:500',
             'warehouse_id' => 'nullable|integer|exists:warehouses,id',
@@ -518,8 +522,27 @@ class ProductController extends Controller
             $query = trim($request->get('q', ''));
 
             if (empty($query)) {
-                // If the query is empty, return all products
-                $products = Product::all();
+                // Eager-load every warehouse row before serialising. Product's
+                // $appends (stock_quantity, total_stock, main_warehouse_stock)
+                // each fall back to their own query when the relation is not
+                // loaded, so Product::all() over a real catalogue ran three
+                // queries per row: 3509 queries and 4 seconds to build a
+                // 1.28 MB body for a product picker. Loading the relation
+                // once makes the accessors read from memory instead.
+                //
+                // Every warehouse is loaded, not just the main one: total_stock
+                // is a sum across all of them. The relation itself is hidden
+                // because it was never in this response before, and the three
+                // heavy columns are dropped because the only consumer of this
+                // endpoint (the sales pipeline) reads id, name, selling_price
+                // and main_warehouse_stock and nothing else.
+                $products = Product::with('productWarehouses')->get()
+                    ->makeHidden([
+                        'productWarehouses',
+                        'description',
+                        'image',
+                        'cover_url',
+                    ]);
             } else {
                 // Otherwise, perform the search
                 $products = $this->productService->searchProducts($query);

@@ -106,7 +106,8 @@
                                 $pos->discount_total_type,
                                 $pos->relationLoaded('purchaseReturns') ? $pos->purchaseReturns : collect(),
                                 $pos->tax_rate ?? 0,
-                                $pos->tax_type ?? 'exclusive'
+                                $pos->tax_type ?? 'exclusive',
+                                $pos->pph_rate ?? 0
                             );
 
                             $subtotal = $summary['subtotal'];

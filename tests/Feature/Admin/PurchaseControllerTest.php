@@ -118,6 +118,38 @@ class PurchaseControllerTest extends TestCase
         ]);
     }
 
+    /**
+     * A discount can only shrink the bill, never grow it, so a negative
+     * figure is a typo rather than a markup. Sales and quotations already
+     * refuse one, which left the purchase form as the only door open to a
+     * discount that adds to what the tenant owes its supplier.
+     */
+    public function test_it_rejects_a_negative_purchase_discount()
+    {
+        $purchaseData = [
+            'invoice' => 'PO-'.rand(10000, 99999),
+            'supplier_id' => $this->supplier->id,
+            'warehouse_id' => $this->warehouse->id,
+            'order_date' => Carbon::now()->format('Y-m-d'),
+            'due_date' => Carbon::now()->addDays(7)->format('Y-m-d'),
+            'discount_total' => -10,
+            'discount_total_type' => 'fixed',
+            'products' => json_encode([
+                [
+                    'product_id' => $this->product->id,
+                    'quantity' => 5,
+                    'price' => $this->product->price,
+                    'total' => $this->product->price * 5,
+                ],
+            ]),
+        ];
+
+        $response = $this->post(route('admin.po.store'), $purchaseData);
+
+        $response->assertSessionHasErrors('discount_total');
+        $this->assertDatabaseMissing('po', ['invoice' => $purchaseData['invoice']]);
+    }
+
     public function test_it_can_display_the_purchase_edit_page()
     {
         $purchase = PurchaseFactory::new()->create([

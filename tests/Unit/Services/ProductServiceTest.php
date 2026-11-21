@@ -3,9 +3,11 @@
 namespace Tests\Unit\Services;
 
 use App\Models\Categories;
+use App\Models\JournalEntry;
 use App\Models\POItem;
 use App\Models\Product;
 use App\Models\ProductWarehouse;
+use App\Models\Purchase;
 use App\Models\Supplier;
 use App\Models\Unit;
 use App\Models\User;
@@ -440,5 +442,141 @@ class ProductServiceTest extends TestCase
         $this->productService->adjustProductStock($product, 5, 'decrease', 'Test', $user->id, $warehouse->id);
 
         $this->assertDatabaseHas('product_warehouse', ['product_id' => $product->id, 'warehouse_id' => $warehouse->id, 'quantity' => 0]);
+    }
+
+    /**
+     * A manual correction changes what the business owns, so it has to move
+     * the Inventory account the same way purchases, sales and opname do.
+     * It used to write only a stock_adjustments row, so the ledger kept
+     * claiming stock that was no longer on the shelf.
+     */
+    #[Test]
+    public function manual_stock_decrease_posts_an_inventory_journal(): void
+    {
+        $user = User::factory()->create();
+        $warehouse = Warehouse::factory()->create(['is_main' => true]);
+        $product = Product::factory()->create(['price' => 1000]);
+
+        ProductWarehouse::updateOrCreate(
+            ['product_id' => $product->id, 'warehouse_id' => $warehouse->id, 'tenant_id' => $product->tenant_id],
+            ['quantity' => 10]
+        );
+
+        $this->productService->adjustProductStock($product, 4, 'decrease', 'Damaged in transit', $user->id, $warehouse->id);
+
+        $inventoryId = $this->tenant->accounting_settings['inventory_account_id'];
+
+        $journal = JournalEntry::whereHas('transactions', function ($query) use ($inventoryId) {
+            $query->where('account_id', $inventoryId)->where('type', 'credit');
+        })->latest('id')->first();
+
+        $this->assertNotNull($journal, 'A manual stock decrease must post a journal entry.');
+
+        $credit = $journal->transactions->firstWhere('type', 'credit');
+        $this->assertEqualsWithDelta(
+            4000,
+            (float) $credit->amount,
+            0.005,
+            'Four units at the 1000 buying price must leave the Inventory account.'
+        );
+    }
+
+    /**
+     * The mirror image: stock found and added to the shelf is an asset the
+     * books do not have yet, so the Inventory account must be debited.
+     */
+    #[Test]
+    public function manual_stock_increase_posts_an_inventory_journal(): void
+    {
+        $user = User::factory()->create();
+        $warehouse = Warehouse::factory()->create(['is_main' => true]);
+        $product = Product::factory()->create(['price' => 1000]);
+
+        ProductWarehouse::updateOrCreate(
+            ['product_id' => $product->id, 'warehouse_id' => $warehouse->id, 'tenant_id' => $product->tenant_id],
+            ['quantity' => 10]
+        );
+
+        $this->productService->adjustProductStock($product, 5, 'increase', 'Found stock', $user->id, $warehouse->id);
+
+        $inventoryId = $this->tenant->accounting_settings['inventory_account_id'];
+
+        $journal = JournalEntry::whereHas('transactions', function ($query) use ($inventoryId) {
+            $query->where('account_id', $inventoryId)->where('type', 'debit');
+        })->latest('id')->first();
+
+        $this->assertNotNull($journal, 'A manual stock increase must post a journal entry.');
+
+        $debit = $journal->transactions->firstWhere('type', 'debit');
+        $this->assertEqualsWithDelta(
+            5000,
+            (float) $debit->amount,
+            0.005,
+            'Five units at the 1000 buying price must enter the Inventory account.'
+        );
+    }
+
+    /**
+     * Physical stock and the batch ledger are two records of the same goods.
+     * A decrease has to consume batches (the way a sale does) and cost them
+     * at what the supplier charged, or later sales cost units that were
+     * thrown away and the stock value counts goods that are gone.
+     */
+    #[Test]
+    public function manual_stock_decrease_consumes_purchase_batches(): void
+    {
+        $user = User::factory()->create();
+        $warehouse = Warehouse::factory()->create(['is_main' => true]);
+        $product = Product::factory()->create(['price' => 1000]);
+
+        ProductWarehouse::updateOrCreate(
+            ['product_id' => $product->id, 'warehouse_id' => $warehouse->id, 'tenant_id' => $product->tenant_id],
+            ['quantity' => 10]
+        );
+
+        // Pinned: a clean purchase (no order discount, no tax) so the
+        // capitalized line cost is exactly the 2000 shown on the batch.
+        $purchase = Purchase::factory()->create([
+            'discount_total' => 0,
+            'discount_total_type' => 'fixed',
+            'tax_type' => 'none',
+            'tax_rate' => 0,
+            'total_tax' => 0,
+            'ppn_enabled' => false,
+            'ppn_amount' => 0,
+        ]);
+
+        POItem::factory()->forPurchase($purchase)->create([
+            'product_id' => $product->id,
+            'quantity' => 10,
+            'remaining_quantity' => 10,
+            'price' => 200,
+            'discount' => 0,
+            'discount_type' => 'fixed',
+            'total' => 2000,
+            'expiry_date' => null,
+        ]);
+
+        $this->productService->adjustProductStock($product, 3, 'decrease', 'Damaged', $user->id, $warehouse->id);
+
+        $batch = POItem::where('product_id', $product->id)->first();
+        $this->assertEquals(
+            7,
+            (int) $batch->fresh()->remaining_quantity,
+            'A manual decrease must consume batches, or costing later claims units that are not on the shelf.'
+        );
+
+        $inventoryId = $this->tenant->accounting_settings['inventory_account_id'];
+        $journal = JournalEntry::whereHas('transactions', function ($query) use ($inventoryId) {
+            $query->where('account_id', $inventoryId)->where('type', 'credit');
+        })->latest('id')->first();
+
+        $this->assertNotNull($journal);
+        $this->assertEqualsWithDelta(
+            600,
+            (float) $journal->transactions->firstWhere('type', 'credit')->amount,
+            0.005,
+            'The three units must be valued at the batch cost (3 x 200), not at the 1000 buying price.'
+        );
     }
 }

@@ -48,7 +48,13 @@ class SalesFactory extends Factory
             'total_tax' => $this->faker->randomFloat(2, 0, 1000),
             'amount_received' => $this->faker->randomFloat(2, 0, 10000),
             'change_amount' => $this->faker->randomFloat(2, 0, 100),
-            'type' => $this->faker->randomElement([Sales::TYPE_REGULAR, Sales::TYPE_POS]),
+            // Always a regular sale. The random draw this replaced made
+            // ~half of all factory sales POS sales, which silently flipped
+            // every type-dependent path: SalesController::show() and edit()
+            // both redirect POS sales away, so a test could pass or fail on
+            // nothing but the roll. POS tests set type explicitly (POSControllerTest,
+            // PrintTest, PosServiceTest), so nothing loses coverage.
+            'type' => Sales::TYPE_REGULAR,
             'sales_opportunity_id' => null,
             'warehouse_id' => Warehouse::factory(),
         ];

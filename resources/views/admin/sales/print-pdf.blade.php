@@ -135,6 +135,8 @@
                     $sales->order_discount ?? 0,
                     $sales->order_discount_type ?? 'fixed',
                     $sales->tax_rate ?? 0,
+                    $sales->tax_type ?? 'exclusive',
+                    $sales->pph_rate ?? 0
                 );
             @endphp
             @foreach($sales->salesItems as $index => $item)

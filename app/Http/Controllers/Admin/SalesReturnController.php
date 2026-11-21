@@ -6,6 +6,7 @@ use App\Helpers\SalesReturnHelper;
 use App\Http\Controllers\Controller;
 use App\Models\Sales;
 use App\Models\SalesReturn;
+use App\Rules\WholeReturnQuantities;
 use App\Services\SalesReturnService;
 use App\Services\SalesService;
 use Illuminate\Http\Request;
@@ -43,12 +44,22 @@ class SalesReturnController extends Controller
         $request->validate([
             'sales_id' => 'required|exists:sales,id',
             'return_date' => 'required|date',
-            'items' => 'required|json',
+            'items' => ['required', 'json', new WholeReturnQuantities],
             'total_amount' => 'required|numeric',
-            'status' => 'required|string',
+            // The index only ever counts Pending/Completed/Canceled, so any
+            // other string written here would sit in the table and vanish
+            // from every status tile. The allowed list lives on the model.
+            'status' => ['required', 'string', 'in:'.implode(',', SalesReturn::$statuses)],
         ]);
 
-        $this->salesReturnService->createSalesReturn($request->all());
+        // A refusal (a product not on the invoice, an empty selection) is a
+        // normal business answer: it comes back as the flash error the
+        // session partial renders, with the form's input kept, not as a 500.
+        try {
+            $this->salesReturnService->createSalesReturn($request->all());
+        } catch (\Exception $e) {
+            return back()->with('error', $e->getMessage())->withInput();
+        }
 
         return redirect()->route('admin.sales-returns.index')->with('success', 'Sales return created successfully.');
     }
@@ -58,19 +69,33 @@ class SalesReturnController extends Controller
         $request->validate([
             'sales_id' => 'required|exists:sales,id',
             'return_date' => 'required|date',
-            'items' => 'required|json',
+            'items' => ['required', 'json', new WholeReturnQuantities],
             'total_amount' => 'required|numeric',
-            'status' => 'required|string',
+            // The index only ever counts Pending/Completed/Canceled, so any
+            // other string written here would sit in the table and vanish
+            // from every status tile. The allowed list lives on the model.
+            'status' => ['required', 'string', 'in:'.implode(',', SalesReturn::$statuses)],
         ]);
 
-        $this->salesReturnService->updateSalesReturn($salesReturn, $request->all());
+        // Same contract as store(): the refusal is a flash error, not a 500.
+        try {
+            $this->salesReturnService->updateSalesReturn($salesReturn, $request->all());
+        } catch (\Exception $e) {
+            return back()->with('error', $e->getMessage())->withInput();
+        }
 
         return redirect()->route('admin.sales-returns.index')->with('success', 'Sales return updated successfully.');
     }
 
     public function destroy(SalesReturn $salesReturn)
     {
-        $this->salesReturnService->deleteSalesReturn($salesReturn);
+        try {
+            $this->salesReturnService->deleteSalesReturn($salesReturn);
+        } catch (\Exception $e) {
+            return redirect()
+                ->route('admin.sales-returns.index')
+                ->with('error', $e->getMessage());
+        }
 
         return redirect()->route('admin.sales-returns.index')->with('success', 'Sales return deleted successfully.');
     }
@@ -162,9 +187,18 @@ class SalesReturnController extends Controller
     public function bulkDelete(Request $request)
     {
         $ids = $request->input('ids');
-        $this->salesReturnService->bulkDeleteSalesReturns($ids);
+        $counts = $this->salesReturnService->bulkDeleteSalesReturns($ids);
 
-        return response()->json(['success' => true, 'message' => 'Selected sales returns have been deleted.']);
+        $message = $counts['deleted'].' sales return'.($counts['deleted'] === 1 ? '' : 's').' deleted.';
+        if ($counts['skipped'] > 0) {
+            $message .= ' '.$counts['skipped'].' skipped: returns already refunded as cash cannot be deleted.';
+        }
+
+        return response()->json([
+            'success' => true,
+            'message' => $message,
+            'counts' => $counts,
+        ]);
     }
 
     public function bulkComplete(Request $request)
@@ -213,6 +247,27 @@ class SalesReturnController extends Controller
         $this->salesReturnService->bulkCancelSalesReturns($ids);
 
         return response()->json(['success' => true, 'message' => 'Selected sales returns have been marked as canceled.']);
+    }
+
+    /**
+     * Pay a return's remaining customer credit back as cash.
+     *
+     * Full balance only: the caller cannot choose an amount, so there is no
+     * partial-refund arithmetic to disagree with the ledger.
+     */
+    public function refundCredit(SalesReturn $salesReturn)
+    {
+        try {
+            $this->salesReturnService->refundCustomerCredit($salesReturn);
+
+            return redirect()
+                ->route('admin.sales-returns.show', $salesReturn->id)
+                ->with('success', __('messages.credit_refund_success'));
+        } catch (\Exception $e) {
+            return redirect()
+                ->route('admin.sales-returns.show', $salesReturn->id)
+                ->with('error', $e->getMessage());
+        }
     }
 
     public function modalView(SalesReturn $salesReturn)

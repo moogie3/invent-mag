@@ -5,8 +5,11 @@ namespace Tests\Unit\Services;
 use App\Models\Account;
 use App\Models\CustomerCredit;
 use App\Models\JournalEntry;
+use App\Models\POItem;
 use App\Models\Product;
+use App\Models\Purchase;
 use App\Models\Sales;
+use App\Models\SalesItem;
 use App\Models\SalesReturn;
 use App\Models\SalesReturnItem;
 use App\Models\Tax;
@@ -52,6 +55,24 @@ class SalesReturnServiceTest extends TestCase
         $this->salesServiceMock = Mockery::mock(SalesService::class);
         $this->salesServiceMock->shouldReceive('updateSaleStatus')->andReturn(null)->byDefault();
         $this->salesReturnService = new SalesReturnService($this->accountingServiceMock, $this->salesServiceMock);
+    }
+
+    /**
+     * The invoice line a return is priced against: the service takes the
+     * price from the sale's own line (never from the request), so a test
+     * that returns goods has to sell them first. $price is what the
+     * invoice charged per unit.
+     */
+    private function giveSalesLine(Sales $sale, int $quantity, float $price): SalesItem
+    {
+        return $sale->salesItems()->create([
+            'product_id' => $this->product->id,
+            'quantity' => $quantity,
+            'customer_price' => $price,
+            'discount' => 0,
+            'discount_type' => 'fixed',
+            'total' => $quantity * $price,
+        ]);
     }
 
     public function test_it_can_get_sales_return_index_data()
@@ -145,6 +166,9 @@ class SalesReturnServiceTest extends TestCase
         // Create a sale that is unpaid first - the factory creates Paid status by default
         // so let's create a fresh sale for testing
         $unpaidSale = Sales::factory()->create(['status' => 'Unpaid']);
+        // The return below lands on this fresh sale, so the invoice has to
+        // carry the line it returns: 2 units at the 100 the return posts.
+        $this->giveSalesLine($unpaidSale, 2, 100);
 
         $returnData = [
             'sales_id' => $unpaidSale->id,
@@ -174,6 +198,297 @@ class SalesReturnServiceTest extends TestCase
         $this->assertEquals('Returned', $unpaidSale->status);
     }
 
+    /**
+     * The return price came from the browser and was stored as-is: a form
+     * (or a crafted request) could post any number and the return would
+     * hand the customer credit, reverse AR and reverse tax off it. The
+     * price is the invoice line's own net unit price, full stop.
+     */
+    public function test_return_lines_are_priced_off_the_invoice_not_the_request()
+    {
+        $service = app(SalesReturnService::class);
+        $this->giveSalesLine($this->sale, 5, 100);
+
+        $salesReturn = $service->createSalesReturn([
+            'sales_id' => $this->sale->id,
+            'return_date' => now()->format('Y-m-d'),
+            'status' => 'Pending',
+            'items' => json_encode([
+                ['product_id' => $this->product->id, 'returned_quantity' => 1, 'price' => 9999],
+            ]),
+        ]);
+
+        $this->assertEquals(100, $salesReturn->total_amount);
+        $this->assertEquals(100, $salesReturn->items->first()->price);
+    }
+
+    /**
+     * The invoice line's discount is part of what the customer paid: a 10%
+     * line charged 90 per unit, so a return of that line is worth 90, not
+     * the und discounted 100 the form posted.
+     */
+    public function test_return_lines_honor_the_invoice_line_discount()
+    {
+        $service = app(SalesReturnService::class);
+        $this->sale->salesItems()->create([
+            'product_id' => $this->product->id,
+            'quantity' => 5,
+            'customer_price' => 100,
+            'discount' => 10,
+            'discount_type' => 'percentage',
+            'total' => 450,
+        ]);
+
+        $salesReturn = $service->createSalesReturn([
+            'sales_id' => $this->sale->id,
+            'return_date' => now()->format('Y-m-d'),
+            'status' => 'Pending',
+            'items' => json_encode([
+                ['product_id' => $this->product->id, 'returned_quantity' => 1, 'price' => 100],
+            ]),
+        ]);
+
+        $this->assertEquals(90, $salesReturn->total_amount);
+        $this->assertEquals(90, $salesReturn->items->first()->price);
+    }
+
+    /**
+     * A product the invoice never sold has no line to price against, so the
+     * return must be refused outright rather than booked at some made-up
+     * price (or at zero).
+     */
+    public function test_returning_a_product_that_is_not_on_the_invoice_is_refused()
+    {
+        $service = app(SalesReturnService::class);
+
+        $refused = null;
+        try {
+            $service->createSalesReturn([
+                'sales_id' => $this->sale->id,
+                'return_date' => now()->format('Y-m-d'),
+                'status' => 'Pending',
+                'items' => json_encode([
+                    ['product_id' => $this->product->id, 'returned_quantity' => 1, 'price' => 100],
+                ]),
+            ]);
+        } catch (\Exception $e) {
+            $refused = $e->getMessage();
+        }
+
+        $this->assertNotNull($refused, 'A product not on the invoice must not be returnable.');
+        $this->assertStringContainsString('not on invoice', $refused);
+        $this->assertDatabaseMissing('sales_returns', ['sales_id' => $this->sale->id]);
+        $this->assertEquals(
+            100,
+            $this->product->fresh()->stock_quantity,
+            'A refused return must not move stock.'
+        );
+    }
+
+    /**
+     * Nothing on the server refused a return larger than the sale ever
+     * sold: the stock record gained units that never existed, the sale
+     * flipped to Returned and the journal reversed more revenue than the
+     * sale booked. The cap counts every live (non-Canceled) return against
+     * the invoice's own quantity, the same contract the purchase side
+     * already honours.
+     */
+    public function test_create_refuses_a_return_larger_than_the_sale_still_owes()
+    {
+        $this->giveSalesLine($this->sale, 10, 50);
+
+        // Count postings in the test body rather than with a Mockery count
+        // expectation: an unmet count throws during teardown, before
+        // RefreshDatabase rolls its transaction back, and poisons every
+        // test that follows. The mock method is typed, so it must return a
+        // JournalEntry.
+        $journalPostings = 0;
+        $this->accountingServiceMock->shouldReceive('createJournalEntry')
+            ->andReturnUsing(function () use (&$journalPostings) {
+                $journalPostings++;
+
+                return Mockery::mock(JournalEntry::class);
+            });
+
+        $refused = null;
+        try {
+            $this->salesReturnService->createSalesReturn([
+                'sales_id' => $this->sale->id,
+                'return_date' => now()->format('Y-m-d'),
+                'status' => 'Pending',
+                'items' => json_encode([
+                    ['product_id' => $this->product->id, 'returned_quantity' => 11],
+                ]),
+            ]);
+        } catch (\Exception $e) {
+            $refused = $e->getMessage();
+        }
+
+        $this->assertNotNull($refused, 'A return larger than the sale sold must be refused.');
+        $this->assertStringContainsString('only 10 of the 10 sold units can still be returned', $refused);
+        $this->assertDatabaseMissing('sales_returns', ['sales_id' => $this->sale->id]);
+        $this->assertEquals(100, $this->product->fresh()->stock_quantity);
+
+        // Fill 6 of the 10 (the one legitimate journal entry)...
+        $this->salesReturnService->createSalesReturn([
+            'sales_id' => $this->sale->id,
+            'return_date' => now()->format('Y-m-d'),
+            'status' => 'Pending',
+            'items' => json_encode([
+                ['product_id' => $this->product->id, 'returned_quantity' => 6],
+            ]),
+        ]);
+        $this->assertEquals(106, $this->product->fresh()->stock_quantity);
+
+        // ...then a second live return of 5: it fits on its own, but 6 live
+        // + 5 exceeds the 10 sold, so it has to be refused too.
+        $refused = null;
+        try {
+            $this->salesReturnService->createSalesReturn([
+                'sales_id' => $this->sale->id,
+                'return_date' => now()->format('Y-m-d'),
+                'status' => 'Pending',
+                'items' => json_encode([
+                    ['product_id' => $this->product->id, 'returned_quantity' => 5],
+                ]),
+            ]);
+        } catch (\Exception $e) {
+            $refused = $e->getMessage();
+        }
+
+        $this->assertNotNull($refused, 'Live returns together must not exceed the sale sold.');
+        $this->assertStringContainsString('only 4 of the 10 sold units can still be returned', $refused);
+        $this->assertEquals(1, SalesReturn::where('sales_id', $this->sale->id)->count());
+        $this->assertEquals(106, $this->product->fresh()->stock_quantity);
+        // Neither refusal may have posted a journal entry.
+        $this->assertEquals(1, $journalPostings);
+    }
+
+    /**
+     * An edit is checked against the OTHER live returns: filling the
+     * invoice's remaining quantity is legitimate (the return's own old
+     * units must not count against it), while an edit that pushes the live
+     * total past what was sold must be refused before stock and the
+     * journal move.
+     */
+    public function test_update_refuses_when_other_live_returns_leave_less_than_requested()
+    {
+        $this->giveSalesLine($this->sale, 10, 50);
+
+        // Same teardown-safe counting as the create-cap proof: three
+        // legitimate postings (create A, edit A, create B), and the refused
+        // edit must add no fourth.
+        $journalPostings = 0;
+        $this->accountingServiceMock->shouldReceive('createJournalEntry')
+            ->andReturnUsing(function () use (&$journalPostings) {
+                $journalPostings++;
+
+                return Mockery::mock(JournalEntry::class);
+            });
+
+        $a = $this->salesReturnService->createSalesReturn([
+            'sales_id' => $this->sale->id,
+            'return_date' => now()->format('Y-m-d'),
+            'status' => 'Pending',
+            'items' => json_encode([
+                ['product_id' => $this->product->id, 'returned_quantity' => 6],
+            ]),
+        ]);
+        $this->assertEquals(106, $this->product->fresh()->stock_quantity);
+
+        // A edits itself up to 9: its own 6 live units are excluded from
+        // its own check, and 9 of 10 sold is inside the cap.
+        $this->salesReturnService->updateSalesReturn($a, [
+            'return_date' => now()->format('Y-m-d'),
+            'status' => 'Pending',
+            'items' => json_encode([
+                ['product_id' => $this->product->id, 'returned_quantity' => 9],
+            ]),
+        ]);
+        $this->assertEquals(9, $a->fresh()->items->sum('quantity'));
+        $this->assertEquals(109, $this->product->fresh()->stock_quantity);
+
+        // B takes the last unit: 9 + 1 = 10 of 10.
+        $this->salesReturnService->createSalesReturn([
+            'sales_id' => $this->sale->id,
+            'return_date' => now()->format('Y-m-d'),
+            'status' => 'Pending',
+            'items' => json_encode([
+                ['product_id' => $this->product->id, 'returned_quantity' => 1],
+            ]),
+        ]);
+        $this->assertEquals(110, $this->product->fresh()->stock_quantity);
+
+        // With B live, A may no longer be edited up to 10: A's 10 plus B's
+        // 1 exceeds the 10 sold.
+        $refused = null;
+        try {
+            $this->salesReturnService->updateSalesReturn($a, [
+                'return_date' => now()->format('Y-m-d'),
+                'status' => 'Pending',
+                'items' => json_encode([
+                    ['product_id' => $this->product->id, 'returned_quantity' => 10],
+                ]),
+            ]);
+        } catch (\Exception $e) {
+            $refused = $e->getMessage();
+        }
+
+        $this->assertNotNull($refused, 'An edit that pushes live returns past the sold quantity must be refused.');
+        // What A may still set itself to: 10 sold - B's 1 live unit = 9.
+        $this->assertStringContainsString('only 9 of the 10 sold units can still be returned', $refused);
+        $this->assertEquals(9, $a->fresh()->items->sum('quantity'));
+        $this->assertEquals(110, $this->product->fresh()->stock_quantity);
+        // The refused edit must not have posted a journal entry either.
+        $this->assertEquals(3, $journalPostings);
+    }
+
+    /**
+     * The invoice line is the source of truth for the product too, exactly
+     * as it already is for the price: a request that names one line by
+     * sales_item_id but a different product_id must not price off this line
+     * while moving stock for the other product. The item takes the matched
+     * line's product.
+     */
+    public function test_a_return_line_takes_the_matched_lines_product_not_the_request()
+    {
+        $service = app(SalesReturnService::class);
+        $mainLine = $this->giveSalesLine($this->sale, 5, 100);
+
+        $otherProduct = Product::factory()->withStock(50)->create();
+        $this->sale->salesItems()->create([
+            'product_id' => $otherProduct->id,
+            'quantity' => 5,
+            'customer_price' => 10,
+            'discount' => 0,
+            'discount_type' => 'fixed',
+            'total' => 50,
+        ]);
+
+        $salesReturn = $service->createSalesReturn([
+            'sales_id' => $this->sale->id,
+            'return_date' => now()->format('Y-m-d'),
+            'status' => 'Pending',
+            'items' => json_encode([
+                ['sales_item_id' => $mainLine->id, 'product_id' => $otherProduct->id, 'returned_quantity' => 1],
+            ]),
+        ]);
+
+        $item = $salesReturn->items->first();
+        $this->assertEquals(
+            $this->product->id,
+            $item->product_id,
+            'The item must take the matched line\'s product, not the request\'s product_id.'
+        );
+        $this->assertEquals(100, $item->price);
+        $this->assertEquals(
+            50,
+            $otherProduct->fresh()->stock_quantity,
+            'The other product\'s stock must not move for a line that did not name it.'
+        );
+        $this->assertEquals(101, $this->product->fresh()->stock_quantity);
+    }
+
     public function test_create_sales_return_throws_exception_for_no_items()
     {
         $this->expectException(\Exception::class);
@@ -193,14 +508,9 @@ class SalesReturnServiceTest extends TestCase
 
     public function test_it_can_update_a_sales_return()
     {
-        $this->sale->salesItems()->create([
-            'product_id' => $this->product->id,
-            'quantity' => 5,
-            'price' => 100,
-            'customer_price' => 100,
-            'discount' => 0,
-            'total' => 500,
-        ]);
+        // The invoice sold at 50: the edit below returns 3 units, and the
+        // service prices them off this line rather than off the request.
+        $this->giveSalesLine($this->sale, 5, 50);
 
         $salesReturn = SalesReturn::factory()->create([
             'sales_id' => $this->sale->id,
@@ -538,6 +848,123 @@ class SalesReturnServiceTest extends TestCase
         $this->assertEquals(60.0, $bookedCogs);
     }
 
+    /**
+     * A return puts goods back on the shelf, so it must put their COST
+     * back in the ledger. Prorating the sale's booked COGS by value
+     * instead prices the units at their selling share: a sale that booked
+     * 120 of COGS for two units the shelf holds at 30 each must see 30
+     * reversed when one unit comes back, not half of 120.
+     */
+    public function test_reversal_values_returned_stock_at_its_cost_not_a_share_of_the_sale_cogs()
+    {
+        $settings = $this->tenant->accounting_settings;
+
+        $this->sale->update(['total' => 200]);
+        $this->sale->salesItems()->create([
+            'product_id' => $this->product->id,
+            'quantity' => 2,
+            'price' => 100,
+            'customer_price' => 100,
+            'discount' => 0,
+            'total' => 200,
+        ]);
+
+        // The sale's journal: COGS 120 for the two units (60 each), the
+        // figure a value-ratio proration would slice in half.
+        $originalJournal = JournalEntry::create([
+            'date' => now(),
+            'description' => 'Sale Invoice #'.$this->sale->invoice,
+            'sourceable_id' => $this->sale->id,
+            'sourceable_type' => Sales::class,
+            'status' => 'posted',
+        ]);
+        $originalJournal->transactions()->create([
+            'account_id' => $settings['accounts_receivable_account_id'],
+            'type' => 'debit',
+            'amount' => 200.0,
+        ]);
+        $originalJournal->transactions()->create([
+            'account_id' => $settings['sales_revenue_account_id'],
+            'type' => 'credit',
+            'amount' => 200.0,
+        ]);
+        $originalJournal->transactions()->create([
+            'account_id' => $settings['cost_of_goods_sold_account_id'],
+            'type' => 'debit',
+            'amount' => 120.0,
+        ]);
+        $originalJournal->transactions()->create([
+            'account_id' => $settings['inventory_account_id'],
+            'type' => 'credit',
+            'amount' => 120.0,
+        ]);
+
+        // The shelf: the units sit in a batch that cost 30 each, capitalised
+        // exactly (no order discount, no tax), so the batch cost is 30.
+        $po = Purchase::factory()->create([
+            'discount_total' => 0,
+            'discount_total_type' => 'fixed',
+            'tax_rate' => 0,
+            'tax_type' => 'none',
+        ]);
+        POItem::factory()->create([
+            'po_id' => $po->id,
+            'product_id' => $this->product->id,
+            'quantity' => 10,
+            'remaining_quantity' => 10,
+            'price' => 30,
+            'total' => 300,
+            'discount' => 0,
+            'discount_type' => 'fixed',
+            'expiry_date' => now()->addDays(40),
+        ]);
+
+        $captured = [];
+        $this->accountingServiceMock
+            ->shouldReceive('createJournalEntry')
+            ->once()
+            ->with(
+                Mockery::any(),
+                Mockery::any(),
+                Mockery::on(function ($transactions) use (&$captured) {
+                    $captured[] = $transactions;
+
+                    return true;
+                }),
+                Mockery::any()
+            );
+
+        $this->salesReturnService->createSalesReturn([
+            'sales_id' => $this->sale->id,
+            'return_date' => Carbon::now()->format('Y-m-d'),
+            'reason' => 'One of the two units came back',
+            'status' => 'Completed',
+            'items' => json_encode([
+                ['product_id' => $this->product->id, 'returned_quantity' => 1, 'price' => 100],
+            ]),
+        ]);
+
+        $this->assertCount(1, $captured);
+
+        // What the journal BOOKED...
+        $this->assertEquals(
+            30.0,
+            $this->sumTransactions($captured[0], Account::find($settings['cost_of_goods_sold_account_id'])->name, 'credit'),
+            'The returned unit must reverse at the 30 it cost, not at half the sale\'s 120 COGS.'
+        );
+        $this->assertEquals(
+            30.0,
+            $this->sumTransactions($captured[0], Account::find($settings['inventory_account_id'])->name, 'debit'),
+            'Inventory must be restored to the shelf value of the returned unit.'
+        );
+
+        // ...must equal what the screens derive from the same code path.
+        $derived = $this->salesReturnService->deriveReversal($this->sale, 100.0, [
+            ['product_id' => $this->product->id, 'returned_quantity' => 1],
+        ]);
+        $this->assertEquals(30.0, $derived['cogs']);
+    }
+
     /** Sum transaction amounts matching an account name and direction. */
     private function sumTransactions(array $transactions, string $accountName, string $type): float
     {
@@ -620,6 +1047,7 @@ class SalesReturnServiceTest extends TestCase
     public function test_update_re_journals_the_gl_with_the_new_total()
     {
         $service = app(SalesReturnService::class);
+        $this->giveSalesLine($this->sale, 5, 50);
 
         // Create: 2 × 50 = 100 → one posted entry, AR credited 100.
         $salesReturn = $service->createSalesReturn([
@@ -663,6 +1091,7 @@ class SalesReturnServiceTest extends TestCase
     public function test_a_second_edit_does_not_reverse_the_same_entry_twice()
     {
         $service = app(SalesReturnService::class);
+        $this->giveSalesLine($this->sale, 5, 50);
 
         $salesReturn = $service->createSalesReturn([
             'sales_id' => $this->sale->id,
@@ -711,6 +1140,7 @@ class SalesReturnServiceTest extends TestCase
     public function test_editing_status_to_canceled_reverses_without_reposting_then_reopens()
     {
         $service = app(SalesReturnService::class);
+        $this->giveSalesLine($this->sale, 5, 50);
         $stockBefore = $this->product->fresh()->stock_quantity;
 
         $salesReturn = $service->createSalesReturn([
@@ -755,7 +1185,10 @@ class SalesReturnServiceTest extends TestCase
         ]);
 
         $this->assertEquals(1, JournalEntry::where('reversed_entry_id', $firstEntryId)->count());
-        $this->assertEqualsWithDelta(-70.0, $this->netAccountsReceivableEffect($salesReturn), 0.001);
+        // The invoice sold at 50 (giveSalesLine above), so the reopened
+        // single unit books 50 regardless of the 70 the form posted: the
+        // price comes from the invoice line, never from the request.
+        $this->assertEqualsWithDelta(-50.0, $this->netAccountsReceivableEffect($salesReturn), 0.001);
         // The reopened return holds exactly its new 1 unit: nothing was
         // handed back for the canceled state it came from, because a canceled
         // return held nothing to hand back.
@@ -765,6 +1198,7 @@ class SalesReturnServiceTest extends TestCase
     public function test_editing_a_completed_return_to_canceled_cancels_its_credit()
     {
         $service = app(SalesReturnService::class);
+        $this->giveSalesLine($this->sale, 5, 60);
 
         // A paid sale: only a paid invoice's return issues a credit.
         $this->sale->update(['total' => 200]);
@@ -829,9 +1263,373 @@ class SalesReturnServiceTest extends TestCase
         );
     }
 
+    /**
+     * The credit is what the customer actually paid, not just the net line:
+     * an exclusive-tax invoice was settled gross (net + PPN), so the credit
+     * for a returned line has to restore the gross too. Issuing only the
+     * net short-changed the customer by the tax on every credited return.
+     */
+    public function test_the_credit_covers_what_the_customer_actually_paid()
+    {
+        $service = app(SalesReturnService::class);
+
+        $tax = Tax::create([
+            'name' => 'PPN 11%',
+            'rate' => 11,
+            'type' => 'exclusive',
+            'is_active' => true,
+        ]);
+        $this->sale->update([
+            'tax_id' => $tax->id,
+            'tax_rate' => 11,
+            'tax_type' => 'exclusive',
+            'total' => 100,
+        ]);
+        $this->sale->payments()->create([
+            'amount' => 100,
+            'payment_date' => now()->toDateString(),
+            'payment_method' => 'Cash',
+        ]);
+        $this->giveSalesLine($this->sale, 5, 100);
+
+        $salesReturn = $service->createSalesReturn([
+            'sales_id' => $this->sale->id,
+            'return_date' => now()->format('Y-m-d'),
+            'status' => 'Completed',
+            'items' => json_encode([
+                ['product_id' => $this->product->id, 'returned_quantity' => 1, 'price' => 100],
+            ]),
+        ]);
+
+        // 100 net + 11 PPN = 111: the gross the customer parted with.
+        $this->assertDatabaseHas('customer_credits', [
+            'sales_return_id' => $salesReturn->id,
+            'amount' => 111,
+            'available_amount' => 111,
+        ]);
+    }
+
+    /**
+     * PPh is withheld at the source: the customer never handed that part
+     * over, so it cannot come back as credit. The withheld share is the
+     * sale's PPh snapshot prorated by the same net-base ratio the return
+     * journal reverses with (return 100 of a 1000-revenue invoice = 10%,
+     * snapshot 80 -> 8 withheld).
+     */
+    public function test_the_credit_subtracts_the_withheld_pph()
+    {
+        $service = app(SalesReturnService::class);
+
+        $this->sale->update([
+            'pph_enabled' => true,
+            'pph_rate' => 8.0,
+            'pph_amount' => 80.0,
+            'total' => 100,
+        ]);
+        $this->sale->payments()->create([
+            'amount' => 100,
+            'payment_date' => now()->toDateString(),
+            'payment_method' => 'Cash',
+        ]);
+        $this->giveSalesLine($this->sale, 5, 100);
+
+        // The sale's posted journal: revenue credit 1000 (the net base the
+        // ratio prorates from) and its COGS leg.
+        $settings = $this->tenant->accounting_settings;
+        $journal = JournalEntry::create([
+            'date' => now(),
+            'description' => 'Sale Invoice #'.$this->sale->invoice,
+            'sourceable_id' => $this->sale->id,
+            'sourceable_type' => Sales::class,
+            'status' => 'posted',
+        ]);
+        $journal->transactions()->create([
+            'account_id' => $settings['sales_revenue_account_id'],
+            'type' => 'credit',
+            'amount' => 1000,
+        ]);
+        $journal->transactions()->create([
+            'account_id' => $settings['cost_of_goods_sold_account_id'],
+            'type' => 'debit',
+            'amount' => 600,
+        ]);
+
+        $salesReturn = $service->createSalesReturn([
+            'sales_id' => $this->sale->id,
+            'return_date' => now()->format('Y-m-d'),
+            'status' => 'Completed',
+            'items' => json_encode([
+                ['product_id' => $this->product->id, 'returned_quantity' => 1, 'price' => 100],
+            ]),
+        ]);
+
+        // 100 - 8 = 92: the net the customer paid, minus the withheld share.
+        $this->assertDatabaseHas('customer_credits', [
+            'sales_return_id' => $salesReturn->id,
+            'amount' => 92,
+            'available_amount' => 92,
+        ]);
+    }
+
+    public function test_refunding_credit_books_cash_out_and_empties_the_credit()
+    {
+        $service = app(SalesReturnService::class);
+        $this->giveSalesLine($this->sale, 5, 50);
+
+        $this->sale->update(['total' => 200]);
+        $this->sale->payments()->create([
+            'amount' => 200,
+            'payment_date' => now()->toDateString(),
+            'payment_method' => 'Cash',
+        ]);
+
+        $salesReturn = $service->createSalesReturn([
+            'sales_id' => $this->sale->id,
+            'return_date' => now()->format('Y-m-d'),
+            'status' => 'Completed',
+            'items' => json_encode([
+                ['product_id' => $this->product->id, 'returned_quantity' => 2, 'price' => 50],
+            ]),
+        ]);
+
+        $creditId = $salesReturn->fresh()->customer_credit_id;
+        $this->assertNotNull($creditId);
+
+        // The return itself has already credited AR, so the customer is owed
+        // 100. That is the balance the refund pays back out.
+        $this->assertEqualsWithDelta(-100.0, $this->netAccountsReceivableEffect($salesReturn), 0.001);
+
+        $service->refundCustomerCredit($salesReturn->fresh());
+
+        // Sourced to the credit: a return edit or delete reverses everything
+        // sourced to the return, and must not be able to undo this cash-out.
+        $refundEntry = JournalEntry::where('sourceable_type', CustomerCredit::class)
+            ->where('sourceable_id', $creditId)
+            ->where('description', 'like', 'Customer Credit Refund%')
+            ->first();
+
+        $this->assertNotNull($refundEntry, 'A refund must post its own journal entry.');
+
+        $arId = $this->tenant->accounting_settings['accounts_receivable_account_id'];
+        $cashId = $this->tenant->accounting_settings['cash_account_id'];
+
+        $byAccount = $refundEntry->transactions->keyBy('account_id');
+        $this->assertEquals('debit', $byAccount[$arId]->type, 'Refund must debit Accounts Receivable.');
+        $this->assertEquals('credit', $byAccount[$cashId]->type, 'Refund must credit Cash.');
+        $this->assertEqualsWithDelta(100.0, (float) $byAccount[$arId]->amount, 0.001);
+
+        // The return credited AR 100 and the refund debits it back: the
+        // customer's balance is settled, not still owed.
+        $this->assertEqualsWithDelta(0.0, $this->netReceivableAcrossReturnAndRefund($salesReturn, $creditId), 0.001);
+
+        // The credit must leave the spendable pool in the same breath as the
+        // cash moves, or it stays refundable a second time.
+        $this->assertDatabaseHas('customer_credits', [
+            'id' => $creditId,
+            'status' => 'refunded',
+            'available_amount' => 0,
+        ]);
+    }
+
+    public function test_refunding_an_already_refunded_credit_is_refused()
+    {
+        $service = app(SalesReturnService::class);
+        $this->giveSalesLine($this->sale, 5, 50);
+
+        $this->sale->update(['total' => 200]);
+        $this->sale->payments()->create([
+            'amount' => 200,
+            'payment_date' => now()->toDateString(),
+            'payment_method' => 'Cash',
+        ]);
+
+        $salesReturn = $service->createSalesReturn([
+            'sales_id' => $this->sale->id,
+            'return_date' => now()->format('Y-m-d'),
+            'status' => 'Completed',
+            'items' => json_encode([
+                ['product_id' => $this->product->id, 'returned_quantity' => 2, 'price' => 50],
+            ]),
+        ]);
+
+        $creditId = $salesReturn->fresh()->customer_credit_id;
+        $this->assertNotNull($creditId);
+
+        $service->refundCustomerCredit($salesReturn->fresh());
+
+        $refundCount = JournalEntry::where('sourceable_type', CustomerCredit::class)
+            ->where('sourceable_id', $creditId)
+            ->where('description', 'like', 'Customer Credit Refund%')
+            ->count();
+        $this->assertEquals(1, $refundCount);
+
+        // A second refund would pay the same money out twice.
+        try {
+            $service->refundCustomerCredit($salesReturn->fresh());
+            $this->fail('Refunding a refunded credit must be refused.');
+        } catch (\Exception $e) {
+            $this->assertStringContainsString('no longer active', $e->getMessage());
+        }
+
+        $this->assertEquals(
+            1,
+            JournalEntry::where('sourceable_type', CustomerCredit::class)
+                ->where('sourceable_id', $creditId)
+                ->where('description', 'like', 'Customer Credit Refund%')
+                ->count(),
+            'The refused attempt must not have posted a second cash-out entry.'
+        );
+    }
+
+    public function test_refunding_a_credit_with_no_balance_is_refused()
+    {
+        $service = app(SalesReturnService::class);
+        $this->giveSalesLine($this->sale, 5, 50);
+
+        $this->sale->update(['total' => 200]);
+        $this->sale->payments()->create([
+            'amount' => 200,
+            'payment_date' => now()->toDateString(),
+            'payment_method' => 'Cash',
+        ]);
+
+        $salesReturn = $service->createSalesReturn([
+            'sales_id' => $this->sale->id,
+            'return_date' => now()->format('Y-m-d'),
+            'status' => 'Completed',
+            'items' => json_encode([
+                ['product_id' => $this->product->id, 'returned_quantity' => 2, 'price' => 50],
+            ]),
+        ]);
+
+        // Everything already consumed against an invoice leaves nothing to
+        // pay out.
+        CustomerCredit::where('id', $salesReturn->fresh()->customer_credit_id)->update([
+            'used_amount' => 100,
+            'available_amount' => 0,
+        ]);
+
+        try {
+            $service->refundCustomerCredit($salesReturn->fresh());
+            $this->fail('Refunding an empty credit must be refused.');
+        } catch (\Exception $e) {
+            $this->assertStringContainsString('no credit balance left', $e->getMessage());
+        }
+
+        $this->assertEquals(
+            0,
+            JournalEntry::where('sourceable_type', CustomerCredit::class)
+                ->where('sourceable_id', $salesReturn->fresh()->customer_credit_id)
+                ->where('description', 'like', 'Customer Credit Refund%')
+                ->count(),
+            'A refused refund must not post any cash-out entry.'
+        );
+    }
+
+    public function test_a_refunded_return_cannot_be_deleted()
+    {
+        $service = app(SalesReturnService::class);
+        $this->giveSalesLine($this->sale, 5, 50);
+
+        $this->sale->update(['total' => 200]);
+        $this->sale->payments()->create([
+            'amount' => 200,
+            'payment_date' => now()->toDateString(),
+            'payment_method' => 'Cash',
+        ]);
+
+        $salesReturn = $service->createSalesReturn([
+            'sales_id' => $this->sale->id,
+            'return_date' => now()->format('Y-m-d'),
+            'status' => 'Completed',
+            'items' => json_encode([
+                ['product_id' => $this->product->id, 'returned_quantity' => 2, 'price' => 50],
+            ]),
+        ]);
+
+        $creditId = $salesReturn->fresh()->customer_credit_id;
+        $service->refundCustomerCredit($salesReturn->fresh());
+
+        try {
+            $service->deleteSalesReturn($salesReturn->fresh());
+            $this->fail('A refunded return must not be deletable.');
+        } catch (\Exception $e) {
+            $this->assertStringContainsString('already been refunded', $e->getMessage());
+        }
+
+        // The return, its credit and the cash-out entry all survive, so the
+        // ledger still shows the money that actually left.
+        $this->assertDatabaseHas('sales_returns', ['id' => $salesReturn->id]);
+        $this->assertDatabaseHas('customer_credits', ['id' => $creditId, 'status' => 'refunded']);
+        $this->assertEquals(
+            1,
+            JournalEntry::where('sourceable_type', CustomerCredit::class)
+                ->where('sourceable_id', $creditId)
+                ->where('description', 'like', 'Customer Credit Refund%')
+                ->count()
+        );
+    }
+
+    public function test_editing_a_return_does_not_undo_or_resurrect_a_refunded_credit()
+    {
+        $service = app(SalesReturnService::class);
+        $this->giveSalesLine($this->sale, 5, 50);
+
+        $this->sale->update(['total' => 200]);
+        $this->sale->payments()->create([
+            'amount' => 200,
+            'payment_date' => now()->toDateString(),
+            'payment_method' => 'Cash',
+        ]);
+
+        $salesReturn = $service->createSalesReturn([
+            'sales_id' => $this->sale->id,
+            'return_date' => now()->format('Y-m-d'),
+            'status' => 'Completed',
+            'items' => json_encode([
+                ['product_id' => $this->product->id, 'returned_quantity' => 2, 'price' => 50],
+            ]),
+        ]);
+
+        $creditId = $salesReturn->fresh()->customer_credit_id;
+        $service->refundCustomerCredit($salesReturn->fresh());
+
+        $refundEntryId = JournalEntry::where('sourceable_type', CustomerCredit::class)
+            ->where('sourceable_id', $creditId)
+            ->where('description', 'like', 'Customer Credit Refund%')
+            ->value('id');
+        $this->assertNotNull($refundEntryId);
+
+        // Re-journal the return with a different total.
+        $service->updateSalesReturn($salesReturn->fresh(), [
+            'return_date' => now()->format('Y-m-d'),
+            'status' => 'Completed',
+            'items' => json_encode([
+                ['product_id' => $this->product->id, 'returned_quantity' => 2, 'price' => 60],
+            ]),
+        ]);
+
+        // The cash-out entry is sourced to the credit, so the return's
+        // re-journal sweep must not have reversed it.
+        $refundEntry = JournalEntry::find($refundEntryId);
+        $this->assertNull(
+            $refundEntry->reversed_entry_id,
+            'Editing the return must not reverse a refund that already paid out cash.'
+        );
+
+        // And the credit must stay spent rather than springing back to life
+        // as spendable balance.
+        $this->assertDatabaseHas('customer_credits', [
+            'id' => $creditId,
+            'status' => 'refunded',
+            'available_amount' => 0,
+        ]);
+    }
+
     public function test_delete_after_edit_does_not_reverse_the_original_entry_twice()
     {
         $service = app(SalesReturnService::class);
+        $this->giveSalesLine($this->sale, 5, 50);
 
         $salesReturn = $service->createSalesReturn([
             'sales_id' => $this->sale->id,
@@ -867,6 +1665,7 @@ class SalesReturnServiceTest extends TestCase
     public function test_completing_a_return_does_not_book_the_entry_create_already_posted()
     {
         $service = app(SalesReturnService::class);
+        $this->giveSalesLine($this->sale, 5, 50);
 
         $salesReturn = $service->createSalesReturn([
             'sales_id' => $this->sale->id,
@@ -902,6 +1701,7 @@ class SalesReturnServiceTest extends TestCase
     public function test_canceling_a_pending_return_reverts_the_stock_and_the_journal()
     {
         $service = app(SalesReturnService::class);
+        $this->giveSalesLine($this->sale, 5, 50);
         $stockBefore = $this->product->fresh()->stock_quantity;
 
         // Created Pending: the stock is already in and the journal already
@@ -947,6 +1747,7 @@ class SalesReturnServiceTest extends TestCase
     public function test_completing_a_canceled_return_is_refused_and_creates_no_credit()
     {
         $service = app(SalesReturnService::class);
+        $this->giveSalesLine($this->sale, 5, 50);
         $stockBefore = $this->product->fresh()->stock_quantity;
 
         $salesReturn = $service->createSalesReturn([
@@ -981,6 +1782,7 @@ class SalesReturnServiceTest extends TestCase
     public function test_bulk_complete_skips_canceled_rows_and_counts_them()
     {
         $service = app(SalesReturnService::class);
+        $this->giveSalesLine($this->sale, 5, 50);
 
         $live = $service->createSalesReturn([
             'sales_id' => $this->sale->id,
@@ -1011,6 +1813,7 @@ class SalesReturnServiceTest extends TestCase
     public function test_deleting_a_canceled_return_does_not_move_the_stock_a_second_time()
     {
         $service = app(SalesReturnService::class);
+        $this->giveSalesLine($this->sale, 5, 50);
         $stockBefore = $this->product->fresh()->stock_quantity;
 
         $salesReturn = $service->createSalesReturn([
@@ -1036,6 +1839,7 @@ class SalesReturnServiceTest extends TestCase
     public function test_creating_a_return_born_canceled_moves_no_stock_and_posts_no_journal()
     {
         $service = app(SalesReturnService::class);
+        $this->giveSalesLine($this->sale, 5, 50);
         $stockBefore = $this->product->fresh()->stock_quantity;
 
         $salesReturn = $service->createSalesReturn([
@@ -1119,6 +1923,71 @@ class SalesReturnServiceTest extends TestCase
     }
 
     /**
+     * Audit F6: both directions walk PO lines in one fixed FEFO order
+     * (earliest expiry, then oldest line, then id). The sales increment side
+     * used to walk in reverse while cancel walked forwards, so a
+     * create/cancel round trip refilled a different line than it drained.
+     *
+     * This test does reproduce the old bug: against the previous
+     * reverse-ordered increment the near line ends at 7 instead of 10, so it
+     * fails rather than passing by luck. The far-expiring line is created
+     * first so insertion order could not mask the difference either.
+     */
+    public function test_po_lines_are_walked_in_expiry_order_by_both_directions()
+    {
+        $service = app(SalesReturnService::class);
+        $this->giveSalesLine($this->sale, 20, 50);
+
+        $farExpiry = POItem::factory()->create([
+            'product_id' => $this->product->id,
+            'quantity' => 10,
+            'remaining_quantity' => 5,
+            'expiry_date' => now()->addDays(40),
+        ]);
+        $nearExpiry = POItem::factory()->create([
+            'product_id' => $this->product->id,
+            'quantity' => 10,
+            'remaining_quantity' => 0,
+            'expiry_date' => now()->addDays(10),
+        ]);
+
+        $salesReturn = $service->createSalesReturn([
+            'sales_id' => $this->sale->id,
+            'return_date' => now()->format('Y-m-d'),
+            'status' => 'Pending',
+            'items' => json_encode([
+                ['product_id' => $this->product->id, 'returned_quantity' => 12, 'price' => 50],
+            ]),
+        ]);
+
+        // A sales return hands quantity back to the PO lines. The near line
+        // has room for 10 of the 12, so it fills; the far line takes the
+        // other 2 and lands on 7.
+        $this->assertEquals(
+            10,
+            (int) $nearExpiry->fresh()->remaining_quantity,
+            'The nearest expiry must be refilled first.'
+        );
+        $this->assertEquals(7, (int) $farExpiry->fresh()->remaining_quantity);
+
+        $service->cancelSalesReturn($salesReturn);
+
+        // Cancel drains in the same order, so both lines land back where the
+        // round trip started instead of trading quantities with each other.
+        $this->assertEquals(
+            0,
+            (int) $nearExpiry->fresh()->remaining_quantity,
+            'Cancel must drain the line the create refilled.'
+        );
+        $this->assertEquals(5, (int) $farExpiry->fresh()->remaining_quantity);
+        $this->assertEquals(
+            5,
+            (int) POItem::whereIn('id', [$nearExpiry->id, $farExpiry->id])->sum('remaining_quantity'),
+            'A canceled return must leave the PO lines exactly as it found them.'
+        );
+    }
+
+    /**
      * Net debit/credit effect on Accounts Receivable from everything
      * journaled against this return: the sourceable entries plus their
      * reversals (reversal entries carry no sourceable themselves). A sales
@@ -1130,6 +1999,32 @@ class SalesReturnServiceTest extends TestCase
             ->where('sourceable_id', $salesReturn->id)
             ->pluck('id');
 
+        $reversalIds = JournalEntry::whereIn('reversed_entry_id', $entryIds)->pluck('id');
+
+        $accountsReceivableId = $this->tenant->accounting_settings['accounts_receivable_account_id'];
+
+        return (float) Transaction::whereIn('journal_entry_id', $entryIds->merge($reversalIds))
+            ->where('account_id', $accountsReceivableId)
+            ->selectRaw("SUM(CASE WHEN type = 'debit' THEN amount ELSE -amount END) AS net")
+            ->value('net');
+    }
+
+    /**
+     * The customer's real receivable position: what the return booked plus
+     * what its cash refund took back out. The refund is sourced to the credit
+     * rather than the return, so the helper above cannot see it on its own.
+     */
+    private function netReceivableAcrossReturnAndRefund(SalesReturn $salesReturn, int $creditId): float
+    {
+        $returnIds = JournalEntry::where('sourceable_type', SalesReturn::class)
+            ->where('sourceable_id', $salesReturn->id)
+            ->pluck('id');
+
+        $refundIds = JournalEntry::where('sourceable_type', CustomerCredit::class)
+            ->where('sourceable_id', $creditId)
+            ->pluck('id');
+
+        $entryIds = $returnIds->merge($refundIds);
         $reversalIds = JournalEntry::whereIn('reversed_entry_id', $entryIds)->pluck('id');
 
         $accountsReceivableId = $this->tenant->accounting_settings['accounts_receivable_account_id'];

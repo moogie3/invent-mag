@@ -30,15 +30,6 @@ class TaxServiceTest extends TestCase
     }
 
     #[Test]
-    public function it_can_get_tax_data()
-    {
-        Tax::factory()->create(['is_active' => true]);
-        $taxes = $this->taxService->getAllActive();
-        $this->assertNotEmpty($taxes);
-        $this->assertInstanceOf(Tax::class, $taxes->first());
-    }
-
-    #[Test]
     public function it_can_update_tax_settings()
     {
         $tax = Tax::factory()->create();
@@ -82,5 +73,71 @@ class TaxServiceTest extends TestCase
             'is_active' => true,
         ]);
         $this->assertInstanceOf(Tax::class, $tax);
+    }
+
+    #[Test]
+    public function it_resolves_one_ordered_default_for_every_document()
+    {
+        // No flagged default at all: the answer has to be the OLDEST active
+        // tax, not whichever row the database happened to hand back first.
+        Tax::factory()->create(['name' => 'First', 'is_active' => true, 'is_default' => false]);
+        Tax::factory()->create(['name' => 'Second', 'is_active' => true, 'is_default' => false]);
+        $third = Tax::factory()->create(['name' => 'Third', 'is_active' => true, 'is_default' => false]);
+
+        $resolved = Tax::effectiveDefault();
+
+        $this->assertNotNull($resolved);
+        $this->assertSame('First', $resolved->name, 'The fallback must be deterministic (lowest id).');
+
+        // A flagged default still wins over the age order...
+        $flagged = Tax::factory()->create(['name' => 'Flagged', 'is_active' => true, 'is_default' => true]);
+        $this->assertSame($flagged->id, Tax::effectiveDefault()->id);
+
+        // ...and an inactive flagged row is not reachable through the
+        // jurisdiction scope, so the resolver keeps walking.
+        $flagged->update(['is_active' => false]);
+        $this->assertSame('First', Tax::effectiveDefault()->name);
+        $this->assertNotSame($third->id, Tax::effectiveDefault()->id);
+    }
+
+    #[Test]
+    public function deleting_the_default_promotes_a_tax_that_can_actually_be_one()
+    {
+        $current = Tax::factory()->create([
+            'name' => 'Zero',
+            'rate' => 0,
+            'type' => Tax::TYPE_NONE,
+            'is_active' => true,
+            'is_default' => true,
+            'is_pph' => false,
+        ]);
+        // Created between the default and the candidate, so an unordered
+        // "first active" query would pick this withholding tax as the next
+        // default and every new document would be created with a 2% deduction.
+        Tax::factory()->create([
+            'name' => 'PPh 23',
+            'rate' => 2,
+            'type' => Tax::TYPE_EXCLUSIVE,
+            'is_active' => true,
+            'is_default' => false,
+            'is_pph' => true,
+        ]);
+        $candidate = Tax::factory()->create([
+            'name' => 'VAT 11%',
+            'rate' => 11,
+            'type' => Tax::TYPE_EXCLUSIVE,
+            'is_active' => true,
+            'is_default' => false,
+            'is_pph' => false,
+        ]);
+
+        $this->taxService->delete($current);
+
+        $freshDefault = Tax::effectiveDefault();
+        $this->assertNotNull($freshDefault);
+        $this->assertSame($candidate->id, $freshDefault->id,
+            'Deleting the default must promote the next non-withholding tax, in a fixed order.');
+        $this->assertFalse((bool) $freshDefault->is_pph);
+        $this->assertTrue((bool) $freshDefault->fresh()->is_default);
     }
 }

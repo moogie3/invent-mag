@@ -52,7 +52,27 @@ class Tax extends Model
 
     public function scopeDefault($query)
     {
-        return $query->where('is_default', true)->forJurisdiction();
+        // is_active is part of it: an inactive tax cannot be selected in any
+        // dropdown, so a default that is switched off would be shown as "the
+        // default" while every document books with the fallback instead.
+        return $query->where('is_default', true)->where('is_active', true)->forJurisdiction();
+    }
+
+    /**
+     * The tax a document books with when the user picked none: the flagged
+     * default, else the first active tax this jurisdiction may use.
+     *
+     * This is the single fallback for every writer. It used to be spelled out
+     * at sixteen call sites, two of them falling back to a collection ordered
+     * BY NAME while the rest took whatever the database returned first. With
+     * no ORDER BY there is no defined "first", so the same tenant could book
+     * sales, purchases, quotations and POS orders through four different
+     * default taxes in the same session.
+     */
+    public static function effectiveDefault(): ?self
+    {
+        return static::default()->orderBy('id')->first()
+            ?? static::active()->orderBy('id')->first();
     }
 
     /**

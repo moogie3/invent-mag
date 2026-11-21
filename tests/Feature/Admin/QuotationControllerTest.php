@@ -10,6 +10,7 @@ use App\Models\Quotation;
 use App\Models\Sales;
 use App\Models\Tax;
 use App\Models\Warehouse;
+use App\Services\SalesService;
 use Database\Seeders\RoleSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -690,6 +691,100 @@ class QuotationControllerTest extends TestCase
     }
 
     /**
+     * The create form posts its lines as `items[...]` inputs, not as the
+     * hidden `products` JSON blob that sales and purchases post, so every
+     * real submission was rejected with "products must be json". The line
+     * totals must also follow the sales convention: a fixed discount comes
+     * off every unit, and the stored lines carry the product name and the
+     * worked-out total the print and show views read.
+     */
+    public function test_it_creates_a_quotation_from_the_item_inputs_the_form_posts()
+    {
+        $product = Product::factory()->create(['name' => 'Browser Line']);
+
+        $response = $this->post(route('admin.quotations.store'), [
+            'customer_id' => $this->customer->id,
+            'quotation_date' => now()->toDateString(),
+            'valid_until' => now()->addDays(30)->toDateString(),
+            'items' => [
+                ['product_id' => $product->id, 'quantity' => 2, 'price' => 1000, 'discount' => 50, 'discount_type' => 'fixed'],
+            ],
+            'discount_total' => 0,
+            'discount_total_type' => 'fixed',
+            'tax_id' => $this->tax->id,
+        ]);
+
+        $response->assertRedirect();
+        $response->assertSessionHasNoErrors();
+
+        // Stored lines carry what the print and show views read.
+        $quotation = Quotation::latest('id')->firstOrFail();
+        $this->assertSame('Browser Line', $quotation->items[0]['name'] ?? null);
+        $this->assertSame(1900.0, (float) ($quotation->items[0]['total'] ?? 0));
+
+        // (1000 - 50 per unit) * 2 = 1900, not the raw 2000. Tax 11% = 209.
+        $this->assertDatabaseHas('quotations', [
+            'subtotal' => 1900,
+            'tax_amount' => 209,
+            'total' => 2109,
+        ]);
+    }
+
+    /**
+     * The edit form posts the same `items[...]` inputs as the create form,
+     * so update() has to accept them and re-price the lines the same way.
+     */
+    public function test_it_updates_a_quotation_from_the_item_inputs_the_form_posts()
+    {
+        $product = Product::factory()->create(['name' => 'Edited Line']);
+        $quotation = $this->createQuotation();
+
+        $response = $this->put(route('admin.quotations.update', $quotation->id), [
+            'customer_id' => $this->customer->id,
+            'quotation_date' => now()->toDateString(),
+            'items' => [
+                ['product_id' => $product->id, 'quantity' => 3, 'price' => 500, 'discount' => 10, 'discount_type' => 'percentage'],
+            ],
+            'discount_total' => 0,
+            'discount_total_type' => 'fixed',
+            'tax_id' => $this->tax->id,
+        ]);
+
+        $response->assertRedirect();
+        $response->assertSessionHasNoErrors();
+
+        // 10% of 500 = 50 off each unit, (500 - 50) * 3 = 1350. Tax 11% = 148.5.
+        $this->assertDatabaseHas('quotations', [
+            'id' => $quotation->id,
+            'subtotal' => 1350,
+            'tax_amount' => 148.5,
+            'total' => 1498.5,
+        ]);
+
+        $quotation->refresh();
+        $this->assertSame('Edited Line', $quotation->items[0]['name'] ?? null);
+        $this->assertSame(1350.0, (float) ($quotation->items[0]['total'] ?? 0));
+    }
+
+    /**
+     * quotation.js reads `.item-*` classes and posts a product_id per row.
+     * The server-rendered edit row carried different classes (so nothing
+     * recalculated on the edit form) and no product_id input at all (so the
+     * converted sale would have had no product to line up with).
+     */
+    public function test_the_edit_form_posts_product_ids_and_the_classes_the_script_reads()
+    {
+        $quotation = $this->createQuotation();
+
+        $response = $this->get(route('admin.quotations.edit', $quotation->id));
+
+        $response->assertStatus(200);
+        $response->assertSee('name="items[0][product_id]"', false);
+        $response->assertSee('class="form-control text-end item-quantity"', false);
+        $response->assertSee('class="form-control text-end item-subtotal"', false);
+    }
+
+    /**
      * A non-Indonesian tenant must not have its quotation total shrunk by
      * withholding: pph_amount is recorded as 0, so subtracting it anyway
      * would make the total disagree with the snapshot on the same row.
@@ -868,6 +963,236 @@ class QuotationControllerTest extends TestCase
         $this->assertDatabaseHas('quotations', [
             'quotation_number' => $prefix.'-0002',
         ]);
+    }
+
+    /**
+     * A quotation keeps its discount two ways: discount_value with
+     * discount_type (10 + percentage, what the customer agreed to) and
+     * discount_amount (100, the worked-out figure). The conversion used to
+     * copy discount_amount while keeping discount_type, which told every
+     * re-calculating reader to take 100% off instead of 10%: the sales view,
+     * the invoice PDF and the invoice email all showed 0 instead of 900,
+     * balance due showed 0, and the CRM revenue figure went with it.
+     */
+    public function test_convert_to_sales_stores_a_discount_pair_that_still_recalculates()
+    {
+        $product = Product::factory()->withStock(10)->create(['price' => 60]);
+        $quotation = $this->createQuotation([
+            'status' => 'accepted',
+            'subtotal' => 1000,
+            'discount_type' => 'percentage',
+            'discount_value' => 10,
+            'discount_amount' => 100,
+            // setUp()'s 11% default tax, kept explicit so the conversion and
+            // a later edit resolve the same one: 1,000 less 10% is 900, plus
+            // 11% tax is 999.
+            'tax_id' => $this->tax->id,
+            'tax_type' => 'exclusive',
+            'tax_rate' => 11,
+            'tax_amount' => 99,
+            'total' => 999,
+            'items' => [
+                ['product_id' => $product->id, 'name' => $product->name, 'quantity' => 1, 'price' => 1000, 'discount' => 0, 'discount_type' => 'fixed', 'total' => 1000],
+            ],
+        ]);
+
+        $this->post(route('admin.quotations.convert-to-sales', $quotation->id))
+            ->assertSessionHas('success', 'Quotation converted to sales order successfully.');
+
+        $sale = Sales::find($quotation->fresh()->converted_to_sales_id);
+        $this->assertNotNull($sale);
+
+        // The pair has to describe ONE number, the way createSale() and
+        // updateSale() store it: raw value plus the type that reads it.
+        $this->assertEqualsWithDelta(10, $sale->order_discount, 0.01);
+        $this->assertSame('percentage', $sale->order_discount_type);
+        $this->assertEqualsWithDelta(999, $sale->total, 0.01);
+
+        // Recalculated from the line items, which is what every screen,
+        // the PDF, the invoice email and balance() rely on.
+        $sale->load('salesItems');
+        $this->assertEqualsWithDelta(999, $sale->grand_total, 0.01, 'The converted sale recalculated to the wrong total.');
+
+        $viewData = app(SalesService::class)->getSalesViewData($sale->id);
+        $this->assertEqualsWithDelta(999, $viewData['finalTotal'], 0.01, 'The sales view page showed the wrong total.');
+
+        $settings = $this->tenant->accounting_settings;
+        $journal = JournalEntry::where('sourceable_type', Sales::class)
+            ->where('sourceable_id', $sale->id)
+            ->where('description', 'Sale Invoice #'.$sale->invoice)
+            ->first();
+
+        $this->assertNotNull($journal);
+        $this->assertEqualsWithDelta(999, $journal->transactions()->where('account_id', $settings['accounts_receivable_account_id'])->where('type', 'debit')->sum('amount'), 0.01);
+        $this->assertEqualsWithDelta(999, $journal->transactions()->where('account_id', $settings['sales_revenue_account_id'])->where('type', 'credit')->sum('amount'), 0.01);
+    }
+
+    /**
+     * The other half of the same bug. Once the pair was wrong, opening the
+     * converted sale and pressing Save without changing anything recomputed
+     * the total to 0 and re-journaled the sale as zero revenue against the
+     * full cost of goods: the entry still balanced (0 + 60 = 0 + 60) so
+     * nothing failed, it just quietly booked a sale that earned nothing.
+     */
+    public function test_editing_a_converted_sale_does_not_zero_it_out()
+    {
+        $product = Product::factory()->withStock(10)->create(['price' => 60]);
+        $quotation = $this->createQuotation([
+            'status' => 'accepted',
+            'subtotal' => 1000,
+            'discount_type' => 'percentage',
+            'discount_value' => 10,
+            'discount_amount' => 100,
+            'tax_id' => $this->tax->id,
+            'tax_type' => 'exclusive',
+            'tax_rate' => 11,
+            'tax_amount' => 99,
+            'total' => 999,
+            'items' => [
+                ['product_id' => $product->id, 'name' => $product->name, 'quantity' => 1, 'price' => 1000, 'discount' => 0, 'discount_type' => 'fixed', 'total' => 1000],
+            ],
+        ]);
+
+        $this->post(route('admin.quotations.convert-to-sales', $quotation->id));
+        $sale = Sales::find($quotation->fresh()->converted_to_sales_id);
+
+        // Exactly what the edit form round-trips back: the pre-filled
+        // discount box and its dropdown, plus the unchanged line.
+        app(SalesService::class)->updateSale($sale->fresh(), [
+            'customer_id' => $this->customer->id,
+            'order_date' => now()->toDateString(),
+            'due_date' => now()->addDays(30)->toDateString(),
+            'discount_total' => $sale->order_discount,
+            'discount_total_type' => $sale->order_discount_type,
+            'products' => json_encode([
+                ['product_id' => $product->id, 'quantity' => 1, 'customer_price' => 1000, 'discount' => 0, 'discount_type' => 'fixed'],
+            ]),
+        ]);
+
+        $sale->refresh()->load('salesItems');
+        $this->assertEqualsWithDelta(999, $sale->total, 0.01, 'Saving an unchanged converted sale destroyed its total.');
+        $this->assertEqualsWithDelta(999, $sale->grand_total, 0.01);
+
+        $settings = $this->tenant->accounting_settings;
+
+        // Net for one account across every entry the sale owns plus the
+        // reversals of those entries. A reversal carries no source document
+        // of its own, so walking this way counts each transaction exactly
+        // once and the signs cancel what should cancel.
+        $net = function (string $accountKey) use ($sale, $settings): float {
+            $total = 0.0;
+
+            $entries = JournalEntry::where('sourceable_type', Sales::class)
+                ->where('sourceable_id', $sale->id)
+                ->get();
+
+            foreach ($entries as $entry) {
+                $reversals = JournalEntry::where('reversed_entry_id', $entry->id)->get();
+
+                foreach ($entry->transactions->concat($reversals->flatMap->transactions) as $transaction) {
+                    if ((int) $transaction->account_id === (int) $settings[$accountKey]) {
+                        $total += ($transaction->type === 'debit' ? 1 : -1) * (float) $transaction->amount;
+                    }
+                }
+            }
+
+            return $total;
+        };
+
+        // Revenue nets to 999 credited, not 0: the original 999 credit is
+        // cancelled by its reversal and the repost brings a fresh 999 back.
+        $this->assertEqualsWithDelta(-999, $net('sales_revenue_account_id'), 0.01, 'Revenue was journaled as zero.');
+        $this->assertEqualsWithDelta(999, $net('accounts_receivable_account_id'), 0.01, 'Receivables were journaled as zero.');
+    }
+
+    /**
+     * A converted quotation is already the source of a posted sale, so the
+     * form would only let the quote drift away from the sale it points at.
+     * The view page is where it goes, the same way a POS sale is sent to
+     * its receipt instead of the sales edit form.
+     */
+    public function test_editing_a_converted_quotation_takes_you_to_its_view_instead()
+    {
+        $sale = Sales::factory()->create([
+            'customer_id' => $this->customer->id,
+            'user_id' => $this->user->id,
+        ]);
+        $quotation = $this->createQuotation([
+            'status' => 'converted',
+            'converted_to_sales_id' => $sale->id,
+        ]);
+
+        $response = $this->get(route('admin.quotations.edit', $quotation->id));
+
+        $response->assertRedirect(route('admin.quotations.show', $quotation->id));
+    }
+
+    /**
+     * The write side of the same guard. Refused before validation, so the
+     * quotation is left exactly as it was rather than half-updated.
+     */
+    public function test_updating_a_converted_quotation_is_refused()
+    {
+        $sale = Sales::factory()->create([
+            'customer_id' => $this->customer->id,
+            'user_id' => $this->user->id,
+        ]);
+        $quotation = $this->createQuotation([
+            'status' => 'converted',
+            'converted_to_sales_id' => $sale->id,
+        ]);
+
+        $response = $this->put(route('admin.quotations.update', $quotation->id), [
+            'customer_id' => $this->customer->id,
+            'quotation_date' => now()->toDateString(),
+            'products' => json_encode([
+                ['product_id' => 1, 'name' => 'Changed', 'quantity' => 9, 'price' => 999, 'discount' => 0, 'total' => 8991],
+            ]),
+            'discount_total' => 50,
+            'discount_total_type' => 'fixed',
+            'notes' => 'Should never land',
+        ]);
+
+        $response->assertSessionHas('error');
+
+        $this->assertDatabaseHas('quotations', [
+            'id' => $quotation->id,
+            'subtotal' => 1000,
+            'total' => 1110,
+            'notes' => null,
+        ]);
+    }
+
+    /**
+     * The sequence reads everything after the last dash rather than the
+     * last four characters, so QTN-20261115-10000 continues at 10001. It
+     * used to read 0000 from that number and try to mint 0001 again, which
+     * the unique constraint on quotation_number rejected once a day passed
+     * ten thousand quotations.
+     */
+    public function test_quotation_numbers_do_not_wrap_after_four_digits()
+    {
+        $prefix = 'QTN-'.now()->format('Ymd');
+        $this->createQuotation(['quotation_number' => $prefix.'-0001']);
+        $this->createQuotation(['quotation_number' => $prefix.'-10000']);
+
+        $response = $this->post(route('admin.quotations.store'), [
+            'customer_id' => $this->customer->id,
+            'quotation_date' => now()->toDateString(),
+            'valid_until' => now()->addDays(30)->toDateString(),
+            'products' => json_encode([
+                ['product_id' => 1, 'name' => 'Widget', 'quantity' => 2, 'price' => 500, 'discount' => 0, 'total' => 1000],
+            ]),
+            'discount_total' => 0,
+            'discount_total_type' => 'fixed',
+            'tax_id' => $this->tax->id,
+        ]);
+
+        $response->assertSessionHas('success', 'Quotation created successfully.');
+        $this->assertTrue(
+            Quotation::where('quotation_number', $prefix.'-10001')->exists(),
+            'The next quotation number wrapped back to 0001 instead of continuing past 10000.'
+        );
     }
 
     protected function tearDown(): void

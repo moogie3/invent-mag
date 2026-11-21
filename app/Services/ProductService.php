@@ -4,6 +4,7 @@ namespace App\Services;
 
 
 use App\Services\Concerns\BuildsListSearch;
+use App\Services\Concerns\CostsLineItems;
 use App\Helpers\CurrencyHelper;
 use App\Models\Categories;
 use App\Models\POItem;
@@ -20,7 +21,7 @@ use Illuminate\Support\Str;
 
 class ProductService
 {
-    use BuildsListSearch;
+    use BuildsListSearch, CostsLineItems;
     public function getPaginatedProducts(int $entries, array $filters = [])
     {
         $query = Product::with(['category', 'supplier', 'unit', 'parent:id,code'])->withCount('variants');
@@ -332,7 +333,7 @@ class ProductService
                         $adjustmentType = 'decrease';
                     }
 
-                    StockAdjustment::create([
+                    $stockAdjustment = StockAdjustment::create([
                         'product_id' => $product->id,
                         'warehouse_id' => $targetWarehouse->id,
                         'adjustment_type' => $adjustmentType,
@@ -343,6 +344,8 @@ class ProductService
                         'adjusted_by' => $adjustedBy,
                         'tenant_id' => $product->tenant_id,
                     ]);
+
+                    $this->postStockCorrection($product, (float) $originalStock, (float) $newStock, $stockAdjustment);
 
                     $stockChanges[] = [
                         'product_id' => $product->id,
@@ -411,7 +414,7 @@ class ProductService
                 $quantityAfter = $adjustmentAmount;
             }
 
-            StockAdjustment::create([
+            $stockAdjustment = StockAdjustment::create([
                 'product_id' => $product->id,
                 'warehouse_id' => $warehouseId,
                 'adjustment_type' => $adjustmentType,
@@ -422,9 +425,59 @@ class ProductService
                 'adjusted_by' => $adjustedBy,
                 'tenant_id' => $product->tenant_id,
             ]);
+
+            $this->postStockCorrection($product, (float) $quantityBefore, (float) $quantityAfter, $stockAdjustment);
         });
 
         return $product;
+    }
+
+    /**
+     * Move the Inventory account for a manual stock change.
+     *
+     * A correction typed into the product screen changes what the business
+     * owns, so it has to reach the ledger the way a purchase, a sale and an
+     * opname already do. It used to write only a stock_adjustments row,
+     * which left the books claiming goods that were no longer on the shelf
+     * (or missing goods that were found) with nothing to say so.
+     *
+     * Stock that left is costed through the purchase batches it came from,
+     * so the credit is the very figure the Inventory debit was posted at;
+     * stock that arrived has no batch to belong to and is valued at the
+     * buying price, the same fallback a sale costs out-of-batch units at.
+     *
+     * Runs inside the caller's transaction: either the stock, its
+     * adjustment row and its journal all land, or none of them do.
+     */
+    private function postStockCorrection(Product $product, float $quantityBefore, float $quantityAfter, StockAdjustment $stockAdjustment): void
+    {
+        $delta = $quantityAfter - $quantityBefore;
+
+        if (abs($delta) < 0.0000001) {
+            return;
+        }
+
+        $valuation = app(StockValuationService::class);
+
+        if ($delta < 0) {
+            $value = $this->costAndConsumeBatches($product->id, -$delta, (float) $product->price);
+            $valuation->postCorrection(0, $value, $this->correctionDescription($product, $delta), $stockAdjustment);
+
+            return;
+        }
+
+        $value = $delta * (float) $product->price;
+
+        $valuation->postCorrection($value, 0, $this->correctionDescription($product, $delta), $stockAdjustment);
+    }
+
+    private function correctionDescription(Product $product, float $delta): string
+    {
+        return sprintf(
+            'Stock Adjustment %s: %s',
+            $delta < 0 ? 'Decrease' : 'Increase',
+            $product->code
+        );
     }
 
     public function searchProducts($query)
@@ -444,11 +497,12 @@ class ProductService
             'supplier' => function ($q) {
                 $q->select('id', 'name');
             },
-            'productWarehouses' => function ($q) use ($mainWarehouseId) {
-                if ($mainWarehouseId) {
-                    $q->where('warehouse_id', $mainWarehouseId);
-                }
-            },
+            // Every warehouse row, deliberately unfiltered. Product's stock
+            // accessors trust whatever relation is loaded: limiting this to
+            // the main warehouse made total_stock a single-warehouse figure,
+            // so a product holding 109 units across three warehouses
+            // reported 0 for it.
+            'productWarehouses',
         ]);
 
         $productsQuery->where(function ($q) use ($query) {
@@ -473,7 +527,9 @@ class ProductService
         $products->each(function ($product) use ($mainWarehouseId) {
             $product->setAppends(['main_warehouse_stock']);
             if ($mainWarehouseId) {
-                $mainStock = $product->productWarehouses->first();
+                // first() would return an arbitrary warehouse now that the
+                // relation is no longer pre-filtered to the main one.
+                $mainStock = $product->productWarehouses->firstWhere('warehouse_id', $mainWarehouseId);
                 $product->main_warehouse_stock = $mainStock ? (float) $mainStock->quantity : 0;
             } else {
                 $product->main_warehouse_stock = 0;

@@ -45,9 +45,13 @@ class PurchaseReturnControllerTest extends TestCase
 
         $this->product = Product::factory()->create();
         $this->purchase = Purchase::factory()->create();
+        // Pinned (the factory picks 1-100): the tests below return 1 to 3
+        // units against this line, so it has to be big enough for every run.
         POItem::factory()->create([
             'po_id' => $this->purchase->id,
             'product_id' => $this->product->id,
+            'quantity' => 10,
+            'remaining_quantity' => 10,
         ]);
     }
 
@@ -116,6 +120,53 @@ class PurchaseReturnControllerTest extends TestCase
         $response->assertRedirect(route('admin.por.index'));
         $response->assertSessionHas('success', 'Purchase return created successfully.');
         $this->assertDatabaseHas('purchase_returns', ['purchase_id' => $this->purchase->id]);
+    }
+
+    /**
+     * status was validated as required|string and nothing else, so any
+     * string at all was written to the row: the index counts only ever
+     * look for Pending/Completed/Canceled, so a bogus value silently
+     * vanished from every status tile while still sitting in the table.
+     * The allowed values already exist on the model.
+     */
+    public function test_store_rejects_a_status_outside_the_allowed_list()
+    {
+        $response = $this->post(route('admin.por.store'), [
+            'purchase_id' => $this->purchase->id,
+            'return_date' => Carbon::now()->format('Y-m-d'),
+            'items' => json_encode([
+                ['product_id' => $this->product->id, 'returned_quantity' => 1, 'price' => 50],
+            ]),
+            'total_amount' => 50,
+            'status' => 'Totally-Made-Up',
+        ]);
+
+        $response->assertSessionHasErrors('status');
+        $this->assertDatabaseMissing('purchase_returns', ['purchase_id' => $this->purchase->id]);
+    }
+
+    /**
+     * The item row casts quantity to integer (2.5 becomes 2) while the
+     * stock move uses the raw 2.5, so shelf and document disagreed by half
+     * a unit. A crafted post could do it: the form's parseInt cannot.
+     */
+    public function test_store_rejects_a_fractional_returned_quantity()
+    {
+        $before = $this->product->fresh()->stock_quantity;
+
+        $response = $this->post(route('admin.por.store'), [
+            'purchase_id' => $this->purchase->id,
+            'return_date' => Carbon::now()->format('Y-m-d'),
+            'items' => json_encode([
+                ['product_id' => $this->product->id, 'returned_quantity' => 2.5, 'price' => 50],
+            ]),
+            'total_amount' => 125,
+            'status' => 'Pending',
+        ]);
+
+        $response->assertSessionHasErrors('items');
+        $this->assertDatabaseMissing('purchase_returns', ['purchase_id' => $this->purchase->id]);
+        $this->assertEquals($before, $this->product->fresh()->stock_quantity, 'A refused return must not move stock.');
     }
 
     public function test_it_can_show_a_purchase_return()
@@ -328,6 +379,101 @@ class PurchaseReturnControllerTest extends TestCase
 
         $response->assertStatus(200);
         $response->assertJsonCount(1);
+    }
+
+    /**
+     * available_quantity must reflect every LIVE return: a Pending one
+     * already holds those units, a Canceled one holds none. The endpoint
+     * counted only Completed returns, so the form offered quantities that
+     * were already spoken for and every real submission over-returned.
+     */
+    public function test_get_purchase_items_counts_pending_returns_and_ignores_canceled_ones()
+    {
+        // setUp ordered 10 of $this->product.
+        $pending = PurchaseReturn::factory()->create([
+            'purchase_id' => $this->purchase->id,
+            'status' => 'Pending',
+        ]);
+        PurchaseReturnItem::factory()->create([
+            'purchase_return_id' => $pending->id,
+            'product_id' => $this->product->id,
+            'quantity' => 4,
+        ]);
+
+        $canceled = PurchaseReturn::factory()->create([
+            'purchase_id' => $this->purchase->id,
+            'status' => 'Canceled',
+        ]);
+        PurchaseReturnItem::factory()->create([
+            'purchase_return_id' => $canceled->id,
+            'product_id' => $this->product->id,
+            'quantity' => 3,
+        ]);
+
+        $response = $this->get(route('admin.por.items', $this->purchase->id));
+
+        $response->assertStatus(200);
+        $item = collect($response->json())->firstWhere('product_id', $this->product->id);
+        $this->assertNotNull($item);
+        // 10 ordered - 4 held by the Pending return; the Canceled one holds none.
+        $this->assertEquals(6, $item['available_quantity']);
+    }
+
+    /**
+     * A cap refusal is a normal business answer, not a crash: it has to
+     * come back as the flash error the session partial renders, with no row
+     * written.
+     */
+    public function test_store_surfaces_a_refused_return_as_an_error_instead_of_a_500()
+    {
+        // setUp ordered 10; ask for 11.
+        $response = $this->post(route('admin.por.store'), [
+            'purchase_id' => $this->purchase->id,
+            'return_date' => Carbon::now()->format('Y-m-d'),
+            'items' => json_encode([
+                ['product_id' => $this->product->id, 'returned_quantity' => 11, 'price' => 50],
+            ]),
+            'total_amount' => 550,
+            'status' => 'Pending',
+        ]);
+
+        $response->assertRedirect();
+        $this->assertNotNull(session('error'), 'The refusal must surface as the flash error.');
+        $this->assertStringContainsString('only 10 of the 10 purchased units can still be returned', session('error'));
+        $this->assertDatabaseMissing('purchase_returns', ['purchase_id' => $this->purchase->id]);
+    }
+
+    /**
+     * Same contract on update: the edited return's own old units are
+     * excluded from its check, so asking for 11 against 10 ordered is
+     * refused as a flash error rather than a 500.
+     */
+    public function test_update_surfaces_a_refused_return_as_an_error_instead_of_a_500()
+    {
+        $purchaseReturn = PurchaseReturn::factory()->create([
+            'purchase_id' => $this->purchase->id,
+            'status' => 'Pending',
+        ]);
+        PurchaseReturnItem::factory()->create([
+            'purchase_return_id' => $purchaseReturn->id,
+            'product_id' => $this->product->id,
+            'quantity' => 1,
+        ]);
+
+        $response = $this->put(route('admin.por.update', $purchaseReturn->id), [
+            'purchase_id' => $this->purchase->id,
+            'return_date' => Carbon::now()->addDay()->format('Y-m-d'),
+            'items' => json_encode([
+                ['product_id' => $this->product->id, 'returned_quantity' => 11, 'price' => 50],
+            ]),
+            'total_amount' => 550,
+            'status' => 'Pending',
+        ]);
+
+        $response->assertRedirect();
+        $this->assertNotNull(session('error'), 'The refusal must surface as the flash error.');
+        $this->assertStringContainsString('only 10 of the 10 purchased units can still be returned', session('error'));
+        $this->assertEquals(1, $purchaseReturn->fresh()->items->sum('quantity'));
     }
 
     public function test_it_can_bulk_delete_purchase_returns()

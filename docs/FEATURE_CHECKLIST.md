@@ -75,6 +75,7 @@
 - [x] Unit of measure management
 - [x] Barcode support
 - [x] Barcode search
+- [x] **Barcodes unique per workspace**: the index and the validation rules are both scoped by `tenant_id`, so two workspaces may hold the same barcode and a false "already taken" on edit is gone (migration `2026_11_20_000001`)
 - [x] Product expiry tracking
 - [x] Expiry alerts
 - [x] Bulk operations (delete, export)
@@ -93,6 +94,13 @@
 - [x] Accounting journal integration
 - [x] Audit trail for all counts
 - [x] Complete workflow (Draft → In Progress → Completed/Canceled)
+- [x] **Count sheet search and filters**: search by name, code or barcode; filter All Rows / Variance Only / Uncounted, each with its own empty state
+- [x] **Counting progress and session totals**: "x of y rows counted", shrinkage value, excess value, variance value
+- [x] **Whole-unit counts only**: fractional counts rejected at the input and again at save
+- [x] **Variance value matches what completion will book**: shrinkage costed from the batches, excess at buying price (`varianceValue()`); `total_variance_value` recorded on completion
+- [x] **Completion dry run**: `GET /admin/stock-opname/{id}/complete-preview` reports the adjustments and journal entry that would post, writing nothing
+- [x] **Print count sheet** for the physical count (`resources/css/stock-opname.css`)
+- [x] **Closed sessions refused server-side**: `assertStillOpen()` blocks updates to Completed or Canceled sessions
 
 ### 🔄 Stock Transfer (All Plans)
 
@@ -174,6 +182,7 @@
 - [x] Quick product search
 - [x] **POS accounting journal entries** — Dr AR/Cr Revenue, Dr COGS/Cr Inventory, Dr Cash/Cr AR automatically posted on POS sale
 - [x] POS uses Tax model dropdown instead of manual tax rate input
+- [x] **POS sale editing**: the Edit link renders for POS rows; an edit reverses the POS entries, reposts the invoice-shaped sale, then `settlePosCashReceipt()` re-books Dr Cash / Cr AR so the cash stays cash; repeat edits stay balanced through `hasDependentEntries()`
 
 ---
 
@@ -315,7 +324,7 @@
 - [x] Currency configuration (one row per tenant)
 - [x] Opening balance setup wizard (New Fiscal Year)
 - [x] General Ledger accurately factors in Sales/Purchase Returns
-- [x] Recurring journal entry infrastructure
+- [ ] Recurring journal entry infrastructure: **removed 2026-11-12** as unreachable dead code (no artisan command, no schedule entry, no route, no UI, no test). The `recurring_journal_entries` table and its migration are kept so a rebuild starts from schema. See `docs/INTERVIEW_QA.md` Q31.2 and §43
 - [x] Journal entry approval workflow
 - [x] Comprehensive accounting audit log
 
@@ -542,14 +551,14 @@
 ### 🧪 Testing
 
 - [x] PHPUnit 11+ configured
-- [x] 1186 PHP test methods / 3715 PHP assertions (Feature + Unit PHP, 169 JS Vitest files)
+- [x] 1623 PHP test methods / 6095 PHP assertions (Feature + Unit PHP, 174 JS Vitest files)
 - [x] **Plan-tier gating regression suite** — `PlanFeatureGateTest` (15 tests) verifying every Professional/Enterprise feature slug is enforced at the route layer (`plan.feature:*` middleware) or controller layer (sales forecasting), including the JSON 403 response for API clients and the legacy no-plan full-access path
 - [x] Feature tests (controllers, routes)
 - [x] Unit tests (services, helpers)
 - [x] Multi-tenancy tests
 - [x] Tenant creation trait
 - [x] Parallel testing support
-- [x] Vitest for frontend (169 JS test files)
+- [x] Vitest for frontend (174 JS test files)
 
 ---
 
@@ -694,7 +703,7 @@
 2. **Complete Accounting** - Double-entry with manual journal entries
 3. **Multi-tenant SaaS** - True isolation, single codebase
 4. **Sales Pipeline** - Kanban with forecasting
-5. **1186 PHP Tests / 3715 Assertions + 169 Vitest Files** - Enterprise-grade testing (PHP + JS)
+5. **1623 PHP Tests / 6095 Assertions + 174 Vitest Files** - Enterprise-grade testing (PHP + JS)
 6. **Docker + CI/CD** - Modern DevOps ready
 7. **Comprehensive Audit Trail** - Security and accounting
 8. **Contextual Tutorial System** - 50+ page-specific help guides with drill-down navigation - users click a topic category, see all pages in that category, click one to navigate there with its contextual tutorial auto-opened

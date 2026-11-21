@@ -8,13 +8,15 @@ use App\Models\ProductWarehouse;
 use App\Models\StockAdjustment;
 use App\Models\StockOpname;
 use App\Models\StockOpnameItem;
-use Carbon\Carbon;
+use App\Services\Concerns\CostsLineItems;
 use Exception;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
 class StockOpnameService
 {
+    use CostsLineItems;
+
     protected AccountingService $accountingService;
 
     public function __construct(AccountingService $accountingService)
@@ -84,6 +86,8 @@ class StockOpnameService
 
     public function updateCounts(StockOpname $opname, array $counts)
     {
+        $this->assertStillOpen($opname);
+
         return DB::transaction(function () use ($opname, $counts) {
             foreach ($counts as $productId => $countedQty) {
                 if ($countedQty === null || $countedQty === '') {
@@ -96,11 +100,15 @@ class StockOpnameService
 
                 if ($item) {
                     $variance = (float) $countedQty - $item->expected_qty;
-                    $unitCost = $item->product->cost ?? $item->product->price ?? 0;
+                    $product = $item->product;
                     $item->update([
                         'counted_qty' => (float) $countedQty,
                         'variance' => $variance,
-                        'variance_value' => abs($variance) * $unitCost,
+                        // The count screen has to show the number the
+                        // completion journal will book: what the missing
+                        // units cost through their batches, what the extra
+                        // ones are worth at the buying price.
+                        'variance_value' => $this->varianceValue($product, $variance),
                     ]);
                 }
             }
@@ -115,13 +123,10 @@ class StockOpnameService
 
     public function completeOpname(StockOpname $opname)
     {
-        if ($opname->status === 'Completed') {
-            throw new Exception('Stock Opname is already completed.');
-        }
+        $this->assertStillOpen($opname);
 
         return DB::transaction(function () use ($opname) {
             $user = Auth::user();
-            $tenant = $user->tenant;
 
             // Get all items with a variance
             $itemsWithVariance = $opname->items()->whereNotNull('variance')->where('variance', '!=', 0)->get();
@@ -158,8 +163,13 @@ class StockOpnameService
                     'adjusted_by' => $user->id,
                 ]);
 
-                // Calculate value for accounting
-                $value = abs($item->variance) * $product->price; // price is the cost/buying price
+                // Value what the count says is missing or extra, and keep
+                // the item's figure identical to the journal below: a count
+                // screen that shows one number and books another is exactly
+                // the disagreement this service exists to prevent.
+                $value = $this->varianceValue($product, (float) $item->variance, true);
+                $item->update(['variance_value' => $value]);
+
                 if ($item->variance > 0) {
                     $totalExcessValue += $value;
                 } else {
@@ -168,57 +178,149 @@ class StockOpnameService
             }
 
             // 3. Accounting Integration
-            if ($tenant->hasFeature('accounting') && ($totalShrinkageValue > 0 || $totalExcessValue > 0)) {
-                $this->processAccounting($opname, $totalShrinkageValue, $totalExcessValue);
+            if ($totalShrinkageValue > 0 || $totalExcessValue > 0) {
+                app(StockValuationService::class)->postCorrection(
+                    $totalExcessValue,
+                    $totalShrinkageValue,
+                    "Stock Opname Variance #{$opname->reference_number}",
+                    $opname
+                );
             }
 
             $opname->update([
                 'status' => 'Completed',
                 'completed_at' => now(),
+                // Both magnitudes are positive by construction (varianceValue
+                // returns what the difference is worth, not its direction), so
+                // their sum is the gross value the journal just moved. The
+                // column was added for exactly this and had stayed null ever
+                // since, which reads as "no variance" to anyone querying the
+                // table instead of the view.
+                'total_variance_value' => $totalExcessValue + $totalShrinkageValue,
             ]);
 
             return $opname;
         });
     }
 
-    protected function processAccounting(StockOpname $opname, float $totalShrinkageValue, float $totalExcessValue)
+    /**
+     * Shut the door on a closed count.
+     *
+     * Completed has already moved stock and posted its journal; Canceled
+     * was thrown away. The screen only hides the buttons for those two
+     * states, so a stale tab or a direct POST would otherwise still land
+     * here. The service is where the rule belongs: it is the one path
+     * every caller shares.
+     */
+    private function assertStillOpen(StockOpname $opname): void
     {
-        $accountingSettings = app('currentTenant')->accounting_settings ?? [];
-        if (! $accountingSettings || ! isset($accountingSettings['inventory_account_id']) || ! isset($accountingSettings['cost_of_goods_sold_account_id'])) {
-            // Silently skip if accounting not configured
-            return;
+        if ($opname->status === 'Completed') {
+            throw new Exception('Stock Opname is already completed.');
         }
 
-        $inventoryAccount = Account::find($accountingSettings['inventory_account_id'] ?? null);
-        // We use COGS or a dedicated Shrinkage account. Here we use COGS as fallback since it's an expense.
-        $expenseAccount = Account::find($accountingSettings['cost_of_goods_sold_account_id'] ?? null);
+        if ($opname->status === 'Canceled') {
+            throw new Exception('Stock Opname is canceled.');
+        }
+    }
 
-        if (! $inventoryAccount || ! $expenseAccount) {
-            return;
+    /**
+     * What a count difference is worth, on the one cost basis every
+     * inventory writer shares.
+     *
+     * Missing units are costed through the batches they came from, so the
+     * figure equals what the Inventory account was charged for them; extra
+     * units have no batch to belong to (a batch is a receipt the books
+     * already know about) and are worth the buying price, the same
+     * fallback a sale costs out-of-batch units at.
+     *
+     * $consume is true only when the opname completes and the goods really
+     * have left the shelf: the count screen must show the very number the
+     * journal will book, without touching the batches while the opname is
+     * still open and can be recounted.
+     */
+    private function varianceValue(Product $product, float $variance, bool $consume = false): float
+    {
+        if (abs($variance) < 0.0000001) {
+            return 0.0;
         }
 
-        $transactions = [];
+        $units = abs($variance);
+        $buyingPrice = (float) ($product->price ?? 0);
 
-        // If there is shrinkage (loss of inventory), we Credit Inventory and Debit Expense
-        if ($totalShrinkageValue > 0) {
-            $transactions[] = ['account_name' => $expenseAccount->name, 'type' => 'debit', 'amount' => $totalShrinkageValue];
-            $transactions[] = ['account_name' => $inventoryAccount->name, 'type' => 'credit', 'amount' => $totalShrinkageValue];
+        if ($variance > 0) {
+            return $units * $buyingPrice;
         }
 
-        // If there is excess (gain of inventory), we Debit Inventory and Credit Expense (or a revenue account, but expense reduction works)
-        if ($totalExcessValue > 0) {
-            $transactions[] = ['account_name' => $inventoryAccount->name, 'type' => 'debit', 'amount' => $totalExcessValue];
-            $transactions[] = ['account_name' => $expenseAccount->name, 'type' => 'credit', 'amount' => $totalExcessValue];
+        return $consume
+            ? $this->costAndConsumeBatches((int) $product->id, $units, $buyingPrice)
+            : app(StockValuationService::class)->costOfUnits((int) $product->id, $units, $buyingPrice);
+    }
+
+    /**
+     * The journal completion would post, without posting it.
+     *
+     * Same arithmetic as completeOpname() with every write stripped out:
+     * the variance values come from varianceValue() with consume=false,
+     * which walks the same batches in the same order without decrementing
+     * them, and the legs mirror StockValuationService::postCorrection()
+     * in the same order and under the same gate it books them. The
+     * confirm modal can therefore show the exact figure the confirm
+     * click will post, and opening it cannot move stock or the GL.
+     *
+     * @return array{lines: array<int, array{account_name: string, type: string, amount: float}>, totals: array{excess: float, shrinkage: float}, will_post: bool}
+     */
+    public function previewCompletion(StockOpname $opname): array
+    {
+        $itemsWithVariance = $opname->items()->whereNotNull('variance')->where('variance', '!=', 0)->get();
+
+        $totalShrinkageValue = 0;
+        $totalExcessValue = 0;
+
+        foreach ($itemsWithVariance as $item) {
+            $value = $this->varianceValue($item->product, (float) $item->variance);
+
+            if ($item->variance > 0) {
+                $totalExcessValue += $value;
+            } else {
+                $totalShrinkageValue += $value;
+            }
         }
 
-        if (! empty($transactions)) {
-            $this->accountingService->createJournalEntry(
-                "Stock Opname Variance #{$opname->reference_number}",
-                Carbon::parse($opname->completed_at ?? now()),
-                $transactions,
-                $opname // sourceable
-            );
+        // The same gate postCorrection() applies before it books anything.
+        $tenant = app('currentTenant');
+        $settings = $tenant?->accounting_settings ?? [];
+        $inventory = Account::find($settings['inventory_account_id'] ?? null);
+        $expense = Account::find($settings['cost_of_goods_sold_account_id'] ?? null);
+
+        $willPost = ($totalShrinkageValue > 0 || $totalExcessValue > 0)
+            && $tenant
+            && $tenant->hasFeature('accounting')
+            && $inventory
+            && $expense;
+
+        $lines = [];
+
+        if ($willPost) {
+            // postCorrection() books the decrease first, then the increase.
+            if ($totalShrinkageValue > 0) {
+                $lines[] = ['account_name' => $expense->name, 'type' => 'debit', 'amount' => round($totalShrinkageValue, 2)];
+                $lines[] = ['account_name' => $inventory->name, 'type' => 'credit', 'amount' => round($totalShrinkageValue, 2)];
+            }
+
+            if ($totalExcessValue > 0) {
+                $lines[] = ['account_name' => $inventory->name, 'type' => 'debit', 'amount' => round($totalExcessValue, 2)];
+                $lines[] = ['account_name' => $expense->name, 'type' => 'credit', 'amount' => round($totalExcessValue, 2)];
+            }
         }
+
+        return [
+            'lines' => $lines,
+            'totals' => [
+                'excess' => round($totalExcessValue, 2),
+                'shrinkage' => round($totalShrinkageValue, 2),
+            ],
+            'will_post' => (bool) $willPost,
+        ];
     }
 
     protected function generateReferenceNumber(): string

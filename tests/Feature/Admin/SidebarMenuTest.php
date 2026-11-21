@@ -154,10 +154,10 @@ class SidebarMenuTest extends TestCase
 
     public function test_the_dark_theme_hands_the_marked_parent_its_glyph_back(): void
     {
-        // dark.css pins every sidebar icon to a fixed grey with !important,
-        // so the dark marked parent would show its primary tray under a grey
-        // glyph - two stories on one row (audit finding #12). The override
-        // has to exist, outrank the pin, and stay off the hover flash (which
+        // The literal primary reads ~2:1 against the dark tray, so the dark
+        // marked parent would show a primary tray under an unreadable glyph
+        // - two stories on one row (audit finding #12). The override has to
+        // exist, outrank the base rule, and stay off the hover flash (which
         // paints the row near-white): source, not the built bundle, for the
         // same reason as the test above.
         $css = file_get_contents(resource_path('css/menu-sidebar.css'));
@@ -170,7 +170,7 @@ class SidebarMenuTest extends TestCase
         $this->assertStringContainsString(
             'color: color-mix(in srgb, var(--tblr-primary, #0054a6) 62%, #ffffff) !important;',
             $css,
-            'The glyph must be a lifted primary (contrast on the dark tray) strong enough to beat dark.css\'s pin.'
+            'The glyph must be a lifted primary (contrast on the dark tray), not the literal blue that fails there.'
         );
     }
 

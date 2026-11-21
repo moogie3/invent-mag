@@ -76,11 +76,14 @@
                         </tbody>
                     </table>
                 </div>
-                @if($tenants->hasPages())
-                <div class="card-footer d-flex justify-content-center border-top">
-                    {{ $tenants->links() }}
+                <div data-pagination-footer class="card-footer d-flex align-items-center">
+                    <p class="m-0 text-secondary">
+                        {{ __('messages.pagination_showing_entries', ['first' => $tenants->firstItem() ?? 0, 'last' => $tenants->lastItem() ?? 0, 'total' => $tenants->total()]) }}
+                    </p>
+                    <div class="ms-auto">
+                        {{ $tenants->appends(request()->query())->links('vendor.pagination.tabler') }}
+                    </div>
                 </div>
-                @endif
             </div>
         </div>
     </div>

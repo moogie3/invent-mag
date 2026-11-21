@@ -131,15 +131,15 @@
                                 </tbody>
                             </table>
                         </div>
-                        <div class="card-footer d-flex align-items-center">
-                            <p class="m-0 text-secondary">
-                                {{ __('messages.pagination_showing_entries', ['first' => $entries->firstItem(), 'last' => $entries->lastItem(), 'total' => $entries->total()]) }}
-                            </p>
-                            <div class="ms-auto">
-                                {{ $entries->appends(request()->query())->links('vendor.pagination.tabler') }}
-                            </div>
-                        </div>
                     @endif
+                    <div data-pagination-footer class="card-footer d-flex align-items-center">
+                        <p class="m-0 text-secondary">
+                            {{ __('messages.pagination_showing_entries', ['first' => $entries->firstItem() ?? 0, 'last' => $entries->lastItem() ?? 0, 'total' => $entries->total()]) }}
+                        </p>
+                        <div class="ms-auto">
+                            {{ $entries->appends(request()->query())->links('vendor.pagination.tabler') }}
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>

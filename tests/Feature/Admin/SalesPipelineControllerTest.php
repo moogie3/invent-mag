@@ -10,6 +10,8 @@ use App\Models\Sales;
 use App\Models\SalesOpportunity;
 use App\Models\SalesPipeline;
 use App\Models\Tax;
+use App\Models\Tenant;
+use App\Models\User;
 use App\Models\Warehouse;
 use Database\Seeders\RoleSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -65,6 +67,37 @@ class SalesPipelineControllerTest extends TestCase
             ->assertJsonFragment($pipelineData);
 
         $this->assertDatabaseHas('sales_pipelines', $pipelineData);
+    }
+
+    /**
+     * Pipeline names are per tenant: the name a pipeline carries in one
+     * ledger says nothing about another tenant's ledgers. The unique check
+     * ran against the whole table, so the second tenant was told the name
+     * was already taken by a company it has no relation to.
+     */
+    public function test_a_second_tenant_can_name_a_pipeline_like_the_first()
+    {
+        SalesPipeline::create([
+            'name' => 'Standard Pipeline',
+            'tenant_id' => $this->tenant->id,
+        ]);
+
+        $tenant = Tenant::create(['name' => 'Second Tenant', 'domain' => 'second.localhost']);
+        $tenant->makeCurrent();
+        $user = User::factory()->create(['tenant_id' => $tenant->id]);
+        $user->assignRole('superuser');
+        $this->actingAs($user);
+
+        $response = $this->postJson(route('admin.sales_pipeline.pipelines.store'), [
+            'name' => 'Standard Pipeline',
+            'is_default' => false,
+        ]);
+
+        $response->assertStatus(201);
+        $this->assertDatabaseHas('sales_pipelines', [
+            'tenant_id' => $tenant->id,
+            'name' => 'Standard Pipeline',
+        ]);
     }
 
     public function test_it_can_update_a_pipeline()
@@ -182,6 +215,40 @@ class SalesPipelineControllerTest extends TestCase
             ->assertJsonFragment(['name' => 'New Opportunity']);
 
         $this->assertDatabaseHas('sales_opportunities', ['name' => 'New Opportunity']);
+    }
+
+    /**
+     * exists:customers,id is raw SQL and ignores the tenant scope, so the
+     * id of another tenant's customer passed validation and was written
+     * straight onto the opportunity: the pipeline row then pointed at a
+     * customer this tenant cannot see. The customer must be re-resolved
+     * through the scoped model before anything is created.
+     */
+    public function test_storing_an_opportunity_refuses_a_customer_owned_by_another_tenant()
+    {
+        $otherTenant = Tenant::create(['name' => 'Other Tenant', 'domain' => 'other.localhost']);
+        $foreignCustomer = Customer::factory()->create(['tenant_id' => $otherTenant->id]);
+        $pipeline = SalesPipeline::factory()->create();
+        $stage = PipelineStage::factory()->create(['sales_pipeline_id' => $pipeline->id]);
+        $product = Product::factory()->create();
+
+        $response = $this->postJson(route('admin.sales_pipeline.opportunities.store'), [
+            'customer_id' => $foreignCustomer->id,
+            'sales_pipeline_id' => $pipeline->id,
+            'pipeline_stage_id' => $stage->id,
+            'name' => 'Cross Tenant Opportunity',
+            'expected_close_date' => now()->addMonth()->format('Y-m-d'),
+            'status' => 'open',
+            'items' => [
+                ['product_id' => $product->id, 'quantity' => 1, 'price' => 100],
+            ],
+        ]);
+
+        // The controller catches \Exception and answers 500 with the reason,
+        // so a refused id surfaces as an error response rather than a 404.
+        $response->assertStatus(500);
+        $response->assertJsonPath('type', 'error');
+        $this->assertDatabaseMissing('sales_opportunities', ['name' => 'Cross Tenant Opportunity']);
     }
 
     public function test_it_can_update_an_opportunity()

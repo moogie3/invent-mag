@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use App\Models\Account;
+use App\Models\JournalEntry;
 use App\Services\AccountingAuditService;
 use App\Services\AccountingService;
 use Carbon\Carbon;
@@ -34,6 +35,36 @@ class ManualJournalEntrySeeder extends Seeder
 
         if (! $cashAccount || ! $expenseAccount) {
             $this->command->warn("Skipping ManualJournalEntrySeeder for tenant {$tenantName}: Required accounts not found. Please run AccountSeeder first.");
+
+            return;
+        }
+
+        // This seeder books six entries that belong to it and nothing else.
+        // They carry no sourceable and entry_type 'standard', which is what
+        // distinguishes them from AccountSeeder's opening balance entries
+        // (entry_type 'opening', also sourceable-less) and from the sales and
+        // purchase journals (standard, but sourceable-backed). Without this a
+        // second db:seed booked six more journal entries and twelve more
+        // transactions on top of the originals: each entry balanced on its
+        // own, so nothing looked wrong, but the general ledger had silently
+        // doubled for this tenant.
+        $ownDescriptions = [
+            'Office Supplies Purchase',
+            'Utility Expense Accrual',
+            'Monthly Rent Payment',
+            'Sales Revenue - Invoice #001',
+            'Monthly Salary Accrual',
+            'Erroneous Entry - To Be Voided',
+        ];
+
+        $alreadySeeded = JournalEntry::where('tenant_id', $tenantId)
+            ->whereNull('sourceable_type')
+            ->where('entry_type', JournalEntry::ENTRY_TYPE_STANDARD)
+            ->whereIn('description', $ownDescriptions)
+            ->exists();
+
+        if ($alreadySeeded) {
+            $this->command->info('Manual journal entries already seeded for tenant '.$tenantName.', skipping.');
 
             return;
         }

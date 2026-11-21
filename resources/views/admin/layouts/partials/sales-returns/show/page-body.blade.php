@@ -202,12 +202,32 @@
                                                 <span class="badge bg-success text-white">{{ __('messages.credit_active') }}</span>
                                             @elseif ($salesReturn->credit->status === 'used')
                                                 <span class="badge bg-secondary text-white">{{ __('messages.credit_used_status') }}</span>
+                                            @elseif ($salesReturn->credit->status === 'refunded')
+                                                <span class="badge bg-info text-white">{{ __('messages.credit_refunded_status') }}</span>
                                             @else
                                                 <span class="badge bg-warning text-white">{{ __('messages.credit_expired_status') }}</span>
                                             @endif
                                         </div>
                                     </div>
                                 </div>
+
+                                @can('create-payments')
+                                    @if ($salesReturn->credit->status === 'active' && $salesReturn->credit->available_amount > 0)
+                                        <div class="border-top pt-3 mt-1 d-flex align-items-center flex-wrap gap-2">
+                                            <form method="POST"
+                                                action="{{ route('admin.sales-returns.refund', $salesReturn->id) }}"
+                                                onsubmit="return confirm('{{ __('messages.credit_refund_confirm') }}');">
+                                                @csrf
+                                                <button type="submit" class="btn btn-danger">
+                                                    <i class="ti ti-cash-banknote me-1"></i> {{ __('messages.refund_credit_cash') }}
+                                                </button>
+                                            </form>
+                                            <span class="text-muted small">
+                                                {{ __('messages.credit_refund_hint') }}
+                                            </span>
+                                        </div>
+                                    @endif
+                                @endcan
                             </div>
                         </div>
                         @endif

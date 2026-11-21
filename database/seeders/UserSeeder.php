@@ -36,6 +36,16 @@ class UserSeeder extends Seeder
 
         $this->command->info("Creating admin user for tenant: {$tenantName}");
 
+        // updateOrCreate() and the accounting_settings save below both fire an
+        // updated event even when nothing is dirty, so a second run added two
+        // activity log rows and no data. The role and settings it applies are
+        // established on the first run.
+        if (User::where('tenant_id', $tenantId)->exists()) {
+            $this->command->info("Admin user already exists for tenant {$tenantName}, skipping.");
+
+            return;
+        }
+
         // Generate shopname from tenant name
         $shopname = $tenantNameSlug;
         if (str_starts_with($tenantName, 'Demo ')) {

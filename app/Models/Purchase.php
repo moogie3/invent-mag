@@ -160,10 +160,19 @@ class Purchase extends Model
                 $this->tax_type ?? 'none'
             );
             if (($this->tax_type ?? 'none') === 'inclusive') {
-                return round($afterDiscount, 2);
+                $total = round($afterDiscount, 2);
+            } else {
+                $total = round($afterDiscount + $taxAmount, 2);
             }
 
-            return round($afterDiscount + $taxAmount, 2);
+            // The purchase journal credits payables with the total AFTER the
+            // withholding and books the withheld tax to PPh Payable on its
+            // own, so the figure this document stands for is net as well.
+            // Leaving it out made the withheld tax read as still owed to the
+            // supplier and kept a fully settled purchase in Partial.
+            $pphAmount = PurchaseHelper::calculatePphAmount($afterDiscount, $this->pph_rate ?? 0);
+
+            return round(max(0, $total - $pphAmount), 2);
         }
 
         $baseTotal = round($this->attributes['total'] ?? 0, 2);
@@ -201,13 +210,20 @@ class Purchase extends Model
             $this->load('items');
         }
 
+        // Same fallback as grand_total: a PO with no lines cannot be
+        // recomputed, so the booked total stands.
+        if ($this->items->isEmpty()) {
+            return (float) ($this->attributes['total'] ?? 0);
+        }
+
         $summary = PurchaseHelper::calculateInvoiceSummaryWithReturns(
             $this->items,
             $this->discount_total ?? 0,
             $this->discount_total_type ?? 'fixed',
             $this->relationLoaded('purchaseReturns') ? $this->purchaseReturns : collect(),
             (float) ($this->tax_rate ?? 0),
-            $this->tax_type ?? 'none'
+            $this->tax_type ?? 'none',
+            (float) ($this->pph_rate ?? 0)
         );
 
         return $summary['finalTotal'];

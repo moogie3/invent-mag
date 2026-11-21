@@ -1,13 +1,15 @@
+import flatpickr from "flatpickr";
+import "flatpickr/dist/themes/material_blue.css";
 import { SALES_PIPELINE_ROUTES, CSRF_TOKEN } from '../common/constants.js';
 import { fetchData } from '../data/init.js';
 import { loadPipelineBoard } from '../ui/pipelineBoard.js';
 import { createProductItemRow, calculateTotalAmount } from '../modals/opportunityItems.js';
 
-const editOpportunityForm = document.getElementById("editOpportunityForm");
-const editOpportunityItemsContainer = document.getElementById(
-    "editOpportunityItemsContainer"
-);
-const pipelineSelect = document.getElementById("pipelineSelect");
+// No element references are held at module level. This bundle is loaded
+// by every admin page and Turbo does not re-run it, so anything captured
+// here is captured before the pipeline page exists and never becomes
+// valid again. initEditOpportunityForm() and loadEditOpportunityModal()
+// both look their own elements up when they run.
 
 let editOpportunityExpectedCloseDateFlatpickr;
 let editOpportunityFormListenerAttached = false;
@@ -97,6 +99,14 @@ export function initEditOpportunityForm() {
 }
 
 export async function loadEditOpportunityModal(opportunityId) {
+    // Looked up here: the old module-level copy was null whenever the
+    // bundle had first run on a different page, so the line below threw
+    // into the catch and the edit modal silently never opened.
+    const editOpportunityItemsContainer = document.getElementById(
+        "editOpportunityItemsContainer"
+    );
+    if (!editOpportunityItemsContainer) return;
+
     try {
         const response = await fetch(
             `${SALES_PIPELINE_ROUTES.opportunitiesBaseUrl}/${opportunityId}`

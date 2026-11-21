@@ -198,23 +198,6 @@
                                             </table>
                                         </div>
                                         </div>
-
-                                        {{-- PAGINATION (if you have pagination for users) --}}
-                                        @if (method_exists($users, 'links'))
-                                            <div class="card-footer d-flex align-items-center">
-                                                <p class="m-0 text-secondary">
-                                                    {{ __('messages.pagination_showing_entries', [
-                                                        'first' => $users->firstItem(),
-                                                        'last' => $users->lastItem(),
-                                                        'total' => $users->total(),
-                                                    ]) }}
-                                                    entries
-                                                </p>
-                                                <div class="ms-auto">
-                                                    {{ $users->appends(request()->query())->links('vendor.pagination.tabler') }}
-                                                </div>
-                                            </div>
-                                        @endif
                                     </div>
                                 </div>
                             </div>

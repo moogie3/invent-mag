@@ -1,13 +1,26 @@
+import Sortable from "sortablejs";
 import { SALES_PIPELINE_ROUTES } from '../common/constants.js';
 import { allPipelines } from '../common/state.js';
 import { formatCurrency, getStatusColor } from '../common/utils.js';
 import { createOpportunityCard } from '../opportunities/card.js';
 import { moveOpportunity } from '../opportunities/dragAndDrop.js';
 
+// Sortable attaches itself to a DOM node and keeps holding it after the
+// node is thrown away, so every rebuild has to let go of the previous
+// set first. Without this each repaint leaked another set of listeners
+// onto the same stage columns.
+let boardSortables = [];
+
+function destroyBoardSortables() {
+    boardSortables.forEach((instance) => instance.destroy());
+    boardSortables = [];
+}
+
 export async function loadPipelineBoard(pipelineId) {
     const pipelineBoard = document.getElementById("pipeline-board");
     if (!pipelineBoard) return;
 
+    destroyBoardSortables();
     pipelineBoard.innerHTML = "";
     const selectedPipeline = allPipelines.find((p) => p.id == pipelineId);
     if (!selectedPipeline) return;
@@ -58,7 +71,11 @@ export async function loadPipelineBoard(pipelineId) {
                 });
                 pipelineBoard.appendChild(stageColumn);
 
-                if (typeof Sortable !== "undefined") {
+                // Sortable is bundled, so it is always here. The old
+                // `typeof Sortable !== "undefined"` check silently built a
+                // board with no drag handles whenever the CDN script had
+                // not landed yet, and nothing ever retried.
+                boardSortables.push(
                     new Sortable(opportunitiesContainer, {
                         group: "opportunities",
                         animation: 150,
@@ -75,8 +92,8 @@ export async function loadPipelineBoard(pipelineId) {
                                 );
                             }
                         },
-                    });
-                }
+                    })
+                );
             });
     } catch (error) {
         console.error("Error loading pipeline board:", error);

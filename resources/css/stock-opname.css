@@ -1,0 +1,68 @@
+/*
+ * Stock opname details page: the print sheet and the autosave flash.
+ *
+ * The screen layout lives in Blade and Tabler; this file holds only what
+ * cannot be expressed there. Printing swaps the interactive sheet for a
+ * signed-off document (buttons, filters and the sidebar carry no ink),
+ * and the flash is the visual half of the autosave confirmation: the
+ * row the count just landed on lights up briefly, so the eye does not
+ * have to hunt for which number changed.
+ */
+
+@media print {
+    body {
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+    }
+
+    /* The print masthead in the Blade already carries reference,
+       warehouse and date; the sidebar would repeat them plus screen-only
+       controls. */
+    .col-md-3,
+    [data-counting-progress],
+    [data-totals-block] {
+        display: none !important;
+    }
+
+    .table {
+        font-size: 11px;
+    }
+
+    .table th,
+    .table td {
+        border: 1px solid #ced4da !important;
+    }
+
+    /* Keep a product's row on one page, and repeat the column heads on
+       every page a long sheet breaks across. */
+    .table tbody tr {
+        break-inside: avoid;
+    }
+
+    .table thead {
+        display: table-header-group;
+    }
+
+    /* An uncounted row prints as a ruled box to write in; a counted one
+       prints the number the counter typed. */
+    .table input {
+        border: 1px solid #adb5bd !important;
+        print-color-adjust: exact;
+    }
+}
+
+@keyframes count-saved-flash {
+    0% {
+        background-color: rgba(13, 110, 253, 0.3);
+    }
+
+    100% {
+        background-color: transparent;
+    }
+}
+
+/* Applied by the autosave for a moment after a row lands; falls back to
+   the row's own variance tint when the animation ends. */
+.count-saved-flash {
+    animation: count-saved-flash 0.9s ease;
+}

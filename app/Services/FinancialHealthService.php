@@ -2,10 +2,10 @@
 
 namespace App\Services;
 
+use App\Helpers\CurrencyHelper;
 use App\Models\Employee;
 use App\Models\JournalEntry;
 use App\Models\PayrollRun;
-use App\Helpers\CurrencyHelper;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 
@@ -77,8 +77,8 @@ class FinancialHealthService
      *
      * @param  string|null  $preset  One of PERIOD_PRESETS. Resolved server-side so a
      *                               filtered URL stays shareable without JavaScript.
-     * @param  string|null  $from    Custom range start (Y-m or Y-m-d).
-     * @param  string|null  $to      Custom range end (Y-m or Y-m-d).
+     * @param  string|null  $from  Custom range start (Y-m or Y-m-d).
+     * @param  string|null  $to  Custom range end (Y-m or Y-m-d).
      */
     public function getOverview(?string $preset = null, ?string $from = null, ?string $to = null): array
     {
@@ -95,6 +95,11 @@ class FinancialHealthService
                 'narrative' => $this->narrative($indicators, $series, $outlook),
                 'outlook' => $outlook,
                 'trends' => $series,
+                // What the shelf holds, and how far the books are from it,
+                // surfaced as their own keys so a caller can render the
+                // figure without digging it out of the indicator list.
+                'stock_value' => $series['stock_value'],
+                'inventory_drift' => $series['inventory_drift'],
                 'attention' => $this->attentionList($series),
                 'period' => $period,
             ];
@@ -406,7 +411,7 @@ class FinancialHealthService
      * one-month window this is exactly the monthly value, which is why the
      * unfiltered page behaves as it always has.
      *
-     * @param  array<int> $idx  Month indexes the window covers.
+     * @param  array<int>  $idx  Month indexes the window covers.
      */
     protected function flowWindowValue(string $key, array $idx, array $s): ?float
     {
@@ -511,6 +516,12 @@ class FinancialHealthService
                 ? 'CAST(substr(a.code, 1, 4) AS INTEGER)'
                 : 'CAST(SUBSTRING(a.code, 1, 4) AS SIGNED)';
             $payrollCodes = implode(',', array_map('intval', config('financial-health.payroll_gl_codes', [6300])));
+            // COGS is the tenant's COGS account (5200 in the seeded chart),
+            // the same account sales and POS entries debit. The whole
+            // 5000-5999 cost group also swallowed purchases, freight and
+            // the contra-expenses, so stock counted as sold the moment it
+            // was bought rather than when it left the warehouse.
+            $cogsAccountId = (int) app('currentTenant')->getAccountingSetting('cost_of_goods_sold_account_id');
 
             // 1) GL monthly aggregates — posted entries only
             $glRows = DB::table('transactions as t')
@@ -525,7 +536,7 @@ class FinancialHealthService
                     SUM(CASE WHEN a.type = 'revenue' THEN CASE t.type WHEN 'credit' THEN t.amount ELSE -t.amount END ELSE 0 END) AS revenue,
                     SUM(CASE WHEN a.type = 'expense' THEN CASE t.type WHEN 'debit' THEN t.amount ELSE -t.amount END ELSE 0 END) AS expenses,
                     SUM(CASE WHEN a.type = 'expense' AND {$prefix} BETWEEN 6000 AND 6999 AND {$prefix} NOT IN ({$payrollCodes}) THEN CASE t.type WHEN 'debit' THEN t.amount ELSE -t.amount END ELSE 0 END) AS operations,
-                    SUM(CASE WHEN {$prefix} BETWEEN 5000 AND 5999 THEN CASE t.type WHEN 'debit' THEN t.amount ELSE -t.amount END ELSE 0 END) AS cogs,
+                    SUM(CASE WHEN t.account_id = {$cogsAccountId} THEN CASE t.type WHEN 'debit' THEN t.amount ELSE -t.amount END ELSE 0 END) AS cogs,
                     SUM(CASE WHEN {$prefix} BETWEEN 1110 AND 1120 THEN CASE t.type WHEN 'debit' THEN t.amount ELSE -t.amount END ELSE 0 END) AS cash_net,
                     SUM(CASE WHEN {$prefix} = 1130 THEN CASE t.type WHEN 'credit' THEN t.amount ELSE -t.amount END ELSE 0 END) AS ar_collections,
                     SUM(CASE WHEN {$prefix} = 1130 THEN CASE t.type WHEN 'debit' THEN t.amount ELSE -t.amount END ELSE 0 END) AS ar_booked
@@ -619,8 +630,8 @@ class FinancialHealthService
             $draftJes = JournalEntry::where('status', 'draft')->count();
 
             // 10 + 11) AR / AP aging with overdue counts (subledger, due_date based)
-            $ar = $this->aging('sales', $tenantId, $driver);
-            $ap = $this->aging('po', $tenantId, $driver);
+            $ar = $this->aging('sales');
+            $ap = $this->aging('po');
 
             // Align everything onto the month labels; cumulate cash into a balance
             $cash = $openingCash;
@@ -657,6 +668,15 @@ class FinancialHealthService
             $series['committed_payroll'] = $committedPayroll;
             $series['draft_jes'] = $draftJes;
             $series['inventory_balance'] = $inventoryBalance;
+            // Stock value and its drift from the ledger are point-in-time
+            // like every balance-sheet figure: one valueOfStock() and one
+            // settings-account balance, both bounded aggregates, and never
+            // re-derived per indicator.
+            $valuation = app(StockValuationService::class);
+            $stockValue = $valuation->valueOfStock();
+            $glInventory = $valuation->glInventoryBalance();
+            $series['stock_value'] = $stockValue;
+            $series['inventory_drift'] = $glInventory === null ? null : $glInventory - $stockValue;
             $series['current_assets'] = (float) ($liquidityRow->current_assets ?? 0);
             $series['current_liabilities'] = (float) ($liquidityRow->current_liabilities ?? 0);
             $series['total_liabilities'] = (float) ($liquidityRow->total_liabilities ?? 0);
@@ -673,38 +693,20 @@ class FinancialHealthService
 
     /**
      * AR/AP aging buckets + counts of 30+ day overdue documents.
-     * Mirrors DashboardService's proven driver-aware SQL (manual tenant_id).
+     *
+     * Read out of the same AgingReportService the report page uses, against
+     * outstanding balances rather than the gross `total` column, so this
+     * screen cannot quote a different figure for the same debt.
      */
-    protected function aging(string $table, int $tenantId, string $driver): array
+    protected function aging(string $table): array
     {
-        $diffSql = $driver === 'sqlite'
-            ? "julianday('now') - julianday(due_date)"
-            : 'DATEDIFF(NOW(), due_date)';
+        $aging = app(AgingReportService::class);
 
-        $row = DB::table($table)
-            ->selectRaw("
-                SUM(CASE WHEN $diffSql < 0 THEN total ELSE 0 END) AS current_amount,
-                SUM(CASE WHEN $diffSql >= 0 AND $diffSql <= 30 THEN total ELSE 0 END) AS overdue_1_30,
-                SUM(CASE WHEN $diffSql > 30 AND $diffSql <= 60 THEN total ELSE 0 END) AS overdue_31_60,
-                SUM(CASE WHEN $diffSql > 60 AND $diffSql <= 90 THEN total ELSE 0 END) AS overdue_61_90,
-                SUM(CASE WHEN $diffSql > 90 THEN total ELSE 0 END) AS overdue_90_plus,
-                SUM(CASE WHEN $diffSql >= 0 THEN total ELSE 0 END) AS total_overdue,
-                COUNT(CASE WHEN $diffSql >= 30 THEN 1 END) AS overdue_30plus_count
-            ")
-            ->where('tenant_id', $tenantId)
-            ->whereIn('status', ['Unpaid', 'Partial'])
-            ->whereNotNull('due_date')
-            ->first();
+        $buckets = $table === 'sales'
+            ? $aging->generateAgedReceivables()
+            : $aging->generateAgedPayables();
 
-        return [
-            'current' => (float) ($row->current_amount ?? 0),
-            '1-30' => (float) ($row->overdue_1_30 ?? 0),
-            '31-60' => (float) ($row->overdue_31_60 ?? 0),
-            '61-90' => (float) ($row->overdue_61_90 ?? 0),
-            '90+' => (float) ($row->overdue_90_plus ?? 0),
-            'total_overdue' => (float) ($row->total_overdue ?? 0),
-            'count_30plus' => (int) ($row->overdue_30plus_count ?? 0),
-        ];
+        return $aging->summarize($buckets, true);
     }
 
     /**
@@ -993,6 +995,28 @@ class FinancialHealthService
             'reason' => $dso === null
                 ? __('messages.fh_reason.dso_none')
                 : $why($dso <= $cfg['dso']['good'] ? 'dso_fast' : ($dso <= $cfg['dso']['warn'] ? 'dso_watch' : 'dso_slow'), ['{days}' => number_format($dso, 0)]),
+            'delta' => null,
+        ];
+
+        // 13) STOCK VALUE: what the warehouse holds, checked against the
+        // Inventory account. This is the only card whose whole job is to
+        // say whether the two records of the same goods agree: the shelf
+        // (batches plus unbatched units at buying price) and the posted
+        // ledger. No Inventory account configured means there is nothing to
+        // reconcile against, so it reads neutral rather than accusing a
+        // tenant that keeps no books of being wrong.
+        $stockValue = $s['stock_value'] ?? 0;
+        $drift = $s['inventory_drift'] ?? null;
+        $status = $drift === null ? 'neutral'
+            : (abs($drift) > $noise['amount'] ? 'danger' : 'good');
+        $out[] = [
+            'key' => 'stock_value', 'label' => __('messages.stock_value'), 'icon' => 'ti-box',
+            'value' => $stockValue, 'display' => 'money', 'status' => $status,
+            'reason' => $drift === null
+                ? __('messages.fh_reason.stock_no_books')
+                : ($status === 'danger'
+                    ? $why('stock_drift', ['{amount}' => CurrencyHelper::format(abs($drift))])
+                    : $why('stock_matched')),
             'delta' => null,
         ];
 
@@ -1360,7 +1384,7 @@ class FinancialHealthService
 
         $window = max(1, (int) ($s['period']['window'] ?? 3));
         $expense3 = $this->avg($this->lastN($this->completeValues($s, 'expenses_gl'), $window));
-        if ($expense3 > 0 && $s['cash_now'] / $expense3 < $cfg['cash']['cover_warn']) {
+        if ($expense3 > 0 && $cfg['cash']['cover_warn'] > $s['cash_now'] / $expense3) {
             $items[] = [
                 'status' => 'warn', 'icon' => 'ti-wallet',
                 'text' => __('messages.fh_attention.low_cash'),
@@ -1387,6 +1411,20 @@ class FinancialHealthService
                 'amount' => null,
                 'url' => route('admin.accounting.journal'),
                 'link_label' => __('messages.open_journal'),
+            ];
+        }
+
+        // The books and the shelf disagreeing is not a rounding difference:
+        // it means stock left or arrived without the ledger hearing about
+        // it, which is exactly what the adjustment log records.
+        $drift = $s['inventory_drift'] ?? null;
+        if ($drift !== null && abs($drift) > $cfg['noise']['amount']) {
+            $items[] = [
+                'status' => 'danger', 'icon' => 'ti-box',
+                'text' => __('messages.fh_attention.inventory_drift'),
+                'amount' => abs($drift),
+                'url' => route('admin.reports.adjustment-log'),
+                'link_label' => __('messages.view_details'),
             ];
         }
 

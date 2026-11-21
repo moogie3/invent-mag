@@ -7,6 +7,8 @@ use App\Mail\SalesInvoiceMail;
 use App\Models\Customer;
 use App\Models\Product;
 use App\Models\Sales;
+use App\Rules\LineDiscountWithinPrice;
+use App\Rules\TaxIsSelectable;
 use App\Services\SalesService;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
@@ -52,6 +54,8 @@ class SalesController extends Controller
 
     public function edit($id)
     {
+        $sale = Sales::findOrFail($id);
+
         $data = $this->salesService->getSalesEditData($id);
 
         return view('admin.sales.sales-edit', $data);
@@ -94,14 +98,14 @@ class SalesController extends Controller
             'customer_id' => 'required|exists:customers,id',
             'order_date' => 'required|date',
             'due_date' => 'required|date',
-            'products' => 'required|json',
+            'products' => ['required', 'json', new LineDiscountWithinPrice],
             'discount_total' => 'nullable|numeric|min:0',
             'discount_total_type' => 'nullable|in:fixed,percentage',
-            'tax_id' => 'nullable|exists:taxes,id',
+            'tax_id' => ['nullable', new TaxIsSelectable],
             'ppn_enabled' => 'nullable|boolean',
             'ppn_rate' => 'nullable|numeric|min:0|max:100',
             'ppn_amount' => 'nullable|numeric|min:0',
-            'pph_tax_id' => 'nullable|exists:taxes,id',
+            'pph_tax_id' => ['nullable', new TaxIsSelectable(enforceJurisdiction: false)],
         ]);
 
         try {
@@ -138,17 +142,20 @@ class SalesController extends Controller
 
         $request->validate([
             'invoice' => ['nullable', 'string', Rule::unique('sales', 'invoice')->where('tenant_id', auth()->user()->tenant_id)->ignore($sale->id)],
-            'customer_id' => 'required|exists:customers,id',
+            // A walk-in POS sale has no customer, and its edit form posts
+            // the empty customer field it renders for one. Regular sales
+            // are billed to a customer, so theirs stays required.
+            'customer_id' => [$sale->type === Sales::TYPE_POS ? 'nullable' : 'required', 'exists:customers,id'],
             'order_date' => 'required|date',
             'due_date' => 'required|date',
-            'products' => 'required|json',
+            'products' => ['required', 'json', new LineDiscountWithinPrice],
             'discount_total' => 'nullable|numeric|min:0',
             'discount_total_type' => 'nullable|in:fixed,percentage',
-            'tax_id' => 'nullable|exists:taxes,id',
+            'tax_id' => ['nullable', new TaxIsSelectable],
             'ppn_enabled' => 'nullable|boolean',
             'ppn_rate' => 'nullable|numeric|min:0|max:100',
             'ppn_amount' => 'nullable|numeric|min:0',
-            'pph_tax_id' => 'nullable|exists:taxes,id',
+            'pph_tax_id' => ['nullable', new TaxIsSelectable(enforceJurisdiction: false)],
         ]);
 
         try {

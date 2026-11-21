@@ -76,6 +76,25 @@ class UserControllerTest extends TestCase
         $response->assertViewHas('entries', $userData['entries']);
     }
 
+    public function test_index_renders_without_a_pagination_footer()
+    {
+        // The user list is not paginated: the service returns every user
+        // because the role stats above the table count the whole collection.
+        $response = $this->get(route('admin.users.index'));
+
+        $response->assertStatus(200);
+        $this->assertStringNotContainsString(
+            'data-pagination-footer',
+            $response->getContent(),
+            'An unpaginated list must not render a pagination footer.'
+        );
+        $this->assertStringNotContainsString(
+            'entries entries',
+            $response->getContent(),
+            'The entries line must never print the word twice.'
+        );
+    }
+
     public function test_store_user_successfully()
     {
         $userData = [

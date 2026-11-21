@@ -174,11 +174,14 @@
                         </tbody>
                     </table>
                 </div>
-                @if($subscriptions->hasPages())
-                <div class="card-footer d-flex justify-content-center border-top">
-                    {{ $subscriptions->links() }}
+                <div data-pagination-footer class="card-footer d-flex align-items-center">
+                    <p class="m-0 text-secondary">
+                        {{ __('messages.pagination_showing_entries', ['first' => $subscriptions->firstItem() ?? 0, 'last' => $subscriptions->lastItem() ?? 0, 'total' => $subscriptions->total()]) }}
+                    </p>
+                    <div class="ms-auto">
+                        {{ $subscriptions->appends(request()->query())->links('vendor.pagination.tabler') }}
+                    </div>
                 </div>
-                @endif
             </div>
         </div>
     </div>

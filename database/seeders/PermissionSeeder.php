@@ -195,6 +195,18 @@ class PermissionSeeder extends Seeder
     private function assignToPos()
     {
         $role = Role::findOrCreate('pos');
+
+        // syncPermissions() detaches everything not in the list below, and
+        // RolePermissionSeeder runs after this seeder and adds permissions
+        // this list does not cover. Re-running the sync therefore stripped
+        // those back out: role_has_permissions lost two rows here and gained
+        // them again on the next seeder, so a second db:seed churned the
+        // table without ever changing the end state. Establish the baseline
+        // once and leave it alone.
+        if ($role->permissions()->exists()) {
+            return;
+        }
+
         $permissions = [
             'view-products', 'create-products',
             'view-sales', 'create-sales',
@@ -209,6 +221,14 @@ class PermissionSeeder extends Seeder
     private function assignToStaff()
     {
         $role = Role::findOrCreate('staff');
+
+        // Same reasoning as assignToPos(): syncPermissions() is destructive
+        // towards the extras RolePermissionSeeder adds afterwards, so the
+        // sync only runs when the role has no permissions yet.
+        if ($role->permissions()->exists()) {
+            return;
+        }
+
         $permissions = [
             'view-products', 'create-products', 'edit-products', 'delete-products', 'import-products',
             'view-purchase-orders', 'create-purchase-orders', 'edit-purchase-orders', 'delete-purchase-orders',

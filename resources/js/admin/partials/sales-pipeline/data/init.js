@@ -34,7 +34,7 @@ export async function initializeData() {
                 setAllCustomers(JSON.parse(customersData));
             }
         } catch (error) {
-            // // console.error("Error parsing initial data:", error);
+            console.error("Error parsing initial data:", error);
             InventMagApp.showToast(
                 "Error",
                 "Error loading initial data. Please refresh the page.",
@@ -75,7 +75,10 @@ export async function initializeData() {
         }
         setAllProducts(await productsResponse.json());
     } catch (error) {
-        // // console.error("Error fetching products:", error);
+        // Kept live on purpose: this was commented out, which is the only
+        // reason a failing product fetch showed a generic toast with no
+        // way to tell what actually went wrong.
+        console.error("Error fetching products:", error);
         InventMagApp.showToast(
             "Error",
             "Failed to load product data. Please refresh the page.",
@@ -97,7 +100,7 @@ export async function fetchData() {
         renderPipelinesSelect(false);
         renderPipelinesList();
     } catch (error) {
-        // // console.error("Error re-fetching data:", error);
+        console.error("Error re-fetching data:", error);
         InventMagApp.showToast(
             "Error",
             "Failed to re-fetch data. Please try again.",

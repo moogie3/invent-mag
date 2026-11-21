@@ -1,3 +1,5 @@
+import flatpickr from "flatpickr";
+import "flatpickr/dist/themes/material_blue.css";
 import { formatCurrency } from "../../../../utils/currencyFormatter.js";
 
 export class SalesOrderModule {

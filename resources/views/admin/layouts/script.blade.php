@@ -1,16 +1,11 @@
-{{-- Load jQuery FIRST --}}
-<script src="https://code.jquery.com/jquery-3.7.1.min.js"
-    integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
-
-{{-- Load Tabler JS (remove defer since jQuery is already loaded) --}}
+{{-- Tabler JS. Every library below is served from public/ rather than a
+     CDN: nothing here waits on an external host before the page can run,
+     and nothing can change version out from under us. Chart.js and
+     Flatpickr are no longer globals at all, they are bundled by Vite into
+     the page that actually uses them. --}}
 <script src="{{ asset('tabler/dist/js/tabler.min.js?1692870487') }}"></script>
 <script src="{{ asset('tabler/dist/js/demo.min.js?1692870487') }}"></script>
-
-{{-- Load other external libraries --}}
-<script src="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/js/select2.min.js"></script>
 <script src="{{ asset('tabler/dist/libs/list.js/dist/list.min.js?1692870487') }}"></script>
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
 
 {{-- Global Notification Helper --}}
 @vite(['resources/js/admin/utils/sound.js', 'resources/js/admin/helpers/notification.js'])

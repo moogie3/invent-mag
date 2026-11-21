@@ -15,6 +15,19 @@ class StockOpnameSeeder extends Seeder
     {
         $tenantId = app('currentTenant')->id;
 
+        // Same guard as SalesSeeder, SalesReturnSeeder and
+        // PurchaseReturnSeeder. The three reference numbers below are fixed
+        // strings and stock_opnames is unique on (tenant_id,
+        // reference_number), so a second run in the same day collided on
+        // SO-{today}-0001 and aborted db:seed partway through the tenant loop.
+        if (StockOpname::where('tenant_id', $tenantId)->exists()) {
+            if ($this->command) {
+                $this->command->info('Stock opnames already exist for tenant '.$tenantId.'. Skipping to preserve existing data.');
+            }
+
+            return;
+        }
+
         $products = Product::where('tenant_id', $tenantId)->limit(10)->get();
         $users = User::where('tenant_id', $tenantId)->get();
         $warehouses = Warehouse::where('tenant_id', $tenantId)->get();

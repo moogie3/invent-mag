@@ -36,8 +36,12 @@ var actionBadgeClasses = {
     'reverse': 'bg-lime text-dark'
 };
 
-var configEl = document.getElementById('audit-log-config');
-var auditLogTranslations = configEl ? JSON.parse(configEl.getAttribute('data-translations') || '{}') : (window.auditLogTranslations || {
+// Resolved from the page rather than once at import: this bundle is
+// shared by every admin page, so the config island is normally not in the
+// document when the module first evaluates and Turbo never re-runs it.
+// Refreshed at the top of initAuditLog(), which runs on every turbo:load
+// for this page, before any detail modal can be opened.
+var auditLogTranslations = {
     timestamp: 'Timestamp',
     user: 'User',
     module: 'Module',
@@ -49,9 +53,26 @@ var auditLogTranslations = configEl ? JSON.parse(configEl.getAttribute('data-tra
     after: 'After',
     error_loading_details: 'Error loading details',
     close: 'Close'
-});
+};
+
+function refreshAuditLogTranslations() {
+    var configEl = document.getElementById('audit-log-config');
+    if (!configEl) return;
+
+    try {
+        auditLogTranslations = Object.assign(
+            {},
+            auditLogTranslations,
+            JSON.parse(configEl.getAttribute('data-translations') || '{}')
+        );
+    } catch (e) {
+        // A malformed island should cost the labels, not the page.
+    }
+}
 
 function initAuditLog() {
+    refreshAuditLogTranslations();
+
     document.querySelectorAll('.btn-view-detail').forEach(function (btn) {
         btn.addEventListener('click', function () {
             var logId = this.dataset.logId;

@@ -7,7 +7,7 @@
 @endphp
 
 <!DOCTYPE html>
-<html lang="en" data-bs-theme="dark">
+<html lang="en" data-bs-theme="{{ $themeMode }}">
 
 <head>
     <meta charset="utf-8" />
@@ -21,7 +21,7 @@
     <link href="{{ asset('tabler/dist/css/tabler-payments.min.css') }}" rel="stylesheet" />
     <link href="{{ asset('tabler/dist/css/tabler-vendors.min.css') }}" rel="stylesheet" />
     @vite('resources/css/error.css')
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+    <link rel="stylesheet" href="{{ asset('tabler/dist/icons/tabler-icons.min.css') }}?2.47.0">
     @vite('resources/js/admin/layouts/page-loader.js')
 </head>
 

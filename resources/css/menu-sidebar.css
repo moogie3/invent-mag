@@ -543,8 +543,8 @@ body.layout-navbar .main-content {
    Hover: in light the tint deepens and the ink stays ink - declining the
    shared dark plate is deliberate, because that plate's white text and
    white chevron are painted for a dark surface and would vanish on a pale
-   one. In dark the existing !important white flash wins (fighting it is the
-   trap dark.css documents); the tray returns on mouse-out. */
+   one. In dark the existing !important white flash wins; the tray returns
+   on mouse-out. */
 .sidebar:not(.collapsed) .navbar-nav .nav-link.has-active-child {
     background-color: rgba(var(--tblr-primary-rgb, 0, 84, 166), 0.08);
     box-shadow: inset 0 0 0 1px rgba(var(--tblr-primary-rgb, 0, 84, 166), 0.18);
@@ -603,11 +603,10 @@ body[data-bs-theme="dark"] .sidebar:not(.collapsed) .navbar-nav .nav-link.has-ac
    deepened tint rather than letting it blink off - this rule outranks the
    rail's transparent-plus-disc hover - and the disc still shows because it
    lives in background-image, which nothing here touches. In dark the
-   existing !important white flash wins, exactly as it does expanded:
-   fighting it is the trap dark.css documents, and the tint returns on
-   mouse-out. The primary glyph is light-only in effect: dark.css pins
-   every sidebar icon to #727476 !important, which is pre-existing and
-   deliberately not fought. .active and .has-active-child can never
+   existing !important white flash wins, exactly as it does expanded, and
+   the tint returns on mouse-out. The primary glyph is restated for dark by
+   audit finding #12 below, which lifts it off the dark tray. .active and
+   .has-active-child can never
    co-occur - a parent carries no route of its own, so menu-sidebar.js's
    href="#" skip keeps .active off it - so nothing here can shadow the
    position marker. */
@@ -631,10 +630,11 @@ body[data-bs-theme="dark"] .sidebar.collapsed .navbar-nav .nav-link.has-active-c
     background-color: rgba(var(--tblr-primary-rgb, 0, 84, 166), 0.28);
 }
 
-/* Audit finding #12: light mode gives the marked parent's glyph the primary
-   color (.has-active-child .nav-link-icon above), but dark.css pins every
-   sidebar icon to #727476 !important, so the dark row told two stories -
-   primary tray, grey glyph. The claim is restated here in a LIFTED primary.
+/* Audit finding #12: the marked parent's glyph takes the primary color
+   (.has-active-child .nav-link-icon above), but on the dark tray that
+   literal blue was too dark to read - the row told two stories, primary
+   tray against an unreadable glyph. The claim is restated here in a LIFTED
+   primary.
    The literal #0054a6 lands ~2:1 against the tray painted just above
    (rgba primary 0.28 over #121416 is about rgb(13,38,62)), under the 3:1
    non-text contrast needs, so color-mix blends the SAME hue 62% primary /

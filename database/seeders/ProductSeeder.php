@@ -18,6 +18,15 @@ class ProductSeeder extends Seeder
         $tenantId = app('currentTenant')->id;
         $tenantName = app('currentTenant')->name;
 
+        // The products below are all updateOrCreate()d, so a second run
+        // created nothing but did fire five updated events, each of which the
+        // activity log listener wrote a row for.
+        if (Product::where('tenant_id', $tenantId)->exists()) {
+            $this->command->info("Products already seeded for tenant {$tenantName}, skipping.");
+
+            return;
+        }
+
         // Fetch existing IDs for the current tenant
         $categoryIds = Categories::where('tenant_id', $tenantId)->pluck('id')->toArray();
         $unitIds = Unit::where('tenant_id', $tenantId)->pluck('id')->toArray();

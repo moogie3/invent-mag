@@ -16,6 +16,17 @@ class PipelineStageSeeder extends Seeder
         $tenantId = app('currentTenant')->id;
         $pipeline = SalesPipeline::where('is_default', true)->where('tenant_id', $tenantId)->first();
 
+        // Same reason as SalesPipelineSeeder: the five updateOrCreate() calls
+        // below are no-ops on a second run but still each write an activity
+        // log row.
+        if (PipelineStage::where('tenant_id', $tenantId)->exists()) {
+            if (isset($this->command)) {
+                $this->command->info('Pipeline stages already seeded for tenant '.$tenantId.', skipping.');
+            }
+
+            return;
+        }
+
         if ($pipeline) {
             PipelineStage::updateOrCreate(
                 ['sales_pipeline_id' => $pipeline->id, 'name' => 'Qualification', 'tenant_id' => $tenantId],

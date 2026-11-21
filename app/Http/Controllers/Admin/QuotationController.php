@@ -10,6 +10,8 @@ use App\Models\Quotation;
 use App\Models\Sales;
 use App\Models\Tax;
 use App\Models\User;
+use App\Rules\LineDiscountWithinPrice;
+use App\Rules\TaxIsSelectable;
 use App\Services\SalesService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -71,40 +73,49 @@ class QuotationController extends Controller
         $products = Product::orderBy('name')->get();
         $taxes = Tax::active()->orderBy('name')->get();
         $quotation = new Quotation;
+        // Resolved, not the stored flag: this has to be the same tax the
+        // service would book with if the form sent no tax_id at all.
+        $defaultTax = Tax::effectiveDefault();
 
-        return view('admin.quotations.quotation-create', compact('customers', 'products', 'taxes', 'quotation'));
+        return view('admin.quotations.quotation-create', compact('customers', 'products', 'taxes', 'quotation', 'defaultTax'));
     }
 
     public function store(Request $request)
     {
+        // The quotation form posts its lines as `items[...][field]` inputs,
+        // while sales and purchases post one hidden `products` JSON blob.
+        // Accept both: `products` when present (existing clients), the item
+        // inputs otherwise, so the form works with or without JavaScript.
+        $items = $request->input('items');
+        if (! $request->filled('products') && is_array($items) && $items !== []) {
+            $request->merge(['products' => json_encode(array_values($items))]);
+        }
+
         $request->validate([
             'customer_id' => 'required|exists:customers,id',
             'quotation_date' => 'required|date',
             'valid_until' => 'nullable|date',
-            'products' => 'required|json',
+            'products' => ['required', 'json', new LineDiscountWithinPrice],
             'notes' => 'nullable|string',
             'terms_conditions' => 'nullable|string',
             'discount_total' => 'nullable|numeric|min:0',
             'discount_total_type' => 'nullable|in:fixed,percentage',
-            'tax_id' => 'nullable|exists:taxes,id',
-            'pph_tax_id' => 'nullable|exists:taxes,id',
+            'tax_id' => ['nullable', new TaxIsSelectable],
+            'pph_tax_id' => ['nullable', new TaxIsSelectable(enforceJurisdiction: false)],
         ]);
 
         try {
             DB::beginTransaction();
 
             $products = json_decode($request->products, true);
-            $subtotal = 0;
-            foreach ($products as $item) {
-                $subtotal += ($item['quantity'] ?? 1) * ($item['price'] ?? 0);
-            }
+            [$products, $subtotal] = $this->priceItems($products);
 
             $discountType = $request->discount_total_type ?? 'percentage';
             $discountValue = $request->discount_total ?? 0;
             $discountAmount = $discountType === 'percentage' ? ($subtotal * $discountValue / 100) : $discountValue;
 
             $taxId = $request->tax_id;
-            $tax = $taxId ? Tax::find($taxId) : (Tax::default()->first() ?? Tax::active()->first());
+            $tax = $taxId ? Tax::find($taxId) : Tax::effectiveDefault();
             $taxRate = $tax ? (float) $tax->rate : 0;
             $taxType = $tax ? $tax->type : 'none';
             $afterDiscount = $subtotal - $discountAmount;
@@ -174,45 +185,67 @@ class QuotationController extends Controller
     public function edit($id)
     {
         $quotation = Quotation::with('customer')->findOrFail($id);
+
+        // A converted quotation is the source document of a sale that is
+        // already on the books and already linked from this row. Editing it
+        // now would only make the quote disagree with the sale it produced,
+        // so the view is where it goes rather than the form.
+        if ($quotation->converted_to_sales_id) {
+            return redirect()->route('admin.quotations.show', $id);
+        }
+
         $customers = Customer::orderBy('name')->get();
         $products = Product::orderBy('name')->get();
         $taxes = Tax::active()->orderBy('name')->get();
+        $defaultTax = Tax::effectiveDefault();
 
-        return view('admin.quotations.quotation-edit', compact('quotation', 'customers', 'products', 'taxes'));
+        return view('admin.quotations.quotation-edit', compact('quotation', 'customers', 'products', 'taxes', 'defaultTax'));
     }
 
     public function update(Request $request, $id)
     {
         $quotation = Quotation::findOrFail($id);
 
+        // Same refusal as edit(): the sale already exists from this
+        // quotation, so changing the quotation would leave the two linked
+        // documents reporting different totals. Refused before validation
+        // so the message is the reason rather than a field error.
+        if ($quotation->converted_to_sales_id) {
+            return redirect()->back()->with('error', 'This quotation has already been converted to a sales order and can no longer be edited.');
+        }
+
+        // Same shape as store(): the form posts `items[...]` inputs, the
+        // legacy clients post `products` JSON. Normalize before validating.
+        $items = $request->input('items');
+        if (! $request->filled('products') && is_array($items) && $items !== []) {
+            $request->merge(['products' => json_encode(array_values($items))]);
+        }
+
         $request->validate([
             'customer_id' => 'required|exists:customers,id',
             'quotation_date' => 'required|date',
             'valid_until' => 'nullable|date',
-            'products' => 'required|json',
+            'products' => ['required', 'json', new LineDiscountWithinPrice],
             'notes' => 'nullable|string',
             'terms_conditions' => 'nullable|string',
             'discount_total' => 'nullable|numeric|min:0',
             'discount_total_type' => 'nullable|in:fixed,percentage',
-            'tax_id' => 'nullable|exists:taxes,id',
-            'pph_tax_id' => 'nullable|exists:taxes,id',
+            'tax_id' => ['nullable', new TaxIsSelectable],
+            'pph_tax_id' => ['nullable', new TaxIsSelectable(enforceJurisdiction: false)],
         ]);
 
         try {
             DB::beginTransaction();
 
             $products = json_decode($request->products, true);
-            $subtotal = 0;
-            foreach ($products as $item) {
-                $subtotal += ($item['quantity'] ?? 1) * ($item['price'] ?? 0);
-            }
+            [$products, $subtotal] = $this->priceItems($products);
 
             $discountType = $request->discount_total_type ?? 'percentage';
             $discountValue = $request->discount_total ?? 0;
             $discountAmount = $discountType === 'percentage' ? ($subtotal * $discountValue / 100) : $discountValue;
 
             $taxId = $request->tax_id;
-            $tax = $taxId ? Tax::find($taxId) : (Tax::default()->first() ?? Tax::active()->first());
+            $tax = $taxId ? Tax::find($taxId) : Tax::effectiveDefault();
             $taxRate = $tax ? (float) $tax->rate : 0;
             $taxType = $tax ? $tax->type : 'none';
             $afterDiscount = $subtotal - $discountAmount;
@@ -343,8 +376,16 @@ class QuotationController extends Controller
                 'order_date' => now(),
                 'due_date' => now()->addDays(30),
                 'payment_type' => 'credit',
-                'order_discount' => $quotation->discount_amount,
-                'order_discount_type' => $quotation->discount_type,
+                // Store the discount the way createSale() and updateSale()
+                // do: the raw value together with the type that describes it.
+                // discount_amount is the WORKED-OUT figure (10% of 1,000 =
+                // 100), so pairing it with discount_type='percentage' told
+                // every re-calculating reader to take 100% off instead: the
+                // sales view, invoice PDF and email all showed 0, balance due
+                // showed 0, and saving that sale re-journaled it as zero
+                // revenue against the full cost of goods.
+                'order_discount' => $quotation->discount_value ?? 0,
+                'order_discount_type' => $quotation->discount_type ?? 'fixed',
                 'tax_id' => $quotation->tax_id,
                 'tax_rate' => $quotation->tax_rate,
                 'total_tax' => $quotation->tax_amount,
@@ -476,6 +517,48 @@ class QuotationController extends Controller
         }
     }
 
+    /**
+     * Price the lines exactly as the sales and purchase documents do: a
+     * fixed discount comes off every unit, a percentage comes off every
+     * unit's price, and the line total is the net unit price times the
+     * quantity. The subtotal is the sum of those totals, so a quotation
+     * keeps agreeing with the sale it converts into once line discounts
+     * are on the table (the old loop counted quantity times price and
+     * silently ignored the discount on every line).
+     *
+     * `name` and `total` are worked out in the same pass because the
+     * print, show and edit views read them from the stored JSON and the
+     * raw request carries neither.
+     *
+     * @param  array<int|string, array<string, mixed>>  $products
+     * @return array{0: array<int, array<string, mixed>>, 1: float}
+     */
+    private function priceItems(array $products): array
+    {
+        $productIds = array_filter(array_column($products, 'product_id'));
+        $names = $productIds === [] ? [] : Product::whereIn('id', $productIds)->pluck('name', 'id');
+
+        $items = [];
+        $subtotal = 0.0;
+
+        foreach (array_values($products) as $item) {
+            $price = (float) ($item['price'] ?? 0);
+            $quantity = (float) ($item['quantity'] ?? 1);
+            $discount = (float) ($item['discount'] ?? 0);
+            $discountType = $item['discount_type'] ?? $item['discountType'] ?? 'fixed';
+
+            $lineTotal = round(SalesHelper::calculateTotal($price, $quantity, $discount, $discountType), 2);
+            $subtotal += $lineTotal;
+
+            $productId = $item['product_id'] ?? null;
+            $item['name'] = ($item['name'] ?? '') !== '' ? $item['name'] : ($names[$productId] ?? null);
+            $item['total'] = $lineTotal;
+            $items[] = $item;
+        }
+
+        return [$items, round($subtotal, 2)];
+    }
+
     private function generateQuotationNumber(): string
     {
         $prefix = 'QTN-'.date('Ymd');
@@ -484,12 +567,23 @@ class QuotationController extends Controller
             ->first();
 
         if ($last) {
-            $lastNum = (int) substr($last->quotation_number, -4);
+            // Everything after the last dash, not the last four characters:
+            // QTN-20261115-10000 reads as 10000, not 0000, so the sequence
+            // does not wrap back to 0001 and trip the unique constraint once
+            // a day passes ten thousand quotations.
+            $lastNum = (int) substr($last->quotation_number, strrpos($last->quotation_number, '-') + 1);
             $newNum = $lastNum + 1;
         } else {
             $newNum = 1;
         }
 
-        return "{$prefix}-".str_pad($newNum, 4, '0', STR_PAD_LEFT);
+        // Step past anything already on file so the sequence never proposes
+        // a number this tenant already holds.
+        do {
+            $quotationNumber = "{$prefix}-".str_pad($newNum, 4, '0', STR_PAD_LEFT);
+            $newNum++;
+        } while (Quotation::where('quotation_number', $quotationNumber)->exists());
+
+        return $quotationNumber;
     }
 }

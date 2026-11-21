@@ -5,6 +5,7 @@ namespace Tests\Feature\Admin;
 use App\Models\Categories;
 use App\Models\Product;
 use App\Models\Supplier;
+use App\Models\Tenant;
 use App\Models\Unit;
 use App\Models\Warehouse;
 use App\Services\ProductService;
@@ -399,6 +400,97 @@ class ProductControllerTest extends TestCase
             ->assertJsonCount(0);
     }
 
+    /**
+     * Give the product two warehouses of stock and pin down what the empty
+     * search returns: total_stock has to add both of them up, while
+     * main_warehouse_stock stays on the main one. It also pins the exact set
+     * of fields the sales pipeline reads, so slimming this response further
+     * (or quietly growing it again) shows up here.
+     */
+    #[Test]
+    public function empty_search_sums_stock_across_every_warehouse_and_returns_only_what_the_picker_reads()
+    {
+        if (! Warehouse::where('is_main', true)->exists()) {
+            Warehouse::factory()->create(['is_main' => true]);
+        }
+        Product::forgetMainWarehouseId();
+        $mainWarehouseId = Product::getMainWarehouseId();
+
+        $overflowWarehouse = Warehouse::factory()->create(['is_main' => false]);
+
+        $product = Product::factory()->create([
+            'name' => 'Warehouse Split Part',
+            'description' => 'A long description that has no business travelling to a product picker.',
+        ]);
+
+        // The factory drops a stock row of its own with a random quantity.
+        // Replace it so both totals below are exact.
+        $product->productWarehouses()->delete();
+        $product->productWarehouses()->create(['warehouse_id' => $mainWarehouseId, 'quantity' => 40]);
+        $product->productWarehouses()->create(['warehouse_id' => $overflowWarehouse->id, 'quantity' => 60]);
+
+        $response = $this->actingAs($this->user)
+            ->getJson(route('admin.product.search', ['q' => '']));
+
+        $response->assertStatus(200);
+
+        $row = collect($response->json())->firstWhere('name', 'Warehouse Split Part');
+
+        $this->assertNotNull($row, 'The product is missing from the empty search response.');
+
+        $this->assertSame(
+            100.0,
+            (float) $row['total_stock'],
+            'total_stock must add up every warehouse, not just the main one.'
+        );
+        $this->assertSame(100.0, (float) $row['stock_quantity']);
+        $this->assertSame(
+            40.0,
+            (float) $row['main_warehouse_stock'],
+            'main_warehouse_stock must stay main-warehouse only.'
+        );
+
+        foreach (['id', 'name', 'selling_price', 'main_warehouse_stock'] as $field) {
+            $this->assertArrayHasKey($field, $row, "The pipeline reads {$field}.");
+        }
+
+        foreach (['description', 'image', 'cover_url', 'productWarehouses'] as $field) {
+            $this->assertArrayNotHasKey($field, $row, "{$field} should not ship to a product picker.");
+        }
+    }
+
+    /**
+     * searchProducts() (the branch behind a non-empty q) used to eager-load
+     * productWarehouses filtered down to the main warehouse, and the stock
+     * accessors trust whatever relation they are handed.
+     */
+    #[Test]
+    public function product_search_service_sums_stock_across_every_warehouse()
+    {
+        if (! Warehouse::where('is_main', true)->exists()) {
+            Warehouse::factory()->create(['is_main' => true]);
+        }
+        Product::forgetMainWarehouseId();
+        $mainWarehouseId = Product::getMainWarehouseId();
+
+        $overflowWarehouse = Warehouse::factory()->create(['is_main' => false]);
+
+        $product = Product::factory()->create(['name' => 'Multi Warehouse Gadget']);
+        $product->productWarehouses()->delete();
+        $product->productWarehouses()->create(['warehouse_id' => $mainWarehouseId, 'quantity' => 40]);
+        $product->productWarehouses()->create(['warehouse_id' => $overflowWarehouse->id, 'quantity' => 60]);
+
+        $found = app(ProductService::class)->searchProducts('Multi Warehouse Gadget');
+
+        $this->assertCount(1, $found);
+        $this->assertSame(
+            100.0,
+            (float) $found->first()->total_stock,
+            'total_stock must add up every warehouse, not just the main one.'
+        );
+        $this->assertSame(40.0, (float) $found->first()->main_warehouse_stock);
+    }
+
     #[Test]
     public function search_by_barcode_returns_404_when_product_not_found()
     {
@@ -461,6 +553,31 @@ class ProductControllerTest extends TestCase
             ]);
 
         $this->assertDatabaseHas('product_warehouse', ['product_id' => $product->id, 'quantity' => 10]);
+    }
+
+    /**
+     * The stock record, the adjustment row and every quantity column behind
+     * them are integers, but adjustment_amount was validated as numeric:
+     * a crafted post of 2.5 decremented the shelf by 2.5 while the row
+     * truncated it to 2, so the log and the shelf disagreed by half a unit.
+     * The modal's own input has no step, so the browser allowed it too.
+     */
+    #[Test]
+    public function adjust_stock_rejects_a_fractional_amount()
+    {
+        $product = Product::factory()->withStock(20)->create();
+
+        $response = $this->actingAs($this->user)
+            ->postJson(route('admin.product.adjust-stock'), [
+                'product_id' => $product->id,
+                'adjustment_amount' => 2.5,
+                'adjustment_type' => 'decrease',
+                'reason' => 'Half a unit',
+            ]);
+
+        $response->assertStatus(422)->assertJsonValidationErrors('adjustment_amount');
+        $this->assertDatabaseMissing('stock_adjustments', ['product_id' => $product->id, 'reason' => 'Half a unit']);
+        $this->assertEquals(20, $product->fresh()->stock_quantity, 'A refused adjustment must not move stock.');
     }
 
     #[Test]
@@ -628,6 +745,106 @@ class ProductControllerTest extends TestCase
 
         $response->assertStatus(302)
             ->assertSessionHasErrors(['barcode']);
+    }
+
+    /**
+     * The barcode index was global: tenant B could not take a barcode
+     * tenant A already scanned, even though the two catalogues never
+     * meet. Uniqueness belongs to the tenant, and the DB index has to
+     * agree with the validation or the two disagree at the worst
+     * moment: the insert.
+     */
+    #[Test]
+    public function barcode_is_unique_per_tenant_not_globally()
+    {
+        $otherTenant = Tenant::create(['name' => 'Other Tenant', 'domain' => 'other.localhost']);
+        Product::factory()->create([
+            'tenant_id' => $otherTenant->id,
+            'barcode' => 'CROSS-TENANT-BC',
+        ]);
+
+        $response = $this->actingAs($this->user)->post(route('admin.product.store'), [
+            'code' => 'BC-OWN-001',
+            'name' => 'Own product',
+            'barcode' => 'CROSS-TENANT-BC',
+            'stock_quantity' => 10,
+            'price' => 50.0,
+            'selling_price' => 100.0,
+            'category_id' => Categories::factory()->create()->id,
+            'units_id' => Unit::factory()->create()->id,
+            'supplier_id' => Supplier::factory()->create()->id,
+            'warehouse_id' => Warehouse::factory()->create()->id,
+        ]);
+
+        $response->assertStatus(302);
+        $response->assertSessionHasNoErrors();
+        $this->assertDatabaseHas('products', [
+            'barcode' => 'CROSS-TENANT-BC',
+            'tenant_id' => $this->tenant->id,
+        ]);
+    }
+
+    /**
+     * The other half of the same rule: within one catalogue the barcode
+     * still has to be unique, and as a validation message rather than
+     * the database exception the store path used to surface.
+     */
+    #[Test]
+    public function store_rejects_a_duplicate_barcode_within_the_tenant()
+    {
+        Product::factory()->create(['barcode' => 'SAME-BC']);
+
+        $response = $this->actingAs($this->user)->post(route('admin.product.store'), [
+            'code' => 'BC-DUP-001',
+            'name' => 'Second product',
+            'barcode' => 'SAME-BC',
+            'stock_quantity' => 10,
+            'price' => 50.0,
+            'selling_price' => 100.0,
+            'category_id' => Categories::factory()->create()->id,
+            'units_id' => Unit::factory()->create()->id,
+            'supplier_id' => Supplier::factory()->create()->id,
+            'warehouse_id' => Warehouse::factory()->create()->id,
+        ]);
+
+        $response->assertStatus(302)
+            ->assertSessionHasErrors(['barcode']);
+        $this->assertEquals(1, Product::withoutGlobalScopes()->where('barcode', 'SAME-BC')->count());
+    }
+
+    /**
+     * The update rule carried the same global index, so another tenant's
+     * data blocked an edit here with a false "already taken". With the
+     * constraint scoped to the tenant, the edit goes through.
+     */
+    #[Test]
+    public function update_can_take_a_barcode_another_tenant_already_uses()
+    {
+        $otherTenant = Tenant::create(['name' => 'Other Tenant', 'domain' => 'other.localhost']);
+        Product::factory()->create([
+            'tenant_id' => $otherTenant->id,
+            'barcode' => 'TAKEN-ELSEWHERE',
+        ]);
+        $mine = Product::factory()->create(['barcode' => 'MY-BC']);
+
+        $response = $this->actingAs($this->user)
+            ->put(route('admin.product.update', $mine->id), [
+                'code' => $mine->code,
+                'name' => $mine->name,
+                'barcode' => 'TAKEN-ELSEWHERE',
+                'price' => $mine->price,
+                'selling_price' => $mine->selling_price,
+                'category_id' => $mine->category_id,
+                'units_id' => $mine->units_id,
+                'supplier_id' => $mine->supplier_id,
+            ]);
+
+        $response->assertStatus(302);
+        $response->assertSessionHasNoErrors();
+        $this->assertDatabaseHas('products', [
+            'id' => $mine->id,
+            'barcode' => 'TAKEN-ELSEWHERE',
+        ]);
     }
 
     #[Test]

@@ -75,6 +75,11 @@
                                                         <tbody id="invoiceTableBody" class="table-tbody">
                                                             @forelse ($taxes as $index => $tax)
                                                                 <tr>
+                                                                    @php
+                                                                        // Resolved default, not the stored flag: the page must agree
+                                                                        // with the tax every document actually books with.
+                                                                        $isDefault = $defaultTax !== null && $defaultTax->id === $tax->id;
+                                                                    @endphp
                                                                     <td class="sort-no">
                                                                         {{ $taxes->firstItem() + $index }}</td>
                                                                     <td class="sort-name">{{ $tax->name }}</td>
@@ -96,7 +101,7 @@
                                                                         @endif
                                                                     </td>
                                                                     <td>
-                                                                        @if ($tax->is_default)
+                                                                        @if ($isDefault)
                                                                             <span class="badge bg-primary text-white rounded-pill">{{ __('messages.default') }}</span>
                                                                         @endif
                                                                     </td>
@@ -111,17 +116,19 @@
                                                                                 data-type="{{ $tax->type }}"
                                                                                 data-description="{{ $tax->description }}"
                                                                                 data-is-active="{{ $tax->is_active ? '1' : '0' }}"
-                                                                                data-is-default="{{ $tax->is_default ? '1' : '0' }}"
+                                                                                data-is-default="{{ $isDefault ? '1' : '0' }}"
+                                                                                data-is-ppn="{{ $tax->is_ppn ? '1' : '0' }}"
+                                                                                data-is-pph="{{ $tax->is_pph ? '1' : '0' }}"
                                                                                 title="{{ __('messages.edit') }}">
                                                                                 <i class="ti ti-edit"></i>
                                                                             </button>
 
-                                                                            @if (!$tax->is_default)
+                                                                            @if (!$isDefault)
                                                                              <button type="button" class="btn btn-icon btn-ghost-success"
                                                                                 data-bs-toggle="modal"
                                                                                 data-bs-target="#defaultTaxModal"
                                                                                 data-onclick="setSetDefaultTaxFormAction('{{ route('admin.setting.tax.default', $tax->id) }}', '{{ $tax->name }} ({{ $tax->rate }}%)')"
-                                                                                title="{{ __('messages.tax_set_default') }}">
+                                                                                title="{{ __('messages.tax_set_as_default') }}">
                                                                                 <i class="ti ti-star"></i>
                                                                             </button>
                                                                             @endif
@@ -155,11 +162,11 @@
                                                     </table>
                                                 </div>
                                             </div>
-                                            <div class="card-footer d-flex align-items-center">
+                                            <div data-pagination-footer class="card-footer d-flex align-items-center">
                                                 <p class="m-0 text-secondary">
                                                     {{ __('messages.pagination_showing_entries', [
-                                                        'first' => $taxes->firstItem(),
-                                                        'last' => $taxes->lastItem(),
+                                                        'first' => $taxes->firstItem() ?? 0,
+                                                        'last' => $taxes->lastItem() ?? 0,
                                                         'total' => $taxes->total(),
                                                     ]) }}
                                                 </p>

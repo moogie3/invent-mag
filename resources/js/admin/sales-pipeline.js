@@ -1,3 +1,5 @@
+import flatpickr from "flatpickr";
+import "flatpickr/dist/themes/material_blue.css";
 import {
     initializeData,
     fetchData,
@@ -27,8 +29,36 @@ import {
 import { onPageLoad } from './utils/onPageLoad.js';
 import { formatCurrency } from '../utils/currencyFormatter.js';
 
+// Turbo snapshots the page before caching it, marker and all. Wipe the boot
+// marker so a restored copy of this page initialises again instead of coming
+// back up blank.
+document.addEventListener("turbo:before-cache", function () {
+    const pageAnchor = document.querySelector(
+        ".card-body[data-initial-pipelines]"
+    );
+    if (pageAnchor) {
+        delete pageAnchor.dataset.booted;
+    }
+});
+
 onPageLoad(function () {
     if (!window.location.pathname.includes("/admin/sales-pipeline")) return;
+
+    // Second layer of the boot guard. onPageLoad is given the id
+    // 'sales-pipeline', so it already keeps a done flag on window and runs
+    // this at most once per visit on its own. This marker is independent of
+    // that flag: it lives on the element Turbo snapshots, and the listener
+    // above wipes it before the snapshot is taken, so a restored copy boots
+    // again while a brand new page does not carry it at all. It is kept off
+    // `document` because Turbo reuses one Document object for the whole
+    // session and would otherwise leave it set after navigating away.
+    const pageAnchor = document.querySelector(
+        ".card-body[data-initial-pipelines]"
+    );
+    if (pageAnchor) {
+        if (pageAnchor.dataset.booted === "true") return;
+        pageAnchor.dataset.booted = "true";
+    }
 
     const pipelineSelect = document.getElementById("pipelineSelect");
     const newStagePipelineId = document.getElementById("newStagePipelineId");

@@ -6,6 +6,8 @@ use App\Models\Account;
 use App\Models\JournalEntry;
 use App\Services\FinancialHealthService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\DB;
 use Tests\TestCase;
 use Tests\Traits\CreatesTenant;
@@ -71,12 +73,12 @@ class FinancialHealthServiceTest extends TestCase
 
     // ── Indicators ──────────────────────────────────────────────────
 
-    public function test_indicators_cover_all_twelve_health_metrics()
+    public function test_indicators_cover_all_thirteen_health_metrics()
     {
         $overview = $this->service->getOverview();
         $keys = collect($overview['indicators'])->pluck('key')->all();
 
-        $expected = ['cash', 'revenue', 'purchases', 'receivables', 'payables', 'payroll', 'turnover', 'debt_to_equity', 'gross_margin', 'net_margin', 'liquidity', 'dso'];
+        $expected = ['cash', 'revenue', 'purchases', 'receivables', 'payables', 'payroll', 'turnover', 'debt_to_equity', 'gross_margin', 'net_margin', 'liquidity', 'dso', 'stock_value'];
         $this->assertEqualsCanonicalizing($expected, $keys);
     }
 
@@ -135,7 +137,7 @@ class FinancialHealthServiceTest extends TestCase
         // (every "vs average" is null-guarded, not a division by zero).
         $overview = $this->service->getOverview();
 
-        $this->assertCount(12, $overview['indicators']);
+        $this->assertCount(13, $overview['indicators']);
         foreach ($overview['indicators'] as $ind) {
             $this->assertNotSame('danger', $ind['status'], "empty tenant should not flag {$ind['key']} critical");
         }
@@ -352,11 +354,11 @@ class FinancialHealthServiceTest extends TestCase
 
     // ── Period comparison (modal + "Compare all") ───────────────────
 
-    public function test_comparison_returns_twelve_rows_split_flow_and_locked()
+    public function test_comparison_returns_thirteen_rows_split_flow_and_locked()
     {
         $comparison = $this->service->getComparison();
 
-        $this->assertCount(12, $comparison['rows']);
+        $this->assertCount(13, $comparison['rows']);
 
         $flow = collect($comparison['rows'])->where('comparable', true);
         $locked = collect($comparison['rows'])->where('comparable', false);
@@ -367,9 +369,12 @@ class FinancialHealthServiceTest extends TestCase
             ['cash', 'revenue', 'net_margin', 'gross_margin', 'purchases'],
             $flow->pluck('key')->all()
         );
-        $this->assertCount(7, $locked);
+        $this->assertCount(8, $locked);
         $this->assertContains('dso', $locked->pluck('key')->all());
         $this->assertContains('debt_to_equity', $locked->pluck('key')->all());
+        // A shelf value does not move with the period filter either: it is
+        // what the warehouse holds on the day the page is opened.
+        $this->assertContains('stock_value', $locked->pluck('key')->all());
 
         // Every locked row explains WHY it does not move.
         foreach ($locked as $row) {
@@ -607,11 +612,11 @@ class FinancialHealthServiceTest extends TestCase
     {
         $comparison = $this->service->getComparison('last_3');
 
-        // 5 flow rows carry a real delta; 7 balance-sheet snapshots stay
+        // 5 flow rows carry a real delta; 8 balance-sheet snapshots stay
         // locked with a reason, whatever the filter says.
         $rows = collect($comparison['rows']);
         $this->assertSame(5, $rows->where('comparable', true)->count());
-        $this->assertSame(7, $rows->where('comparable', false)->count());
+        $this->assertSame(8, $rows->where('comparable', false)->count());
         $rows->where('comparable', false)->each(function ($row) {
             $this->assertNotNull($row['lock_reason']);
             $this->assertNull($row['delta']);
@@ -619,10 +624,10 @@ class FinancialHealthServiceTest extends TestCase
 
         // Each side spans the full selected window: 3 months back-to-back.
         $compared = $comparison['compared'];
-        $current = \Illuminate\Support\Carbon::parse($compared['current']);
-        $currentFrom = \Illuminate\Support\Carbon::parse($compared['current_from']);
-        $previous = \Illuminate\Support\Carbon::parse($compared['previous']);
-        $previousFrom = \Illuminate\Support\Carbon::parse($compared['previous_from']);
+        $current = Carbon::parse($compared['current']);
+        $currentFrom = Carbon::parse($compared['current_from']);
+        $previous = Carbon::parse($compared['previous']);
+        $previousFrom = Carbon::parse($compared['previous_from']);
         $this->assertSame(2, (int) $currentFrom->diffInMonths($current));
         $this->assertSame(2, (int) $previousFrom->diffInMonths($previous));
         // And the prior window ends exactly where the current one begins.
@@ -645,7 +650,7 @@ class FinancialHealthServiceTest extends TestCase
         // The locale lives on the user, not the URL, so the Indonesian side
         // is asserted here: every period-bearing string must translate AND
         // leave no raw {placeholder} behind once the service fills it.
-        \Illuminate\Support\Facades\App::setLocale('id');
+        App::setLocale('id');
 
         // Seed posted revenue so the margin reasons (the period-bearing
         // ones) actually render instead of the "no activity" variants.
@@ -680,6 +685,48 @@ class FinancialHealthServiceTest extends TestCase
         $this->assertNotSame('Default (rolling window)', __('messages.fh_period_default'));
         $this->assertNotSame('Hide', __('messages.hide'));
 
-        \Illuminate\Support\Facades\App::setLocale('en');
+        App::setLocale('en');
+    }
+
+    /**
+     * COGS is the tenant's COGS account, not the whole 5000-5999 cost
+     * group. Summing the group priced stock as sold the moment it was
+     * bought: 5000 of purchases plus 700 genuinely sold read as 5700.
+     */
+    public function test_cogs_series_costs_only_the_cogs_account()
+    {
+        $tenantId = $this->tenant->id;
+        $purchasesAccount = Account::create([
+            'code' => '5100', 'name' => 'Purchases', 'type' => 'expense', 'tenant_id' => $tenantId,
+        ]);
+        $cogsAccountId = $this->tenant->getAccountingSetting('cost_of_goods_sold_account_id');
+        $cashAccountId = $this->tenant->getAccountingSetting('cash_account_id');
+        $inventoryAccountId = $this->tenant->getAccountingSetting('inventory_account_id');
+
+        // Buy 5000 of stock, then sell 700 of it through the books.
+        $je = JournalEntry::create([
+            'tenant_id' => $tenantId,
+            'date' => now()->toDateString(),
+            'description' => 'buy 5000, sell 700 of it',
+            'status' => 'posted',
+        ]);
+        DB::table('transactions')->insert([
+            ['journal_entry_id' => $je->id, 'tenant_id' => $tenantId, 'account_id' => $purchasesAccount->id, 'type' => 'debit', 'amount' => 5000, 'created_at' => now(), 'updated_at' => now()],
+            ['journal_entry_id' => $je->id, 'tenant_id' => $tenantId, 'account_id' => $cashAccountId, 'type' => 'credit', 'amount' => 5000, 'created_at' => now(), 'updated_at' => now()],
+            ['journal_entry_id' => $je->id, 'tenant_id' => $tenantId, 'account_id' => $cogsAccountId, 'type' => 'debit', 'amount' => 700, 'created_at' => now(), 'updated_at' => now()],
+            ['journal_entry_id' => $je->id, 'tenant_id' => $tenantId, 'account_id' => $inventoryAccountId, 'type' => 'credit', 'amount' => 700, 'created_at' => now(), 'updated_at' => now()],
+        ]);
+
+        $this->app->forgetInstance(FinancialHealthService::class);
+
+        $series = app(FinancialHealthService::class)->getOverview()['trends'];
+        $month = array_search(now()->format('Y-m'), $series['labels'], true);
+
+        $this->assertNotFalse($month, 'The current month must appear in the series.');
+        $this->assertEquals(
+            700,
+            $series['cogs'][$month],
+            'COGS must cost the 700 sold, not the 5000 bought.'
+        );
     }
 }

@@ -369,7 +369,7 @@
              The section itself stays open — the intro and the color legend
              are always useful. Each metric entry, however, is collapsed to
              its title until clicked: reference material a user reads once,
-             so 16 paragraphs of prose never bury the legend. Toggles are
+             so 17 paragraphs of prose never bury the legend. Toggles are
              wired in financial-health.js (CSP blocks inline handlers). --}}
         @php
             // Each entry is [label key, body key] rendered in the order the
@@ -387,6 +387,7 @@
                 ['understanding_net_margin', 'understanding_net_margin_body'],
                 ['understanding_liquidity', 'understanding_liquidity_body'],
                 ['understanding_dso', 'understanding_dso_body'],
+                ['understanding_stock_value', 'understanding_stock_value_body'],
             ];
             $explainerOutlook = [
                 ['understanding_confidence', 'understanding_confidence_body'],

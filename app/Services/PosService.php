@@ -14,6 +14,7 @@ use App\Models\Supplier;
 use App\Models\Tax;
 use App\Models\Unit;
 use App\Models\Warehouse;
+use App\Services\Concerns\CostsLineItems;
 use Carbon\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
@@ -21,6 +22,8 @@ use Illuminate\Support\Facades\DB;
 
 class PosService
 {
+    use CostsLineItems;
+
     /**
      * Products per catalog page. With 1000+ items the POS grid renders this
      * page up front and loads the rest via admin.pos.products (search/paging).
@@ -162,7 +165,7 @@ class PosService
         // always submits tax_id — "None (0%)" sends an empty value, which must
         // be honored as no tax. Only fall back to the default active tax when
         // the field is absent entirely (clients that omit the selection).
-        $defaultTax = Tax::default()->first() ?? Tax::active()->first();
+        $defaultTax = Tax::effectiveDefault();
         $taxId = array_key_exists('tax_id', $data) ? ($data['tax_id'] ?: null) : $defaultTax?->id;
         $tax = $taxId ? Tax::find($taxId) : null;
         $taxType = $tax?->type ?? 'none';
@@ -173,13 +176,27 @@ class PosService
         // For inclusive tax the price already contains tax; do NOT add taxAmount again.
         $grandTotal = ($taxType === 'inclusive') ? $taxable : ($taxable + $taxAmount);
 
-        // Validate cash payment covers the total
+        // Withholding (PPh) is subtracted from what the customer owes, so the
+        // cash check has to run against that NET figure - the same one the POS
+        // cart sends as grandTotalInput - not the pre-withholding gross. The
+        // check used to run first and reject a payment of exactly what the
+        // receipt shows.
+        $pphTaxId = $data['pph_tax_id'] ?? null;
+        $pphTax = $pphTaxId ? Tax::find($pphTaxId) : null;
+        // Gate like the snapshot below: for a non-Indonesian tenant the
+        // total must not shrink, since pph_amount is recorded as 0.
+        $pphApplied = app('currentTenant')->isIndonesian() && ($pphTax?->is_pph ?? false);
+        $pphTaxRate = $pphApplied && $pphTax ? (float) $pphTax->rate : 0;
+        $pphAmount = $pphApplied ? SalesHelper::calculatePphAmount($taxable, $pphTaxRate) : 0;
+        $dueTotal = max(0, $grandTotal - $pphAmount);
+
+        // Validate cash payment covers the amount due
         $paymentMethod = $data['payment_method'] ?? 'Cash';
-        $amountReceived = (float) ($data['amount_received'] ?? $grandTotal);
-        if (strtoupper($paymentMethod) === 'CASH' && $amountReceived < $grandTotal) {
+        $amountReceived = (float) ($data['amount_received'] ?? $dueTotal);
+        if (strtoupper($paymentMethod) === 'CASH' && $amountReceived < $dueTotal) {
             throw new \Exception(
                 'Amount received ('.number_format($amountReceived, 2, '.', '').') '.
-                'must be greater than or equal to the grand total ('.number_format($grandTotal, 2, '.', '').').'
+                'must be greater than or equal to the amount due ('.number_format($dueTotal, 2, '.', '').').'
             );
         }
 
@@ -193,6 +210,12 @@ class PosService
             $invoiceNumber = $lastNumber + 1;
         }
         $invoice = 'POS-'.str_pad($invoiceNumber, 4, '0', STR_PAD_LEFT);
+        // Never propose a number this tenant already holds (a manually
+        // entered POS invoice can sit above the newest row's number).
+        while (Sales::where('invoice', $invoice)->exists()) {
+            $invoiceNumber++;
+            $invoice = 'POS-'.str_pad($invoiceNumber, 4, '0', STR_PAD_LEFT);
+        }
 
         $mainWarehouse = Warehouse::where('is_main', true)->first();
         if (! $mainWarehouse) {
@@ -233,21 +256,24 @@ class PosService
             throw new \Exception('Insufficient stock for: '.$productList.'. Please adjust quantities or restock.');
         }
 
-        return DB::transaction(function () use ($data, $products, $dbProducts, $grandTotal, $orderDiscount, $orderDiscountType, $tax, $taxAmount, $taxRateVal, $taxId, $taxType, $mainWarehouse, $invoice, $amountReceived, $taxable) {
-            $pphTaxId = $data['pph_tax_id'] ?? null;
-            $pphTax = $pphTaxId ? Tax::find($pphTaxId) : null;
-            // Gate like the snapshot below: for a non-Indonesian tenant the
-            // total must not shrink, since pph_amount is recorded as 0.
-            $pphApplied = app('currentTenant')->isIndonesian() && ($pphTax?->is_pph ?? false);
-            $pphTaxRate = $pphApplied && $pphTax ? (float) $pphTax->rate : 0;
-            $pphAmount = $pphApplied ? SalesHelper::calculatePphAmount($taxable, $pphTaxRate) : 0;
-            // Update grandTotal to subtract PPh
+        return DB::transaction(function () use ($data, $products, $dbProducts, $grandTotal, $orderDiscount, $orderDiscountType, $tax, $taxAmount, $taxRateVal, $taxId, $taxType, $mainWarehouse, $invoice, $amountReceived, $pphTax, $pphTaxRate, $pphAmount) {
+            // Update grandTotal to subtract PPh (computed above the cash check)
             $grandTotal = max(0, $grandTotal - $pphAmount);
 
             $changeAmount = max(0, $amountReceived - $grandTotal);
+
+            // exists:customers,id is raw SQL with no tenant filter, so it
+            // would accept another tenant's customer id. Re-resolve through
+            // the scoped model. A walk-in sale carries no customer at all
+            // and stays legal, so only a present id is checked.
+            $customerId = $data['customer_id'] ?? null;
+            if ($customerId !== null && $customerId !== '') {
+                $customerId = Customer::findOrFail($customerId)->id;
+            }
+
             $sale = Sales::create([
                 'invoice' => $invoice,
-                'customer_id' => $data['customer_id'],
+                'customer_id' => $customerId,
                 'user_id' => Auth::id(),
                 'warehouse_id' => $mainWarehouse->id,
                 'order_date' => $data['transaction_date'],
@@ -268,6 +294,14 @@ class PosService
                 'pph_rate' => app('currentTenant')->isIndonesian() && ($pphTax?->is_pph ?? false) ? $pphTaxRate : null,
                 'pph_amount' => app('currentTenant')->isIndonesian() && ($pphTax?->is_pph ?? false) ? $pphAmount : 0,
                 'pph_tax_id' => app('currentTenant')->isIndonesian() && ($pphTax?->is_pph ?? false) ? $pphTax?->id : null,
+                // PPN snapshot, same gating as the journal's VAT split below.
+                // e-Faktur (isPpn), Tenant::unissuedCount() and the sales
+                // return PPN reversal all read these off the row; without
+                // them a POS PPN sale was invisible to all three even though
+                // its journal had already credited PPN Keluaran.
+                'ppn_enabled' => app('currentTenant')->isIndonesian() && ($tax?->is_ppn ?? false),
+                'ppn_rate' => app('currentTenant')->isIndonesian() && ($tax?->is_ppn ?? false) ? $taxRateVal : null,
+                'ppn_amount' => app('currentTenant')->isIndonesian() && ($tax?->is_ppn ?? false) ? $taxAmount : 0,
             ]);
 
             $sale->payments()->create([
@@ -281,6 +315,8 @@ class PosService
                 ->where('warehouse_id', $mainWarehouse->id)
                 ->get()
                 ->keyBy('product_id');
+
+            $totalCostOfGoods = 0;
 
             foreach ($products as $product) {
                 $productModel = $dbProducts[$product['id']] ?? null;
@@ -303,11 +339,22 @@ class PosService
                 if (isset($stockRecords[$product['id']])) {
                     $stockRecords[$product['id']]->decrement('quantity', $product['quantity']);
                 }
-            }
 
-            $totalCostOfGoods = 0;
-            foreach ($dbProducts as $productModel) {
-                $totalCostOfGoods += ($productModel->cost_price ?? 0) * ($products[array_search($productModel->id, array_column($products, 'id'))]['quantity'] ?? 0);
+                // Costed the way a regular sale costs it, batches and all.
+                // This used to read $productModel->cost_price, a column that
+                // has never existed on products, so the value was always null
+                // and every POS transaction booked zero cost: revenue was
+                // recorded, the goods were never charged against it, and the
+                // Inventory account never fell even though stock had left the
+                // warehouse. Note the two different prices in play here:
+                // $product['price'] is what the cashier charged (the selling
+                // price the POS screen sends), $productModel->price is what
+                // the goods cost us.
+                $totalCostOfGoods += $this->costAndConsumeBatches(
+                    $productModel->id,
+                    $product['quantity'],
+                    $productModel->price
+                );
             }
 
             $accountingSettings = app('currentTenant')->accounting_settings ?? [];
@@ -318,9 +365,17 @@ class PosService
                 $inventoryAccount = Account::find($accountingSettings['inventory_account_id']);
 
                 if ($salesRevenueAccount && $accountsReceivableAccount && $costOfGoodsSoldAccount && $inventoryAccount) {
+                    // AR is booked at the GROSS the customer owes before
+                    // withholding: $grandTotal is already net of PPh (it was
+                    // reduced above) and the withholding entry credits AR a
+                    // second time, so booking the net deducted the withheld
+                    // amount twice and left AR sitting at minus the PPh.
+                    // Same figure SalesService::postSaleJournalEntry() uses.
+                    $arBase = $grandTotal + $pphAmount;
+
                     $transactions = [
-                        ['account_name' => $accountsReceivableAccount->name, 'type' => 'debit', 'amount' => $grandTotal],
-                        ['account_name' => $salesRevenueAccount->name, 'type' => 'credit', 'amount' => $grandTotal],
+                        ['account_name' => $accountsReceivableAccount->name, 'type' => 'debit', 'amount' => $arBase],
+                        ['account_name' => $salesRevenueAccount->name, 'type' => 'credit', 'amount' => $arBase],
                         ['account_name' => $costOfGoodsSoldAccount->name, 'type' => 'debit', 'amount' => $totalCostOfGoods],
                         ['account_name' => $inventoryAccount->name, 'type' => 'credit', 'amount' => $totalCostOfGoods],
                     ];
@@ -339,7 +394,7 @@ class PosService
 
                             foreach ($transactions as &$transaction) {
                                 if ($transaction['account_name'] === $salesRevenueAccount->name && $transaction['type'] === 'credit') {
-                                    $transaction['amount'] = round($grandTotal - $taxAmount, 2);
+                                    $transaction['amount'] = round($arBase - $taxAmount, 2);
                                 }
                             }
                             unset($transaction);

@@ -261,6 +261,14 @@ class Sales extends Model
             $this->load('salesItems');
         }
 
+        // An invoice with no line items has nothing to recompute from, so the
+        // booked total is the answer - the same fallback grand_total already
+        // uses. Without it a line-less invoice reports an adjusted total of 0
+        // and therefore a balance of 0, whatever it was actually billed.
+        if ($this->salesItems->isEmpty()) {
+            return (float) ($this->attributes['total'] ?? 0);
+        }
+
         if (! $this->relationLoaded('salesReturns')) {
             $this->load('salesReturns');
         }

@@ -255,9 +255,9 @@ function initAdjustStockModal() {
             let adjustmentAmount = 0;
             
             if (adjustmentType === 'correction') {
-                adjustmentAmount = parseFloat(correctionAmountInput?.value) || 0;
+                adjustmentAmount = parseInt(correctionAmountInput?.value, 10) || 0;
             } else {
-                adjustmentAmount = parseFloat(adjustmentAmountInput?.value) || 0;
+                adjustmentAmount = parseInt(adjustmentAmountInput?.value, 10) || 0;
             }
 
             let newStock = currentStock;
@@ -330,9 +330,9 @@ function initAdjustStockModal() {
                 let adjustmentAmount = 0;
 
                 if (adjustmentType === 'correction') {
-                    adjustmentAmount = parseFloat(document.getElementById('correctionAmount').value) || 0;
+                    adjustmentAmount = parseInt(document.getElementById('correctionAmount').value, 10) || 0;
                 } else {
-                    adjustmentAmount = parseFloat(document.getElementById('adjustmentAmount').value) || 0;
+                    adjustmentAmount = parseInt(document.getElementById('adjustmentAmount').value, 10) || 0;
                 }
 
                 if (!adjustmentAmount || adjustmentAmount < 0) {
@@ -354,7 +354,7 @@ function initAdjustStockModal() {
                         product_id: productId,
                         warehouse_id: warehouseId,
                         adjustment_type: adjustmentType,
-                        adjustment_amount: parseFloat(adjustmentAmount),
+                        adjustment_amount: parseInt(adjustmentAmount, 10),
                         reason: reason
                     })
                 })

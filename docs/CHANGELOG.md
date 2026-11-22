@@ -9,6 +9,68 @@ Date-ordered, newest first.
 
 ---
 
+## 2026-11-22: The Books and the Shelf Disagreed by Rp 3.9 Million Because Four Seeders Moved Stock Without Journaling It, so Two Repairs Bring Inventory Back to the Stock on Hand
+
+The repairs are migrations `2026_11_21_000001_reverse_provably_wrong_sale_cogs.php`
+and `2026_11_21_000002_align_gl_inventory_to_stock_on_hand.php` (named for the repair
+date they carry), plus the same alignment call at the end of `DatabaseSeeder`.
+
+### What was wrong, and why it is seed data only
+
+Two records describe the same stock: the shelf (`product_warehouse` valued at batch
+cost) and the Inventory account in the ledger. After a fresh seed they disagreed in
+every tenant, to a grand total of 3,906,790.82 (shelf 4,905,476.68 against Inventory
+998,685.86). The cause is four demo stock sources that move goods without ever
+journaling them: `StockAdjustmentSeeder`'s "Initial stock adjustment",
+`ProductSeeder`'s fixed rows, `SalesSeeder`'s pre-sale top-up and
+`CreditFeatureSeeder`'s top-ups. `StockTransferSeeder` nets to zero per product and
+correctly needs no entry. Every production path (purchase, POS, adjustment, opname,
+returns) journals correctly, so real data was never wrong: tenant 3's two real POS
+sales book correctly and are untouched by these repairs.
+
+### Only what can be proven is moved
+
+`StockValuationService::assessSaleCost()` compares each sale's booked COGS with the
+range of costs its surviving batch history still permits for the moment the sale was
+made: a batch untouched since the sale held exactly its recorded remaining, one moved
+since may have held anything from none to all of it, a batch received later did not
+exist, and a product repriced after the sale bounds nothing above. The range relaxes
+the draw to dearest-first and cheapest-first, which can only widen it, but keeps one
+FIFO fact: a batch is reachable only after every batch before it has run dry, so a
+later dearer batch cannot absorb a line the earlier full batches would have blocked
+(`a_dearer_batch_sitting_behind_a_full_earlier_one_is_out_of_reach`, red against the
+version that drew without that rule).
+
+Of 320 seeded sales: 42 provably overstated (10,079.79 reversed), 5 provably
+understated (1,474.67 posted), 206 correct, and 67 indeterminate, which are reported
+and left alone rather than moved on an estimate. Each correction is sourced to its
+sale and dated as the sale, so a later edit or delete reverses it with everything
+else the sale owns, and a re-run finds the ledger sitting on the proven edge and
+posts nothing.
+
+### One entry closes the rest, and a second run posts nothing
+
+`alignGlToShelf()` posts stock on hand minus Inventory in a single entry: Inventory
+on one side, Opening Balance Equity (`3010`) on the other, which is the account
+QuickBooks, Xero and Wave credit when inventory is set up at company setup. The
+mirror entry books when the ledger claims more than the shelf holds. Migration B
+applies it to an existing database, after the COGS repair so it measures what is
+left, and the `DatabaseSeeder` tail applies the same call to a fresh one, which is
+what keeps `a_second_full_seed_is_a_no_op` and the new
+`a_fresh_seed_leaves_every_inventory_account_matching_the_stock_on_hand` true at the
+same time. Both migrations run on the next deploy or container start, because
+`deploy.yml` and `docker/start.sh` already run `migrate --force` and a migration runs
+once, recorded in the `migrations` table.
+
+After them the ledger reconciles exactly to the shelf: 998,685.86 + (10,079.79 -
+1,474.67) + 3,898,185.70 = 4,905,476.68.
+
+Proof: 1641 tests, 6163 assertions, exit 0; Pint clean; `BackfillCogs` refactored
+onto `bookedCostOfSale()` and `recomputedCostOfSale()` with its original 9 tests
+staying green; the envelope revert-proven red then green as above.
+
+---
+
 ## 2026-11-21: POS Sales Can Be Edited Without Losing the Cash, Barcodes and Document Numbers Became Per-Tenant, Stock Opname Counts Got Search, Filters and a Dry Run, and a Backfill Priced the Sales That Carried No Cost
 
 Work from 2026-11-17 to 2026-11-21, on top of the two entries below. Every

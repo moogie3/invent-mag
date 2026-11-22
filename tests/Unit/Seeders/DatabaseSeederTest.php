@@ -6,6 +6,7 @@ use App\Models\JournalEntry;
 use App\Models\Purchase;
 use App\Models\Sales;
 use App\Models\Tenant;
+use App\Services\StockValuationService;
 use Database\Seeders\AccountSeeder;
 use Database\Seeders\DatabaseSeeder;
 use Database\Seeders\PurchaseReturnSeeder;
@@ -423,6 +424,47 @@ class DatabaseSeederTest extends TestCase
             [],
             $overpaid,
             'Invoices paid more than they total: '.implode('; ', $overpaid)
+        );
+    }
+
+    /**
+     * Four demo stock sources move goods without journaling them, so
+     * DatabaseSeeder closes the gap at the end of every tenant. A fresh
+     * seed must therefore end with each tenant's Inventory account equal
+     * to what its stock is worth, or the demo books would open lying:
+     * every balance sheet built on them would inherit the difference.
+     */
+    #[Test]
+    public function a_fresh_seed_leaves_every_inventory_account_matching_the_stock_on_hand(): void
+    {
+        $this->seed(DatabaseSeeder::class);
+
+        $misaligned = [];
+
+        foreach (Tenant::query()->get() as $tenant) {
+            $tenant->execute(function () use ($tenant, &$misaligned) {
+                $drift = app(StockValuationService::class)->drift();
+
+                if ($drift === null) {
+                    $misaligned[] = "{$tenant->name}: no Inventory account to measure against";
+
+                    return;
+                }
+
+                if (abs($drift) >= 0.01) {
+                    $misaligned[] = sprintf(
+                        '%s: Inventory account is off the stock on hand by %s',
+                        $tenant->name,
+                        number_format($drift, 2)
+                    );
+                }
+            });
+        }
+
+        $this->assertSame(
+            [],
+            $misaligned,
+            'Seeded books do not match the stock: '.implode(' | ', $misaligned)
         );
     }
 

@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 use App\Models\Plan;
 use App\Models\Tenant;
+use App\Services\StockValuationService;
 use Illuminate\Database\Seeder;
 
 // Add this line
@@ -118,6 +119,24 @@ class DatabaseSeeder extends Seeder
                 AttendanceSeeder::class,
                 PayrollSeeder::class,
             ]);
+
+            // Four of those seeders move stock without journaling it, so a
+            // fresh seed ends with goods the Inventory account has never
+            // heard of. Close that gap the same way the 2026-11-21 shelf
+            // migration closes it on an existing database; a second seed
+            // measures zero and posts nothing.
+            $gap = app(StockValuationService::class)->alignGlToShelf(
+                'Stock on hand not in the books - demo seed alignment',
+                'demo seed alignment'
+            );
+
+            if ($gap && isset($this->command)) {
+                $this->command->info(sprintf(
+                    '  Stock on hand aligned with the Inventory account: %s%s',
+                    $gap > 0 ? '+' : '',
+                    number_format($gap, 2)
+                ));
+            }
         }
 
         // 5. Forget the current tenant to clean up

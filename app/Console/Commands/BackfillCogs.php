@@ -3,7 +3,6 @@
 namespace App\Console\Commands;
 
 use App\Models\Account;
-use App\Models\JournalEntry;
 use App\Models\Sales;
 use App\Models\Tenant;
 use App\Services\AccountingService;
@@ -104,59 +103,19 @@ class BackfillCogs extends Command
             ->orderBy('id')
             ->chunkById(100, function ($sales) use (&$summary, &$rows, $cogsAccount, $inventoryAccount, $valuation, $accountingService, $apply) {
                 foreach ($sales as $sale) {
-                    $entries = JournalEntry::with('transactions')
-                        ->where('sourceable_type', Sales::class)
-                        ->where('sourceable_id', $sale->id)
-                        ->get();
+                    // What the ledger already holds as cost for this sale,
+                    // or null when it holds nothing: never booked, or every
+                    // entry netted out by a reversal. Either way the sale is
+                    // not in the books and must not be written back in.
+                    $booked = $valuation->bookedCostOfSale($sale, $cogsAccount);
 
-                    if ($entries->isEmpty()) {
+                    if ($booked === null) {
                         $summary['missing']++;
 
                         continue;
                     }
 
-                    $reversals = JournalEntry::with('transactions')
-                        ->whereIn('reversed_entry_id', $entries->pluck('id'))
-                        ->get();
-
-                    $reversedIds = $reversals->pluck('reversed_entry_id');
-
-                    if (! $entries->contains(fn ($entry) => ! $reversedIds->contains($entry->id))) {
-                        // Every entry this sale owns has been netted out by a
-                        // reversal; the sale is no longer in the books and
-                        // must not be written back in.
-                        $summary['missing']++;
-
-                        continue;
-                    }
-
-                    // What the ledger already holds as cost for this sale:
-                    // its own COGS lines, with any reversal subtracted.
-                    $booked = 0.0;
-                    foreach ($entries->concat($reversals) as $entry) {
-                        foreach ($entry->transactions as $transaction) {
-                            if ((int) $transaction->account_id !== (int) $cogsAccount->id) {
-                                continue;
-                            }
-
-                            $booked += $transaction->type === 'debit'
-                                ? (float) $transaction->amount
-                                : -(float) $transaction->amount;
-                        }
-                    }
-
-                    $recomputed = 0.0;
-                    foreach ($sale->salesItems as $item) {
-                        if (! $item->product) {
-                            continue;
-                        }
-
-                        $recomputed += $valuation->costOfUnits(
-                            (int) $item->product->id,
-                            $item->quantity,
-                            (float) $item->product->price
-                        );
-                    }
+                    $recomputed = $valuation->recomputedCostOfSale($sale);
 
                     $delta = $recomputed - $booked;
 

@@ -7,6 +7,8 @@ use App\Models\Account;
 use App\Models\JournalEntry;
 use App\Models\POItem;
 use App\Models\Product;
+use App\Models\Sales;
+use App\Models\SalesItem;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Support\Facades\DB;
@@ -304,6 +306,336 @@ class StockValuationService
         }
 
         $this->accountingService->createJournalEntry($description, now(), $transactions, $source);
+    }
+
+    /**
+     * What the ledger charges one sale for the goods it sold: its own COGS
+     * lines, with any reversal subtracted. Null when the sale holds no
+     * live entry at all, which is the signal that it is absent from the
+     * books rather than booked at zero.
+     *
+     * The arithmetic BackfillCogs used to do by hand, moved here so the
+     * command and the one-time repair migration cannot read a sale
+     * differently.
+     */
+    public function bookedCostOfSale(Sales $sale, Account $cogsAccount): ?float
+    {
+        $entries = JournalEntry::with('transactions')
+            ->where('sourceable_type', Sales::class)
+            ->where('sourceable_id', $sale->id)
+            ->get();
+
+        if ($entries->isEmpty()) {
+            return null;
+        }
+
+        $reversals = JournalEntry::with('transactions')
+            ->whereIn('reversed_entry_id', $entries->pluck('id'))
+            ->get();
+
+        $reversedIds = $reversals->pluck('reversed_entry_id');
+
+        if (! $entries->contains(fn ($entry) => ! $reversedIds->contains($entry->id))) {
+            return null;
+        }
+
+        $booked = 0.0;
+
+        foreach ($entries->concat($reversals) as $entry) {
+            foreach ($entry->transactions as $transaction) {
+                if ((int) $transaction->account_id !== (int) $cogsAccount->id) {
+                    continue;
+                }
+
+                $booked += $transaction->type === 'debit'
+                    ? (float) $transaction->amount
+                    : -(float) $transaction->amount;
+            }
+        }
+
+        return $booked;
+    }
+
+    /**
+     * What the current batches say the sale's goods cost: the figure a
+     * booking made today would post, catalogue fallback included.
+     */
+    public function recomputedCostOfSale(Sales $sale): float
+    {
+        $recomputed = 0.0;
+
+        foreach ($sale->salesItems as $item) {
+            if (! $item->product) {
+                continue;
+            }
+
+            $recomputed += $this->costOfUnits(
+                (int) $item->product->id,
+                $item->quantity,
+                (float) $item->product->price
+            );
+        }
+
+        return $recomputed;
+    }
+
+    /**
+     * Judge a sale's booked cost against what its goods can still be shown
+     * to have cost, and say only what the data proves.
+     *
+     * Verdicts:
+     *   missing        the sale holds no live entry at all
+     *   correct        the books agree with the current recompute
+     *   over/under     the books sit outside every cost the surviving
+     *                  history permits, so the excess (or the shortfall)
+     *                  is provable; target is the edge that was proven
+     *   indeterminate  the booked figure is inside the range, where the
+     *                  history cannot say what the truth was
+     *
+     * @return array{in_books: bool, booked: float|null, reference: float, min: float, max: float, target: float|null, verdict: string}
+     */
+    public function assessSaleCost(Sales $sale, Account $cogsAccount): array
+    {
+        $booked = $this->bookedCostOfSale($sale, $cogsAccount);
+        $reference = $this->recomputedCostOfSale($sale);
+        [$min, $max] = $this->costBoundsOfSale($sale);
+
+        $assessment = [
+            'in_books' => $booked !== null,
+            'booked' => $booked,
+            'reference' => $reference,
+            'min' => $min,
+            'max' => $max,
+            'target' => null,
+            'verdict' => 'missing',
+        ];
+
+        if ($booked === null) {
+            return $assessment;
+        }
+
+        if (abs($booked - $reference) <= 0.005) {
+            $assessment['verdict'] = 'correct';
+
+            return $assessment;
+        }
+
+        if ($booked > $max + 0.005) {
+            $assessment['verdict'] = 'over';
+            $assessment['target'] = $max;
+
+            return $assessment;
+        }
+
+        if ($booked < $min - 0.005) {
+            $assessment['verdict'] = 'under';
+            $assessment['target'] = $min;
+
+            return $assessment;
+        }
+
+        $assessment['verdict'] = 'indeterminate';
+
+        return $assessment;
+    }
+
+    /**
+     * Bring the Inventory account back to what the stock on hand is worth.
+     *
+     * Four demo stock sources (the initial-stock adjustment, the fixed
+     * product rows, the pre-sale top-ups and the credit-feature top-ups)
+     * moved goods without ever journaling them, so a seeded database holds
+     * stock the books have never heard of. One entry closes the difference:
+     * Inventory moves by the gap and Opening Balance Equity takes the other
+     * side, which is where a company-setup inventory figure belongs.
+     *
+     * Silent when accounting is not configured or the two already agree,
+     * so a second run posts nothing and a fresh seed cannot drift again.
+     * No plan-feature gate: a Starter tenant's ledger is fed by the same
+     * purchase and sale paths as any other, so its Inventory account has
+     * to answer to the shelf too.
+     *
+     * @return float|null the gap that was closed, 0.0 when they already
+     *                    agreed, null when there was nothing to measure
+     */
+    public function alignGlToShelf(string $description, ?string $notes = null): ?float
+    {
+        $tenant = app('currentTenant');
+
+        if (! $tenant) {
+            return null;
+        }
+
+        $inventory = Account::find($tenant->getAccountingSetting('inventory_account_id'));
+
+        if (! $inventory) {
+            return null;
+        }
+
+        $equity = Account::where('code', '3010-'.$tenant->id)->first();
+
+        if (! $equity) {
+            return null;
+        }
+
+        $gl = $this->glInventoryBalance();
+
+        if ($gl === null) {
+            return null;
+        }
+
+        $gap = round($this->valueOfStock() - $gl, 2);
+
+        if (abs($gap) < 0.01) {
+            return 0.0;
+        }
+
+        $transactions = $gap > 0
+            ? [
+                ['account_name' => $inventory->name, 'type' => 'debit', 'amount' => $gap],
+                ['account_name' => $equity->name, 'type' => 'credit', 'amount' => $gap],
+            ]
+            : [
+                ['account_name' => $inventory->name, 'type' => 'credit', 'amount' => abs($gap)],
+                ['account_name' => $equity->name, 'type' => 'debit', 'amount' => abs($gap)],
+            ];
+
+        $this->accountingService->createJournalEntry($description, now(), $transactions, null, [
+            'notes' => $notes,
+        ]);
+
+        return $gap;
+    }
+
+    /**
+     * The cheapest and the dearest the sale's goods can still be shown to
+     * have cost at the moment it was made, from what the data records.
+     *
+     * A batch never touched after the sale held exactly its recorded
+     * remaining quantity; one moved since may have held anything between
+     * none and all of it; a batch received after the sale did not exist.
+     * The catalogue fallback counts only while the product itself has not
+     * been touched since the sale, and then only as a floor of zero when
+     * it has: a price that may have changed cannot bound the top.
+     *
+     * The draw order is relaxed on purpose. Costing the dearest units
+     * first gives the upper bound and the cheapest first gives the lower
+     * one, either of which can only widen the range against the FIFO walk
+     * the sale actually took. Widening is safe: the verdict never claims
+     * anything outside the range, while a range narrowed by guesswork
+     * would. One FIFO fact is kept, because it narrows without guessing:
+     * a batch can only be reached once every batch before it has run dry,
+     * and each of those could have held as little as its own floor. A
+     * later dearest batch therefore cannot swallow a line whose earlier
+     * batches were full at sale time.
+     *
+     * @return array{0: float, 1: float} [min, max], max being INF while
+     *                                   the sale-time fallback is unknown
+     */
+    private function costBoundsOfSale(Sales $sale): array
+    {
+        $min = 0.0;
+        $max = 0.0;
+
+        foreach ($sale->salesItems as $item) {
+            if (! $item->product) {
+                continue;
+            }
+
+            [$lineMin, $lineMax] = $this->lineCostBounds($item, $sale);
+
+            $min += $lineMin;
+            $max += $lineMax;
+        }
+
+        return [$min, $max];
+    }
+
+    /**
+     * The same range for one line of one sale.
+     *
+     * @return array{0: float, 1: float}
+     */
+    private function lineCostBounds(SalesItem $item, Sales $sale): array
+    {
+        $quantity = (float) $item->quantity;
+        $product = $item->product;
+
+        if ($quantity <= 0) {
+            return [0.0, 0.0];
+        }
+
+        // In costing order, exactly as batchesFor() walks them: the prefix
+        // below is only meaningful in the order the sale would have drawn.
+        $batches = POItem::where('product_id', $product->id)
+            ->where('created_at', '<=', $sale->created_at)
+            ->orderBy('expiry_date', 'asc')
+            ->orderBy('created_at', 'asc')
+            ->get();
+
+        $this->warmFactors($batches->pluck('po_id')->all());
+
+        $certain = 0.0;
+        $possible = 0.0;
+        $sources = [];
+
+        foreach ($batches as $batch) {
+            $remaining = (float) $batch->remaining_quantity;
+            $untouched = $batch->updated_at <= $sale->created_at;
+
+            // Untouched: the recorded remaining is the sale-time truth.
+            // Moved: it may have held anything from none to all it ever
+            // received (or ever held, if a return put units back).
+            $lo = $untouched ? $remaining : 0.0;
+            $hi = $untouched ? $remaining : max((float) $batch->quantity, $remaining);
+
+            // Reach: every batch before this one must run dry first, and
+            // each could have held as little as its own floor.
+            $cap = min($hi, max(0.0, $quantity - $certain));
+
+            if ($cap > 0) {
+                $sources[] = [$this->unitCost($batch), $cap];
+            }
+
+            $certain += $lo;
+            $possible += $hi;
+        }
+
+        $from = min($quantity, $certain);
+        $to = min($quantity, $possible);
+
+        $fallback = (float) $product->price;
+        $fallbackKnown = $product->updated_at <= $sale->created_at;
+        $floor = $fallbackKnown ? $fallback : 0.0;
+        $ceiling = $fallbackKnown ? $fallback : INF;
+
+        $draw = function (float $units, bool $dearest) use ($sources, $quantity, $floor, $ceiling): float {
+            usort($sources, fn ($a, $b) => $dearest ? $b[0] <=> $a[0] : $a[0] <=> $b[0]);
+
+            $left = $units;
+            $cost = 0.0;
+
+            foreach ($sources as [$unitCost, $cap]) {
+                if ($left <= 0) {
+                    break;
+                }
+
+                $take = min($cap, $left);
+                $cost += $take * $unitCost;
+                $left -= $take;
+            }
+
+            return $cost + ($quantity - $units) * ($dearest ? $ceiling : $floor);
+        };
+
+        // Both bounds are taken at the ends of the feasible supply range:
+        // the dearest draw grows slower than the fallback shrinks (concave)
+        // and the cheapest draw grows faster (convex), so the extreme of
+        // either sits at an end, never in the middle.
+        return [
+            min($draw($from, false), $draw($to, false)),
+            max($draw($from, true), $draw($to, true)),
+        ];
     }
 
     /**

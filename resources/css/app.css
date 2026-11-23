@@ -582,3 +582,178 @@ body.no-animations .card:hover {
         transform: none;
     }
 }
+
+/* --------------------------------------------------------------------------
+   Two utility colours the markup asks for and Tabler never ships a dark for.
+
+   .bg-tertiary-lt exists only in our views (Tabler has no such class), so the
+   financial-health compare buttons fell through to a bare .btn. Pointing it
+   at the tertiary surface token gives it the light tint it always meant and,
+   because tokens.css re-aims that token for dark (#141618), a recessed dark
+   plate instead of nothing.
+
+   .bg-light Tabler DOES ship, but it reads --tblr-light-rgb, which Tabler
+   leaves at its near-white value in dark - modal header strips and the
+   return-table theads painted a white slab. The raised surface rung is the
+   same role in both themes: a step off the card, never a step to white.
+   -------------------------------------------------------------------------- */
+.bg-tertiary-lt {
+    background-color: var(--tblr-tertiary-bg) !important;
+}
+
+[data-bs-theme="dark"] .bg-light {
+    background-color: var(--tblr-bg-surface-secondary) !important;
+}
+
+/* --------------------------------------------------------------------------
+   flatpickr, dark.
+
+   Five pickers (opportunity, purchase order, sales order, POS, pipeline)
+   import flatpickr's material_blue theme, which is light-only end to end:
+   white sheets, #484848 text, grey hovers, light dividers. Every rule below
+   re-aims one of those values at the dark ladder - sheet #26282a (the
+   dropdown rung), text #f1f3f5, white-at-frost hovers - and keeps the
+   blue header and selection, which read fine on either theme.
+
+   The html[data-bs-theme] prefix is load-bearing: these rules have to beat
+   the theme no matter which order Vite emits the two stylesheets in.
+   -------------------------------------------------------------------------- */
+html[data-bs-theme="dark"] .flatpickr-calendar {
+    box-shadow: var(--frz-shadow-2);
+}
+
+html[data-bs-theme="dark"] .flatpickr-innerContainer,
+html[data-bs-theme="dark"] .flatpickr-time {
+    background: #26282a;
+}
+
+html[data-bs-theme="dark"] .flatpickr-innerContainer {
+    border-bottom-color: rgba(255, 255, 255, 0.1);
+}
+
+html[data-bs-theme="dark"] .flatpickr-days {
+    border-left-color: rgba(255, 255, 255, 0.1);
+    border-right-color: rgba(255, 255, 255, 0.1);
+}
+
+html[data-bs-theme="dark"] .dayContainer + .dayContainer {
+    box-shadow: -1px 0 0 rgba(255, 255, 255, 0.1);
+}
+
+html[data-bs-theme="dark"] .flatpickr-calendar.arrowTop:before {
+    border-bottom-color: rgba(255, 255, 255, 0.1);
+}
+
+html[data-bs-theme="dark"] .flatpickr-calendar.arrowBottom:before {
+    border-top-color: rgba(255, 255, 255, 0.1);
+}
+
+html[data-bs-theme="dark"] .flatpickr-day {
+    color: #f1f3f5;
+}
+
+html[data-bs-theme="dark"] .flatpickr-day.inRange,
+html[data-bs-theme="dark"] .flatpickr-day.prevMonthDay.inRange,
+html[data-bs-theme="dark"] .flatpickr-day.nextMonthDay.inRange,
+html[data-bs-theme="dark"] .flatpickr-day.today.inRange,
+html[data-bs-theme="dark"] .flatpickr-day.prevMonthDay.today.inRange,
+html[data-bs-theme="dark"] .flatpickr-day.nextMonthDay.today.inRange,
+html[data-bs-theme="dark"] .flatpickr-day:hover,
+html[data-bs-theme="dark"] .flatpickr-day.prevMonthDay:hover,
+html[data-bs-theme="dark"] .flatpickr-day.nextMonthDay:hover,
+html[data-bs-theme="dark"] .flatpickr-day:focus,
+html[data-bs-theme="dark"] .flatpickr-day.prevMonthDay:focus,
+html[data-bs-theme="dark"] .flatpickr-day.nextMonthDay:focus {
+    background: rgba(255, 255, 255, 0.11);
+    border-color: rgba(255, 255, 255, 0.11);
+}
+
+html[data-bs-theme="dark"] .flatpickr-day.inRange {
+    box-shadow: -5px 0 0 rgba(255, 255, 255, 0.11), 5px 0 0 rgba(255, 255, 255, 0.11);
+}
+
+html[data-bs-theme="dark"] .flatpickr-day.today {
+    border-color: #bbb;
+}
+
+html[data-bs-theme="dark"] .flatpickr-day.today:hover,
+html[data-bs-theme="dark"] .flatpickr-day.today:focus {
+    background: rgba(255, 255, 255, 0.11);
+    border-color: #bbb;
+    color: #f1f3f5;
+}
+
+html[data-bs-theme="dark"] .flatpickr-day.flatpickr-disabled,
+html[data-bs-theme="dark"] .flatpickr-day.flatpickr-disabled:hover,
+html[data-bs-theme="dark"] .flatpickr-day.prevMonthDay,
+html[data-bs-theme="dark"] .flatpickr-day.nextMonthDay,
+html[data-bs-theme="dark"] .flatpickr-day.notAllowed,
+html[data-bs-theme="dark"] .flatpickr-day.notAllowed.prevMonthDay,
+html[data-bs-theme="dark"] .flatpickr-day.notAllowed.nextMonthDay {
+    color: rgba(255, 255, 255, 0.3);
+    background: transparent;
+    border-color: transparent;
+}
+
+html[data-bs-theme="dark"] .flatpickr-day.flatpickr-disabled,
+html[data-bs-theme="dark"] .flatpickr-day.flatpickr-disabled:hover {
+    color: rgba(255, 255, 255, 0.15);
+}
+
+html[data-bs-theme="dark"] .flatpickr-weekwrapper span.flatpickr-day,
+html[data-bs-theme="dark"] .flatpickr-weekwrapper span.flatpickr-day:hover {
+    color: rgba(255, 255, 255, 0.3);
+}
+
+html[data-bs-theme="dark"] .flatpickr-weekwrapper .flatpickr-weeks {
+    border-left-color: rgba(255, 255, 255, 0.1);
+}
+
+html[data-bs-theme="dark"] .flatpickr-calendar.hasTime .flatpickr-time {
+    border-color: rgba(255, 255, 255, 0.1);
+}
+
+html[data-bs-theme="dark"] .flatpickr-time input,
+html[data-bs-theme="dark"] .flatpickr-time .flatpickr-time-separator,
+html[data-bs-theme="dark"] .flatpickr-time .flatpickr-am-pm {
+    color: #f1f3f5;
+}
+
+html[data-bs-theme="dark"] .flatpickr-time .numInputWrapper span.arrowUp:after {
+    border-bottom-color: rgba(255, 255, 255, 0.6);
+}
+
+html[data-bs-theme="dark"] .flatpickr-time .numInputWrapper span.arrowDown:after {
+    border-top-color: rgba(255, 255, 255, 0.6);
+}
+
+html[data-bs-theme="dark"] .flatpickr-time input:hover,
+html[data-bs-theme="dark"] .flatpickr-time .flatpickr-am-pm:hover,
+html[data-bs-theme="dark"] .flatpickr-time input:focus,
+html[data-bs-theme="dark"] .flatpickr-time .flatpickr-am-pm:focus {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+html[data-bs-theme="dark"] .numInputWrapper span {
+    border-color: rgba(255, 255, 255, 0.15);
+}
+
+html[data-bs-theme="dark"] .numInputWrapper span:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+html[data-bs-theme="dark"] .numInputWrapper span:active {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+html[data-bs-theme="dark"] .numInputWrapper span.arrowUp:after {
+    border-bottom-color: rgba(255, 255, 255, 0.6);
+}
+
+html[data-bs-theme="dark"] .numInputWrapper span.arrowDown:after {
+    border-top-color: rgba(255, 255, 255, 0.6);
+}
+
+html[data-bs-theme="dark"] .numInputWrapper:hover {
+    background: rgba(255, 255, 255, 0.05);
+}

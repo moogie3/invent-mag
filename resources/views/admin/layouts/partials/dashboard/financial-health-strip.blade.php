@@ -21,6 +21,7 @@
         return match ($ind['display']) {
             'percent' => number_format(($ind['value'] ?? 0) * 100, 1).'%',
             'ratio' => number_format($ind['value'] ?? 0, 1).'×',
+            'count' => number_format($ind['value'] ?? 0, 0),
             'days' => $ind['value'] === null
                 ? '—'
                 : number_format($ind['value'], 0).' '.__('messages.days'),

@@ -41,7 +41,7 @@
             </div>
             <div class="modal-status bg-success"></div>
             <div class="modal-body text-center py-4">
-                <i class="ti ti-check-circle text-success" style="font-size: 3rem;"></i>
+                <i class="ti ti-circle-check text-success" style="font-size: 3rem;"></i>
                 <h3>{{ __('messages.are_you_sure') }}</h3>
                 <div class="text-muted">{{ __('messages.complete_opname_warning') }}</div>
                 {{-- Filled by the preview fetch when the modal opens:

@@ -140,7 +140,7 @@ return [
                 ],
                 [
                     'title' => 'messages.coa',
-                    'route' => 'admin.accounting.chart',
+                    'route' => 'admin.accounting.accounts.index',
                     'permission' => 'view-accounting',
                     'icon' => 'ti ti-list-details',
                 ],

@@ -1180,13 +1180,16 @@ body[data-bs-theme="dark"] .sidebar .navbar-nav .nav-link,
     color: #f1f3f5 !important;
 }
 
+/* Expanded dark hover: the same frost the rail uses, as a flat wash. The
+   near-white #f8f9fa plate it replaces read as a light block on the dark
+   rail and outshone the active pill, exactly like the rail disc did. */
 [data-bs-theme="dark"] .sidebar:not(.collapsed) .navbar-nav .nav-link:hover,
 html[data-bs-theme="dark"] .sidebar:not(.collapsed) .navbar-nav .nav-link:hover,
 body[data-bs-theme="dark"] .sidebar:not(.collapsed) .navbar-nav .nav-link:hover,
 .dark .sidebar:not(.collapsed) .navbar-nav .nav-link:hover,
 [data-theme="dark"] .sidebar:not(.collapsed) .navbar-nav .nav-link:hover {
-    background-color: #f8f9fa !important;
-    color: #37393b !important;
+    background-color: rgba(255, 255, 255, 0.06) !important;
+    color: #ffffff !important;
 }
 
 [data-bs-theme="dark"] .sidebar:not(.collapsed) .navbar-nav .nav-link:hover .nav-link-icon,
@@ -1199,7 +1202,7 @@ body[data-bs-theme="dark"] .sidebar:not(.collapsed) .navbar-nav .nav-link:hover 
 .dark .sidebar:not(.collapsed) .navbar-nav .nav-link:hover .nav-link-title,
 [data-theme="dark"] .sidebar:not(.collapsed) .navbar-nav .nav-link:hover .nav-link-icon,
 [data-theme="dark"] .sidebar:not(.collapsed) .navbar-nav .nav-link:hover .nav-link-title {
-    color: #37393b !important;
+    color: #ffffff !important;
 }
 
 /* Dark rail hover: the frost disc (Change 50). This block USED to paint

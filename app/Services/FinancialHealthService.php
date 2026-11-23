@@ -657,7 +657,9 @@ class FinancialHealthService
             }
 
             $series['opening_cash'] = $openingCash;
-            $series['collection_ratio'] = $this->collectionRatio($tenantId, $prefix);
+            $collection = $this->collectionRatio($tenantId, $prefix);
+            $series['collection_ratio'] = $collection['ratio'];
+            $series['collection_measured'] = $collection['measured'];
             $series['ar'] = $ar;
             $series['ap'] = $ap;
             $series['pending_payroll'] = $pendingRun ? [
@@ -712,9 +714,13 @@ class FinancialHealthService
     /**
      * Collection ratio: what share of booked receivables turned into money
      * (GL: AR credits vs AR debits over the window). Falls back to 1.0 for
-     * cash businesses with no meaningful AR activity.
+     * cash businesses with no meaningful AR activity; the measured flag
+     * tells the card that 1.0 is a fallback, not a flawless score, so an
+     * empty tenant reads neutral instead of inventing a perfect result.
+     *
+     * @return array{ratio: float, measured: bool}
      */
-    protected function collectionRatio(int $tenantId, string $prefix): float
+    protected function collectionRatio(int $tenantId, string $prefix): array
     {
         // Re-read the raw 6-month AR movement from the GL (bounded, one query)
         $row = DB::table('transactions as t')
@@ -734,10 +740,16 @@ class FinancialHealthService
         $collected = (float) ($row->collected ?? 0);
 
         if ($booked <= config('financial-health.noise.amount', 100000)) {
-            return (float) config('financial-health.collection_ratio_fallback', 1.0);
+            return [
+                'ratio' => (float) config('financial-health.collection_ratio_fallback', 1.0),
+                'measured' => false,
+            ];
         }
 
-        return max(0.0, min(1.0, $collected / $booked));
+        return [
+            'ratio' => max(0.0, min(1.0, $collected / $booked)),
+            'measured' => true,
+        ];
     }
 
     // ────────────────────────────────────────────────────────────────
@@ -915,7 +927,7 @@ class FinancialHealthService
             : ($de <= $cfg['debt_to_equity']['good'] ? 'good'
                 : ($de <= $cfg['debt_to_equity']['warn'] ? 'warn' : 'danger'));
         $out[] = [
-            'key' => 'debt_to_equity', 'label' => __('messages.debt_to_equity'), 'icon' => 'ti-balance',
+            'key' => 'debt_to_equity', 'label' => __('messages.debt_to_equity'), 'icon' => 'ti-scale',
             'value' => $de, 'display' => 'ratio', 'status' => $status,
             'reason' => $de === null
                 ? __('messages.fh_reason.de_none')
@@ -998,7 +1010,50 @@ class FinancialHealthService
             'delta' => null,
         ];
 
-        // 13) STOCK VALUE: what the warehouse holds, checked against the
+        // 13) DAYS PAYABLE OUTSTANDING: how long open bills sit before the
+        // money leaves. AP total ÷ purchases over the window, scaled to
+        // that window's day count. Purchases below the noise floor give no
+        // pace to measure (neutral); no open bills at all is a clean zero
+        // (good, nothing outstanding to time).
+        $dpoPurchases = array_sum($this->lastN($s['purchases'], $window));
+        $dpo = null;
+        if ($dpoPurchases > $noise['amount']) {
+            $dpo = $apTotal > 0 ? $apTotal / $dpoPurchases * $windowDays : 0.0;
+        }
+        $status = $dpo === null ? 'neutral'
+            : ($dpo <= $cfg['dpo']['good'] ? 'good'
+                : ($dpo <= $cfg['dpo']['warn'] ? 'warn' : 'danger'));
+        $out[] = [
+            'key' => 'dpo', 'label' => __('messages.dpo'), 'icon' => 'ti-calendar-dollar',
+            'value' => $dpo, 'display' => 'days', 'status' => $status,
+            'reason' => $dpo === null
+                ? __('messages.fh_reason.dpo_none')
+                : ($apTotal > 0
+                    ? $why($dpo <= $cfg['dpo']['good'] ? 'dpo_good' : ($dpo <= $cfg['dpo']['warn'] ? 'dpo_watch' : 'dpo_late'), ['{days}' => number_format($dpo, 0)])
+                    : __('messages.fh_reason.dpo_paid')),
+            'delta' => null,
+        ];
+
+        // 14) COLLECTION RATIO: of everything invoiced over the trailing
+        // ledger window, how much has actually been collected (GL 1130
+        // credits ÷ debits). No invoiced activity above the noise floor
+        // means there is nothing to convert, so it reads neutral instead
+        // of a flawless 100% the fallback would claim.
+        $collection = $s['collection_ratio'];
+        $measured = (bool) ($s['collection_measured'] ?? false);
+        $status = ! $measured ? 'neutral'
+            : ($collection >= $cfg['collection']['good'] ? 'good'
+                : ($collection >= $cfg['collection']['warn'] ? 'warn' : 'danger'));
+        $out[] = [
+            'key' => 'collection_ratio', 'label' => __('messages.collection_ratio'), 'icon' => 'ti-coins',
+            'value' => $collection, 'display' => 'percent', 'status' => $status,
+            'reason' => ! $measured
+                ? __('messages.fh_reason.collection_none')
+                : $why($collection >= $cfg['collection']['good'] ? 'collection_strong' : ($collection >= $cfg['collection']['warn'] ? 'collection_slow' : 'collection_bad'), ['{pct}' => number_format($collection * 100, 0)]),
+            'delta' => null,
+        ];
+
+        // 15) STOCK VALUE: what the warehouse holds, checked against the
         // Inventory account. This is the only card whose whole job is to
         // say whether the two records of the same goods agree: the shelf
         // (batches plus unbatched units at buying price) and the posted
@@ -1017,6 +1072,21 @@ class FinancialHealthService
                 : ($status === 'danger'
                     ? $why('stock_drift', ['{amount}' => CurrencyHelper::format(abs($drift))])
                     : $why('stock_matched')),
+            'delta' => null,
+        ];
+
+        // 16) UNPOSTED ENTRIES: draft journal entries waiting to be posted.
+        // Every GL-derived card above reads final only at zero: one draft
+        // and the ledger numbers are still provisional, which is exactly
+        // what the attention list already warns about.
+        $draftJes = (int) ($s['draft_jes'] ?? 0);
+        $status = $draftJes >= $cfg['draft_jes']['warn'] ? 'warn' : 'good';
+        $out[] = [
+            'key' => 'draft_jes', 'label' => __('messages.draft_entries'), 'icon' => 'ti-notebook',
+            'value' => $draftJes, 'display' => 'count', 'status' => $status,
+            'reason' => $draftJes === 0
+                ? __('messages.fh_reason.draft_none')
+                : $why('draft_pending', ['{count}' => number_format($draftJes, 0)]),
             'delta' => null,
         ];
 

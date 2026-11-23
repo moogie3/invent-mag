@@ -92,6 +92,28 @@ return [
         'warn' => 90,
     ],
 
+    // Days Payable Outstanding: open payables ÷ purchases over the
+    // selected window, scaled to that window's day count, so the figure
+    // reads as "unpaid bills equal about N days of purchases". Mirrors
+    // the DSO bands; actual overdue tracking stays on the payables card.
+    'dpo' => [
+        'good' => 60,
+        'warn' => 90,
+    ],
+
+    // Collection: cash collected ÷ invoices booked across the trailing
+    // ledger window (GL 1130). 1.0 = every invoiced rupiah has arrived.
+    'collection' => [
+        'good' => 0.90,
+        'warn' => 0.75,
+    ],
+
+    // Unposted (draft) journal entries. Zero means every GL-derived card
+    // on the page reads final; one draft and the numbers are provisional.
+    'draft_jes' => [
+        'warn' => 1,
+    ],
+
     // Inventory turnover: annualised COGS (6-month GL) / inventory GL
     // balance. Green >= 4 turns/year, amber >= 1.5, red below.
     'turnover' => [

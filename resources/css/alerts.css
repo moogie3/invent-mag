@@ -103,11 +103,11 @@
     color: #d97706 !important;
 }
 
-/* Tab styling improvements for system alerts */
+/* Tab styling improvements for system alerts.
+   Geometry stays shared; the colours are scoped so dark can own its own. */
 #alertTabs .nav-link {
     border: none;
     background: transparent;
-    color: #64748b;
     font-weight: 500;
     font-size: 14px;
     padding: 12px 16px;
@@ -115,12 +115,16 @@
     border-radius: 6px 6px 0 0;
 }
 
-#alertTabs .nav-link:hover {
+html:not([data-bs-theme="dark"]) #alertTabs .nav-link {
+    color: #64748b;
+}
+
+html:not([data-bs-theme="dark"]) #alertTabs .nav-link:hover {
     background: #f8fafc;
     color: #1e293b;
 }
 
-#alertTabs .nav-link.active {
+html:not([data-bs-theme="dark"]) #alertTabs .nav-link.active {
     background: #fff;
     color: #1e293b;
     border-bottom: 2px solid #3b82f6;
@@ -134,24 +138,44 @@
     border-radius: 12px;
 }
 
-.bg-danger-lt {
+/* Light-only tints: Tabler's own .bg-*-lt rules carry dark tokens, so the
+   hand-mixed hexes below are scoped out of dark instead of fighting them. */
+html:not([data-bs-theme="dark"]) .bg-danger-lt {
     background-color: #fef2f2 !important;
     color: #dc2626 !important;
 }
 
-.bg-warning-lt {
+html:not([data-bs-theme="dark"]) .bg-warning-lt {
     background-color: #fffbeb !important;
     color: #d97706 !important;
 }
 
+/* Tabler flips the -lt BACKGROUNDS for dark but keeps the vivid status
+   colour as the text: danger-lt measures 3.15:1 with it, info-lt 4.42:1,
+   secondary-lt 2.92:1. Same lifted values app.css uses for the badges. */
+[data-bs-theme="dark"] .bg-danger-lt {
+    color: #f06565 !important;
+}
+
+[data-bs-theme="dark"] .bg-info-lt {
+    color: #74c0fc !important;
+}
+
+[data-bs-theme="dark"] .bg-secondary-lt {
+    color: #a8b0b8 !important;
+}
+
 /* Tab content styling */
 #alertTabContent {
-    background: #fff;
     border-radius: 0 0 8px 8px;
     height: auto;
     min-height: 320px;
     max-height: 320px;
     overflow-y: auto;
+}
+
+html:not([data-bs-theme="dark"]) #alertTabContent {
+    background: #fff;
 }
 
 /* Empty state styling */
@@ -189,18 +213,20 @@
     border-color: #475569;
 }
 
-.theme-dark #alertTabs .nav-link {
-    color: #94a3b8;
+[data-bs-theme="dark"] #alertTabs .nav-link {
+    color: #a8b0b8;
 }
 
-.theme-dark #alertTabs .nav-link:hover {
-    background: #334155;
-    color: #f1f5f9;
+[data-bs-theme="dark"] #alertTabs .nav-link:hover {
+    background: #26282a;
+    color: #f1f3f5;
 }
 
-.theme-dark #alertTabs .nav-link.active {
-    background: #1e293b;
-    color: #f1f5f9;
+[data-bs-theme="dark"] #alertTabs .nav-link.active {
+    background: #26282a;
+    color: #f1f3f5;
+    border-bottom: 2px solid #3b82f6;
+    font-weight: 600;
 }
 
 [data-bs-theme="dark"] #alertTabContent {

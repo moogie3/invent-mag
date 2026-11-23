@@ -99,6 +99,7 @@ onPageLoad(function () {
         switch (row.display) {
             case 'percent': return (v * 100).toFixed(1) + '%';
             case 'ratio': return v.toFixed(1) + '×';
+            case 'count': return String(Math.round(v));
             case 'days': return Math.round(v) + ' ' + (i18n.days || 'days');
             default: return fmtMoney(v);
         }
@@ -111,6 +112,7 @@ onPageLoad(function () {
         switch (row.display) {
             case 'percent': return sign + (abs * 100).toFixed(1) + ' pp';
             case 'ratio': return sign + abs.toFixed(2) + '×';
+            case 'count': return sign + Math.round(abs);
             case 'days': return sign + Math.round(abs) + ' ' + (i18n.days || 'days');
             default: return sign + fmtMoney(abs).replace('Rp', '').trim();
         }
@@ -137,7 +139,7 @@ onPageLoad(function () {
         // Mini table sparklines: the row carries its own month axis so the
         // year span is readable at a glance. The cell is tall enough (40px)
         // for line + labels, and ticks are limited to the window's ends so
-        // thirteen rows of month names never turn into noise.
+        // sixteen rows of month names never turn into noise.
         const showAxis = !!(opts && opts.axis);
         // Destroy any prior instance (modal reopens reuse the same canvas id).
         const prior = Chart.getChart(canvas);

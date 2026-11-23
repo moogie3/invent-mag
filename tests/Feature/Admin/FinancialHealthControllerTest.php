@@ -14,7 +14,7 @@ use Tests\Traits\CreatesTenant;
  * this file pins the CONTRACT BETWEEN page and browser instead:
  *  - the period filter is a plain GET form whose query params survive the
  *    round-trip (preset stays selected, chip shows the resolved range);
- *  - the explainer is PER-ENTRY accordions (13 metrics + 4 outlook), every
+ *  - the explainer is PER-ENTRY accordions (16 metrics + 4 outlook), every
  *    entry collapsed by default, intro + color legend always visible;
  *  - point-in-time metrics get lock icons only when a filter is active;
  *  - the drill-down buttons carry the theme's soft-pill styling.
@@ -113,23 +113,23 @@ class FinancialHealthControllerTest extends TestCase
 
     // ── Explainer: per-entry accordions ─────────────────────────────
 
-    public function test_explainer_has_seventeen_entry_toggles_all_collapsed()
+    public function test_explainer_has_twenty_entry_toggles_all_collapsed()
     {
         $html = $this->actingAs($this->user)
             ->get(route('admin.accounting.health'))
             ->assertOk()
             ->getContent();
 
-        // 13 metric entries + 4 outlook concepts.
+        // 16 metric entries + 4 outlook concepts.
         $this->assertSame(
-            17,
+            20,
             substr_count($html, 'fh-explainer-item'),
-            'Expected one toggle per explainer entry (13 metrics + 4 outlook)'
+            'Expected one toggle per explainer entry (16 metrics + 4 outlook)'
         );
         // Every toggle controls its own collapse panel, and every panel
         // starts collapsed (no "show" class server-rendered).
-        $this->assertSame(17, substr_count($html, 'aria-controls="fh-expl-'));
-        $this->assertSame(17, substr_count($html, 'id="fh-expl-'));
+        $this->assertSame(20, substr_count($html, 'aria-controls="fh-expl-'));
+        $this->assertSame(20, substr_count($html, 'id="fh-expl-'));
         $this->assertSame(
             0,
             substr_count($html, 'collapse show'),
@@ -151,15 +151,15 @@ class FinancialHealthControllerTest extends TestCase
             ->getContent();
         $this->assertStringNotContainsString('ti-lock', $default);
 
-        // Filtered view: the 8 balance-sheet metrics are point-in-time and
-        // carry the lock + tooltip explaining why they ignore the period.
+        // Filtered view: the 11 point-in-time metrics carry the lock +
+        // tooltip explaining why they ignore the period.
         $filtered = $this->actingAs($this->user)
             ->get(route('admin.accounting.health', ['preset' => 'last_3']))
             ->getContent();
         $this->assertSame(
-            8,
+            11,
             substr_count($filtered, 'ti-lock'),
-            'Expected a lock icon on each of the 8 point-in-time metrics'
+            'Expected a lock icon on each of the 11 point-in-time metrics'
         );
         $this->assertStringContainsString('Point-in-time', $filtered);
     }

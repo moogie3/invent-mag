@@ -48,7 +48,7 @@ onPageLoad(function () {
             // Update UI to default placeholder
             avatarPreview.style.backgroundImage = 'none';
             avatarPreview.classList.add('avatar-initial');
-            avatarPreview.innerHTML = '<i class="ti ti-person" style="font-size: 4rem;"></i>';
+            avatarPreview.innerHTML = '<i class="ti ti-user" style="font-size: 4rem;"></i>';
             
             // Hide remove button
             this.style.display = 'none';

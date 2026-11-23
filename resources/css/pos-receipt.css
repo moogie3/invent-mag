@@ -17,6 +17,11 @@
     align-items: center;
 }
 
+/* Receipt page runs on the dark base too; the white sheet went with it. */
+[data-bs-theme="dark"] .page-loader {
+    background-color: rgba(28, 30, 32, 0.92);
+}
+
 .main-content {
     opacity: 1;
     transition: opacity var(--anim-slow) ease-in-out;

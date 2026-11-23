@@ -73,12 +73,12 @@ class FinancialHealthServiceTest extends TestCase
 
     // ── Indicators ──────────────────────────────────────────────────
 
-    public function test_indicators_cover_all_thirteen_health_metrics()
+    public function test_indicators_cover_all_sixteen_health_metrics()
     {
         $overview = $this->service->getOverview();
         $keys = collect($overview['indicators'])->pluck('key')->all();
 
-        $expected = ['cash', 'revenue', 'purchases', 'receivables', 'payables', 'payroll', 'turnover', 'debt_to_equity', 'gross_margin', 'net_margin', 'liquidity', 'dso', 'stock_value'];
+        $expected = ['cash', 'revenue', 'purchases', 'receivables', 'payables', 'payroll', 'turnover', 'debt_to_equity', 'gross_margin', 'net_margin', 'liquidity', 'dso', 'dpo', 'collection_ratio', 'stock_value', 'draft_jes'];
         $this->assertEqualsCanonicalizing($expected, $keys);
     }
 
@@ -97,7 +97,7 @@ class FinancialHealthServiceTest extends TestCase
             $this->assertArrayHasKey('delta', $ind);
 
             $this->assertContains($ind['status'], ['good', 'warn', 'danger', 'neutral']);
-            $this->assertContains($ind['display'], ['money', 'percent', 'ratio', 'days']);
+            $this->assertContains($ind['display'], ['money', 'percent', 'ratio', 'days', 'count']);
             $this->assertNotEmpty($ind['label']);
             $this->assertNotEmpty($ind['reason']);
         }
@@ -137,9 +137,37 @@ class FinancialHealthServiceTest extends TestCase
         // (every "vs average" is null-guarded, not a division by zero).
         $overview = $this->service->getOverview();
 
-        $this->assertCount(13, $overview['indicators']);
+        $this->assertCount(16, $overview['indicators']);
         foreach ($overview['indicators'] as $ind) {
             $this->assertNotSame('danger', $ind['status'], "empty tenant should not flag {$ind['key']} critical");
+        }
+    }
+
+    public function test_new_pace_cards_read_safe_and_translated_on_an_empty_tenant()
+    {
+        // The three cards added when the grid went 13 to 16 must degrade
+        // honestly with no history: no pace to measure (neutral), nothing
+        // posted-but-draft (good), and no invented perfect collection
+        // score. Reasons must be resolved strings, not raw lang keys.
+        $overview = $this->service->getOverview();
+        $byKey = collect($overview['indicators'])->keyBy('key');
+
+        $this->assertSame('neutral', $byKey['dpo']['status']);
+        $this->assertSame('days', $byKey['dpo']['display']);
+
+        $this->assertSame('neutral', $byKey['collection_ratio']['status']);
+        $this->assertSame('percent', $byKey['collection_ratio']['display']);
+
+        $this->assertSame('good', $byKey['draft_jes']['status']);
+        $this->assertSame(0, $byKey['draft_jes']['value']);
+        $this->assertSame('count', $byKey['draft_jes']['display']);
+
+        foreach (['dpo', 'collection_ratio', 'draft_jes'] as $key) {
+            $this->assertStringNotContainsString(
+                'messages.',
+                $byKey[$key]['reason'],
+                "{$key} reason is an unresolved translation key"
+            );
         }
     }
 
@@ -273,6 +301,7 @@ class FinancialHealthServiceTest extends TestCase
             'pending_payroll' => null, 'committed_payroll' => 0.0, 'inventory_balance' => 0.0,
             'current_assets' => 0.0, 'current_liabilities' => 0.0,
             'total_liabilities' => 0.0, 'total_equity' => 0.0, 'ar_balance' => 0.0,
+            'collection_ratio' => 1.0, 'collection_measured' => false,
             // spanInDays() reads the real month labels: five complete months
             // plus the in-progress one (last slot), like the live series.
             'labels' => collect(range(5, 0))->map(
@@ -354,11 +383,11 @@ class FinancialHealthServiceTest extends TestCase
 
     // ── Period comparison (modal + "Compare all") ───────────────────
 
-    public function test_comparison_returns_thirteen_rows_split_flow_and_locked()
+    public function test_comparison_returns_sixteen_rows_split_flow_and_locked()
     {
         $comparison = $this->service->getComparison();
 
-        $this->assertCount(13, $comparison['rows']);
+        $this->assertCount(16, $comparison['rows']);
 
         $flow = collect($comparison['rows'])->where('comparable', true);
         $locked = collect($comparison['rows'])->where('comparable', false);
@@ -369,7 +398,7 @@ class FinancialHealthServiceTest extends TestCase
             ['cash', 'revenue', 'net_margin', 'gross_margin', 'purchases'],
             $flow->pluck('key')->all()
         );
-        $this->assertCount(8, $locked);
+        $this->assertCount(11, $locked);
         $this->assertContains('dso', $locked->pluck('key')->all());
         $this->assertContains('debt_to_equity', $locked->pluck('key')->all());
         // A shelf value does not move with the period filter either: it is
@@ -612,11 +641,11 @@ class FinancialHealthServiceTest extends TestCase
     {
         $comparison = $this->service->getComparison('last_3');
 
-        // 5 flow rows carry a real delta; 8 balance-sheet snapshots stay
+        // 5 flow rows carry a real delta; 11 point-in-time snapshots stay
         // locked with a reason, whatever the filter says.
         $rows = collect($comparison['rows']);
         $this->assertSame(5, $rows->where('comparable', true)->count());
-        $this->assertSame(8, $rows->where('comparable', false)->count());
+        $this->assertSame(11, $rows->where('comparable', false)->count());
         $rows->where('comparable', false)->each(function ($row) {
             $this->assertNotNull($row['lock_reason']);
             $this->assertNull($row['delta']);

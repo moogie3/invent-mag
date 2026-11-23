@@ -27,7 +27,7 @@
                         @else
                             <span class="avatar avatar-xl avatar-initial rounded-circle"
                                 style="width: 100px; height: 100px;">
-                                <i class="ti ti-person" style="font-size: 4rem;"></i>
+                                <i class="ti ti-user" style="font-size: 4rem;"></i>
                             </span>
                         @endif
                         <div class="d-flex flex-column gap-2">

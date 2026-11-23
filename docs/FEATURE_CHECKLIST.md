@@ -677,23 +677,23 @@
 | Metric               | Value     |
 | -------------------- | --------- |
 | **Total Features**   | 220+      |
-| **Controllers**      | 64        |
-| **Services**         | 54        |
+| **Controllers**      | 66        |
+| **Services**         | 62        |
 | **Models**           | 54        |
-| **Helpers**          | 6         |
-| **Test Methods (PHP)** | 1208     |
-| **Test Assertions (PHP)** | 3827   |
-| **JS Test Files**    | 170       |
-| **API Endpoints**    | 11        |
-| **Database Tables**  | 57        |
-| **Migrations**       | 110       |
+| **Helpers**          | 9         |
+| **Tests (PHP)**      | 1642      |
+| **Test Assertions (PHP)** | 6230   |
+| **JS Test Files**    | 174       |
+| **API Endpoints**    | 12        |
+| **Database Tables**  | 65        |
+| **Migrations**       | 121       |
 | **Seeders**          | 36        |
 | **Permissions**      | 101       |
-| **Routes**           | 437       |
-| **JavaScript Files** | 189       |
+| **Routes**           | 447       |
+| **JavaScript Files** | 196       |
 | **Languages**        | 2 (EN/ID) |
 | **Development Time** | 1.5 years |
-| **Total Commits**    | 527+      |
+| **Total Commits**    | 549+      |
 
 ---
 

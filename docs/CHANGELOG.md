@@ -9,6 +9,146 @@ Date-ordered, newest first.
 
 ---
 
+## 2026-11-23: The Dark Theme Stopped Leaking Light Across Nine Pages, the Chart of Accounts Submenu Finally Highlighted Because Its Menu Entry Pointed at a Redirect, and Financial Health Filled Its Grid with Three New Cards
+
+Committed as `203e483a` ("minor update on styling css and financial health
+page"). Three separate complaints from the same drive for consistency, each
+proved before and after the fix.
+
+### Dark theme: what was light, why, and what was deliberately left white
+
+Reported symptom: several pages still showed light blocks in dark mode, and
+icons disappeared from the Financial Health cards.
+
+**The disappearing icons were class names with no glyph.** `ti-balance`,
+`ti-check-circle` and `ti-person` do not exist in the Tabler webfont
+(`public/tabler/dist/icons/tabler-icons.min.css` has no `:before` rule for any
+of them), so the browser had nothing to draw: an icon class whose glyph is
+missing renders as an empty avatar, which is what "disappeared" meant. The
+correct names (`ti-scale`, `ti-circle-check`, `ti-user`) were swapped in across
+four files: the Debt to Equity card in `FinancialHealthService`, the avatar
+preview in `profile.js` and `_profile_settings.blade.php`, and the stock opname
+success icon in `stockopnamemodals.blade.php`. Proof was taken three ways: no
+glyph rule exists for the old names, the live page carries zero occurrences of
+them, and an A/B page rendered the three old names empty beside the three new
+names drawing.
+
+**The light leaks, by file:**
+
+- `alerts.css`: alert tab colors were hardcoded light, and a dead
+  `.theme-dark #alertTabs` block (the theme flag lives on `<html>`, never on
+  `<body>`) was retargeted to `[data-bs-theme="dark"]` with the house dark
+  colors, plus dark text rules for the `-lt` soft badges (danger, info,
+  secondary) which painted light backgrounds over unreadable text.
+- `app.css`: appended `.bg-tertiary-lt`, a dark-scoped `[data-bs-theme="dark"]
+  .bg-light`, and a full flatpickr dark block (calendar sheet, days, time row)
+  prefixed `html[data-bs-theme="dark"]` so it can never bleed into light mode.
+- `menu-sidebar.css`: the dark submenu hover went from near-invisible to
+  `rgba(255,255,255,0.06)` with a white icon.
+- `superadmin.css`: frost hover, the icon-badge split (hover `#fff`, active
+  `#37393b`), and `.nav-category-label` moved `#4d4f51` to `#94a3b8`, which
+  takes it from 2.18:1 to 7.01:1 contrast (verified with the contrast checker).
+- `settings.css`: disabled wrappers to `#f2f2f2`, `.sticky-col` scoped light
+  and given a dark `var(--tblr-body-bg)` guard, keeping its `position:sticky`
+  behavior intact.
+- `error.css` / `pos-receipt.css`: the page loader overlay now paints the dark
+  `rgba(28,30,32,0.92)` instead of a light sheet.
+- `tutorial-modal.css`: a bare `:not(...)` selector that matched everywhere
+  became `html:not(...)`.
+
+**Left white on purpose, not forgotten:** the `@media print` receipt paper
+(`pos-receipt.css`), product photo blocks (photos are content), the sidebar
+active pill `#e9ecef` (the Tabler convention, used identically in light mode),
+the coordinated navbar white hover chip system with its "FIXED:" radius and
+margin comments, and the `.sidebar-actions` bell/theme-toggle hover. Each was
+checked rather than blanket-replaced.
+
+**Proof:** nine pages captured at 1600x2600 and censused in 20px blocks
+(70% light, 10+ block clusters): the Financial Health banner went from 100
+light clusters to 0 (light pixels 134,949 down to 11,592, the remainder being
+the deliberate active pill), dashboard 2 clusters to 1, product page 2 to 1,
+and sales, settings, pipeline, attendance, purchase order and POS all at 0.
+
+### Chart of Accounts: the one submenu that never highlighted
+
+Reported symptom: opening Accounting > Chart of Accounts left the sidebar with
+no active highlight, while every other submenu highlighted correctly.
+
+Root cause: `config/navigation.php` pointed the entry at
+`admin.accounting.chart`, and that controller method only does
+`redirect()->route('admin.accounting.accounts.index')`. After the redirect the
+browser sits on `/admin/accounting/accounts`, where
+`request()->routeIs('admin.accounting.chart')` can never match, so the child
+anchor never receives `active` and the parent never receives
+`has-active-child`. Every other submenu works because none of their routes
+redirect.
+
+The bug was proved red first: the live HTML on `/admin/accounting/accounts`
+showed the CoA anchor as plain `nav-link` with no `active` and the parent
+missing `has-active-child`. The fix is one line, pointing the menu entry at
+the final route instead of the hop. Bookmarks still work because the legacy
+`/admin/accounting/chart-of-accounts` URL keeps its 302 redirect, and all 35
+menu routes were scanned afterwards: no other entry's controller returns a
+redirect (every other index returns a view), so this was the unique case.
+
+### Financial Health: from 13 cards to a full 4x4 grid
+
+Reported symptom: the "Condition Right Now" grid looked unfinished, with one
+lonely card starting a fifth row. The grid is `col-xl-3` (four per row at
+desktop), so 16 cards fill exactly four rows, on the Financial Health page and
+on the dashboard strip, which loops the same indicators.
+
+Three cards were added, every one computed from data the service already had,
+so no new queries were introduced:
+
+- **Collection Ratio** (`collection_ratio`, thresholds
+  `collection.good = 0.90`, `collection.warn = 0.75`): the share of invoiced
+  money that actually arrived (GL 1130 credits against debits). It already
+  drove the next-month outlook invisibly ("after your 78% collection pace")
+  but had no card, which is how a business can show green revenue and margins
+  while cash starves. `collectionRatio()` now returns a `measured` flag beside
+  the ratio so an empty tenant reads neutral instead of the 1.0 fallback
+  claiming a flawless score.
+- **Draft Entries** (`draft_jes`, threshold `draft_jes.warn = 1`): draft
+  journal entries were already counted for the attention list; the card makes
+  the accuracy contract of the whole page explicit. Zero means every
+  GL-derived card above reads final; one or more turns warn, matching the
+  attention list's own severity for the same fact. It needed a new `count`
+  display threaded through both `$formatValue` closures and the compare-modal
+  `fmtValue`/`fmtDelta` switches in `financial-health.js`.
+- **Days Payable Outstanding** (`dpo`, thresholds mirroring DSO at 60/90): open
+  payables divided by purchases over the window, scaled to the window's day
+  count, built from AP aging buckets and the purchase series already loaded.
+  The first draft used 45/75 bands with "past typical terms" wording; on the
+  live tenant that rendered "Needs Attention, 47 Days" one card away from
+  Payables' "No overdue bills", a contradiction the number cannot resolve,
+  because bill age and bill due dates are different facts. The final wording
+  states only what is measured ("Unpaid bills equal about N days of
+  purchases") and the bands mirror DSO, so collect-in-60 and pay-in-60 read as
+  one story.
+
+Supporting changes: thresholds documented next to their reasoning in
+`config/financial-health.php`; English and Indonesian labels, reasons and
+explainer bodies (the Indonesian intro still said "twelve cards" and was
+corrected to sixteen); three explainer entries added (17 to 20 toggles); and
+the comparison modal gained three point-in-time rows, so a filtered page now
+carries 11 lock icons instead of 8, each explaining why the row ignores the
+period.
+
+Tests moved with the feature: indicator and comparison counts 13 to 16, locked
+rows 8 to 11, explainer toggles 17 to 20, the synthetic-series fixture gained
+`collection_ratio` and `collection_measured`, and a new
+`test_new_pace_cards_read_safe_and_translated_on_an_empty_tenant` pins the
+three new cards to neutral/good with resolved translation keys on a tenant
+with no history.
+
+**Proof:** 1642 tests, 6230 assertions, exit 0; vitest 174 files / 217 tests;
+Pint clean on every touched file; both the page and the dashboard strip
+captured showing the 4x4 grid with every icon rendering, and the compare-modal
+payload carrying all 16 rows in card order.
+
+---
+
 ## 2026-11-22: The Books and the Shelf Disagreed by Rp 3.9 Million Because Four Seeders Moved Stock Without Journaling It, so Two Repairs Bring Inventory Back to the Stock on Hand
 
 The repairs are migrations `2026_11_21_000001_reverse_provably_wrong_sale_cogs.php`

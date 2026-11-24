@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Services\SecurityLogger;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -131,7 +132,7 @@ class BackupController extends Controller
                 ->with('error', __('messages.backup_unauthorized'));
         }
 
-        Log::channel('security')->info('Backup downloaded', [
+        SecurityLogger::log('info', 'Backup downloaded', [
             'tenant_id' => $tenant->id,
             'filename' => $filename,
         ]);
@@ -159,7 +160,7 @@ class BackupController extends Controller
         try {
             Storage::disk('local')->delete($path);
 
-            Log::channel('security')->info('Backup deleted', [
+            SecurityLogger::log('info', 'Backup deleted', [
                 'tenant_id' => $tenant->id,
                 'filename' => $filename,
             ]);
@@ -176,7 +177,7 @@ class BackupController extends Controller
     {
         $tenant = app('currentTenant');
 
-        Log::channel('security')->info('Restore attempt started', [
+        SecurityLogger::log('info', 'Restore attempt started', [
             'tenant_id' => $tenant->id,
             'is_encrypted' => $tenant->isBackupEncrypted(),
             'has_file' => $request->hasFile('backup_file'),
@@ -204,7 +205,7 @@ class BackupController extends Controller
         $file = $request->file('backup_file');
         $password = $request->input('password');
 
-        Log::channel('security')->info('Restore validation passed', [
+        SecurityLogger::log('info', 'Restore validation passed', [
             'filename' => $file->getClientOriginalName(),
             'size' => $file->getSize(),
         ]);
@@ -221,7 +222,7 @@ class BackupController extends Controller
             // Store the uploaded file temporarily
             $tempPath = $file->store('backup-restore');
 
-            Log::channel('security')->info('Backup restore file stored', [
+            SecurityLogger::log('info', 'Backup restore file stored', [
                 'tenant_id' => $tenant->id,
                 'temp_path' => $tempPath,
                 'filename' => $file->getClientOriginalName(),
@@ -309,7 +310,7 @@ class BackupController extends Controller
                     ->with('error', __('messages.backup_restore_error').': '.$error);
             }
 
-            Log::channel('security')->info('Backup restored successfully', [
+            SecurityLogger::log('info', 'Backup restored successfully', [
                 'tenant_id' => $tenantId,
                 'filename' => $file->getClientOriginalName(),
             ]);
@@ -351,7 +352,7 @@ class BackupController extends Controller
 
         // Verify current password against user's password
         if (! Hash::check($request->current_password, $user->password)) {
-            Log::channel('security')->warning('Failed password change attempt', [
+            SecurityLogger::log('warning', 'Failed password change attempt', [
                 'user_id' => $user->id,
                 'email' => $user->email,
                 'reason' => 'Incorrect current password',
@@ -370,7 +371,7 @@ class BackupController extends Controller
             'backup_encrypted' => $encryptionEnabled,
         ]);
 
-        Log::channel('security')->info('Backup password changed', [
+        SecurityLogger::log('info', 'Backup password changed', [
             'tenant_id' => $tenant->id,
             'user_id' => $user->id,
         ]);

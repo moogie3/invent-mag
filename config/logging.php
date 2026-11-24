@@ -132,6 +132,12 @@ return [
             'path' => storage_path('logs/security.log'),
             'level' => env('LOG_LEVEL', 'debug'),
             'days' => 90,  // Keep security logs for 90 days
+            // The web server (daemon) and the CLI/test runner (emberfall) are
+            // different OS users but both append to these files. Without an
+            // explicit mode the file is created 0644 by whoever writes first,
+            // the other user then cannot append, and the audit write throws
+            // after the caller's database work has already committed.
+            'permission' => 0666,
         ],
 
     ],

@@ -4,6 +4,7 @@ namespace App\Http\Controllers\SuperAdmin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Tenant;
+use App\Services\SecurityLogger;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Artisan;
@@ -152,7 +153,7 @@ class BackupController extends Controller
         try {
             $tempPath = $file->store('backup-restore');
 
-            Log::channel('security')->info('Super admin restore attempt', [
+            SecurityLogger::log('info', 'Super admin restore attempt', [
                 'tenant_id' => $tenant->id,
                 'tenant_name' => $tenant->name,
                 'filename' => $file->getClientOriginalName(),
@@ -233,7 +234,7 @@ class BackupController extends Controller
                 return redirect()->route('superadmin.backups.index');
             }
 
-            Log::channel('security')->info('Super admin restore completed', [
+            SecurityLogger::log('info', 'Super admin restore completed', [
                 'tenant_id' => $tenant->id,
                 'tenant_name' => $tenant->name,
                 'filename' => $file->getClientOriginalName(),

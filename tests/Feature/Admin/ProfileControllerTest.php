@@ -6,6 +6,8 @@ use App\Services\ProfileService;
 use Database\Seeders\RoleSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Mockery;
 use Tests\TestCase;
@@ -117,6 +119,50 @@ class ProfileControllerTest extends TestCase
 
         $response->assertStatus(200);
         $response->assertJson(['success' => true, 'message' => 'Profile updated successfully!']);
+    }
+
+    public function test_password_change_survives_an_unwritable_security_log()
+    {
+        // Reproduces the production failure byte for byte: the security channel
+        // cannot open its file for append, so Monolog throws UnexpectedValueException
+        // "could not be opened in append mode". The password is already committed
+        // by ProfileService before the audit write, so a logging failure must never
+        // turn a successful change into a 500.
+        $this->app->forgetInstance(ProfileService::class);
+        config(['logging.channels.security.path' => storage_path('logs/laravel.log/security.log')]);
+        Log::forgetChannel('security');
+
+        $response = $this
+            ->actingAs($this->user)
+            ->from('/admin/settings/profile')
+            ->put(route('admin.setting.profile.update-password'), [
+                'current_password' => 'password',
+                'password' => 'StrongUniquePass!789',
+                'password_confirmation' => 'StrongUniquePass!789',
+            ]);
+
+        $response->assertSessionHasNoErrors();
+        $response->assertRedirect(route('admin.setting.profile.edit'));
+        $response->assertSessionHas('success');
+        $this->assertTrue(Hash::check('StrongUniquePass!789', $this->user->refresh()->password));
+    }
+
+    public function test_incorrect_current_password_is_rejected_without_touching_the_password()
+    {
+        $this->app->forgetInstance(ProfileService::class);
+
+        $response = $this
+            ->actingAs($this->user)
+            ->from('/admin/settings/profile')
+            ->put(route('admin.setting.profile.update-password'), [
+                'current_password' => 'not-the-password',
+                'password' => 'StrongUniquePass!789',
+                'password_confirmation' => 'StrongUniquePass!789',
+            ]);
+
+        $response->assertRedirect('/admin/settings/profile');
+        $response->assertSessionHas('error');
+        $this->assertTrue(Hash::check('password', $this->user->refresh()->password));
     }
 
     public function test_delete_avatar_deletes_avatar_successfully()

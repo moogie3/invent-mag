@@ -134,4 +134,48 @@ class SecurityLoggerTest extends TestCase
             'attempts' => 5,
         ]);
     }
+
+    public function test_it_falls_back_to_the_main_log_when_the_security_channel_fails()
+    {
+        // Mirrors the production failure: the web user cannot append to the
+        // security log, so opening it throws.
+        Log::shouldReceive('channel')
+            ->with('security')
+            ->andThrow(new \UnexpectedValueException('Permission denied'))
+            ->once();
+
+        Log::shouldReceive('error')
+            ->once()
+            ->withArgs(function ($message, $context) {
+                return str_starts_with($message, 'SECURITY:')
+                    && isset($context['email']);
+            })
+            ->andReturnNull();
+
+        SecurityLogger::logFailedLogin('test@example.com');
+    }
+
+    public function test_it_never_propagates_a_logging_failure_to_the_caller()
+    {
+        // Both the security channel and the main log are unavailable.
+        Log::shouldReceive('channel')
+            ->andThrow(new \UnexpectedValueException('Permission denied'));
+
+        Log::shouldReceive('error')
+            ->andThrow(new \UnexpectedValueException('Permission denied'));
+
+        $threw = false;
+
+        try {
+            SecurityLogger::logPasswordChange(User::factory()->create());
+            SecurityLogger::log('info', 'Backup downloaded', ['tenant_id' => 1]);
+        } catch (\Throwable $e) {
+            $threw = true;
+        }
+
+        $this->assertFalse(
+            $threw,
+            'A security audit write must never break the request that triggered it'
+        );
+    }
 }

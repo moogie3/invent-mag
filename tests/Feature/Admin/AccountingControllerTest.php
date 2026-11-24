@@ -173,6 +173,73 @@ class AccountingControllerTest extends TestCase
     }
 
     #[Test]
+    public function it_confirms_the_trial_balance_is_balanced_when_totals_match()
+    {
+        $this->accountingReportServiceMock->shouldReceive('generateTrialBalance')
+            ->andReturn([
+                'report_data' => [
+                    ['id' => 1, 'code' => '1000', 'name' => 'Cash', 'type' => 'asset', 'debit' => 1500.0, 'credit' => 0.0],
+                    ['id' => 2, 'code' => '4000', 'name' => 'Sales', 'type' => 'revenue', 'debit' => 0.0, 'credit' => 1500.0],
+                ],
+                'total_debits' => 1500.0,
+                'total_credits' => 1500.0,
+                'is_balanced' => true,
+                'end_date' => '2024-01-31',
+            ]);
+
+        $response = $this->actingAs($this->user)->get(route('admin.accounting.trial_balance'));
+
+        $response->assertOk();
+        $response->assertSee(__('messages.trial_balance_balanced'));
+        $response->assertDontSee(__('messages.totals_do_not_match'));
+    }
+
+    #[Test]
+    public function it_flags_the_trial_balance_as_out_of_balance_when_totals_differ()
+    {
+        $this->accountingReportServiceMock->shouldReceive('generateTrialBalance')
+            ->andReturn([
+                'report_data' => [
+                    ['id' => 1, 'code' => '1000', 'name' => 'Cash', 'type' => 'asset', 'debit' => 2000.0, 'credit' => 0.0],
+                    ['id' => 2, 'code' => '4000', 'name' => 'Sales', 'type' => 'revenue', 'debit' => 0.0, 'credit' => 1500.0],
+                ],
+                'total_debits' => 2000.0,
+                'total_credits' => 1500.0,
+                'is_balanced' => false,
+                'end_date' => '2024-01-31',
+            ]);
+
+        $response = $this->actingAs($this->user)->get(route('admin.accounting.trial_balance'));
+
+        $response->assertOk();
+        $response->assertSee(__('messages.totals_do_not_match'));
+        $response->assertDontSee(__('messages.trial_balance_balanced'));
+    }
+
+    #[Test]
+    public function it_claims_no_balance_verdict_when_the_book_is_empty()
+    {
+        // An empty book is 0 = 0, which is technically balanced but proves
+        // nothing: claiming "balanced" beside "no accounts with balances
+        // found" would be two contradictory rows. No data, no verdict.
+        $this->accountingReportServiceMock->shouldReceive('generateTrialBalance')
+            ->andReturn([
+                'report_data' => [],
+                'total_debits' => 0,
+                'total_credits' => 0,
+                'is_balanced' => true,
+                'end_date' => '2024-01-31',
+            ]);
+
+        $response = $this->actingAs($this->user)->get(route('admin.accounting.trial_balance'));
+
+        $response->assertOk();
+        $response->assertSee(__('messages.no_accounts_with_balances_found'));
+        $response->assertDontSee(__('messages.trial_balance_balanced'));
+        $response->assertDontSee(__('messages.totals_do_not_match'));
+    }
+
+    #[Test]
     public function it_can_display_the_accounts_index_page()
     {
         $this->accountServiceMock->shouldReceive('getAccountsWithChildren')

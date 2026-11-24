@@ -87,10 +87,13 @@ class DownloadShopeeCoverImages implements ShouldQueue
     }
 
     /**
-     * Increment the per-import media counters the modal polls. A batch counts
-     * as done only when every item succeeded; failures only count on the final
-     * attempt so a retry that later succeeds doesn't double-count. Best-effort:
-     * progress reporting must never fail a download batch.
+     * Increment the per-import media counters the modal polls, per item: an
+     * all-success batch counts every item as done, and a batch that still has
+     * failures on its final attempt counts its successes as done and only the
+     * failed items as failed, so one bad URL never marks the whole batch
+     * failed. Failures only count on the final attempt so a retry that later
+     * succeeds doesn't double-count. Best-effort: progress reporting must
+     * never fail a download batch.
      */
     private function reportProgress(int $processed, int $failures): void
     {
@@ -104,7 +107,8 @@ class DownloadShopeeCoverImages implements ShouldQueue
             if ($failures === 0) {
                 Cache::increment($base.'.done', $processed);
             } elseif ($this->attempts() >= $this->tries) {
-                Cache::increment($base.'.failed', $processed);
+                Cache::increment($base.'.done', $processed - $failures);
+                Cache::increment($base.'.failed', $failures);
             }
         } catch (\Throwable $e) {
             report($e);

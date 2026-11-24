@@ -691,7 +691,8 @@
                     data-label-progress-images="{{ __('messages.import_shopee_progress_images') }}"
                     data-label-progress-complete="{{ __('messages.import_shopee_progress_complete') }}"
                     data-label-media-done="{{ __('messages.import_shopee_media_done') }}"
-                    data-label-media-partial="{{ __('messages.import_shopee_media_partial') }}">
+                    data-label-media-partial="{{ __('messages.import_shopee_media_partial') }}"
+                    data-label-media-pending="{{ __('messages.import_shopee_media_pending') }}">
                     @csrf
                     <input type="hidden" name="progress_token" id="shopeeImportProgressToken" value="">
                     <div class="row g-3">

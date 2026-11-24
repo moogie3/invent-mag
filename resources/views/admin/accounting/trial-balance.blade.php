@@ -91,8 +91,14 @@
                             </tr>
                             @if (round($totalDebits, 2) !== round($totalCredits, 2))
                                 <tr>
-                                    <td colspan="4" class="text-center text-danger">
-                                        <strong>{{ __('messages.totals_do_not_match') }}</strong>
+                                    <td colspan="4" class="text-center text-danger-emphasis">
+                                        <strong><i class="ti ti-alert-triangle me-1"></i>{{ __('messages.totals_do_not_match') }}</strong>
+                                    </td>
+                                </tr>
+                            @elseif (count($reportData) > 0)
+                                <tr>
+                                    <td colspan="4" class="text-center text-success-emphasis">
+                                        <strong><i class="ti ti-circle-check me-1"></i>{{ __('messages.trial_balance_balanced') }}</strong>
                                     </td>
                                 </tr>
                             @endif

@@ -542,6 +542,12 @@ class ShopeeImportService
         }
 
         $userId = auth()->id();
+        $expected = count($pending);
+        // Seed the counters BEFORE dispatch: a fast job (sync queue, warm CDN)
+        // increments them while dispatch runs, and seeding afterwards would
+        // wipe the progress it already reported, leaving the modal unsettled.
+        $this->initMediaProgress($userId, $progressToken, $expected);
+
         $queued = 0;
         // Small batches keep each job well under the 300s job timeout even when
         // the CDN stalls on every request (15 items x 15s worst case = 225s).
@@ -559,9 +565,30 @@ class ShopeeImportService
             }
         }
 
-        $this->initMediaProgress($userId, $progressToken, $queued);
+        // A failed dispatch queued fewer items than planned: shrink the total
+        // so the modal still settles (done + failed reaches total).
+        if ($queued !== $expected) {
+            $this->setMediaProgressTotal($userId, $progressToken, $queued);
+        }
 
         return $queued;
+    }
+
+    /**
+     * Adjust only the seeded total (done/failed keep their counts), so a
+     * partial dispatch still lets the modal's counters settle.
+     */
+    private function setMediaProgressTotal(mixed $userId, ?string $progressToken, int $total): void
+    {
+        if ($progressToken === null || $progressToken === '') {
+            return;
+        }
+
+        Cache::put(
+            self::mediaProgressCacheKey(is_int($userId) ? $userId : null, $progressToken),
+            $total,
+            now()->addMinutes(15)
+        );
     }
 
     /**

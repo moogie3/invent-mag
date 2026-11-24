@@ -79,6 +79,42 @@ class QuotationControllerTest extends TestCase
         $response->assertViewHas('quotations');
     }
 
+    public function test_the_index_renders_no_raw_translation_keys_in_english()
+    {
+        $this->createQuotation();
+
+        $response = $this->get(route('admin.quotations'));
+
+        $response->assertOk();
+        // A missing key falls back to the key itself, so the page would show
+        // "messages.quotation_status_draft" instead of the status label.
+        $response->assertDontSee('messages.quotation_status_');
+        $response->assertDontSee('messages.quotations');
+        $response->assertSee('All Status');
+        $response->assertSee('Date From');
+        $response->assertSee('Date To');
+    }
+
+    public function test_the_index_renders_no_raw_translation_keys_in_indonesian()
+    {
+        $this->createQuotation();
+        $this->user->system_settings = ['system_language' => 'id'];
+        $this->user->save();
+
+        $response = $this->get(route('admin.quotations'));
+
+        $response->assertOk();
+        $response->assertDontSee('messages.quotation_status_');
+        $response->assertDontSee('messages.quotations');
+        $response->assertDontSee('>All<');
+        $response->assertDontSee('>From<');
+        $response->assertDontSee('>To<');
+        $response->assertSee('Semua Status');
+        $response->assertSee('Tanggal Dari');
+        $response->assertSee('Tanggal Sampai');
+        $response->assertSee('Draf');
+    }
+
     public function test_it_can_display_the_create_page()
     {
         $response = $this->get(route('admin.quotations.create'));

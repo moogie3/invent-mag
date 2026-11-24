@@ -152,6 +152,10 @@ export function initShopeeImport() {
             "labelMediaPartial",
             ":done of :total cover images imported (:failed failed)",
         );
+        const mediaPendingLabel = msg(
+            "labelMediaPending",
+            ":done of :total cover images imported, the rest continue in the background",
+        );
 
         const finish = (stats) => {
             stopImagePolling();
@@ -167,7 +171,7 @@ export function initShopeeImport() {
                             failed: stats.failed,
                         },
                     ),
-                    stats.failed > 0,
+                    stats.failed > 0 ? "warning" : "success",
                 );
             }
             // Short pause so the updated banner is readable before the reload.
@@ -223,16 +227,30 @@ export function initShopeeImport() {
         imageTimer = setInterval(tick, 1500);
         imageCapTimer = setTimeout(() => {
             stopImagePolling();
-            // Out of time — surface the partial state instead of freezing silently.
+            // Out of time: stop polling, but never report a failure that did
+            // not happen. A zero count with warning copy made every capped
+            // import look broken; when nothing failed, say the downloads are
+            // still running in the background instead.
             if (lastStats && lastStats.done + lastStats.failed < lastStats.total) {
-                appendMediaResult(
-                    template(mediaPartialLabel, {
-                        done: lastStats.done,
-                        total: lastStats.total,
-                        failed: lastStats.failed,
-                    }),
-                    true,
-                );
+                const failed = lastStats.failed;
+                if (failed > 0) {
+                    appendMediaResult(
+                        template(mediaPartialLabel, {
+                            done: lastStats.done,
+                            total: lastStats.total,
+                            failed,
+                        }),
+                        "warning",
+                    );
+                } else {
+                    appendMediaResult(
+                        template(mediaPendingLabel, {
+                            done: lastStats.done,
+                            total: lastStats.total,
+                        }),
+                        "muted",
+                    );
+                }
             }
         }, 300000);
     }
@@ -396,7 +414,7 @@ function renderSummary(summary, form, resultBox) {
  * banner, so the result reflects the media phase too — not just the counts
  * from the initial import response.
  */
-function appendMediaResult(text, isWarning) {
+function appendMediaResult(text, tone = "success") {
     const resultBox = document.getElementById("shopeeImportResult");
     if (!resultBox) return;
     const alert = resultBox.querySelector(".alert");
@@ -405,13 +423,16 @@ function appendMediaResult(text, isWarning) {
     const existing = alert.querySelector(".media-result-line");
     if (existing) existing.remove();
 
+    const styles = {
+        warning: { cls: "text-warning", icon: "ti-alert-triangle" },
+        muted: { cls: "text-muted", icon: "ti-clock" },
+        success: { cls: "text-success", icon: "ti-circle-check" },
+    };
+    const style = styles[tone] || styles.success;
+
     const line = document.createElement("div");
-    line.className = `media-result-line small fw-semibold mt-2 ${isWarning ? "text-warning" : "text-success"}`;
-    line.innerHTML = `${
-        isWarning
-            ? '<i class="ti ti-alert-triangle me-1"></i>'
-            : '<i class="ti ti-circle-check me-1"></i>'
-    }${escapeHtml(text)}`;
+    line.className = `media-result-line small fw-semibold mt-2 ${style.cls}`;
+    line.innerHTML = `<i class="ti ${style.icon} me-1"></i>${escapeHtml(text)}`;
     alert.appendChild(line);
 }
 

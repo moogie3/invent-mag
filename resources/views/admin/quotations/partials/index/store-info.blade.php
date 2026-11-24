@@ -7,18 +7,18 @@
         <div class="col-md-2">
             <label class="form-label">{{ __('messages.quotation_status') }}</label>
             <select class="form-select" id="statusFilter" data-onchange="(() => { const u = new URL(window.location.href); this.value ? u.searchParams.set('status', this.value) : u.searchParams.delete('status'); u.searchParams.delete('page'); window.location.href = u.toString(); })();">
-                <option value="">All</option>
+                <option value="">{{ __('messages.all_status') }}</option>
                 @foreach(['draft', 'sent', 'accepted', 'rejected', 'expired', 'converted'] as $s)
                     <option value="{{ $s }}" {{ request('status') === $s ? 'selected' : '' }}>{{ __("messages.quotation_status_{$s}") }}</option>
                 @endforeach
             </select>
         </div>
         <div class="col-md-2">
-            <label class="form-label">From</label>
+            <label class="form-label">{{ __('messages.date_from') }}</label>
             <input type="date" class="form-control" id="dateFrom" data-onchange="(() => { const u = new URL(window.location.href); this.value ? u.searchParams.set('date_from', this.value) : u.searchParams.delete('date_from'); u.searchParams.delete('page'); window.location.href = u.toString(); })();" value="{{ request('date_from') }}">
         </div>
         <div class="col-md-2">
-            <label class="form-label">To</label>
+            <label class="form-label">{{ __('messages.date_to') }}</label>
             <input type="date" class="form-control" id="dateTo" data-onchange="(() => { const u = new URL(window.location.href); this.value ? u.searchParams.set('date_to', this.value) : u.searchParams.delete('date_to'); u.searchParams.delete('page'); window.location.href = u.toString(); })();" value="{{ request('date_to') }}">
         </div>
         <div class="col-md-2">

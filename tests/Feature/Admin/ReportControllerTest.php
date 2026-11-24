@@ -199,6 +199,49 @@ class ReportControllerTest extends TestCase
         $response->assertViewHas('totalAssets');
     }
 
+    public function test_balance_sheet_paints_a_broken_equation_as_a_failure()
+    {
+        $this->financialReportingServiceMock->shouldReceive('generateBalanceSheet')->andReturn([
+            'assets' => collect([]),
+            'liabilities' => collect([]),
+            'equity' => collect([]),
+            'total_assets' => 100,
+            'total_liabilities' => 50,
+            'total_equity' => 25,
+            'equation_balanced' => false,
+            'end_date' => '2024-01-31',
+        ]);
+
+        $response = $this->actingAs($this->user)->get(route('admin.reports.balance-sheet'));
+
+        $response->assertStatus(200);
+        // A failed accounting equation must never wear the success colour.
+        $response->assertDontSee('justify-content-between text-success"', false);
+        $response->assertSee('justify-content-between text-danger-emphasis', false);
+        $response->assertSee(__('messages.no'));
+    }
+
+    public function test_balance_sheet_paints_a_balanced_equation_as_a_success()
+    {
+        $this->financialReportingServiceMock->shouldReceive('generateBalanceSheet')->andReturn([
+            'assets' => collect([]),
+            'liabilities' => collect([]),
+            'equity' => collect([]),
+            'total_assets' => 100,
+            'total_liabilities' => 50,
+            'total_equity' => 50,
+            'equation_balanced' => true,
+            'end_date' => '2024-01-31',
+        ]);
+
+        $response = $this->actingAs($this->user)->get(route('admin.reports.balance-sheet'));
+
+        $response->assertStatus(200);
+        $response->assertSee('justify-content-between text-success-emphasis', false);
+        $response->assertDontSee('justify-content-between text-danger-emphasis', false);
+        $response->assertSee(__('messages.yes'));
+    }
+
     public function test_aged_receivables_displays_aged_receivables_page()
     {
         $this->agingReportServiceMock->shouldReceive('generateAgedReceivables')->andReturn([

@@ -144,8 +144,13 @@
                                 <span
                                     class="text-end">{{ \App\Helpers\CurrencyHelper::format($totalLiabilities + $totalEquity) }}</span>
                             </h3>
-                            <h3 class="d-flex justify-content-between text-success">
-                                <span>{{ __('messages.accounting_equation_balanced') }}</span>
+                            {{-- The verdict colour must follow the verdict: a broken
+                                 equation was previously painted green regardless. --}}
+                            <h3 class="d-flex justify-content-between {{ $equation_balanced ? 'text-success-emphasis' : 'text-danger-emphasis' }}">
+                                <span>
+                                    <i class="ti {{ $equation_balanced ? 'ti-circle-check' : 'ti-alert-triangle' }} me-1"></i>
+                                    {{ __('messages.accounting_equation_balanced') }}
+                                </span>
                                 <span
                                     class="text-end">{{ $equation_balanced ? __('messages.yes') : __('messages.no') }}</span>
                             </h3>

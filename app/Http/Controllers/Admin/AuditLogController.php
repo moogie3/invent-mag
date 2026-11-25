@@ -14,7 +14,7 @@ class AuditLogController extends Controller
 
     public function __construct(ActivityLogService $logService)
     {
-        // Only superusers may access the audit log (bypasses all plan limits)
+        // Only superusers may access the audit log
         // Role check is sufficient since superuser gets all permissions automatically
         $this->middleware(['role:superuser']);
         $this->logService = $logService;

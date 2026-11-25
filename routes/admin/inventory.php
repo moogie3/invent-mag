@@ -6,7 +6,7 @@ use App\Http\Controllers\Admin\StockTransferController;
 use App\Http\Controllers\Admin\WarehouseController;
 
 // Stock Opname Routes
-Route::prefix('stock-opname')->middleware('plan.feature:stock_opname')->group(function () {
+Route::prefix('stock-opname')->group(function () {
     Route::get('/', [StockOpnameController::class, 'index'])->name('admin.stock-opname.index')->middleware('can:view-stock-opname');
     Route::post('/', [StockOpnameController::class, 'store'])->name('admin.stock-opname.store')->middleware('can:manage-stock-opname');
     Route::get('/create', [StockOpnameController::class, 'create'])->name('admin.stock-opname.create')->middleware('can:manage-stock-opname');
@@ -25,11 +25,7 @@ Route::prefix('warehouses')->group(function () {
 
     Route::post('/store', [WarehouseController::class, 'store'])
         ->name('admin.warehouse.store')
-        ->middleware(['can:create-warehouses', 'plan.limit:warehouses']);
-
-    Route::get('/edit/{id}', [WarehouseController::class, 'edit'])
-        ->name('admin.warehouse.edit')
-        ->middleware('can:edit-warehouses');
+        ->middleware(['can:create-warehouses']);
 
     Route::put('/update/{id}', [WarehouseController::class, 'update'])
         ->name('admin.warehouse.update')
@@ -52,8 +48,8 @@ Route::prefix('warehouses')->group(function () {
         ->middleware('can:view-warehouses');
 });
 
-// POS Routes - Protected by plan feature
-Route::prefix('pos')->middleware('plan.feature:pos')->group(function () {
+// POS Routes
+Route::prefix('pos')->group(function () {
     Route::get('/', [POSController::class, 'index'])
         ->name('admin.pos')
         ->middleware('can:access-pos');

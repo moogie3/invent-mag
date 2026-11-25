@@ -110,22 +110,10 @@ class AppServiceProvider extends ServiceProvider
         });
 
         // ---------------------------------------------------------------
-        // Custom Blade Directives for Plan System
+        // Blade: @planHas always true (all enterprise features unlocked)
         // ---------------------------------------------------------------
-
-        /**
-         * @planHas('feature_slug') ... @endplanHas
-         * Conditionally renders content if the current tenant's plan includes the feature.
-         * Returns true (show content) if: no tenant context, legacy tenant, or plan has feature.
-         */
         Blade::if('planHas', function (string $feature) {
-            try {
-                $tenant = app('currentTenant');
-
-                return $tenant instanceof Tenant ? $tenant->hasFeature($feature) : true;
-            } catch (\Exception $e) {
-                return true; // No tenant context, allow content
-            }
+            return true;
         });
 
         /**
@@ -147,20 +135,6 @@ class AppServiceProvider extends ServiceProvider
             }
 
             return $query;
-        });
-
-        /**
-         * @onTrial ... @endOnTrial
-         * Conditionally renders content if the current tenant is on a trial period.
-         */
-        Blade::if('onTrial', function () {
-            try {
-                $tenant = app('currentTenant');
-
-                return $tenant instanceof Tenant && $tenant->onTrial();
-            } catch (\Exception $e) {
-                return false;
-            }
         });
 
         if (! app()->environment('testing')) {

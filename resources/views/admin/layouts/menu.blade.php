@@ -1,7 +1,4 @@
 <div class="card-body">
-    @php
-        $currentTenant = app('currentTenant');
-    @endphp
     <h3 class="header"><i class="ti ti-menu-2 me-2"></i>Setting List</h3>
     <hr class="my-3">
     <div class="list-group list-group-transparent">
@@ -29,19 +26,13 @@
             class="list-group-item list-group-item-action d-flex align-items-center {{ request()->routeIs('admin.setting.tax') ? 'active' : '' }}">
             <i class="ti ti-receipt-tax fs-2 me-2"></i> {{ __('messages.tax') }}
         </a>
-        @if($currentTenant && $currentTenant->hasFeature('accounting'))
         <a href="{{ route('admin.setting.accounting') }}"
             class="list-group-item list-group-item-action d-flex align-items-center {{ request()->routeIs('admin.setting.accounting') ? 'active' : '' }}">
             <i class="ti ti-calculator fs-2 me-2"></i> {{ __('messages.accounting') }}
         </a>
-        @endif
         <a href="{{ route('admin.setting.index') }}"
             class="list-group-item list-group-item-action d-flex align-items-center {{ request()->routeIs('admin.setting.index') ? 'active' : '' }}">
             <i class="ti ti-settings-2 fs-2 me-2"></i> {{ __('messages.system') }}
-        </a>
-        <a href="{{ route('admin.setting.plan') }}"
-            class="list-group-item list-group-item-action d-flex align-items-center {{ request()->routeIs('admin.setting.plan') || request()->routeIs('admin.setting.plan.*') ? 'active' : '' }}">
-            <i class="ti ti-crown fs-2 me-2"></i> {{ __('plan.title') }}
         </a>
         @role('superuser')
             <a href="{{ route('admin.users.index') }}"
@@ -53,7 +44,6 @@
                 <i class="ti ti-database fs-2 me-2"></i> {{ __('messages.backup') }}
             </a>
         @endrole
-        @if($currentTenant && $currentTenant->hasFeature('hr'))
         @can('view-hr')
             <a href="#" class="list-group-item list-group-item-action d-flex align-items-center" data-bs-toggle="collapse" data-bs-target="#adminCollapse" role="button" aria-expanded="{{ request()->routeIs('admin.hr.*') ? 'true' : 'false' }}">
                 <i class="ti ti-shield-cog fs-2 me-2"></i> {{ __('messages.administration') }}
@@ -74,7 +64,6 @@
                 </a>
             </div>
         @endcan
-        @endif
         <a href="#" class="list-group-item list-group-item-action d-flex align-items-center trigger-tutorial-modal-general">
             <i class="ti ti-help fs-2 me-2"></i> {{ __('messages.tutorial') }}
         </a>

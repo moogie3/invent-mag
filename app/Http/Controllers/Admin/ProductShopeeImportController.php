@@ -54,7 +54,7 @@ class ProductShopeeImportController extends Controller
         $message = __('messages.import_shopee_summary', [
             'updated' => $summary['updated'],
             'created' => $summary['created'],
-            'skipped' => $summary['skipped_plan_limit'],
+            'skipped' => 0,
             'errors' => count($summary['errors']),
         ]);
 

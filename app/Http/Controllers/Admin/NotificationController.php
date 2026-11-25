@@ -101,12 +101,12 @@ class NotificationController extends Controller
 
         // Handle specific system notification routes based on ID part
         if ($type === 'system') {
-            if (str_contains($id, 'trial') || str_contains($id, 'plan') || str_contains($id, 'limit')) {
-                return redirect()->route('admin.setting.plan.upgrade');
-            } elseif (str_contains($id, 'accounting')) {
+            if (str_contains($id, 'accounting')) {
                 return redirect()->route('admin.setting.accounting');
             } elseif (str_contains($id, 'profile')) {
                 return redirect()->route('admin.setting.profile.edit');
+            } elseif (str_contains($id, 'backup')) {
+                return redirect()->route('admin.setting.backup.index');
             }
         }
 

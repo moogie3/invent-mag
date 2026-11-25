@@ -1,95 +1,6 @@
 <?php
 
 return [
-    'title' => 'Paket Langganan',
-    'manage_subscription' => 'Kelola Langganan',
-    'current_plan' => 'Paket Saat Ini',
-    'renew_plan' => 'Perbarui Paket',
-    'choose_your_plan' => 'Pilih Paket Anda',
-    'change_your_plan' => 'Ubah Paket Anda',
-    'change_plan' => 'Ubah Paket',
-    'usage_statistics' => 'Statistik Penggunaan',
-    'plan_features' => 'Fitur Paket',
-    'plan' => '.',
-    'unlimited_access' => 'Akses Tanpa Batas',
-    'legacy_desc' => 'Akun Anda saat ini menikmati akses level enterprise warisan (legacy) tanpa batasan.',
-    'upgrade_plan' => 'Tingkatkan Paket',
-    'users' => 'Pengguna',
-    'warehouses' => 'Gudang',
-    'products' => 'Produk',
-    'unlimited' => 'Tanpa Batas',
-    'of' => 'dari',
-    'used' => 'digunakan',
-    'your_plan_includes' => 'Paket Anda saat ini mencakup fitur-fitur berikut:',
-    'trial_ends_in' => 'Masa uji coba Anda berakhir dalam :days hari',
-    'current' => 'Saat Ini',
-    'billing_monthly' => 'per bulan',
-    'plan_comparison' => 'Perbandingan Paket',
-    'trial_banner_desc' => 'Anda saat ini menggunakan uji coba gratis. Tersisa :days hari lagi.',
-    'upgrade_now' => 'Tingkatkan Sekarang',
-    'back_to_plan' => 'Kembali ke Paket',
-    'switch_plan' => 'Ganti Paket',
-    'confirm_upgrade_title' => 'Konfirmasi Peningkatan',
-    'upgrade_to' => 'Tingkatkan ke',
-    'upgrade_amount' => 'Jumlah',
-    'confirm_upgrade' => 'Ya, Tingkatkan Sekarang',
-    'free_trial' => 'Uji coba gratis :days hari',
-
-    // Checkout
-    'checkout' => 'Pembayaran',
-    'invoice' => 'Faktur',
-    'pending_payment' => 'Menunggu Pembayaran',
-    'from' => 'Dari',
-    'invoice_date' => 'Tanggal Faktur',
-    'payment_expires' => 'Pembayaran kedaluwarsa dalam',
-    'description' => 'Deskripsi',
-    'qty' => 'Jml',
-    'price' => 'Harga',
-    'total' => 'Total',
-    'subscription_plan' => 'Paket Langganan',
-    'monthly_billing' => 'Tagihan Bulanan',
-    'subtotal' => 'Subtotal',
-    'tax' => 'Pajak',
-    'grand_total' => 'Total',
-    'new_plan' => 'Paket Baru',
-    'no_plan' => 'Tidak Ada Paket',
-    'select_payment_method' => 'Pilih Metode Pembayaran',
-    'pay_with_midtrans' => 'Bayar dengan Midtrans',
-    'credit_debit_card' => 'Kartu Kredit/Debit',
-    'bank_transfer' => 'Transfer Bank',
-    'coming_soon' => 'Segera Hadir',
-    'cancel_and_back' => 'Batal dan kembali ke paket',
-    'secure_payment' => 'Pembayaran Anda aman dan terenkripsi',
-    'token_error' => 'Token pembayaran tidak dihasilkan. Silakan coba lagi atau hubungi dukungan.',
-    'back_to_plans' => 'Kembali ke Paket',
-    'loading' => 'Memuat',
-
-    // Success Modal
-    'ok' => 'OK',
-
-    // Notifikasi Sistem - Status Uji Coba
-    'notif_trial_ending_title' => 'Uji Coba Segera Berakhir',
-    'notif_trial_ending_desc' => 'Uji coba gratis Anda berakhir dalam :days hari. Tingkatkan sekarang untuk mempertahankan semua fitur.',
-    'notif_trial_expired_title' => 'Uji Coba Berakhir',
-    'notif_trial_expired_desc' => 'Uji coba gratis Anda telah berakhir. Harap tingkatkan untuk terus menggunakan semua fitur.',
-
-    // Kedaluwarsa Langganan (periode penagihan paket berbayar berakhir)
-    'notif_subscription_expired_desc' => 'Langganan Anda telah kedaluwarsa. Harap perpanjang untuk terus menggunakan semua fitur.',
-
-    // Notifikasi Sistem - Masa Berlaku Paket
-    'notif_plan_expiring_title' => 'Paket Segera Kedaluwarsa',
-    'notif_plan_expiring_desc' => 'Paket :plan Anda kedaluwarsa dalam :days hari. Perpanjang untuk menghindari gangguan.',
-    'notif_plan_expired_title' => 'Paket Kedaluwarsa',
-    'notif_plan_expired_desc' => 'Paket :plan Anda telah kedaluwarsa. Harap perpanjang atau tingkatkan untuk memulihkan akses.',
-
-    // Notifikasi Sistem - Batas Penggunaan
-    'notif_user_limit_title' => 'Batas Pengguna Tercapai',
-    'notif_user_limit_desc' => 'Anda telah menggunakan :current dari :limit pengguna. Tingkatkan untuk menambah anggota tim.',
-    'notif_warehouse_limit_title' => 'Batas Gudang Tercapai',
-    'notif_warehouse_limit_desc' => 'Anda telah menggunakan :current dari :limit gudang. Tingkatkan untuk gudang tanpa batas.',
-    'notif_product_limit_title' => 'Batas Produk Tercapai',
-    'notif_product_limit_desc' => 'Anda telah menggunakan :current dari :limit produk. Tingkatkan untuk produk tanpa batas.',
-
     // Notifikasi Sistem - Pengaturan Akuntansi
     'notif_accounting_setup_title' => 'Pengaturan Akuntansi Belum Lengkap',
     'notif_accounting_setup_desc' => ':count akun default belum dikonfigurasi. Atur untuk mengaktifkan pembukuan yang benar.',
@@ -102,13 +13,6 @@ return [
     'notif_field_shopname' => 'nama toko',
     'notif_field_address' => 'alamat',
     'notif_field_avatar' => 'foto profil',
-
-    // Notifikasi Sistem - Perubahan Paket
-    'notif_scheduled_downgrade_title' => 'Penurunan Paket Terjadwal',
-    'notif_scheduled_downgrade_desc' => 'Paket Anda akan diturunkan dari :from_plan ke :to_plan pada :date.',
-    'notif_upgrade_success_title' => 'Paket Dinaikkan',
-    'notif_upgrade_success_desc' => 'Anda telah berhasil meningkatkan ke paket :plan.',
-    'view_plan_details' => 'Lihat Detail Paket',
 
     // UI Dropdown Notifikasi
     'notif_header' => 'Notifikasi',
@@ -131,7 +35,18 @@ return [
     'notif_more_expiring' => '+ :count peringatan produk kedaluwarsa lainnya',
     'notif_view_all' => 'Lihat semua notifikasi',
 
-    // Trial Banner
-    'close_normal' => 'Tutup',
-    'close_session' => 'Jangan tampilkan untuk sesi ini',
+    // Notifikasi Kedaluwarsa Produk
+    'notif_product_expiry_title' => 'Produk Mendekati Kedaluwarsa',
+    'notif_product_expiry_desc' => ':count item di inventaris Anda akan kedaluwarsa dalam 30 hari. Tinjau dan tindak sebelum terjadi kerugian.',
+    'notif_product_expiry_critical_desc' => ':critical item kedaluwarsa dalam 7 hari (:total total kedaluwarsa dalam 30 hari). Tindakan segera disarankan.',
+    'notif_view_products' => 'Lihat Produk',
+
+    // Notifikasi Status Cadangan
+    'notif_no_backup_title' => 'Cadangan Tidak Ditemukan',
+    'notif_no_backup_desc' => 'Anda belum membuat cadangan apa pun. Jalankan cadangan untuk melindungi data Anda.',
+    'notif_backup_recent_title' => 'Cadangan Berhasil',
+    'notif_backup_recent_desc' => 'Cadangan terakhir dibuat :time. Data Anda terlindungi.',
+    'notif_backup_overdue_title' => 'Cadangan Terlambat',
+    'notif_backup_overdue_desc' => 'Cadangan terakhir :days hari yang lalu. Kami sarankan mencadangkan data Anda secara berkala.',
+    'notif_go_to_backup' => 'Ke Cadangan',
 ];

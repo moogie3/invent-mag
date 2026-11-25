@@ -1,15 +1,9 @@
 <?php
 
-use App\Http\Middleware\CaptureImpersonation;
-use App\Http\Middleware\CheckPlanFeature;
-use App\Http\Middleware\CheckPlanLimit;
-use App\Http\Middleware\CheckSubscriptionStatus;
 use App\Http\Middleware\DebugModeMiddleware;
-use App\Http\Middleware\HandleTenantFromPath;
 use App\Http\Middleware\RedirectIfAuthenticated;
 use App\Http\Middleware\SecurityHeaders;
 use App\Http\Middleware\SetLocale;
-use App\Http\Middleware\SetSessionCookieName;
 use App\Providers\FortifyServiceProvider;
 use App\Providers\TestingServiceProvider;
 use HotwiredLaravel\TurboLaravel\Http\Middleware\TurboMiddleware;
@@ -43,35 +37,18 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
         using: function () {
-            $appUrl = env('APP_URL', 'http://localhost');
-            $baseDomain = env('APP_URL_BASE', parse_url($appUrl, PHP_URL_HOST) ?? 'localhost');
-
-            // Super admin routes — registered FIRST so domain-specific routes
-            // take priority over the generic root route in web.php
-            Route::middleware('web')
-                ->domain('super.'.$baseDomain)
-                ->withoutMiddleware([
-                    NeedsTenant::class,
-                    HandleTenantFromPath::class,
-                ])
-                ->group(base_path('routes/superadmin.php'));
-
-            // Standard tenant routes
             require base_path('routes/web.php');
 
             // API routes — loaded under the `api` middleware group and `/api` prefix.
-            // A custom `using` closure bypasses Laravel's automatic prefix/group wiring,
-            // so they must be applied manually here.
             Route::middleware('api')->prefix('api')->group(base_path('routes/api.php'));
 
-            // Console commands (Artisan)
             require base_path('routes/console.php');
         },
         health: '/up',
     )
     ->withProviders([
-        MultitenancyServiceProvider::class, // Ensure Spatie is loaded before Fortify
-        FortifyServiceProvider::class, // Ensure Fortify is loaded
+        MultitenancyServiceProvider::class,
+        FortifyServiceProvider::class,
         TestingServiceProvider::class,
     ])
     ->withMiddleware(function (Middleware $middleware) {
@@ -80,14 +57,10 @@ return Application::configure(basePath: dirname(__DIR__))
 
         $middleware->web(append: [
             NeedsTenant::class,
-            HandleTenantFromPath::class,
             SetLocale::class,
             DebugModeMiddleware::class,
             SecurityHeaders::class,
             TurboMiddleware::class,
-            CaptureImpersonation::class,
-        ])->web(prepend: [
-            SetSessionCookieName::class,
         ]);
 
         $middleware->api(append: [
@@ -95,14 +68,7 @@ return Application::configure(basePath: dirname(__DIR__))
             SubstituteBindings::class,
         ]);
 
-        $middleware->redirectGuestsTo(function (Request $request) {
-            $baseDomain = env('APP_URL_BASE', parse_url(env('APP_URL', 'http://localhost'), PHP_URL_HOST) ?? 'localhost');
-            if ($request->getHost() === 'super.'.$baseDomain) {
-                return route('superadmin.login');
-            }
-
-            return route('admin.login');
-        });
+        $middleware->redirectGuestsTo(fn (Request $request) => route('admin.login'));
 
         $middleware->alias([
             'role' => RoleMiddleware::class,
@@ -110,9 +76,6 @@ return Application::configure(basePath: dirname(__DIR__))
             'role_or_permission' => RoleOrPermissionMiddleware::class,
             'guest' => RedirectIfAuthenticated::class,
             'throttle' => ThrottleRequests::class,
-            'plan.feature' => CheckPlanFeature::class,
-            'plan.limit' => CheckPlanLimit::class,
-            'subscription.active' => CheckSubscriptionStatus::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
@@ -154,12 +117,7 @@ return Application::configure(basePath: dirname(__DIR__))
             return $handleError($request, 400, 'Bad Request');
         });
 
-        // 401 - Unauthorized (handled by redirectGuestsTo in middleware config above)
-
         // 403 - Forbidden
-        // NOTE: Laravel's prepareException() converts AuthorizationException into
-        // AccessDeniedHttpException before render callbacks run, so we must match
-        // AccessDeniedHttpException (and AuthorizationException as a fallback).
         $exceptions->render(function (AccessDeniedHttpException $e, Request $request) use ($handleError) {
             return $handleError($request, 403, 'Forbidden');
         });
@@ -193,23 +151,13 @@ return Application::configure(basePath: dirname(__DIR__))
             return $handleError($request, 429, 'Too many requests');
         });
 
-        // NoCurrentTenant - Multitenancy (must be before Throwable catch-all)
+        // No tenant seeded yet
         $exceptions->render(function (NoCurrentTenant $e, Request $request) use ($shouldJson) {
             if ($shouldJson($request)) {
-                return response()->json(['message' => 'Workspace not found or no tenant specified.'], 404);
+                return response()->json(['message' => 'No workspace configured. Run database seeders.'], 503);
             }
 
-            // If on the super admin domain, redirect to super admin dashboard
-            $appUrl = env('APP_URL', 'http://localhost');
-            $baseDomain = env('APP_URL_BASE', parse_url($appUrl, PHP_URL_HOST) ?? 'localhost');
-            if ($request->getHost() === 'super.'.$baseDomain) {
-                return redirect()->route('superadmin.dashboard');
-            }
-
-            // Redirect to frontend login
-            $frontendUrl = config('app.frontend_url');
-
-            return redirect()->away($frontendUrl.'/login');
+            return redirect()->route('admin.login');
         });
 
         // Model Not Found
@@ -236,8 +184,6 @@ return Application::configure(basePath: dirname(__DIR__))
         });
 
         // ValidationException — check raw Accept header directly (not expectsJson)
-        // Turbo 8 sends: Accept: text/html, application/xhtml+xml (no X-Requested-With)
-        // expectsJson() depends on Symfony's content negotiation which can misclassify.
         $exceptions->render(function (ValidationException $e, Request $request) {
             $accept = $request->header('Accept', '');
             Log::info('ValidationException caught', ['accept' => $accept]);
@@ -255,15 +201,12 @@ return Application::configure(basePath: dirname(__DIR__))
 
         // 500 - Server Error (catch-all)
         $exceptions->render(function (Throwable $e, Request $request) use ($handleError) {
-            // Don't handle TokenMismatch here (handled above)
             if ($e instanceof TokenMismatchException) {
                 return $handleError($request, 419, 'Page expired due to inactivity');
             }
-            // Don't handle ValidationException here (handled above)
             if ($e instanceof ValidationException) {
                 return null;
             }
-            // Let AuthenticationException pass through to default handler (redirects to login)
             if ($e instanceof AuthenticationException) {
                 return null;
             }

@@ -5,8 +5,8 @@ use App\Http\Controllers\Admin\Hr\EmployeeController;
 use App\Http\Controllers\Admin\Hr\PayrollController;
 use App\Http\Controllers\Admin\Hr\PayslipController;
 
-// HR Routes - requires hr plan feature
-Route::middleware('plan.feature:hr')->prefix('hr')->name('admin.hr.')->group(function () {
+// HR Routes
+Route::prefix('hr')->name('admin.hr.')->group(function () {
     Route::resource('employee', EmployeeController::class)->only(['index', 'store', 'update', 'destroy']);
     Route::post('employee/export', [EmployeeController::class, 'export'])->name('employee.export');
     Route::get('attendance', [AttendanceController::class, 'index'])->name('attendance.index');

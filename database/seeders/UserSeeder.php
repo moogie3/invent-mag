@@ -11,53 +11,27 @@ use Spatie\Permission\Models\Role;
 class UserSeeder extends Seeder
 {
     /**
-     * Run the database seeds.
+     * Seed the single superuser for personal use.
      */
     public function run(): void
     {
         $tenant = app('currentTenant');
         $tenantId = $tenant->id;
-        $tenantName = $tenant->name;
-        $tenantNameSlug = strtolower(str_replace(' ', '-', $tenantName));
 
-        $email = 'admin-'.$tenantNameSlug.'@gmail.com';
+        $email = env('SEED_ADMIN_EMAIL', 'admin@localhost');
 
-        if (str_starts_with($tenantName, 'Demo ')) {
-            if (str_contains($tenantName, 'Starter')) {
-                $email = 'starter@demo.com';
-            } elseif (str_contains($tenantName, 'Professional')) {
-                $email = 'pro@demo.com';
-            } elseif (str_contains($tenantName, 'Enterprise')) {
-                $email = 'enterprise@demo.com';
-            } else {
-                $email = 'admin@demo.com';
-            }
-        }
-
-        $this->command->info("Creating admin user for tenant: {$tenantName}");
-
-        // updateOrCreate() and the accounting_settings save below both fire an
-        // updated event even when nothing is dirty, so a second run added two
-        // activity log rows and no data. The role and settings it applies are
-        // established on the first run.
         if (User::where('tenant_id', $tenantId)->exists()) {
-            $this->command->info("Admin user already exists for tenant {$tenantName}, skipping.");
+            $this->command->info('Admin user already exists, skipping.');
 
             return;
-        }
-
-        // Generate shopname from tenant name
-        $shopname = $tenantNameSlug;
-        if (str_starts_with($tenantName, 'Demo ')) {
-            $shopname = strtolower(str_replace(' ', '-', preg_replace('/\s+Workspace\s*$/', '', $tenantName)));
         }
 
         $user = User::updateOrCreate(
             ['email' => $email, 'tenant_id' => $tenantId],
             [
-                'name' => 'admin-'.$tenantNameSlug,
-                'shopname' => $shopname,
-                'password' => Hash::make('password'),
+                'name' => env('SEED_ADMIN_NAME', 'Admin'),
+                'shopname' => env('SEED_ADMIN_SHOPNAME', $tenant->name),
+                'password' => Hash::make(env('SEED_ADMIN_PASSWORD', 'password')),
                 'avatar' => '',
                 'created_at' => now(),
                 'updated_at' => now(),
@@ -67,10 +41,9 @@ class UserSeeder extends Seeder
         $role = Role::where('name', 'superuser')->first();
         if ($role) {
             $user->assignRole($role);
-            $this->command->info('  - Assigned superuser role');
+            $this->command->info('Assigned superuser role');
         }
 
-        // Set default accounting settings
         $cashAccount = Account::where('code', '1110-'.$tenantId)->first();
         $accountsPayableAccount = Account::where('code', '2110-'.$tenantId)->first();
         $inventoryAccount = Account::where('code', '1140-'.$tenantId)->first();
@@ -88,10 +61,9 @@ class UserSeeder extends Seeder
                 'cost_of_goods_sold_account_id' => $costOfGoodsSoldAccount->id,
             ];
             $user->save();
-            $this->command->info('  - Configured default accounting settings');
+            $this->command->info('Configured default accounting settings');
         }
 
-        $this->command->info("Admin user created: {$email} (password: 'password')");
-        $this->command->info("User seeding completed for tenant: {$tenantName}");
+        $this->command->info("Admin user created: {$email} (password: '".env('SEED_ADMIN_PASSWORD', 'password')."')");
     }
 }

@@ -2,8 +2,8 @@
 
 use App\Http\Controllers\Admin\SalesPipelineController;
 
-// Sales Pipeline Routes - Protected by plan feature + sales pipeline permissions
-Route::middleware(['plan.feature:crm', 'can:view-sales-pipeline'])->group(function () {
+// Sales Pipeline Routes
+Route::middleware(['can:view-sales-pipeline'])->group(function () {
     Route::get('/sales-pipeline', [SalesPipelineController::class, 'index'])->name('admin.sales_pipeline.index');
 
     Route::prefix('sales-pipeline')->group(function () {
@@ -14,7 +14,6 @@ Route::middleware(['plan.feature:crm', 'can:view-sales-pipeline'])->group(functi
         Route::get('/opportunities/{opportunity}/convert', [SalesPipelineController::class, 'showConvertForm'])->name('admin.sales_pipeline.opportunities.convert.show');
         Route::get('/opportunities/{opportunity}/print', [SalesPipelineController::class, 'print'])->name('admin.sales_pipeline.opportunities.print');
         Route::get('/opportunities/{opportunity}/generate-quotation', [SalesPipelineController::class, 'generateQuotation'])->name('admin.sales_pipeline.opportunities.generate-quotation');
-        Route::post('/export', [SalesPipelineController::class, 'exportAll'])->name('admin.sales-pipeline.export');
 
         // Pipeline management routes
         Route::middleware('can:manage-sales-pipelines')->group(function () {

@@ -8,25 +8,15 @@ use Illuminate\Support\ServiceProvider;
 
 class AuthServiceProvider extends ServiceProvider
 {
-    /**
-     * Register services.
-     */
     public function register(): void
     {
         //
     }
 
-    /**
-     * Bootstrap services.
-     */
     public function boot(): void
     {
         Gate::define('is-superuser', function (User $user) {
             return $user->roles()->where('name', 'superuser')->exists();
-        });
-
-        Gate::define('is-admin', function (User $user) {
-            return $user->roles()->where('name', 'admin')->exists();
         });
     }
 }

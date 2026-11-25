@@ -41,14 +41,7 @@ class RegisteredUserController extends Controller
      *   "access_token": "1|abcdefghijklmnopqrstuvwxyz",
      *   "token_type": "Bearer",
      *   "tenant_domain": "mycompany.invent-mag.web.id",
-     *   "workspace_slug": "mycompany",
-     *   "plan": {
-     *     "name": "Starter",
-     *     "slug": "starter",
-     *     "status": "trial",
-     *     "on_trial": true,
-     *     "trial_ends_at": "2026-09-11T09:00:00.000000Z"
-     *   }
+     *   "workspace_slug": "mycompany"
      * }
      * @response status=422 scenario="validation error" {
      *   "message": "The shopname has already been taken. (and 2 more errors)",
@@ -67,36 +60,23 @@ class RegisteredUserController extends Controller
         // Manual validation since we are not using a FormRequest here
         $request->validate([
             'name' => ['required', 'string', 'max:255'],
-            'shopname' => ['required', 'string', 'max:255', 'unique:tenants,name'],
+            'shopname' => ['nullable', 'string', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
             'password' => ['required', 'string', Password::default(), 'confirmed'],
-            'plan' => ['nullable', 'string', 'in:starter,professional,enterprise'],
         ]);
 
-        // Use the existing action to create the user and tenant
         $user = $creator->create($request->all());
 
-        // Create a token for the new user
         $token = $user->createToken('auth_token')->plainTextToken;
 
-        // Load fresh tenant with plan relationship
-        $tenant = $user->tenant->load('plan');
-        $workspaceSlug = explode('.', $tenant->domain)[0];
+        $tenant = $user->tenant;
 
         return response()->json([
             'message' => 'Registration successful',
             'user' => $user,
             'access_token' => $token,
             'token_type' => 'Bearer',
-            'tenant_domain' => $tenant->domain,
-            'workspace_slug' => $workspaceSlug,
-            'plan' => [
-                'name' => $tenant->plan?->name,
-                'slug' => $tenant->plan?->slug,
-                'status' => $tenant->plan_status,
-                'on_trial' => $tenant->onTrial(),
-                'trial_ends_at' => $tenant->trial_ends_at?->toISOString(),
-            ],
+            'tenant_domain' => $tenant?->domain,
         ], 201);
     }
 }

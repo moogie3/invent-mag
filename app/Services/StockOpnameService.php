@@ -294,7 +294,6 @@ class StockOpnameService
 
         $willPost = ($totalShrinkageValue > 0 || $totalExcessValue > 0)
             && $tenant
-            && $tenant->hasFeature('accounting')
             && $inventory
             && $expense;
 

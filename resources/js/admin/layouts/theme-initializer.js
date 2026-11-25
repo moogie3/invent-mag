@@ -1,8 +1,8 @@
 (function() {
     /*
      * Every interactive layout already decides the theme server-side:
-     *   base.blade.php / superadmin base  -> data-bs-theme="{{ $themeMode }}"
-     *   authbase / superadmin login      -> applied from localStorage before paint
+     *   base.blade.php  -> data-bs-theme="{{ $themeMode }}"
+     *   authbase / login -> applied from localStorage before paint
      *
      * That value is authoritative: theme-toggle.js writes every change back to
      * /admin/settings/update-theme-mode, so the server always holds the user's

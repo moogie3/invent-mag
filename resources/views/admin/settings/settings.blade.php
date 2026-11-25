@@ -396,18 +396,14 @@
                                              Settings" used to report success while silently
                                              dropping the jurisdiction. Mirror the select's
                                              value into a hidden field so both save paths
-                                             persist the same value. Rendered only when the
-                                             section itself renders (same plan gate). --}}
-                                        @if(($tenant->plan->slug ?? '') !== 'starter')
+                                             persist the same value. --}}
                                         <input type="hidden" name="tax_jurisdiction"
                                             id="taxJurisdictionFormField"
                                             value="{{ $tenant->tax_jurisdiction ?? '' }}">
-                                        @endif
 
                                     </form>
 
                                     <!-- Tax Region (outside main form — saved independently via AJAX) -->
-                                    @if(($tenant->plan->slug ?? '') !== 'starter')
                                     <div class="settings-section mb-5">
                                         <div class="settings-section-header">
                                             <div class="settings-icon-wrapper">
@@ -434,10 +430,8 @@
                                                     </select>
                                                     <div class="form-text">{{ __('messages.tax_jurisdiction_hint') }}</div>
                                                 </div>
-                                            </div>
                                         </div>
                                     </div>
-                                    @endif
                                 </div>
                                 <div class="card-footer bg-transparent mt-auto">
                                     <div class="btn-list justify-content-end">

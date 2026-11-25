@@ -69,7 +69,7 @@ document.addEventListener("turbo:load", function () {
     syncActiveState();
 });
 
-// Fallback for contexts without Turbo (e.g. superadmin)
+// Fallback for contexts without Turbo
 if (document.readyState === "complete" || document.readyState === "interactive") {
     restoreSidebarMemory();
     initSidebar();

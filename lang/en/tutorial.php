@@ -414,11 +414,6 @@ return [
     'api_tokens' => 'API Tokens: Generate personal API tokens for integration with external applications or programmatic data access.',
 
     // Settings - Plan
-    'subscription_plan' => 'Subscription Plan',
-    'subscription_plan_desc' => 'Monitor workspace plan limits, billing status, and available premium features.',
-    'current_plan' => 'Current Plan: View your current subscription tier, monthly price, and status (Active, Trial, or Demo). Click "Upgrade Plan" to change your subscription.',
-    'usage_statistics' => 'Usage Statistics: Monitor your current usage against plan limits for Users and Warehouses. Progress bars show how close you are to reaching limits (turns red when above 80%).',
-    'plan_features' => 'Plan Features: See which premium features are included in your plan. Green checkmarks indicate enabled features, while gray X indicates features not available on your current tier.',
 
     // Settings - Accounting
     'accounting_setup' => 'Accounting Setup',

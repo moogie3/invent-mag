@@ -17,7 +17,6 @@
         "laravel/framework": "^12.69",
         "laravel/sanctum": "^4.0",
         "laravel/tinker": "^2.9",
-        "midtrans/midtrans-php": "*",
         "nesbot/carbon": "^3.0",
         "openspout/openspout": "^4.28",
         "resend/resend-laravel": "^1.3",
@@ -44,7 +43,7 @@
             "Database\\Seeders\\": "database/seeders/"
         },
         "files": [
-        "app/Helpers/CurrencyHelper.php"
+            "app/Helpers/CurrencyHelper.php"
         ]
     },
     "autoload-dev": {

@@ -130,10 +130,6 @@
 {{-- BOOTSTRAP RE-INITIALIZATION FOR TURBO --}}
 @vite('resources/js/admin/bootstrap-init.js')
 
-{{-- SCRIPT FOR PLAN CHECKOUT --}}
-@vite('resources/js/admin/plan/checkout.js')
-@vite('resources/js/admin/plan/upgrade.js')
-
 {{-- SCRIPT FOR TUTORIAL MODAL --}}
 @vite('resources/js/admin/layouts/tutorial-modal.js')
 

@@ -14,14 +14,14 @@ Route::prefix('notifications')->group(function () {
     Route::get('/view/{id}', [NotificationController::class, 'view'])->name('admin.notifications.view');
 });
 
-// User Management Routes - with plan limit on user creation
+// User Management Routes
 // create is excluded: user creation happens via the modal on the index page
-Route::middleware(['role:superuser', 'plan.limit:users'])->group(function () {
+Route::middleware(['role:superuser'])->group(function () {
     Route::resource('users', UserController::class)->except(['create'])->names('admin.users');
 });
 
-// Audit Log - superuser only + Enterprise plan required
-Route::middleware(['role:superuser', 'plan.feature:audit_compliance'])->group(function () {
+// Audit Log - superuser only
+Route::middleware(['role:superuser'])->group(function () {
     Route::get('/audit-log', [AuditLogController::class, 'index'])->name('admin.audit-log.index');
     Route::get('/audit-log/{auditLog}', [AuditLogController::class, 'show'])->name('admin.audit-log.show');
 });

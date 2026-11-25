@@ -12,7 +12,7 @@ class FinancialHealthController extends Controller
      * indicators, what stands out, the next-month outlook chain with its
      * best/worst range, six-month trends and the attention list.
      *
-     * Route group already enforces plan.feature:accounting + view-accounting.
+     * Route group enforces view-accounting permission.
      */
     public function index(FinancialHealthService $financialHealth)
     {

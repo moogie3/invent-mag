@@ -10,7 +10,6 @@ use App\Models\Supplier;
 use App\Models\Unit;
 use App\Models\Warehouse;
 use App\Services\ActivityLogService;
-use App\Services\PlanService;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
@@ -36,7 +35,6 @@ class ShopeeImportService
 {
     public function __construct(
         private readonly ShopeeXlsxParser $parser,
-        private readonly PlanService $planService,
         private readonly ActivityLogService $activityLogService,
         private readonly ShopeeCategoryResolver $categoryResolver,
     ) {}
@@ -93,7 +91,6 @@ class ShopeeImportService
             'total_products' => $totalFamilies,
             'updated' => 0,
             'created' => 0,
-            'skipped_plan_limit' => 0,
             'split_families' => 0,
             'stock_skipped' => 0,
             'images_queued' => 0,
@@ -101,8 +98,6 @@ class ShopeeImportService
             'errors' => [],
         ];
 
-        $productLimit = $this->planService->getProductLimit();
-        $currentCount = Product::count();
         $covers = [];
         $processed = 0;
 
@@ -136,14 +131,7 @@ class ShopeeImportService
                     $product = Product::where('code', $code)->first();
 
                     if ($product === null) {
-                        if ($productLimit >= 0 && $currentCount >= $productLimit) {
-                            $summary['skipped_plan_limit']++;
-
-                            continue;
-                        }
-
                         $product = $this->createProduct($target, $family, $idx === 0 ? null : $anchor?->id);
-                        $currentCount++;
                         $summary['created']++;
                     } else {
                         $this->updateProduct($product, $target, $family, $summary);
@@ -181,10 +169,9 @@ class ShopeeImportService
                 ActivityLog::MODULE_PRODUCT,
                 ActivityLog::ACTION_IMPORT,
                 sprintf(
-                    'Shopee XLSX import: %d products updated, %d created, %d skipped (plan limit), %d errors.',
+                    'Shopee XLSX import: %d products updated, %d created, %d errors.',
                     $summary['updated'],
                     $summary['created'],
-                    $summary['skipped_plan_limit'],
                     count($summary['errors'])
                 )
             );

@@ -5,7 +5,6 @@ namespace Tests\Feature;
 use App\Models\AttendancePeriod;
 use App\Models\AttendanceRecord;
 use App\Models\Employee;
-use App\Models\Plan;
 use App\Models\User;
 use Database\Seeders\PermissionSeeder;
 use Database\Seeders\RolePermissionSeeder;
@@ -23,23 +22,6 @@ class HrFeatureTest extends TestCase
         parent::setUp();
 
         $this->setupTenant();
-
-        // Assign enterprise plan to access HR features
-        $plan = Plan::create([
-            'slug' => 'enterprise',
-            'name' => 'Enterprise',
-            'price' => 0,
-            'features' => ['hr'],
-            'stripe_price_id' => '123',
-        ]);
-
-        $this->tenant->update([
-            'plan_id' => $plan->id,
-            'plan_status' => 'active',
-        ]);
-
-        $this->tenant->refresh();
-        $this->tenant->makeCurrent();
 
         $this->seed(PermissionSeeder::class);
         $this->seed(RoleSeeder::class);

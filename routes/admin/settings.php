@@ -5,7 +5,6 @@ use App\Http\Controllers\Admin\BackupController;
 use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\CurrencyController;
 use App\Http\Controllers\Admin\NotificationController;
-use App\Http\Controllers\Admin\PlanController;
 use App\Http\Controllers\Admin\ProfileController;
 use App\Http\Controllers\Admin\SettingsController;
 use App\Http\Controllers\Admin\TaxController;
@@ -15,8 +14,8 @@ Route::get('api/settings', [SettingsController::class, 'getSettings'])->name('ad
 
 // Settings Routes
 Route::prefix('settings')->group(function () {
-    // Currency Settings - Protected by plan feature
-    Route::prefix('currency')->middleware(['role:superuser', 'plan.feature:multi_currency'])->group(function () {
+    // Currency Settings
+    Route::prefix('currency')->middleware(['role:superuser'])->group(function () {
         Route::get('/', [CurrencyController::class, 'edit'])->name('admin.setting.currency.edit');
         Route::post('/update', [CurrencyController::class, 'update'])->name('admin.setting.currency.update');
     });
@@ -27,9 +26,7 @@ Route::prefix('settings')->group(function () {
         Route::put('/update', [ProfileController::class, 'update'])->name('admin.setting.profile.update');
         Route::put('/update-password', [ProfileController::class, 'updatePassword'])->name('admin.setting.profile.update-password');
         Route::delete('/delete-avatar', [ProfileController::class, 'deleteAvatar'])->name('admin.setting.profile.delete-avatar');
-        Route::middleware('plan.feature:api_access')->group(function () {
-            Route::post('/token', [ProfileController::class, 'generateApiToken'])->name('admin.setting.profile.token');
-        });
+        Route::post('/token', [ProfileController::class, 'generateApiToken'])->name('admin.setting.profile.token');
     });
 
     // Tax Settings - Full CRUD
@@ -45,9 +42,7 @@ Route::prefix('settings')->group(function () {
     // Category Settings
     Route::prefix('categories')->group(function () {
         Route::get('/', [CategoryController::class, 'index'])->name('admin.setting.category');
-        Route::get('/create', [CategoryController::class, 'create'])->name('admin.setting.category.create');
         Route::post('/store', [CategoryController::class, 'store'])->name('admin.setting.category.store');
-        Route::get('/edit/{id}', [CategoryController::class, 'edit'])->name('admin.setting.category.edit');
         Route::put('/update/{id}', [CategoryController::class, 'update'])->name('admin.setting.category.update');
         Route::delete('/destroy/{id}', [CategoryController::class, 'destroy'])->name('admin.setting.category.destroy');
     });
@@ -55,9 +50,7 @@ Route::prefix('settings')->group(function () {
     // Unit Settings
     Route::prefix('units')->group(function () {
         Route::get('/', [UnitController::class, 'index'])->name('admin.setting.unit');
-        Route::get('/create', [UnitController::class, 'create'])->name('admin.setting.unit.create');
         Route::post('/store', [UnitController::class, 'store'])->name('admin.setting.unit.store');
-        Route::get('/edit/{id}', [UnitController::class, 'edit'])->name('admin.setting.unit.edit');
         Route::put('/update/{id}', [UnitController::class, 'update'])->name('admin.setting.unit.update');
         Route::delete('/destroy/{id}', [UnitController::class, 'destroy'])->name('admin.setting.unit.destroy');
     });
@@ -69,22 +62,9 @@ Route::prefix('settings')->group(function () {
     Route::put('/update-theme-mode', [SettingsController::class, 'updateThemeMode'])->name('admin.setting.update-theme-mode');
     Route::put('/update-tax-jurisdiction', [SettingsController::class, 'updateTaxJurisdiction'])->name('admin.setting.update-tax-jurisdiction');
 
-    Route::middleware('plan.feature:accounting')->group(function () {
-        Route::get('/accounting', [AccountingController::class, 'accounting'])->name('admin.setting.accounting');
-        Route::post('/accounting', [AccountingController::class, 'updateAccounting'])->name('admin.setting.accounting.update');
-        Route::post('/reset-coa-default', [AccountingController::class, 'resetToDefault'])->name('admin.setting.reset-coa-default');
-    });
-
-    // Subscription Plan Settings
-    Route::prefix('plan')->group(function () {
-        Route::get('/', [PlanController::class, 'index'])->name('admin.setting.plan');
-        Route::get('/upgrade', [PlanController::class, 'upgrade'])->name('admin.setting.plan.upgrade');
-        Route::post('/change', [PlanController::class, 'change'])->name('admin.setting.plan.change');
-        Route::get('/checkout/{order}', [PlanController::class, 'checkout'])->name('admin.setting.plan.checkout');
-
-        // Payment confirmation via web route (AJAX with CSRF)
-        Route::post('/confirm-payment', [PlanController::class, 'confirmPayment'])->name('admin.setting.plan.confirm-payment');
-    });
+    Route::get('/accounting', [AccountingController::class, 'accounting'])->name('admin.setting.accounting');
+    Route::post('/accounting', [AccountingController::class, 'updateAccounting'])->name('admin.setting.accounting.update');
+    Route::post('/reset-coa-default', [AccountingController::class, 'resetToDefault'])->name('admin.setting.reset-coa-default');
 
     // Backup Settings
     Route::prefix('backup')->middleware('role:superuser')->group(function () {

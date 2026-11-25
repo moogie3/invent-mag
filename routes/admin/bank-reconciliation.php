@@ -2,8 +2,8 @@
 
 use App\Http\Controllers\Admin\BankReconciliationController;
 
-// Bank Reconciliation Routes - Protected by plan feature
-Route::prefix('bank-reconciliation')->middleware('plan.feature:bank_reconciliation')->group(function () {
+// Bank Reconciliation Routes
+Route::prefix('bank-reconciliation')->group(function () {
     Route::get('/', [BankReconciliationController::class, 'index'])
         ->name('admin.bank-reconciliation.index')
         ->middleware('can:view-accounting');

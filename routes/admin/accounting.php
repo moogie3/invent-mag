@@ -5,8 +5,8 @@ use App\Http\Controllers\Admin\FinancialHealthController;
 use App\Http\Controllers\Admin\JournalEntryController;
 use App\Http\Controllers\Admin\OpeningBalanceController;
 
-// Accounting Routes - Protected by plan feature
-Route::prefix('accounting')->middleware(['plan.feature:accounting', 'can:view-accounting'])->group(function () {
+// Accounting Routes
+Route::prefix('accounting')->middleware(['can:view-accounting'])->group(function () {
     Route::get('/', fn () => redirect()->route('admin.accounting.ledger'));
 
     // Financial Health — the accounting landing view (red/green money health,

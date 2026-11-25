@@ -373,7 +373,7 @@ function renderSummary(summary, form, resultBox) {
     const rows = [
         [label("labelUpdated"), summary.updated ?? 0],
         [label("labelCreated"), summary.created ?? 0],
-        [label("labelSkipped"), summary.skipped_plan_limit ?? 0],
+        [label("labelSkipped"), summary.skipped ?? 0],
         [label("labelImages"), summary.images_queued ?? 0],
         [label("labelSplitFamilies"), summary.split_families ?? 0],
         [label("labelErrors"), (summary.errors || []).length],

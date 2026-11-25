@@ -9,7 +9,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('tenants', function (Blueprint $table) {
-            $table->string('backup_password', 100)->nullable()->after('proration_credit');
+            $table->string('backup_password', 100)->nullable();
             $table->boolean('backup_encrypted')->default(false)->after('backup_password');
         });
     }

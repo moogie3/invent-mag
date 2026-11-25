@@ -33,10 +33,6 @@ Route::prefix('sales')->group(function () {
         ->name('admin.sales.destroy')
         ->middleware('can:delete-sales');
 
-    Route::get('/product/{id}', [SalesController::class, 'getInvoiceDetails'])
-        ->name('admin.sales.product.details')
-        ->middleware('can:view-sales');
-
     Route::get('/modal-view/{id}', [SalesController::class, 'modalViews'])
         ->name('admin.sales.modal-view')
         ->middleware('can:view-sales');
@@ -78,21 +74,19 @@ Route::prefix('sales')->group(function () {
         ->middleware('can:edit-sales');
 });
 
-// Sales Return Routes - Protected by plan feature
-Route::middleware('plan.feature:sales_returns')->group(function () {
-    Route::get('sales-returns/sale/{sale}', [SalesReturnController::class, 'getSalesItems'])->name('admin.sales-returns.items');
-    // Before the resource: this is a 2-segment path that {salesReturn} would
-    // otherwise swallow and fail to bind.
-    Route::get('sales-returns/derive-reversal', [SalesReturnController::class, 'deriveReversal'])->name('admin.sales-returns.derive-reversal');
-    Route::get('sales-returns/{salesReturn}/modal-view', [SalesReturnController::class, 'modalView'])->name('admin.sales-returns.modal-view');
-    // Refund is a POST before the resource so {salesReturn} cannot swallow it.
-    Route::post('sales-returns/{salesReturn}/refund', [SalesReturnController::class, 'refundCredit'])
-        ->name('admin.sales-returns.refund')
-        ->middleware('can:create-payments');
-    Route::resource('sales-returns', SalesReturnController::class)->names('admin.sales-returns');
-    Route::post('sales-returns/bulk-delete', [SalesReturnController::class, 'bulkDelete'])->name('admin.sales-returns.bulk-delete');
-    Route::post('sales-returns/bulk-complete', [SalesReturnController::class, 'bulkComplete'])->name('admin.sales-returns.bulk-complete');
-    Route::post('sales-returns/bulk-cancel', [SalesReturnController::class, 'bulkCancel'])->name('admin.sales-returns.bulk-cancel');
-    Route::post('sales-returns/bulk-export', [SalesReturnController::class, 'bulkExport'])->name('admin.sales-returns.bulk-export');
-    Route::get('sales-returns/print/{id}', [SalesReturnController::class, 'print'])->name('admin.sales-returns.print');
-});
+// Sales Return Routes
+Route::get('sales-returns/sale/{sale}', [SalesReturnController::class, 'getSalesItems'])->name('admin.sales-returns.items');
+// Before the resource: this is a 2-segment path that {salesReturn} would
+// otherwise swallow and fail to bind.
+Route::get('sales-returns/derive-reversal', [SalesReturnController::class, 'deriveReversal'])->name('admin.sales-returns.derive-reversal');
+Route::get('sales-returns/{salesReturn}/modal-view', [SalesReturnController::class, 'modalView'])->name('admin.sales-returns.modal-view');
+// Refund is a POST before the resource so {salesReturn} cannot swallow it.
+Route::post('sales-returns/{salesReturn}/refund', [SalesReturnController::class, 'refundCredit'])
+    ->name('admin.sales-returns.refund')
+    ->middleware('can:create-payments');
+Route::resource('sales-returns', SalesReturnController::class)->names('admin.sales-returns');
+Route::post('sales-returns/bulk-delete', [SalesReturnController::class, 'bulkDelete'])->name('admin.sales-returns.bulk-delete');
+Route::post('sales-returns/bulk-complete', [SalesReturnController::class, 'bulkComplete'])->name('admin.sales-returns.bulk-complete');
+Route::post('sales-returns/bulk-cancel', [SalesReturnController::class, 'bulkCancel'])->name('admin.sales-returns.bulk-cancel');
+Route::post('sales-returns/bulk-export', [SalesReturnController::class, 'bulkExport'])->name('admin.sales-returns.bulk-export');
+Route::get('sales-returns/print/{id}', [SalesReturnController::class, 'print'])->name('admin.sales-returns.print');

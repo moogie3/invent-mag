@@ -16,7 +16,7 @@ Route::prefix('product')->group(function () {
 
     Route::post('/store', [ProductController::class, 'store'])
         ->name('admin.product.store')
-        ->middleware('can:create-products', 'plan.limit:products');
+        ->middleware('can:create-products');
 
     Route::get('/edit/{id}', [ProductController::class, 'edit'])
         ->name('admin.product.edit')
@@ -40,7 +40,7 @@ Route::prefix('product')->group(function () {
 
     Route::post('/quick-create', [ProductController::class, 'quickCreate'])
         ->name('admin.product.quickCreate')
-        ->middleware('can:create-products', 'plan.limit:products');
+        ->middleware('can:create-products');
 
     Route::post('/bulk-delete', [ProductController::class, 'bulkDelete'])
         ->name('product.bulk-delete')
@@ -52,11 +52,11 @@ Route::prefix('product')->group(function () {
 
     Route::get('/shopee-import/progress', [ProductShopeeImportController::class, 'progress'])
         ->name('product.shopee-import.progress')
-        ->middleware('can:import-products', 'plan.feature:shopee_import');
+        ->middleware('can:import-products');
 
     Route::post('/shopee-import', [ProductShopeeImportController::class, 'store'])
         ->name('product.shopee-import')
-        ->middleware('can:import-products', 'plan.feature:shopee_import');
+        ->middleware('can:import-products');
 
     Route::post('/bulk-update-stock', [ProductController::class, 'bulkUpdateStock'])
         ->name('product.bulk-update-stock')

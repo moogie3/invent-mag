@@ -4,7 +4,6 @@ namespace Tests\Feature\Admin;
 
 use App\Jobs\DownloadShopeeCoverImages;
 use App\Models\Categories;
-use App\Models\Plan;
 use App\Models\Product;
 use App\Models\ProductWarehouse;
 use App\Models\Supplier;
@@ -12,7 +11,6 @@ use App\Models\Unit;
 use App\Models\User;
 use App\Models\Warehouse;
 use App\Services\Shopee\ShopeeImportService;
-use Database\Seeders\PlanSeeder;
 use Database\Seeders\RoleSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
@@ -49,7 +47,6 @@ class ProductShopeeImportTest extends TestCase
         parent::setUp();
         $this->setupTenant();
         $this->seed(RoleSeeder::class);
-        $this->seed(PlanSeeder::class);
         Storage::fake('public');
         Queue::fake();
 
@@ -57,21 +54,6 @@ class ProductShopeeImportTest extends TestCase
         Categories::factory()->create();
         Unit::factory()->create();
         Supplier::factory()->create();
-
-        $this->assignPlan('enterprise');
-    }
-
-    private function assignPlan(string $slug): void
-    {
-        $plan = Plan::findBySlug($slug);
-        $this->tenant->update([
-            'plan_id' => $plan->id,
-            'plan_status' => 'active',
-            'plan_expires_at' => null,
-            'trial_ends_at' => null,
-        ]);
-        $this->tenant->refresh();
-        $this->tenant->makeCurrent();
     }
 
     /**
@@ -226,7 +208,6 @@ class ProductShopeeImportTest extends TestCase
         $summary = $this->runImport(['basic' => $basic, 'sales' => $sales]);
 
         $this->assertSame(1, $summary['created']);
-        $this->assertSame(0, $summary['skipped_plan_limit']);
 
         $product = Product::where('code', 'NEW-001')->first();
         $this->assertNotNull($product);
@@ -236,25 +217,6 @@ class ProductShopeeImportTest extends TestCase
         $warehouse = Warehouse::where('is_main', true)->first();
         $this->assertSame(10.0, (float) ProductWarehouse::where('product_id', $product->id)
             ->where('warehouse_id', $warehouse->id)->value('quantity'));
-    }
-
-    #[Test]
-    public function it_caps_creations_at_the_plan_product_limit()
-    {
-        $starter = Plan::findBySlug('starter');
-        $starter->update(['max_products' => 0]);
-        $this->assignPlan('starter');
-
-        $basic = $this->makeXlsx('basic_info', self::BASIC_HEADERS, [
-            ['111', 'NEW-001', 'Produk Baru', 'Deskripsi', ''],
-            ['112', 'NEW-002', 'Produk Baru 2', 'Deskripsi', ''],
-        ]);
-
-        $summary = $this->runImport(['basic' => $basic]);
-
-        $this->assertSame(0, $summary['created']);
-        $this->assertSame(2, $summary['skipped_plan_limit']);
-        $this->assertNull(Product::where('code', 'NEW-001')->first());
     }
 
     #[Test]

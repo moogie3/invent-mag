@@ -33,10 +33,6 @@ Route::prefix('po')->group(function () {
         ->name('admin.po.destroy')
         ->middleware('can:delete-purchase-orders');
 
-    Route::get('/product/{id}', [PurchaseController::class, 'getProductDetails'])
-        ->name('admin.po.product.details')
-        ->middleware('can:view-purchase-orders');
-
     Route::get('/modal-view/{id}', [PurchaseController::class, 'modalView'])
         ->name('admin.po.modal-view')
         ->middleware('can:view-purchase-orders');
@@ -70,17 +66,15 @@ Route::prefix('po')->group(function () {
         ->middleware('can:edit-purchase-orders');
 });
 
-// Purchase Return Routes - Protected by plan feature
-Route::middleware('plan.feature:purchase_returns')->group(function () {
-    // Before the resource: this is a 2-segment path that {por} would
-    // otherwise swallow and fail to bind.
-    Route::get('por/derive-reversal', [PurchaseReturnController::class, 'deriveReversal'])->name('admin.por.derive-reversal');
-    Route::resource('por', PurchaseReturnController::class)->names('admin.por');
-    Route::get('por/{por}/modal-view', [PurchaseReturnController::class, 'modalView'])->name('admin.por.modal-view');
-    Route::get('por/purchase/{purchase}', [PurchaseReturnController::class, 'getPurchaseItems'])->name('admin.por.items');
-    Route::post('por/bulk-delete', [PurchaseReturnController::class, 'bulkDelete'])->name('admin.por.bulk-delete');
-    Route::post('por/bulk-complete', [PurchaseReturnController::class, 'bulkComplete'])->name('admin.por.bulk-complete');
-    Route::post('por/bulk-cancel', [PurchaseReturnController::class, 'bulkCancel'])->name('admin.por.bulk-cancel');
-    Route::post('por/bulk-export', [PurchaseReturnController::class, 'bulkExport'])->name('admin.por.bulk-export');
-    Route::get('por/print/{id}', [PurchaseReturnController::class, 'print'])->name('admin.por.print');
-});
+// Purchase Return Routes
+// Before the resource: this is a 2-segment path that {por} would
+// otherwise swallow and fail to bind.
+Route::get('por/derive-reversal', [PurchaseReturnController::class, 'deriveReversal'])->name('admin.por.derive-reversal');
+Route::resource('por', PurchaseReturnController::class)->names('admin.por');
+Route::get('por/{por}/modal-view', [PurchaseReturnController::class, 'modalView'])->name('admin.por.modal-view');
+Route::get('por/purchase/{purchase}', [PurchaseReturnController::class, 'getPurchaseItems'])->name('admin.por.items');
+Route::post('por/bulk-delete', [PurchaseReturnController::class, 'bulkDelete'])->name('admin.por.bulk-delete');
+Route::post('por/bulk-complete', [PurchaseReturnController::class, 'bulkComplete'])->name('admin.por.bulk-complete');
+Route::post('por/bulk-cancel', [PurchaseReturnController::class, 'bulkCancel'])->name('admin.por.bulk-cancel');
+Route::post('por/bulk-export', [PurchaseReturnController::class, 'bulkExport'])->name('admin.por.bulk-export');
+Route::get('por/print/{id}', [PurchaseReturnController::class, 'print'])->name('admin.por.print');

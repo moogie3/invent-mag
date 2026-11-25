@@ -1,96 +1,6 @@
 <?php
 
 return [
-    'title' => 'Subscription Plan',
-    'manage_subscription' => 'Manage Subscription',
-    'current_plan' => 'Current Plan',
-    'renew_plan' => 'Renew Plan',
-    'choose_your_plan' => 'Choose Your Plan',
-    'change_your_plan' => 'Change Your Plan',
-    'change_plan' => 'Change Plan',
-    'usage_statistics' => 'Usage Statistics',
-    'plan_features' => 'Plan Features',
-    'plan' => 'plan.',
-    'unlimited_access' => 'Unlimited Access',
-    'legacy_desc' => 'Your account currently enjoys legacy enterprise-level access with no restrictions.',
-    'upgrade_plan' => 'Upgrade Plan',
-    'users' => 'Users',
-    'warehouses' => 'Warehouses',
-    'products' => 'Products',
-    'unlimited' => 'Unlimited',
-    'of' => 'of',
-    'used' => 'used',
-    'your_plan_includes' => 'Your current plan includes the following features:',
-    'trial_ends_in' => 'Your trial ends in :days days',
-    'current' => 'Current',
-    'billing_monthly' => 'per month',
-    'plan_comparison' => 'Plan Comparison',
-    'trial_banner_desc' => 'You are currently on a free trial. You have :days days remaining.',
-    'upgrade_now' => 'Upgrade Now',
-    'back_to_plan' => 'Back to Plan',
-    'switch_plan' => 'Switch Plan',
-    'confirm_upgrade_title' => 'Confirm Upgrade',
-    'upgrade_to' => 'Upgrade to',
-    'upgrade_amount' => 'Amount',
-    'confirm_upgrade' => 'Yes, Upgrade Now',
-    'free_trial' => ':days-day free trial',
-    'scheduled_downgrade' => 'Scheduled Downgrade',
-
-    // Checkout
-    'checkout' => 'Checkout',
-    'invoice' => 'Invoice',
-    'pending_payment' => 'Pending Payment',
-    'from' => 'From',
-    'invoice_date' => 'Invoice Date',
-    'payment_expires' => 'Payment expires in',
-    'description' => 'Description',
-    'qty' => 'Qty',
-    'price' => 'Price',
-    'total' => 'Total',
-    'subscription_plan' => 'Subscription Plan',
-    'monthly_billing' => 'Monthly Billing',
-    'subtotal' => 'Subtotal',
-    'tax' => 'Tax',
-    'grand_total' => 'Grand Total',
-    'new_plan' => 'New Plan',
-    'no_plan' => 'No Plan',
-    'select_payment_method' => 'Select Payment Method',
-    'pay_with_midtrans' => 'Pay with Midtrans',
-    'credit_debit_card' => 'Credit/Debit Card',
-    'bank_transfer' => 'Bank Transfer',
-    'coming_soon' => 'Coming Soon',
-    'cancel_and_back' => 'Cancel and back to plans',
-    'secure_payment' => 'Your payment is secure and encrypted',
-    'token_error' => 'Payment token not generated. Please try again or contact support.',
-    'back_to_plans' => 'Back to Plans',
-    'loading' => 'Loading',
-
-    // Success Modal
-    'ok' => 'OK',
-
-    // System Notification - Trial Status
-    'notif_trial_ending_title' => 'Trial Ending Soon',
-    'notif_trial_ending_desc' => 'Your free trial ends in :days days. Upgrade now to keep all features.',
-    'notif_trial_expired_title' => 'Trial Expired',
-    'notif_trial_expired_desc' => 'Your free trial has ended. Please upgrade to continue using all features.',
-
-    // Subscription Expiry (paid plan billing period ended)
-    'notif_subscription_expired_desc' => 'Your subscription has expired. Please renew to continue using all features.',
-
-    // System Notification - Plan Expiry
-    'notif_plan_expiring_title' => 'Plan Expiring Soon',
-    'notif_plan_expiring_desc' => 'Your :plan plan expires in :days days. Renew to avoid interruption.',
-    'notif_plan_expired_title' => 'Plan Expired',
-    'notif_plan_expired_desc' => 'Your :plan plan has expired. Please renew or upgrade to restore access.',
-
-    // System Notification - Usage Limits
-    'notif_user_limit_title' => 'User Limit Reached',
-    'notif_user_limit_desc' => 'You have used :current of :limit users. Upgrade to add more team members.',
-    'notif_warehouse_limit_title' => 'Warehouse Limit Reached',
-    'notif_warehouse_limit_desc' => 'You have used :current of :limit warehouses. Upgrade for unlimited warehouses.',
-    'notif_product_limit_title' => 'Product Limit Reached',
-    'notif_product_limit_desc' => 'You have used :current of :limit products. Upgrade for unlimited products.',
-
     // System Notification - Accounting Setup
     'notif_accounting_setup_title' => 'Accounting Setup Incomplete',
     'notif_accounting_setup_desc' => ':count default account(s) are not configured. Set them up to enable proper bookkeeping.',
@@ -103,13 +13,6 @@ return [
     'notif_field_shopname' => 'shop name',
     'notif_field_address' => 'address',
     'notif_field_avatar' => 'profile photo',
-
-    // System Notification - Scheduled Plan Change
-    'notif_scheduled_downgrade_title' => 'Scheduled Plan Downgrade',
-    'notif_scheduled_downgrade_desc' => 'Your plan will be downgraded from :from_plan to :to_plan on :date.',
-    'notif_upgrade_success_title' => 'Plan Upgraded',
-    'notif_upgrade_success_desc' => 'You have successfully upgraded to the :plan plan.',
-    'view_plan_details' => 'View Plan Details',
 
     // Notification Dropdown UI
     'notif_header' => 'Notifications',
@@ -146,8 +49,4 @@ return [
     'notif_backup_overdue_title' => 'Backup Overdue',
     'notif_backup_overdue_desc' => 'Your last backup was :days day(s) ago. We recommend backing up your data regularly.',
     'notif_go_to_backup' => 'Go to Backup',
-
-    // Trial Banner
-    'close_normal' => 'Close',
-    'close_session' => 'Don\'t show for this session',
 ];

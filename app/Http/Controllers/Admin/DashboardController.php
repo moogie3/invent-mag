@@ -37,11 +37,6 @@ class DashboardController extends Controller
 
             // Defer heavy sales forecasting to an AJAX call after page load
             if ($request->get('action') === 'forecast') {
-                $tenant = app('currentTenant');
-                if (! $tenant || ! $tenant->hasFeature('sales_forecasting')) {
-                    return response()->json(['labels' => [], 'historical' => [], 'forecast' => [], 'metrics' => null]);
-                }
-
                 $forecastData = $this->salesForecastService->generateForecast();
 
                 if (! empty($forecastData['labels'])) {
@@ -81,17 +76,12 @@ class DashboardController extends Controller
         $data = $this->dashboardService->getDashboardData($dates, $reportType, $categoryId);
 
         // Sales Forecast is deferred via AJAX, so pass a dummy initial structure to trigger the loader
-        $tenant = app('currentTenant');
-        if ($tenant && $tenant->hasFeature('sales_forecasting')) {
-            $data['salesForecast'] = [
-                'labels' => [],
-                'historical' => [],
-                'forecast' => [],
-                'deferred' => true,
-            ];
-        } else {
-            $data['salesForecast'] = null;
-        }
+        $data['salesForecast'] = [
+            'labels' => [],
+            'historical' => [],
+            'forecast' => [],
+            'deferred' => true,
+        ];
 
         return view('admin.dashboard', $data);
     }

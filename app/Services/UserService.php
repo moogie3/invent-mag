@@ -2,7 +2,6 @@
 
 namespace App\Services;
 
-use App\Exceptions\PlanLimitExceededException;
 use App\Models\User;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
@@ -30,22 +29,6 @@ class UserService
 
     public function createUser(array $data): User
     {
-        // Defense-in-depth: check plan user limit before creating
-        try {
-            $planService = app(PlanService::class);
-            if (! $planService->canAddUser()) {
-                $limit = $planService->getUserLimit();
-                throw new PlanLimitExceededException(
-                    "You have reached the maximum number of users ({$limit}) allowed on your current plan. Please upgrade to add more users."
-                );
-            }
-        } catch (PlanLimitExceededException $e) {
-            throw $e;
-        } catch (\Exception $e) {
-            // If PlanService is unavailable (e.g., plans table doesn't exist yet),
-            // allow user creation to proceed (backward compatibility)
-        }
-
         $user = new User([
             'name' => $data['name'],
             'email' => $data['email'],

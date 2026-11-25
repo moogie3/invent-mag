@@ -23,7 +23,6 @@ return [
                 ['icon' => 'ti-building', 'label' => 'Company Profile', 'route' => 'admin.setting.profile.edit'],
                 ['icon' => 'ti-calculator', 'label' => 'Accounting Setup', 'route' => 'admin.setting.accounting'],
                 ['icon' => 'ti-bell-cog', 'label' => 'Notification Settings', 'route' => 'admin.setting.notifications'],
-                ['icon' => 'ti-crown', 'label' => 'Subscription Plan', 'route' => 'admin.setting.plan'],
                 ['icon' => 'ti-file-invoice', 'label' => 'e-Faktur Settings', 'route' => 'admin.efaktur.settings'],
             ],
         ],
@@ -388,12 +387,6 @@ return [
             'icon' => 'ti-user-circle',
             'desc' => 'tutorial.my_profile_desc',
             'steps' => ['tutorial.account_info', 'tutorial.password_management', 'tutorial.api_tokens'],
-        ],
-        'admin.setting.plan*' => [
-            'title' => 'tutorial.subscription_plan',
-            'icon' => 'ti-crown',
-            'desc' => 'tutorial.subscription_plan_desc',
-            'steps' => ['tutorial.current_plan', 'tutorial.usage_statistics', 'tutorial.plan_features'],
         ],
         'admin.setting.accounting*' => [
             'title' => 'tutorial.accounting_setup',

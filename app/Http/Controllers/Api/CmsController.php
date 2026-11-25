@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Models\BillingSetting;
 use Illuminate\Http\JsonResponse;
 
 class CmsController extends Controller
@@ -12,27 +11,13 @@ class CmsController extends Controller
      * Get marketing-site CMS content.
      *
      * Returns the landing-page copy (hero, features, pricing, CTA, footer)
-     * served to the Astro marketing site at build time. Also includes the
-     * current USD→IDR billing rate, computed live from `BillingSetting::getRate()`
-     * (superadmin-managed at Superadmin → Settings → Billing Rate), falling back
-     * to `config/billing.php`. Responses are cached for 1 hour.
+     * served to the Astro marketing site at build time. Responses are cached
+     * for 1 hour.
      *
      * @group CMS Content
-     * Public landing-page content and billing rate served to the Astro marketing site at build time.
+     * Public landing-page content served to the Astro marketing site at build time.
      *
      * @unauthenticated
-     *
-     * @response scenario=success {
-     *   "hero_title": "The All-In-One ERP to Streamline Your Business",
-     *   "hero_subtitle": "From inventory and sales to a full accounting suite, Invent-MAG provides the tools you need to make smarter, data-driven decisions and accelerate your growth.",
-     *   "pricing_badge": "Simple, transparent pricing",
-     *   "pricing_title": "One platform, every tool your business needs",
-     *   "pricing_most_popular_badge": "most popular",
-     *   "billing_rate": 16000,
-     *   "cta_title": "Ready to streamline your business?",
-     *   "contact_email": "jefrydwijaya3@gmail.com",
-     *   "footer_text": "© 2026 Invent-MAG. All rights reserved."
-     * }
      */
     public function show(): JsonResponse
     {
@@ -40,14 +25,11 @@ class CmsController extends Controller
 
         $path = storage_path('app/cms.json');
         if (! file_exists($path)) {
-            $defaults['billing_rate'] = BillingSetting::getRate();
-
             return response()->json($defaults);
         }
 
         $stored = json_decode(file_get_contents($path), true) ?? [];
         $content = array_merge($defaults, $stored);
-        $content['billing_rate'] = BillingSetting::getRate();
 
         return response()->json($content)->header('Cache-Control', 'public, max-age=3600');
     }
@@ -57,10 +39,10 @@ class CmsController extends Controller
         return [
             'hero_title' => 'The All-In-One ERP to Streamline Your Business',
             'hero_subtitle' => 'From inventory and sales to a full accounting suite, Invent-MAG provides the tools you need to make smarter, data-driven decisions and accelerate your growth.',
-            'hero_cta_text' => 'Start 30-Day Free Trial',
-            'hero_cta_url' => '/signup',
-            'hero_cta_demo_text' => 'Try Live Demo',
-            'hero_cta_demo_url' => 'https://demo-pro.invent-mag.web.id/admin/login',
+            'hero_cta_text' => 'Start Free',
+            'hero_cta_url' => '/admin/login',
+            'hero_cta_demo_text' => 'Open App',
+            'hero_cta_demo_url' => '/admin/login',
             'features_title' => 'Everything You Need',
             'features_subtitle' => 'A Better Way to Manage Your Business',
             'features_description' => 'Invent-MAG isn\'t just another tool, it\'s a complete ecosystem designed to give you a bird\'s-eye view of your entire operation, from inventory to accounting.',
@@ -80,26 +62,26 @@ class CmsController extends Controller
             'feature_card_7_title' => 'Returns Management',
             'feature_card_7_desc' => 'Complete sales and purchase return workflows with automatic stock adjustments and accounting entries.',
             'feature_card_8_title' => 'User & Role Management',
-            'feature_card_8_desc' => 'Secure access control with 101 granular permissions. Assign roles like Superuser, Staff, or POS operator.',
+            'feature_card_8_desc' => 'Secure access control with granular permissions. Assign roles like Superuser, Staff, or POS operator.',
             'feature_card_9_title' => 'Sales Forecasting AI',
             'feature_card_9_desc' => 'AI-powered sales predictions using Holt-Winters algorithms and linear regression for accurate demand forecasting.',
             'feature_card_10_title' => 'RESTful API Access',
             'feature_card_10_desc' => 'Full API access with Sanctum authentication. Integrate with external systems and build custom integrations.',
             'feature_card_11_title' => 'Audit Trail & Compliance',
             'feature_card_11_desc' => 'Comprehensive audit logging for all system changes. Track user actions, modifications, and maintain compliance records.',
-            'pricing_badge' => 'Simple, transparent pricing',
-            'pricing_title' => 'One platform, every tool your business needs',
-            'pricing_subtitle' => 'From inventory tracking to full double-entry accounting &mdash; pick the plan that matches where your business is today.',
-            'pricing_no_credit_badge' => 'No credit card required',
-            'pricing_trial_badge' => '30-day free trial',
-            'pricing_cancel_badge' => 'Cancel anytime',
-            'pricing_most_popular_badge' => 'most popular',
-            'pricing_trial_included' => '30 days free trial included',
-            'pricing_enterprise_support' => 'Enterprise support & SLA',
-            'billing_rate' => (float) config('billing.fallback_rate', 16000),
-            'cta_title' => 'Ready to streamline your business?',
-            'cta_description' => 'Join thousands of businesses using Invent-MAG to manage inventory, sales, and accounting in one place.',
-            'contact_email' => 'jefrydwijaya3@gmail.com',
+            'pricing_badge' => 'Personal use',
+            'pricing_title' => 'One platform, every tool you need',
+            'pricing_subtitle' => 'From inventory tracking to full double-entry accounting — all enterprise features included.',
+            'pricing_no_credit_badge' => 'No subscription',
+            'pricing_trial_badge' => 'Free forever',
+            'pricing_cancel_badge' => 'No renewals',
+            'pricing_most_popular_badge' => 'included',
+            'pricing_trial_included' => 'All features included',
+            'pricing_enterprise_support' => 'Enterprise features unlocked',
+            'billing_rate' => 0,
+            'cta_title' => 'Ready to manage your business?',
+            'cta_description' => 'Run inventory, sales, and accounting in one place.',
+            'contact_email' => config('app.contact_email'),
             'footer_text' => '© '.date('Y').' Invent-MAG. All rights reserved.',
         ];
     }

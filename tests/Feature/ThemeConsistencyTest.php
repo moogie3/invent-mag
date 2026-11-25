@@ -2,7 +2,6 @@
 
 namespace Tests\Feature;
 
-use App\Models\SuperAdmin;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Auth;
 use PHPUnit\Framework\Attributes\Test;
@@ -44,26 +43,6 @@ class ThemeConsistencyTest extends TestCase
             '<html lang="en" data-bs-theme="light">',
             $response->getContent(),
             'The auth layout must not pin light: the saved choice is applied before first paint.'
-        );
-    }
-
-    #[Test]
-    public function a_superadmin_page_renders_the_saved_theme(): void
-    {
-        $superAdmin = SuperAdmin::create([
-            'name' => 'Super Admin',
-            'email' => 'super@example.test',
-            'password' => 'password',
-            'system_settings' => ['theme_mode' => 'dark'],
-        ]);
-
-        $response = $this->actingAs($superAdmin, 'super_admin')->get(route('superadmin.dashboard'));
-
-        $response->assertOk();
-        $this->assertStringContainsString(
-            '<html lang="en" data-bs-theme="dark">',
-            $response->getContent(),
-            'A saved superadmin theme must survive a page load instead of resetting to light.'
         );
     }
 

@@ -37,12 +37,11 @@ class DashboardService
         $apAging = $this->getAccountsPayableAging();
 
         // Financial Health strip (GL-true red/green money view; replaces the
-        // old subledger Accounting Summary cards). Gated by plan feature AND
-        // the accounting permission, matching the page it links to.
+        // old subledger Accounting Summary cards). Gated by the accounting
+        // permission, matching the page it links to.
         $healthSummary = null;
         $healthUrl = null;
-        $healthTenant = app('currentTenant');
-        if ($healthTenant && $healthTenant->hasFeature('accounting') && auth()->user()?->can('view-accounting')) {
+        if (auth()->user()?->can('view-accounting')) {
             $healthSummary = app(FinancialHealthService::class)->getSummary();
             $healthUrl = route('admin.accounting.health');
         }

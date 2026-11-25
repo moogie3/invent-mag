@@ -13,7 +13,7 @@ return [
     'title' => config('app.name').' API Documentation',
 
     // A short description of your API. Will be included in the docs webpage, Postman collection and OpenAPI spec.
-    'description' => 'Invent-MAG exposes a deliberately small REST API covering authentication, tenant discovery, CMS content, marketing plan pricing, payment confirmations, and Midtrans webhooks. All other functionality is served by the session-authenticated web admin panel (`/admin/*`) and is intentionally not part of the API.',
+    'description' => 'Invent-MAG exposes a deliberately small REST API covering authentication, CMS content, and supporting endpoints. All other functionality is served by the session-authenticated web admin panel (`/admin/*`) and is intentionally not part of the API.',
 
     // Text to place in the "Introduction" section, right after the `description`. Markdown and HTML are supported.
     'intro_text' => <<<'INTRO'
@@ -179,9 +179,6 @@ return [
         'order' => [
             'Authentication',
             'CMS Content',
-            'Plans',
-            'Payments',
-            'Webhooks',
             'Contact',
         ],
     ],

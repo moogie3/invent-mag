@@ -3,7 +3,6 @@
 namespace App\Helpers;
 
 use App\Models\CurrencySetting;
-use App\Models\PlatformCurrencySetting;
 use Carbon\Carbon;
 
 class CurrencyHelper
@@ -113,12 +112,13 @@ class CurrencyHelper
     }
 
     /**
-     * Get platform currency settings with caching
+     * Get platform currency settings with caching.
+     * Personal standalone: falls back to defaults.
      */
     public static function getPlatformSettings()
     {
         if (self::$platformSettings === null) {
-            self::$platformSettings = PlatformCurrencySetting::first() ?? self::getDefaultPlatformSettings();
+            self::$platformSettings = self::getDefaultPlatformSettings();
         }
 
         return self::$platformSettings;

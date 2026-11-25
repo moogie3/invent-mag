@@ -424,11 +424,6 @@ return [
     'api_tokens' => 'Token API: Hasilkan token API personal.',
 
     // Settings - Plan
-    'subscription_plan' => 'Paket Langganan',
-    'subscription_plan_desc' => 'Pantau batas paket, status penagihan, dan fitur premium.',
-    'current_plan' => 'Paket Saat Ini: Lihat tier langganan Anda.',
-    'usage_statistics' => 'Statistik Penggunaan: Pantau penggunaan Anda terhadap batas paket.',
-    'plan_features' => 'Fitur Paket: Lihat fitur premium yang termasuk dalam paket Anda.',
 
     // Settings - Accounting
     'accounting_setup' => 'Pengaturan Akuntansi',

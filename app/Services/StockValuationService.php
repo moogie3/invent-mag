@@ -281,7 +281,7 @@ class StockValuationService
 
         $tenant = app('currentTenant');
 
-        if (! $tenant || ! $tenant->hasFeature('accounting')) {
+        if (! $tenant) {
             return;
         }
 
@@ -451,7 +451,7 @@ class StockValuationService
      *
      * Silent when accounting is not configured or the two already agree,
      * so a second run posts nothing and a fresh seed cannot drift again.
-     * No plan-feature gate: a Starter tenant's ledger is fed by the same
+     * Ledger is fed by the same
      * purchase and sale paths as any other, so its Inventory account has
      * to answer to the shelf too.
      *

@@ -180,6 +180,7 @@ return [
             'Authentication',
             'CMS Content',
             'Contact',
+            'Mobile',
         ],
     ],
 

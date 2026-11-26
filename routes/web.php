@@ -28,6 +28,9 @@ Route::middleware('web')->prefix('admin')->group(function () {
     });
 });
 
+// Mobile PWA shells (before the fallback route below)
+require __DIR__.'/mobile.php';
+
 // Root redirect to admin login
 Route::get('/', function (Request $request) {
     if (auth()->check()) {

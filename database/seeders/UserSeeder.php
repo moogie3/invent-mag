@@ -32,6 +32,10 @@ class UserSeeder extends Seeder
                 'name' => env('SEED_ADMIN_NAME', 'Admin'),
                 'shopname' => env('SEED_ADMIN_SHOPNAME', $tenant->name),
                 'password' => Hash::make(env('SEED_ADMIN_PASSWORD', 'password')),
+                // Standalone install: there is no mailer pointed at anything
+                // real, so an unverified seed account would bounce every login
+                // to /admin/email/verify with no way out.
+                'email_verified_at' => now(),
                 'avatar' => '',
                 'created_at' => now(),
                 'updated_at' => now(),
